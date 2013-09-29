@@ -33,7 +33,7 @@ The tool has a set of CLI parameters that are described in the following:
 
 ##Downloads##
 
-The latest development version can be downloaded here: [0.0.1-SNAPSHOT](http://repository-siom79.forge.cloudbees.com/snapshot/japicmp/japicmp/0.0.1-SNAPSHOT/japicmp-0.0.1-20130929.203701-1.jar)
+The latest development version can be downloaded here: [0.0.1-SNAPSHOT](http://repository-siom79.forge.cloudbees.com/snapshot/japicmp/japicmp/0.0.1-SNAPSHOT/japicmp-0.0.1-20130929.212744-3.jar)
 
 ##Development##
 
