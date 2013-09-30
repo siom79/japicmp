@@ -1,5 +1,6 @@
 package japicmp.util;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
@@ -8,7 +9,8 @@ public class StringArrayEnumeration implements Enumeration<String> {
     private int pos = 0;
 
     public StringArrayEnumeration(String[] array) {
-        this.array = array;
+        this.array = new String[array.length];
+        System.arraycopy(array, 0, this.array, 0, array.length);
     }
 
     @Override

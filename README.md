@@ -5,8 +5,9 @@ japicmp is a tool to compare two versions of a jar archive:
 
     java -jar japicmp-0.0.1-SNAPSHOT.jar -n new-version.jar -o old-version.jar
 
-It can also be used as a library to integration its functionality in some other kind of software:
+It can also be used as a library to integrate its functionality in some other kind of software:
 
+	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator();
     List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
 
 ##Motivation##

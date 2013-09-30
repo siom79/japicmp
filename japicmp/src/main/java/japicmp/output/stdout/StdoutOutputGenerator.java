@@ -17,7 +17,7 @@ public class StdoutOutputGenerator {
             OutputTransformer.removeUnchanged(jApiClasses);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Comparing %s with %s:\n", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath()));
+        sb.append(String.format("Comparing %s with %s:%n", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath()));
         for (JApiClass jApiClass : jApiClasses) {
             processClass(sb, jApiClass);
             processMethods(sb, jApiClass);

@@ -35,10 +35,9 @@ public class JApiCmp {
     }
 
     private static Options parseCliOptions(String[] args) {
-        Options options = new Options();
         try {
             CliParser cliParser = new CliParser();
-            options = cliParser.parse(args);
+            return cliParser.parse(args);
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
             System.exit(-1);
@@ -46,7 +45,7 @@ public class JApiCmp {
             System.err.println("Failed to parse command line options: " + e.getMessage());
             System.exit(-1);
         }
-        return options;
+        return new Options();
     }
 
     private static void verifyFilesExist(File oldArchive, File newArchive) {

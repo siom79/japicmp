@@ -17,6 +17,7 @@
 
     <modules>
         <module>japicmp</module>
+		<module>japicmp-testbase</module>
     </modules>
 
     <dependencies>
