@@ -3,6 +3,7 @@ package japicmp.test;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiMethod;
 import org.junit.Test;
 
 import java.io.File;
@@ -18,11 +19,17 @@ public class BasicTest {
     public void test() {
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator();
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-        assertThat(jApiClasses.size(), is(2));
-        assertThat(getJApiClass(jApiClasses, Removed.class.getName()), is(notNullValue()));
-        assertThat(getJApiClass(jApiClasses, Added.class.getName()), is(notNullValue()));
-        assertThat(getJApiClass(jApiClasses, Removed.class.getName()).getChangeStatus(), is(JApiChangeStatus.REMOVED));
-        assertThat(getJApiClass(jApiClasses, Added.class.getName()).getChangeStatus(), is(JApiChangeStatus.NEW));
+        assertThat(jApiClasses.size(), is(3));
+        JApiClass jApiClassRemoved = getJApiClass(jApiClasses, Removed.class.getName());
+        JApiClass jApiClassAdded = getJApiClass(jApiClasses, Added.class.getName());
+        JApiClass jApiClassUnchanged = getJApiClass(jApiClasses, Unchanged.class.getName());
+        assertThat(jApiClassRemoved, is(notNullValue()));
+        assertThat(jApiClassAdded, is(notNullValue()));
+        assertThat(jApiClassUnchanged, is(notNullValue()));
+        assertThat(jApiClassRemoved.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+        assertThat(jApiClassAdded.getChangeStatus(), is(JApiChangeStatus.NEW));
+        assertThat(jApiClassUnchanged.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+        assertThat(getJApiMethod(jApiClassUnchanged.getMethods(), "unchangedMethod"), is(notNullValue()));
     }
 
     private File getArchive(String filename) {
@@ -36,5 +43,14 @@ public class BasicTest {
             }
         }
         throw new IllegalArgumentException("No class found with name " + fqn + ".");
+    }
+
+    private JApiMethod getJApiMethod(List<JApiMethod> jApiMethods, String name) {
+        for(JApiMethod jApiMethod : jApiMethods) {
+            if(jApiMethod.getName().equals(name)) {
+                return jApiMethod;
+            }
+        }
+        throw new IllegalArgumentException("No method found with name " + name + ".");
     }
 }
