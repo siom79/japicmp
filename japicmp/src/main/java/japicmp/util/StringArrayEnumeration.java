@@ -13,12 +13,10 @@ public class StringArrayEnumeration implements Enumeration<String> {
         System.arraycopy(array, 0, this.array, 0, array.length);
     }
 
-    @Override
     public boolean hasMoreElements() {
         return pos < array.length;
     }
 
-    @Override
     public String nextElement() {
         if(hasMoreElements()) {
             return array[pos++];
