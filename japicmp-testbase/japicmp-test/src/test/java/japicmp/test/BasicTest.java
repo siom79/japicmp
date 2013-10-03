@@ -1,6 +1,7 @@
 package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiMethod;
@@ -17,7 +18,7 @@ public class BasicTest {
 
     @Test
     public void test() {
-        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator();
+        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         assertThat(jApiClasses.size(), is(3));
         JApiClass jApiClassRemoved = getJApiClass(jApiClasses, Removed.class.getName());

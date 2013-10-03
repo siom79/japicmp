@@ -12,7 +12,7 @@ It can also be used as a library to integrate its functionality in some other ki
 
 ##Motivation##
 
-Every time you make a new release of a library or a product you have to tell your clients or customers what
+Every time you make a new release of a library or a product, you have to tell your clients or customers what
 has changed in comparison to the last release. Without the appropriate tooling, this task is tedious and error-prone.
 This tool/library helps you to determine the differences between the java class files that are contained in the two
 jar archives.

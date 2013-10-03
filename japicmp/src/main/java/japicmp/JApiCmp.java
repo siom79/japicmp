@@ -2,6 +2,7 @@ package japicmp;
 
 import japicmp.cli.CliParser;
 import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputTransformer;
@@ -18,7 +19,7 @@ public class JApiCmp {
         File oldArchive = new File(options.getOldArchive());
         File newArchive = new File(options.getNewArchive());
         verifyFilesExist(oldArchive, newArchive);
-        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator();
+        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
         generateOutput(options, oldArchive, newArchive, jApiClasses);
     }

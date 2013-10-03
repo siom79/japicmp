@@ -15,6 +15,10 @@ import java.util.jar.JarFile;
 public class JarArchiveComparator {
     private static final Logger logger = Logger.getLogger(JarArchiveComparator.class);
 
+    public JarArchiveComparator(JarArchiveComparatorOptions options) {
+
+    }
+
     public List<JApiClass> compare(File oldArchive, File newArchive) {
         ClassPool classPool = new ClassPool();
         try {
