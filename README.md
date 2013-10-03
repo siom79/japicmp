@@ -65,6 +65,10 @@ In the following you see the beginning of the xml output file after having compu
 
 ##Downloads##
 
+The following release are available:
+
+* [Version 0.0.1](http://repository-siom79.forge.cloudbees.com/release/japicmp/japicmp/0.0.1/japicmp-0.0.1.jar)
+
 The latest snapshot version can be downloaded here: [japicmp-SNAPSHOT](http://repository-siom79.forge.cloudbees.com/snapshot/japicmp/japicmp/)
 
 ##Development##
