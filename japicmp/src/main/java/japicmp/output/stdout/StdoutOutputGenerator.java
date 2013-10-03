@@ -57,7 +57,7 @@ public class StdoutOutputGenerator {
         int paramCount = 0;
         for (JApiParameter jApiParameter : jApiMethod.getParameters()) {
             if (paramCount > 0) {
-                sb.append(",");
+                sb.append(", ");
             }
             sb.append(jApiParameter.getType());
             paramCount++;

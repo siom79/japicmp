@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.AccessModifier;
 import javassist.CtMethod;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -15,14 +16,18 @@ public class JApiMethod {
     private final Optional<CtMethod> oldMethod;
     private final Optional<CtMethod> newMethod;
     private final String returnType;
+    private Optional<AccessModifier> accessModifierOld;
+    private Optional<AccessModifier> accessModifierNew;
     private final List<JApiParameter> parameters = new LinkedList<JApiParameter>();
 
-    public JApiMethod(String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldClass, Optional<CtMethod> newClass, String returnType) {
+    public JApiMethod(String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldClass, Optional<CtMethod> newClass, String returnType, Optional<AccessModifier> oldModifierLevel, Optional<AccessModifier> newModifierLevel) {
         this.name = name;
         this.changeStatus = changeStatus;
         this.oldMethod = oldClass;
         this.newMethod = newClass;
         this.returnType = returnType;
+        this.accessModifierOld = oldModifierLevel;
+        this.accessModifierNew = newModifierLevel;
     }
 
     @XmlAttribute
@@ -57,5 +62,21 @@ public class JApiMethod {
 
     public void addParameter(JApiParameter jApiParameter) {
         parameters.add(jApiParameter);
+    }
+
+    @XmlAttribute(name = "accessModifierNew")
+    public String getAccessModifierNew() {
+        if(this.accessModifierNew.isPresent()) {
+            return this.accessModifierNew.get().toString();
+        }
+        return "n.a.";
+    }
+
+    @XmlAttribute(name = "accessModifierOld")
+    public String getAccessModifierOld() {
+        if(this.accessModifierOld.isPresent()) {
+            return this.accessModifierOld.get().toString();
+        }
+        return "n.a.";
     }
 }

@@ -1,8 +1,10 @@
 package japicmp.cmp;
 
 import japicmp.model.JApiClass;
+import japicmp.util.ModifierHelper;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.Modifier;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -14,15 +16,16 @@ import java.util.jar.JarFile;
 
 public class JarArchiveComparator {
     private static final Logger logger = Logger.getLogger(JarArchiveComparator.class);
+    private JarArchiveComparatorOptions options;
 
     public JarArchiveComparator(JarArchiveComparatorOptions options) {
-
+        this.options = options;
     }
 
     public List<JApiClass> compare(File oldArchive, File newArchive) {
         ClassPool classPool = new ClassPool();
         try {
-            ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool);
+            ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
             List<JApiClass> classList = classesComparator.getClasses();
             compareClasses(classList);
             return classList;
@@ -34,14 +37,14 @@ public class JarArchiveComparator {
 
     private void compareClasses(List<JApiClass> classList) {
         for (JApiClass jApiClass : classList) {
-            ClassComparator classComparator = new ClassComparator();
+            ClassComparator classComparator = new ClassComparator(options);
             classComparator.compare(jApiClass);
         }
     }
 
-    private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool) throws Exception {
-        List<CtClass> oldClasses = createListOfCtClasses(oldArchive, classPool);
-        List<CtClass> newClasses = createListOfCtClasses(newArchive, classPool);
+    private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) throws Exception {
+        List<CtClass> oldClasses = createListOfCtClasses(oldArchive, classPool, options);
+        List<CtClass> newClasses = createListOfCtClasses(newArchive, classPool, options);
         ClassesComparator classesComparator = new ClassesComparator();
         classesComparator.compare(oldClasses, newClasses);
         if (logger.isDebugEnabled()) {
@@ -52,7 +55,7 @@ public class JarArchiveComparator {
         return classesComparator;
     }
 
-    private List<CtClass> createListOfCtClasses(File archive, ClassPool classPool) throws Exception {
+    private List<CtClass> createListOfCtClasses(File archive, ClassPool classPool, JarArchiveComparatorOptions options) throws Exception {
         List<CtClass> classes = new LinkedList<CtClass>();
         JarFile oldJar = null;
         try {
@@ -69,7 +72,9 @@ public class JarArchiveComparator {
                         logger.error(String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()));
                         throw e;
                     }
-                    classes.add(ctClass);
+                    if(ModifierHelper.matchesModifierLevel(ctClass.getModifiers(), options.getModifierLevel())) {
+                        classes.add(ctClass);
+                    }
                     if (logger.isDebugEnabled()) {
                         logger.debug(String.format("Adding class '%s' with jar name '%s' to list.", ctClass.getName(), name));
                     }

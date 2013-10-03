@@ -1,12 +1,14 @@
 package japicmp.config;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.AccessModifier;
 
 public class Options {
     private String oldArchive;
     private String newArchive;
     private boolean outputOnlyModifications = false;
     private Optional<String> xmlOutputFile = Optional.<String>absent();
+    private AccessModifier acessModifier = AccessModifier.PUBLIC;
 
     public String getNewArchive() {
         return newArchive;
@@ -38,5 +40,13 @@ public class Options {
 
     public void setXmlOutputFile(Optional<String> xmlOutputFile) {
         this.xmlOutputFile = xmlOutputFile;
+    }
+
+    public void setAcessModifier(AccessModifier acessModifier) {
+        this.acessModifier = acessModifier;
+    }
+
+    public AccessModifier getAcessModifier() {
+        return acessModifier;
     }
 }

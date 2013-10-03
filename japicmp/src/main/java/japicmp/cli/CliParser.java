@@ -1,6 +1,7 @@
 package japicmp.cli;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.AccessModifier;
 import japicmp.config.Options;
 import japicmp.util.StringArrayEnumeration;
 
@@ -32,8 +33,18 @@ public class CliParser {
                 System.out.println("-o <pathToOldVersionJar>  Provides the path to the old version of the jar.");
                 System.out.println("-n <pathToNewVersionJar>  Provides the path to the new version of the jar.");
                 System.out.println("-x <pathToXmlOutputFile>  Provides the path to the xml output file. If not given, stdout is used.");
+                System.out.println("-a <accessModifier>       Sets the access modifier level (public, package, protected, private), which should be used.");
                 System.out.println("-m                        Outputs only modified classes/methods. If not given, all classes and methods are printed.");
                 System.exit(0);
+            }
+            if ("-a".equals(arg)) {
+                String accessModifierArg = getOptionWithArgument("-a", sae);
+                try {
+                    AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
+                    options.setAcessModifier(accessModifier);
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException(String.format("Invalid value for option -a: %s. Possible values are: %s.", accessModifierArg, listOfAccessModifiers()));
+                }
             }
         }
         checkForMandatoryOptions(options);
@@ -52,12 +63,25 @@ public class CliParser {
     private String getOptionWithArgument(String option, StringArrayEnumeration sae) {
         if (sae.hasMoreElements()) {
             String value = sae.nextElement();
-            if(value.startsWith("-")) {
+            if (value.startsWith("-")) {
                 throw new IllegalArgumentException(String.format("Missing argument for option %s.", option));
             }
             return value;
         } else {
             throw new IllegalArgumentException(String.format("Missing argument for option %s.", option));
         }
+    }
+
+    private String listOfAccessModifiers() {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        for (AccessModifier am : AccessModifier.values()) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(am.toString());
+            i++;
+        }
+        return sb.toString();
     }
 }
