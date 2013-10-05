@@ -4,6 +4,7 @@ import japicmp.cli.CliParser;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputTransformer;
 import japicmp.output.stdout.StdoutOutputGenerator;
@@ -15,18 +16,41 @@ import java.util.List;
 public class JApiCmp {
 
     public static void main(String[] args) {
+        try {
+            JApiCmp app = new JApiCmp();
+            app.run(args);
+        } catch (JApiCmpException e) {
+            if (e.getReason() != JApiCmpException.Reason.NormalTermination) {
+                System.err.println(e.getMessage());
+                System.exit(-1);
+            }
+        } catch (Exception e) {
+            System.err.println(String.format("Execution of %s failed: %s", JApiCmp.class.getSimpleName(), e.getMessage()));
+            System.exit(-2);
+        }
+    }
+
+    private void run(String[] args) {
         Options options = parseCliOptions(args);
         File oldArchive = new File(options.getOldArchive());
         File newArchive = new File(options.getNewArchive());
         verifyFilesExist(oldArchive, newArchive);
-        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
+        JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
+        copyOptions(options, comparatorOptions);
+        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
         generateOutput(options, oldArchive, newArchive, jApiClasses);
     }
 
-    private static void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
+    private void copyOptions(Options options, JarArchiveComparatorOptions comparatorOptions) {
+        comparatorOptions.setModifierLevel(options.getAccessModifier());
+        comparatorOptions.getPackagesInclude().addAll(options.getPackagesInclude());
+        comparatorOptions.getPackagesExclude().addAll(options.getPackagesExclude());
+    }
+
+    private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
         OutputTransformer.sortClassesAndMethods(jApiClasses);
-        if(options.getXmlOutputFile().isPresent()) {
+        if (options.getXmlOutputFile().isPresent()) {
             XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
             xmlGenerator.generate(oldArchive, newArchive, jApiClasses, options);
         }
@@ -35,28 +59,29 @@ public class JApiCmp {
         System.out.println(output);
     }
 
-    private static Options parseCliOptions(String[] args) {
+    private Options parseCliOptions(String[] args) {
         try {
             CliParser cliParser = new CliParser();
             return cliParser.parse(args);
         } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
-            System.exit(-1);
+            throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
         } catch (Exception e) {
-            System.err.println("Failed to parse command line options: " + e.getMessage());
-            System.exit(-1);
+            throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, "Failed to parse command line options: " + e.getMessage());
         }
-        return new Options();
     }
 
-    private static void verifyFilesExist(File oldArchive, File newArchive) {
+    private void verifyFilesExist(File oldArchive, File newArchive) {
         if (!oldArchive.exists()) {
-            System.err.println(String.format("File '%s' does not exist.", oldArchive.getAbsolutePath()));
-            System.exit(-1);
+            String msg = String.format("File '%s' does not exist.", oldArchive.getAbsolutePath());
+            throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
         }
         if (!newArchive.exists()) {
-            System.err.println(String.format("File '%s' does not exist.", newArchive.getAbsolutePath()));
-            System.exit(-1);
+            String msg = String.format("File '%s' does not exist.", newArchive.getAbsolutePath());
+            throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
+        }
+        if(oldArchive.equals(newArchive)) {
+            String msg = String.format("Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
+            throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
         }
     }
 }

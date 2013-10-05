@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>japicmp</groupId>
@@ -9,13 +10,13 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<github.account>siom79</github.account>
+        <github.account>siom79</github.account>
         <cloudbees.account>siom79</cloudbees.account>
     </properties>
 
     <modules>
         <module>japicmp</module>
-		<module>japicmp-testbase</module>
+        <module>japicmp-testbase</module>
     </modules>
 
     <dependencies>
@@ -29,7 +30,7 @@
 
     <build>
         <plugins>
-			<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
@@ -85,22 +86,45 @@
                 </executions>
             </plugin>
         </plugins>
-		<extensions>
+        <extensions>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-webdav-jackrabbit</artifactId>
                 <version>1.0-beta-7</version>
             </extension>
         </extensions>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.5.2</version>
+                    <configuration>
+                        <formats>
+                            <format>html</format>
+                        </formats>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>clean</goal>
+                                <goal>cobertura</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
-	
+
     <scm>
         <connection>scm:git:git://github.com/${github.account}/${project.groupId}.git</connection>
         <developerConnection>scm:git:git@github.com:${github.account}/${project.groupId}.git</developerConnection>
         <url>http://github.com/${github.account}/${project.groupId}/tree/master/</url>
         <tag>HEAD</tag>
     </scm>
-	
+
     <distributionManagement>
         <repository>
             <id>cloudbees-public-release</id>
@@ -111,7 +135,7 @@
             <url>dav:https://repository-${cloudbees.account}.forge.cloudbees.com/snapshot</url>
         </snapshotRepository>
     </distributionManagement>
-	
+
     <repositories>
         <repository>
             <id>cloudbees-public-snapshot</id>

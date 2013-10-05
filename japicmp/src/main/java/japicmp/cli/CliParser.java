@@ -2,7 +2,9 @@ package japicmp.cli;
 
 import com.google.common.base.Optional;
 import japicmp.cmp.AccessModifier;
+import japicmp.cmp.PackageFilter;
 import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
 import japicmp.util.StringArrayEnumeration;
 
 public class CliParser {
@@ -27,28 +29,58 @@ public class CliParser {
             if ("-m".equals(arg)) {
                 options.setOutputOnlyModifications(true);
             }
-            if ("-h".equals(arg)) {
-                System.out.println("Available parameters:");
-                System.out.println("-h                        Prints this help.");
-                System.out.println("-o <pathToOldVersionJar>  Provides the path to the old version of the jar.");
-                System.out.println("-n <pathToNewVersionJar>  Provides the path to the new version of the jar.");
-                System.out.println("-x <pathToXmlOutputFile>  Provides the path to the xml output file. If not given, stdout is used.");
-                System.out.println("-a <accessModifier>       Sets the access modifier level (public, package, protected, private), which should be used.");
-                System.out.println("-m                        Outputs only modified classes/methods. If not given, all classes and methods are printed.");
-                System.exit(0);
-            }
             if ("-a".equals(arg)) {
                 String accessModifierArg = getOptionWithArgument("-a", sae);
                 try {
                     AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
-                    options.setAcessModifier(accessModifier);
+                    options.setAccessModifier(accessModifier);
                 } catch (IllegalArgumentException e) {
                     throw new IllegalArgumentException(String.format("Invalid value for option -a: %s. Possible values are: %s.", accessModifierArg, listOfAccessModifiers()));
                 }
             }
+            if ("-i".equals(arg)) {
+                String packagesIncludeArg = getOptionWithArgument("-i", sae);
+                String[] parts = packagesIncludeArg.split(",");
+                for (String part : parts) {
+                    part = part.trim();
+                    try {
+                        options.getPackagesInclude().add(new PackageFilter(part));
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(String.format("Wrong syntax for include option '%s': %s", part, e.getMessage()));
+                    }
+                }
+            }
+            if ("-e".equals(arg)) {
+                String packagesExcludeArg = getOptionWithArgument("-e", sae);
+                String[] parts = packagesExcludeArg.split(",");
+                for (String part : parts) {
+                    part = part.trim();
+                    try {
+                        options.getPackagesInclude().add(new PackageFilter(part));
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(String.format("Wrong syntax for exclude option '%s': %s", part, e.getMessage()));
+                    }
+                }
+            }
+            if ("-h".equals(arg)) {
+                printHelp();
+            }
         }
         checkForMandatoryOptions(options);
         return options;
+    }
+
+    private void printHelp() {
+        System.out.println("Available parameters:");
+        System.out.println("-h                        Prints this help.");
+        System.out.println("-o <pathToOldVersionJar>  Provides the path to the old version of the jar.");
+        System.out.println("-n <pathToNewVersionJar>  Provides the path to the new version of the jar.");
+        System.out.println("-x <pathToXmlOutputFile>  Provides the path to the xml output file. If not given, stdout is used.");
+        System.out.println("-a <accessModifier>       Sets the access modifier level (public, package, protected, private), which should be used.");
+        System.out.println("-i <packagesToInclude>    Comma separated list of package names to include, * can be used as wildcard.");
+        System.out.println("-e <packagesToExclude>    Comma separated list of package names to exclude, * can be used as wildcard.");
+        System.out.println("-m                        Outputs only modified classes/methods. If not given, all classes and methods are printed.");
+        throw new JApiCmpException(JApiCmpException.Reason.NormalTermination);
     }
 
     private void checkForMandatoryOptions(Options options) {

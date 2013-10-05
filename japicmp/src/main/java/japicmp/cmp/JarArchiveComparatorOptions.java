@@ -4,15 +4,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JarArchiveComparatorOptions {
-    private List<String> packagesInclude = new LinkedList<String>();
-    private List<String> packagesExclude = new LinkedList<String>();
+    private List<PackageFilter> packagesInclude = new LinkedList<PackageFilter>();
+    private List<PackageFilter> packagesExclude = new LinkedList<PackageFilter>();
     private AccessModifier modifierLevel = AccessModifier.PUBLIC;
 
-    public List<String> getPackagesExclude() {
+    public List<PackageFilter> getPackagesExclude() {
         return packagesExclude;
     }
 
-    public List<String> getPackagesInclude() {
+    public List<PackageFilter> getPackagesInclude() {
         return packagesInclude;
     }
 

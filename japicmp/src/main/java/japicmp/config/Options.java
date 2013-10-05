@@ -2,13 +2,19 @@ package japicmp.config;
 
 import com.google.common.base.Optional;
 import japicmp.cmp.AccessModifier;
+import japicmp.cmp.PackageFilter;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class Options {
     private String oldArchive;
     private String newArchive;
     private boolean outputOnlyModifications = false;
     private Optional<String> xmlOutputFile = Optional.<String>absent();
-    private AccessModifier acessModifier = AccessModifier.PUBLIC;
+    private AccessModifier accessModifier = AccessModifier.PUBLIC;
+    private List<PackageFilter> packagesInclude = new LinkedList<PackageFilter>();
+    private List<PackageFilter> packagesExclude = new LinkedList<PackageFilter>();
 
     public String getNewArchive() {
         return newArchive;
@@ -42,11 +48,19 @@ public class Options {
         this.xmlOutputFile = xmlOutputFile;
     }
 
-    public void setAcessModifier(AccessModifier acessModifier) {
-        this.acessModifier = acessModifier;
+    public void setAccessModifier(AccessModifier accessModifier) {
+        this.accessModifier = accessModifier;
     }
 
-    public AccessModifier getAcessModifier() {
-        return acessModifier;
+    public AccessModifier getAccessModifier() {
+        return accessModifier;
+    }
+
+    public List<PackageFilter> getPackagesInclude() {
+        return packagesInclude;
+    }
+
+    public List<PackageFilter> getPackagesExclude() {
+        return packagesExclude;
     }
 }

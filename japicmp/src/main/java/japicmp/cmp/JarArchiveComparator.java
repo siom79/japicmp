@@ -4,7 +4,6 @@ import japicmp.model.JApiClass;
 import japicmp.util.ModifierHelper;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.Modifier;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -72,7 +71,7 @@ public class JarArchiveComparator {
                         logger.error(String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()));
                         throw e;
                     }
-                    if(ModifierHelper.matchesModifierLevel(ctClass.getModifiers(), options.getModifierLevel())) {
+                    if (ModifierHelper.matchesModifierLevel(ctClass.getModifiers(), options.getModifierLevel()) && packageMatches(options, ctClass)) {
                         classes.add(ctClass);
                     }
                     if (logger.isDebugEnabled()) {
@@ -88,5 +87,24 @@ public class JarArchiveComparator {
             }
         }
         return classes;
+    }
+
+    private boolean packageMatches(JarArchiveComparatorOptions options, CtClass ctClass) {
+        String packageName = ctClass.getPackageName();
+        for (PackageFilter packageFilter : options.getPackagesInclude()) {
+            if (packageFilter.matches(packageName)) {
+                return true;
+            }
+        }
+        for (PackageFilter packageFilter : options.getPackagesExclude()) {
+            if (packageFilter.matches(packageName)) {
+                return false;
+            }
+        }
+        int noInclude = options.getPackagesInclude().size();
+        if (noInclude > 0) {
+            return false;
+        }
+        return true;
     }
 }

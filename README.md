@@ -5,7 +5,7 @@ japicmp is a tool to compare two versions of a jar archive:
 
     java -jar japicmp-0.0.1.jar -n new-version.jar -o old-version.jar
 
-It can also be used as a library to integrate its functionality in some other kind of software:
+It can also be used as a library:
 
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator();
     List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
@@ -29,6 +29,7 @@ library to inspect the class files. This way you only have to provide the two ja
 * Differences can optionally be printed to an xml file. This can be transformed to an HTML file using XSLT.
 * Per default only public classes and class members are compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to package, protected or private.
+* Per default classes from all packages are compared. If necessary, certain packages can be excluded or only specific packages can be included.
 
 ##Usage##
 
@@ -39,6 +40,8 @@ The tool has a set of CLI parameters that are described in the following:
     -n <pathToNewVersionJar>  Provides the path to the new version of the jar.
     -x <pathToXmlOutputFile>  Provides the path to the xml output file. If not given, stdout is used.
     -a <accessModifier>       Sets the access modifier level (public, package, protected, private), which should be used.
+    -i <packagesToInclude>    Comma separated list of package names to include, * can be used as wildcard.
+    -e <packagesToExclude>    Comma separated list of package names to exclude, * can be used as wildcard.
     -m                        Outputs only modified classes/methods. If not given, all classes and methods are printed.
 	
 ###Example###
