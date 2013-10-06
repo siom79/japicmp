@@ -73,7 +73,7 @@ In the following you see the beginning of the xml output file after having compu
 
 ##Downloads##
 
-The following release are available:
+The following releases are available:
 
 * [Version 0.0.1](http://repository-siom79.forge.cloudbees.com/release/japicmp/japicmp/0.0.1/japicmp-0.0.1.jar)
 
@@ -81,5 +81,6 @@ The latest snapshot version can be downloaded here: [japicmp-SNAPSHOT](http://re
 
 ##Development##
 
-* [Jenkins build server](https://siom79.ci.cloudbees.com/job/japicmp) [![Build Status](https://siom79.ci.cloudbees.com/job/japicmp/badge/icon)](https://siom79.ci.cloudbees.com/job/japicmp)
+* [Jenkins build server](https://siom79.ci.cloudbees.com/job/japicmp)
 * [Maven snapshot repository](https://repository-siom79.forge.cloudbees.com/snapshot)
+* [Maven release repository](https://repository-siom79.forge.cloudbees.com/release)
