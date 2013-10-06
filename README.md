@@ -3,7 +3,7 @@ japicmp
 
 japicmp is a tool to compare two versions of a jar archive:
 
-    java -jar japicmp-0.0.1.jar -n new-version.jar -o old-version.jar
+    java -jar japicmp-0.0.2.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
