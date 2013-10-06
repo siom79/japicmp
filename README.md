@@ -92,6 +92,12 @@ The differences between the two Java APIs are also printed on the command line f
 
 The following releases are available:
 
+* [Version 0.0.2](http://repository-siom79.forge.cloudbees.com/release/japicmp/japicmp/0.0.2/japicmp-0.0.2.jar)
+    * Changes:
+        * [Command-line option to filter packages](https://github.com/siom79/japicmp/issues/1)
+        * [CLI option for comparing public, package, protected or private classes/class members](https://github.com/siom79/japicmp/issues/2)
+        * ["No differences" output when comparing the same file](https://github.com/siom79/japicmp/issues/4)
+        * [Giving a non-jar file as argument should not output "Comparing..."](https://github.com/siom79/japicmp/issues/5)
 * [Version 0.0.1](http://repository-siom79.forge.cloudbees.com/release/japicmp/japicmp/0.0.1/japicmp-0.0.1.jar)
 
 The latest snapshot version can be downloaded here: [japicmp-SNAPSHOT](http://repository-siom79.forge.cloudbees.com/snapshot/japicmp/japicmp/)
