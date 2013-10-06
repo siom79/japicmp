@@ -11,7 +11,9 @@ import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.jar.JarFile;
 
 public class JApiCmp {
 
@@ -34,7 +36,7 @@ public class JApiCmp {
         Options options = parseCliOptions(args);
         File oldArchive = new File(options.getOldArchive());
         File newArchive = new File(options.getNewArchive());
-        verifyFilesExist(oldArchive, newArchive);
+        verifyFiles(oldArchive, newArchive);
         JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
         copyOptions(options, comparatorOptions);
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
@@ -70,7 +72,7 @@ public class JApiCmp {
         }
     }
 
-    private void verifyFilesExist(File oldArchive, File newArchive) {
+    private void verifyFiles(File oldArchive, File newArchive) {
         if (!oldArchive.exists()) {
             String msg = String.format("File '%s' does not exist.", oldArchive.getAbsolutePath());
             throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
@@ -81,6 +83,17 @@ public class JApiCmp {
         }
         if(oldArchive.equals(newArchive)) {
             String msg = String.format("Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
+            throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
+        }
+        verifyJarArchive(oldArchive);
+        verifyJarArchive(newArchive);
+    }
+
+    private void verifyJarArchive(File file) {
+        try {
+            new JarFile(file);
+        } catch (IOException e) {
+            String msg = String.format("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
             throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
         }
     }
