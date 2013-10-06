@@ -71,6 +71,23 @@ In the following you see the beginning of the xml output file after having compu
         </class>
 		...
 
+The differences between the two Java APIs are also printed on the command line for a quick overview:
+
+    --- REMOVED ANNOTATION org.apache.http.annotation.GuardedBy
+        --- REMOVED METHOD value()
+    --- REMOVED ANNOTATION org.apache.http.annotation.Immutable
+    --- REMOVED ANNOTATION org.apache.http.annotation.NotThreadSafe
+    --- REMOVED ANNOTATION org.apache.http.annotation.ThreadSafe
+    === UNCHANGED CLASS org.apache.http.auth.AUTH
+    === UNCHANGED CLASS org.apache.http.auth.AuthenticationException
+    +++ NEW CLASS org.apache.http.auth.AuthOption
+        +++ NEW METHOD getAuthScheme()
+        +++ NEW METHOD getCredentials()
+        +++ NEW METHOD toString()
+    +++ NEW ENUM org.apache.http.auth.AuthProtocolState
+        +++ NEW METHOD valueOf(java.lang.String)
+        +++ NEW METHOD values()
+
 ##Downloads##
 
 The following releases are available:
