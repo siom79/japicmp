@@ -1,4 +1,4 @@
-package japicmp.cmp;
+package japicmp.config;
 
 import java.util.regex.Pattern;
 

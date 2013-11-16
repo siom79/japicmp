@@ -1,4 +1,4 @@
-package japicmp.cmp;
+package japicmp.model;
 
 public enum AccessModifier {
     PUBLIC(3), PACKAGE(2), PROTECTED(1), PRIVATE(0);

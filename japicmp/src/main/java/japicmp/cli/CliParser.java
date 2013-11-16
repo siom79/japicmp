@@ -1,8 +1,8 @@
 package japicmp.cli;
 
 import com.google.common.base.Optional;
-import japicmp.cmp.AccessModifier;
-import japicmp.cmp.PackageFilter;
+import japicmp.model.AccessModifier;
+import japicmp.config.PackageFilter;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.StringArrayEnumeration;

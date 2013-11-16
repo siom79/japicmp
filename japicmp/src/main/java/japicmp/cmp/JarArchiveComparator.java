@@ -1,5 +1,6 @@
 package japicmp.cmp;
 
+import japicmp.config.PackageFilter;
 import japicmp.model.JApiClass;
 import japicmp.util.ModifierHelper;
 import javassist.ClassPool;

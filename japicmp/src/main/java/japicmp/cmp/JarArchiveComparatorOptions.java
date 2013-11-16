@@ -1,5 +1,8 @@
 package japicmp.cmp;
 
+import japicmp.config.PackageFilter;
+import japicmp.model.AccessModifier;
+
 import java.util.LinkedList;
 import java.util.List;
 

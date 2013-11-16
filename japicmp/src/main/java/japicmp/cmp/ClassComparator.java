@@ -1,10 +1,7 @@
 package japicmp.cmp;
 
 import com.google.common.base.Optional;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiParameter;
+import japicmp.model.*;
 import japicmp.util.ModifierHelper;
 import japicmp.util.SignatureParser;
 import javassist.CtClass;

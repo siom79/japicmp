@@ -1,7 +1,6 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
-import japicmp.cmp.AccessModifier;
 import javassist.CtMethod;
 
 import javax.xml.bind.annotation.XmlAttribute;

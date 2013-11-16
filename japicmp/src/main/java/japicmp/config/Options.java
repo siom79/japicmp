@@ -1,8 +1,7 @@
 package japicmp.config;
 
 import com.google.common.base.Optional;
-import japicmp.cmp.AccessModifier;
-import japicmp.cmp.PackageFilter;
+import japicmp.model.AccessModifier;
 
 import java.util.LinkedList;
 import java.util.List;
