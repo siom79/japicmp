@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<local-project language="java" version="4.0.5155" xml-version="3" flavor="j2se">
+  <property name="hide-externals" value="true" />
+  <property name="show-needs-to-compile" value="false" />
+  <property name="detail-mode" value="true" />
+  <property name="include-injected-dependency" value="true" />
+  <property name="project-type" value="maven" />
+  <property name="action-set-mod" value="10" />
+  <property name="hide-deprecated" value="false" />
+  <property name="parse-archive-in-archive" value="false" />
+  <classpath relativeto="D:\Programmierung\japicmp\github\japicmp">
+    <classpathentry kind="lib" path="japicmp-testbase\japicmp-test-v1\target\japicmp-test-v1-0.0.3-SNAPSHOT.jar" />
+    <classpathentry kind="lib" path="japicmp-testbase\japicmp-test\target\japicmp-test-0.0.3-SNAPSHOT.jar" />
+    <classpathentry kind="lib" path="japicmp\target\japicmp-0.0.3-SNAPSHOT.jar" />
+    <classpathentry kind="lib" path="japicmp-testbase\japicmp-test-v2\target\japicmp-test-v2-0.0.3-SNAPSHOT.jar" />
+  </classpath>
+  <pom-root-files>
+    <pom path="D:\Programmierung\japicmp\github\japicmp\pom.xml" />
+  </pom-root-files>
+  <transformations>
+    <transformation in="*" out="{jar}.*" />
+  </transformations>
+  <restructuring>
+    <set version="3" name="Model 1" hiview="Codemap" active="true" todo="false" list="0">
+      <hide>
+        <item-fqn fqn="japicmp-base.japicmp.japicmp.javassist" type="package">
+          <node name="japicmp-base" type="pom" />
+          <node name="japicmp" type="pom" />
+          <node name="japicmp" type="jar" />
+          <node name="javassist" type="package" />
+        </item-fqn>
+      </hide>
+      <hide>
+        <item-fqn fqn="japicmp-base.japicmp.japicmp.org" type="package">
+          <node name="japicmp-base" type="pom" />
+          <node name="japicmp" type="pom" />
+          <node name="japicmp" type="jar" />
+          <node name="org" type="package" />
+        </item-fqn>
+      </hide>
+      <hide>
+        <item-fqn fqn="japicmp-base.japicmp.japicmp.com" type="package">
+          <node name="japicmp-base" type="pom" />
+          <node name="japicmp" type="pom" />
+          <node name="japicmp" type="jar" />
+          <node name="com" type="package" />
+        </item-fqn>
+      </hide>
+    </set>
+  </restructuring>
+  <sourcepaths>
+    <pathentry type="file" path="D:\Programmierung\japicmp\github\japicmp\japicmp-testbase\japicmp-test-v1\src\main\java" />
+    <pathentry type="file" path="D:\Programmierung\japicmp\github\japicmp\japicmp\src\main\java" />
+    <pathentry type="file" path="D:\Programmierung\japicmp\github\japicmp\japicmp-testbase\japicmp-test-v2\src\main\java" />
+  </sourcepaths>
+  <grid-set sep="." version="4.0.5155">
+    <grid name="Diagram 2" enforce="true" locked="true" strict="false">
+      <row>
+        <cell name="japicmp" pattern="japicmp-base.japicmp.*" vexpanded="true" visibility="public" drill="false">
+          <grid>
+            <row>
+              <cell name="japicmp" pattern="japicmp-base.japicmp.japicmp.*" vexpanded="true" visibility="public" drill="false">
+                <grid>
+                  <row>
+                    <cell name="japicmp" pattern="japicmp-base.japicmp.japicmp.japicmp.*" vexpanded="true" visibility="public" drill="false">
+                      <grid>
+                        <row>
+                          <cell name="japicmp" pattern="japicmp-base.japicmp.japicmp.japicmp.?" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="JApiCmp" pattern="japicmp-base.japicmp.japicmp.japicmp.JApiCmp" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                            </grid>
+                          </cell>
+                        </row>
+                        <row>
+                          <cell name="cli" pattern="japicmp-base.japicmp.japicmp.japicmp.cli.?" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="CliParser" pattern="japicmp-base.japicmp.japicmp.japicmp.cli.CliParser" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                            </grid>
+                          </cell>
+                          <cell name="output" pattern="japicmp-base.japicmp.japicmp.japicmp.output.*" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="stdout" pattern="japicmp-base.japicmp.japicmp.japicmp.output.stdout.?" vexpanded="true" visibility="public" drill="false">
+                                  <grid>
+                                    <row>
+                                      <cell name="StdoutOutputGenerator" pattern="japicmp-base.japicmp.japicmp.japicmp.output.stdout.StdoutOutputGenerator" vexpanded="false" visibility="public" drill="false" />
+                                    </row>
+                                  </grid>
+                                </cell>
+                                <cell name="xml" pattern="japicmp-base.japicmp.japicmp.japicmp.output.xml.*" vexpanded="true" visibility="public" drill="false">
+                                  <grid>
+                                    <row>
+                                      <cell name="xml" pattern="japicmp-base.japicmp.japicmp.japicmp.output.xml.?" vexpanded="true" visibility="public" drill="false">
+                                        <grid>
+                                          <row>
+                                            <cell name="XmlOutputGenerator" pattern="japicmp-base.japicmp.japicmp.japicmp.output.xml.XmlOutputGenerator" vexpanded="false" visibility="public" drill="false" />
+                                          </row>
+                                        </grid>
+                                      </cell>
+                                    </row>
+                                    <row>
+                                      <cell name="model" pattern="japicmp-base.japicmp.japicmp.japicmp.output.xml.model.?" vexpanded="true" visibility="public" drill="false">
+                                        <grid>
+                                          <row>
+                                            <cell name="JApiCmpXmlRoot" pattern="japicmp-base.japicmp.japicmp.japicmp.output.xml.model.JApiCmpXmlRoot" vexpanded="false" visibility="public" drill="false" />
+                                          </row>
+                                        </grid>
+                                      </cell>
+                                    </row>
+                                  </grid>
+                                </cell>
+                              </row>
+                              <row>
+                                <cell name="output" pattern="japicmp-base.japicmp.japicmp.japicmp.output.?" vexpanded="true" visibility="public" drill="false">
+                                  <grid>
+                                    <row>
+                                      <cell name="OutputTransformer" pattern="japicmp-base.japicmp.japicmp.japicmp.output.OutputTransformer" vexpanded="false" visibility="public" drill="false" />
+                                    </row>
+                                  </grid>
+                                </cell>
+                              </row>
+                            </grid>
+                          </cell>
+                        </row>
+                        <row>
+                          <cell name="config" pattern="japicmp-base.japicmp.japicmp.japicmp.config.?" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="Options" pattern="japicmp-base.japicmp.japicmp.japicmp.config.Options" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                            </grid>
+                          </cell>
+                        </row>
+                        <row>
+                          <cell name="cmp" pattern="japicmp-base.japicmp.japicmp.japicmp.cmp.?" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="JarArchiveComparator" pattern="japicmp-base.japicmp.japicmp.japicmp.cmp.JarArchiveComparator" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                              <row>
+                                <cell name="ClassComparator" pattern="japicmp-base.japicmp.japicmp.japicmp.cmp.ClassComparator" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                              <row>
+                                <cell name="ClassesComparator" pattern="japicmp-base.japicmp.japicmp.japicmp.cmp.ClassesComparator" vexpanded="false" visibility="public" drill="false" />
+                                <cell name="JarArchiveComparatorOptions" pattern="japicmp-base.japicmp.japicmp.japicmp.cmp.JarArchiveComparatorOptions" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                              <row>
+                                <cell name="AccessModifier" pattern="japicmp-base.japicmp.japicmp.japicmp.cmp.AccessModifier" vexpanded="false" visibility="public" drill="false" />
+                                <cell name="PackageFilter" pattern="japicmp-base.japicmp.japicmp.japicmp.config.PackageFilter" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                            </grid>
+                          </cell>
+                        </row>
+                        <row>
+                          <cell name="exception" pattern="japicmp-base.japicmp.japicmp.japicmp.exception.?" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="JApiCmpException" pattern="japicmp-base.japicmp.japicmp.japicmp.exception.JApiCmpException" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                            </grid>
+                          </cell>
+                          <cell name="model" pattern="japicmp-base.japicmp.japicmp.japicmp.model.?" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="JApiClass" pattern="japicmp-base.japicmp.japicmp.japicmp.model.JApiClass" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                              <row>
+                                <cell name="JApiMethod" pattern="japicmp-base.japicmp.japicmp.japicmp.model.JApiMethod" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                              <row>
+                                <cell name="JApiChangeStatus" pattern="japicmp-base.japicmp.japicmp.japicmp.model.JApiChangeStatus" vexpanded="false" visibility="public" drill="false" />
+                                <cell name="JApiParameter" pattern="japicmp-base.japicmp.japicmp.japicmp.model.JApiParameter" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                            </grid>
+                          </cell>
+                          <cell name="util" pattern="japicmp-base.japicmp.japicmp.japicmp.util.?" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="ModifierHelper" pattern="japicmp-base.japicmp.japicmp.japicmp.util.ModifierHelper" vexpanded="false" visibility="public" drill="false" />
+                                <cell name="SignatureParser" pattern="japicmp-base.japicmp.japicmp.japicmp.util.SignatureParser" vexpanded="false" visibility="public" drill="false" />
+                                <cell name="StringArrayEnumeration" pattern="japicmp-base.japicmp.japicmp.japicmp.util.StringArrayEnumeration" vexpanded="false" visibility="public" drill="false" />
+                              </row>
+                            </grid>
+                          </cell>
+                        </row>
+                      </grid>
+                    </cell>
+                  </row>
+                </grid>
+              </cell>
+            </row>
+          </grid>
+        </cell>
+        <cell name="japicmp-testbase" pattern="japicmp-base.japicmp-testbase.*" vexpanded="true" visibility="public" drill="false">
+          <grid>
+            <row>
+              <cell name="japicmp-test-v1" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.*" vexpanded="true" visibility="public" drill="false">
+                <grid>
+                  <row>
+                    <cell name="japicmp-test-v1" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.*" vexpanded="true" visibility="public" drill="false">
+                      <grid>
+                        <row>
+                          <cell name="japicmp" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.*" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="test" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.*" vexpanded="true" visibility="public" drill="false">
+                                  <grid>
+                                    <row>
+                                      <cell name="test" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.?" vexpanded="true" visibility="public" drill="false">
+                                        <grid>
+                                          <row>
+                                            <cell name="Modifier" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.Modifier" vexpanded="false" visibility="public" drill="false" />
+                                            <cell name="Removed" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.Removed" vexpanded="false" visibility="public" drill="false" />
+                                            <cell name="Unchanged" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.Unchanged" vexpanded="false" visibility="public" drill="false" />
+                                          </row>
+                                        </grid>
+                                      </cell>
+                                      <cell name="packageOne" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.packageOne.?" vexpanded="true" visibility="public" drill="false">
+                                        <grid>
+                                          <row>
+                                            <cell name="PackageOne" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.packageOne.PackageOne" vexpanded="false" visibility="public" drill="false" />
+                                          </row>
+                                        </grid>
+                                      </cell>
+                                      <cell name="packageTwo" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.packageTwo.?" vexpanded="true" visibility="public" drill="false">
+                                        <grid>
+                                          <row>
+                                            <cell name="PackageTwo" pattern="japicmp-base.japicmp-testbase.japicmp-test-v1.japicmp-test-v1.japicmp.test.packageTwo.PackageTwo" vexpanded="false" visibility="public" drill="false" />
+                                          </row>
+                                        </grid>
+                                      </cell>
+                                    </row>
+                                  </grid>
+                                </cell>
+                              </row>
+                            </grid>
+                          </cell>
+                        </row>
+                      </grid>
+                    </cell>
+                  </row>
+                </grid>
+              </cell>
+              <cell name="japicmp-test-v2" pattern="japicmp-base.japicmp-testbase.japicmp-test-v2.*" vexpanded="true" visibility="public" drill="false">
+                <grid>
+                  <row>
+                    <cell name="japicmp-test-v2" pattern="japicmp-base.japicmp-testbase.japicmp-test-v2.japicmp-test-v2.*" vexpanded="true" visibility="public" drill="false">
+                      <grid>
+                        <row>
+                          <cell name="japicmp" pattern="japicmp-base.japicmp-testbase.japicmp-test-v2.japicmp-test-v2.japicmp.*" vexpanded="true" visibility="public" drill="false">
+                            <grid>
+                              <row>
+                                <cell name="test" pattern="japicmp-base.japicmp-testbase.japicmp-test-v2.japicmp-test-v2.japicmp.test.?" vexpanded="true" visibility="public" drill="false">
+                                  <grid>
+                                    <row>
+                                      <cell name="Added" pattern="japicmp-base.japicmp-testbase.japicmp-test-v2.japicmp-test-v2.japicmp.test.Added" vexpanded="false" visibility="public" drill="false" />
+                                    </row>
+                                  </grid>
+                                </cell>
+                              </row>
+                            </grid>
+                          </cell>
+                        </row>
+                      </grid>
+                    </cell>
+                  </row>
+                </grid>
+              </cell>
+            </row>
+          </grid>
+        </cell>
+      </row>
+      <description>Top-level breakout (depth=2147483647)</description>
+    </grid>
+  </grid-set>
+</local-project>
+
