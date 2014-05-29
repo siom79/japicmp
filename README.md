@@ -100,8 +100,6 @@ The following releases are available:
         * [Giving a non-jar file as argument should not output "Comparing..."](https://github.com/siom79/japicmp/issues/5)
 * [Version 0.0.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.0.1)
 
-The latest snapshot version can be downloaded here: [japicmp-SNAPSHOT](http://repository-siom79.forge.cloudbees.com/snapshot/japicmp/japicmp/)
-
 ##Development##
 
 * [Jenkins build server](https://siom79.ci.cloudbees.com/job/japicmp)
