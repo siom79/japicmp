@@ -14,5 +14,6 @@
 		<module>japicmp-test-v1</module>
 		<module>japicmp-test-v2</module>
 		<module>japicmp-test</module>
-	</modules>
+        <module>japicmp-test-maven-plugin</module>
+    </modules>
 </project>
