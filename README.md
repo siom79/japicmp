@@ -3,7 +3,7 @@ japicmp
 
 japicmp is a tool to compare two versions of a jar archive:
 
-    java -jar japicmp-0.0.3.jar -n new-version.jar -o old-version.jar
+    java -jar japicmp-0.1.0.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -55,7 +55,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.0.3</version>
+                <version>0.1.0</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
