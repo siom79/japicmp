@@ -149,6 +149,9 @@ The differences between the two Java APIs are also printed on the command line f
 
 The following releases are available:
 
+* [Version 0.1.0](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.1.0)
+    * Changes:
+        * [The functionality of japicmp should be available as a maven plugin](https://github.com/siom79/japicmp/issues/6)
 * [Version 0.0.2](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.0.2)
     * Changes:
         * [Command-line option to filter packages](https://github.com/siom79/japicmp/issues/1)
@@ -156,8 +159,6 @@ The following releases are available:
         * ["No differences" output when comparing the same file](https://github.com/siom79/japicmp/issues/4)
         * [Giving a non-jar file as argument should not output "Comparing..."](https://github.com/siom79/japicmp/issues/5)
 * [Version 0.0.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.0.1)
-
-The latest snapshot version can be downloaded here: [japicmp-SNAPSHOT](http://repository-siom79.forge.cloudbees.com/snapshot/japicmp/japicmp/)
 
 ##Development##
 
