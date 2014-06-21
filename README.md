@@ -71,8 +71,8 @@ The maven plugin can be included in the pom.xml file of your artificat in the fo
                     </newVersion>
                     <parameter>
                         <onlyModified>true</onlyModified>
-                        <packagesToInclude>*</packagesToInclude>
-                        <packagesToExclude>*</packagesToExclude>
+                        <packagesToInclude>example</packagesToInclude>
+                        <packagesToExclude>excludeMe</packagesToExclude>
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                     </parameter>
