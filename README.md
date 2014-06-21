@@ -3,11 +3,12 @@ japicmp
 
 japicmp is a tool to compare two versions of a jar archive:
 
-    java -jar japicmp-0.0.2.jar -n new-version.jar -o old-version.jar
+    java -jar japicmp-0.0.3.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
-	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator();
+    JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
+	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
     List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
 
 ##Motivation##
@@ -30,8 +31,9 @@ library to inspect the class files. This way you only have to provide the two ja
 * Per default only public classes and class members are compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to package, protected or private.
 * Per default classes from all packages are compared. If necessary, certain packages can be excluded or only specific packages can be included.
+* A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 
-##Usage##
+##Usage CLI tool##
 
 The tool has a set of CLI parameters that are described in the following:
 
@@ -43,6 +45,61 @@ The tool has a set of CLI parameters that are described in the following:
     -i <packagesToInclude>    Comma separated list of package names to include, * can be used as wildcard.
     -e <packagesToExclude>    Comma separated list of package names to exclude, * can be used as wildcard.
     -m                        Outputs only modified classes/methods. If not given, all classes and methods are printed.
+    
+##Usage maven plugin##
+
+The maven plugin can be included in the pom.xml file of your artificat in the following way:
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>0.0.3</version>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>japicmp</groupId>
+                            <artifactId>japicmp-test-v1</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </oldVersion>
+                    <newVersion>
+                        <file>
+                            <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+                        </file>
+                    </newVersion>
+                    <parameter>
+                        <onlyModified>true</onlyModified>
+                        <packagesToInclude>*</packagesToInclude>
+                        <packagesToExclude>*</packagesToExclude>
+                        <accessModifier>public</accessModifier>
+                        <breakBuildOnModifications>false</breakBuildOnModifications>
+                    </parameter>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cmp</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+The elements <oldVersion> and <newVersion> elements let you specify which version you want to compare. Both elements
+ support either a <dependency> or a <file> element. Through the <parameter> element you can provide the following options:
+  
+* onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
+* packagesToInclude: Comma separated list of package names to include, * can be used as wildcard.
+* packagesToExclude: Comma separated list of package names to exclude, * can be used as wildcard.
+* accessModifier: Sets the access modifier level (public, package, protected, private).
+* breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
+
+The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
+of your artifact.
 	
 ###Example###
 
