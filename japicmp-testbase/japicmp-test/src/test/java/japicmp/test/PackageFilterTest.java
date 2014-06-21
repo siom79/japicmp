@@ -2,7 +2,7 @@ package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.cmp.PackageFilter;
+import japicmp.config.PackageFilter;
 import japicmp.model.JApiClass;
 import japicmp.test.packageOne.PackageOne;
 import japicmp.test.packageTwo.PackageTwo;

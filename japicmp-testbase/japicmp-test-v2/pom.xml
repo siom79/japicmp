@@ -8,4 +8,36 @@
     </parent>
 
     <artifactId>japicmp-test-v2</artifactId>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>japicmp</groupId>
+                            <artifactId>japicmp-test-v1</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </oldVersion>
+                    <newVersion>
+                        <file>
+                            <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+                        </file>
+                    </newVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cmp</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

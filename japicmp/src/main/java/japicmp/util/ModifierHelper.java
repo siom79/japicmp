@@ -1,6 +1,6 @@
 package japicmp.util;
 
-import japicmp.cmp.AccessModifier;
+import japicmp.model.AccessModifier;
 
 import java.lang.reflect.Modifier;
 

@@ -1,6 +1,6 @@
 package japicmp.util;
 
-import japicmp.cmp.AccessModifier;
+import japicmp.model.AccessModifier;
 import javassist.Modifier;
 import org.junit.Test;
 

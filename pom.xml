@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>japicmp</groupId>
@@ -11,11 +12,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.account>siom79</github.account>
         <cloudbees.account>siom79</cloudbees.account>
+        <java.source>1.7</java.source>
+        <java.target>1.7</java.target>
     </properties>
 
     <modules>
         <module>japicmp</module>
         <module>japicmp-testbase</module>
+        <module>japicmp-maven-plugin</module>
     </modules>
 
     <dependencies>
@@ -34,8 +38,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>${java.source}</source>
+                    <target>${java.target}</target>
                 </configuration>
             </plugin>
             <plugin>
