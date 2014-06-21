@@ -48,7 +48,7 @@ The tool has a set of CLI parameters that are described in the following:
     
 ##Usage maven plugin##
 
-The maven plugin can be included in the pom.xml file of your artificat in the following way:
+The maven plugin can be included in the pom.xml file of your artifact in the following way:
 
     <build>
         <plugins>
