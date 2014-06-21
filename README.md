@@ -89,8 +89,8 @@ The maven plugin can be included in the pom.xml file of your artificat in the fo
         </plugins>
     </build>
     
-The elements <oldVersion> and <newVersion> elements let you specify which version you want to compare. Both elements
- support either a <dependency> or a <file> element. Through the <parameter> element you can provide the following options:
+The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify which version you want to compare. Both elements
+ support either a &lt;dependency&gt; or a &lt;file&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
   
 * onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
 * packagesToInclude: Comma separated list of package names to include, * can be used as wildcard.
