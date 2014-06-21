@@ -30,6 +30,7 @@ import java.util.List;
 
 /**
  * @goal cmp
+ * @phase verify
  */
 public class JApiCmpMojo extends AbstractMojo {
     /**
