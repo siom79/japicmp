@@ -12,4 +12,17 @@ public enum AccessModifier {
     public int getLevel() {
         return level;
     }
+
+    public static String listOfAccessModifier() {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        for (AccessModifier am : AccessModifier.values()) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(am.toString());
+            i++;
+        }
+        return sb.toString();
+    }
 }

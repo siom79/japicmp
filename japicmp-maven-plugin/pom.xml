@@ -14,7 +14,6 @@
 
     <properties>
         <maven.version>3.1.0</maven.version>
-        <aether.version>0.9.0.M2</aether.version>
     </properties>
 
     <prerequisites>
@@ -48,19 +47,19 @@
             <version>${maven.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-api</artifactId>
-            <version>${aether.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-util</artifactId>
-            <version>${aether.version}</version>
-        </dependency>
-        <dependency>
             <groupId>japicmp</groupId>
             <artifactId>japicmp</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${maven.version}</version>
         </dependency>
     </dependencies>
 

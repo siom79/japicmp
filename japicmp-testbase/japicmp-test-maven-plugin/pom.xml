@@ -40,6 +40,13 @@
                             <version>${project.version}</version>
                         </dependency>
                     </newVersion>
+                    <parameter>
+                        <onlyModified>true</onlyModified>
+                        <packagesToInclude>*</packagesToInclude>
+                        <packagesToExclude>*</packagesToExclude>
+                        <accessModifier>public</accessModifier>
+                        <breakBuildOnModifications>false</breakBuildOnModifications>
+                    </parameter>
                 </configuration>
                 <executions>
                     <execution>

@@ -2,7 +2,6 @@ package japicmp.cli;
 
 import com.google.common.base.Optional;
 import japicmp.model.AccessModifier;
-import japicmp.config.PackageFilter;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.StringArrayEnumeration;
@@ -35,32 +34,16 @@ public class CliParser {
                     AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
                     options.setAccessModifier(accessModifier);
                 } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException(String.format("Invalid value for option -a: %s. Possible values are: %s.", accessModifierArg, listOfAccessModifiers()));
+                    throw new IllegalArgumentException(String.format("Invalid value for option -a: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()));
                 }
             }
             if ("-i".equals(arg)) {
                 String packagesIncludeArg = getOptionWithArgument("-i", sae);
-                String[] parts = packagesIncludeArg.split(",");
-                for (String part : parts) {
-                    part = part.trim();
-                    try {
-                        options.getPackagesInclude().add(new PackageFilter(part));
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException(String.format("Wrong syntax for include option '%s': %s", part, e.getMessage()));
-                    }
-                }
+                options.addPackageIncludeFromArgument(packagesIncludeArg);
             }
             if ("-e".equals(arg)) {
                 String packagesExcludeArg = getOptionWithArgument("-e", sae);
-                String[] parts = packagesExcludeArg.split(",");
-                for (String part : parts) {
-                    part = part.trim();
-                    try {
-                        options.getPackagesInclude().add(new PackageFilter(part));
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException(String.format("Wrong syntax for exclude option '%s': %s", part, e.getMessage()));
-                    }
-                }
+                options.addPackagesExcludeFromArgument(packagesExcludeArg);
             }
             if ("-h".equals(arg)) {
                 printHelp();
@@ -102,18 +85,5 @@ public class CliParser {
         } else {
             throw new IllegalArgumentException(String.format("Missing argument for option %s.", option));
         }
-    }
-
-    private String listOfAccessModifiers() {
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        for (AccessModifier am : AccessModifier.values()) {
-            if (i > 0) {
-                sb.append(",");
-            }
-            sb.append(am.toString());
-            i++;
-        }
-        return sb.toString();
     }
 }

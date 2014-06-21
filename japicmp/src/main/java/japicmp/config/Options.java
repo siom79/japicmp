@@ -62,4 +62,28 @@ public class Options {
     public List<PackageFilter> getPackagesExclude() {
         return packagesExclude;
     }
+
+    public void addPackagesExcludeFromArgument(String packagesExcludeArg) {
+        String[] parts = packagesExcludeArg.split(",");
+        for (String part : parts) {
+            part = part.trim();
+            try {
+                getPackagesExclude().add(new PackageFilter(part));
+            } catch (Exception e) {
+                throw new IllegalArgumentException(String.format("Wrong syntax for package include option '%s': %s", part, e.getMessage()));
+            }
+        }
+    }
+
+    public void addPackageIncludeFromArgument(String packagesIncludeArg) {
+        String[] parts = packagesIncludeArg.split(",");
+        for (String part : parts) {
+            part = part.trim();
+            try {
+                getPackagesInclude().add(new PackageFilter(part));
+            } catch (Exception e) {
+                throw new IllegalArgumentException(String.format("Wrong syntax for package exclude option '%s': %s", part, e.getMessage()));
+            }
+        }
+    }
 }
