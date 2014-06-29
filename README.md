@@ -53,7 +53,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
     <build>
         <plugins>
             <plugin>
-                <groupId>japicmp</groupId>
+                <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
                 <version>0.1.0</version>
                 <configuration>
@@ -100,6 +100,12 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 
 The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
 of your artifact.
+
+Currently the maven plugin is not available at the central repository; hence you will have to download it from the [release
+site](https://github.com/siom79/japicmp/releases) and install it locally with the following command using 
+[this pom file](https://github.com/siom79/japicmp/blob/master/japicmp-maven-plugin/pom.xml):
+
+    mvn install:install-file -Dfile=<path-to-file> -DpomFile=<path-to-pomfile>
 	
 ###Example###
 
