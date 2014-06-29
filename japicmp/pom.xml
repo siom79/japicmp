@@ -24,9 +24,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>javassist</groupId>
+            <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
+            <version>3.18.2-GA</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
