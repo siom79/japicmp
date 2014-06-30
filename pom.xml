@@ -39,6 +39,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.account>siom79</github.account>
+        <github.project>japicmp</github.project>
         <cloudbees.account>siom79</cloudbees.account>
         <java.source>1.7</java.source>
         <java.target>1.7</java.target>
@@ -151,9 +152,9 @@
     </build>
 
     <scm>
-        <connection>scm:git:git@github.com:${github.account}/${project.groupId}.git</connection>
-        <developerConnection>scm:git:git@github.com:${github.account}/${project.groupId}.git</developerConnection>
-        <url>git@github.com:${github.account}/${project.groupId}.git</url>
+        <connection>scm:git:git@github.com:${github.account}/${github.project}.git</connection>
+        <developerConnection>scm:git:git@github.com:${github.account}/${github.project}.git</developerConnection>
+        <url>git@github.com:${github.account}/${github.project}.git</url>
         <tag>HEAD</tag>
     </scm>
 
