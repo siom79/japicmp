@@ -151,9 +151,9 @@
     </build>
 
     <scm>
-        <connection>scm:git:git://github.com/${github.account}/${project.groupId}.git</connection>
+        <connection>scm:git:git@github.com:${github.account}/${project.groupId}.git</connection>
         <developerConnection>scm:git:git@github.com:${github.account}/${project.groupId}.git</developerConnection>
-        <url>http://github.com/${github.account}/${project.groupId}/tree/master/</url>
+        <url>git@github.com:${github.account}/${project.groupId}.git</url>
         <tag>HEAD</tag>
     </scm>
 
