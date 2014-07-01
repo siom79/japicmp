@@ -177,5 +177,4 @@ The following releases are available:
 ##Development##
 
 * [Jenkins build server](https://siom79.ci.cloudbees.com/job/japicmp)
-* [Maven snapshot repository](https://repository-siom79.forge.cloudbees.com/snapshot)
-* [Maven release repository](https://repository-siom79.forge.cloudbees.com/release)
+* [Maven snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/)
