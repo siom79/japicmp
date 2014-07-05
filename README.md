@@ -11,7 +11,7 @@ It can also be used as a library:
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
     List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
     
-The corresponding maven dependency is:
+japicmp is available in the Maven Central Repository. The corresponding dependency is:
 
     <dependency>
         <groupId>com.github.siom79.japicmp</groupId>
