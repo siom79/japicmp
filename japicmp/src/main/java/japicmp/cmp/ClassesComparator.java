@@ -1,10 +1,8 @@
 package japicmp.cmp;
 
 import com.google.common.base.Optional;
-import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
-import japicmp.util.ModifierHelper;
 import javassist.CtClass;
 
 import java.util.HashMap;
@@ -26,15 +24,15 @@ public class ClassesComparator {
         for(CtClass ctClass : oldClassesMap.values()) {
             CtClass foundClass = newClassesMap.get(ctClass.getName());
             if(foundClass == null) {
-                classes.add(new JApiClass(ctClass.getName(), Optional.<CtClass>of(ctClass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, getType(ctClass), Optional.of(ModifierHelper.translateToModifierLevel(ctClass.getModifiers())), Optional.<AccessModifier>absent()));
+                classes.add(new JApiClass(ctClass.getName(), Optional.<CtClass>of(ctClass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, getType(ctClass)));
             } else {
-                classes.add(new JApiClass(ctClass.getName(), Optional.<CtClass>of(ctClass), Optional.<CtClass>of(foundClass), JApiChangeStatus.UNCHANGED, getType(ctClass), Optional.of(ModifierHelper.translateToModifierLevel(ctClass.getModifiers())), Optional.of(ModifierHelper.translateToModifierLevel(foundClass.getModifiers()))));
+                classes.add(new JApiClass(ctClass.getName(), Optional.<CtClass>of(ctClass), Optional.<CtClass>of(foundClass), JApiChangeStatus.UNCHANGED, getType(ctClass)));
             }
         }
         for(CtClass ctClass : newClassesMap.values()) {
             CtClass foundClass = oldClassesMap.get(ctClass.getName());
             if(foundClass == null) {
-                classes.add(new JApiClass(ctClass.getName(), Optional.<CtClass>absent(), Optional.<CtClass>of(ctClass), JApiChangeStatus.NEW, getType(ctClass), Optional.<AccessModifier>absent(), Optional.of(ModifierHelper.translateToModifierLevel(ctClass.getModifiers()))));
+                classes.add(new JApiClass(ctClass.getName(), Optional.<CtClass>absent(), Optional.<CtClass>of(ctClass), JApiChangeStatus.NEW, getType(ctClass)));
             }
         }
     }

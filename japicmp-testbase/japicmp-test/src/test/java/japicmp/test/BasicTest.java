@@ -8,9 +8,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.getArchive;
-import static japicmp.test.util.Helper.getJApiClass;
-import static japicmp.test.util.Helper.getJApiMethod;
+import static japicmp.test.util.Helper.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -21,7 +19,7 @@ public class BasicTest {
     public void test() {
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-        assertThat(jApiClasses.size(), is(7));
+        assertThat(jApiClasses.size(), is(19));
         JApiClass jApiClassRemoved = getJApiClass(jApiClasses, Removed.class.getName());
         JApiClass jApiClassAdded = getJApiClass(jApiClasses, Added.class.getName());
         JApiClass jApiClassUnchanged = getJApiClass(jApiClasses, Unchanged.class.getName());

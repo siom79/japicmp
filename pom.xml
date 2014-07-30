@@ -1,16 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>japicmp</groupId>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <groupId>com.github.siom79.japicmp</groupId>
     <artifactId>japicmp-base</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <name>japicmp-base</name>
+    <description>japicmp is a library/maven plugin that computes the differences between two
+        versions of a jar file/artifact in order to ease the API documentation for clients/customers.
+    </description>
+    <url>https://github.com/siom79/japicmp</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>martin.mois</id>
+            <name>Martin Mois</name>
+            <email>martin.mois@gmail.com</email>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.account>siom79</github.account>
+        <github.project>japicmp</github.project>
         <cloudbees.account>siom79</cloudbees.account>
         <java.source>1.7</java.source>
         <java.target>1.7</java.target>
@@ -45,7 +73,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>2.5</version>
+                <configuration>
+                    <remoteTagging>false</remoteTagging>
+                    <suppressCommitBeforeTag>false</suppressCommitBeforeTag>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -123,43 +155,39 @@
     </build>
 
     <scm>
-        <connection>scm:git:git://github.com/${github.account}/${project.groupId}.git</connection>
-        <developerConnection>scm:git:git@github.com:${github.account}/${project.groupId}.git</developerConnection>
-        <url>http://github.com/${github.account}/${project.groupId}/tree/master/</url>
+        <connection>scm:git:git@github.com:${github.account}/${github.project}.git</connection>
+        <developerConnection>scm:git:git@github.com:${github.account}/${github.project}.git</developerConnection>
+        <url>git@github.com:${github.account}/${github.project}.git</url>
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>cloudbees-public-release</id>
-            <url>dav:https://repository-${cloudbees.account}.forge.cloudbees.com/release</url>
-        </repository>
-        <snapshotRepository>
-            <id>cloudbees-public-snapshot</id>
-            <url>dav:https://repository-${cloudbees.account}.forge.cloudbees.com/snapshot</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>cloudbees-public-snapshot</id>
-            <url>https://repository-${cloudbees.account}.forge.cloudbees.com/public-snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>cloudbees-public-release</id>
-            <url>https://repository-${cloudbees.account}.forge.cloudbees.com/public-release</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <profiles>
+        <profile>
+            <id>sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

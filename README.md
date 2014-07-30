@@ -3,13 +3,21 @@ japicmp
 
 japicmp is a tool to compare two versions of a jar archive:
 
-    java -jar japicmp-0.0.3.jar -n new-version.jar -o old-version.jar
+    java -jar japicmp-0.1.1.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
     JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
     List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
+    
+japicmp is available in the Maven Central Repository. The corresponding dependency is:
+
+    <dependency>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp</artifactId>
+        <version>0.1.1</version>
+    </dependency>
 
 ##Motivation##
 
@@ -53,15 +61,15 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
     <build>
         <plugins>
             <plugin>
-                <groupId>japicmp</groupId>
+                <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.0.3</version>
+                <version>0.1.1</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>${project.version}</version>
+                            <version>0.1.1</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -103,52 +111,61 @@ of your artifact.
 	
 ###Example###
 
-In the following you see the beginning of the xml output file after having computed the differences between the versions 4.0.1 and 4.2.3 of httpclient:
+In the following you see the beginning of the xml output file after having computed the differences between the versions 16.0 and 17.0 of google's guava library:
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <japicmp newJar="D:\Programmierung\japicmp\github\japicmp\japicmp\httpclient-4.2.3.jar" oldJar="D:\Programmierung\japicmp\github\japicmp\japicmp\httpclient-4.0.1.jar">
-        <class accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" fullyQualifiedName="org.apache.http.annotation.GuardedBy" type="ANNOTATION">
-            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="value" returnType="java.lang.String"/>
-        </class>
-        <class accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" fullyQualifiedName="org.apache.http.annotation.Immutable" type="ANNOTATION"/>
-        <class accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" fullyQualifiedName="org.apache.http.annotation.NotThreadSafe" type="ANNOTATION"/>
-        <class accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" fullyQualifiedName="org.apache.http.annotation.ThreadSafe" type="ANNOTATION"/>
-        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="UNCHANGED" fullyQualifiedName="org.apache.http.auth.AUTH" type="CLASS"/>
-        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="UNCHANGED" fullyQualifiedName="org.apache.http.auth.AuthenticationException" type="CLASS"/>
-        <class accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" fullyQualifiedName="org.apache.http.auth.AuthOption" type="CLASS">
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="getAuthScheme" returnType="org.apache.http.auth.AuthScheme"/>
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="getCredentials" returnType="org.apache.http.auth.Credentials"/>
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="toString" returnType="java.lang.String"/>
-        </class>
-        <class accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" fullyQualifiedName="org.apache.http.auth.AuthProtocolState" type="ENUM">
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="valueOf" returnType="org.apache.http.auth.AuthProtocolState">
-                <parameter type="java.lang.String"/>
+    <japicmp newJar="/home/martin/.m2/repository/com/google/guava/guava/17.0/guava-17.0.jar" oldJar="/home/martin/.m2/repository/com/google/guava/guava/16.0/guava-16.0.jar">
+        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.io.Closeables" type="CLASS">
+            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="closeQuietly" returnType="void">
+                <parameter type="java.io.Reader"/>
             </method>
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="values" returnType="org.apache.http.auth.AuthProtocolState[]"/>
+            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="closeQuietly" returnType="void">
+                <parameter type="java.io.InputStream"/>
+            </method>
+        </class>
+        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.util.concurrent.AbstractService" type="CLASS">
+            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="startAndWait" returnType="com.google.common.util.concurrent.Service$State"/>
+            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="stop" returnType="com.google.common.util.concurrent.ListenableFuture"/>
+            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="stopAndWait" returnType="com.google.common.util.concurrent.Service$State"/>
+            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="start" returnType="com.google.common.util.concurrent.ListenableFuture"/>
+        </class>
+        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.io.CountingOutputStream" type="CLASS">
+            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="close" returnType="void"/>
+        </class>
+        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.cache.CacheLoader" type="CLASS">
+            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="asyncReloading" returnType="com.google.common.cache.CacheLoader">
+                <parameter type="com.google.common.cache.CacheLoader"/>
+                <parameter type="java.util.concurrent.Executor"/>
+            </method>
         </class>
 		...
 
 The differences between the two Java APIs are also printed on the command line for a quick overview:
 
-    --- REMOVED ANNOTATION org.apache.http.annotation.GuardedBy
-        --- REMOVED METHOD value()
-    --- REMOVED ANNOTATION org.apache.http.annotation.Immutable
-    --- REMOVED ANNOTATION org.apache.http.annotation.NotThreadSafe
-    --- REMOVED ANNOTATION org.apache.http.annotation.ThreadSafe
-    === UNCHANGED CLASS org.apache.http.auth.AUTH
-    === UNCHANGED CLASS org.apache.http.auth.AuthenticationException
-    +++ NEW CLASS org.apache.http.auth.AuthOption
-        +++ NEW METHOD getAuthScheme()
-        +++ NEW METHOD getCredentials()
-        +++ NEW METHOD toString()
-    +++ NEW ENUM org.apache.http.auth.AuthProtocolState
-        +++ NEW METHOD valueOf(java.lang.String)
-        +++ NEW METHOD values()
+    *** MODIFIED CLASS com.google.common.io.Closeables
+        +++ NEW METHOD closeQuietly(java.io.Reader)
+        +++ NEW METHOD closeQuietly(java.io.InputStream)
+    *** MODIFIED CLASS com.google.common.util.concurrent.AbstractService
+        --- REMOVED METHOD startAndWait()
+        --- REMOVED METHOD stop()
+        --- REMOVED METHOD stopAndWait()
+        --- REMOVED METHOD start()
+    *** MODIFIED CLASS com.google.common.io.CountingOutputStream
+        +++ NEW METHOD close()
+    *** MODIFIED CLASS com.google.common.cache.CacheLoader
+        +++ NEW METHOD asyncReloading(com.google.common.cache.CacheLoader, java.util.concurrent.Executor)
+    ...
 
 ##Downloads##
 
 The following releases are available:
 
+* [Version 0.1.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.1.1)
+    * Changes:
+        * [The maven-plugin should be available in the central repository](https://github.com/siom79/japicmp/issues/8)
+* [Version 0.1.0](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.1.0)
+    * Changes:
+        * [The functionality of japicmp should be available as a maven plugin](https://github.com/siom79/japicmp/issues/6)
 * [Version 0.0.2](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.0.2)
     * Changes:
         * [Command-line option to filter packages](https://github.com/siom79/japicmp/issues/1)
@@ -157,10 +174,7 @@ The following releases are available:
         * [Giving a non-jar file as argument should not output "Comparing..."](https://github.com/siom79/japicmp/issues/5)
 * [Version 0.0.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.0.1)
 
-The latest snapshot version can be downloaded here: [japicmp-SNAPSHOT](http://repository-siom79.forge.cloudbees.com/snapshot/japicmp/japicmp/)
-
 ##Development##
 
 * [Jenkins build server](https://siom79.ci.cloudbees.com/job/japicmp)
-* [Maven snapshot repository](https://repository-siom79.forge.cloudbees.com/snapshot)
-* [Maven release repository](https://repository-siom79.forge.cloudbees.com/release)
+* [Maven snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/)

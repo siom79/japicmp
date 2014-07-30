@@ -1,10 +1,15 @@
 package japicmp.cmp;
 
 import com.google.common.base.Optional;
-import japicmp.model.*;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiParameter;
 import japicmp.util.ModifierHelper;
 import japicmp.util.SignatureParser;
+import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtMethod;
 
 import java.util.HashMap;
@@ -30,14 +35,11 @@ public class ClassComparator {
             signatureParser.parse(ctMethod.getSignature());
             CtMethod foundMethod = newMethodsMap.get(longName);
             if (foundMethod == null) {
-                JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtMethod>absent(), signatureParser.getReturnType(), Optional.of(ModifierHelper.translateToModifierLevel(ctMethod.getModifiers())), Optional.<AccessModifier>absent());
+                JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtMethod>absent(), signatureParser.getReturnType());
                 addParametersToMethod(signatureParser, jApiMethod);
                 jApiClass.addMethod(jApiMethod);
-                if(jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                    jApiClass.setChangeStatus(JApiChangeStatus.MODIFIED);
-                }
             } else {
-                JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod), signatureParser.getReturnType(), Optional.of(ModifierHelper.translateToModifierLevel(ctMethod.getModifiers())), Optional.of(ModifierHelper.translateToModifierLevel(foundMethod.getModifiers())));
+                JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod), signatureParser.getReturnType());
                 addParametersToMethod(signatureParser, jApiMethod);
                 jApiClass.addMethod(jApiMethod);
             }
@@ -47,12 +49,9 @@ public class ClassComparator {
             signatureParser.parse(ctMethod.getSignature());
             CtMethod foundMethod = oldMethodsMap.get(longName);
             if (foundMethod == null) {
-                JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod), signatureParser.getReturnType(), Optional.<AccessModifier>absent(), Optional.of(ModifierHelper.translateToModifierLevel(ctMethod.getModifiers())));
+                JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod), signatureParser.getReturnType());
                 addParametersToMethod(signatureParser, jApiMethod);
                 jApiClass.addMethod(jApiMethod);
-                if(jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                    jApiClass.setChangeStatus(JApiChangeStatus.MODIFIED);
-                }
             }
         }
     }
@@ -70,6 +69,18 @@ public class ClassComparator {
                 if(ModifierHelper.matchesModifierLevel(ctMethod.getModifiers(), options.getModifierLevel())) {
                     methods.put(ctMethod.getLongName(), ctMethod);
                 }
+            }
+        }
+        return methods;
+    }
+    
+    private Map<String, CtBehavior> createConstructorMap(Optional<CtClass> ctClass) {
+        Map<String, CtBehavior> methods = new HashMap<String, CtBehavior>();
+        if (ctClass.isPresent()) {
+            for(CtConstructor ctConstructor : ctClass.get().getDeclaredConstructors()) {
+            	if(ModifierHelper.matchesModifierLevel(ctConstructor.getModifiers(), options.getModifierLevel())) {
+            		methods.put(ctConstructor.getLongName(), ctConstructor);
+            	}
             }
         }
         return methods;
