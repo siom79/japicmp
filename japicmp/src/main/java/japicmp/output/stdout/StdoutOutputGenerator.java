@@ -17,22 +17,38 @@ public class StdoutOutputGenerator {
 		sb.append(String.format("Comparing %s with %s:%n", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath()));
 		for (JApiClass jApiClass : jApiClasses) {
 			processClass(sb, jApiClass);
+            processConstructors(sb, jApiClass);
 			processMethods(sb, jApiClass);
 		}
 		return sb.toString();
 	}
 
+    private void processConstructors(StringBuilder sb, JApiClass jApiClass) {
+        List<JApiConstructor> constructors = jApiClass.getConstructors();
+        for (JApiConstructor jApiConstructor : constructors) {
+            if (jApiConstructor.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+                appendMethod(sb, "===", jApiConstructor, "CONSTRUCTOR");
+            } else if (jApiConstructor.getChangeStatus() == JApiChangeStatus.NEW) {
+                appendMethod(sb, "+++", jApiConstructor, "CONSTRUCTOR");
+            } else if (jApiConstructor.getChangeStatus() == JApiChangeStatus.REMOVED) {
+                appendMethod(sb, "---", jApiConstructor, "CONSTRUCTOR");
+            } else if (jApiConstructor.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+                appendMethod(sb, "***", jApiConstructor, "CONSTRUCTOR");
+            }
+        }
+    }
+
 	private void processMethods(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiMethod> methods = jApiClass.getMethods();
 		for (JApiMethod jApiMethod : methods) {
 			if (jApiMethod.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-				appendMethod(sb, "===", jApiMethod);
+				appendMethod(sb, "===", jApiMethod, "METHOD");
 			} else if (jApiMethod.getChangeStatus() == JApiChangeStatus.NEW) {
-				appendMethod(sb, "+++", jApiMethod);
+				appendMethod(sb, "+++", jApiMethod, "METHOD");
 			} else if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				appendMethod(sb, "---", jApiMethod);
+				appendMethod(sb, "---", jApiMethod, "METHOD");
 			} else if (jApiMethod.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				appendMethod(sb, "***", jApiMethod);
+				appendMethod(sb, "***", jApiMethod, "METHOD");
 			}
 		}
 	}
@@ -49,8 +65,8 @@ public class StdoutOutputGenerator {
 		}
 	}
 
-	private void appendMethod(StringBuilder sb, String signs, JApiMethod jApiMethod) {
-		sb.append("\t" + signs + " " + jApiMethod.getChangeStatus() + " METHOD " + jApiMethod.getName() + "(");
+	private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiMethod, String classMemberType) {
+		sb.append("\t" + signs + " " + jApiMethod.getChangeStatus() + " "+classMemberType+" " + jApiMethod.getName() + "(");
 		int paramCount = 0;
 		for (JApiParameter jApiParameter : jApiMethod.getParameters()) {
 			if (paramCount > 0) {
@@ -66,29 +82,29 @@ public class StdoutOutputGenerator {
 		sb.append("\n");
 	}
 
-    private void appendModifierChanges(StringBuilder sb, JApiModifier jApiModifier) {
-        if (jApiModifier.getAccessModifierOld() != jApiModifier.getAccessModifierNew()) {
-            sb.append(" " + jApiModifier.getAccessModifierOld() + "->" + jApiModifier.getAccessModifierNew());
+    private void appendModifierChanges(StringBuilder sb, JApiHasModifier jApiHasModifier) {
+        if (jApiHasModifier.getAccessModifierOld() != jApiHasModifier.getAccessModifierNew()) {
+            sb.append(" " + jApiHasModifier.getAccessModifierOld() + "->" + jApiHasModifier.getAccessModifierNew());
         }
-        if(!jApiModifier.getFinalModifierOldOptional().isPresent() && jApiModifier.getFinalModifierNewOptional().isPresent() && jApiModifier.getFinalModifierNewOptional().get() == true) {
+        if(!jApiHasModifier.getFinalModifierOldOptional().isPresent() && jApiHasModifier.getFinalModifierNewOptional().isPresent() && jApiHasModifier.getFinalModifierNewOptional().get() == true) {
             sb.append(" +++final");
-        } else if(jApiModifier.getFinalModifierOldOptional().isPresent() && jApiModifier.getFinalModifierOldOptional().get() == true && !jApiModifier.getFinalModifierNewOptional().isPresent()) {
+        } else if(jApiHasModifier.getFinalModifierOldOptional().isPresent() && jApiHasModifier.getFinalModifierOldOptional().get() == true && !jApiHasModifier.getFinalModifierNewOptional().isPresent()) {
             sb.append(" ---final");
-        } else if(jApiModifier.getFinalModifierOldOptional().isPresent() && jApiModifier.getFinalModifierNewOptional().isPresent()) {
-            if(jApiModifier.getFinalModifierOldOptional().get() == true && jApiModifier.getFinalModifierNewOptional().get() == false) {
+        } else if(jApiHasModifier.getFinalModifierOldOptional().isPresent() && jApiHasModifier.getFinalModifierNewOptional().isPresent()) {
+            if(jApiHasModifier.getFinalModifierOldOptional().get() == true && jApiHasModifier.getFinalModifierNewOptional().get() == false) {
                 sb.append(" ---final");
-            } else if(jApiModifier.getFinalModifierOldOptional().get() == false && jApiModifier.getFinalModifierNewOptional().get() == true) {
+            } else if(jApiHasModifier.getFinalModifierOldOptional().get() == false && jApiHasModifier.getFinalModifierNewOptional().get() == true) {
                 sb.append(" +++final");
             }
         }
-        if(!jApiModifier.getStaticModifierOldOptional().isPresent() && jApiModifier.getStaticModifierNewOptional().isPresent() && jApiModifier.getStaticModifierNewOptional().get() == true) {
+        if(!jApiHasModifier.getStaticModifierOldOptional().isPresent() && jApiHasModifier.getStaticModifierNewOptional().isPresent() && jApiHasModifier.getStaticModifierNewOptional().get() == true) {
             sb.append(" +++static");
-        } else if(jApiModifier.getStaticModifierOldOptional().isPresent() && jApiModifier.getStaticModifierOldOptional().get() == true && !jApiModifier.getStaticModifierNewOptional().isPresent()) {
+        } else if(jApiHasModifier.getStaticModifierOldOptional().isPresent() && jApiHasModifier.getStaticModifierOldOptional().get() == true && !jApiHasModifier.getStaticModifierNewOptional().isPresent()) {
             sb.append(" ---static");
-        } else if(jApiModifier.getStaticModifierOldOptional().isPresent() && jApiModifier.getStaticModifierNewOptional().isPresent()) {
-            if(jApiModifier.getStaticModifierOldOptional().get() == true && jApiModifier.getStaticModifierNewOptional().get() == false) {
+        } else if(jApiHasModifier.getStaticModifierOldOptional().isPresent() && jApiHasModifier.getStaticModifierNewOptional().isPresent()) {
+            if(jApiHasModifier.getStaticModifierOldOptional().get() == true && jApiHasModifier.getStaticModifierNewOptional().get() == false) {
                 sb.append(" ---static");
-            } else if(jApiModifier.getStaticModifierOldOptional().get() == false && jApiModifier.getStaticModifierNewOptional().get() == true) {
+            } else if(jApiHasModifier.getStaticModifierOldOptional().get() == false && jApiHasModifier.getStaticModifierNewOptional().get() == true) {
                 sb.append(" +++static");
             }
         }

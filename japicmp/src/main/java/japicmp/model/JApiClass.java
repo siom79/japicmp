@@ -11,11 +11,12 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JApiClass implements JApiModifier {
+public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     private final String fullyQualifiedName;
     private final Optional<CtClass> oldClass;
     private final Optional<CtClass> newClass;
-    private List<JApiMethod> methods = new LinkedList<JApiMethod>();
+    private List<JApiConstructor> constructors = new LinkedList<>();
+    private List<JApiMethod> methods = new LinkedList<>();
     private JApiChangeStatus changeStatus;
     private final Type type;
     private Optional<AccessModifier> accessModifierOld;
@@ -42,6 +43,13 @@ public class JApiClass implements JApiModifier {
         this.staticModifierOld = extractStaticFinalModifier(oldClass);
         this.staticModifierNew = extractStaticFinalModifier(newClass);
         evaluateChangeStatus();
+    }
+
+    public void addConstructor(JApiConstructor jApiConstructor) {
+        constructors.add(jApiConstructor);
+        if(jApiConstructor.getChangeStatus() != JApiChangeStatus.UNCHANGED && this.changeStatus == JApiChangeStatus.UNCHANGED) {
+            this.changeStatus = JApiChangeStatus.MODIFIED;
+        }
     }
 
     public void addMethod(JApiMethod jApiMethod) {
@@ -132,28 +140,19 @@ public class JApiClass implements JApiModifier {
         this.changeStatus = changeStatus;
     }
 
+    @XmlElement(name = "constructor")
+    public List<JApiConstructor> getConstructors() {
+        return constructors;
+    }
+
     @XmlElement(name = "method")
     public List<JApiMethod> getMethods() {
         return methods;
     }
 
-    public void setMethods(List<JApiMethod> methods) {
-        this.methods = methods;
-    }
-
     @XmlAttribute
     public Type getType() {
         return type;
-    }
-
-    @Override
-    public String toString() {
-        return "JApiClass{" +
-                "changeStatus=" + changeStatus +
-                ", fullyQualifiedName='" + fullyQualifiedName + '\'' +
-                ", oldClass=" + oldClass +
-                ", newClass=" + newClass +
-                '}';
     }
     
     @XmlAttribute(name = "accessModifierNew")
@@ -212,4 +211,23 @@ public class JApiClass implements JApiModifier {
 	public Optional<Boolean> getStaticModifierNewOptional() {
 		return staticModifierNew;
 	}
+
+    @Override
+    public String toString() {
+        return "JApiClass{" +
+                "fullyQualifiedName='" + fullyQualifiedName + '\'' +
+                ", oldClass=" + oldClass +
+                ", newClass=" + newClass +
+                ", constructors=" + constructors +
+                ", methods=" + methods +
+                ", changeStatus=" + changeStatus +
+                ", type=" + type +
+                ", accessModifierOld=" + accessModifierOld +
+                ", accessModifierNew=" + accessModifierNew +
+                ", finalModifierOld=" + finalModifierOld +
+                ", finalModifierNew=" + finalModifierNew +
+                ", staticModifierOld=" + staticModifierOld +
+                ", staticModifierNew=" + staticModifierNew +
+                '}';
+    }
 }

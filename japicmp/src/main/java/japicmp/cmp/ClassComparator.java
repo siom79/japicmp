@@ -1,10 +1,7 @@
 package japicmp.cmp;
 
 import com.google.common.base.Optional;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiParameter;
+import japicmp.model.*;
 import japicmp.util.ModifierHelper;
 import japicmp.util.SignatureParser;
 import javassist.CtBehavior;
@@ -26,6 +23,9 @@ public class ClassComparator {
         Map<String, CtMethod> oldMethodsMap = createMethodMap(jApiClass.getOldClass());
         Map<String, CtMethod> newMethodsMap = createMethodMap(jApiClass.getNewClass());
         sortMethodsIntoLists(oldMethodsMap, newMethodsMap, jApiClass);
+        Map<String, CtConstructor> oldConstructorsMap = createConstructorMap(jApiClass.getOldClass());
+        Map<String, CtConstructor> newConstructorsMap = createConstructorMap(jApiClass.getNewClass());
+        sortConstructorsIntoLists(oldConstructorsMap, newConstructorsMap, jApiClass);
     }
 
     private void sortMethodsIntoLists(Map<String, CtMethod> oldMethodsMap, Map<String, CtMethod> newMethodsMap, JApiClass jApiClass) {
@@ -56,7 +56,35 @@ public class ClassComparator {
         }
     }
 
-    private void addParametersToMethod(SignatureParser signatureParser, JApiMethod jApiMethod) {
+    private void sortConstructorsIntoLists(Map<String, CtConstructor> oldConstructorsMap, Map<String, CtConstructor> newConstructorsMap, JApiClass jApiClass) {
+        SignatureParser signatureParser = new SignatureParser();
+        for (CtConstructor ctMethod : oldConstructorsMap.values()) {
+            String longName = ctMethod.getLongName();
+            signatureParser.parse(ctMethod.getSignature());
+            CtConstructor foundMethod = newConstructorsMap.get(longName);
+            if (foundMethod == null) {
+                JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>absent());
+                addParametersToMethod(signatureParser, jApiConstructor);
+                jApiClass.addConstructor(jApiConstructor);
+            } else {
+                JApiConstructor jApiMethod = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod));
+                addParametersToMethod(signatureParser, jApiMethod);
+                jApiClass.addConstructor(jApiMethod);
+            }
+        }
+        for (CtConstructor ctMethod : newConstructorsMap.values()) {
+            String longName = ctMethod.getLongName();
+            signatureParser.parse(ctMethod.getSignature());
+            CtConstructor foundMethod = oldConstructorsMap.get(longName);
+            if (foundMethod == null) {
+                JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>absent(), Optional.of(ctMethod));
+                addParametersToMethod(signatureParser, jApiConstructor);
+                jApiClass.addConstructor(jApiConstructor);
+            }
+        }
+    }
+
+    private void addParametersToMethod(SignatureParser signatureParser, JApiBehavior jApiMethod) {
         for (String param : signatureParser.getParameters()) {
             jApiMethod.addParameter(new JApiParameter(param));
         }
@@ -74,8 +102,8 @@ public class ClassComparator {
         return methods;
     }
     
-    private Map<String, CtBehavior> createConstructorMap(Optional<CtClass> ctClass) {
-        Map<String, CtBehavior> methods = new HashMap<String, CtBehavior>();
+    private Map<String, CtConstructor> createConstructorMap(Optional<CtClass> ctClass) {
+        Map<String, CtConstructor> methods = new HashMap<>();
         if (ctClass.isPresent()) {
             for(CtConstructor ctConstructor : ctClass.get().getDeclaredConstructors()) {
             	if(ModifierHelper.matchesModifierLevel(ctConstructor.getModifiers(), options.getModifierLevel())) {
