@@ -2,12 +2,16 @@ package japicmp.output;
 
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiImplementedInterface;
 import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
+
+import com.google.common.base.Optional;
 
 public class OutputTransformer {
 
@@ -16,25 +20,33 @@ public class OutputTransformer {
     }
 
     public static void removeUnchanged(List<JApiClass> jApiClasses) {
-        List<JApiClass> classesToRemove = new LinkedList<JApiClass>();
-        for (JApiClass jApiClass : jApiClasses) {
-            if (jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                classesToRemove.add(jApiClass);
-            } else {
-                List<JApiMethod> methodsToRemove = new LinkedList<JApiMethod>();
-                List<JApiMethod> methods = jApiClass.getMethods();
-                for (JApiMethod jApiMethod : methods) {
-                    if (jApiMethod.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                        methodsToRemove.add(jApiMethod);
-                    }
-                }
-                for (JApiMethod jApiMethod : methodsToRemove) {
-                    methods.remove(jApiMethod);
-                }
-            }
-        }
-        for (JApiClass jApiClass : classesToRemove) {
-            jApiClasses.remove(jApiClass);
+        Iterator<JApiClass> itClasses = jApiClasses.iterator();
+        while(itClasses.hasNext()) {
+        	JApiClass jApiClass = itClasses.next();
+        	if(jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+        		itClasses.remove();
+        	} else {
+        		Iterator<JApiMethod> itMethods = jApiClass.getMethods().iterator();
+        		while(itMethods.hasNext()) {
+        			JApiMethod jApiMethod = itMethods.next();
+        			if(jApiMethod.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+        				itMethods.remove();
+        			}
+        		}
+        		Iterator<JApiImplementedInterface> itInterfaces = jApiClass.getInterfaces().iterator();
+        		while(itInterfaces.hasNext()) {
+        			JApiImplementedInterface jApiImplementedInterface = itInterfaces.next();
+        			if(jApiImplementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+        				itInterfaces.remove();
+        			}
+        		}
+        		if(jApiClass.getSuperclassOptional().isPresent()) {
+        			JApiSuperclass jApiSuperclass = jApiClass.getSuperclassOptional().get();
+        			if(jApiSuperclass.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+        				jApiClass.setSuperclassOptional(Optional.<JApiSuperclass>absent());
+        			}
+        		}
+        	}
         }
     }
 
