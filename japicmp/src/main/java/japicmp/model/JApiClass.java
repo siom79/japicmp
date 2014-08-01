@@ -17,44 +17,39 @@ import java.util.Map;
 
 public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     private final String fullyQualifiedName;
+    private final Type type;
     private final Optional<CtClass> oldClass;
     private final Optional<CtClass> newClass;
+    private JApiChangeStatus changeStatus;
     private final List<JApiConstructor> constructors = new LinkedList<>();
     private final List<JApiMethod> methods = new LinkedList<>();
     private final List<JApiImplementedInterface> interfaces = new LinkedList<>();
-    private JApiChangeStatus changeStatus;
-    private final Type type;
-    private final Optional<AccessModifier> accessModifierOld;
-    private final Optional<AccessModifier> accessModifierNew;
-    private final Optional<Boolean> finalModifierOld;
-    private final Optional<Boolean> finalModifierNew;
-    private final Optional<Boolean> staticModifierOld;
-    private final Optional<Boolean> staticModifierNew;
-    private Optional<JApiSuperclass> superclass;
+    private final JApiModifier<AccessModifier> accessModifier;
+    private final JApiModifier<FinalModifier> finalModifier;
+    private final JApiModifier<StaticModifier> staticModifier;
+    private final JApiModifier<AbstractModifier> abstractModifier;
+    private final JApiSuperclass superclass;
 
     public enum Type {
         ANNOTATION, INTERFACE, CLASS, ENUM
     }
 
     public JApiClass(String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, Type type) {
-        this.changeStatus = changeStatus;
         this.fullyQualifiedName = fullyQualifiedName;
         this.newClass = newClass;
         this.oldClass = oldClass;
         this.type = type;
-        this.accessModifierOld = extractAccessModifier(oldClass);
-        this.accessModifierNew = extractAccessModifier(newClass);
-        this.finalModifierOld = extractFinalModifier(oldClass);
-        this.finalModifierNew = extractFinalModifier(newClass);
-        this.staticModifierOld = extractStaticFinalModifier(oldClass);
-        this.staticModifierNew = extractStaticFinalModifier(newClass);
+        this.accessModifier = extractAccessModifier(oldClass, newClass);
+        this.finalModifier = extractFinalModifier(oldClass, newClass);
+        this.staticModifier = extractStaticModifier(oldClass, newClass);
+        this.abstractModifier = extractAbstractModifier(oldClass, newClass);
         this.superclass = extractSuperclass(oldClass, newClass);
         computeInterfaceChanges(this.interfaces, oldClass, newClass);
-        evaluateChangeStatus();
+        this.changeStatus = evaluateChangeStatus(changeStatus);
     }
 
-	private Optional<JApiSuperclass> extractSuperclass(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
-		Optional<JApiSuperclass> retVal = Optional.absent();
+	private JApiSuperclass extractSuperclass(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+		JApiSuperclass retVal = null;
 		if(oldClassOptional.isPresent() && newClassOptional.isPresent()) {
 			CtClass oldClass = oldClassOptional.get();
 			CtClass newClass = newClassOptional.get();
@@ -63,27 +58,30 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 			if(superclassOldOptional.isPresent() && superclassNewOptional.isPresent()) {
 				String nameOld = superclassOldOptional.get().getName();
 				String nameNew = superclassNewOptional.get().getName();
-				JApiSuperclass superclass = new JApiSuperclass(Optional.of(nameOld), Optional.of(nameNew), nameOld.equals(nameNew) ? JApiChangeStatus.UNCHANGED : JApiChangeStatus.MODIFIED);
-				retVal = Optional.of(superclass);
+				retVal = new JApiSuperclass(Optional.of(nameOld), Optional.of(nameNew), nameOld.equals(nameNew) ? JApiChangeStatus.UNCHANGED : JApiChangeStatus.MODIFIED);
 			} else if(superclassOldOptional.isPresent() && !superclassNewOptional.isPresent()) {
-				JApiSuperclass superclass = new JApiSuperclass(Optional.of(superclassOldOptional.get().getName()), Optional.<String>absent(), JApiChangeStatus.REMOVED);
-				retVal = Optional.of(superclass);
+				retVal = new JApiSuperclass(Optional.of(superclassOldOptional.get().getName()), Optional.<String>absent(), JApiChangeStatus.REMOVED);
 			} else if(!superclassOldOptional.isPresent() && superclassNewOptional.isPresent()) {
-				JApiSuperclass superclass = new JApiSuperclass(Optional.<String>absent(), Optional.of(superclassNewOptional.get().getName()), JApiChangeStatus.NEW);
-				retVal = Optional.of(superclass);
+				retVal = new JApiSuperclass(Optional.<String>absent(), Optional.of(superclassNewOptional.get().getName()), JApiChangeStatus.NEW);
+			} else {
+				retVal = new JApiSuperclass(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
 			}
 		} else {
 			if(oldClassOptional.isPresent()) {
 				Optional<CtClass> superclassOldOptional = getSuperclass(oldClassOptional.get());
 				if(superclassOldOptional.isPresent()) {
 					JApiSuperclass superclass = new JApiSuperclass(Optional.of(superclassOldOptional.get().getName()), Optional.<String>absent(), JApiChangeStatus.REMOVED);
-					retVal = Optional.of(superclass);
+					retVal = superclass;
+				} else {
+					retVal = new JApiSuperclass(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
 				}
 			} else if(newClassOptional.isPresent()) {
 				Optional<CtClass> superclassNewOptional = getSuperclass(newClassOptional.get());
 				if(superclassNewOptional.isPresent()) {
 					JApiSuperclass superclass = new JApiSuperclass(Optional.<String>absent(), Optional.of(superclassNewOptional.get().getName()), JApiChangeStatus.NEW);
-					retVal = Optional.of(superclass);
+					retVal = superclass;
+				} else {
+					retVal = new JApiSuperclass(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
 				}
 			}
 		}
@@ -166,72 +164,126 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
         }
     }
     
-    public void evaluateChangeStatus() {
-    	if(this.changeStatus == JApiChangeStatus.UNCHANGED) {
-    		if(this.accessModifierOld.isPresent() && this.accessModifierNew.isPresent()) {
-    			if(this.accessModifierOld.get() != this.accessModifierNew.get()) {
-    				this.changeStatus = JApiChangeStatus.MODIFIED;
-    			}
-    		} else if(this.accessModifierOld.isPresent() && !this.accessModifierNew.isPresent()) {
-    			this.changeStatus = JApiChangeStatus.MODIFIED;
-    		} else if(!this.accessModifierOld.isPresent() && this.accessModifierNew.isPresent()) {
-    			this.changeStatus = JApiChangeStatus.MODIFIED;
+    public JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+    	if(changeStatus == JApiChangeStatus.UNCHANGED) {
+    		if(staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+    			changeStatus = JApiChangeStatus.MODIFIED;
     		}
-    		if(this.finalModifierOld.isPresent() && this.finalModifierNew.isPresent()) {
-    			if(this.finalModifierOld.get() != this.finalModifierNew.get()) {
-    				this.changeStatus = JApiChangeStatus.MODIFIED;
-    			}
-    		} else if(this.finalModifierOld.isPresent() && !this.finalModifierNew.isPresent()) {
-    			this.changeStatus = JApiChangeStatus.MODIFIED;
-    		} else if(!this.finalModifierOld.isPresent() && this.finalModifierNew.isPresent()) {
-    			this.changeStatus = JApiChangeStatus.MODIFIED;
+    		if(finalModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+    			changeStatus = JApiChangeStatus.MODIFIED;
     		}
-    		if(this.staticModifierOld.isPresent() && this.staticModifierNew.isPresent()) {
-    			if(this.staticModifierOld.get() != this.staticModifierNew.get()) {
-    				this.changeStatus = JApiChangeStatus.MODIFIED;
-    			}
-    		} else if(this.staticModifierOld.isPresent() && !this.staticModifierNew.isPresent()) {
-    			this.changeStatus = JApiChangeStatus.MODIFIED;
-    		} else if(!this.staticModifierOld.isPresent() && this.staticModifierNew.isPresent()) {
-    			this.changeStatus = JApiChangeStatus.MODIFIED;
+    		if(accessModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+    			changeStatus = JApiChangeStatus.MODIFIED;
+    		}
+    		if(abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+    			changeStatus = JApiChangeStatus.MODIFIED;
     		}
     		for(JApiImplementedInterface implementedInterface : interfaces) {
     			if(implementedInterface.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-    				this.changeStatus = JApiChangeStatus.MODIFIED;
+    				changeStatus = JApiChangeStatus.MODIFIED;
     			}
     		}
-    		if(this.superclass.isPresent()) {
-    			JApiSuperclass jApiSuperclass = this.superclass.get();
-    			if(jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-    				this.changeStatus = JApiChangeStatus.MODIFIED;
-    			}
-    		}
+			if(superclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				changeStatus = JApiChangeStatus.MODIFIED;
+			}
     	}
+    	return changeStatus;
     }
     
-    private Optional<Boolean> extractStaticFinalModifier(Optional<CtClass> classOptional) {
-		if(classOptional.isPresent()) {
-			CtClass ctClass = classOptional.get();
-			return Optional.of(Modifier.isStatic(ctClass.getModifiers()));
+    private JApiModifier<StaticModifier> extractStaticModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+    	if(oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			CtClass oldClass = oldClassOptional.get();
+			CtClass newClass = newClassOptional.get();
+			StaticModifier oldClassFinalModifier = Modifier.isStatic(oldClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
+			StaticModifier newClassFinalModifier = Modifier.isStatic(newClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
+			if(oldClassFinalModifier != newClassFinalModifier) {
+				return new JApiModifier<StaticModifier>(Optional.of(oldClassFinalModifier), Optional.of(newClassFinalModifier), JApiChangeStatus.MODIFIED);
+			} else {
+				return new JApiModifier<StaticModifier>(Optional.of(oldClassFinalModifier), Optional.of(newClassFinalModifier), JApiChangeStatus.UNCHANGED);
+			}
+		} else {
+			if(oldClassOptional.isPresent()) {
+				CtClass ctClass = oldClassOptional.get();
+				StaticModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
+				return new JApiModifier<StaticModifier>(Optional.of(finalModifier), Optional.<StaticModifier>absent(), JApiChangeStatus.REMOVED);
+			} else {
+				CtClass ctClass = newClassOptional.get();
+				StaticModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
+				return new JApiModifier<StaticModifier>(Optional.<StaticModifier>absent(), Optional.of(finalModifier), JApiChangeStatus.NEW);
+			}
 		}
-		return Optional.absent();
 	}
 
-	private Optional<Boolean> extractFinalModifier(Optional<CtClass> classOptional) {
-		if(classOptional.isPresent()) {
-			CtClass ctClass = classOptional.get();
-			return Optional.of(Modifier.isFinal(ctClass.getModifiers()));
+	private JApiModifier<FinalModifier> extractFinalModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+		if(oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			CtClass oldClass = oldClassOptional.get();
+			CtClass newClass = newClassOptional.get();
+			FinalModifier oldClassFinalModifier = Modifier.isFinal(oldClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
+			FinalModifier newClassFinalModifier = Modifier.isFinal(newClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
+			if(oldClassFinalModifier != newClassFinalModifier) {
+				return new JApiModifier<FinalModifier>(Optional.of(oldClassFinalModifier), Optional.of(newClassFinalModifier), JApiChangeStatus.MODIFIED);
+			} else {
+				return new JApiModifier<FinalModifier>(Optional.of(oldClassFinalModifier), Optional.of(newClassFinalModifier), JApiChangeStatus.UNCHANGED);
+			}
+		} else {
+			if(oldClassOptional.isPresent()) {
+				CtClass ctClass = oldClassOptional.get();
+				FinalModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
+				return new JApiModifier<FinalModifier>(Optional.of(finalModifier), Optional.<FinalModifier>absent(), JApiChangeStatus.REMOVED);
+			} else {
+				CtClass ctClass = newClassOptional.get();
+				FinalModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
+				return new JApiModifier<FinalModifier>(Optional.<FinalModifier>absent(), Optional.of(finalModifier), JApiChangeStatus.NEW);
+			}
 		}
-		return Optional.absent();
 	}
 
-	private Optional<AccessModifier> extractAccessModifier(Optional<CtClass> classOptional) {
-		if(classOptional.isPresent()) {
-			CtClass ctClass = classOptional.get();
-			AccessModifier accessModifier = ModifierHelper.translateToModifierLevel(ctClass.getModifiers());
-			return Optional.of(accessModifier);
+	private JApiModifier<AccessModifier> extractAccessModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+		if(oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			CtClass oldClass = oldClassOptional.get();
+			CtClass newClass = newClassOptional.get();
+			AccessModifier oldClassAccessModifier = ModifierHelper.translateToModifierLevel(oldClass.getModifiers());
+			AccessModifier newClassAccessModifier = ModifierHelper.translateToModifierLevel(newClass.getModifiers());
+			if(oldClassAccessModifier != newClassAccessModifier) {
+				return new JApiModifier<AccessModifier>(Optional.of(oldClassAccessModifier), Optional.of(newClassAccessModifier), JApiChangeStatus.MODIFIED);
+			} else {
+				return new JApiModifier<AccessModifier>(Optional.of(oldClassAccessModifier), Optional.of(newClassAccessModifier), JApiChangeStatus.UNCHANGED);
+			}
+		} else {
+			if(oldClassOptional.isPresent()) {
+				CtClass ctClass = oldClassOptional.get();
+				AccessModifier accessModifier = ModifierHelper.translateToModifierLevel(ctClass.getModifiers());
+				return new JApiModifier<AccessModifier>(Optional.of(accessModifier), Optional.<AccessModifier>absent(), JApiChangeStatus.REMOVED);
+			} else {
+				CtClass ctClass = newClassOptional.get();
+				AccessModifier accessModifier = ModifierHelper.translateToModifierLevel(ctClass.getModifiers());
+				return new JApiModifier<AccessModifier>(Optional.<AccessModifier>absent(), Optional.of(accessModifier), JApiChangeStatus.NEW);
+			}
 		}
-		return Optional.absent();
+	}
+	
+	private JApiModifier<AbstractModifier> extractAbstractModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+		if(oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			CtClass oldClass = oldClassOptional.get();
+			CtClass newClass = newClassOptional.get();
+			AbstractModifier oldClassAccessModifier = Modifier.isAbstract(oldClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
+			AbstractModifier newClassAccessModifier = Modifier.isAbstract(newClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
+			if(oldClassAccessModifier != newClassAccessModifier) {
+				return new JApiModifier<AbstractModifier>(Optional.of(oldClassAccessModifier), Optional.of(newClassAccessModifier), JApiChangeStatus.MODIFIED);
+			} else {
+				return new JApiModifier<AbstractModifier>(Optional.of(oldClassAccessModifier), Optional.of(newClassAccessModifier), JApiChangeStatus.UNCHANGED);
+			}
+		} else {
+			if(oldClassOptional.isPresent()) {
+				CtClass ctClass = oldClassOptional.get();
+				AbstractModifier abstractModifier = Modifier.isAbstract(ctClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
+				return new JApiModifier<AbstractModifier>(Optional.of(abstractModifier), Optional.<AbstractModifier>absent(), JApiChangeStatus.REMOVED);
+			} else {
+				CtClass ctClass = newClassOptional.get();
+				AbstractModifier abstractModifier = Modifier.isAbstract(ctClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
+				return new JApiModifier<AbstractModifier>(Optional.<AbstractModifier>absent(), Optional.of(abstractModifier), JApiChangeStatus.NEW);
+			}
+		}
 	}
 
     @XmlAttribute
@@ -273,11 +325,6 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     	return interfaces;
     }
 
-    @XmlElement(name = "superclass")
-    public String getSuperclass() {
-		return optionalToString(superclass);
-	}
-
 	@XmlAttribute
     public Type getType() {
         return type;
@@ -285,32 +332,32 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     
     @XmlAttribute(name = "accessModifierNew")
     public String getAccessModifierNew() {
-    	return optionalToString(accessModifierNew);
+    	return optionalToString(this.accessModifier.getNewModifier());
     }
 
     @XmlAttribute(name = "accessModifierOld")
     public String getAccessModifierOld() {
-    	return optionalToString(accessModifierOld);
+    	return optionalToString(this.accessModifier.getOldModifier());
     }
 
     @XmlAttribute(name = "finalModifierOld")
 	public String getFinalModifierOld() {
-		return optionalToString(finalModifierOld);
+		return optionalToString(finalModifier.getOldModifier());
 	}
 
     @XmlAttribute(name = "finalModifierNew")
 	public String getFinalModifierNew() {
-		return optionalToString(finalModifierNew);
+		return optionalToString(finalModifier.getNewModifier());
 	}
 
     @XmlAttribute(name = "staticModifierOld")
 	public String getStaticModifierOld() {
-		return optionalToString(staticModifierOld);
+		return optionalToString(staticModifier.getOldModifier());
 	}
 
     @XmlAttribute(name = "staticModifierNew")
 	public String getStaticModifierNew() {
-		return optionalToString(staticModifierNew);
+		return optionalToString(staticModifier.getNewModifier());
 	}
     
     private <T> String optionalToString(Optional<T> optional) {
@@ -321,31 +368,41 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     }
     
     @XmlTransient
-	public Optional<Boolean> getFinalModifierOldOptional() {
-		return finalModifierOld;
-	}
-
-    @XmlTransient
-	public Optional<Boolean> getFinalModifierNewOptional() {
-		return finalModifierNew;
-	}
-
-    @XmlTransient
-	public Optional<Boolean> getStaticModifierOldOptional() {
-		return staticModifierOld;
-	}
-
-    @XmlTransient
-	public Optional<Boolean> getStaticModifierNewOptional() {
-		return staticModifierNew;
-	}
-    
-    @XmlTransient
-    public Optional<JApiSuperclass> getSuperclassOptional() {
+    public JApiSuperclass getSuperclass() {
 		return superclass;
 	}
-    
-    public void setSuperclassOptional(Optional<JApiSuperclass> superclass) {
-		this.superclass = superclass;
+
+    @XmlTransient
+	@Override
+	public JApiModifier<FinalModifier> getFinalModifier() {
+		return this.finalModifier;
+	}
+
+    @XmlTransient
+    @Override
+	public JApiModifier<StaticModifier> getStaticModifier() {
+		return staticModifier;
+	}
+
+    @XmlTransient
+	@Override
+	public JApiModifier<AccessModifier> getAccessModifier() {
+		return this.accessModifier;
+	}
+
+    @XmlTransient
+	@Override
+	public JApiModifier<AbstractModifier> getAbstractModifier() {
+		return this.abstractModifier;
+	}
+
+	@Override
+	public String getAbstractModifierOld() {
+		return optionalToString(this.abstractModifier.getOldModifier());
+	}
+
+	@Override
+	public String getAbstractModifierNew() {
+		return optionalToString(this.abstractModifier.getNewModifier());
 	}
 }

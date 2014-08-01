@@ -1,25 +1,28 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
-
 public interface JApiHasModifier {
-    String getAccessModifierNew();
 
-    String getAccessModifierOld();
+	JApiModifier<AccessModifier> getAccessModifier();
 
-    String getFinalModifierOld();
+	String getAccessModifierOld();
 
-    String getFinalModifierNew();
+	String getAccessModifierNew();
 
-    String getStaticModifierOld();
+	JApiModifier<FinalModifier> getFinalModifier();
 
-    String getStaticModifierNew();
+	String getFinalModifierOld();
 
-    Optional<Boolean> getFinalModifierOldOptional();
+	String getFinalModifierNew();
 
-    Optional<Boolean> getFinalModifierNewOptional();
+	JApiModifier<StaticModifier> getStaticModifier();
 
-    Optional<Boolean> getStaticModifierOldOptional();
+	String getStaticModifierOld();
 
-    Optional<Boolean> getStaticModifierNewOptional();
+	String getStaticModifierNew();
+	
+	JApiModifier<AbstractModifier> getAbstractModifier();
+
+	String getAbstractModifierOld();
+
+	String getAbstractModifierNew();
 }

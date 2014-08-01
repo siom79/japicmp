@@ -169,8 +169,8 @@ public class JApiCmpMojo extends AbstractMojo {
     }
 
     private String generateDiffOutput(File newVersionFile, File oldVersionFile, List<JApiClass> jApiClasses, Options options) {
-        StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator();
-        String diffOutput = stdoutOutputGenerator.generate(oldVersionFile, newVersionFile, jApiClasses, options);
+        StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
+        String diffOutput = stdoutOutputGenerator.generate(oldVersionFile, newVersionFile, jApiClasses);
         getLog().info(diffOutput);
         return diffOutput;
     }

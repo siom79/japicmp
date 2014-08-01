@@ -56,8 +56,8 @@ public class JApiCmp {
             XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
             xmlGenerator.generate(oldArchive, newArchive, jApiClasses, options);
         }
-        StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator();
-        String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses, options);
+        StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
+        String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses);
         System.out.println(output);
     }
 

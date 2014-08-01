@@ -1,16 +1,22 @@
 package japicmp.cmp;
 
-import com.google.common.base.Optional;
-import japicmp.model.*;
+import japicmp.model.JApiBehavior;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiParameter;
 import japicmp.util.ModifierHelper;
 import japicmp.util.SignatureParser;
-import javassist.CtBehavior;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.base.Optional;
 
 public class ClassComparator {
     private final JarArchiveComparatorOptions options;
