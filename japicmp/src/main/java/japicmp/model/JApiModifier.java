@@ -1,5 +1,9 @@
 package japicmp.model;
 
+import japicmp.util.OptionalUtil;
+
+import javax.xml.bind.annotation.XmlAttribute;
+
 import com.google.common.base.Optional;
 
 public class JApiModifier<T> {
@@ -21,7 +25,18 @@ public class JApiModifier<T> {
 		return newModifier;
 	}
 
+	@XmlAttribute(name = "changeStatus")
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
+	}
+	
+	@XmlAttribute(name = "oldValue")
+	public String getValueOld() {
+		return OptionalUtil.optionalToString(this.oldModifier);
+	}
+	
+	@XmlAttribute(name = "newValue")
+	public String getValueNew() {
+		return OptionalUtil.optionalToString(this.newModifier);
 	}
 }

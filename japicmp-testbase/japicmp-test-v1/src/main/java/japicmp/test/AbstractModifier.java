@@ -8,7 +8,5 @@ public abstract class AbstractModifier {
     	
     }
     
-    public void nonAbstractRemainsNonAbstract() {
-    	
-    }
+    public abstract void abstractRemainsAbstract();
 }

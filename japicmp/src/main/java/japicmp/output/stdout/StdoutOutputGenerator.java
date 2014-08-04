@@ -8,6 +8,7 @@ import japicmp.model.JApiBehavior;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
 import japicmp.model.JApiHasModifier;
 import japicmp.model.JApiImplementedInterface;
 import japicmp.model.JApiMethod;
@@ -151,12 +152,20 @@ public class StdoutOutputGenerator {
 		processModifierChanges(sb, jApiClass, 1);
 		processInterfaceChanges(sb, jApiClass);
 		processSuperclassChanges(sb, jApiClass);
+		processFieldChanges(sb, jApiClass);
+	}
+
+	private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
+		List<JApiField> fields = jApiClass.getFields();
+		for(JApiField field : fields) {
+			sb.append(tabs(1) + signs(field.getChangeStatus()) + " " + field.getChangeStatus() + " FIELD " + field.getName() + "\n");
+		}
 	}
 
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
 		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
 		if (options.isOutputOnlyModifications() && jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-			sb.append(tabs(1) + signs(jApiSuperclass.getChangeStatus()) + " " + jApiSuperclass.getChangeStatus() + " EXTENDS " + superclassChangeAsString(jApiSuperclass) + "\n");
+			sb.append(tabs(1) + signs(jApiSuperclass.getChangeStatus()) + " " + jApiSuperclass.getChangeStatus() + " SUPERCLASS " + superclassChangeAsString(jApiSuperclass) + "\n");
 		}
 	}
 
@@ -174,7 +183,7 @@ public class StdoutOutputGenerator {
 	private void processInterfaceChanges(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiImplementedInterface> interfaces = jApiClass.getInterfaces();
 		for (JApiImplementedInterface implementedInterface : interfaces) {
-			sb.append(tabs(1) + signs(implementedInterface.getChangeStatus()) + " " + implementedInterface.getChangeStatus() + " IMPLEMENTS "
+			sb.append(tabs(1) + signs(implementedInterface.getChangeStatus()) + " " + implementedInterface.getChangeStatus() + " INTERFACE "
 					+ implementedInterface.getFullyQualifiedName() + "\n");
 		}
 	}

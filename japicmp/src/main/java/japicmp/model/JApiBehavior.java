@@ -2,6 +2,7 @@ package japicmp.model;
 
 import japicmp.util.ModifierHelper;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import javassist.Modifier;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Optional;
@@ -27,7 +29,7 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
     	this.name = name;
 		this.accessModifier = extractAccessModifier(oldBehavior, newBehavior);
         this.finalModifier = extractFinalModifier(oldBehavior, newBehavior);
-        this.staticModifier = extractStaticFinalModifier(oldBehavior, newBehavior);
+        this.staticModifier = extractStaticModifier(oldBehavior, newBehavior);
         this.abstractModifier = extractAbstractModifier(oldBehavior, newBehavior);
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
@@ -50,7 +52,7 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
         return changeStatus;
     }
 
-    protected JApiModifier<StaticModifier> extractStaticFinalModifier(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional) {
+    protected JApiModifier<StaticModifier> extractStaticModifier(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional) {
     	if(oldClassOptional.isPresent() && newClassOptional.isPresent()) {
     		CtBehavior oldClass = oldClassOptional.get();
     		CtBehavior newClass = newClassOptional.get();
@@ -145,6 +147,12 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
 			}
 		}
 	}
+	
+    @XmlElementWrapper(name = "modifiers")
+    @XmlElement(name = "modifier")
+    public List<JApiModifier<? extends Enum<?>>> getModifiers() {
+    	return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier);
+    }
     
     @XmlAttribute
     public String getName() {
@@ -154,43 +162,6 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
     @XmlAttribute
     public JApiChangeStatus getChangeStatus() {
         return changeStatus;
-    }
-
-    @XmlAttribute(name = "accessModifierNew")
-    public String getAccessModifierNew() {
-        return optionalToString(accessModifier.getNewModifier());
-    }
-
-    @XmlAttribute(name = "accessModifierOld")
-    public String getAccessModifierOld() {
-        return optionalToString(accessModifier.getOldModifier());
-    }
-
-    @XmlAttribute(name = "finalModifierOld")
-    public String getFinalModifierOld() {
-        return optionalToString(finalModifier.getOldModifier());
-    }
-
-    @XmlAttribute(name = "finalModifierNew")
-    public String getFinalModifierNew() {
-        return optionalToString(finalModifier.getNewModifier());
-    }
-
-    @XmlAttribute(name = "staticModifierOld")
-    public String getStaticModifierOld() {
-        return optionalToString(staticModifier.getOldModifier());
-    }
-
-    @XmlAttribute(name = "staticModifierNew")
-    public String getStaticModifierNew() {
-        return optionalToString(staticModifier.getNewModifier());
-    }
-
-    private <T> String optionalToString(Optional<T> optional) {
-        if(optional.isPresent()) {
-            return optional.get().toString();
-        }
-        return "n.a.";
     }
 
     @XmlElement(name = "parameter")
@@ -220,15 +191,5 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
 	@Override
 	public JApiModifier<AbstractModifier> getAbstractModifier() {
 		return this.abstractModifier;
-	}
-
-	@Override
-	public String getAbstractModifierOld() {
-		return optionalToString(this.abstractModifier.getOldModifier());
-	}
-
-	@Override
-	public String getAbstractModifierNew() {
-		return optionalToString(this.abstractModifier.getNewModifier());
 	}
 }

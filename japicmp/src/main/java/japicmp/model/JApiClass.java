@@ -1,19 +1,24 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
 import japicmp.util.ModifierHelper;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import javassist.CtClass;
+import javassist.CtField;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Optional;
 
 public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     private final String fullyQualifiedName;
@@ -21,14 +26,15 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     private final Optional<CtClass> oldClass;
     private final Optional<CtClass> newClass;
     private JApiChangeStatus changeStatus;
+    private final JApiSuperclass superclass;
+    private final List<JApiImplementedInterface> interfaces = new LinkedList<>();
+    private final List<JApiField> fields = new LinkedList<>();
     private final List<JApiConstructor> constructors = new LinkedList<>();
     private final List<JApiMethod> methods = new LinkedList<>();
-    private final List<JApiImplementedInterface> interfaces = new LinkedList<>();
     private final JApiModifier<AccessModifier> accessModifier;
     private final JApiModifier<FinalModifier> finalModifier;
     private final JApiModifier<StaticModifier> staticModifier;
     private final JApiModifier<AbstractModifier> abstractModifier;
-    private final JApiSuperclass superclass;
 
     public enum Type {
         ANNOTATION, INTERFACE, CLASS, ENUM
@@ -39,14 +45,67 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
         this.newClass = newClass;
         this.oldClass = oldClass;
         this.type = type;
+        this.superclass = extractSuperclass(oldClass, newClass);
+        computeInterfaceChanges(this.interfaces, oldClass, newClass);
+        computeFieldChanges(this.fields, oldClass, newClass);
         this.accessModifier = extractAccessModifier(oldClass, newClass);
         this.finalModifier = extractFinalModifier(oldClass, newClass);
         this.staticModifier = extractStaticModifier(oldClass, newClass);
         this.abstractModifier = extractAbstractModifier(oldClass, newClass);
-        this.superclass = extractSuperclass(oldClass, newClass);
-        computeInterfaceChanges(this.interfaces, oldClass, newClass);
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
+
+	private void computeFieldChanges(List<JApiField> fields, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			CtClass oldClass = oldClassOptional.get();
+			CtClass newClass = newClassOptional.get();
+			Map<String, CtField> oldFieldsMap = buildFieldMap(oldClass);
+			Map<String, CtField> newFieldsMap = buildFieldMap(newClass);
+			for(CtField oldField : oldFieldsMap.values()) {
+				String oldFieldName = oldField.getName();
+				CtField newField = newFieldsMap.get(oldFieldName);
+				if(newField != null) {
+					JApiField jApiField = new JApiField(JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField));
+					fields.add(jApiField);
+				} else {
+					JApiField jApiField = new JApiField(JApiChangeStatus.REMOVED, Optional.of(oldField), Optional.<CtField>absent());
+					fields.add(jApiField);
+				}
+			}
+			for(CtField newField : newFieldsMap.values()) {
+				CtField oldField = oldFieldsMap.get(newField.getName());
+				if(oldField == null) {
+					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(newField));
+					fields.add(jApiField);
+				}
+			}
+		} else {
+			if(oldClassOptional.isPresent()) {
+				Map<String, CtField> fieldMap = buildFieldMap(oldClassOptional.get());
+				for(CtField field : fieldMap.values()) {
+					JApiField jApiField = new JApiField(JApiChangeStatus.REMOVED, Optional.of(field), Optional.<CtField>absent());
+					fields.add(jApiField);
+				}
+			}
+			if(newClassOptional.isPresent()) {
+				Map<String, CtField> fieldMap = buildFieldMap(newClassOptional.get());
+				for(CtField field : fieldMap.values()) {
+					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(field));
+					fields.add(jApiField);
+				}
+			}
+		}
+	}
+
+	private Map<String, CtField> buildFieldMap(CtClass ctClass) {
+		Map<String,CtField> fieldMap = new HashMap<>();
+		CtField[] declaredFields = ctClass.getDeclaredFields();
+		for (CtField field : declaredFields) {
+			String name = field.getName();
+			fieldMap.put(name, field);
+		}
+		return fieldMap;
+	}
 
 	private JApiSuperclass extractSuperclass(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
 		JApiSuperclass retVal = null;
@@ -186,6 +245,11 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 			if(superclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
+			for(JApiField field : fields) {
+				if(field.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+					changeStatus = JApiChangeStatus.MODIFIED;
+				}
+			}
     	}
     	return changeStatus;
     }
@@ -309,68 +373,46 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     public void setChangeStatus(JApiChangeStatus changeStatus) {
         this.changeStatus = changeStatus;
     }
+    
+    @XmlElementWrapper(name = "modifiers")
+    @XmlElement(name = "modifier")
+    public List<JApiModifier<? extends Enum<?>>> getModifiers() {
+    	return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier);
+    }
+    
+    @XmlElement(name = "superclass")
+    public JApiSuperclass getSuperclass() {
+		return superclass;
+	}
+    
+    @XmlElementWrapper(name = "interfaces")
+    @XmlElement(name = "interface")
+    public List<JApiImplementedInterface> getInterfaces() {
+    	return interfaces;
+    }
 
+	@XmlElementWrapper(name = "constructors", nillable = false)
     @XmlElement(name = "constructor")
     public List<JApiConstructor> getConstructors() {
         return constructors;
     }
 
+    @XmlElementWrapper(name = "methods")
     @XmlElement(name = "method")
     public List<JApiMethod> getMethods() {
         return methods;
     }
     
-    @XmlElement(name = "interface")
-    public List<JApiImplementedInterface> getInterfaces() {
-    	return interfaces;
+    @XmlElementWrapper(name = "fields")
+    @XmlElement(name = "field")
+    public List<JApiField> getFields() {
+        return fields;
     }
 
 	@XmlAttribute
     public Type getType() {
         return type;
     }
-    
-    @XmlAttribute(name = "accessModifierNew")
-    public String getAccessModifierNew() {
-    	return optionalToString(this.accessModifier.getNewModifier());
-    }
-
-    @XmlAttribute(name = "accessModifierOld")
-    public String getAccessModifierOld() {
-    	return optionalToString(this.accessModifier.getOldModifier());
-    }
-
-    @XmlAttribute(name = "finalModifierOld")
-	public String getFinalModifierOld() {
-		return optionalToString(finalModifier.getOldModifier());
-	}
-
-    @XmlAttribute(name = "finalModifierNew")
-	public String getFinalModifierNew() {
-		return optionalToString(finalModifier.getNewModifier());
-	}
-
-    @XmlAttribute(name = "staticModifierOld")
-	public String getStaticModifierOld() {
-		return optionalToString(staticModifier.getOldModifier());
-	}
-
-    @XmlAttribute(name = "staticModifierNew")
-	public String getStaticModifierNew() {
-		return optionalToString(staticModifier.getNewModifier());
-	}
-    
-    private <T> String optionalToString(Optional<T> optional) {
-    	if(optional.isPresent()) {
-    		return optional.get().toString();
-    	}
-    	return "n.a.";
-    }
-    
-    @XmlTransient
-    public JApiSuperclass getSuperclass() {
-		return superclass;
-	}
 
     @XmlTransient
 	@Override
@@ -394,15 +436,5 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 	@Override
 	public JApiModifier<AbstractModifier> getAbstractModifier() {
 		return this.abstractModifier;
-	}
-
-	@Override
-	public String getAbstractModifierOld() {
-		return optionalToString(this.abstractModifier.getOldModifier());
-	}
-
-	@Override
-	public String getAbstractModifierNew() {
-		return optionalToString(this.abstractModifier.getNewModifier());
 	}
 }

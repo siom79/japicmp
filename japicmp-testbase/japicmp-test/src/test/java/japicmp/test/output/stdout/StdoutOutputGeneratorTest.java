@@ -26,6 +26,6 @@ public class StdoutOutputGeneratorTest {
 		assertThat(string, containsString("+++ NEW CLASS japicmp.test.Added"));
 		assertThat(string, containsString("--- REMOVED CLASS japicmp.test.Removed"));
 		assertThat(string, containsString("*** MODIFIED CLASS japicmp.test.Superclasses$SuperClassChanges"));
-		assertThat(string, containsString("*** MODIFIED EXTENDS japicmp.test.Superclasses$SuperclassB (<- japicmp.test.Superclasses$SuperclassA)"));
+		assertThat(string, containsString("*** MODIFIED SUPERCLASS japicmp.test.Superclasses$SuperclassB (<- japicmp.test.Superclasses$SuperclassA)"));
 	}
 }
