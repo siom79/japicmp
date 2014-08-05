@@ -104,7 +104,7 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 			Map<String, CtField> oldFieldsMap = buildFieldMap(oldClass);
 			Map<String, CtField> newFieldsMap = buildFieldMap(newClass);
 			for(CtField oldField : oldFieldsMap.values()) {
-				String oldFieldName = oldField.getName() + "#" + oldField.getSignature();
+				String oldFieldName = oldField.getName();
 				CtField newField = newFieldsMap.get(oldFieldName);
 				if(newField != null) {
 					JApiField jApiField = new JApiField(JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField));
@@ -115,7 +115,7 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 				}
 			}
 			for(CtField newField : newFieldsMap.values()) {
-				CtField oldField = oldFieldsMap.get(newField.getName() + "#" + newField.getSignature());
+				CtField oldField = oldFieldsMap.get(newField.getName());
 				if(oldField == null) {
 					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(newField));
 					fields.add(jApiField);
@@ -143,7 +143,7 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 		Map<String,CtField> fieldMap = new HashMap<>();
 		CtField[] declaredFields = ctClass.getDeclaredFields();
 		for (CtField field : declaredFields) {
-			String name = field.getName() + "#" + field.getSignature();
+			String name = field.getName();
 			fieldMap.put(name, field);
 		}
 		return fieldMap;

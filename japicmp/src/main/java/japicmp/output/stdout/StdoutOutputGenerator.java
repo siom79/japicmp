@@ -1,17 +1,7 @@
 package japicmp.output.stdout;
 
 import japicmp.config.Options;
-import japicmp.model.JApiBehavior;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiConstructor;
-import japicmp.model.JApiField;
-import japicmp.model.JApiHasModifier;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiModifier;
-import japicmp.model.JApiParameter;
-import japicmp.model.JApiSuperclass;
+import japicmp.model.*;
 import japicmp.output.OutputTransformer;
 
 import java.io.File;
@@ -141,10 +131,30 @@ public class StdoutOutputGenerator {
 	private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiField> fields = jApiClass.getFields();
 		for(JApiField field : fields) {
-			sb.append(tabs(1) + signs(field.getChangeStatus()) + " " + field.getChangeStatus() + " FIELD " + field.getName() + "\n");
+			sb.append(tabs(1) + signs(field.getChangeStatus()) + " " + field.getChangeStatus() + " FIELD " + fieldTypeChangeAsString(field) + " " + field.getName() + "\n");
 			processModifierChanges(sb, field, 2);
 		}
 	}
+
+    private String fieldTypeChangeAsString(JApiField field) {
+        JApiType type = field.getType();
+        if(type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
+            if(type.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+                return type.getOldTypeOptional().get() + " (<- " + type.getNewTypeOptional().get() + ")";
+            } else if(type.getChangeStatus() == JApiChangeStatus.NEW) {
+                return type.getNewTypeOptional().get();
+            } else if(type.getChangeStatus() == JApiChangeStatus.REMOVED) {
+                return type.getOldTypeOptional().get();
+            } else {
+                return type.getNewTypeOptional().get();
+            }
+        } else if(type.getOldTypeOptional().isPresent() && !type.getNewTypeOptional().isPresent()) {
+            return type.getOldTypeOptional().get();
+        } else if(!type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
+            return type.getNewTypeOptional().get();
+        }
+        return "n.a.";
+    }
 
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
 		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
