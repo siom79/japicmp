@@ -1,6 +1,6 @@
 package japicmp.model;
 
-import japicmp.util.OptionalUtil;
+import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
@@ -35,11 +35,11 @@ public class JApiSuperclass {
 	
 	@XmlAttribute(name = "superclassOld")
 	public String getSuperclassOld() {
-		return OptionalUtil.optionalToString(this.oldSuperclass);
+		return OptionalHelper.optionalToString(this.oldSuperclass);
 	}
 	
 	@XmlAttribute(name = "superclassNew")
 	public String getSuperclassNew() {
-		return OptionalUtil.optionalToString(this.newSuperclass);
+		return OptionalHelper.optionalToString(this.newSuperclass);
 	}
 }

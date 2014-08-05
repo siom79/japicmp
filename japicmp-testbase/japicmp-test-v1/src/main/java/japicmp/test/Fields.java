@@ -17,4 +17,5 @@ public class Fields {
 	public int nonfinalToFinalField;
 	public int nonfinalStaysNonFinalField;
 	public final int finalRemainsFinalField = 0;
+	public String stringToInt;
 }

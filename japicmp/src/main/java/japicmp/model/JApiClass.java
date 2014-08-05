@@ -1,7 +1,9 @@
 package japicmp.model;
 
+import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,7 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import com.google.common.base.Optional;
 
 public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
-    private final String fullyQualifiedName;
+	private final String fullyQualifiedName;
     private final Type type;
     private final Optional<CtClass> oldClass;
     private final Optional<CtClass> newClass;
@@ -35,6 +37,7 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     private final JApiModifier<FinalModifier> finalModifier;
     private final JApiModifier<StaticModifier> staticModifier;
     private final JApiModifier<AbstractModifier> abstractModifier;
+    private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 
     public enum Type {
         ANNOTATION, INTERFACE, CLASS, ENUM
@@ -52,8 +55,47 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
         this.finalModifier = extractFinalModifier(oldClass, newClass);
         this.staticModifier = extractStaticModifier(oldClass, newClass);
         this.abstractModifier = extractAbstractModifier(oldClass, newClass);
+        this.syntheticAttribute = extractSyntheticAttribute(oldClass, newClass);
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
+
+	private JApiAttribute<SyntheticAttribute> extractSyntheticAttribute(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			CtClass oldClass = oldClassOptional.get();
+			CtClass newClass = newClassOptional.get();
+			byte[] attributeOldClass = oldClass.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+			byte[] attributeNewClass = newClass.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+			if(attributeOldClass != null && attributeNewClass != null) {
+				return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+			} else if(attributeOldClass != null) {
+				return new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+			} else if(attributeNewClass != null) {
+				return new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+			} else {
+				return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+			}
+		} else {
+			if(oldClassOptional.isPresent()) {
+				CtClass ctClass = oldClassOptional.get();
+				byte[] attribute = ctClass.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+				if(attribute != null) {
+					return new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>absent());
+				} else {
+					return new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>absent());
+				}
+			}
+			if(newClassOptional.isPresent()) {
+				CtClass ctClass = newClassOptional.get();
+				byte[] attribute = ctClass.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+				if(attribute != null) {
+					return new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
+				} else {
+					return new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+				}
+			}
+		}
+		return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+	}
 
 	private void computeFieldChanges(List<JApiField> fields, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
@@ -62,7 +104,7 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 			Map<String, CtField> oldFieldsMap = buildFieldMap(oldClass);
 			Map<String, CtField> newFieldsMap = buildFieldMap(newClass);
 			for(CtField oldField : oldFieldsMap.values()) {
-				String oldFieldName = oldField.getName();
+				String oldFieldName = oldField.getName() + "#" + oldField.getSignature();
 				CtField newField = newFieldsMap.get(oldFieldName);
 				if(newField != null) {
 					JApiField jApiField = new JApiField(JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField));
@@ -73,7 +115,7 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 				}
 			}
 			for(CtField newField : newFieldsMap.values()) {
-				CtField oldField = oldFieldsMap.get(newField.getName());
+				CtField oldField = oldFieldsMap.get(newField.getName() + "#" + newField.getSignature());
 				if(oldField == null) {
 					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(newField));
 					fields.add(jApiField);
@@ -101,7 +143,7 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
 		Map<String,CtField> fieldMap = new HashMap<>();
 		CtField[] declaredFields = ctClass.getDeclaredFields();
 		for (CtField field : declaredFields) {
-			String name = field.getName();
+			String name = field.getName() + "#" + field.getSignature();
 			fieldMap.put(name, field);
 		}
 		return fieldMap;
@@ -223,7 +265,7 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
         }
     }
     
-    public JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+    private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
     	if(changeStatus == JApiChangeStatus.UNCHANGED) {
     		if(staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
     			changeStatus = JApiChangeStatus.MODIFIED;
@@ -237,6 +279,9 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     		if(abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
     			changeStatus = JApiChangeStatus.MODIFIED;
     		}
+			if(this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				changeStatus = JApiChangeStatus.MODIFIED;
+			}
     		for(JApiImplementedInterface implementedInterface : interfaces) {
     			if(implementedInterface.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
     				changeStatus = JApiChangeStatus.MODIFIED;
@@ -415,26 +460,35 @@ public class JApiClass implements JApiHasModifier, JApiHasChangeStatus {
     }
 
     @XmlTransient
-	@Override
 	public JApiModifier<FinalModifier> getFinalModifier() {
 		return this.finalModifier;
 	}
 
     @XmlTransient
-    @Override
 	public JApiModifier<StaticModifier> getStaticModifier() {
 		return staticModifier;
 	}
 
     @XmlTransient
-	@Override
 	public JApiModifier<AccessModifier> getAccessModifier() {
 		return this.accessModifier;
 	}
 
     @XmlTransient
-	@Override
 	public JApiModifier<AbstractModifier> getAbstractModifier() {
 		return this.abstractModifier;
 	}
+
+    @XmlTransient
+	public JApiAttribute<SyntheticAttribute> getSyntheticAttribute() {
+		return syntheticAttribute;
+	}
+    
+    @XmlElementWrapper(name = "attributes")
+    @XmlElement(name = "attribute")
+    public List<JApiAttribute<? extends Enum<?>>> getAttributes() {
+    	List<JApiAttribute<? extends Enum<?>>> list = new ArrayList<>();
+    	list.add(this.syntheticAttribute);
+    	return list;
+    }
 }

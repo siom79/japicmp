@@ -1,9 +1,6 @@
 package japicmp.output.stdout;
 
 import japicmp.config.Options;
-import japicmp.model.AbstractModifier;
-import japicmp.model.AccessModifier;
-import japicmp.model.FinalModifier;
 import japicmp.model.JApiBehavior;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
@@ -15,7 +12,6 @@ import japicmp.model.JApiMethod;
 import japicmp.model.JApiModifier;
 import japicmp.model.JApiParameter;
 import japicmp.model.JApiSuperclass;
-import japicmp.model.StaticModifier;
 import japicmp.output.OutputTransformer;
 
 import java.io.File;
@@ -94,25 +90,12 @@ public class StdoutOutputGenerator {
 	}
 
 	private void processModifierChanges(StringBuilder sb, JApiHasModifier jApiHasModifier, int numberOfTabs) {
-		JApiModifier<AccessModifier> accessModifier = jApiHasModifier.getAccessModifier();
-		if (options.isOutputOnlyModifications() && accessModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-			sb.append(tabs(numberOfTabs) + signs(accessModifier.getChangeStatus()) + " " + accessModifier.getChangeStatus() + " " + 
-					modifierChangeAsString(accessModifier, accessModifier.getChangeStatus()) + "\n");
-		}
-		JApiModifier<FinalModifier> finalModifier = jApiHasModifier.getFinalModifier();
-		if (options.isOutputOnlyModifications() && finalModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-			sb.append(tabs(numberOfTabs) + signs(finalModifier.getChangeStatus()) + " " + finalModifier.getChangeStatus() + " " +
-					modifierChangeAsString(finalModifier, finalModifier.getChangeStatus()) + "\n");
-		}
-		JApiModifier<StaticModifier> staticModifier = jApiHasModifier.getStaticModifier();
-		if (options.isOutputOnlyModifications() && staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-			sb.append(tabs(numberOfTabs) + signs(staticModifier.getChangeStatus()) + " " + staticModifier.getChangeStatus() + " " +
-					modifierChangeAsString(staticModifier, staticModifier.getChangeStatus()) + "\n");
-		}
-		JApiModifier<AbstractModifier> abstractModifier = jApiHasModifier.getAbstractModifier();
-		if (options.isOutputOnlyModifications() && abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-			sb.append(tabs(numberOfTabs) + signs(abstractModifier.getChangeStatus()) + " " + abstractModifier.getChangeStatus() + " " +
-					modifierChangeAsString(abstractModifier, abstractModifier.getChangeStatus()) + "\n");
+		List<JApiModifier<? extends Enum<?>>> modifiers = jApiHasModifier.getModifiers();
+		for(JApiModifier<? extends Enum<?>> modifier : modifiers) {
+			if ((options.isOutputOnlyModifications() && modifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) || !options.isOutputOnlyModifications()) {
+				sb.append(tabs(numberOfTabs) + signs(modifier.getChangeStatus()) + " " + modifier.getChangeStatus() + " MODIFIER " + 
+						modifierChangeAsString(modifier, modifier.getChangeStatus()) + "\n");
+			}
 		}
 	}
 
@@ -159,6 +142,7 @@ public class StdoutOutputGenerator {
 		List<JApiField> fields = jApiClass.getFields();
 		for(JApiField field : fields) {
 			sb.append(tabs(1) + signs(field.getChangeStatus()) + " " + field.getChangeStatus() + " FIELD " + field.getName() + "\n");
+			processModifierChanges(sb, field, 2);
 		}
 	}
 

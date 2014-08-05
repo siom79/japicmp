@@ -6,6 +6,10 @@ public class Interfaces {
 		
 	}
 	
+	public interface SecondTestInterface {
+		
+	}
+	
 	public static class InterfaceToNoInterfaceClass implements TestInterface {
 		
 	}

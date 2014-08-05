@@ -3,6 +3,7 @@ package japicmp.output;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
 import japicmp.model.JApiImplementedInterface;
 import japicmp.model.JApiMethod;
 
@@ -43,6 +44,13 @@ public class OutputTransformer {
         			JApiImplementedInterface jApiImplementedInterface = itInterfaces.next();
         			if(jApiImplementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
         				itInterfaces.remove();
+        			}
+        		}
+        		Iterator<JApiField> itFields = jApiClass.getFields().iterator();
+        		while(itFields.hasNext()) {
+        			JApiField jApiField = itFields.next();
+        			if(jApiField.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+        				itFields.remove();
         			}
         		}
         	}

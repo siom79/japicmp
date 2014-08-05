@@ -28,7 +28,7 @@ public class SignatureParser {
         parameters.addAll(paramTypes);
     }
 
-    private List<String> parseTypes(String paramPart) {
+    public List<String> parseTypes(String paramPart) {
         List<String> types = new LinkedList<String>();
         boolean arrayNotation = false;
         for(int i=0; i<paramPart.length(); i++) {

@@ -2,7 +2,7 @@ package japicmp.model;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class JApiImplementedInterface {
+public class JApiImplementedInterface implements JApiHasChangeStatus {
 	private final String fullyQualifiedName;
 	private final JApiChangeStatus changeStatus;
 

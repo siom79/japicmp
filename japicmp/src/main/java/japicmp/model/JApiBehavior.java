@@ -1,7 +1,9 @@
 package japicmp.model;
 
+import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +25,7 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
     private final JApiModifier<FinalModifier> finalModifier;
     private final JApiModifier<StaticModifier> staticModifier;
     private final JApiModifier<AbstractModifier> abstractModifier;
+    private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
     private final JApiChangeStatus changeStatus;
     
     public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus) {
@@ -31,10 +34,11 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
         this.finalModifier = extractFinalModifier(oldBehavior, newBehavior);
         this.staticModifier = extractStaticModifier(oldBehavior, newBehavior);
         this.abstractModifier = extractAbstractModifier(oldBehavior, newBehavior);
+        this.syntheticAttribute = extractSyntheticAttribute(oldBehavior, newBehavior);
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
 
-    public JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+    private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
         if(changeStatus == JApiChangeStatus.UNCHANGED) {
         	if(this.staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
     			changeStatus = JApiChangeStatus.MODIFIED;
@@ -48,9 +52,50 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
     		if(this.abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
     			changeStatus = JApiChangeStatus.MODIFIED;
     		}
+			if(this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				changeStatus = JApiChangeStatus.MODIFIED;
+			}
         }
         return changeStatus;
     }
+    
+	protected JApiAttribute<SyntheticAttribute> extractSyntheticAttribute(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+		if (oldBehaviorOptional.isPresent() && newBehaviorOptional.isPresent()) {
+			CtBehavior oldBehavior = oldBehaviorOptional.get();
+			CtBehavior newBehavior = newBehaviorOptional.get();
+			byte[] attributeOldBehavior = oldBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+			byte[] attributeNewBehavior = newBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+			if(attributeOldBehavior != null && attributeNewBehavior != null) {
+				return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+			} else if(attributeOldBehavior != null) {
+				return new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+			} else if(attributeNewBehavior != null) {
+				return new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+			} else {
+				return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+			}
+		} else {
+			if(oldBehaviorOptional.isPresent()) {
+				CtBehavior ctBehavior = oldBehaviorOptional.get();
+				byte[] attribute = ctBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+				if(attribute != null) {
+					return new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>absent());
+				} else {
+					return new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>absent());
+				}
+			}
+			if(newBehaviorOptional.isPresent()) {
+				CtBehavior ctBehavior = newBehaviorOptional.get();
+				byte[] attribute = ctBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+				if(attribute != null) {
+					return new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
+				} else {
+					return new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+				}
+			}
+		}
+		return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+	}
 
     protected JApiModifier<StaticModifier> extractStaticModifier(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional) {
     	if(oldClassOptional.isPresent() && newClassOptional.isPresent()) {
@@ -164,6 +209,7 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
         return changeStatus;
     }
 
+    @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter")
     public List<JApiParameter> getParameters() {
         return parameters;
@@ -188,8 +234,20 @@ public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
 		return staticModifier;
 	}
 
-	@Override
 	public JApiModifier<AbstractModifier> getAbstractModifier() {
 		return this.abstractModifier;
+	}
+	
+    @XmlElementWrapper(name = "attributes")
+    @XmlElement(name = "attribute")
+    public List<JApiAttribute<? extends Enum<?>>> getAttributes() {
+    	List<JApiAttribute<? extends Enum<?>>> list = new ArrayList<>();
+    	list.add(this.syntheticAttribute);
+    	return list;
+    }
+
+    @XmlTransient
+	public JApiAttribute<SyntheticAttribute> getSyntheticAttribute() {
+		return syntheticAttribute;
 	}
 }

@@ -1,6 +1,6 @@
 package japicmp.model;
 
-import japicmp.util.OptionalUtil;
+import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
@@ -32,11 +32,11 @@ public class JApiModifier<T> {
 	
 	@XmlAttribute(name = "oldValue")
 	public String getValueOld() {
-		return OptionalUtil.optionalToString(this.oldModifier);
+		return OptionalHelper.optionalToString(this.oldModifier);
 	}
 	
 	@XmlAttribute(name = "newValue")
 	public String getValueNew() {
-		return OptionalUtil.optionalToString(this.newModifier);
+		return OptionalHelper.optionalToString(this.newModifier);
 	}
 }

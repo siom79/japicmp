@@ -3,7 +3,7 @@ japicmp
 
 japicmp is a tool to compare two versions of a jar archive:
 
-    java -jar japicmp-0.1.1.jar -n new-version.jar -o old-version.jar
+    java -jar japicmp-0.2.0.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -16,7 +16,7 @@ japicmp is available in the Maven Central Repository. The corresponding dependen
     <dependency>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp</artifactId>
-        <version>0.1.1</version>
+        <version>0.2.0</version>
     </dependency>
 
 ##Motivation##
@@ -30,6 +30,8 @@ the differences, as the usage of the Reflection API makes it necessary to includ
 investigation depends on are available on the classpath. To prevent the inclusion of all dependent libraries, which
 can be a lot of work for bigger applications, this library makes use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/)
 library to inspect the class files. This way you only have to provide the two jar archives on the command line, that's it.
+In contrast to solutions that investigate the javadoc comments of two APIs, this approach also detects changes in
+instrumented and generated classes. You can even evaluate changes in class file attributes like synthetic.
 
 ##Features##
 
@@ -113,47 +115,98 @@ of your artifact.
 
 In the following you see the beginning of the xml output file after having computed the differences between the versions 16.0 and 17.0 of google's guava library:
 
-    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <japicmp newJar="/home/martin/.m2/repository/com/google/guava/guava/17.0/guava-17.0.jar" oldJar="/home/martin/.m2/repository/com/google/guava/guava/16.0/guava-16.0.jar">
-        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.io.Closeables" type="CLASS">
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="closeQuietly" returnType="void">
-                <parameter type="java.io.Reader"/>
-            </method>
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="closeQuietly" returnType="void">
-                <parameter type="java.io.InputStream"/>
-            </method>
-        </class>
-        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.util.concurrent.AbstractService" type="CLASS">
-            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="startAndWait" returnType="com.google.common.util.concurrent.Service$State"/>
-            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="stop" returnType="com.google.common.util.concurrent.ListenableFuture"/>
-            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="stopAndWait" returnType="com.google.common.util.concurrent.Service$State"/>
-            <method accessModifierNew="n.a." accessModifierOld="PUBLIC" changeStatus="REMOVED" name="start" returnType="com.google.common.util.concurrent.ListenableFuture"/>
-        </class>
-        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.io.CountingOutputStream" type="CLASS">
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="close" returnType="void"/>
-        </class>
-        <class accessModifierNew="PUBLIC" accessModifierOld="PUBLIC" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.cache.CacheLoader" type="CLASS">
-            <method accessModifierNew="PUBLIC" accessModifierOld="n.a." changeStatus="NEW" name="asyncReloading" returnType="com.google.common.cache.CacheLoader">
-                <parameter type="com.google.common.cache.CacheLoader"/>
-                <parameter type="java.util.concurrent.Executor"/>
-            </method>
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<japicmp newJar="C:\projekte\im\moja\cmp\IMApiCmp\japicmp\target\guava-17.0.jar" oldJar="C:\projekte\im\moja\cmp\IMApiCmp\japicmp\target\guava-16.0.jar">
+		<classes>
+			<class changeStatus="MODIFIED" fullyQualifiedName="com.google.common.base.CharMatcher" type="CLASS">
+				<attributes>
+					<attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
+				</attributes>
+				<constructors/>
+				<fields>
+					<field changeStatus="NEW" name="WHITESPACE_TABLE">
+						<attributes>
+							<attribute changeStatus="NEW" newValue="NON_SYNTHETIC" oldValue="n.a."/>
+						</attributes>
+						<modifiers>
+							<modifier changeStatus="NEW" newValue="PACKAGE" oldValue="n.a."/>
+							<modifier changeStatus="NEW" newValue="STATIC" oldValue="n.a."/>
+							<modifier changeStatus="NEW" newValue="FINAL" oldValue="n.a."/>
+						</modifiers>
+						<type changeStatus="NEW" newValue="n.a." oldValue="java.lang.String"/>
+					</field>
+					<field changeStatus="NEW" name="WHITESPACE_SHIFT">
+						<attributes>
+							<attribute changeStatus="NEW" newValue="NON_SYNTHETIC" oldValue="n.a."/>
+						</attributes>
+						<modifiers>
+							<modifier changeStatus="NEW" newValue="PACKAGE" oldValue="n.a."/>
+							<modifier changeStatus="NEW" newValue="STATIC" oldValue="n.a."/>
+							<modifier changeStatus="NEW" newValue="FINAL" oldValue="n.a."/>
+						</modifiers>
+						<type changeStatus="NEW" newValue="n.a." oldValue="int"/>
+					</field>
+					<field changeStatus="NEW" name="WHITESPACE_MULTIPLIER">
+						<attributes>
+							<attribute changeStatus="NEW" newValue="NON_SYNTHETIC" oldValue="n.a."/>
+						</attributes>
+						<modifiers>
+							<modifier changeStatus="NEW" newValue="PACKAGE" oldValue="n.a."/>
+							<modifier changeStatus="NEW" newValue="STATIC" oldValue="n.a."/>
+							<modifier changeStatus="NEW" newValue="FINAL" oldValue="n.a."/>
+						</modifiers>
+						<type changeStatus="NEW" newValue="n.a." oldValue="int"/>
+					</field>
+				</fields>
+				<interfaces/>
+				<methods/>
+				<modifiers>
+					<modifier changeStatus="UNCHANGED" newValue="NON_FINAL" oldValue="NON_FINAL"/>
+					<modifier changeStatus="UNCHANGED" newValue="NON_STATIC" oldValue="NON_STATIC"/>
+					<modifier changeStatus="UNCHANGED" newValue="PUBLIC" oldValue="PUBLIC"/>
+					<modifier changeStatus="UNCHANGED" newValue="ABSTRACT" oldValue="ABSTRACT"/>
+				</modifiers>
+				<superclass changeStatus="UNCHANGED" superclassNew="n.a." superclassOld="n.a."/>
         </class>
 		...
 
 The differences between the two Java APIs are also printed on the command line for a quick overview:
 
-    *** MODIFIED CLASS com.google.common.io.Closeables
-        +++ NEW METHOD closeQuietly(java.io.Reader)
-        +++ NEW METHOD closeQuietly(java.io.InputStream)
-    *** MODIFIED CLASS com.google.common.util.concurrent.AbstractService
-        --- REMOVED METHOD startAndWait()
-        --- REMOVED METHOD stop()
-        --- REMOVED METHOD stopAndWait()
-        --- REMOVED METHOD start()
-    *** MODIFIED CLASS com.google.common.io.CountingOutputStream
-        +++ NEW METHOD close()
-    *** MODIFIED CLASS com.google.common.cache.CacheLoader
-        +++ NEW METHOD asyncReloading(com.google.common.cache.CacheLoader, java.util.concurrent.Executor)
+	*** MODIFIED CLASS com.google.common.base.CharMatcher
+		+++ NEW FIELD WHITESPACE_TABLE
+			+++ NEW MODIFIER PACKAGE
+			+++ NEW MODIFIER STATIC
+			+++ NEW MODIFIER FINAL
+		+++ NEW FIELD WHITESPACE_SHIFT
+			+++ NEW MODIFIER PACKAGE
+			+++ NEW MODIFIER STATIC
+			+++ NEW MODIFIER FINAL
+		+++ NEW FIELD WHITESPACE_MULTIPLIER
+			+++ NEW MODIFIER PACKAGE
+			+++ NEW MODIFIER STATIC
+			+++ NEW MODIFIER FINAL
+	*** MODIFIED CLASS com.google.common.base.Converter
+		+++ NEW METHOD from(com.google.common.base.Function, com.google.common.base.Function)
+			+++ NEW MODIFIER NON_FINAL
+			+++ NEW MODIFIER NON_STATIC
+			+++ NEW MODIFIER PUBLIC
+			+++ NEW MODIFIER NON_ABSTRACT
+	*** MODIFIED CLASS com.google.common.base.Enums
+		+++ NEW FIELD enumConstantCache
+			+++ NEW MODIFIER PRIVATE
+			+++ NEW MODIFIER STATIC
+			+++ NEW MODIFIER FINAL
+	*** MODIFIED CLASS com.google.common.base.Stopwatch
+		--- REMOVED CONSTRUCTOR Stopwatch()
+			--- REMOVED MODIFIER NON_FINAL
+			--- REMOVED MODIFIER NON_STATIC
+			--- REMOVED MODIFIER PUBLIC
+			--- REMOVED MODIFIER NON_ABSTRACT
+		--- REMOVED CONSTRUCTOR Stopwatch(com.google.common.base.Ticker)
+			--- REMOVED MODIFIER NON_FINAL
+			--- REMOVED MODIFIER NON_STATIC
+			--- REMOVED MODIFIER PUBLIC
+			--- REMOVED MODIFIER NON_ABSTRACT
     ...
 
 ##Downloads##

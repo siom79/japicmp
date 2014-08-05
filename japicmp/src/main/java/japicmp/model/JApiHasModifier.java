@@ -1,12 +1,8 @@
 package japicmp.model;
 
-public interface JApiHasModifier {
+import java.util.List;
 
-	JApiModifier<AccessModifier> getAccessModifier();
-
-	JApiModifier<FinalModifier> getFinalModifier();
-
-	JApiModifier<StaticModifier> getStaticModifier();
+public interface JApiHasModifier extends JApiHasChangeStatus {
 	
-	JApiModifier<AbstractModifier> getAbstractModifier();
+	List<JApiModifier<? extends Enum<?>>> getModifiers();
 }
