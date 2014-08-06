@@ -18,4 +18,5 @@ public class Fields {
 	public int nonfinalStaysNonFinalField;
 	public final int finalRemainsFinalField = 0;
 	public Integer stringToInt;
+	public Integer hasBeenAdded;
 }

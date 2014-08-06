@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Optional;
 
-public class JApiBehavior implements JApiHasModifier, JApiHasChangeStatus {
+public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier {
     private final String name;
     private final List<JApiParameter> parameters = new LinkedList<>();
     private final JApiModifier<AccessModifier> accessModifier;

@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Optional;
 
-public class JApiField implements JApiHasChangeStatus, JApiHasModifier {
+public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier {
 	private final JApiChangeStatus changeStatus;
 	private final Optional<CtField> oldFieldOptional;
 	private final Optional<CtField> newFieldOptional;

@@ -6,7 +6,7 @@ public class Modifier {
 
     }
 
-    private static class ModifierPublicToProtected {
+    protected static class ModifierPublicToProtected {
 
     }
     

@@ -2,7 +2,7 @@ package japicmp.output.stdout;
 
 import japicmp.config.Options;
 import japicmp.model.*;
-import japicmp.output.OutputTransformer;
+import japicmp.output.OutputFilter;
 
 import java.io.File;
 import java.util.List;
@@ -15,9 +15,8 @@ public class StdoutOutputGenerator {
 	}
 
 	public String generate(File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
-		if (options.isOutputOnlyModifications()) {
-			OutputTransformer.removeUnchanged(jApiClasses);
-		}
+		OutputFilter outputFilter = new OutputFilter(options);
+		outputFilter.filter(jApiClasses);
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("Comparing %s with %s:%n", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath()));
 		for (JApiClass jApiClass : jApiClasses) {
@@ -31,14 +30,14 @@ public class StdoutOutputGenerator {
 	private void processConstructors(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiConstructor> constructors = jApiClass.getConstructors();
 		for (JApiConstructor jApiConstructor : constructors) {
-			appendMethod(sb, signs(jApiConstructor.getChangeStatus()), jApiConstructor, "CONSTRUCTOR");
+			appendMethod(sb, signs(jApiConstructor.getChangeStatus()), jApiConstructor, "CONSTRUCTOR:");
 		}
 	}
 
 	private void processMethods(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiMethod> methods = jApiClass.getMethods();
 		for (JApiMethod jApiMethod : methods) {
-			appendMethod(sb, signs(jApiMethod.getChangeStatus()), jApiMethod, "METHOD");
+			appendMethod(sb, signs(jApiMethod.getChangeStatus()), jApiMethod, "METHOD:");
 		}
 	}
 
@@ -66,7 +65,8 @@ public class StdoutOutputGenerator {
 	}
 
 	private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiMethod, String classMemberType) {
-		sb.append("\t" + signs + " " + jApiMethod.getChangeStatus() + " " + classMemberType + " " + jApiMethod.getName() + "(");
+		sb.append("\t" + signs + " " + jApiMethod.getChangeStatus() + " " + classMemberType + " " + accessModifierAsString(jApiMethod) + abstractModifierAsString(jApiMethod) 
+				+ staticModifierAsString(jApiMethod) + finalModifierAsString(jApiMethod) + jApiMethod.getName() + "(");
 		int paramCount = 0;
 		for (JApiParameter jApiParameter : jApiMethod.getParameters()) {
 			if (paramCount > 0) {
@@ -76,32 +76,6 @@ public class StdoutOutputGenerator {
 			paramCount++;
 		}
 		sb.append(")\n");
-		processModifierChanges(sb, jApiMethod, 2);
-	}
-
-	private void processModifierChanges(StringBuilder sb, JApiHasModifier jApiHasModifier, int numberOfTabs) {
-		List<JApiModifier<? extends Enum<?>>> modifiers = jApiHasModifier.getModifiers();
-		for(JApiModifier<? extends Enum<?>> modifier : modifiers) {
-			if ((options.isOutputOnlyModifications() && modifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) || !options.isOutputOnlyModifications()) {
-				sb.append(tabs(numberOfTabs) + signs(modifier.getChangeStatus()) + " " + modifier.getChangeStatus() + " MODIFIER " + 
-						modifierChangeAsString(modifier, modifier.getChangeStatus()) + "\n");
-			}
-		}
-	}
-
-	private <T> String modifierChangeAsString(JApiModifier<T> jApiModifier, JApiChangeStatus changeStatus) {
-		if (jApiModifier.getOldModifier().isPresent() && jApiModifier.getNewModifier().isPresent()) {
-			if(changeStatus == JApiChangeStatus.MODIFIED) {
-				return jApiModifier.getNewModifier().get() + " (<- " + jApiModifier.getOldModifier().get() + ")";
-			} else {
-				return jApiModifier.getNewModifier().get().toString();
-			}
-		} else if (jApiModifier.getOldModifier().isPresent() && !jApiModifier.getNewModifier().isPresent()) {
-			return jApiModifier.getOldModifier().get().toString();
-		} else if (!jApiModifier.getOldModifier().isPresent() && jApiModifier.getNewModifier().isPresent()) {
-			return jApiModifier.getNewModifier().get().toString();
-		}
-		return "n.a.";
 	}
 
 	private String tabs(int numberOfTabs) {
@@ -121,8 +95,8 @@ public class StdoutOutputGenerator {
 	}
 
 	private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
-		sb.append(signs + " " + jApiClass.getChangeStatus() + " " + jApiClass.getType() + " " + jApiClass.getFullyQualifiedName() + "\n");
-		processModifierChanges(sb, jApiClass, 1);
+		sb.append(signs + " " + jApiClass.getChangeStatus() + " " + jApiClass.getType() + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
+				+ staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + "\n");
 		processInterfaceChanges(sb, jApiClass);
 		processSuperclassChanges(sb, jApiClass);
 		processFieldChanges(sb, jApiClass);
@@ -130,36 +104,86 @@ public class StdoutOutputGenerator {
 
 	private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiField> fields = jApiClass.getFields();
-		for(JApiField field : fields) {
-			sb.append(tabs(1) + signs(field.getChangeStatus()) + " " + field.getChangeStatus() + " FIELD " + fieldTypeChangeAsString(field) + " " + field.getName() + "\n");
-			processModifierChanges(sb, field, 2);
+		for (JApiField field : fields) {
+			sb.append(tabs(1) + signs(field.getChangeStatus()) + " " + field.getChangeStatus() + " FIELD: " + accessModifierAsString(field) + staticModifierAsString(field)
+					+ finalModifierAsString(field) + fieldTypeChangeAsString(field) + field.getName() + "\n");
 		}
 	}
 
-    private String fieldTypeChangeAsString(JApiField field) {
-        JApiType type = field.getType();
-        if(type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
-            if(type.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-                return type.getOldTypeOptional().get() + " (<- " + type.getNewTypeOptional().get() + ")";
-            } else if(type.getChangeStatus() == JApiChangeStatus.NEW) {
-                return type.getNewTypeOptional().get();
-            } else if(type.getChangeStatus() == JApiChangeStatus.REMOVED) {
-                return type.getOldTypeOptional().get();
-            } else {
-                return type.getNewTypeOptional().get();
-            }
-        } else if(type.getOldTypeOptional().isPresent() && !type.getNewTypeOptional().isPresent()) {
-            return type.getOldTypeOptional().get();
-        } else if(!type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
-            return type.getNewTypeOptional().get();
-        }
-        return "n.a.";
-    }
+	private String abstractModifierAsString(JApiHasAbstractModifier hasAbstractModifier) {
+		JApiModifier<AbstractModifier> modifier = hasAbstractModifier.getAbstractModifier();
+		return modifierAsString(modifier, AbstractModifier.NON_ABSTRACT);
+	}
+
+	private String finalModifierAsString(JApiHasFinalModifier hasFinalModifier) {
+		JApiModifier<FinalModifier> modifier = hasFinalModifier.getFinalModifier();
+		return modifierAsString(modifier, FinalModifier.NON_FINAL);
+	}
+
+	private String staticModifierAsString(JApiHasStaticModifier hasStaticModifier) {
+		JApiModifier<StaticModifier> modifier = hasStaticModifier.getStaticModifier();
+		return modifierAsString(modifier, StaticModifier.NON_STATIC);
+	}
+
+	private String accessModifierAsString(JApiHasAccessModifier modifier) {
+		JApiModifier<AccessModifier> accessModifier = modifier.getAccessModifier();
+		return modifierAsString(accessModifier, AccessModifier.PACKAGE_PROTECTED);
+	}
+
+	private <T> String modifierAsString(JApiModifier<T> accessModifier, T notPrintValue) {
+		if (accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
+			if (accessModifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				return accessModifier.getNewModifier().get() + " (<- " + accessModifier.getOldModifier().get() + ") ";
+			} else if (accessModifier.getChangeStatus() == JApiChangeStatus.NEW) {
+				if (accessModifier.getNewModifier().get() != notPrintValue) {
+					return accessModifier.getNewModifier().get() + "(+) ";
+				}
+			} else if (accessModifier.getChangeStatus() == JApiChangeStatus.REMOVED) {
+				if (accessModifier.getOldModifier().get() != notPrintValue) {
+					return accessModifier.getOldModifier().get() + "(-) ";
+				}
+			} else {
+				if (accessModifier.getNewModifier().get() != notPrintValue) {
+					return accessModifier.getNewModifier().get() + " ";
+				}
+			}
+		} else if (accessModifier.getOldModifier().isPresent() && !accessModifier.getNewModifier().isPresent()) {
+			if (accessModifier.getOldModifier().get() != notPrintValue) {
+				return accessModifier.getOldModifier().get() + "(-) ";
+			}
+		} else if (!accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
+			if (accessModifier.getNewModifier().get() != notPrintValue) {
+				return accessModifier.getNewModifier().get() + "(+) ";
+			}
+		}
+		return "";
+	}
+
+	private String fieldTypeChangeAsString(JApiField field) {
+		JApiType type = field.getType();
+		if (type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
+			if (type.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				return type.getNewTypeOptional().get() + " (<- " + type.getOldTypeOptional().get() + ") ";
+			} else if (type.getChangeStatus() == JApiChangeStatus.NEW) {
+				return type.getNewTypeOptional().get() + "(+) ";
+			} else if (type.getChangeStatus() == JApiChangeStatus.REMOVED) {
+				return type.getOldTypeOptional().get() + "(-) ";
+			} else {
+				return type.getNewTypeOptional().get() + " ";
+			}
+		} else if (type.getOldTypeOptional().isPresent() && !type.getNewTypeOptional().isPresent()) {
+			return type.getOldTypeOptional().get() + " ";
+		} else if (!type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
+			return type.getNewTypeOptional().get() + " ";
+		}
+		return "n.a.";
+	}
 
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
 		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
 		if (options.isOutputOnlyModifications() && jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-			sb.append(tabs(1) + signs(jApiSuperclass.getChangeStatus()) + " " + jApiSuperclass.getChangeStatus() + " SUPERCLASS " + superclassChangeAsString(jApiSuperclass) + "\n");
+			sb.append(tabs(1) + signs(jApiSuperclass.getChangeStatus()) + " " + jApiSuperclass.getChangeStatus() + " SUPERCLASS: " + superclassChangeAsString(jApiSuperclass)
+					+ "\n");
 		}
 	}
 
@@ -177,7 +201,7 @@ public class StdoutOutputGenerator {
 	private void processInterfaceChanges(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiImplementedInterface> interfaces = jApiClass.getInterfaces();
 		for (JApiImplementedInterface implementedInterface : interfaces) {
-			sb.append(tabs(1) + signs(implementedInterface.getChangeStatus()) + " " + implementedInterface.getChangeStatus() + " INTERFACE "
+			sb.append(tabs(1) + signs(implementedInterface.getChangeStatus()) + " " + implementedInterface.getChangeStatus() + " INTERFACE: "
 					+ implementedInterface.getFullyQualifiedName() + "\n");
 		}
 	}

@@ -10,3 +10,4 @@ japicmp/guava-14.0.1.jar
 .project
 .settings
 .classpath
+*/*.jar

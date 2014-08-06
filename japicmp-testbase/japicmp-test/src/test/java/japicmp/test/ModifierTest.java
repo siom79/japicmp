@@ -25,8 +25,8 @@ public class ModifierTest {
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         JApiClass modifierInnerClass = getJApiClass(jApiClasses, Modifier.ModifierPublicToProtected.class.getName());
         JApiClass modifierClass = getJApiClass(jApiClasses, Modifier.class.getName());
-        assertThat(modifierInnerClass.getChangeStatus(), is(JApiChangeStatus.REMOVED));
-        assertThat(Helper.getJApiMethod(modifierClass.getMethods(), "publicToPrivateMethod").getChangeStatus(), is(JApiChangeStatus.REMOVED));
+        assertThat(modifierInnerClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(Helper.getJApiMethod(modifierClass.getMethods(), "publicToPrivateMethod").getChangeStatus(), is(JApiChangeStatus.MODIFIED));
     }
 
     @Test

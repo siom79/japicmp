@@ -2,10 +2,6 @@ package japicmp.cmp;
 
 import japicmp.config.PackageFilter;
 import japicmp.model.JApiClass;
-import japicmp.util.ModifierHelper;
-import javassist.ClassPool;
-import javassist.CtClass;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.Enumeration;
@@ -13,6 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import javassist.ClassPool;
+import javassist.CtClass;
+
+import org.apache.log4j.Logger;
 
 public class JarArchiveComparator {
     private static final Logger logger = Logger.getLogger(JarArchiveComparator.class);
@@ -37,7 +38,7 @@ public class JarArchiveComparator {
 
     private void compareClasses(List<JApiClass> classList) {
         for (JApiClass jApiClass : classList) {
-            ClassComparator classComparator = new ClassComparator(options);
+            ClassComparator classComparator = new ClassComparator();
             classComparator.compare(jApiClass);
         }
     }
@@ -72,7 +73,7 @@ public class JarArchiveComparator {
                         logger.error(String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()));
                         throw e;
                     }
-                    if (ModifierHelper.matchesModifierLevel(ctClass.getModifiers(), options.getModifierLevel()) && packageMatches(options, ctClass)) {
+                    if(packageMatches(options, ctClass)) {
                         classes.add(ctClass);
                     }
                     if (logger.isDebugEnabled()) {

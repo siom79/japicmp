@@ -35,7 +35,7 @@ public class FieldsTest {
         assertThat(getJApiField(fieldsClass.getFields(), "privateToProtectedField").getAccessModifier().getNewModifier(), is(Optional.of(AccessModifier.PROTECTED)));
         assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProctedField").getChangeStatus(), is(JApiChangeStatus.MODIFIED));
         assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProctedField").getAccessModifier().getOldModifier(), is(Optional.of(AccessModifier.PRIVATE)));
-        assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProctedField").getAccessModifier().getNewModifier(), is(Optional.of(AccessModifier.PACKAGE)));
+        assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProctedField").getAccessModifier().getNewModifier(), is(Optional.of(AccessModifier.PACKAGE_PROTECTED)));
         assertThat(getJApiField(fieldsClass.getFields(), "privateRemainsPrivateField").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
         assertThat(getJApiField(fieldsClass.getFields(), "privateRemainsPrivateField").getAccessModifier().getOldModifier(), is(Optional.of(AccessModifier.PRIVATE)));
         assertThat(getJApiField(fieldsClass.getFields(), "privateRemainsPrivateField").getAccessModifier().getNewModifier(), is(Optional.of(AccessModifier.PRIVATE)));
