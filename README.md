@@ -42,6 +42,8 @@ This approach also detects changes in instrumented and generated classes. You ca
 * Per default classes from all packages are compared. If necessary, certain packages can be excluded or only specific packages can be included.
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 
+[melix](https://github.com/melix) has developed a gradle plugin for japicmp. The github page can be found [here](https://github.com/melix/japicmp-gradle-plugin).
+
 ##Usage CLI tool##
 
 The tool has a set of CLI parameters that are described in the following:
@@ -178,6 +180,11 @@ The differences between the two Java APIs are also printed on the command line f
 
 The following releases are available:
 
+* [Version 0.2.0](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.0)
+	* Changes:
+		* added support for the comparison of constructors, implemented interfaces, the superclass and fields
+		* added support for the comparison of modifiers (access, final, static, abstract)
+		* added support for the synthetic attribute for classes, methods, constructors and fields
 * [Version 0.1.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.1.1)
     * Changes:
         * [The maven-plugin should be available in the central repository](https://github.com/siom79/japicmp/issues/8)
