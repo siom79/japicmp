@@ -6,7 +6,7 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
-import japicmp.output.OutputTransformer;
+import japicmp.output.OutputFilter;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
 
@@ -51,13 +51,13 @@ public class JApiCmp {
     }
 
     private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
-        OutputTransformer.sortClassesAndMethods(jApiClasses);
+        OutputFilter.sortClassesAndMethods(jApiClasses);
         if (options.getXmlOutputFile().isPresent()) {
             XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
             xmlGenerator.generate(oldArchive, newArchive, jApiClasses, options);
         }
-        StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator();
-        String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses, options);
+        StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
+        String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses);
         System.out.println(output);
     }
 

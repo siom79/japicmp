@@ -1,7 +1,8 @@
 package japicmp.exception;
 
 public class JApiCmpException extends RuntimeException {
-    private final Reason reason;
+	private static final long serialVersionUID = 1L;
+	private final Reason reason;
 
     public JApiCmpException(Reason reason) {
         this.reason = reason;

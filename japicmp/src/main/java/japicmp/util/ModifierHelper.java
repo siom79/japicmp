@@ -9,10 +9,14 @@ public class ModifierHelper {
     private ModifierHelper() {
 
     }
+    
+    public static boolean matchesModifierLevel(AccessModifier modifierLevelOfElement, AccessModifier modifierLevel) {
+    	return (modifierLevelOfElement.getLevel() >= modifierLevel.getLevel());
+    }
 
     public static boolean matchesModifierLevel(int modifierOfElement, AccessModifier modifierLevel) {
         AccessModifier modifierLevelOfElement = translateToModifierLevel(modifierOfElement);
-        return (modifierLevelOfElement.getLevel() >= modifierLevel.getLevel());
+        return matchesModifierLevel(modifierLevelOfElement, modifierLevel);
     }
 
     public static AccessModifier translateToModifierLevel(int modifier) {
@@ -23,7 +27,7 @@ public class ModifierHelper {
         } else if(Modifier.isPrivate(modifier)) {
             return AccessModifier.PRIVATE;
         } else {
-            return AccessModifier.PACKAGE;
+            return AccessModifier.PACKAGE_PROTECTED;
         }
     }
 }

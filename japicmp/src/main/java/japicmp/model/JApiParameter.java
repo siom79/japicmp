@@ -9,7 +9,7 @@ public class JApiParameter {
         this.type = type;
     }
 
-    @XmlAttribute
+    @XmlAttribute(name = "type")
     public String getType() {
         return type;
     }

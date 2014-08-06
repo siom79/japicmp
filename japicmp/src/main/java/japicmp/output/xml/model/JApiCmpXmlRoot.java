@@ -4,6 +4,7 @@ import japicmp.model.JApiClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class JApiCmpXmlRoot {
     private String newJar = "";
     private List<JApiClass> classes = new LinkedList<JApiClass>();
 
+    @XmlElementWrapper(name = "classes")
     @XmlElement(name = "class")
     public List<JApiClass> getClasses() {
         return classes;
