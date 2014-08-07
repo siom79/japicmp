@@ -66,13 +66,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.1.1</version>
+                <version>0.2.0</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.1.1</version>
+                            <version>0.2.0</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -182,7 +182,7 @@ The following releases are available:
 
 * [Version 0.2.0](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.0)
 	* Changes:
-		* added support for the comparison of constructors, implemented interfaces, the superclass and fields
+		* added support for the comparison of constructors, implemented interfaces, superclass and fields
 		* added support for the comparison of modifiers (access, final, static, abstract)
 		* added support for the synthetic attribute for classes, methods, constructors and fields
 * [Version 0.1.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.1.1)
