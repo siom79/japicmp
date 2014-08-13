@@ -41,4 +41,12 @@ public class ClassModifier {
 	public final class FinalStaysFinalInnerClass {
 		
 	}
+	
+	public abstract class AbstractToNonAbstractClass {
+		
+	}
+	
+	public class NonAbstractToAbstractClass {
+		
+	}
 }

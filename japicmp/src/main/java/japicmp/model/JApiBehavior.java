@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Optional;
 
-public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier {
+public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility {
     private final String name;
     private final List<JApiParameter> parameters = new LinkedList<>();
     private final JApiModifier<AccessModifier> accessModifier;
@@ -27,6 +27,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private final JApiModifier<AbstractModifier> abstractModifier;
     private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
     private final JApiChangeStatus changeStatus;
+	private boolean binaryCompatible = true;
     
     public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus) {
     	this.name = name;
@@ -169,6 +170,23 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 		}
 	}
     
+	public boolean hasSameParameter(JApiMethod method) {
+		boolean haveSameParameter = true;
+		List<JApiParameter> parameters1 = getParameters();
+		List<JApiParameter> parameters2 = method.getParameters();
+		if (parameters1.size() != parameters2.size()) {
+			haveSameParameter = false;
+		}
+		if (haveSameParameter) {
+			for (int i = 0; i < parameters1.size(); i++) {
+				if (!parameters1.get(i).getType().equals(parameters2.get(i).getType())) {
+					haveSameParameter = false;
+				}
+			}
+		}
+		return haveSameParameter;
+	}
+    
 	private JApiModifier<AbstractModifier> extractAbstractModifier(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional) {
 		if(oldClassOptional.isPresent() && newClassOptional.isPresent()) {
 			CtBehavior oldClass = oldClassOptional.get();
@@ -249,5 +267,15 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     @XmlTransient
 	public JApiAttribute<SyntheticAttribute> getSyntheticAttribute() {
 		return syntheticAttribute;
+	}
+    
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+		return this.binaryCompatible;
+	}
+
+	void setBinaryCompatible(boolean binaryCompatible) {
+		this.binaryCompatible = binaryCompatible;
 	}
 }

@@ -29,4 +29,27 @@ public class Interfaces {
 	public static class InterfaceChangesClass implements TestInterface {
 		
 	}
+	
+	public interface InterfaceLosesMethod {
+		void method();
+	}
+	
+	public class ClassWithInterfaceLosesMethod implements InterfaceLosesMethod {
+
+		@Override
+		public void method() {
+			
+		}
+	}
+	
+	public class SuperclassLosesMethod {
+		
+		public void method() {
+			
+		}
+	}
+	
+	public class SubclassWithSuperclassLosesMethod extends SuperclassLosesMethod {
+		
+	}
 }

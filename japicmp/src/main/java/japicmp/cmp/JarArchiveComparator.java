@@ -1,6 +1,7 @@
 package japicmp.cmp;
 
 import japicmp.config.PackageFilter;
+import japicmp.model.BinaryCompatibility;
 import japicmp.model.JApiClass;
 
 import java.io.File;
@@ -28,22 +29,20 @@ public class JarArchiveComparator {
         try {
             ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
             List<JApiClass> classList = classesComparator.getClasses();
-            compareClasses(classList);
-            return classList;
+            checkBinaryCompatibility(classList);
+			return classList;
         } catch (Exception e) {
             System.err.println(String.format("Processing jar files '%s' and '%s' failed: %s.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), e.getMessage()));
             return new LinkedList<JApiClass>();
         }
     }
 
-    private void compareClasses(List<JApiClass> classList) {
-        for (JApiClass jApiClass : classList) {
-            ClassComparator classComparator = new ClassComparator();
-            classComparator.compare(jApiClass);
-        }
-    }
+    private void checkBinaryCompatibility(List<JApiClass> classList) {
+    	BinaryCompatibility binaryCompatibility = new BinaryCompatibility();
+		binaryCompatibility.evaluate(classList);
+	}
 
-    private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) throws Exception {
+	private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) throws Exception {
         List<CtClass> oldClasses = createListOfCtClasses(oldArchive, classPool, options);
         List<CtClass> newClasses = createListOfCtClasses(newArchive, classPool, options);
         ClassesComparator classesComparator = new ClassesComparator();

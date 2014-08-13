@@ -1,6 +1,8 @@
 package japicmp.util;
 
 import japicmp.model.AccessModifier;
+import japicmp.model.JApiHasAccessModifier;
+import japicmp.model.JApiModifier;
 
 import java.lang.reflect.Modifier;
 
@@ -30,4 +32,34 @@ public class ModifierHelper {
             return AccessModifier.PACKAGE_PROTECTED;
         }
     }
+    
+	public static boolean isNotPrivate(JApiHasAccessModifier jApiHasAccessModifier) {
+		JApiModifier<AccessModifier> accessModifier = jApiHasAccessModifier.getAccessModifier();
+		if(accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
+			if(accessModifier.getNewModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel() || accessModifier.getOldModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
+				return true;
+			}
+		} else if(!accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
+			if(accessModifier.getNewModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
+				return true;
+			}
+		} else if(accessModifier.getOldModifier().isPresent() && !accessModifier.getNewModifier().isPresent()) {
+			if(accessModifier.getOldModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean hasModifierLevelDecreased(JApiHasAccessModifier hasAccessModifier) {
+		JApiModifier<AccessModifier> accessModifier = hasAccessModifier.getAccessModifier();
+		if(accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
+			AccessModifier oldModifier = accessModifier.getOldModifier().get();
+			AccessModifier newModifier = accessModifier.getNewModifier().get();
+			if(newModifier.getLevel() < oldModifier.getLevel()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

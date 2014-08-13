@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Optional;
 
-public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier {
+public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiBinaryCompatibility {
 	private final JApiChangeStatus changeStatus;
 	private final Optional<CtField> oldFieldOptional;
 	private final Optional<CtField> newFieldOptional;
@@ -27,6 +27,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	private final JApiModifier<FinalModifier> finalModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private final JApiType type;
+	private boolean binaryCompatible = true;
 
 	public JApiField(JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
 		this.oldFieldOptional = oldFieldOptional;
@@ -268,5 +269,15 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     @XmlElement(name = "type")
 	public JApiType getType() {
 		return type;
+	}
+    
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+		return this.binaryCompatible;
+	}
+
+	void setBinaryCompatible(boolean binaryCompatible) {
+		this.binaryCompatible = binaryCompatible;
 	}
 }

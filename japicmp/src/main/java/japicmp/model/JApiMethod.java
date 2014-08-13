@@ -33,4 +33,14 @@ public class JApiMethod extends JApiBehavior {
     public String getReturnType() {
         return returnType;
     }
+	
+	public boolean hasSameReturnType(JApiMethod method) {
+		boolean haveSameReturnValue = true;
+		String returnType1 = getReturnType();
+		String returnType2 = method.getReturnType();
+		if(!returnType1.equals(returnType2)) {
+			haveSameReturnValue = false;
+		}
+		return haveSameReturnValue;
+	}
 }

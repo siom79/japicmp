@@ -2,9 +2,10 @@ package japicmp.model;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class JApiImplementedInterface implements JApiHasChangeStatus {
+public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final String fullyQualifiedName;
 	private final JApiChangeStatus changeStatus;
+	private boolean binaryCompatible;
 
 	public JApiImplementedInterface(String fullyQualifiedName, JApiChangeStatus changeStatus) {
 		this.fullyQualifiedName = fullyQualifiedName;
@@ -19,5 +20,15 @@ public class JApiImplementedInterface implements JApiHasChangeStatus {
 	@XmlAttribute
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
+	}
+	
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+		return this.binaryCompatible;
+	}
+
+	void setBinaryCompatible(boolean binaryCompatible) {
+		this.binaryCompatible = binaryCompatible;
 	}
 }

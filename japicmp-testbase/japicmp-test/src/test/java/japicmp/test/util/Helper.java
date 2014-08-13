@@ -49,4 +49,8 @@ public class Helper {
     	}
     	throw new IllegalArgumentException("No interface found with name " + name + ".");
     }
+    
+    public static String replace$(String str) {
+    	return str.replace("$", ".");
+    }
 }

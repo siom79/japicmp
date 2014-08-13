@@ -7,10 +7,11 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Optional;
 
-public class JApiSuperclass {
+public class JApiSuperclass implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final Optional<String> oldSuperclass;
 	private final Optional<String> newSuperclass;
 	private final JApiChangeStatus changeStatus;
+	private boolean binaryCompatible = true;
 	
 	public JApiSuperclass(Optional<String> oldSuperclass, Optional<String> newSuperclass, JApiChangeStatus changeStatus) {
 		this.oldSuperclass = oldSuperclass;
@@ -41,5 +42,15 @@ public class JApiSuperclass {
 	@XmlAttribute(name = "superclassNew")
 	public String getSuperclassNew() {
 		return OptionalHelper.optionalToString(this.newSuperclass);
+	}
+	
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+		return this.binaryCompatible;
+	}
+
+	void setBinaryCompatible(boolean binaryCompatible) {
+		this.binaryCompatible = binaryCompatible;
 	}
 }
