@@ -11,7 +11,7 @@ public class JApiType {
 	private final Optional<String> oldTypeOptional;
 	private final Optional<String> newTypeOptional;
 	private final JApiChangeStatus changeStatus;
-	
+
 	public JApiType(Optional<String> oldTypeOptional, Optional<String> newTypeOptional, JApiChangeStatus changeStatus) {
 		this.oldTypeOptional = oldTypeOptional;
 		this.newTypeOptional = newTypeOptional;
@@ -32,14 +32,24 @@ public class JApiType {
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
 	}
-	
+
 	@XmlAttribute(name = "oldValue")
 	public String getOldValue() {
 		return OptionalHelper.optionalToString(this.oldTypeOptional);
 	}
-	
+
 	@XmlAttribute(name = "newValue")
 	public String getNewValue() {
 		return OptionalHelper.optionalToString(this.newTypeOptional);
+	}
+
+	public boolean hasChanged() {
+		boolean hasChanged = false;
+		if (oldTypeOptional.isPresent() && newTypeOptional.isPresent()) {
+			if (!oldTypeOptional.get().equals(newTypeOptional.get())) {
+				hasChanged = true;
+			}
+		}
+		return hasChanged;
 	}
 }

@@ -30,22 +30,23 @@ public class StdoutOutputGenerator {
 	private void processConstructors(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiConstructor> constructors = jApiClass.getConstructors();
 		for (JApiConstructor jApiConstructor : constructors) {
-			appendMethod(sb, signs(jApiConstructor.getChangeStatus()), jApiConstructor, "CONSTRUCTOR:");
+			appendMethod(sb, signs(jApiConstructor), jApiConstructor, "CONSTRUCTOR:");
 		}
 	}
 
 	private void processMethods(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiMethod> methods = jApiClass.getMethods();
 		for (JApiMethod jApiMethod : methods) {
-			appendMethod(sb, signs(jApiMethod.getChangeStatus()), jApiMethod, "METHOD:");
+			appendMethod(sb, signs(jApiMethod), jApiMethod, "METHOD:");
 		}
 	}
 
 	private void processClass(StringBuilder sb, JApiClass jApiClass) {
-		appendClass(sb, signs(jApiClass.getChangeStatus()), jApiClass);
+		appendClass(sb, signs(jApiClass), jApiClass);
 	}
 
-	private String signs(JApiChangeStatus changeStatus) {
+	private String signs(JApiHasChangeStatus hasChangeStatus) {
+		JApiChangeStatus changeStatus = hasChangeStatus.getChangeStatus();
 		String retVal = "???";
 		switch (changeStatus) {
 		case UNCHANGED:
@@ -61,11 +62,21 @@ public class StdoutOutputGenerator {
 			retVal = "***";
 			break;
 		}
+		boolean binaryCompatible = true;
+		if (hasChangeStatus instanceof JApiBinaryCompatibility) {
+			JApiBinaryCompatibility binaryCompatibility = (JApiBinaryCompatibility) hasChangeStatus;
+			binaryCompatible = binaryCompatibility.isBinaryCompatible();
+		}
+		if(binaryCompatible) {
+			retVal += " ";
+		} else {
+			retVal += "!";
+		}
 		return retVal;
 	}
 
 	private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiMethod, String classMemberType) {
-		sb.append("\t" + signs + " " + jApiMethod.getChangeStatus() + " " + classMemberType + " " + accessModifierAsString(jApiMethod) + abstractModifierAsString(jApiMethod) 
+		sb.append("\t" + signs + " " + jApiMethod.getChangeStatus() + " " + classMemberType + " " + accessModifierAsString(jApiMethod) + abstractModifierAsString(jApiMethod)
 				+ staticModifierAsString(jApiMethod) + finalModifierAsString(jApiMethod) + jApiMethod.getName() + "(");
 		int paramCount = 0;
 		for (JApiParameter jApiParameter : jApiMethod.getParameters()) {
@@ -105,7 +116,7 @@ public class StdoutOutputGenerator {
 	private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiField> fields = jApiClass.getFields();
 		for (JApiField field : fields) {
-			sb.append(tabs(1) + signs(field.getChangeStatus()) + " " + field.getChangeStatus() + " FIELD: " + accessModifierAsString(field) + staticModifierAsString(field)
+			sb.append(tabs(1) + signs(field) + " " + field.getChangeStatus() + " FIELD: " + accessModifierAsString(field) + staticModifierAsString(field)
 					+ finalModifierAsString(field) + fieldTypeChangeAsString(field) + field.getName() + "\n");
 		}
 	}
@@ -182,8 +193,7 @@ public class StdoutOutputGenerator {
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
 		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
 		if (options.isOutputOnlyModifications() && jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-			sb.append(tabs(1) + signs(jApiSuperclass.getChangeStatus()) + " " + jApiSuperclass.getChangeStatus() + " SUPERCLASS: " + superclassChangeAsString(jApiSuperclass)
-					+ "\n");
+			sb.append(tabs(1) + signs(jApiSuperclass) + " " + jApiSuperclass.getChangeStatus() + " SUPERCLASS: " + superclassChangeAsString(jApiSuperclass) + "\n");
 		}
 	}
 
@@ -201,8 +211,7 @@ public class StdoutOutputGenerator {
 	private void processInterfaceChanges(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiImplementedInterface> interfaces = jApiClass.getInterfaces();
 		for (JApiImplementedInterface implementedInterface : interfaces) {
-			sb.append(tabs(1) + signs(implementedInterface.getChangeStatus()) + " " + implementedInterface.getChangeStatus() + " INTERFACE: "
-					+ implementedInterface.getFullyQualifiedName() + "\n");
+			sb.append(tabs(1) + signs(implementedInterface) + " " + implementedInterface.getChangeStatus() + " INTERFACE: " + implementedInterface.getFullyQualifiedName() + "\n");
 		}
 	}
 }

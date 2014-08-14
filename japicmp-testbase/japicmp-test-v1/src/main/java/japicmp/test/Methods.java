@@ -17,4 +17,24 @@ public class Methods {
 	public void nonFinalStaysNonFinalMethod() {
 		
 	}
+	
+	public static void staticNonFinalToStaticFinalMethod() {
+		
+	}
+	
+	public static void staticToNonStaticMethod() {
+		
+	}
+	
+	public void nonStaticToStaticMethod() {
+		
+	}
+	
+	public static void staticStaysStaticMethod() {
+		
+	}
+	
+	public void nonStaticStaysNonStaticMethod() {
+		
+	}
 }

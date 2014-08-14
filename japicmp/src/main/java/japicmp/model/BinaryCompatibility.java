@@ -74,7 +74,8 @@ public class BinaryCompatibility {
 			}
 			// section 13.4.8 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.NEW) {
-				forAllSuperclasses(jApiClass, classMap, new ArrayList<Boolean>(), new OnSuperclassCallback() {
+				ArrayList<Boolean> returnValues = new ArrayList<Boolean>();
+				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
 					@Override
 					public boolean callback(JApiClass jApiClass, Map<String, JApiClass> classMap) {
 						boolean changedIncompatible = false;
@@ -96,6 +97,12 @@ public class BinaryCompatibility {
 						return changedIncompatible;
 					}
 				});
+				for(boolean returnValue : returnValues) {
+					if(returnValue) {
+						field.setBinaryCompatible(false);
+						changedIncompatible = true;
+					}
+				}
 			}
 			// section 13.4.9 of "Java Language Specification" SE7
 			if (field.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
@@ -103,7 +110,11 @@ public class BinaryCompatibility {
 				changedIncompatible = true;
 			}
 			// section 13.4.10 of "Java Language Specification" SE7
-			if (isNotPrivate(field) && field.getStaticModifier().getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+			if (isNotPrivate(field) && (field.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC) || field.getStaticModifier().hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC))) {
+				field.setBinaryCompatible(false);
+				changedIncompatible = true;
+			}
+			if (isNotPrivate(field) && field.getType().hasChanged()) {
 				field.setBinaryCompatible(false);
 				changedIncompatible = true;
 			}
@@ -232,6 +243,13 @@ public class BinaryCompatibility {
 					changedIncompatible = true;
 				}
 			}
+			// section 13.4.18 of "Java Language Specification" SE7
+			if (isNotPrivate(method)
+					&& (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC) || method.getStaticModifier().hasChangedFromTo(
+							StaticModifier.STATIC, StaticModifier.NON_STATIC))) {
+				method.setBinaryCompatible(false);
+				changedIncompatible = true;
+			}
 		}
 		return changedIncompatible;
 	}
@@ -241,6 +259,7 @@ public class BinaryCompatibility {
 		final JApiSuperclass superclass = jApiClass.getSuperclass();
 		// section 13.4.4 of "Java Language Specification" SE7
 		if (superclass.getChangeStatus() == JApiChangeStatus.REMOVED) {
+			superclass.setBinaryCompatible(false);
 			changedIncompatible = true;
 		} else if (superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED || superclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			List<Boolean> returnValues = new ArrayList<Boolean>();
@@ -268,6 +287,18 @@ public class BinaryCompatibility {
 					changedIncompatible = true;
 				}
 			}
+			if(superclass.getOldSuperclass().isPresent() && superclass.getNewSuperclass().isPresent()) {
+				if(!superclass.getOldSuperclass().get().equals(superclass.getNewSuperclass().get())) {
+					superclass.setBinaryCompatible(false);
+					changedIncompatible = true;
+				}
+			} else if(superclass.getOldSuperclass().isPresent() && !superclass.getNewSuperclass().isPresent()) {
+				superclass.setBinaryCompatible(false);
+				changedIncompatible = true;
+			} else if(!superclass.getOldSuperclass().isPresent() && superclass.getNewSuperclass().isPresent()) {
+				superclass.setBinaryCompatible(false);
+				changedIncompatible = true;
+			}
 		}
 		// section 13.4.4 of "Java Language Specification" SE7
 		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {
@@ -289,6 +320,10 @@ public class BinaryCompatibility {
 						implementedInterface.setBinaryCompatible(false);
 						changedIncompatible = true;
 					}
+				}
+				if(implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+					implementedInterface.setBinaryCompatible(false);
+					changedIncompatible = true;
 				}
 			}
 		}

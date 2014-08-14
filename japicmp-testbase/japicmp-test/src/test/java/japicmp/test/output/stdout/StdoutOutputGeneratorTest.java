@@ -23,9 +23,9 @@ public class StdoutOutputGeneratorTest {
 		options.setOutputOnlyModifications(true);
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options);
 		String string = generator.generate(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"), jApiClasses);
-		assertThat(string, containsString("+++ NEW CLASS: PUBLIC(+) japicmp.test.Added"));
-		assertThat(string, containsString("--- REMOVED CLASS: PUBLIC(-) japicmp.test.Removed"));
-		assertThat(string, containsString("*** MODIFIED CLASS: PUBLIC STATIC japicmp.test.Superclasses$SuperClassChanges"));
-		assertThat(string, containsString("*** MODIFIED SUPERCLASS: japicmp.test.Superclasses$SuperclassB (<- japicmp.test.Superclasses$SuperclassA)"));
+		assertThat(string, containsString("+++  NEW CLASS: PUBLIC(+) japicmp.test.Added"));
+		assertThat(string, containsString("---! REMOVED CLASS: PUBLIC(-) japicmp.test.Removed"));
+		assertThat(string, containsString("***! MODIFIED CLASS: PUBLIC STATIC japicmp.test.Superclasses$SuperClassChanges"));
+		assertThat(string, containsString("***! MODIFIED SUPERCLASS: japicmp.test.Superclasses$SuperclassB (<- japicmp.test.Superclasses$SuperclassA)"));
 	}
 }

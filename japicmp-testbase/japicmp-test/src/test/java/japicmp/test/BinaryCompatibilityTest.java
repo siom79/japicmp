@@ -24,6 +24,8 @@ import japicmp.test.ClassModifier.FinalToNonFinalInnerClass;
 import japicmp.test.ClassModifier.NonAbstractToAbstractClass;
 import japicmp.test.ClassModifier.NonFinalToFinalInnerClass;
 import japicmp.test.ClassModifier.PublicToPrivateInnerClass;
+import japicmp.test.Enums.AbcToAb;
+import japicmp.test.Enums.AbcToAbcd;
 import japicmp.test.Interfaces.ClassWithInterfaceLosesMethod;
 import japicmp.test.Interfaces.SubclassWithSuperclassLosesMethod;
 
@@ -135,7 +137,26 @@ public class BinaryCompatibilityTest {
 		JApiClass methods = getJApiClass(jApiClasses, Methods.class.getName());
 		JApiMethod finalToNonFinalMethod = getJApiMethod(methods.getMethods(), "finalToNonFinalMethod");
 		JApiMethod nonFinalToFinalMethod = getJApiMethod(methods.getMethods(), "nonFinalToFinalMethod");
+		JApiMethod staticNonFinalToStaticFinalMethod = getJApiMethod(methods.getMethods(), "staticNonFinalToStaticFinalMethod");
 		assertThat(finalToNonFinalMethod.isBinaryCompatible(), is(true));
 		assertThat(nonFinalToFinalMethod.isBinaryCompatible(), is(false));
+		assertThat(staticNonFinalToStaticFinalMethod.isBinaryCompatible(), is(true));
+	}
+	
+	@Test
+	public void test_JLS_13_4_18() {
+		JApiClass methods = getJApiClass(jApiClasses, Methods.class.getName());
+		JApiMethod staticToNonStaticMethod = getJApiMethod(methods.getMethods(), "staticToNonStaticMethod");
+		JApiMethod nonStaticToStaticMethod = getJApiMethod(methods.getMethods(), "nonStaticToStaticMethod");
+		assertThat(staticToNonStaticMethod.isBinaryCompatible(), is(false));
+		assertThat(nonStaticToStaticMethod.isBinaryCompatible(), is(false));
+	}
+	
+	@Test
+	public void test_JLS_13_4_26() {
+		JApiClass abcToAbcd = getJApiClass(jApiClasses, AbcToAbcd.class.getName());
+		assertThat(abcToAbcd.isBinaryCompatible(), is(true));
+		JApiClass abcToAb = getJApiClass(jApiClasses, AbcToAb.class.getName());
+		assertThat(abcToAb.isBinaryCompatible(), is(false));
 	}
 }
