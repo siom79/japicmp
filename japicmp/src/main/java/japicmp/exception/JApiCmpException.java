@@ -9,7 +9,7 @@ public class JApiCmpException extends RuntimeException {
     }
 
     public enum Reason {
-        IllegalArgument, NormalTermination
+        IllegalArgument, NormalTermination, CliMissingMandatoryOption, CliMissingArgumentForOption
     }
 
     public JApiCmpException(Reason reason, String msg) {

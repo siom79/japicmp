@@ -46,6 +46,11 @@ public class OutputFilter {
 						remove = true;
 					}
 				}
+				if (options.isOutputOnlyBinaryIncompatibleModifications()) {
+					if (element.isBinaryCompatible()) {
+						remove = true;
+					}
+				}
 				if (!matchesModifierLevel(element)) {
 					remove = true;
 				}
@@ -62,6 +67,11 @@ public class OutputFilter {
 						remove = true;
 					}
 				}
+				if (options.isOutputOnlyBinaryIncompatibleModifications()) {
+					if (element.isBinaryCompatible()) {
+						remove = true;
+					}
+				}
 				if (remove) {
 					iterator.remove();
 				}
@@ -72,6 +82,11 @@ public class OutputFilter {
 				boolean remove = false;
 				if (options.isOutputOnlyModifications()) {
 					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+						remove = true;
+					}
+				}
+				if (options.isOutputOnlyBinaryIncompatibleModifications()) {
+					if (element.isBinaryCompatible()) {
 						remove = true;
 					}
 				}
@@ -91,6 +106,11 @@ public class OutputFilter {
 						remove = true;
 					}
 				}
+				if (options.isOutputOnlyBinaryIncompatibleModifications()) {
+					if (element.isBinaryCompatible()) {
+						remove = true;
+					}
+				}
 				if (!matchesModifierLevel(element)) {
 					remove = true;
 				}
@@ -107,12 +127,17 @@ public class OutputFilter {
 						remove = true;
 					}
 				}
+				if (options.isOutputOnlyBinaryIncompatibleModifications()) {
+					if (element.isBinaryCompatible()) {
+						remove = true;
+					}
+				}
 				if (!matchesModifierLevel(element)) {
 					remove = true;
 				}
 				if (element.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 					if (element.getMethods().size() == 0 && element.getConstructors().size() == 0 && element.getInterfaces().size() == 0 && element.getFields().size() == 0
-							&& element.getAbstractModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
+							&& element.getAnnotations().size() == 0 && element.getAbstractModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
 							&& element.getAccessModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
 							&& element.getFinalModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
 							&& element.getStaticModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED

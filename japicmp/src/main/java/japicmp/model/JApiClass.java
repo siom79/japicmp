@@ -17,6 +17,8 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.annotation.Annotation;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -31,12 +33,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final Type type;
 	private final Optional<CtClass> oldClass;
 	private final Optional<CtClass> newClass;
-	private JApiChangeStatus changeStatus;
+	private final JApiChangeStatus changeStatus;
 	private final JApiSuperclass superclass;
 	private final List<JApiImplementedInterface> interfaces = new LinkedList<>();
 	private final List<JApiField> fields = new LinkedList<>();
 	private final List<JApiConstructor> constructors = new LinkedList<>();
 	private final List<JApiMethod> methods = new LinkedList<>();
+	private final List<JApiAnnotation> annotations = new LinkedList<>();
 	private final JApiModifier<AccessModifier> accessModifier;
 	private final JApiModifier<FinalModifier> finalModifier;
 	private final JApiModifier<StaticModifier> staticModifier;
@@ -57,12 +60,83 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		computeMethodChanges(oldClass, newClass);
 		computeInterfaceChanges(this.interfaces, oldClass, newClass);
 		computeFieldChanges(this.fields, oldClass, newClass);
+		computeAnnotationChanges(this.annotations, oldClass, newClass);
 		this.accessModifier = extractAccessModifier(oldClass, newClass);
 		this.finalModifier = extractFinalModifier(oldClass, newClass);
 		this.staticModifier = extractStaticModifier(oldClass, newClass);
 		this.abstractModifier = extractAbstractModifier(oldClass, newClass);
 		this.syntheticAttribute = extractSyntheticAttribute(oldClass, newClass);
 		this.changeStatus = evaluateChangeStatus(changeStatus);
+	}
+
+	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			CtClass oldClass = oldClassOptional.get();
+			CtClass newClass = newClassOptional.get();
+			AnnotationsAttribute oldAnnotationsAttribute = (AnnotationsAttribute) oldClass.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
+			AnnotationsAttribute newAnnotationsAttribute = (AnnotationsAttribute) newClass.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
+			Map<String, Annotation> oldAnnotationMap;
+			Map<String, Annotation> newAnnotationMap;
+			if (oldAnnotationsAttribute != null) {
+				oldAnnotationMap = buildAnnotationMap(oldAnnotationsAttribute.getAnnotations());
+			} else {
+				oldAnnotationMap = new HashMap<>();
+			}
+			if (newAnnotationsAttribute != null) {
+				newAnnotationMap = buildAnnotationMap(newAnnotationsAttribute.getAnnotations());
+			} else {
+				newAnnotationMap = new HashMap<>();
+			}
+			for (Annotation annotation : oldAnnotationMap.values()) {
+				Annotation foundAnnotation = newAnnotationMap.get(annotation.getTypeName());
+				if (foundAnnotation != null) {
+					JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.of(foundAnnotation), JApiChangeStatus.UNCHANGED);
+					annotations.add(jApiAnnotation);
+				} else {
+					JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.<Annotation> absent(), JApiChangeStatus.REMOVED);
+					annotations.add(jApiAnnotation);
+				}
+			}
+			for (Annotation annotation : newAnnotationMap.values()) {
+				Annotation foundAnnotation = oldAnnotationMap.get(annotation.getTypeName());
+				if (foundAnnotation == null) {
+					JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.<Annotation> absent(), Optional.of(annotation), JApiChangeStatus.NEW);
+					annotations.add(jApiAnnotation);
+				}
+			}
+		} else {
+			if (oldClassOptional.isPresent()) {
+				CtClass oldClass = oldClassOptional.get();
+				AnnotationsAttribute oldAnnotationsAttribute = (AnnotationsAttribute) oldClass.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
+				if (oldAnnotationsAttribute != null) {
+					Map<String, Annotation> oldAnnotationMap = buildAnnotationMap(oldAnnotationsAttribute.getAnnotations());
+					for (Annotation annotation : oldAnnotationMap.values()) {
+						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.<Annotation> absent(),
+								JApiChangeStatus.REMOVED);
+						annotations.add(jApiAnnotation);
+					}
+				}
+			}
+			if (newClassOptional.isPresent()) {
+				CtClass newClass = newClassOptional.get();
+				AnnotationsAttribute newAnnotationsAttribute = (AnnotationsAttribute) newClass.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
+				if (newAnnotationsAttribute != null) {
+					Map<String, Annotation> newAnnotationMap = buildAnnotationMap(newAnnotationsAttribute.getAnnotations());
+					for (Annotation annotation : newAnnotationMap.values()) {
+						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.<Annotation> absent(), Optional.of(annotation), JApiChangeStatus.NEW);
+						annotations.add(jApiAnnotation);
+					}
+				}
+			}
+		}
+	}
+
+	private Map<String, Annotation> buildAnnotationMap(Annotation[] annotations) {
+		Map<String, Annotation> map = new HashMap<>();
+		for (Annotation annotation : annotations) {
+			map.put(annotation.getTypeName(), annotation);
+		}
+		return map;
 	}
 
 	private JApiAttribute<SyntheticAttribute> extractSyntheticAttribute(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -391,6 +465,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 					changeStatus = JApiChangeStatus.MODIFIED;
 				}
 			}
+			for (JApiAnnotation annotation : annotations) {
+				if (annotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+					changeStatus = JApiChangeStatus.MODIFIED;
+				}
+			}
 		}
 		return changeStatus;
 	}
@@ -511,10 +590,6 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return oldClass;
 	}
 
-	public void setChangeStatus(JApiChangeStatus changeStatus) {
-		this.changeStatus = changeStatus;
-	}
-
 	@XmlElementWrapper(name = "modifiers")
 	@XmlElement(name = "modifier")
 	public List<JApiModifier<? extends Enum<?>>> getModifiers() {
@@ -596,5 +671,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 
 	void setBinaryCompatible(boolean binaryCompatible) {
 		this.binaryCompatible = binaryCompatible;
+	}
+
+	@XmlElementWrapper(name = "annotations")
+	@XmlElement(name = "annotation")
+	public List<JApiAnnotation> getAnnotations() {
+		return annotations;
 	}
 }

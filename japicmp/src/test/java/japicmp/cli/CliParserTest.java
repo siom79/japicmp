@@ -1,6 +1,8 @@
 package japicmp.cli;
 
 import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,9 +26,16 @@ public class CliParserTest {
         assertThat(options.isOutputOnlyModifications(), is(true));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMissingArgumentForN() {
-        subject.parse(new String[]{"-n", "-o", "opath"});
+    	boolean exceptionCaught = false;
+        try {
+			subject.parse(new String[]{"-n", "-o", "opath"});
+		} catch (JApiCmpException e) {
+			exceptionCaught = true;
+			assertThat(e.getReason(), is(JApiCmpException.Reason.CliMissingArgumentForOption));
+		}
+        assertThat(exceptionCaught, is(true));
     }
 
     @Test

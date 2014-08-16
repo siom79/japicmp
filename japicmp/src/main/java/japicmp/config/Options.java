@@ -10,6 +10,7 @@ public class Options {
     private String oldArchive;
     private String newArchive;
     private boolean outputOnlyModifications = false;
+    private boolean outputOnlyBinaryIncompatibleModifications = false;
     private Optional<String> xmlOutputFile = Optional.<String>absent();
     private AccessModifier accessModifier = AccessModifier.PUBLIC;
     private List<PackageFilter> packagesInclude = new LinkedList<PackageFilter>();
@@ -86,4 +87,12 @@ public class Options {
             }
         }
     }
+
+	public void setOutputOnlyBinaryIncompatibleModifications(boolean outputOnlyBinaryIncompatibleModifications) {
+		this.outputOnlyBinaryIncompatibleModifications = outputOnlyBinaryIncompatibleModifications;
+	}
+
+	public boolean isOutputOnlyBinaryIncompatibleModifications() {
+		return outputOnlyBinaryIncompatibleModifications;
+	}
 }

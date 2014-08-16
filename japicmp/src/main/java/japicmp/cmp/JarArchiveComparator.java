@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 
 public class JarArchiveComparator {
     private static final Logger logger = Logger.getLogger(JarArchiveComparator.class);
+    private static final ClassPool classPool = new ClassPool();
     private JarArchiveComparatorOptions options;
 
     public JarArchiveComparator(JarArchiveComparatorOptions options) {
@@ -25,8 +26,8 @@ public class JarArchiveComparator {
     }
 
     public List<JApiClass> compare(File oldArchive, File newArchive) {
-        ClassPool classPool = new ClassPool();
         try {
+        	classPool.appendSystemPath();
             ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
             List<JApiClass> classList = classesComparator.getClasses();
             checkBinaryCompatibility(classList);
@@ -35,6 +36,10 @@ public class JarArchiveComparator {
             System.err.println(String.format("Processing jar files '%s' and '%s' failed: %s.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), e.getMessage()));
             return new LinkedList<JApiClass>();
         }
+    }
+    
+    public static ClassPool getClassPool() {
+    	return classPool;
     }
 
     private void checkBinaryCompatibility(List<JApiClass> classList) {
