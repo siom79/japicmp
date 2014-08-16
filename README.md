@@ -201,4 +201,4 @@ The following releases are available:
 
 ##Development##
 
-* ![Build Status](https://travis-ci.org/siom79/japicmp.png?branch=master)
+* ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
