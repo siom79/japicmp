@@ -201,5 +201,4 @@ The following releases are available:
 
 ##Development##
 
-* [Jenkins build server](https://siom79.ci.cloudbees.com/job/japicmp)
-* [Maven snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/)
+* ![Build Status](https://travis-ci.org/siom79/japicmp.png?branch=master)
