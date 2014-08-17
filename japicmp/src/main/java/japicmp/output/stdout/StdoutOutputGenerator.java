@@ -25,18 +25,18 @@ public class StdoutOutputGenerator {
             processClass(sb, jApiClass);
             processConstructors(sb, jApiClass);
             processMethods(sb, jApiClass);
-            processAnnotations(sb, jApiClass);
+            processAnnotations(sb, jApiClass, 1);
         }
         return sb.toString();
     }
 
-    private void processAnnotations(StringBuilder sb, JApiClass jApiClass) {
+    private void processAnnotations(StringBuilder sb, JApiHasAnnotations jApiClass, int numberofTabs) {
         List<JApiAnnotation> annotations = jApiClass.getAnnotations();
         for (JApiAnnotation jApiAnnotation : annotations) {
-            appendAnnotation(sb, signs(jApiAnnotation), jApiAnnotation);
+            appendAnnotation(sb, signs(jApiAnnotation), jApiAnnotation, numberofTabs);
             List<JApiAnnotationElement> elements = jApiAnnotation.getElements();
             for (JApiAnnotationElement jApiAnnotationElement : elements) {
-                appendAnnotationElement(sb, signs(jApiAnnotationElement), jApiAnnotationElement, 2);
+                appendAnnotationElement(sb, signs(jApiAnnotationElement), jApiAnnotationElement, numberofTabs + 1);
             }
         }
     }
@@ -45,6 +45,7 @@ public class StdoutOutputGenerator {
         List<JApiConstructor> constructors = jApiClass.getConstructors();
         for (JApiConstructor jApiConstructor : constructors) {
             appendMethod(sb, signs(jApiConstructor), jApiConstructor, "CONSTRUCTOR:");
+            processAnnotations(sb, jApiConstructor, 2);
         }
     }
 
@@ -52,6 +53,7 @@ public class StdoutOutputGenerator {
         List<JApiMethod> methods = jApiClass.getMethods();
         for (JApiMethod jApiMethod : methods) {
             appendMethod(sb, signs(jApiMethod), jApiMethod, "METHOD:");
+            processAnnotations(sb, jApiMethod, 2);
         }
     }
 
@@ -103,8 +105,8 @@ public class StdoutOutputGenerator {
         sb.append(")\n");
     }
 
-    private void appendAnnotation(StringBuilder sb, String signs, JApiAnnotation jApiAnnotation) {
-        sb.append("\t" + signs + " " + jApiAnnotation.getChangeStatus() + " ANNOTATION: " + jApiAnnotation.getFullyQualifiedName() + "\n");
+    private void appendAnnotation(StringBuilder sb, String signs, JApiAnnotation jApiAnnotation, int numberOfTabs) {
+        sb.append(tabs(numberOfTabs) + signs + " " + jApiAnnotation.getChangeStatus() + " ANNOTATION: " + jApiAnnotation.getFullyQualifiedName() + "\n");
     }
 
     private void appendAnnotationElement(StringBuilder sb, String signs, JApiAnnotationElement jApiAnnotationElement, int numberOfTabs) {
@@ -160,6 +162,7 @@ public class StdoutOutputGenerator {
         for (JApiField field : fields) {
             sb.append(tabs(1) + signs(field) + " " + field.getChangeStatus() + " FIELD: " + accessModifierAsString(field) + staticModifierAsString(field)
                     + finalModifierAsString(field) + fieldTypeChangeAsString(field) + field.getName() + "\n");
+            processAnnotations(sb, field, 2);
         }
     }
 
