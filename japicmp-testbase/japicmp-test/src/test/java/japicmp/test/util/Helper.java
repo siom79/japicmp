@@ -1,9 +1,6 @@
 package japicmp.test.util;
 
-import japicmp.model.JApiClass;
-import japicmp.model.JApiField;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
+import japicmp.model.*;
 
 import java.io.File;
 import java.util.List;
@@ -50,7 +47,21 @@ public class Helper {
     	throw new IllegalArgumentException("No interface found with name " + name + ".");
     }
     
-    public static String replace$(String str) {
-    	return str.replace("$", ".");
+    public static JApiAnnotation getJApiAnnotation(List<JApiAnnotation> annotations, String name) {
+        for(JApiAnnotation annotation : annotations) {
+            if(annotation.getFullyQualifiedName().equals(name)) {
+                return annotation;
+            }
+        }
+        throw new IllegalArgumentException("No annotation found with name " + name + ".");
+    }
+
+    public static JApiAnnotationElement getJApiAnnotationElement(List<JApiAnnotationElement> annotationElements, String name) {
+        for(JApiAnnotationElement annotationElement : annotationElements) {
+            if(annotationElement.getName().equals(name)) {
+                return annotationElement;
+            }
+        }
+        throw new IllegalArgumentException("No annotation element found with name " + name + ".");
     }
 }

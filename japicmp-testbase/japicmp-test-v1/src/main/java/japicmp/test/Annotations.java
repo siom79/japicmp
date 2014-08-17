@@ -11,6 +11,7 @@ public class Annotations {
 	public @interface Author {
 		String name();
 		int year();
+        String language() default "en";
 	}
 	
 	@XmlRootElement
@@ -22,4 +23,14 @@ public class Annotations {
 	public class Goethe {
 		
 	}
+
+    @Author(name = "Brecht", year = 1898)
+    public class AuthorAnnotationChanges {
+
+    }
+
+    @Author(name = "Brecht", year = 1898)
+    public class AuthorAnnotationGetsNewValue {
+
+    }
 }

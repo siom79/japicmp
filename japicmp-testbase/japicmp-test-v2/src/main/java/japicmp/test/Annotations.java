@@ -9,6 +9,7 @@ public class Annotations {
 	public @interface Author {
 		String name();
 		int year();
+        String language() default "en";
 	}
 	
 	public class Shakespeare {
@@ -19,4 +20,14 @@ public class Annotations {
 	public class Goethe {
 		
 	}
+
+    @Author(name = "Schiller", year = 1759)
+    public class AuthorAnnotationChanges {
+
+    }
+
+    @Author(name = "Brecht", year = 1898, language = "de")
+    public class AuthorAnnotationGetsNewValue {
+
+    }
 }

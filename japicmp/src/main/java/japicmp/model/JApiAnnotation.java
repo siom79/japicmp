@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Optional;
 
-public class JApiAnnotation implements JApiHasChangeStatus {
+public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final String fullyQualifiedName;
 	private final Optional<Annotation> oldAnnotation;
 	private final Optional<Annotation> newAnnotation;
@@ -132,4 +132,9 @@ public class JApiAnnotation implements JApiHasChangeStatus {
 	public List<JApiAnnotationElement> getElements() {
 		return elements;
 	}
+
+    @Override
+    public boolean isBinaryCompatible() {
+        return true;
+    }
 }
