@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final String fullyQualifiedName;
 	private final JApiChangeStatus changeStatus;
-	private boolean binaryCompatible;
+	private boolean binaryCompatible = true;
 
 	public JApiImplementedInterface(String fullyQualifiedName, JApiChangeStatus changeStatus) {
 		this.fullyQualifiedName = fullyQualifiedName;

@@ -1,5 +1,7 @@
 package japicmp.test;
 
+import java.io.Serializable;
+
 public class Interfaces {
 	
 	public interface TestInterface {
@@ -48,4 +50,8 @@ public class Interfaces {
 	public class SubclassWithSuperclassLosesMethod extends SuperclassLosesMethod {
 		
 	}
+
+    public class NewClassWithNewInterface implements TestInterface {
+
+    }
 }
