@@ -100,4 +100,13 @@ public class Annotations {
     public class AuthorAnnotationGetsNewValue {
 
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface IntArrayAnnotation {
+        int[] values();
+    }
+
+    @IntArrayAnnotation(values = {2, 3, 4})
+    public int fieldWithIntArrayAnnotation;
 }

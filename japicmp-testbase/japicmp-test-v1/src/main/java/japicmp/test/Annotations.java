@@ -1,20 +1,21 @@
 package japicmp.test;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 public class Annotations {
 
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Author {
-		String name();
-		int year();
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Author {
+        String name();
+
+        int year();
+
         String language() default "en";
-	}
+    }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -83,16 +84,16 @@ public class Annotations {
     public void methodAnnotationValueModified() {
 
     }
-	
-	@XmlRootElement
-	@Author(name = "Shakespeare", year = 1564)
-	public class Shakespeare {
-		
-	}
-	
-	public class Goethe {
-		
-	}
+
+    @XmlRootElement
+    @Author(name = "Shakespeare", year = 1564)
+    public class Shakespeare {
+
+    }
+
+    public class Goethe {
+
+    }
 
     @Author(name = "Brecht", year = 1898)
     public class AuthorAnnotationChanges {
@@ -103,4 +104,13 @@ public class Annotations {
     public class AuthorAnnotationGetsNewValue {
 
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface IntArrayAnnotation {
+        int[] values();
+    }
+
+    @IntArrayAnnotation(values = {1, 2, 3})
+    public int fieldWithIntArrayAnnotation;
 }
