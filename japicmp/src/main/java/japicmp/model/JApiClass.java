@@ -19,7 +19,6 @@ import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.annotation.Annotation;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -283,9 +282,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private void sortMethodsIntoLists(Map<String, CtMethod> oldMethodsMap, Map<String, CtMethod> newMethodsMap) {
 		SignatureParser signatureParser = new SignatureParser();
 		for (CtMethod ctMethod : oldMethodsMap.values()) {
-			String longName = ctMethod.getLongName();
 			signatureParser.parse(ctMethod.getSignature());
-			CtMethod foundMethod = newMethodsMap.get(longName);
+			CtMethod foundMethod = newMethodsMap.get(toMethodKey(ctMethod));
 			if (foundMethod == null) {
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtMethod> absent(),
 						signatureParser.getReturnType());
@@ -299,9 +297,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		}
 		for (CtMethod ctMethod : newMethodsMap.values()) {
-			String longName = ctMethod.getLongName();
 			signatureParser.parse(ctMethod.getSignature());
-			CtMethod foundMethod = oldMethodsMap.get(longName);
+			CtMethod foundMethod = oldMethodsMap.get(toMethodKey(ctMethod));
 			if (foundMethod == null) {
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod> absent(), Optional.of(ctMethod),
 						signatureParser.getReturnType());
@@ -349,10 +346,24 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		Map<String, CtMethod> methods = new HashMap<String, CtMethod>();
 		if (ctClass.isPresent()) {
 			for (CtMethod ctMethod : ctClass.get().getDeclaredMethods()) {
-				methods.put(ctMethod.getLongName(), ctMethod);
+				methods.put(toMethodKey(ctMethod), ctMethod);
 			}
 		}
 		return methods;
+	}
+
+	private String toMethodKey(CtMethod ctMethod) {
+		CtClass returnType = null;
+		try {
+			returnType = ctMethod.getReturnType();
+		} catch (NotFoundException e) {
+			
+		}
+		String returnTypeAsString = "void";
+		if(returnType != null) {
+			returnTypeAsString = returnType.getName();
+		}
+		return ctMethod.getLongName()+"#"+returnTypeAsString;
 	}
 
 	private Map<String, CtConstructor> createConstructorMap(Optional<CtClass> ctClass) {

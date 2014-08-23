@@ -1,9 +1,14 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import javassist.CtBehavior;
 import javassist.CtConstructor;
 import javassist.CtMethod;
@@ -14,10 +19,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+
+import com.google.common.base.Optional;
 
 public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations {
     private final String name;
@@ -28,7 +31,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private final JApiModifier<StaticModifier> staticModifier;
     private final JApiModifier<AbstractModifier> abstractModifier;
     private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
-    private final JApiChangeStatus changeStatus;
+    protected JApiChangeStatus changeStatus;
     private boolean binaryCompatible = true;
 
     public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus) {
@@ -42,7 +45,8 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
 
-    private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior) {
+    @SuppressWarnings("unchecked")
+	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior) {
         if (oldBehavior.isPresent()) {
             CtBehavior ctBehavior = oldBehavior.get();
             if (ctBehavior instanceof CtMethod) {

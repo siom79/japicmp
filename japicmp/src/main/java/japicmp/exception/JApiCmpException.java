@@ -9,7 +9,7 @@ public class JApiCmpException extends RuntimeException {
     }
 
     public enum Reason {
-        IllegalArgument, NormalTermination, CliMissingMandatoryOption, CliMissingArgumentForOption
+        IllegalArgument, NormalTermination, CliMissingMandatoryOption, CliMissingArgumentForOption, IoException, JaxbException
     }
 
     public JApiCmpException(Reason reason, String msg) {
@@ -17,7 +17,12 @@ public class JApiCmpException extends RuntimeException {
         this.reason = reason;
     }
 
-    public Reason getReason() {
+    public JApiCmpException(Reason reason, String msg, Throwable t) {
+    	super(msg, t);
+    	this.reason = reason;
+	}
+
+	public Reason getReason() {
         return reason;
     }
 }

@@ -63,7 +63,7 @@ public class CliParser {
 		System.out.println("-h                        Prints this help.");
 		System.out.println("-o <pathToOldVersionJar>  Provides the path to the old version of the jar.");
 		System.out.println("-n <pathToNewVersionJar>  Provides the path to the new version of the jar.");
-		System.out.println("-x <pathToXmlOutputFile>  Provides the path to the xml output file. If not given, stdout is used.");
+		System.out.println("-x <pathToXmlOutputFile>  Provides the path to the xml output file.");
 		System.out.println("-a <accessModifier>       Sets the access modifier level (public, package, protected, private), which should be used.");
 		System.out.println("-i <packagesToInclude>    Comma separated list of package names to include, * can be used as wildcard.");
 		System.out.println("-e <packagesToExclude>    Comma separated list of package names to exclude, * can be used as wildcard.");

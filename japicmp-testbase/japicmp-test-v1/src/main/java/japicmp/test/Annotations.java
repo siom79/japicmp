@@ -113,4 +113,82 @@ public class Annotations {
 
     @IntArrayAnnotation(values = {1, 2, 3})
     public int fieldWithIntArrayAnnotation;
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface StringArrayAnnotation {
+        String[] values();
+    }
+
+    @StringArrayAnnotation(values = {"a", "b", "c"})
+    public int fieldWithStringArrayAnnotation;
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface ClassArrayAnnotation {
+        Class<?>[] values();
+    }
+
+    @ClassArrayAnnotation(values = {String.class, Integer.class, Short.class})
+    public int fieldWithClassArrayAnnotation;
+    
+    public enum AnnotationEnum {
+    	ONE, TWO, THREE, FOUR
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface EnumArrayAnnotation {
+    	AnnotationEnum[] values();
+    }
+
+    @EnumArrayAnnotation(values = {AnnotationEnum.ONE, AnnotationEnum.TWO, AnnotationEnum.THREE})
+    public int fieldWithEnumArrayAnnotation;
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface InnerAnnotation {
+    	int[] values();
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface OuterAnnotation {
+    	InnerAnnotation[] values();
+    }
+    
+	@OuterAnnotation(values = { @InnerAnnotation(values = { 1, 2, 3 }), @InnerAnnotation(values = { 1, 2, 3, 4 }) })
+    public int fieldWithOuterAnnotation;
+	
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface InnerInnerAnnotation {
+    	int[] innerInner();
+    	int	number();
+    }
+	
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface InnerAnnotation2 {
+    	InnerInnerAnnotation[] inner();
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface OuterAnnotation2 {
+    	InnerAnnotation2[] outer();
+    }
+    
+	@OuterAnnotation2(outer = { @InnerAnnotation2(inner = { @InnerInnerAnnotation(innerInner = { 1, 2 }, number = 42) }),
+			@InnerAnnotation2(inner = { @InnerInnerAnnotation(innerInner = { 1, 2 }, number = 42), @InnerInnerAnnotation(innerInner = { 1, 2 }, number = 42) }) })
+    public int fieldWithInnerInnerAnnotation;
+	
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface FromIntArrayToIntAnnotation {
+    	int[] fromIntArrayToInt();
+    }
+    
+    @FromIntArrayToIntAnnotation(fromIntArrayToInt = {1,2,3})
+    public int fromIntArrayToIntField;
 }

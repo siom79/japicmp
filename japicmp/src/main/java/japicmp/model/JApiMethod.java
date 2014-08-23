@@ -1,19 +1,11 @@
 package japicmp.model;
 
-import japicmp.util.AnnotationHelper;
-import javassist.CtBehavior;
 import javassist.CtMethod;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Optional;
-import javassist.bytecode.AnnotationsAttribute;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class JApiMethod extends JApiBehavior {
     private final Optional<CtMethod> oldMethod;

@@ -35,8 +35,9 @@ public class AnnotationsTest {
         assertThat(authorAnnotation.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
         assertThat(authorAnnotation.getNewAnnotation().isPresent(), is(true));
         JApiAnnotationElement language = getJApiAnnotationElement(authorAnnotation.getElements(), "language");
-        //assertThat(language.getValueOld(), is("n.a."));
-        //assertThat(language.getValueNew(), is("de"));
+        assertThat(language.getOldElementValues().size(), is(0));
+        assertThat(language.getNewElementValues().size(), is(1));
+        assertThat(language.getNewElementValues().get(0).getValueString(), is("de"));
     }
 
     @Test

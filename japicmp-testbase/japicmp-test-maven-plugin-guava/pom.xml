@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.siom79.japicmp</groupId>
+		<artifactId>japicmp-testbase</artifactId>
+		<version>0.2.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>japicmp-test-maven-plugin-guava</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-maven-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.github.siom79.japicmp</groupId>
+				<artifactId>japicmp-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<oldVersion>
+						<dependency>
+							<groupId>com.google.guava</groupId>
+							<artifactId>guava</artifactId>
+							<version>16.0</version>
+						</dependency>
+					</oldVersion>
+					<newVersion>
+						<dependency>
+							<groupId>com.google.guava</groupId>
+							<artifactId>guava</artifactId>
+							<version>17.0</version>
+						</dependency>
+					</newVersion>
+					<parameter>
+						<onlyModified>true</onlyModified>
+						<packagesToInclude>*</packagesToInclude>
+						<packagesToExclude>*</packagesToExclude>
+						<accessModifier>public</accessModifier>
+						<breakBuildOnModifications>false</breakBuildOnModifications>
+					</parameter>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

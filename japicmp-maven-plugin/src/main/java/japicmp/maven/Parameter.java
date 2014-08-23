@@ -6,6 +6,7 @@ public class Parameter {
     private String packagesToExclude;
     private String onlyModified;
     private String breakBuildOnModifications;
+    private String breakBuildOnBinaryIncompatibleModifications;
 
     public String getAccessModifier() {
         return accessModifier;
@@ -46,4 +47,12 @@ public class Parameter {
     public void setBreakBuildOnModifications(String breakBuildOnModifications) {
         this.breakBuildOnModifications = breakBuildOnModifications;
     }
+
+	public String getBreakBuildOnBinaryIncompatibleModifications() {
+		return breakBuildOnBinaryIncompatibleModifications;
+	}
+
+	public void setBreakBuildOnBinaryIncompatibleModifications(String breakBuildOnBinaryIncompatibleModifications) {
+		this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;
+	}
 }

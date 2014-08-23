@@ -110,6 +110,13 @@ public class JApiCmpMojo extends AbstractMojo {
                 }
             }
         }
+        if(breakBuildOnBinaryIncompatibleModifications()) {
+            for(JApiClass jApiClass : jApiClasses) {
+                if(jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isBinaryCompatible()) {
+                    throw new MojoFailureException(String.format("Breaking the build because there is at least one modified class: %s", jApiClass.getFullyQualifiedName()));
+                }
+            }
+        }
     }
 
     private Options createOptions() throws MojoFailureException {
@@ -153,6 +160,14 @@ public class JApiCmpMojo extends AbstractMojo {
         boolean retVal = false;
         if (parameter != null) {
             retVal = Boolean.valueOf(parameter.getBreakBuildOnModifications());
+        }
+        return retVal;
+    }
+    
+    private boolean breakBuildOnBinaryIncompatibleModifications() {
+        boolean retVal = false;
+        if (parameter != null) {
+            retVal = Boolean.valueOf(parameter.getBreakBuildOnBinaryIncompatibleModifications());
         }
         return retVal;
     }

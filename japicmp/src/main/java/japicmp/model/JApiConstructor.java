@@ -1,12 +1,10 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
-import japicmp.util.AnnotationHelper;
 import javassist.CtConstructor;
-import javassist.bytecode.AnnotationsAttribute;
 
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.List;
+
+import com.google.common.base.Optional;
 
 public class JApiConstructor extends JApiBehavior {
     private final Optional<CtConstructor> oldConstructor;

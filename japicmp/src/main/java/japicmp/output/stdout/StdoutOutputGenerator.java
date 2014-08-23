@@ -3,6 +3,7 @@ package japicmp.output.stdout;
 import com.google.common.base.Optional;
 import japicmp.config.Options;
 import japicmp.model.*;
+import japicmp.model.JApiAnnotationElementValue.Type;
 import japicmp.output.OutputFilter;
 import javassist.bytecode.annotation.MemberValue;
 
@@ -91,11 +92,11 @@ public class StdoutOutputGenerator {
         return retVal;
     }
 
-    private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiMethod, String classMemberType) {
-        sb.append("\t" + signs + " " + jApiMethod.getChangeStatus() + " " + classMemberType + " " + accessModifierAsString(jApiMethod) + abstractModifierAsString(jApiMethod)
-                + staticModifierAsString(jApiMethod) + finalModifierAsString(jApiMethod) + jApiMethod.getName() + "(");
+    private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiBehavior, String classMemberType) {
+        sb.append("\t" + signs + " " + jApiBehavior.getChangeStatus() + " " + classMemberType + " " + accessModifierAsString(jApiBehavior) + abstractModifierAsString(jApiBehavior)
+                + staticModifierAsString(jApiBehavior) + finalModifierAsString(jApiBehavior) + returnType(jApiBehavior) + jApiBehavior.getName() + "(");
         int paramCount = 0;
-        for (JApiParameter jApiParameter : jApiMethod.getParameters()) {
+        for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {
             if (paramCount > 0) {
                 sb.append(", ");
             }
@@ -103,6 +104,14 @@ public class StdoutOutputGenerator {
             paramCount++;
         }
         sb.append(")\n");
+    }
+    
+    private String returnType(JApiBehavior jApiBehavior) {
+    	if(jApiBehavior instanceof JApiMethod) {
+    		JApiMethod method = (JApiMethod)jApiBehavior;
+    		return method.getReturnType() + " ";
+    	}
+    	return "";
     }
 
     private void appendAnnotation(StringBuilder sb, String signs, JApiAnnotation jApiAnnotation, int numberOfTabs) {
@@ -115,25 +124,51 @@ public class StdoutOutputGenerator {
         Optional<MemberValue> newValue = jApiAnnotationElement.getNewValue();
         if (oldValue.isPresent() && newValue.isPresent()) {
             if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                sb.append(jApiAnnotationElement.getValueNew());
+                sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()));
             } else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.REMOVED) {
-                sb.append(jApiAnnotationElement.getValueOld() + " (-)");
+                sb.append(elementValueList2String(jApiAnnotationElement.getOldElementValues()) + " (-)");
             } else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.NEW) {
-                sb.append(jApiAnnotationElement.getValueNew() + " (+)");
+                sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()) + " (+)");
             } else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-                sb.append(jApiAnnotationElement.getValueNew() + " (<- " + jApiAnnotationElement.getValueOld() + ")");
+                sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()) + " (<- " + elementValueList2String(jApiAnnotationElement.getOldElementValues()) + ")");
             }
         } else if (!oldValue.isPresent() && newValue.isPresent()) {
-            sb.append(jApiAnnotationElement.getValueNew() + " (+)");
+            sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()) + " (+)");
         } else if (oldValue.isPresent() && !newValue.isPresent()) {
-            sb.append(jApiAnnotationElement.getValueOld() + " (-)");
+            sb.append(elementValueList2String(jApiAnnotationElement.getOldElementValues()) + " (-)");
         } else {
             sb.append(" n.a.");
         }
         sb.append("\n");
     }
+    
+	private String elementValueList2String(List<JApiAnnotationElementValue> values) {
+		StringBuilder sb = new StringBuilder();
+		for (JApiAnnotationElementValue value : values) {
+			if (sb.length() > 0) {
+				sb.append(",");
+			}
+			if (value.getName().isPresent()) {
+				sb.append(value.getName().get() + "=");
+			}
+			if (value.getType() != Type.Array && value.getType() != Type.Annotation) {
+				if (value.getType() == Type.Enum) {
+					sb.append(value.getFullyQualifiedName() + "." + value.getValueString());
+				} else {
+					sb.append(value.getValueString());
+				}
+			} else {
+				if (value.getType() == Type.Array) {
+					sb.append("{" + elementValueList2String(value.getValues()) + "}");
+				} else if (value.getType() == Type.Annotation) {
+					sb.append("@" + value.getFullyQualifiedName() + "(" + elementValueList2String(value.getValues()) + ")");
+				}
+			}
+		}
+		return sb.toString();
+	}
 
-    private String tabs(int numberOfTabs) {
+	private String tabs(int numberOfTabs) {
         if (numberOfTabs <= 0) {
             return "";
         } else if (numberOfTabs == 1) {

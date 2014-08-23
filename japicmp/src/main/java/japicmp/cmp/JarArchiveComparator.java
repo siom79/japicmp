@@ -1,23 +1,26 @@
 package japicmp.cmp;
 
 import japicmp.config.PackageFilter;
+import japicmp.exception.JApiCmpException;
+import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.BinaryCompatibility;
 import japicmp.model.JApiClass;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 
-import org.apache.log4j.Logger;
-
 public class JarArchiveComparator {
-    private static final Logger logger = Logger.getLogger(JarArchiveComparator.class);
+    private static final Logger logger = Logger.getLogger(JarArchiveComparator.class.getName());
     private static final ClassPool classPool = new ClassPool();
     private JarArchiveComparatorOptions options;
 
@@ -26,16 +29,10 @@ public class JarArchiveComparator {
     }
 
     public List<JApiClass> compare(File oldArchive, File newArchive) {
-        try {
-        	classPool.appendSystemPath();
-            ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
-            List<JApiClass> classList = classesComparator.getClasses();
-            checkBinaryCompatibility(classList);
-			return classList;
-        } catch (Exception e) {
-            System.err.println(String.format("Processing jar files '%s' and '%s' failed: %s.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), e.getMessage()));
-            return new LinkedList<JApiClass>();
-        }
+        ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
+        List<JApiClass> classList = classesComparator.getClasses();
+        checkBinaryCompatibility(classList);
+		return classList;
     }
     
     public static ClassPool getClassPool() {
@@ -47,20 +44,20 @@ public class JarArchiveComparator {
 		binaryCompatibility.evaluate(classList);
 	}
 
-	private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) throws Exception {
+	private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) {
         List<CtClass> oldClasses = createListOfCtClasses(oldArchive, classPool, options);
         List<CtClass> newClasses = createListOfCtClasses(newArchive, classPool, options);
         ClassesComparator classesComparator = new ClassesComparator();
         classesComparator.compare(oldClasses, newClasses);
-        if (logger.isDebugEnabled()) {
+        if (logger.isLoggable(Level.FINE)) {
             for (JApiClass jApiClass : classesComparator.getClasses()) {
-                logger.debug(jApiClass);
+                logger.fine(jApiClass.toString());
             }
         }
         return classesComparator;
     }
 
-    private List<CtClass> createListOfCtClasses(File archive, ClassPool classPool, JarArchiveComparatorOptions options) throws Exception {
+    private List<CtClass> createListOfCtClasses(File archive, ClassPool classPool, JarArchiveComparatorOptions options) {
         List<CtClass> classes = new LinkedList<CtClass>();
         JarFile oldJar = null;
         try {
@@ -74,22 +71,29 @@ public class JarArchiveComparator {
                     try {
                         ctClass = classPool.makeClass(oldJar.getInputStream(jarEntry));
                     } catch (Exception e) {
-                        logger.error(String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()));
-                        throw e;
+                    	throw new JApiCmpException(Reason.IoException, String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()), e);
                     }
                     if(packageMatches(options, ctClass)) {
                         classes.add(ctClass);
                     }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(String.format("Adding class '%s' with jar name '%s' to list.", ctClass.getName(), name));
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine(String.format("Adding class '%s' with jar name '%s' to list.", ctClass.getName(), name));
                     }
                 } else {
-                    logger.debug(String.format("Skipping file '%s' because filename does not end with '.class'.", name));
+                	if (logger.isLoggable(Level.FINE)) {
+                		logger.fine(String.format("Skipping file '%s' because filename does not end with '.class'.", name));
+                	}
                 }
             }
-        } finally {
+        } catch (IOException e) {
+        	throw new JApiCmpException(Reason.IoException, String.format("Processing of jar file %s failed: %s", archive.getAbsolutePath(), e.getMessage()), e);
+		} finally {
             if (oldJar != null) {
-                oldJar.close();
+                try {
+					oldJar.close();
+				} catch (IOException e) {
+					logger.warning("Failed to close jar archive: " + e.getMessage());
+				}
             }
         }
         return classes;

@@ -1,15 +1,16 @@
 package japicmp.util;
 
-import com.google.common.base.Optional;
 import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiChangeStatus;
-import javassist.CtClass;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.annotation.Annotation;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.annotation.Annotation;
+
+import com.google.common.base.Optional;
 
 public class AnnotationHelper {
 

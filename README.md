@@ -1,9 +1,8 @@
-japicmp
-=======
+#japicmp#
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.2.0.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.2.1.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -16,21 +15,20 @@ japicmp is available in the Maven Central Repository. The corresponding dependen
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.2.0</version>
+		<version>0.2.1</version>
 	</dependency>
 
 ##Motivation##
 
-Every time you make a new release of a library or a product, you have to tell your clients or customers what
+Every time you release a new version of a library or a product, you have to tell your clients or customers what
 has changed in comparison to the last release. Without the appropriate tooling, this task is tedious and error-prone.
-This tool/library helps you to determine the differences between the java class files that are contained in the two
+This tool/library helps you to determine the differences between the java class files that are contained in two given
 jar archives.
-In contrast to other libraries/tools, this library does not use the Java Reflection API to compute
-the differences, as the usage of the Reflection API makes it necessary to include all classes the jar archive under
-investigation depends on are available on the classpath. To prevent the inclusion of all dependent libraries, which
-can be a lot of work for bigger applications, this library makes use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/)
-library to inspect the class files. This way you only have to provide the two jar archives on the command line, that's it.
-This approach also detects changes in instrumented and generated classes. You can even evaluate changes in class file attributes like synthetic.
+
+This library does not use the Java Reflection API to compute the differences, as the usage of the Reflection API makes 
+it necessary to include all classes the jar archive under investigation depends on are available on the classpath. To prevent the inclusion of all dependencies, which can be a lot of work for bigger applications, this library makes use of the [javassist (http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/) library to inspect the class files. This way you only have to provide the two jar archives on the command line, that's it.
+
+This approach also detects changes in instrumented and generated classes. You can even evaluate changes in class file attributes (like synthetic) or annotations. The comparison of annotations makes this approach suitable for annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 
 ##Features##
 
@@ -40,24 +38,28 @@ This approach also detects changes in instrumented and generated classes. You ca
 * Per default only public classes and class members are compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to package, protected or private.
 * Per default classes from all packages are compared. If necessary, certain packages can be excluded or only specific packages can be included.
+* All changes between all classes/methods/fields are compared. If necessary, output can be limited to changes that are binary incompatible (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html)).
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 
-[melix](https://github.com/melix) has developed a gradle plugin for japicmp. The github page can be found [here](https://github.com/melix/japicmp-gradle-plugin).
+[melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
-##Usage CLI tool##
+##Tools##
+
+###Usage CLI tool###
 
 The tool has a set of CLI parameters that are described in the following:
 
     -h                        Prints this help.
     -o <pathToOldVersionJar>  Provides the path to the old version of the jar.
     -n <pathToNewVersionJar>  Provides the path to the new version of the jar.
-    -x <pathToXmlOutputFile>  Provides the path to the xml output file. If not given, stdout is used.
+    -x <pathToXmlOutputFile>  Provides the path to the xml output file.
     -a <accessModifier>       Sets the access modifier level (public, package, protected, private), which should be used.
     -i <packagesToInclude>    Comma separated list of package names to include, * can be used as wildcard.
     -e <packagesToExclude>    Comma separated list of package names to exclude, * can be used as wildcard.
     -m                        Outputs only modified classes/methods. If not given, all classes and methods are printed.
+    -b                        Outputs only classes/methods that are binary incompatible. If not given, all classes and methods are printed.
     
-##Usage maven plugin##
+###Usage maven plugin###
 
 The maven plugin can be included in the pom.xml file of your artifact in the following way:
 
@@ -66,13 +68,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.2.0</version>
+                <version>0.2.1</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.2.0</version>
+                            <version>0.2.1</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -86,6 +88,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <packagesToExclude>excludeMe</packagesToExclude>
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
+                        <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
                     </parameter>
                 </configuration>
                 <executions>
@@ -108,73 +111,120 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * packagesToExclude: Comma separated list of package names to exclude, * can be used as wildcard.
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
+* breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
 
 The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
 of your artifact.
 	
-###Example###
+##Examples##
 
-In the following you see the beginning of the xml output file after having computed the differences between the versions 16.0 and 17.0 of google's guava library:
+###Comparing two versions of the guava library###
+
+In the following you see the beginning of the XML output file after having computed the differences between the versions 16.0 and 17.0 of google's guava library:
 
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<japicmp newJar="/home/siom79/dev/guava-17.0.jar" oldJar="/home/siom79/dev/guava-16.0.jar">
 		<classes>
-			<class changeStatus="MODIFIED" fullyQualifiedName="com.google.common.base.Converter" type="CLASS">
+			<class binaryCompatible="false" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.base.Stopwatch" type="CLASS">
+				<annotations/>
 				<attributes>
 					<attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
 				</attributes>
-				<constructors/>
-				<fields/>
-				<interfaces/>
-				<methods>
-					<method returnType="com.google.common.base.Converter" changeStatus="NEW" name="from">
+				<constructors>
+					<constructor binaryCompatible="false" changeStatus="MODIFIED" name="Stopwatch">
+						<annotations>
+							<annotation fullyQualifiedName="java.lang.Deprecated">
+								<elements/>
+							</annotation>
+						</annotations>
 						<attributes>
-							<attribute changeStatus="NEW" newValue="NON_SYNTHETIC" oldValue="n.a."/>
+							<attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
 						</attributes>
 						<modifiers>
-							<modifier changeStatus="NEW" newValue="NON_FINAL" oldValue="n.a."/>
-							<modifier changeStatus="NEW" newValue="NON_STATIC" oldValue="n.a."/>
-							<modifier changeStatus="NEW" newValue="PUBLIC" oldValue="n.a."/>
-							<modifier changeStatus="NEW" newValue="NON_ABSTRACT" oldValue="n.a."/>
+							<modifier changeStatus="UNCHANGED" newValue="NON_FINAL" oldValue="NON_FINAL"/>
+							<modifier changeStatus="UNCHANGED" newValue="NON_STATIC" oldValue="NON_STATIC"/>
+							<modifier changeStatus="MODIFIED" newValue="PACKAGE_PROTECTED" oldValue="PUBLIC"/>
+							<modifier changeStatus="UNCHANGED" newValue="NON_ABSTRACT" oldValue="NON_ABSTRACT"/>
+						</modifiers>
+						<parameters/>
+					</constructor>
+					<constructor binaryCompatible="false" changeStatus="MODIFIED" name="Stopwatch">
+						<annotations>
+							<annotation fullyQualifiedName="java.lang.Deprecated">
+								<elements/>
+							</annotation>
+						</annotations>
+						<attributes>
+							<attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
+						</attributes>
+						<modifiers>
+							<modifier changeStatus="UNCHANGED" newValue="NON_FINAL" oldValue="NON_FINAL"/>
+							<modifier changeStatus="UNCHANGED" newValue="NON_STATIC" oldValue="NON_STATIC"/>
+							<modifier changeStatus="MODIFIED" newValue="PACKAGE_PROTECTED" oldValue="PUBLIC"/>
+							<modifier changeStatus="UNCHANGED" newValue="NON_ABSTRACT" oldValue="NON_ABSTRACT"/>
 						</modifiers>
 						<parameters>
-							<parameter type="com.google.common.base.Function"/>
-							<parameter type="com.google.common.base.Function"/>
+							<parameter type="com.google.common.base.Ticker"/>
 						</parameters>
-					</method>
-				</methods>
+					</constructor>
+				</constructors>
+				<fields/>
+				<interfaces/>
+				<methods/>
 				<modifiers>
-					<modifier changeStatus="UNCHANGED" newValue="NON_FINAL" oldValue="NON_FINAL"/>
+					<modifier changeStatus="UNCHANGED" newValue="FINAL" oldValue="FINAL"/>
 					<modifier changeStatus="UNCHANGED" newValue="NON_STATIC" oldValue="NON_STATIC"/>
 					<modifier changeStatus="UNCHANGED" newValue="PUBLIC" oldValue="PUBLIC"/>
-					<modifier changeStatus="UNCHANGED" newValue="ABSTRACT" oldValue="ABSTRACT"/>
+					<modifier changeStatus="UNCHANGED" newValue="NON_ABSTRACT" oldValue="NON_ABSTRACT"/>
 				</modifiers>
-				<superclass changeStatus="UNCHANGED" superclassNew="n.a." superclassOld="n.a."/>
+				<superclass binaryCompatible="true" changeStatus="UNCHANGED" superclassNew="n.a." superclassOld="n.a."/>
 			</class>
 		...
 
-The differences between the two Java APIs are also printed on the command line for a quick overview:
+The differences between the two Java APIs are also printed on the command line for a quick overview. Please note that binary incompatible changes are flagged with an exclamation mark. 
 
-	*** MODIFIED CLASS: PUBLIC ABSTRACT com.google.common.base.Converter
-		+++ NEW METHOD: PUBLIC(+) from(com.google.common.base.Function, com.google.common.base.Function)
-	*** MODIFIED CLASS: PUBLIC FINAL com.google.common.base.Stopwatch
-		*** MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch()
-		*** MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch(com.google.common.base.Ticker)
-	+++ NEW CLASS: PUBLIC(+) STATIC(+) FINAL(+) com.google.common.base.Verify
-		+++ NEW METHOD: PUBLIC(+) verify(boolean)
-		+++ NEW METHOD: PUBLIC(+) verify(boolean, java.lang.String, java.lang.Object[])
-		+++ NEW METHOD: PUBLIC(+) verifyNotNull(java.lang.Object, java.lang.String, java.lang.Object[])
-		+++ NEW METHOD: PUBLIC(+) verifyNotNull(java.lang.Object)
-	+++ NEW CLASS: PUBLIC(+) com.google.common.base.VerifyException
-		+++ NEW CONSTRUCTOR: PUBLIC(+) VerifyException()
-		+++ NEW CONSTRUCTOR: PUBLIC(+) VerifyException(java.lang.String)
-	*** MODIFIED CLASS: PUBLIC ABSTRACT com.google.common.cache.CacheLoader
-		+++ NEW METHOD: PUBLIC(+) asyncReloading(com.google.common.cache.CacheLoader, java.util.concurrent.Executor)
-	*** MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.collect.SortedMultiset
-		+++ NEW METHOD: PUBLIC(+) ABSTRACT(+) entrySet()
-	*** MODIFIED CLASS: PUBLIC FINAL com.google.common.hash.HashingOutputStream
-		+++ NEW METHOD: PUBLIC(+) close()
+	***! MODIFIED CLASS: PUBLIC FINAL com.google.common.base.Stopwatch
+		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch()
+			===  UNCHANGED ANNOTATION: java.lang.Deprecated
+		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch(com.google.common.base.Ticker)
+			===  UNCHANGED ANNOTATION: java.lang.Deprecated
+	***! MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.util.concurrent.Service
+		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.Service$State startAndWait()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.Service$State stopAndWait()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.ListenableFuture start()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.ListenableFuture stop()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+	***  MODIFIED CLASS: PUBLIC FINAL com.google.common.net.HttpHeaders
+		+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String FOLLOW_ONLY_WHEN_PRERENDER_SHOWN
+	***! MODIFIED CLASS: PUBLIC ABSTRACT com.google.common.util.concurrent.AbstractScheduledService
+		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.ListenableFuture start()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.Service$State startAndWait()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.Service$State stopAndWait()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.ListenableFuture stop()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
     ...
+    
+###Tracking changes of an XML document marshalled with JAXB###
+
+The following output shows the changes of a model class with some JAXB bindings:
+
+	***  MODIFIED CLASS: PUBLIC japicmp.test.jaxb.SimpleDocument
+		***  MODIFIED METHOD: PUBLIC java.lang.String getTitle()
+			---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
+			+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlElement
+		***  MODIFIED METHOD: PUBLIC java.lang.String getAuthor()
+			---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
+			+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlElement
+		***  MODIFIED ANNOTATION: javax.xml.bind.annotation.XmlRootElement
+			***  MODIFIED ELEMENT: name=document (<- simpleDocument)
+			
+As can bee seen from the output above, the XML attributes title and author have changed to an XML element. The name of the XML root element has also changed from "simpleDocument" to "document".
 
 ##Downloads##
 
@@ -202,3 +252,11 @@ The following releases are available:
 ##Development##
 
 * ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
+
+##Related work##
+
+The following projects have related goals:
+
+* [Java API Compliance Checker](http://ispras.linuxbase.org/index.php/Java_API_Compliance_Checker): A Perl script that uses javap to compare two jar archives. This approach cannot compare annotations and requires an installation of Perl.
+* [Clirr](http://clirr.sourceforge.net/): A tool written in Java that compares two libraries for binary compatibility. Tracking of API changes is implemented only partially, tracking of annotations is not supported.
+* [JDiff](http://javadiff.sourceforge.net/): A Javadoc doclet that generates an HTML report of all API changes. The source code for both versions has to be available, the differences are not distinguished between binary incompatible or not. Comparison of annotations is not supported.
