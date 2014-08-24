@@ -233,6 +233,10 @@ As can bee seen from the output above, the XML attributes title and author have 
 
 The following releases are available:
 
+* [Version 0.2.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.1)
+	* Changes:
+		* [japicmp should provide a boolean flag for each change that indicates if this modification breaks binary compatibility](https://github.com/siom79/japicmp/issues/16)
+		* [japicmp should track changes on annotations](https://github.com/siom79/japicmp/issues/15)
 * [Version 0.2.0](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.0)
 	* Changes:
 		* added support for the comparison of constructors, implemented interfaces, superclass and fields
