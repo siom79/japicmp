@@ -34,10 +34,6 @@ public class JarArchiveComparator {
         checkBinaryCompatibility(classList);
 		return classList;
     }
-    
-    public static ClassPool getClassPool() {
-    	return classPool;
-    }
 
     private void checkBinaryCompatibility(List<JApiClass> classList) {
     	BinaryCompatibility binaryCompatibility = new BinaryCompatibility();
@@ -59,17 +55,15 @@ public class JarArchiveComparator {
 
     private List<CtClass> createListOfCtClasses(File archive, ClassPool classPool, JarArchiveComparatorOptions options) {
         List<CtClass> classes = new LinkedList<CtClass>();
-        JarFile oldJar = null;
-        try {
-            oldJar = new JarFile(archive);
-            Enumeration<JarEntry> entryEnumeration = oldJar.entries();
+        try (JarFile jarFile = new JarFile(archive)) {
+            Enumeration<JarEntry> entryEnumeration = jarFile.entries();
             while (entryEnumeration.hasMoreElements()) {
                 JarEntry jarEntry = entryEnumeration.nextElement();
                 String name = jarEntry.getName();
                 if (name.endsWith(".class")) {
                     CtClass ctClass = null;
                     try {
-                        ctClass = classPool.makeClass(oldJar.getInputStream(jarEntry));
+                        ctClass = classPool.makeClass(jarFile.getInputStream(jarEntry));
                     } catch (Exception e) {
                     	throw new JApiCmpException(Reason.IoException, String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()), e);
                     }
@@ -87,15 +81,7 @@ public class JarArchiveComparator {
             }
         } catch (IOException e) {
         	throw new JApiCmpException(Reason.IoException, String.format("Processing of jar file %s failed: %s", archive.getAbsolutePath(), e.getMessage()), e);
-		} finally {
-            if (oldJar != null) {
-                try {
-					oldJar.close();
-				} catch (IOException e) {
-					logger.warning("Failed to close jar archive: " + e.getMessage());
-				}
-            }
-        }
+		}
         return classes;
     }
 
