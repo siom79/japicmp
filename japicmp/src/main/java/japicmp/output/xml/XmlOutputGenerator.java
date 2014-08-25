@@ -20,8 +20,9 @@ import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
 
 public class XmlOutputGenerator {
+	private static final String XSD_FILENAME = "japicmp.xsd";
 	private static final String XML_NAMESPACE = "https://github.com/siom79/japicmp/schema/japicmp.xsd";
-	private static final String XML_SCHEMA = "japicmp.xsd";
+	private static final String XML_SCHEMA = XSD_FILENAME;
 	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());
 
     public void generate(File oldArchive, File newArchive, List<JApiClass> jApiClasses, Options options) {
@@ -44,10 +45,10 @@ public class XmlOutputGenerator {
 				public Result createOutput(String namespaceUri, String suggestedFileName) throws IOException {
 					File schemaFile = xmlFile.getParentFile();
 					if(schemaFile == null) {
-						LOGGER.warning(String.format("File '%s' has no parent file. Using suggested file instead: '%s'.", xmlFile.getAbsolutePath(), suggestedFileName));
-						schemaFile = new File(suggestedFileName);
+						LOGGER.warning(String.format("File '%s' has no parent file. Using instead: '%s'.", xmlFile.getAbsolutePath(), XSD_FILENAME));
+						schemaFile = new File(XSD_FILENAME);
 					} else {
-						schemaFile = new File(schemaFile + File.separator + "japicmp.xsd");
+						schemaFile = new File(schemaFile + File.separator + XSD_FILENAME);
 					}
 			        StreamResult result = new StreamResult(schemaFile);
 			        result.setSystemId(schemaFile.toURI().toURL().toString());
