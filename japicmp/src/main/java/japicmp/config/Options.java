@@ -15,6 +15,7 @@ public class Options {
     private boolean outputOnlyModifications = false;
     private boolean outputOnlyBinaryIncompatibleModifications = false;
     private Optional<String> xmlOutputFile = Optional.absent();
+    private Optional<String> htmlOutputFile = Optional.absent();
     private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PUBLIC);
     private List<PackageFilter> packagesInclude = new LinkedList<>();
     private List<PackageFilter> packagesExclude = new LinkedList<>();
@@ -105,4 +106,12 @@ public class Options {
     public boolean isOutputOnlyBinaryIncompatibleModifications() {
         return outputOnlyBinaryIncompatibleModifications;
     }
+
+	public Optional<String> getHtmlOutputFile() {
+		return htmlOutputFile;
+	}
+
+	public void setHtmlOutputFile(Optional<String> htmlOutputFile) {
+		this.htmlOutputFile = htmlOutputFile;
+	}
 }

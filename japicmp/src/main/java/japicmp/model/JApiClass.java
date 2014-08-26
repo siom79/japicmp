@@ -205,6 +205,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				}
 			}
 		}
+		if(retVal == null) {
+			retVal = new JApiSuperclass(Optional.<String> absent(), Optional.<String> absent(), JApiChangeStatus.UNCHANGED);
+		}
 		return retVal;
 	}
 
@@ -441,12 +444,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				CtClass ctClass = oldClassOptional.get();
 				StaticModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
 				return new JApiModifier<StaticModifier>(Optional.of(finalModifier), Optional.<StaticModifier> absent(), JApiChangeStatus.REMOVED);
-			} else {
+			}
+			if (newClassOptional.isPresent()) {
 				CtClass ctClass = newClassOptional.get();
 				StaticModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
 				return new JApiModifier<StaticModifier>(Optional.<StaticModifier> absent(), Optional.of(finalModifier), JApiChangeStatus.NEW);
 			}
 		}
+		return new JApiModifier<StaticModifier>(Optional.<StaticModifier> absent(), Optional.<StaticModifier> absent(), JApiChangeStatus.UNCHANGED);
 	}
 
 	private JApiModifier<FinalModifier> extractFinalModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -465,12 +470,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				CtClass ctClass = oldClassOptional.get();
 				FinalModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
 				return new JApiModifier<FinalModifier>(Optional.of(finalModifier), Optional.<FinalModifier> absent(), JApiChangeStatus.REMOVED);
-			} else {
+			}
+			if (newClassOptional.isPresent()) {
 				CtClass ctClass = newClassOptional.get();
 				FinalModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
 				return new JApiModifier<FinalModifier>(Optional.<FinalModifier> absent(), Optional.of(finalModifier), JApiChangeStatus.NEW);
 			}
 		}
+		return new JApiModifier<FinalModifier>(Optional.<FinalModifier> absent(), Optional.<FinalModifier> absent(), JApiChangeStatus.UNCHANGED);
 	}
 
 	private JApiModifier<AccessModifier> extractAccessModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -489,12 +496,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				CtClass ctClass = oldClassOptional.get();
 				AccessModifier accessModifier = ModifierHelper.translateToModifierLevel(ctClass.getModifiers());
 				return new JApiModifier<AccessModifier>(Optional.of(accessModifier), Optional.<AccessModifier> absent(), JApiChangeStatus.REMOVED);
-			} else {
+			} 
+			if (newClassOptional.isPresent()) {
 				CtClass ctClass = newClassOptional.get();
 				AccessModifier accessModifier = ModifierHelper.translateToModifierLevel(ctClass.getModifiers());
 				return new JApiModifier<AccessModifier>(Optional.<AccessModifier> absent(), Optional.of(accessModifier), JApiChangeStatus.NEW);
 			}
 		}
+		return new JApiModifier<AccessModifier>(Optional.<AccessModifier> absent(), Optional.<AccessModifier> absent(), JApiChangeStatus.UNCHANGED);
 	}
 
 	private JApiModifier<AbstractModifier> extractAbstractModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -513,12 +522,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				CtClass ctClass = oldClassOptional.get();
 				AbstractModifier abstractModifier = Modifier.isAbstract(ctClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
 				return new JApiModifier<AbstractModifier>(Optional.of(abstractModifier), Optional.<AbstractModifier> absent(), JApiChangeStatus.REMOVED);
-			} else {
+			}
+			if (newClassOptional.isPresent()) {
 				CtClass ctClass = newClassOptional.get();
 				AbstractModifier abstractModifier = Modifier.isAbstract(ctClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
 				return new JApiModifier<AbstractModifier>(Optional.<AbstractModifier> absent(), Optional.of(abstractModifier), JApiChangeStatus.NEW);
 			}
 		}
+		return new JApiModifier<AbstractModifier>(Optional.<AbstractModifier> absent(), Optional.<AbstractModifier> absent(), JApiChangeStatus.UNCHANGED);
 	}
 
 	@XmlAttribute

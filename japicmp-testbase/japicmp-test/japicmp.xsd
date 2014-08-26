@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="japicmp" type="jApiCmpXmlRoot"/>
+
+  <xs:complexType name="jApiCmpXmlRoot">
+    <xs:sequence>
+      <xs:element name="classes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="class" type="jApiClass" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="newJar" type="xs:string"/>
+    <xs:attribute name="oldJar" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiClass">
+    <xs:sequence>
+      <xs:element name="annotations" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="annotation" type="jApiAnnotation" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="attributes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="attribute" type="jApiAttribute" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="constructors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="constructor" type="jApiConstructor" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="fields" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="field" type="jApiField" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="interfaces" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="interface" type="jApiImplementedInterface" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="methods" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="method" type="jApiMethod" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="modifiers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="modifier" type="jApiModifier" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="superclass" type="jApiSuperclass" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="binaryCompatible" type="xs:boolean" use="required"/>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="fullyQualifiedName" type="xs:string"/>
+    <xs:attribute name="type" type="type"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiAnnotation">
+    <xs:sequence>
+      <xs:element name="elements" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="element" type="jApiAnnotationElement" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="fullyQualifiedName" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiAnnotationElement">
+    <xs:sequence>
+      <xs:element name="newElementValues" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="newElementValue" type="jApiAnnotationElementValue" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="oldElementValues" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="oldElementValue" type="jApiAnnotationElementValue" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiAnnotationElementValue">
+    <xs:sequence>
+      <xs:element name="values" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="value" type="jApiAnnotationElementValue" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="fullyQualifiedName" type="xs:string"/>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="value" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiAttribute">
+    <xs:sequence/>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="newValue" type="xs:string"/>
+    <xs:attribute name="oldValue" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiConstructor">
+    <xs:complexContent>
+      <xs:extension base="jApiBehavior">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="jApiBehavior">
+    <xs:sequence>
+      <xs:element name="annotations" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="annotation" type="jApiAnnotation" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="attributes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="attribute" type="jApiAttribute" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="modifiers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="modifier" type="jApiModifier" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="parameters" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="parameter" type="jApiParameter" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="binaryCompatible" type="xs:boolean" use="required"/>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiModifier">
+    <xs:sequence/>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="newValue" type="xs:string"/>
+    <xs:attribute name="oldValue" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiParameter">
+    <xs:sequence/>
+    <xs:attribute name="type" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiField">
+    <xs:sequence>
+      <xs:element name="annotations" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="annotation" type="jApiAnnotation" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="attributes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="attribute" type="jApiAttribute" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="modifiers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="modifier" type="jApiModifier" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="type" type="jApiType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="binaryCompatible" type="xs:boolean" use="required"/>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiType">
+    <xs:sequence/>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="newValue" type="xs:string"/>
+    <xs:attribute name="oldValue" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiImplementedInterface">
+    <xs:sequence/>
+    <xs:attribute name="binaryCompatible" type="xs:boolean" use="required"/>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="fullyQualifiedName" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="jApiMethod">
+    <xs:complexContent>
+      <xs:extension base="jApiBehavior">
+        <xs:sequence/>
+        <xs:attribute name="returnType" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="jApiSuperclass">
+    <xs:sequence/>
+    <xs:attribute name="binaryCompatible" type="xs:boolean" use="required"/>
+    <xs:attribute name="changeStatus" type="jApiChangeStatus"/>
+    <xs:attribute name="superclassNew" type="xs:string"/>
+    <xs:attribute name="superclassOld" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:simpleType name="jApiChangeStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NEW"/>
+      <xs:enumeration value="REMOVED"/>
+      <xs:enumeration value="UNCHANGED"/>
+      <xs:enumeration value="MODIFIED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ANNOTATION"/>
+      <xs:enumeration value="INTERFACE"/>
+      <xs:enumeration value="CLASS"/>
+      <xs:enumeration value="ENUM"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

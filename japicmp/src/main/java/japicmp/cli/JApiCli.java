@@ -40,8 +40,10 @@ public class JApiCli {
 		public String packagesToInclude;
 		@Option(name = { "-e", "--exclude" }, description = "Comma separated list of package names to exclude, * can be used as wildcard.")
 		public String packagesToExclude;
-		@Option(name = { "-x", "--xml-to-file" }, description = "Provides the path to the xml output file. If not given, stdout is used.")
+		@Option(name = { "-x", "--xml-to-file" }, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;
+		@Option(name = { "-h", "--html-to-file" }, description = "Provides the path to the html output file.")
+		public String pathToHtmlOutputFile;
 
 		@Override
 		public void run() {
@@ -66,7 +68,7 @@ public class JApiCli {
 			OutputFilter.sortClassesAndMethods(jApiClasses);
 			if (options.getXmlOutputFile().isPresent()) {
 				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
-				xmlGenerator.generate(oldArchive, newArchive, jApiClasses, options);
+				xmlGenerator.generate(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
 			}
 			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
 			String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses);
@@ -75,7 +77,7 @@ public class JApiCli {
 
 		private Options parseCliOptions() {
 			try {
-				return parse(pathToOldVersionJar, pathToNewVersionJar, pathToXmlOutputFile, modifiedOnly, //
+				return parse(pathToOldVersionJar, pathToNewVersionJar, pathToXmlOutputFile, pathToHtmlOutputFile, modifiedOnly,
 						toModifier(accessModifier), packagesToInclude, packagesToExclude, onlyBinaryIncompatibleModifications);
 			} catch (IllegalArgumentException e) {
 				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
@@ -84,13 +86,14 @@ public class JApiCli {
 			}
 		}
 
-		public Options parse(String oldArchive, String newArchive, String xmlOutputFile,
+		public Options parse(String oldArchive, String newArchive, String xmlOutputFile, String htmlOutputFile,
 				boolean onlyModifications, Optional<AccessModifier> accessModifier, String packagesIncludeArg,
 				String packagesExcludeArg, boolean onlyBinaryIncompatibleModifications) throws IllegalArgumentException {
 			Options options = new Options();
 			options.setNewArchive(validFile(newArchive, "no valid new archive found"));
 			options.setOldArchive(validFile(oldArchive, "no valid old archive found"));
 			options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
+			options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
 			options.setOutputOnlyModifications(onlyModifications);
 			options.setAccessModifier(accessModifier);
 			options.addPackageIncludeFromArgument(Optional.fromNullable(packagesIncludeArg));

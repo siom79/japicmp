@@ -7,8 +7,12 @@ import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -17,7 +21,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 public class XmlOutputGenerator {
 	private static final String XSD_FILENAME = "japicmp.xsd";
@@ -25,11 +34,11 @@ public class XmlOutputGenerator {
 	private static final String XML_SCHEMA = XSD_FILENAME;
 	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());
 
-    public void generate(File oldArchive, File newArchive, List<JApiClass> jApiClasses, Options options) {
-        JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchive, newArchive, jApiClasses);
-        filterClasses(jApiClasses, options);
-        createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
-    }
+	public void generate(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
+		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, oldArchivePath, jApiClasses);
+		filterClasses(jApiClasses, options);
+		createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
+	}
 
 	private void createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
 		try {
@@ -38,28 +47,47 @@ public class XmlOutputGenerator {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XML_NAMESPACE + " " + XML_SCHEMA);
 			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, XML_SCHEMA);
-			final File xmlFile = new File(options.getXmlOutputFile().get());
-			marshaller.marshal(jApiCmpXmlRoot, xmlFile);
-			SchemaOutputResolver outputResolver = new SchemaOutputResolver() {
-				@Override
-				public Result createOutput(String namespaceUri, String suggestedFileName) throws IOException {
-					File schemaFile = xmlFile.getParentFile();
-					if(schemaFile == null) {
-						LOGGER.warning(String.format("File '%s' has no parent file. Using instead: '%s'.", xmlFile.getAbsolutePath(), XSD_FILENAME));
-						schemaFile = new File(XSD_FILENAME);
-					} else {
-						schemaFile = new File(schemaFile + File.separator + XSD_FILENAME);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			marshaller.marshal(jApiCmpXmlRoot, baos);
+			if (options.getXmlOutputFile().isPresent()) {
+				final File xmlFile = new File(options.getXmlOutputFile().get());
+				FileOutputStream fos = new FileOutputStream(xmlFile);
+				baos.writeTo(fos);
+				SchemaOutputResolver outputResolver = new SchemaOutputResolver() {
+					@Override
+					public Result createOutput(String namespaceUri, String suggestedFileName) throws IOException {
+						File schemaFile = xmlFile.getParentFile();
+						if (schemaFile == null) {
+							LOGGER.warning(String.format("File '%s' has no parent file. Using instead: '%s'.", xmlFile.getAbsolutePath(), XSD_FILENAME));
+							schemaFile = new File(XSD_FILENAME);
+						} else {
+							schemaFile = new File(schemaFile + File.separator + XSD_FILENAME);
+						}
+						StreamResult result = new StreamResult(schemaFile);
+						result.setSystemId(schemaFile.toURI().toURL().toString());
+						return result;
 					}
-			        StreamResult result = new StreamResult(schemaFile);
-			        result.setSystemId(schemaFile.toURI().toURL().toString());
-			        return result;
+				};
+				jaxbContext.generateSchema(outputResolver);
+			}
+			if (options.getHtmlOutputFile().isPresent()) {
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				InputStream inputStream = XmlOutputGenerator.class.getResourceAsStream("/html.xslt");
+				if(inputStream == null) {
+					throw new JApiCmpException(Reason.XsltError, "Failed to load XSLT.");
 				}
-			};
-			jaxbContext.generateSchema(outputResolver);
+				Transformer transformer = transformerFactory.newTransformer(new StreamSource(inputStream));
+				ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+				transformer.transform(new StreamSource(bais), new StreamResult(new FileOutputStream(options.getHtmlOutputFile().get())));
+			}
 		} catch (JAXBException e) {
 			throw new JApiCmpException(Reason.JaxbException, String.format("Marshalling of XML document failed: %s", e.getMessage()), e);
 		} catch (IOException e) {
 			throw new JApiCmpException(Reason.IoException, String.format("Marshalling of XML document failed: %s", e.getMessage()), e);
+		} catch (TransformerConfigurationException e) {
+			throw new JApiCmpException(Reason.XsltError, String.format("Configuration of XSLT transformer failed: %s", e.getMessage()), e);
+		} catch (TransformerException e) {
+			throw new JApiCmpException(Reason.XsltError, String.format("XSLT transformation failed: %s", e.getMessage()), e);
 		}
 	}
 
@@ -68,11 +96,11 @@ public class XmlOutputGenerator {
 		outputFilter.filter(jApiClasses);
 	}
 
-	private JApiCmpXmlRoot createRootElement(File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
+	private JApiCmpXmlRoot createRootElement(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses) {
 		JApiCmpXmlRoot jApiCmpXmlRoot = new JApiCmpXmlRoot();
-        jApiCmpXmlRoot.setOldJar(oldArchive.getAbsolutePath());
-        jApiCmpXmlRoot.setNewJar(newArchive.getAbsolutePath());
-        jApiCmpXmlRoot.setClasses(jApiClasses);
+		jApiCmpXmlRoot.setOldJar(oldArchivePath);
+		jApiCmpXmlRoot.setNewJar(newArchivePath);
+		jApiCmpXmlRoot.setClasses(jApiClasses);
 		return jApiCmpXmlRoot;
 	}
 }
