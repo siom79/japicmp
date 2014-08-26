@@ -52,15 +52,38 @@ This approach also detects changes in instrumented and generated classes. You ca
 
 The tool has a set of CLI parameters that are described in the following:
 
-    -h                        Prints this help.
-    -o <pathToOldVersionJar>  Provides the path to the old version of the jar.
-    -n <pathToNewVersionJar>  Provides the path to the new version of the jar.
-    -x <pathToXmlOutputFile>  Provides the path to the xml output file.
-    -a <accessModifier>       Sets the access modifier level (public, package, protected, private), which should be used.
-    -i <packagesToInclude>    Comma separated list of package names to include, * can be used as wildcard.
-    -e <packagesToExclude>    Comma separated list of package names to exclude, * can be used as wildcard.
-    -m                        Outputs only modified classes/methods. If not given, all classes and methods are printed.
-    -b                        Outputs only classes/methods that are binary incompatible. If not given, all classes and methods are printed.
+	-a <accessModifier>
+	    Sets the access modifier level (public, package, protected,
+	    private), which should be used.
+	
+	-b, --only-incompatible
+	    Outputs only classes/methods that are binary incompatible. If not
+	    given, all classes and methods are printed.
+	
+	-e <packagesToExclude>, --exclude <packagesToExclude>
+	    Comma separated list of package names to exclude, * can be used as
+	    wildcard.
+	
+	-h, --help
+	    Display help information
+	
+	-i <packagesToInclude>, --include <packagesToInclude>
+	    Comma separated list of package names to include, * can be used as
+	    wildcard.
+	
+	-m, --only-modified
+	    Outputs only modified classes/methods. If not given, all classes and
+	    methods are printed.
+	
+	-n <pathToNewVersionJar>, --new <pathToNewVersionJar>
+	    Provides the path to the new version of the jar.
+	
+	-o <pathToOldVersionJar>, --old <pathToOldVersionJar>
+	    Provides the path to the old version of the jar.
+	
+	-x <pathToXmlOutputFile>, --xml-to-file <pathToXmlOutputFile>
+	    Provides the path to the xml output file. If not given, stdout is
+	    used.
     
 ###Usage maven plugin###
 
