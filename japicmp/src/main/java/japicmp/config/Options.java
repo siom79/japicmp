@@ -1,34 +1,37 @@
 package japicmp.config;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import japicmp.model.AccessModifier;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Options {
-    private String oldArchive;
-    private String newArchive;
+    private File oldArchive;
+    private File newArchive;
     private boolean outputOnlyModifications = false;
     private boolean outputOnlyBinaryIncompatibleModifications = false;
-    private Optional<String> xmlOutputFile = Optional.<String>absent();
-    private AccessModifier accessModifier = AccessModifier.PUBLIC;
-    private List<PackageFilter> packagesInclude = new LinkedList<PackageFilter>();
-    private List<PackageFilter> packagesExclude = new LinkedList<PackageFilter>();
+    private Optional<String> xmlOutputFile = Optional.absent();
+    private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PUBLIC);
+    private List<PackageFilter> packagesInclude = new LinkedList<>();
+    private List<PackageFilter> packagesExclude = new LinkedList<>();
 
-    public String getNewArchive() {
+    public File getNewArchive() {
         return newArchive;
     }
 
-    public void setNewArchive(String newArchive) {
+    public void setNewArchive(File newArchive) {
         this.newArchive = newArchive;
     }
 
-    public String getOldArchive() {
+    public File getOldArchive() {
         return oldArchive;
     }
 
-    public void setOldArchive(String oldArchive) {
+    public void setOldArchive(File oldArchive) {
         this.oldArchive = oldArchive;
     }
 
@@ -48,51 +51,58 @@ public class Options {
         this.xmlOutputFile = xmlOutputFile;
     }
 
-    public void setAccessModifier(AccessModifier accessModifier) {
+    public void setAccessModifier(Optional<AccessModifier> accessModifier) {
         this.accessModifier = accessModifier;
     }
 
+    public void setAccessModifier(AccessModifier accessModifier) {
+        this.accessModifier = Optional.of(accessModifier);
+    }
+
     public AccessModifier getAccessModifier() {
-        return accessModifier;
+        return accessModifier.get();
     }
 
     public List<PackageFilter> getPackagesInclude() {
-        return packagesInclude;
+        return ImmutableList.copyOf(packagesInclude);
     }
 
     public List<PackageFilter> getPackagesExclude() {
-        return packagesExclude;
+        return ImmutableList.copyOf(packagesExclude);
     }
 
     public void addPackagesExcludeFromArgument(String packagesExcludeArg) {
-        String[] parts = packagesExcludeArg.split(",");
-        for (String part : parts) {
-            part = part.trim();
-            try {
-                getPackagesExclude().add(new PackageFilter(part));
-            } catch (Exception e) {
-                throw new IllegalArgumentException(String.format("Wrong syntax for package include option '%s': %s", part, e.getMessage()));
-            }
-        }
+        addPackagesExcludeFromArgument(Optional.of(packagesExcludeArg));
+    }
+
+    public void addPackagesExcludeFromArgument(Optional<String> packagesExcludeArg) {
+        packagesExclude = apply(packagesExcludeArg, packagesExclude);
     }
 
     public void addPackageIncludeFromArgument(String packagesIncludeArg) {
-        String[] parts = packagesIncludeArg.split(",");
-        for (String part : parts) {
-            part = part.trim();
+        addPackageIncludeFromArgument(Optional.of(packagesIncludeArg));
+    }
+
+    public void addPackageIncludeFromArgument(Optional<String> packagesIncludeArg) {
+        packagesInclude = apply(packagesIncludeArg, packagesInclude);
+    }
+
+    private List<PackageFilter> apply(Optional<String> filterString, List<PackageFilter> packages) {
+        for (String part : Splitter.on(",").trimResults().omitEmptyStrings().split(filterString.or(""))) {
             try {
-                getPackagesInclude().add(new PackageFilter(part));
+                packages.add(new PackageFilter(part));
             } catch (Exception e) {
                 throw new IllegalArgumentException(String.format("Wrong syntax for package exclude option '%s': %s", part, e.getMessage()));
             }
         }
+        return packages;
     }
 
-	public void setOutputOnlyBinaryIncompatibleModifications(boolean outputOnlyBinaryIncompatibleModifications) {
-		this.outputOnlyBinaryIncompatibleModifications = outputOnlyBinaryIncompatibleModifications;
-	}
+    public void setOutputOnlyBinaryIncompatibleModifications(boolean outputOnlyBinaryIncompatibleModifications) {
+        this.outputOnlyBinaryIncompatibleModifications = outputOnlyBinaryIncompatibleModifications;
+    }
 
-	public boolean isOutputOnlyBinaryIncompatibleModifications() {
-		return outputOnlyBinaryIncompatibleModifications;
-	}
+    public boolean isOutputOnlyBinaryIncompatibleModifications() {
+        return outputOnlyBinaryIncompatibleModifications;
+    }
 }
