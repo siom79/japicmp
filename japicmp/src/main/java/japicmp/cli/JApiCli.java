@@ -43,7 +43,7 @@ public class JApiCli {
 		public String packagesToExclude;
 		@Option(name = { "-x", "--xml-to-file" }, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;
-		@Option(name = { "-h", "--html-to-file" }, description = "Provides the path to the html output file.")
+		@Option(name = { "--html-to-file" }, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
 
 		@Override
