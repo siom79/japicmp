@@ -7,6 +7,7 @@ import io.airlift.command.Option;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
+import japicmp.exception.FormattedException;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
@@ -42,12 +43,18 @@ public class JApiCli {
 		public String packagesToExclude;
 		@Option(name = { "-x", "--xml-to-file" }, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;
-		@Option(name = { "-h", "--html-to-file" }, description = "Provides the path to the html output file.")
+		@Option(name = { "--html-to-file" }, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
 
 		@Override
 		public void run() {
-			Options options = parseCliOptions();
+
+			Options options = create(pathToOldVersionJar, pathToNewVersionJar, //
+					pathToXmlOutputFile, pathToHtmlOutputFile, //
+					modifiedOnly, toModifier(accessModifier), //
+					packagesToInclude, packagesToExclude, //
+					onlyBinaryIncompatibleModifications);
+
 			File oldArchive = options.getOldArchive();
 			File newArchive = options.getNewArchive();
 			verifyFiles(oldArchive, newArchive);
@@ -75,30 +82,28 @@ public class JApiCli {
 			System.out.println(output);
 		}
 
-		private Options parseCliOptions() {
+		private Options create(String oldArchive, String newArchive, //
+				String xmlOutputFile, String htmlOutputFile, //
+				boolean onlyModifications, Optional<AccessModifier> accessModifier, //
+				String packagesIncludeArg, String packagesExcludeArg, //
+				boolean onlyBinaryIncompatibleModifications) throws IllegalArgumentException {
+
+			Options options = new Options();
 			try {
-				return parse(pathToOldVersionJar, pathToNewVersionJar, pathToXmlOutputFile, pathToHtmlOutputFile, modifiedOnly,
-						toModifier(accessModifier), packagesToInclude, packagesToExclude, onlyBinaryIncompatibleModifications);
+				options.setNewArchive(validFile(newArchive, "no valid new archive found"));
+				options.setOldArchive(validFile(oldArchive, "no valid old archive found"));
+				options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
+				options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
+				options.setOutputOnlyModifications(onlyModifications);
+				options.setAccessModifier(accessModifier);
+				options.addPackageIncludeFromArgument(Optional.fromNullable(packagesIncludeArg));
+				options.addPackagesExcludeFromArgument(Optional.fromNullable(packagesExcludeArg));
+				options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
 			} catch (IllegalArgumentException e) {
 				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
-		}
-
-		public Options parse(String oldArchive, String newArchive, String xmlOutputFile, String htmlOutputFile,
-				boolean onlyModifications, Optional<AccessModifier> accessModifier, String packagesIncludeArg,
-				String packagesExcludeArg, boolean onlyBinaryIncompatibleModifications) throws IllegalArgumentException {
-			Options options = new Options();
-			options.setNewArchive(validFile(newArchive, "no valid new archive found"));
-			options.setOldArchive(validFile(oldArchive, "no valid old archive found"));
-			options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
-			options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
-			options.setOutputOnlyModifications(onlyModifications);
-			options.setAccessModifier(accessModifier);
-			options.addPackageIncludeFromArgument(Optional.fromNullable(packagesIncludeArg));
-			options.addPackagesExcludeFromArgument(Optional.fromNullable(packagesExcludeArg));
-			options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
 			return options;
 		}
 
@@ -112,8 +117,7 @@ public class JApiCli {
 
 		private void verifyCanRead(File file) {
 			if (!file.canRead()) {
-				String msg = String.format("Cannot read file '%s'.", file.getAbsolutePath());
-				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
+				throw JApiCmpException.of("Cannot read file '%s'.", file.getAbsolutePath());
 			}
 		}
 
@@ -131,8 +135,9 @@ public class JApiCli {
 				try {
 					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
 				} catch (IllegalArgumentException e) {
-					throw new IllegalArgumentException(String.format("Invalid value for option -a: %s. Possible values are: %s.", accessModifierArg,
-							AccessModifier.listOfAccessModifier()));
+					throw FormattedException //
+							.ofIAE("Invalid value for option -a: %s. Possible values are: %s.", //
+									accessModifierArg, AccessModifier.listOfAccessModifier());
 				}
 			} else {
 				return Optional.of(AccessModifier.PUBLIC);
@@ -141,15 +146,13 @@ public class JApiCli {
 
 		private void verifyFiles(File oldArchive, File newArchive) {
 			if (oldArchive.equals(newArchive)) {
-				String msg = String.format("Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
-				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
+				throw JApiCmpException.of("Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
 			}
 		}
 
 		private void verifyExisting(File newArchive) {
 			if (!newArchive.exists()) {
-				String msg = String.format("File '%s' does not exist.", newArchive.getAbsolutePath());
-				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
+				throw JApiCmpException.of("File '%s' does not exist.", newArchive.getAbsolutePath());
 			}
 		}
 
@@ -157,8 +160,7 @@ public class JApiCli {
 			try {
 				new JarFile(file);
 			} catch (IOException e) {
-				String msg = String.format("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
-				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
+				throw JApiCmpException.of("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
 			}
 		}
 	}
