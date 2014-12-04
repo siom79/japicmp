@@ -99,9 +99,6 @@
                     <xsl:if test="count(classes/class) > 0">
                         <li><a href="#toc">Classes</a></li>
                     </xsl:if>
-                    <xsl:if test="count(jpa-tables/jpa-table) > 0">
-                        <li><a href="#toc-jpa-tables">JPA Tables</a></li>
-                    </xsl:if>
                 </ul>
 				<xsl:apply-templates />
 			</body>
@@ -598,80 +595,5 @@
                 (!)
             </xsl:if>
         </span>
-    </xsl:template>
-
-    <xsl:template match="jpa-tables">
-        <div class="toc">
-            <a name="toc-jpa-tables"/>
-            <span class="label">JPA Tables:</span>
-            <table>
-                <thead>
-                    <tr>
-                        <td>Status</td>
-                        <td>Fully Qualified Name</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <xsl:apply-templates select="jpa-table" mode="toc"><xsl:sort select="@fullyQualifiedName"/></xsl:apply-templates>
-                </tbody>
-            </table>
-        </div>
-        <div id="jpa-tables">
-            <xsl:apply-templates select="jpa-table" mode="detail"><xsl:sort select="@fullyQualifiedName"/></xsl:apply-templates>
-        </div>
-    </xsl:template>
-
-    <xsl:template match="jpa-table" mode="toc">
-        <tr>
-            <td>
-                <xsl:call-template name="outputChangeStatus"/>
-            </td>
-            <td>
-                <a>
-                    <xsl:attribute name="href">#jpa-table.<xsl:value-of select="@fullyQualifiedName"/></xsl:attribute>
-                    <xsl:value-of select="@fullyQualifiedName" />
-                </a>
-            </td>
-        </tr>
-    </xsl:template>
-
-    <xsl:template match="jpa-table" mode="detail">
-        <div>
-            <div class="class">
-                <div class="class_header">
-                    <span class="label">
-                        <a>
-                            <xsl:attribute name="name">jpa-table.<xsl:value-of select="@fullyQualifiedName" /></xsl:attribute>
-                        </a>
-                        <xsl:call-template name="outputChangeStatus"/>&#160;
-                        <xsl:value-of select="@fullyQualifiedName" />
-                    </span>
-                    <a href="#toc" class="toc_link">top</a>
-                </div>
-                <div>
-                    <span class="label_class_member">Name:</span>
-                    <table>
-                        <thead>
-                            <tr>
-                                <td>Status:</td>
-                                <td>Old name:</td>
-                                <td>New name:</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <xsl:apply-templates select="name"/>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </xsl:template>
-
-    <xsl:template match="name">
-        <tr>
-            <td><xsl:call-template name="outputChangeStatus"/></td>
-            <td><xsl:value-of select="@oldName"/></td>
-            <td><xsl:value-of select="@newName"/></td>
-        </tr>
     </xsl:template>
 </xsl:stylesheet>
