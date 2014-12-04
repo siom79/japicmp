@@ -146,7 +146,38 @@ of your artifact.
 
 ###Comparing two versions of the guava library###
 
-In the following you see the beginning of the XML output file after having computed the differences between the versions 16.0 and 17.0 of google's guava library:
+In the following you see the beginning of the differences between the versions 16.0 and 17.0 of Google's guava library. The differences between the two Java APIs are also printed on the command line for a quick overview. Please note that binary incompatible changes are flagged with an exclamation mark. 
+
+	***! MODIFIED CLASS: PUBLIC FINAL com.google.common.base.Stopwatch
+		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch()
+			===  UNCHANGED ANNOTATION: java.lang.Deprecated
+		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch(com.google.common.base.Ticker)
+			===  UNCHANGED ANNOTATION: java.lang.Deprecated
+	***! MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.util.concurrent.Service
+		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.Service$State startAndWait()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.Service$State stopAndWait()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.ListenableFuture start()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.ListenableFuture stop()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+	***  MODIFIED CLASS: PUBLIC FINAL com.google.common.net.HttpHeaders
+		+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String FOLLOW_ONLY_WHEN_PRERENDER_SHOWN
+	***! MODIFIED CLASS: PUBLIC ABSTRACT com.google.common.util.concurrent.AbstractScheduledService
+		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.ListenableFuture start()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.Service$State startAndWait()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.Service$State stopAndWait()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.ListenableFuture stop()
+			---  REMOVED ANNOTATION: java.lang.Deprecated
+	...
+
+Optionally japicmp can also create an HTML report. An example for such a report can be found [here](https://github.com/siom79/japicmp/blob/development/doc/japicmp_guava.html).
+
+You can also let japicmp create an XML report like the following one:
 
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<japicmp newJar="/home/siom79/dev/guava-17.0.jar" oldJar="/home/siom79/dev/guava-16.0.jar">
@@ -206,35 +237,6 @@ In the following you see the beginning of the XML output file after having compu
 				<superclass binaryCompatible="true" changeStatus="UNCHANGED" superclassNew="n.a." superclassOld="n.a."/>
 			</class>
 		...
-
-The differences between the two Java APIs are also printed on the command line for a quick overview. Please note that binary incompatible changes are flagged with an exclamation mark. 
-
-	***! MODIFIED CLASS: PUBLIC FINAL com.google.common.base.Stopwatch
-		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch()
-			===  UNCHANGED ANNOTATION: java.lang.Deprecated
-		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch(com.google.common.base.Ticker)
-			===  UNCHANGED ANNOTATION: java.lang.Deprecated
-	***! MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.util.concurrent.Service
-		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.Service$State startAndWait()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.Service$State stopAndWait()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.ListenableFuture start()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.ListenableFuture stop()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-	***  MODIFIED CLASS: PUBLIC FINAL com.google.common.net.HttpHeaders
-		+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String FOLLOW_ONLY_WHEN_PRERENDER_SHOWN
-	***! MODIFIED CLASS: PUBLIC ABSTRACT com.google.common.util.concurrent.AbstractScheduledService
-		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.ListenableFuture start()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.Service$State startAndWait()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.Service$State stopAndWait()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.ListenableFuture stop()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-    ...
     
 ###Tracking changes of an XML document marshalled with JAXB###
 
