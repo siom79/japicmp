@@ -193,6 +193,7 @@ public class JApiCmpMojo extends AbstractMojo {
     private void generateXmlOutput(File newVersionFile, File oldVersionFile, List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options) throws IOException {
         XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
         options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + "japicmp.xml"));
+	    options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + "japicmp.html"));
         xmlGenerator.generate(oldVersionFile.getAbsolutePath(), newVersionFile.getAbsolutePath(), jApiClasses, options);
     }
 

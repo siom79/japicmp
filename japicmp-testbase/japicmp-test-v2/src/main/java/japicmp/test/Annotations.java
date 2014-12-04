@@ -5,6 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@Annotations.OuterAnnotation2(outer = {
+		@Annotations.InnerAnnotation2(inner = { @Annotations.InnerInnerAnnotation(innerInner = { 1, 2 }, number = 42) }),
+		@Annotations.InnerAnnotation2(inner = { @Annotations.InnerInnerAnnotation(innerInner = { 1, 2 }, number = 42),
+												@Annotations.InnerInnerAnnotation(innerInner = { 1, 2 }, number = 42) })
+})
 public class Annotations {
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -157,20 +162,20 @@ public class Annotations {
     public int fieldWithOuterAnnotation;
 	
     @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
+    @Target({ElementType.FIELD, ElementType.TYPE})
     public @interface InnerInnerAnnotation {
     	int[] innerInner();
     	int	number();
     }
 	
     @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
+    @Target({ElementType.FIELD, ElementType.TYPE})
     public @interface InnerAnnotation2 {
     	InnerInnerAnnotation[] inner();
     }
     
     @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
+    @Target({ElementType.FIELD, ElementType.TYPE})
     public @interface OuterAnnotation2 {
     	InnerAnnotation2[] outer();
     }

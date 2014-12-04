@@ -13,8 +13,8 @@ import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
-import javax.inject.Inject;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -115,7 +115,6 @@ public class JApiCli {
 				String msg = String.format("Cannot read file '%s'.", file.getAbsolutePath());
 				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
 			}
-
 		}
 
 		private <T> T checkNonNull(T in, String errorMessage) {
@@ -163,5 +162,4 @@ public class JApiCli {
 			}
 		}
 	}
-
 }

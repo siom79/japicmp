@@ -8,7 +8,6 @@ import japicmp.exception.JApiCmpException;
 public class JApiCmp {
 
 	public static void main(String[] args) {
-
 		try {
 			run(args);
 		} catch (ParseException e) {
@@ -34,5 +33,4 @@ public class JApiCmp {
 			cmd.run();
 		}
 	}
-
 }

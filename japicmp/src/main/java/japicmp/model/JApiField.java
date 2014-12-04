@@ -70,7 +70,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
             } else if (newFieldOptional.isPresent()) {
                 CtField newField = newFieldOptional.get();
                 String newType = signatureToType(newField.getSignature());
-                return new JApiType(Optional.of(newType), Optional.<String>absent(), JApiChangeStatus.NEW);
+                return new JApiType(Optional.<String>absent(), Optional.of(newType), JApiChangeStatus.NEW);
             }
         }
         return new JApiType(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);

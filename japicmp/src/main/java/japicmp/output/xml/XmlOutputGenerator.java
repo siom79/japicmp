@@ -5,39 +5,37 @@ import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
+import japicmp.output.extapi.jpa.JpaAnalyzer;
+import japicmp.output.extapi.jpa.model.JpaTable;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.SchemaOutputResolver;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.util.List;
+import java.util.logging.Logger;
 
 public class XmlOutputGenerator {
 	private static final String XSD_FILENAME = "japicmp.xsd";
-	private static final String XML_NAMESPACE = "https://github.com/siom79/japicmp/schema/japicmp.xsd";
 	private static final String XML_SCHEMA = XSD_FILENAME;
 	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());
 
 	public void generate(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
-		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, oldArchivePath, jApiClasses);
+		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, newArchivePath, jApiClasses);
+		analyzeJpaAnnotations(jApiCmpXmlRoot, jApiClasses);
 		filterClasses(jApiClasses, options);
 		createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
+	}
+
+	private void analyzeJpaAnnotations(JApiCmpXmlRoot jApiCmpXmlRoot, List<JApiClass> jApiClasses) {
+		JpaAnalyzer jpaAnalyzer = new JpaAnalyzer();
+		List<JpaTable> jpaEntities = jpaAnalyzer.analyze(jApiClasses);
+		jApiCmpXmlRoot.setJpaTables(jpaEntities);
 	}
 
 	private void createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
@@ -45,7 +43,7 @@ public class XmlOutputGenerator {
 			JAXBContext jaxbContext = JAXBContext.newInstance(JApiCmpXmlRoot.class);
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XML_NAMESPACE + " " + XML_SCHEMA);
+			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, XML_SCHEMA);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			marshaller.marshal(jApiCmpXmlRoot, baos);

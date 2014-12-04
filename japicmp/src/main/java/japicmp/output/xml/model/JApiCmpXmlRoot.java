@@ -1,6 +1,7 @@
 package japicmp.output.xml.model;
 
 import japicmp.model.JApiClass;
+import japicmp.output.extapi.jpa.model.JpaTable;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -13,9 +14,10 @@ import java.util.List;
 public class JApiCmpXmlRoot {
     private String oldJar = "";
     private String newJar = "";
-    private List<JApiClass> classes = new LinkedList<JApiClass>();
+    private List<JApiClass> classes = new LinkedList<>();
+	private List<JpaTable> jpaTables = new LinkedList<>();
 
-    @XmlElementWrapper(name = "classes")
+	@XmlElementWrapper(name = "classes")
     @XmlElement(name = "class")
     public List<JApiClass> getClasses() {
         return classes;
@@ -42,4 +44,14 @@ public class JApiCmpXmlRoot {
     public void setOldJar(String oldJar) {
         this.oldJar = oldJar;
     }
+
+	public void setJpaTables(List<JpaTable> jpaTables) {
+		this.jpaTables = jpaTables;
+	}
+
+    @XmlElementWrapper(name = "jpa-tables")
+    @XmlElement(name = "jpa-table")
+	public List<JpaTable> getJpaTables() {
+		return jpaTables;
+	}
 }

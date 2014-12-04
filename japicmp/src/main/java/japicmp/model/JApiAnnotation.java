@@ -1,11 +1,6 @@
 package japicmp.model;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Optional;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
 
@@ -13,8 +8,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.google.common.base.Optional;
+import java.util.*;
 
 public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final String fullyQualifiedName;
@@ -108,6 +102,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
 	}
 
 	@Override
+	@XmlAttribute(name = "changeStatus")
 	public JApiChangeStatus getChangeStatus() {
 		return this.changeStatus;
 	}
