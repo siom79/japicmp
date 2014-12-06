@@ -27,7 +27,7 @@ public class XmlOutputGenerator {
 
 	public void generate(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
 		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, newArchivePath, jApiClasses);
-		analyzeJpaAnnotations(jApiCmpXmlRoot, jApiClasses);
+		//analyzeJpaAnnotations(jApiCmpXmlRoot, jApiClasses);
 		filterClasses(jApiClasses, options);
 		createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
 	}
@@ -35,7 +35,7 @@ public class XmlOutputGenerator {
 	private void analyzeJpaAnnotations(JApiCmpXmlRoot jApiCmpXmlRoot, List<JApiClass> jApiClasses) {
 		JpaAnalyzer jpaAnalyzer = new JpaAnalyzer();
 		List<JpaTable> jpaEntities = jpaAnalyzer.analyze(jApiClasses);
-		jApiCmpXmlRoot.setJpaTables(jpaEntities);
+		//jApiCmpXmlRoot.setJpaTables(jpaEntities);
 	}
 
 	private void createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {

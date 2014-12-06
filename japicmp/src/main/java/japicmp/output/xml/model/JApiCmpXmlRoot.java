@@ -44,14 +44,4 @@ public class JApiCmpXmlRoot {
     public void setOldJar(String oldJar) {
         this.oldJar = oldJar;
     }
-
-	public void setJpaTables(List<JpaTable> jpaTables) {
-		this.jpaTables = jpaTables;
-	}
-
-    @XmlElementWrapper(name = "jpa-tables")
-    @XmlElement(name = "jpa-table")
-	public List<JpaTable> getJpaTables() {
-		return jpaTables;
-	}
 }
