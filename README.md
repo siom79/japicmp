@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.2.1.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.2.2.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository. The corresponding dependen
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.2.1</version>
+		<version>0.2.2</version>
 	</dependency>
 
 ##Motivation##
@@ -37,11 +37,12 @@ This approach also detects changes in instrumented and generated classes. You ca
 
 * Comparison of two jar archives without the need to add all of their dependencies to the classpath.
 * Differences are printed on the command line in a simple diff format.
-* Differences can optionally be printed to an xml file. This can be transformed to an HTML file using XSLT.
+* Differences can optionally be printed as XML or HTML file.
 * Per default only public classes and class members are compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to package, protected or private.
 * Per default classes from all packages are compared. If necessary, certain packages can be excluded or only specific packages can be included.
 * All changes between all classes/methods/fields are compared. If necessary, output can be limited to changes that are binary incompatible (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html)).
+* All changes between annotations are compared, hence japicmp can be used to track annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
@@ -50,40 +51,52 @@ This approach also detects changes in instrumented and generated classes. You ca
 
 ###Usage CLI tool###
 
-The tool has a set of CLI parameters that are described in the following:
+japicmp has a set of CLI parameters that are described in the following:
 
-	-a <accessModifier>
-	    Sets the access modifier level (public, package, protected,
-	    private), which should be used.
-	
-	-b, --only-incompatible
-	    Outputs only classes/methods that are binary incompatible. If not
-	    given, all classes and methods are printed.
-	
-	-e <packagesToExclude>, --exclude <packagesToExclude>
-	    Comma separated list of package names to exclude, * can be used as
-	    wildcard.
-	
-	-h, --help
-	    Display help information
-	
-	-i <packagesToInclude>, --include <packagesToInclude>
-	    Comma separated list of package names to include, * can be used as
-	    wildcard.
-	
-	-m, --only-modified
-	    Outputs only modified classes/methods. If not given, all classes and
-	    methods are printed.
-	
-	-n <pathToNewVersionJar>, --new <pathToNewVersionJar>
-	    Provides the path to the new version of the jar.
-	
-	-o <pathToOldVersionJar>, --old <pathToOldVersionJar>
-	    Provides the path to the old version of the jar.
-	
-	-x <pathToXmlOutputFile>, --xml-to-file <pathToXmlOutputFile>
-	    Provides the path to the xml output file. If not given, stdout is
-	    used.
+	SYNOPSIS
+			java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
+					[(-e <packagesToExclude> | --exclude <packagesToExclude>)]
+					[(-h | --help)] [--html-to-file <pathToHtmlOutputFile>]
+					[(-i <packagesToInclude> | --include <packagesToInclude>)]
+					[(-m | --only-modified)]
+					[(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
+					[(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
+					[(-x <pathToXmlOutputFile> | --xml-to-file <pathToXmlOutputFile>)]
+
+	OPTIONS
+			-a <accessModifier>
+				Sets the access modifier level (public, package, protected,
+				private), which should be used.
+
+			-b, --only-incompatible
+				Outputs only classes/methods that are binary incompatible. If not
+				given, all classes and methods are printed.
+
+			-e <packagesToExclude>, --exclude <packagesToExclude>
+				Comma separated list of package names to exclude, * can be used as
+				wildcard.
+
+			-h, --help
+				Display help information
+
+			--html-to-file <pathToHtmlOutputFile>
+				Provides the path to the html output file.
+
+			-i <packagesToInclude>, --include <packagesToInclude>
+				Comma separated list of package names to include, * can be used as
+				wildcard.
+
+			-m, --only-modified
+				Outputs only modified classes/methods.
+
+			-n <pathToNewVersionJar>, --new <pathToNewVersionJar>
+				Provides the path to the new version of the jar.
+
+			-o <pathToOldVersionJar>, --old <pathToOldVersionJar>
+				Provides the path to the old version of the jar.
+
+			-x <pathToXmlOutputFile>, --xml-to-file <pathToXmlOutputFile>
+				Provides the path to the xml output file.
     
 ###Usage maven plugin###
 
@@ -94,13 +107,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.2.1</version>
+                <version>0.2.2</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.2.1</version>
+                            <version>0.2.2</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -258,6 +271,9 @@ As can bee seen from the output above, the XML attributes title and author have 
 
 The following releases are available:
 
+* [Version 0.2.2](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.2)
+	* Changes:
+		* [japicmp should provide a single page HTML report](https://github.com/siom79/japicmp/issues/18)
 * [Version 0.2.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.1)
 	* Changes:
 		* [japicmp should provide a boolean flag for each change that indicates if this modification breaks binary compatibility](https://github.com/siom79/japicmp/issues/16)
