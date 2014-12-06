@@ -56,12 +56,12 @@ japicmp has a set of CLI parameters that are described in the following:
 	SYNOPSIS
 			java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
 					[(-e <packagesToExclude> | --exclude <packagesToExclude>)]
-					[(-h | --help)] [--html-to-file <pathToHtmlOutputFile>]
+					[(-h | --help)] [--html-file <pathToHtmlOutputFile>]
 					[(-i <packagesToInclude> | --include <packagesToInclude>)]
 					[(-m | --only-modified)]
 					[(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
 					[(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
-					[(-x <pathToXmlOutputFile> | --xml-to-file <pathToXmlOutputFile>)]
+					[(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
 	OPTIONS
 			-a <accessModifier>
@@ -79,7 +79,7 @@ japicmp has a set of CLI parameters that are described in the following:
 			-h, --help
 				Display help information
 
-			--html-to-file <pathToHtmlOutputFile>
+			--html-file <pathToHtmlOutputFile>
 				Provides the path to the html output file.
 
 			-i <packagesToInclude>, --include <packagesToInclude>
@@ -95,7 +95,7 @@ japicmp has a set of CLI parameters that are described in the following:
 			-o <pathToOldVersionJar>, --old <pathToOldVersionJar>
 				Provides the path to the old version of the jar.
 
-			-x <pathToXmlOutputFile>, --xml-to-file <pathToXmlOutputFile>
+			-x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
 				Provides the path to the xml output file.
     
 ###Usage maven plugin###
