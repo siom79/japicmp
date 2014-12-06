@@ -41,9 +41,9 @@ public class JApiCli {
 		public String packagesToInclude;
 		@Option(name = { "-e", "--exclude" }, description = "Comma separated list of package names to exclude, * can be used as wildcard.")
 		public String packagesToExclude;
-		@Option(name = { "-x", "--xml-to-file" }, description = "Provides the path to the xml output file.")
+		@Option(name = { "-x", "--xml-file" }, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;
-		@Option(name = { "--html-to-file" }, description = "Provides the path to the html output file.")
+		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
 
 		@Override
@@ -73,7 +73,7 @@ public class JApiCli {
 
 		private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
 			OutputFilter.sortClassesAndMethods(jApiClasses);
-			if (options.getXmlOutputFile().isPresent()) {
+			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
 				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
 				xmlGenerator.generate(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
 			}
