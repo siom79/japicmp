@@ -7,6 +7,7 @@ import japicmp.model.JApiClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static japicmp.test.util.Helper.*;
@@ -23,14 +24,44 @@ public class IntefacesTest {
     }
 
     @Test
-    public void test() {
+    public void testInterfaceToNoInterface() {
         JApiClass interfaceToNoInterfaceClass = getJApiClass(jApiClasses, Interfaces.InterfaceToNoInterfaceClass.class.getName());
+        assertThat(interfaceToNoInterfaceClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(interfaceToNoInterfaceClass.getInterfaces().size(), is(1));
         assertThat(getJApiImplementedInterface(interfaceToNoInterfaceClass.getInterfaces(), replaceLastDotWith$(Interfaces.TestInterface.class.getCanonicalName())).getChangeStatus(), is(JApiChangeStatus.REMOVED));
+    }
+
+    @Test
+    public void testInterfaceChangesClass() {
         JApiClass interfaceChangesClass = getJApiClass(jApiClasses, Interfaces.InterfaceChangesClass.class.getName());
+        assertThat(interfaceChangesClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(interfaceChangesClass.getInterfaces().size(), is(2));
         assertThat(getJApiImplementedInterface(interfaceChangesClass.getInterfaces(), replaceLastDotWith$(Interfaces.TestInterface.class.getCanonicalName())).getChangeStatus(), is(JApiChangeStatus.REMOVED));
         assertThat(getJApiImplementedInterface(interfaceChangesClass.getInterfaces(), replaceLastDotWith$(Interfaces.SecondTestInterface.class.getCanonicalName())).getChangeStatus(), is(JApiChangeStatus.NEW));
+    }
+
+    @Test
+    public void testInterfaceRemainsInterface() {
         JApiClass interfaceRemainsInterfaceClass = getJApiClass(jApiClasses, Interfaces.InterfaceRemainsInterfaceClass.class.getName());
+        assertThat(interfaceRemainsInterfaceClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+        assertThat(interfaceRemainsInterfaceClass.getInterfaces().size(), is(1));
         assertThat(getJApiImplementedInterface(interfaceRemainsInterfaceClass.getInterfaces(), replaceLastDotWith$(Interfaces.TestInterface.class.getCanonicalName())).getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+    }
+
+    @Test
+    public void testNoInterfaceToWithInterface() {
+        JApiClass noInterfaceToWithInterfaceClass = getJApiClass(jApiClasses, Interfaces.NoInterfaceToInterfaceClass.class.getName());
+        assertThat(noInterfaceToWithInterfaceClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(noInterfaceToWithInterfaceClass.getInterfaces().size(), is(1));
+        assertThat(getJApiImplementedInterface(noInterfaceToWithInterfaceClass.getInterfaces(), replaceLastDotWith$(Interfaces.TestInterface.class.getCanonicalName())).getChangeStatus(), is(JApiChangeStatus.NEW));
+    }
+
+    @Test
+    public void testNoInterfaceToSerializableInterface() {
+        JApiClass jApiClass = getJApiClass(jApiClasses, Interfaces.NoInterfaceToSerializableInterface.class.getName());
+        assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(jApiClass.getInterfaces().size(), is(1));
+        assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), Serializable.class.getCanonicalName()).getChangeStatus(), is(JApiChangeStatus.NEW));
     }
 
     private String replaceLastDotWith$(String str) {

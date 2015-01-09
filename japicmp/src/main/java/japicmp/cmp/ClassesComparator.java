@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ClassesComparator {
-    private List<JApiClass> classes = new LinkedList<JApiClass>();
+    private List<JApiClass> classes = new LinkedList<>();
 
     public void compare(List<CtClass> oldClassesArg, List<CtClass> newClassesArg) {
-        classes = new LinkedList<JApiClass>();
+        classes = new LinkedList<>();
         Map<String, CtClass> oldClassesMap = createClassMap(oldClassesArg);
         Map<String, CtClass> newClassesMap = createClassMap(newClassesArg);
         sortIntoLists(oldClassesMap, newClassesMap);

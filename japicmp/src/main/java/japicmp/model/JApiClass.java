@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -29,6 +31,7 @@ import com.google.common.base.Optional;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
 		JApiBinaryCompatibility, JApiHasAnnotations {
+	private static final Logger LOGGER = Logger.getLogger(JApiClass.class.getName());
 	private final String fullyQualifiedName;
 	private final Type type;
 	private final Optional<CtClass> oldClass;
@@ -268,7 +271,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				map.put(ctInterface.getName(), ctInterface);
 			}
 		} catch (NotFoundException e) {
-
+			LOGGER.log(Level.WARNING, "Could not load interfaces for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + System.getProperty("java.class.path") + ").", e);
 		}
 		return map;
 	}

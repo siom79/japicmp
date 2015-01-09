@@ -54,4 +54,8 @@ public class Interfaces {
 	public class SubclassWithSuperclassLosesMethod extends SuperclassLosesMethod {
 		
 	}
+
+	public static class NoInterfaceToSerializableInterface {
+
+	}
 }

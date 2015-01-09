@@ -29,6 +29,7 @@ public class JarArchiveComparator {
     }
 
     public List<JApiClass> compare(File oldArchive, File newArchive) {
+        classPool.appendSystemPath();
         ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
         List<JApiClass> classList = classesComparator.getClasses();
         checkBinaryCompatibility(classList);
