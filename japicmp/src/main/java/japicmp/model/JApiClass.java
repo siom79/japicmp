@@ -219,6 +219,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			CtClass superClass = ctClass.getSuperclass();
 			return Optional.of(superClass);
 		} catch (NotFoundException e) {
+			LOGGER.log(Level.WARNING, "Could not load superclass for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + System.getProperty("java.class.path") + ").", e);
 			return Optional.absent();
 		}
 	}
@@ -348,10 +349,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 	}
 
-	private Map<String, CtMethod> createMethodMap(Optional<CtClass> ctClass) {
+	private Map<String, CtMethod> createMethodMap(Optional<CtClass> ctClassOptional) {
 		Map<String, CtMethod> methods = new HashMap<String, CtMethod>();
-		if (ctClass.isPresent()) {
-			for (CtMethod ctMethod : ctClass.get().getDeclaredMethods()) {
+		if (ctClassOptional.isPresent()) {
+			CtClass ctClass = ctClassOptional.get();
+			for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
 				methods.put(toMethodKey(ctMethod), ctMethod);
 			}
 		}
@@ -363,7 +365,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		try {
 			returnType = ctMethod.getReturnType();
 		} catch (NotFoundException e) {
-			
+			LOGGER.log(Level.WARNING, "Could not load return type for method '" + ctMethod.getName() + "' of class '" + ctMethod.getDeclaringClass().getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + System.getProperty("java.class.path") + ").", e);
 		}
 		String returnTypeAsString = "void";
 		if(returnType != null) {
