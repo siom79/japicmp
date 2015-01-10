@@ -29,7 +29,7 @@ This library does not use the Java Reflection API to compute the differences, as
 it necessary to include all classes the jar archive under investigation depends on are available on the classpath. 
 To prevent the inclusion of all dependencies, which can be a lot of work for bigger applications, this library makes 
 use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/) library to inspect the class files. 
-This way you only have to provide the two jar archives on the command line, that's it.
+This way you only have to provide the two jar archives on the command line.
 
 This approach also detects changes in instrumented and generated classes. You can even evaluate changes in class file attributes (like synthetic) or annotations. The comparison of annotations makes this approach suitable for annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 
@@ -129,6 +129,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
                     </parameter>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.commons</groupId>
+							<artifactId>commons-math3</artifactId>
+							<version>3.4</version>
+						</dependency>
+					</dependencies>
                 </configuration>
                 <executions>
                     <execution>
@@ -151,6 +158,19 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
+
+If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
+&lt;dependencies&gt; element. The &lt;systemPath&gt; element of the &lt;dependency&gt; element allows you to add local files as a dependency:
+
+```
+<dependency>
+	<groupId>com.sun</groupId>
+	<artifactId>tools</artifactId>
+	<version>1.4.2</version>
+	<scope>system</scope>
+	<systemPath>${java.home}/../lib/tools.jar</systemPath>
+</dependency>
+```
 
 The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
 of your artifact.
