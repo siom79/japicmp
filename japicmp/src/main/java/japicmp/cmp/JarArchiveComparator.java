@@ -126,4 +126,8 @@ public class JarArchiveComparator {
         }
         return true;
     }
+
+    public JarArchiveComparatorOptions getJarArchiveComparatorOptions() {
+        return this.options;
+    }
 }

@@ -45,7 +45,7 @@ public class OutputFilter {
                         remove = true;
                     }
                 }
-                if (!matchesModifierLevel(element)) {
+                if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {
                     remove = true;
                 }
                 if (remove) {
@@ -102,7 +102,7 @@ public class OutputFilter {
                         remove = true;
                     }
                 }
-                if (!matchesModifierLevel(element)) {
+                if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {
                     remove = true;
                 }
                 if (remove) {
@@ -123,7 +123,7 @@ public class OutputFilter {
                         remove = true;
                     }
                 }
-                if (!matchesModifierLevel(element)) {
+                if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {
                     remove = true;
                 }
                 if (remove) {
@@ -144,7 +144,7 @@ public class OutputFilter {
                         remove = true;
                     }
                 }
-                if (!matchesModifierLevel(element)) {
+                if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {
                     remove = true;
                 }
                 if (element.getChangeStatus() == JApiChangeStatus.MODIFIED) {
@@ -195,23 +195,6 @@ public class OutputFilter {
             }
             visitor.visit(itClasses, jApiClass);
         }
-    }
-
-    private boolean matchesModifierLevel(JApiHasAccessModifier hasAccessModifier) {
-        JApiModifier<AccessModifier> accessModifier = hasAccessModifier.getAccessModifier();
-        if (accessModifier.getOldModifier().isPresent()) {
-            AccessModifier oldModifier = accessModifier.getOldModifier().get();
-            if (ModifierHelper.matchesModifierLevel(oldModifier, options.getAccessModifier())) {
-                return true;
-            }
-        }
-        if (accessModifier.getNewModifier().isPresent()) {
-            AccessModifier newModifier = accessModifier.getNewModifier().get();
-            if (ModifierHelper.matchesModifierLevel(newModifier, options.getAccessModifier())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static void sortClassesAndMethods(List<JApiClass> jApiClasses) {

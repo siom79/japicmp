@@ -62,4 +62,21 @@ public class ModifierHelper {
 		}
 		return false;
 	}
+
+	public static boolean matchesModifierLevel(JApiHasAccessModifier hasAccessModifier, AccessModifier accessModifierParam) {
+		JApiModifier<AccessModifier> accessModifier = hasAccessModifier.getAccessModifier();
+		if (accessModifier.getOldModifier().isPresent()) {
+			AccessModifier oldModifier = accessModifier.getOldModifier().get();
+			if (matchesModifierLevel(oldModifier, accessModifierParam)) {
+				return true;
+			}
+		}
+		if (accessModifier.getNewModifier().isPresent()) {
+			AccessModifier newModifier = accessModifier.getNewModifier().get();
+			if (matchesModifierLevel(newModifier, accessModifierParam)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

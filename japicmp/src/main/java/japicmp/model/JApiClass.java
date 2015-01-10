@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
@@ -391,6 +392,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+		JarArchiveComparatorOptions options = this.jarArchiveComparator.getJarArchiveComparatorOptions();
 		if (changeStatus == JApiChangeStatus.UNCHANGED) {
 			if (staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
@@ -416,18 +418,24 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			for (JApiField field : fields) {
-				if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-					changeStatus = JApiChangeStatus.MODIFIED;
+				if (ModifierHelper.matchesModifierLevel(field, options.getModifierLevel())) {
+					if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+						changeStatus = JApiChangeStatus.MODIFIED;
+					}
 				}
 			}
 			for (JApiMethod method : methods) {
-				if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-					changeStatus = JApiChangeStatus.MODIFIED;
+				if (ModifierHelper.matchesModifierLevel(method, options.getModifierLevel())) {
+					if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+						changeStatus = JApiChangeStatus.MODIFIED;
+					}
 				}
 			}
 			for (JApiConstructor constructor : constructors) {
-				if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-					changeStatus = JApiChangeStatus.MODIFIED;
+				if (ModifierHelper.matchesModifierLevel(constructor, options.getModifierLevel())) {
+					if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+						changeStatus = JApiChangeStatus.MODIFIED;
+					}
 				}
 			}
 			for (JApiAnnotation annotation : annotations) {
