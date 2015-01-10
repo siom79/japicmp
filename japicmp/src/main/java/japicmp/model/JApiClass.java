@@ -1,5 +1,7 @@
 package japicmp.model;
 
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.exception.JApiCmpException;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
@@ -31,7 +33,7 @@ import com.google.common.base.Optional;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
 		JApiBinaryCompatibility, JApiHasAnnotations {
-	private static final Logger LOGGER = Logger.getLogger(JApiClass.class.getName());
+	private JarArchiveComparator jarArchiveComparator;
 	private final String fullyQualifiedName;
 	private final Type type;
 	private final Optional<CtClass> oldClass;
@@ -54,7 +56,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		ANNOTATION, INTERFACE, CLASS, ENUM
 	}
 
-	public JApiClass(String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, Type type) {
+	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, Type type) {
+		this.jarArchiveComparator = jarArchiveComparator;
 		this.fullyQualifiedName = fullyQualifiedName;
 		this.newClass = newClass;
 		this.oldClass = oldClass;
@@ -219,9 +222,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			CtClass superClass = ctClass.getSuperclass();
 			return Optional.of(superClass);
 		} catch (NotFoundException e) {
-			LOGGER.log(Level.WARNING, "Could not load superclass for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + System.getProperty("java.class.path") + ").", e);
-			return Optional.absent();
+			throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load superclass for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + constructClasspath() + ").", e);
 		}
+	}
+
+	private String constructClasspath() {
+		return this.jarArchiveComparator.getClasspath();
 	}
 
 	private void computeInterfaceChanges(List<JApiImplementedInterface> interfacesArg, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -272,7 +278,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				map.put(ctInterface.getName(), ctInterface);
 			}
 		} catch (NotFoundException e) {
-			LOGGER.log(Level.WARNING, "Could not load interfaces for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + System.getProperty("java.class.path") + ").", e);
+			throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load interfaces for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + constructClasspath() + ").", e);
 		}
 		return map;
 	}
@@ -365,7 +371,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		try {
 			returnType = ctMethod.getReturnType();
 		} catch (NotFoundException e) {
-			LOGGER.log(Level.WARNING, "Could not load return type for method '" + ctMethod.getName() + "' of class '" + ctMethod.getDeclaringClass().getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + System.getProperty("java.class.path") + ").", e);
+			throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load return type for method '" + ctMethod.getName() + "' of class '" + ctMethod.getDeclaringClass().getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + constructClasspath() + ").", e);
 		}
 		String returnTypeAsString = "void";
 		if(returnType != null) {

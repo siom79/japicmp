@@ -7,8 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JarArchiveComparatorOptions {
-    private List<PackageFilter> packagesInclude = new LinkedList<PackageFilter>();
-    private List<PackageFilter> packagesExclude = new LinkedList<PackageFilter>();
+    private List<String> classPathEntries = new LinkedList<>();
+    private List<PackageFilter> packagesInclude = new LinkedList<>();
+    private List<PackageFilter> packagesExclude = new LinkedList<>();
     private AccessModifier modifierLevel = AccessModifier.PUBLIC;
 
     public List<PackageFilter> getPackagesExclude() {
@@ -25,5 +26,9 @@ public class JarArchiveComparatorOptions {
 
     public void setModifierLevel(AccessModifier modifierLevel) {
         this.modifierLevel = modifierLevel;
+    }
+
+    public List<String> getClassPathEntries() {
+        return classPathEntries;
     }
 }

@@ -9,7 +9,7 @@ public class JApiCmpException extends RuntimeException {
 		NormalTermination, //
 		IoException, //
 		JaxbException, //
-		XsltError
+		ClassLoading, XsltError
 	}
 
 	public JApiCmpException(Reason reason, String msg) {

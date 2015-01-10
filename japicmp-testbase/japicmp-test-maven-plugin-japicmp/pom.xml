@@ -43,6 +43,20 @@
 						<accessModifier>public</accessModifier>
 						<breakBuildOnModifications>false</breakBuildOnModifications>
 					</parameter>
+					<dependencies>
+						<dependency>
+							<groupId>org.javassist</groupId>
+							<artifactId>javassist</artifactId>
+							<version>3.18.2-GA</version>
+						</dependency>
+						<dependency>
+							<groupId>com.sun</groupId>
+							<artifactId>tools</artifactId>
+							<version>1.4.2</version>
+							<scope>system</scope>
+							<systemPath>${java.home}/../lib/tools.jar</systemPath>
+						</dependency>
+					</dependencies>
 				</configuration>
 				<executions>
 					<execution>

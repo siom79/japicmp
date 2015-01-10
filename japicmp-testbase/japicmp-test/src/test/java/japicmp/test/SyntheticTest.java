@@ -59,7 +59,7 @@ public class SyntheticTest {
 		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getNewAttribute(), is(Optional.of(SyntheticAttribute.SYNTHETIC)));
 	}
 
-	private File instrumentClass(File archive) throws ZipException, IOException, CannotCompileException, NotFoundException {
+	private File instrumentClass(File archive) throws IOException, CannotCompileException, NotFoundException {
 		ClassPool classPool = ClassPool.getDefault();
 		String path = Paths.get(System.getProperty("user.dir"), "target", "japicmp-test-v2-instrumented.jar").toString();
 		try (ZipFile zipFile = new ZipFile(archive); ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path))) {
