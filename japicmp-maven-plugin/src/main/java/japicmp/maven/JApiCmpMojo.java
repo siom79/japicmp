@@ -275,7 +275,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					String property = matcher.group(i);
 					String propertyResolved = mavenProject.getProperties().getProperty(property);
 					if (propertyResolved != null) {
-						systemPath.replaceAll("${" + property + "}", propertyResolved);
+						systemPath = systemPath.replaceAll("${" + property + "}", propertyResolved);
 					} else {
 						throw new MojoFailureException("Could not resolve property '" + property + "'.");
 					}
