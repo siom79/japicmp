@@ -1,14 +1,33 @@
 package japicmp.test;
 
 public class AccessModifierLevel {
-	private int fieldFromPrivateToPackageProtected;
-	int fieldFromPackageProtectedToPrivate;
 
-	private void methodFromPackageProtectedToPrivate() {
+	public static class AccessModifierChangesBelowPublic {
+		int fieldFromPrivateToPackageProtected;
+		private int fieldFromPackageProtectedToPrivate;
 
+		private void methodFromPackageProtectedToPrivate() {
+
+		}
+
+		void methodFromPrivateToPackageProtected() {
+
+		}
 	}
 
-	void methodFromPrivateToPackageProtected() {
+	public static class AccessModifierChangesFromPrivateToPublic {
+		public int fieldFromPrivateToPublic;
 
+		public void methodFromPrivateToPublic() {
+
+		}
+	}
+
+	public static class AccessModifierChangesFromPublicToPrivate {
+		private int fieldFromPublicToPrivate;
+
+		private void methodFromPublicToPrivate() {
+
+		}
 	}
 }
