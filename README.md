@@ -29,9 +29,11 @@ This library does not use the Java Reflection API to compute the differences, as
 it necessary to include all classes the jar archive under investigation depends on are available on the classpath. 
 To prevent the inclusion of all dependencies, which can be a lot of work for bigger applications, this library makes 
 use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/) library to inspect the class files. 
-This way you only have to provide the two jar archives on the command line.
+This way you only have to provide the two jar archives on the command line (and eventually libraries that contain
+classes/interfaces you have extended/implemented).
 
-This approach also detects changes in instrumented and generated classes. You can even evaluate changes in class file attributes (like synthetic) or annotations. The comparison of annotations makes this approach suitable for annotation-based APIs like JAXB, JPA, JAX-RS, etc.
+This approach also detects changes in instrumented and generated classes. You can even evaluate changes in class file attributes (like synthetic) or annotations.
+The comparison of annotations makes this approach suitable for annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 
 ##Features##
 

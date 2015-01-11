@@ -37,4 +37,16 @@ public class Methods {
 	public void nonStaticStaysNonStaticMethod() {
 		
 	}
+
+	public int returnValueIntToString() {
+		return 0;
+	}
+
+	public String returnValueStringToInt() {
+		return "";
+	}
+
+	public int returnValueIntRemains() {
+		return 0;
+	}
 }

@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -297,7 +295,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		SignatureParser signatureParser = new SignatureParser();
 		for (CtMethod ctMethod : oldMethodsMap.values()) {
 			signatureParser.parse(ctMethod.getSignature());
-			CtMethod foundMethod = newMethodsMap.get(toMethodKey(ctMethod));
+			CtMethod foundMethod = newMethodsMap.get(toMethodKey(ctMethod, signatureParser));
 			if (foundMethod == null) {
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtMethod> absent(),
 						signatureParser.getReturnType());
@@ -312,7 +310,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 		for (CtMethod ctMethod : newMethodsMap.values()) {
 			signatureParser.parse(ctMethod.getSignature());
-			CtMethod foundMethod = oldMethodsMap.get(toMethodKey(ctMethod));
+			CtMethod foundMethod = oldMethodsMap.get(toMethodKey(ctMethod, signatureParser));
 			if (foundMethod == null) {
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod> absent(), Optional.of(ctMethod),
 						signatureParser.getReturnType());
@@ -361,24 +359,16 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		if (ctClassOptional.isPresent()) {
 			CtClass ctClass = ctClassOptional.get();
 			for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
-				methods.put(toMethodKey(ctMethod), ctMethod);
+				SignatureParser signatureParser = new SignatureParser();
+				signatureParser.parse(ctMethod.getSignature());
+				methods.put(toMethodKey(ctMethod, signatureParser), ctMethod);
 			}
 		}
 		return methods;
 	}
 
-	private String toMethodKey(CtMethod ctMethod) {
-		CtClass returnType = null;
-		try {
-			returnType = ctMethod.getReturnType();
-		} catch (NotFoundException e) {
-			throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load return type for method '" + ctMethod.getName() + "' of class '" + ctMethod.getDeclaringClass().getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + constructClasspath() + ").", e);
-		}
-		String returnTypeAsString = "void";
-		if(returnType != null) {
-			returnTypeAsString = returnType.getName();
-		}
-		return ctMethod.getLongName()+"#"+returnTypeAsString;
+	private String toMethodKey(CtMethod ctMethod, SignatureParser signatureParser) {
+		return ctMethod.getLongName()+"#"+signatureParser.getReturnType();
 	}
 
 	private Map<String, CtConstructor> createConstructorMap(Optional<CtClass> ctClass) {
