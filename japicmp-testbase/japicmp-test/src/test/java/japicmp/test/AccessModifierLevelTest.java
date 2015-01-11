@@ -27,7 +27,7 @@ public class AccessModifierLevelTest {
 	@Test
 	public void testThatChangesBelowPublicDoNotChangeStatus() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, AccessModifierLevel.AccessModifierChangesBelowPublic.class.getName());
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.getMethods().size(), is(2));
 		for (JApiMethod method : jApiClass.getMethods()) {
 			assertThat(method.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
