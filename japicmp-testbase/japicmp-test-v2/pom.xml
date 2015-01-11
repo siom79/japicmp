@@ -28,6 +28,9 @@
                             <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
                         </file>
                     </newVersion>
+                    <parameter>
+                        <accessModifier>public</accessModifier>
+                    </parameter>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.commons</groupId>
