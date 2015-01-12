@@ -150,9 +150,6 @@ class OptionsBuilder {
 	}
 
 	public OptionsBuilder showOnlySeverDiff(boolean showOnlySemverDiff) {
-		if (showOnlySemverDiff) {
-			System.err.println("E: semver diff option is not implemented"); // TODO
-		}
 		this.showOnlySemverDiff = showOnlySemverDiff;
 		return this;
 	}
