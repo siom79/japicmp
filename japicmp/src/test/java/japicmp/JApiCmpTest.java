@@ -54,8 +54,7 @@ public class JApiCmpTest {
 		exit.expectSystemExitWithStatus(128);
 		exit.checkAssertionAfterwards(new Assertion() {
 			public void checkAssertion() {
-				assertEquals(ImmutableList.of("E: semver diff option is not implemented", //
-						"E: no valid new archive found"), errLog.getLines());
+				assertEquals("E: no valid new archive found\n", errLog.getOnlyLine());
 				assertShortHelp(outLog.getLog());
 			}
 		});

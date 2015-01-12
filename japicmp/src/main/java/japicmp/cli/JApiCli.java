@@ -13,9 +13,9 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.OutputGenerator;
-import japicmp.output.SemverOut;
-import japicmp.output.StdOut;
-import japicmp.output.XmlOut;
+import japicmp.output.semver.SemverOut;
+import japicmp.output.stdout.StdOut;
+import japicmp.output.xml.XmlOut;
 
 public class JApiCli {
 

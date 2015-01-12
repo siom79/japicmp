@@ -1,9 +1,22 @@
 package japicmp.test.util;
 
-import japicmp.model.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiAnnotationElement;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiField;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import org.hamcrest.core.StringEndsWith;
 
 public class Helper {
 
@@ -63,5 +76,25 @@ public class Helper {
             }
         }
         throw new IllegalArgumentException("No annotation element found with name " + name + ".");
+    }
+
+    public static File getArchiveLike(final String filenamePart) {
+        File root = new File(".").getAbsoluteFile();
+        org.hamcrest.MatcherAssert.assertThat(root.getAbsolutePath(), //
+            new StringEndsWith("/japicmp-testbase/japicmp-test/."));
+        Path target = root.toPath().resolve(Paths.get("..", filenamePart, "target"));
+        File targetDir = target.toFile().getAbsoluteFile();
+        assertTrue(targetDir.isDirectory());
+        ImmutableList<File> list = ImmutableList.copyOf(targetDir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                String name = file.getName();
+                return name.startsWith(filenamePart) && name.endsWith(".jar") &&
+                    !name.contains("javadoc") && !name.contains("sources");
+            }
+        }));
+        File onlyFile = Iterables.getOnlyElement(list);
+        assertTrue(onlyFile.canRead());
+        return onlyFile;
     }
 }
