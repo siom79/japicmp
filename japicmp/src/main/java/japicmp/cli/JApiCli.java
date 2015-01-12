@@ -12,8 +12,10 @@ import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
-import japicmp.output.stdout.StdoutOutputGenerator;
-import japicmp.output.xml.XmlOutputGenerator;
+import japicmp.output.OutputGenerator;
+import japicmp.output.SemverOut;
+import japicmp.output.StdOut;
+import japicmp.output.XmlOut;
 
 public class JApiCli {
 
@@ -66,7 +68,7 @@ public class JApiCli {
 			JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(copyOptions(options));
 			List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
 
-			generateOutput(options, oldArchive, newArchive, jApiClasses);
+			generateOutput(options, jApiClasses);
 		}
 
 		private JarArchiveComparatorOptions copyOptions(Options options) {
@@ -77,17 +79,19 @@ public class JApiCli {
 			return comparatorOptions;
 		}
 
-		private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
+		private void generateOutput(Options options, List<JApiClass> jApiClasses) {
 			OutputFilter.sortClassesAndMethods(jApiClasses);
+			OutputGenerator out = selectGenerator(options, jApiClasses);
+			out.generate();
+		}
+
+		private OutputGenerator selectGenerator(Options options, List<JApiClass> jApiClasses) {
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
-				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
-				xmlGenerator.generate(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
+				return new XmlOut(options, jApiClasses);
 			} else if (options.isOnlySemverDiff()) {
-				System.err.println("E: semver diff output is not implemented"); // TODO
+				return new SemverOut(options, jApiClasses);
 			} else {
-				StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
-				String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses);
-				System.out.println(output);
+				return new StdOut(options, jApiClasses);
 			}
 		}
 
