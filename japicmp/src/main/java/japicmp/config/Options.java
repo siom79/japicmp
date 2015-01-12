@@ -1,14 +1,14 @@
 package japicmp.config;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import japicmp.exception.FormattedException;
 import japicmp.model.AccessModifier;
-
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Options {
 	private File oldArchive;
@@ -20,6 +20,7 @@ public class Options {
 	private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PUBLIC);
 	private List<PackageFilter> packagesInclude = new LinkedList<>();
 	private List<PackageFilter> packagesExclude = new LinkedList<>();
+	private boolean showOnlySemverDiff = false;
 
 	public File getNewArchive() {
 		return newArchive;
@@ -114,5 +115,13 @@ public class Options {
 
 	public void setHtmlOutputFile(Optional<String> htmlOutputFile) {
 		this.htmlOutputFile = htmlOutputFile;
+	}
+
+	public void setShowOnlySemverDiff(boolean showOnlySemverDiff) {
+		this.showOnlySemverDiff = showOnlySemverDiff;
+	}
+
+	public boolean isOnlySemverDiff() {
+		return showOnlySemverDiff;
 	}
 }
