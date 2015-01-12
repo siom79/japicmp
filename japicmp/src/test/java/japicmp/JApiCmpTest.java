@@ -15,23 +15,22 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.Assertion;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.StandardErrorStreamLog;
-import org.junit.contrib.java.lang.system.StandardOutputStreamLog;
+import org.junit.contrib.java.lang.system.LogMode;
 
 public class JApiCmpTest {
 	@Rule
 	public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 	@Rule
-	public final StandardErrorStreamLog errLog = new StandardErrorStreamLog();
+	public final ErrLogRule errLog = new ErrLogRule(LogMode.LOG_ONLY);
 	@Rule
-	public final StandardOutputStreamLog outLog = new StandardOutputStreamLog();
+	public final OutLogRule outLog = new OutLogRule(LogMode.LOG_ONLY);
 
 	@Test
 	public void testMain_without_arguments() {
 		exit.expectSystemExitWithStatus(128);
 		exit.checkAssertionAfterwards(new Assertion() {
 			public void checkAssertion() {
-				assertEquals("E: no valid new archive found", errLog.getLog().trim());
+				assertEquals("E: no valid new archive found\n", errLog.getOnlyLine());
 				assertShortHelp(outLog.getLog());
 			}
 		});
@@ -43,11 +42,24 @@ public class JApiCmpTest {
 		exit.expectSystemExitWithStatus(2);
 		exit.checkAssertionAfterwards(new Assertion() {
 			public void checkAssertion() {
-				assertEquals("E: Found unexpected parameters: [--no]", errLog.getLog().trim());
+				assertEquals("E: Found unexpected parameters: [--no]\n", errLog.getOnlyLine());
 				assertShortHelp(outLog.getLog());
 			}
 		});
 		JApiCmp.main(new String[] { "--no" });
+	}
+
+	@Test
+	public void testMain_with_wip_semver_argument() {
+		exit.expectSystemExitWithStatus(128);
+		exit.checkAssertionAfterwards(new Assertion() {
+			public void checkAssertion() {
+				assertEquals(ImmutableList.of("E: semver diff option is not implemented", //
+						"E: no valid new archive found"), errLog.getLines());
+				assertShortHelp(outLog.getLog());
+			}
+		});
+		JApiCmp.main(new String[] { "--only-semver-diff" });
 	}
 
 	@Test
@@ -125,8 +137,7 @@ public class JApiCmpTest {
 		assertListsEquals(ImmutableList.of("NAME", "SYNOPSIS", "OPTIONS"), topicLines);
 	}
 
-	private static void assertListsEquals(ImmutableList<String> expected,
-			ImmutableList<String> actual) {
+	static void assertListsEquals(ImmutableList<String> expected, ImmutableList<String> actual) {
 		Joiner nlJoiner = Joiner.on("\n");
 		assertEquals(nlJoiner.join(expected), nlJoiner.join(actual));
 	}

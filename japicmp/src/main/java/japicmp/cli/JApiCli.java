@@ -2,19 +2,14 @@ package japicmp.cli;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.jar.JarFile;
 
-import com.google.common.base.Optional;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.exception.FormattedException;
 import japicmp.exception.JApiCmpException;
-import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.stdout.StdoutOutputGenerator;
@@ -44,21 +39,33 @@ public class JApiCli {
 		public String pathToXmlOutputFile;
 		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
+		@Option(name = { "--only-semver-diff"}, //
+				description = "Shows only the semver difference between new and old", //
+				hidden = true)
+		public boolean showOnlySemverDiff = false;
 
 		@Override
 		public void run() {
-
-			Options options = create(pathToOldVersionJar, pathToNewVersionJar, //
-					pathToXmlOutputFile, pathToHtmlOutputFile, //
-					modifiedOnly, toModifier(accessModifier), //
-					packagesToInclude, packagesToExclude, //
-					onlyBinaryIncompatibleModifications);
+			Options options = OptionsBuilder.create() //
+					.newJar(pathToNewVersionJar) //
+					.oldJar(pathToOldVersionJar) //
+					.xmlOutputFilename(pathToXmlOutputFile) //
+					.htmlOutputFilename(pathToHtmlOutputFile) //
+					.showModifiedOnly(modifiedOnly) //
+					.useOnlyVisibilty(accessModifier) //
+					.includePackages(packagesToInclude) //
+					.excludePackages(packagesToExclude) //
+					.showOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications) //
+					.showOnlySeverDiff(showOnlySemverDiff) //
+					.build();
 
 			File oldArchive = options.getOldArchive();
 			File newArchive = options.getNewArchive();
 			verifyFiles(oldArchive, newArchive);
+
 			JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(copyOptions(options));
 			List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
+
 			generateOutput(options, oldArchive, newArchive, jApiClasses);
 		}
 
@@ -75,71 +82,12 @@ public class JApiCli {
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
 				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
 				xmlGenerator.generate(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
-			}
-			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
-			String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses);
-			System.out.println(output);
-		}
-
-		private Options create(String oldArchive, String newArchive, //
-				String xmlOutputFile, String htmlOutputFile, //
-				boolean onlyModifications, Optional<AccessModifier> accessModifier, //
-				String packagesIncludeArg, String packagesExcludeArg, //
-				boolean onlyBinaryIncompatibleModifications) throws IllegalArgumentException {
-
-			Options options = new Options();
-			try {
-				options.setNewArchive(validFile(newArchive, "no valid new archive found"));
-				options.setOldArchive(validFile(oldArchive, "no valid old archive found"));
-				options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
-				options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
-				options.setOutputOnlyModifications(onlyModifications);
-				options.setAccessModifier(accessModifier);
-				options.addPackageIncludeFromArgument(Optional.fromNullable(packagesIncludeArg));
-				options.addPackagesExcludeFromArgument(Optional.fromNullable(packagesExcludeArg));
-				options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
-			} catch (IllegalArgumentException e) {
-				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-			return options;
-		}
-
-		private File validFile(String archive, String errorMessage) {
-			File file = new File(checkNonNull(archive, errorMessage));
-			verifyExisting(file);
-			verifyCanRead(file);
-			verifyJarArchive(file);
-			return file;
-		}
-
-		private void verifyCanRead(File file) {
-			if (!file.canRead()) {
-				throw JApiCmpException.of("Cannot read file '%s'.", file.getAbsolutePath());
-			}
-		}
-
-		private <T> T checkNonNull(T in, String errorMessage) {
-			if (in == null) {
-				throw new IllegalArgumentException(errorMessage);
+			} else if (options.isOnlySemverDiff()) {
+				System.err.println("E: semver diff output is not implemented"); // TODO
 			} else {
-				return in;
-			}
-		}
-
-		private Optional<AccessModifier> toModifier(String accessModifierArg) {
-			Optional<String> stringOptional = Optional.fromNullable(accessModifierArg);
-			if (stringOptional.isPresent()) {
-				try {
-					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
-				} catch (IllegalArgumentException e) {
-					throw FormattedException //
-							.ofIAE("Invalid value for option -a: %s. Possible values are: %s.", //
-									accessModifierArg, AccessModifier.listOfAccessModifier());
-				}
-			} else {
-				return Optional.of(AccessModifier.PUBLIC);
+				StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
+				String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses);
+				System.out.println(output);
 			}
 		}
 
@@ -149,18 +97,5 @@ public class JApiCli {
 			}
 		}
 
-		private void verifyExisting(File newArchive) {
-			if (!newArchive.exists()) {
-				throw JApiCmpException.of("File '%s' does not exist.", newArchive.getAbsolutePath());
-			}
-		}
-
-		private void verifyJarArchive(File file) {
-			try {
-				new JarFile(file);
-			} catch (IOException e) {
-				throw JApiCmpException.of("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
-			}
-		}
 	}
 }
