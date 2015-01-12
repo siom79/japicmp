@@ -1,8 +1,13 @@
 package japicmp.cli;
 
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.jar.JarFile;
+
 import com.google.common.base.Optional;
 import io.airlift.command.Command;
-import io.airlift.command.HelpOption;
 import io.airlift.command.Option;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -15,18 +20,12 @@ import japicmp.output.OutputFilter;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
 
-import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.jar.JarFile;
-
 public class JApiCli {
 
 	@Command(name = "java -jar japicmp.jar", description = "Compares jars")
 	public static class Compare implements Runnable {
 		@Inject
-		public HelpOption helpOption;
+		public ShortHelpOption helpOption;
 		@Option(name = { "-o", "--old" }, description = "Provides the path to the old version of the jar.")
 		public String pathToOldVersionJar;
 		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version of the jar.")
