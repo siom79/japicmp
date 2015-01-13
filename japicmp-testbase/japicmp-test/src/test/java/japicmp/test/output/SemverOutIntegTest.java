@@ -18,7 +18,7 @@ import org.junit.Test;
 public class SemverOutIntegTest {
 
 	@Test
-	public void testSemver001() {
+	public void testSemver001_new_private_method() {
 		String lastPackage = "semver001.a";
 
 		String string = getSemverDiff(lastPackage);
@@ -36,7 +36,7 @@ public class SemverOutIntegTest {
 	}
 
 	@Test
-	public void testSemver010() {
+	public void testSemver010_added_new_annotations() {
 		String lastPackage = "semver010.a";
 
 		String string = getSemverDiff(lastPackage);
@@ -45,7 +45,7 @@ public class SemverOutIntegTest {
 	}
 
 	@Test
-	public void testSemver010_package_to_public() {
+	public void testSemver010_increase_visibility_to_public() {
 		String lastPackage = "semver010.b";
 
 		String string = getSemverDiff(lastPackage);
@@ -56,6 +56,24 @@ public class SemverOutIntegTest {
 	@Test
 	public void testSemver100_change_method() {
 		String lastPackage = "semver100.a";
+
+		String string = getSemverDiff(lastPackage);
+
+		assertEquals("1.0.0", string);
+	}
+
+	@Test
+	public void testSemver100_reduce_class_visibility() {
+		String lastPackage = "semver100.b";
+
+		String string = getSemverDiff(lastPackage);
+
+		assertEquals("1.0.0", string);
+	}
+
+	@Test
+	public void testSemver100_reduce_method_visibility() {
+		String lastPackage = "semver100.c";
 
 		String string = getSemverDiff(lastPackage);
 

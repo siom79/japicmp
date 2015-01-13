@@ -16,7 +16,6 @@ import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
 import japicmp.model.JApiImplementedInterface;
 import japicmp.model.JApiMethod;
-import org.hamcrest.core.StringEndsWith;
 
 public class Helper {
 
@@ -41,7 +40,7 @@ public class Helper {
         }
         throw new IllegalArgumentException("No method found with name " + name + ".");
     }
-    
+
     public static JApiField getJApiField(List<JApiField> jApiFields, String name) {
     	for(JApiField jApiField : jApiFields) {
     		if(jApiField.getName().equals(name)) {
@@ -50,7 +49,7 @@ public class Helper {
     	}
     	throw new IllegalArgumentException("No field found with name " + name + ".");
     }
-    
+
     public static JApiImplementedInterface getJApiImplementedInterface(List<JApiImplementedInterface> jApiImplementedInterfaces, String name) {
     	for(JApiImplementedInterface jApiImplementedInterface : jApiImplementedInterfaces) {
     		if(jApiImplementedInterface.getFullyQualifiedName().equals(name)) {
@@ -59,7 +58,7 @@ public class Helper {
     	}
     	throw new IllegalArgumentException("No interface found with name " + name + ".");
     }
-    
+
     public static JApiAnnotation getJApiAnnotation(List<JApiAnnotation> annotations, String name) {
         for(JApiAnnotation annotation : annotations) {
             if(annotation.getFullyQualifiedName().equals(name)) {
@@ -80,8 +79,11 @@ public class Helper {
 
     public static File getArchiveLike(final String filenamePart) {
         File root = new File(".").getAbsoluteFile();
-        org.hamcrest.MatcherAssert.assertThat(root.getAbsolutePath(), //
-            new StringEndsWith("/japicmp-testbase/japicmp-test/."));
+        Path testPath = Paths.get("japicmp-testbase", "japicmp-test", ".");
+
+        File absoluteFile = root.getAbsoluteFile();
+        assertTrue(absoluteFile.toString() + " must end with " + testPath.toString(),
+		        absoluteFile.toPath().endsWith(testPath));
         Path target = root.toPath().resolve(Paths.get("..", filenamePart, "target"));
         File targetDir = target.toFile().getAbsoluteFile();
         assertTrue(targetDir.isDirectory());
