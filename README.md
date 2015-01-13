@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.2.2.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.2.3-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository. The corresponding dependen
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.2.2</version>
+		<version>0.2.3</version>
 	</dependency>
 
 ##Motivation##
@@ -103,7 +103,7 @@ japicmp has a set of CLI parameters that are described in the following:
 When your library under investigation implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
-	java -cp japicmp-0.2.2.jar;otherLibrary.jar;japicmp-0.2.2.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.2.3-SNAPSHOT-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
 ###Usage maven plugin###
 
@@ -114,13 +114,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.2.2</version>
+                <version>0.2.3</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.2.2</version>
+                            <version>0.2.3</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -298,6 +298,9 @@ As can bee seen from the output above, the XML attributes title and author have 
 
 The following releases are available:
 
+* [Version 0.2.3](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.3)
+	* Changes:
+		* [Fails to recognize changed interfaces](https://github.com/siom79/japicmp/issues/12)
 * [Version 0.2.2](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.2)
 	* Changes:
 		* [japicmp should provide a single page HTML report](https://github.com/siom79/japicmp/issues/18)
