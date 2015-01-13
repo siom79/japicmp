@@ -80,6 +80,15 @@ public class SemverOutIntegTest {
 		assertEquals("1.0.0", string);
 	}
 
+	@Test
+	public void testSemver100_superclass_with_field() {
+		String lastPackage = "semver100.d";
+
+		String string = getSemverDiff(lastPackage);
+
+		assertEquals("1.0.0", string);
+	}
+
 	private String getSemverDiff(String lastPackage) {
 		JarArchiveComparator jarArchiveComparator = newComparator(lastPackage);
 		File oldFile = Helper.getArchiveLike("japicmp-test-v1");
