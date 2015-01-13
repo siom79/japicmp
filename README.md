@@ -103,7 +103,7 @@ japicmp has a set of CLI parameters that are described in the following:
 When your library under investigation implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
-	java -cp japicmp-0.2.2.jar;otherLibrary.jar -jar japicmp-0.2.2.jar -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.2.2.jar;otherLibrary.jar;japicmp-0.2.2.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
 ###Usage maven plugin###
 
