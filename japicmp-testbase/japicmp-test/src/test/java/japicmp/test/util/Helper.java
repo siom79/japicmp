@@ -76,27 +76,4 @@ public class Helper {
         }
         throw new IllegalArgumentException("No annotation element found with name " + name + ".");
     }
-
-    public static File getArchiveLike(final String filenamePart) {
-        File root = new File(".").getAbsoluteFile();
-        Path testPath = Paths.get("japicmp-testbase", "japicmp-test", ".");
-
-        File absoluteFile = root.getAbsoluteFile();
-        assertTrue(absoluteFile.toString() + " must end with " + testPath.toString(),
-		        absoluteFile.toPath().endsWith(testPath));
-        Path target = root.toPath().resolve(Paths.get("..", filenamePart, "target"));
-        File targetDir = target.toFile().getAbsoluteFile();
-        assertTrue(targetDir.isDirectory());
-        ImmutableList<File> list = ImmutableList.copyOf(targetDir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                String name = file.getName();
-                return name.startsWith(filenamePart) && name.endsWith(".jar") &&
-                    !name.contains("javadoc") && !name.contains("sources");
-            }
-        }));
-        File onlyFile = Iterables.getOnlyElement(list);
-        assertTrue(onlyFile.canRead());
-        return onlyFile;
-    }
 }
