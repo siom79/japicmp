@@ -19,20 +19,9 @@ import org.junit.Test;
 public class SemverOutIntegTest {
 
 	@Test
-	@Ignore
-	public void testSemver001_new_private_method() {
-		String lastPackage = "semver.t001";
+	public void testSemver001_implementation_of_method_changes() {
+		String lastPackage = "semver001.a";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("0.0.1", string);
-	}
-
-	@Test
-	@Ignore
-	public void testSemver001_new_package_visible_type() {
-		String lastPackage = "semver001.b";
-
-		String string = getSemverDiff(lastPackage);
-
 		assertEquals("0.0.1", string);
 	}
 

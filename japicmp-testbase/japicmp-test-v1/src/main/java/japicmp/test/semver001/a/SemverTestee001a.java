@@ -2,19 +2,11 @@ package japicmp.test.semver001.a;
 
 public class SemverTestee001a {
 
-	public void doNothing() {
+	public void methodUnchanged() {
 
 	}
 
-	void doSomething() {
-
-	}
-
-	protected void doAll() {
-
-	}
-
-	private void doIt() {
-
+	public int methodImplementationChanges(int a, int b) {
+		return a + b;
 	}
 }
