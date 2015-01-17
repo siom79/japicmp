@@ -64,6 +64,11 @@ public class SemverOut extends OutputGenerator {
 			for (JApiAnnotationElement jApiAnnotationElement : elements) {
 				builder.add(signs(jApiAnnotationElement));
 			}
+			if ("java.lang.Deprecated".equals(jApiAnnotation.getFullyQualifiedName())) {
+				if (jApiAnnotation.getChangeStatus().equals(JApiChangeStatus.NEW)) {
+					builder.add(SemverStatus.CHANGED_BINARY_COMPATIBLE);
+				}
+			}
 		}
 		return builder.build();
 	}

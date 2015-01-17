@@ -26,12 +26,9 @@ public class SemverOutIntegTest {
 	}
 
 	@Test
-	@Ignore
-	public void testSemver010_added_new_annotations() {
+	public void testSemver010_added_deprecated_annotation() {
 		String lastPackage = "semver010.a";
-
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("0.1.0", string);
 	}
 
