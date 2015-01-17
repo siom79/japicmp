@@ -33,11 +33,9 @@ public class SemverOutIntegTest {
 	}
 
 	@Test
-	public void testSemver010_increase_visibility_to_public() {
+	public void testSemver010_increase_visibility_of_class_from_default_to_public() {
 		String lastPackage = "semver010.b";
-
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("0.1.0", string);
 	}
 
