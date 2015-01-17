@@ -3,21 +3,21 @@ package japicmp.test.semver100.a;
 public class SemverTestee100a {
 
 	@Deprecated
-	public void doNothing(int value) {
+	public void methodAnnotationDeprecatedAddedAndParameterIntAdded(int value) {
 
 	}
 
 	@Deprecated
-	void doSomething() {
+	void methodAnnotationDeprecatedAdded() {
 
 	}
 
 	@Deprecated
-	protected String doAll() {
+	protected String methodReturnValueChangesFromVoidToString() {
 		return null;
 	}
 
-	private void doItReal() {
+	private void methodAdded() {
 
 	}
 }

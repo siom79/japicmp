@@ -32,16 +32,10 @@ public class SemverOut extends OutputGenerator {
 	}
 
 	public String value() {
-		options.setOutputOnlyModifications(true);
-		options.setAccessModifier(AccessModifier.PUBLIC);
-
 		return generate(jApiClasses);
 	}
 
 	public String generate(List<JApiClass> jApiClasses) {
-		OutputFilter outputFilter = new OutputFilter(options);
-		outputFilter.filter(jApiClasses);
-
 		ImmutableSet.Builder<SemverStatus> builder = ImmutableSet.builder();
 		for (JApiClass jApiClass : jApiClasses) {
 			builder.addAll(processClass(jApiClass));
@@ -50,16 +44,15 @@ public class SemverOut extends OutputGenerator {
 			builder.addAll(processAnnotations(jApiClass));
 		}
 		ImmutableSet<SemverStatus> build = builder.build();
-		if (build.contains(SemverStatus.MAJOR)) {
+		if (build.contains(SemverStatus.CHANGED_BINARY_INCOMPATIBLE)) {
 			return "1.0.0";
-		} else if (build.contains(SemverStatus.MINOR)) {
+		} else if (build.contains(SemverStatus.CHANGED_BINARY_COMPATIBLE)) {
 			return "0.1.0";
-		} else if (build.isEmpty() || build.contains(SemverStatus.PATCH)) {
+		} else if (build.isEmpty() || build.contains(SemverStatus.UNCHANGED)) {
 			return "0.0.1";
 		} else {
 			return "N/A";
 		}
-
 	}
 
 	private ImmutableSet<SemverStatus> processAnnotations(JApiHasAnnotations jApiClass) {
@@ -97,7 +90,6 @@ public class SemverOut extends OutputGenerator {
 
 	private ImmutableSet<SemverStatus> processClass(JApiClass jApiClass) {
 		ImmutableSet.Builder<SemverStatus> builder = ImmutableSet.builder();
-		// builder.add(signs(jApiClass)); // XXX why not
 		builder.addAll(processInterfaceChanges(jApiClass));
 		builder.add(processSuperclassChanges(jApiClass));
 		builder.addAll(processFieldChanges(jApiClass));
@@ -107,25 +99,22 @@ public class SemverOut extends OutputGenerator {
 	static SemverStatus signs(JApiHasChangeStatus hasChangeStatus) {
 		JApiChangeStatus changeStatus = hasChangeStatus.getChangeStatus();
 		switch (changeStatus) {
-		case UNCHANGED:
-			return SemverStatus.PATCH;
-		case NEW:
-			return SemverStatus.MINOR;
-		case REMOVED:
-			return SemverStatus.MAJOR;
-		case MODIFIED:
-			if (hasChangeStatus instanceof JApiBinaryCompatibility) {
-				JApiBinaryCompatibility binaryCompatibility = (JApiBinaryCompatibility) hasChangeStatus;
-				if (binaryCompatibility.isBinaryCompatible()) {
-					return SemverStatus.MINOR;
-				} else {
-					return SemverStatus.MAJOR;
+			case UNCHANGED:
+				return SemverStatus.UNCHANGED;
+			case NEW:
+			case REMOVED:
+			case MODIFIED:
+				if (hasChangeStatus instanceof JApiBinaryCompatibility) {
+					JApiBinaryCompatibility binaryCompatibility = (JApiBinaryCompatibility) hasChangeStatus;
+					if (binaryCompatibility.isBinaryCompatible()) {
+						return SemverStatus.CHANGED_BINARY_COMPATIBLE;
+					} else {
+						return SemverStatus.CHANGED_BINARY_INCOMPATIBLE;
+					}
 				}
-			}
-		default:
-			throw new IllegalStateException();
+			default:
+				throw new IllegalStateException();
 		}
-
 	}
 
 	private ImmutableSet<SemverStatus> processFieldChanges(JApiClass jApiClass) {
@@ -153,6 +142,6 @@ public class SemverOut extends OutputGenerator {
 	}
 
 	static enum SemverStatus {
-		MAJOR, MINOR, PATCH;
+		UNCHANGED, CHANGED_BINARY_COMPATIBLE, CHANGED_BINARY_INCOMPATIBLE;
 	}
 }

@@ -2,19 +2,19 @@ package japicmp.test.semver100.a;
 
 public class SemverTestee100a {
 
-	public void doNothing() {
+	public void methodAnnotationDeprecatedAddedAndParameterIntAdded() {
 
 	}
 
-	void doSomething() {
+	void methodAnnotationDeprecatedAdded() {
 
 	}
 
-	protected void doAll() {
+	protected void methodReturnValueChangesFromVoidToString() {
 
 	}
 
-	private void doIt() {
+	private void methodRemoved() {
 
 	}
 }

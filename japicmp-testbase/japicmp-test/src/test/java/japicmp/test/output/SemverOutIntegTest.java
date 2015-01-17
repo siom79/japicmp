@@ -19,15 +19,15 @@ import org.junit.Test;
 public class SemverOutIntegTest {
 
 	@Test
+	@Ignore
 	public void testSemver001_new_private_method() {
-		String lastPackage = "semver001.a";
-
+		String lastPackage = "semver.t001";
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("0.0.1", string);
 	}
 
 	@Test
+	@Ignore
 	public void testSemver001_new_package_visible_type() {
 		String lastPackage = "semver001.b";
 
@@ -37,6 +37,7 @@ public class SemverOutIntegTest {
 	}
 
 	@Test
+	@Ignore
 	public void testSemver010_added_new_annotations() {
 		String lastPackage = "semver010.a";
 
@@ -82,7 +83,6 @@ public class SemverOutIntegTest {
 	}
 
 	@Test
-	@Ignore("TODO")
 	public void testSemver100_superclass_with_field() {
 		String lastPackage = "semver100.d";
 
