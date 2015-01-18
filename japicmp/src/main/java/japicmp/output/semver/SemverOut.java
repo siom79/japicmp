@@ -64,7 +64,7 @@ public class SemverOut extends OutputGenerator {
 			for (JApiAnnotationElement jApiAnnotationElement : elements) {
 				builder.add(signs(jApiAnnotationElement));
 			}
-			if ("java.lang.Deprecated".equals(jApiAnnotation.getFullyQualifiedName())) {
+			if (Deprecated.class.getCanonicalName().equals(jApiAnnotation.getFullyQualifiedName())) {
 				if (jApiAnnotation.getChangeStatus().equals(JApiChangeStatus.NEW)) {
 					builder.add(SemverStatus.CHANGED_BINARY_COMPATIBLE);
 				}
@@ -116,9 +116,11 @@ public class SemverOut extends OutputGenerator {
 					} else {
 						return SemverStatus.CHANGED_BINARY_INCOMPATIBLE;
 					}
+				} else {
+					throw new IllegalStateException("Element '" + hasChangeStatus.getClass().getCanonicalName() + " does not implement '" + JApiBinaryCompatibility.class.getCanonicalName() + "'.");
 				}
 			default:
-				throw new IllegalStateException();
+				throw new IllegalStateException("The following JApiChangeStatus is not supported: " + (changeStatus == null ? "null" : changeStatus.name()));
 		}
 	}
 
