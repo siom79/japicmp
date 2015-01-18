@@ -1,42 +1,34 @@
 package japicmp;
 
+import io.airlift.command.Help;
 import io.airlift.command.ParseException;
 import io.airlift.command.SingleCommand;
 import japicmp.cli.JApiCli;
-import japicmp.cli.ShortHelpOption;
 import japicmp.exception.JApiCmpException;
 
 public class JApiCmp {
 
 	public static void main(String[] args) {
+		SingleCommand<JApiCli.Compare> singleCommand = SingleCommand.singleCommand(JApiCli.Compare.class);
 		try {
-			run(args);
-			System.exit(0);
+			JApiCli.Compare cmd = singleCommand.parse(args);
+			if (!cmd.helpOption.showHelpIfRequested()) {
+				cmd.run();
+			}
 		} catch (ParseException e) {
 			System.err.println("E: " + e.getMessage());
-			ShortHelpOption.shortHelp(getCmdParser().getCommandMetadata());
-			System.exit(2);
+			Help.help(singleCommand.getCommandMetadata());
+			System.exit(-1);
 		} catch (JApiCmpException e) {
 			if (e.getReason() != JApiCmpException.Reason.NormalTermination) {
 				System.err.println("E: " + e.getMessage());
-				ShortHelpOption.shortHelp(getCmdParser().getCommandMetadata());
-				System.exit(128);
+				Help.help(singleCommand.getCommandMetadata());
+				System.exit(-1);
 			}
 		} catch (Exception e) {
 			System.err.println(String.format("Execution of %s failed: %s", JApiCmp.class.getSimpleName(), e.getMessage()));
 			e.printStackTrace();
-			System.exit(1);
+			System.exit(-2);
 		}
-	}
-
-	private static void run(String[] args) {
-		JApiCli.Compare cmd = getCmdParser().parse(args);
-		if (!cmd.helpOption.showHelpIfRequested()) {
-			cmd.run();
-		}
-	}
-
-	private static SingleCommand<JApiCli.Compare> getCmdParser() {
-		return SingleCommand.singleCommand(JApiCli.Compare.class);
 	}
 }

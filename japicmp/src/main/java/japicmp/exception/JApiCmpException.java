@@ -5,11 +5,12 @@ public class JApiCmpException extends RuntimeException {
 	private final Reason reason;
 
 	public enum Reason {
-		IllegalArgument, //
-		NormalTermination, //
-		IoException, //
-		JaxbException, //
-		ClassLoading, XsltError
+		IllegalArgument,
+		NormalTermination,
+		IoException,
+		JaxbException,
+		ClassLoading,
+		XsltError
 	}
 
 	public JApiCmpException(Reason reason, String msg) {

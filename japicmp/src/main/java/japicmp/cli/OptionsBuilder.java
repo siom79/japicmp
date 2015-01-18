@@ -11,7 +11,6 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 
 class OptionsBuilder {
-
 	private String pathToNewVersionJar;
 	private String pathToOldVersionJar;
 	private String pathToXmlOutputFile;
@@ -26,7 +25,7 @@ class OptionsBuilder {
 	static Options create(OptionsBuilder builder) {
 		Options options = new Options();
 		try {
-			options.setNewArchive(validFile(builder.pathToNewVersionJar, "no valid new archive found"));
+			options.setNewArchive(validFile(builder.pathToNewVersionJar, "C"));
 			options.setOldArchive(validFile(builder.pathToOldVersionJar, "no valid old archive found"));
 			options.setXmlOutputFile(Optional.fromNullable(builder.pathToXmlOutputFile));
 			options.setHtmlOutputFile(Optional.fromNullable(builder.pathToHtmlOutputFile));
@@ -36,10 +35,8 @@ class OptionsBuilder {
 			options.addPackagesExcludeFromArgument(Optional.fromNullable(builder.packagesToExclude));
 			options.setOutputOnlyBinaryIncompatibleModifications(builder.onlyBinaryIncompatibleModifications);
 			options.setShowOnlySemverDiff(builder.showOnlySemverDiff);
-		} catch (IllegalArgumentException e) {
-			throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
 		} catch (Exception e) {
-			throw new IllegalStateException(e);
+			throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
 		}
 		return options;
 	}
