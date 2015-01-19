@@ -22,38 +22,53 @@ public class SemverOutIntegTest {
 	public static final String MAJOR = "1.0.0";
 
 	@Test
-	public void testSemver001_implementation_of_method_changes() {
+	public void testSemver_implementation_of_method_changes() {
 		assertSemverDiffByPackage(PATCH, "implementationChange");
 	}
 
 	@Test
-	public void testSemver010_added_deprecated_annotation() {
+	public void testSemver_removed_interface_from_default_class() {
+		assertSemverDiffByPackage(PATCH, "removedInterfaceFromDefault");
+	}
+
+	@Test
+	public void testSemver_added_deprecated_annotation() {
 		assertSemverDiffByPackage(MINOR, "addedPublicDeprecation"); // TODO is this MINOR?
 	}
 
 	@Test
-	public void testSemver010_increase_visibility_of_class_from_default_to_public() {
+	public void testSemver_increase_visibility_of_class_from_default_to_public() {
 		assertSemverDiffByPackage(MINOR, "changesFromDefaultToPublic");
 	}
 
 	@Test
-	public void testSemver100_change_method() {
+	public void testSemver_change_method() {
 		assertSemverDiffByPackage(MAJOR, "publicMethodParamChange");
 	}
 
 	@Test
-	public void testSemver100_reduce_class_visibility() {
+	public void testSemver_reduce_class_visibility() {
 		assertSemverDiffByPackage(MAJOR, "changesFromPublicToDefault");
 	}
 
 	@Test
-	public void testSemver100_reduce_method_visibility() {
+	public void testSemver_reduce_method_visibility() {
 		assertSemverDiffByPackage(MAJOR, "changesMethodFromPublicToDefault");
 	}
 
 	@Test
-	public void testSemver100_superclass_with_field() {
+	public void testSemver_superclass_with_field() {
 		assertSemverDiffByPackage(MAJOR, "superclassWithField");
+	}
+
+	@Test
+	public void testSemver_removed_interface_from_public_class() {
+		assertSemverDiffByPackage(MAJOR, "removedInterfaceFromPublic");
+	}
+
+	@Test
+	public void testSemver_removed_interface_from_public_class_without_methods() {
+		assertSemverDiffByPackage(MAJOR, "removedInterfaceFromPublicWithoutMethods");
 	}
 
 	private void assertSemverDiffByPackage(String expectedSemverDiff, String lastPackageName) {
