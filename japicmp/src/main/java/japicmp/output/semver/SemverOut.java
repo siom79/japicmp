@@ -2,9 +2,9 @@ package japicmp.output.semver;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import japicmp.config.Options;
-import japicmp.model.AccessModifier;
 import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiAnnotationElement;
 import japicmp.model.JApiBinaryCompatibility;
@@ -17,25 +17,12 @@ import japicmp.model.JApiHasChangeStatus;
 import japicmp.model.JApiImplementedInterface;
 import japicmp.model.JApiMethod;
 import japicmp.model.JApiSuperclass;
-import japicmp.output.OutputFilter;
-import japicmp.output.OutputGenerator;
+import japicmp.output.Output;
 
-public class SemverOut extends OutputGenerator {
-
-	public SemverOut(Options options, List<JApiClass> jApiClasses) {
-		super(options, jApiClasses);
-	}
+public class SemverOut implements Output {
 
 	@Override
-	public void generate() {
-		System.err.println(value());
-	}
-
-	public String value() {
-		return generate(jApiClasses);
-	}
-
-	public String generate(List<JApiClass> jApiClasses) {
+	public Optional<String> generate(ImmutableList<JApiClass> jApiClasses) {
 		ImmutableSet.Builder<SemverStatus> builder = ImmutableSet.builder();
 		for (JApiClass jApiClass : jApiClasses) {
 			builder.addAll(processClass(jApiClass));
@@ -45,13 +32,13 @@ public class SemverOut extends OutputGenerator {
 		}
 		ImmutableSet<SemverStatus> build = builder.build();
 		if (build.contains(SemverStatus.CHANGED_BINARY_INCOMPATIBLE)) {
-			return "1.0.0";
+			return Optional.of("1.0.0");
 		} else if (build.contains(SemverStatus.CHANGED_BINARY_COMPATIBLE)) {
-			return "0.1.0";
+			return Optional.of("0.1.0");
 		} else if (build.isEmpty() || build.contains(SemverStatus.UNCHANGED)) {
-			return "0.0.1";
+			return Optional.of("0.0.1");
 		} else {
-			return "N/A";
+			return Optional.of("N/A");
 		}
 	}
 
@@ -101,26 +88,32 @@ public class SemverOut extends OutputGenerator {
 		return builder.build();
 	}
 
+	/**
+	 * Visible for testing
+	 */
 	static SemverStatus signs(JApiHasChangeStatus hasChangeStatus) {
 		JApiChangeStatus changeStatus = hasChangeStatus.getChangeStatus();
 		switch (changeStatus) {
-			case UNCHANGED:
-				return SemverStatus.UNCHANGED;
-			case NEW:
-			case REMOVED:
-			case MODIFIED:
-				if (hasChangeStatus instanceof JApiBinaryCompatibility) {
-					JApiBinaryCompatibility binaryCompatibility = (JApiBinaryCompatibility) hasChangeStatus;
-					if (binaryCompatibility.isBinaryCompatible()) {
-						return SemverStatus.CHANGED_BINARY_COMPATIBLE;
-					} else {
-						return SemverStatus.CHANGED_BINARY_INCOMPATIBLE;
-					}
+		case UNCHANGED:
+			return SemverStatus.UNCHANGED;
+		case NEW:
+		case REMOVED:
+		case MODIFIED:
+			if (hasChangeStatus instanceof JApiBinaryCompatibility) {
+				JApiBinaryCompatibility binaryCompatibility = (JApiBinaryCompatibility) hasChangeStatus;
+				if (binaryCompatibility.isBinaryCompatible()) {
+					return SemverStatus.CHANGED_BINARY_COMPATIBLE;
 				} else {
-					throw new IllegalStateException("Element '" + hasChangeStatus.getClass().getCanonicalName() + " does not implement '" + JApiBinaryCompatibility.class.getCanonicalName() + "'.");
+					return SemverStatus.CHANGED_BINARY_INCOMPATIBLE;
 				}
-			default:
-				throw new IllegalStateException("The following JApiChangeStatus is not supported: " + (changeStatus == null ? "null" : changeStatus.name()));
+			} else {
+				throw new IllegalStateException(
+						"Element '" + hasChangeStatus.getClass().getCanonicalName() + " does not implement '" +
+								JApiBinaryCompatibility.class.getCanonicalName() + "'.");
+			}
+		default:
+			throw new IllegalStateException("The following JApiChangeStatus is not supported: " +
+					(changeStatus == null ? "null" : changeStatus.name()));
 		}
 	}
 
@@ -148,6 +141,9 @@ public class SemverOut extends OutputGenerator {
 		return builder.build();
 	}
 
+	/**
+	 * Visible for testing
+	 */
 	static enum SemverStatus {
 		UNCHANGED, CHANGED_BINARY_COMPATIBLE, CHANGED_BINARY_INCOMPATIBLE;
 	}

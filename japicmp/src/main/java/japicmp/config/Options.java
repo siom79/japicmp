@@ -79,7 +79,13 @@ public class Options {
 	}
 
 	public void addPackagesExcludeFromArgument(Optional<String> packagesExcludeArg) {
-		packagesExclude = apply(packagesExcludeArg, packagesExclude, "Wrong syntax for package exclude option '%s': %s");
+		packagesExclude = applyExclude(packagesExcludeArg, packagesExclude);
+	}
+
+	 static ImmutableList<PackageFilter> applyExclude(Optional<String> packagesExcludeArg,
+			List<PackageFilter> in) {
+		return apply(packagesExcludeArg, in,
+				"Wrong syntax for package exclude option '%s': %s");
 	}
 
 	public void addPackageIncludeFromArgument(String packagesIncludeArg) {
@@ -87,21 +93,40 @@ public class Options {
 	}
 
 	public void addPackageIncludeFromArgument(Optional<String> packagesIncludeArg) {
-		packagesInclude = apply(packagesIncludeArg, packagesInclude, "Wrong syntax for include exclude option '%s': %s");
+		packagesInclude = applyInclude(packagesIncludeArg, packagesInclude);
 	}
 
-	private List<PackageFilter> apply(Optional<String> filterString, List<PackageFilter> packages, String format) {
-		for (String part : Splitter.on(",").trimResults().omitEmptyStrings().split(filterString.or(""))) {
+	static ImmutableList<PackageFilter> applyInclude(Optional<String> packagesIncludeArg,
+			List<PackageFilter> in) {
+		return apply(packagesIncludeArg, in,
+				"Wrong syntax for package include option '%s': %s");
+	}
+
+	void setPackagesInclude(ImmutableList<PackageFilter> packagesInclude) {
+		this.packagesInclude = packagesInclude;
+	}
+
+	void setPackagesExclude(ImmutableList<PackageFilter> packagesExclude) {
+		this.packagesExclude = packagesExclude;
+	}
+
+	private static ImmutableList<PackageFilter> apply(Optional<String> filterString,
+			List<PackageFilter> packages,
+			String format) {
+		ImmutableList.Builder<PackageFilter> builder = ImmutableList.builder();
+		builder.addAll(packages);
+		for (String part : Splitter.on(",").trimResults().omitEmptyStrings()
+				.split(filterString.or(""))) {
 			try {
-				packages.add(new PackageFilter(part));
+				builder.add(new PackageFilter(part));
 			} catch (Exception e) {
 				throw FormattedException.ofIAE(format, part, e.getMessage());
 			}
 		}
-		return packages;
+		return builder.build();
 	}
-
-	public void setOutputOnlyBinaryIncompatibleModifications(boolean outputOnlyBinaryIncompatibleModifications) {
+	public void setOutputOnlyBinaryIncompatibleModifications(
+			boolean outputOnlyBinaryIncompatibleModifications) {
 		this.outputOnlyBinaryIncompatibleModifications = outputOnlyBinaryIncompatibleModifications;
 	}
 
@@ -124,4 +149,5 @@ public class Options {
 	public boolean isOnlySemverDiff() {
 		return showOnlySemverDiff;
 	}
+
 }

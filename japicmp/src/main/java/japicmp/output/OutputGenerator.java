@@ -1,19 +1,16 @@
 package japicmp.output;
 
-import java.util.List;
-
-import japicmp.config.Options;
+import com.google.common.collect.ImmutableList;
+import japicmp.config.ImmutableOptions;
 import japicmp.model.JApiClass;
 
-public abstract class OutputGenerator {
+public abstract class OutputGenerator implements Output {
 
-	protected final Options options;
-	protected final List<JApiClass> jApiClasses;
+	protected final ImmutableOptions options;
+	protected final ImmutableList<JApiClass> jApiClasses;
 
-	public OutputGenerator(Options options, List<JApiClass> jApiClasses) {
+	public OutputGenerator(ImmutableOptions options, ImmutableList<JApiClass> jApiClasses) {
 		this.options = options;
 		this.jApiClasses = jApiClasses;
 	}
-
-	public abstract void generate();
 }

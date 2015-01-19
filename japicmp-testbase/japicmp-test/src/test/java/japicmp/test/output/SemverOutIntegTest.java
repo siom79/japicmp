@@ -2,17 +2,8 @@ package japicmp.test.output;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.util.List;
-
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.config.Options;
-import japicmp.config.PackageFilter;
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiClass;
 import japicmp.output.semver.SemverOut;
-import japicmp.test.util.Helper;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SemverOutIntegTest {
@@ -23,51 +14,70 @@ public class SemverOutIntegTest {
 
 	@Test
 	public void testSemver_implementation_of_method_changes() {
+		// should be PATCH because implementation details does not affect public api
+		// but it could be MINOR or MAJOR, but this is hard to detect automatically
 		assertSemverDiffByPackage(PATCH, "implementationChange");
 	}
 
 	@Test
+	public void testSemver_added_public_source_annotation() {
+		// should be PATCH because it is not visible at runtime
+		assertSemverDiffByPackage(PATCH, "addedPublicDocAnnotation");
+	}
+
+	@Test
+	@Ignore("TODO") // TODO
 	public void testSemver_removed_interface_from_default_class() {
+		// should be PATCH because package protected classes are not part of public API
+		// "Package by feature, not layer" -> http://www.javapractices.com/topic/TopicAction.do?Id=205
 		assertSemverDiffByPackage(PATCH, "removedInterfaceFromDefault");
 	}
 
 	@Test
-	public void testSemver_added_deprecated_annotation() {
-		assertSemverDiffByPackage(MINOR, "addedPublicDeprecation"); // TODO is this MINOR?
+	public void testSemver_added_public_runtime_annotation() {
+		// should be MINOR because it is an new information for public API
+		assertSemverDiffByPackage(MINOR, "addedCustomPublicAnnotation");
 	}
 
 	@Test
 	public void testSemver_increase_visibility_of_class_from_default_to_public() {
+		// should be MINOR because a new class will be visible for all
 		assertSemverDiffByPackage(MINOR, "changesFromDefaultToPublic");
 	}
 
 	@Test
 	public void testSemver_change_method() {
+		// should be MAJOR because it is an API break
 		assertSemverDiffByPackage(MAJOR, "publicMethodParamChange");
 	}
 
 	@Test
 	public void testSemver_reduce_class_visibility() {
+		// should be MAJOR because it is an API break
 		assertSemverDiffByPackage(MAJOR, "changesFromPublicToDefault");
 	}
 
 	@Test
 	public void testSemver_reduce_method_visibility() {
+		// should be MAJOR because it is an API break
 		assertSemverDiffByPackage(MAJOR, "changesMethodFromPublicToDefault");
 	}
 
 	@Test
 	public void testSemver_superclass_with_field() {
+		// should be MAJOR because it is an API break
 		assertSemverDiffByPackage(MAJOR, "superclassWithField");
 	}
 
 	@Test
 	public void testSemver_removed_interface_from_public_class() {
+		// should be MAJOR because it is an API break e.g. instanceof checks
 		assertSemverDiffByPackage(MAJOR, "removedInterfaceFromPublic");
 	}
 
 	@Test
 	public void testSemver_removed_interface_from_public_class_without_methods() {
+		// should be MAJOR because it is an API break e.g. instanceof checks
 		assertSemverDiffByPackage(MAJOR, "removedInterfaceFromPublicWithoutMethods");
 	}
 
@@ -76,22 +86,10 @@ public class SemverOutIntegTest {
 	}
 
 	private String getSemverDiffByPackage(String lastPackage) {
-		File oldFile = Helper.getArchive("japicmp-test-v1.jar");
-		File newFile = Helper.getArchive("japicmp-test-v2.jar");
+		OutputTestHelper.Config config = //
+				OutputTestHelper.newTestConfigWithInclude("japicmp.test.semver." + lastPackage);
 
-		List<JApiClass> jApiClasses = newComparatorFor(lastPackage).compare(oldFile, newFile);
-		Options options = new Options();
-		options.setNewArchive(newFile);
-		options.setOldArchive(oldFile);
-		options.setAccessModifier(AccessModifier.PRIVATE);
-		options.setOutputOnlyModifications(false);
-		return new SemverOut(options, jApiClasses).value();
+		return new SemverOut().generate(config.classes()).get();
 	}
 
-	private JarArchiveComparator newComparatorFor(String lastPackage) {
-		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		String packageName = "japicmp.test.semver." + lastPackage;
-		options.getPackagesInclude().add(new PackageFilter(packageName));
-		return new JarArchiveComparator(options);
-	}
 }

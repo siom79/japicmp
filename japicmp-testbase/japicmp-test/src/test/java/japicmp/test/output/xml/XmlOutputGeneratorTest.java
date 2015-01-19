@@ -1,34 +1,58 @@
 package japicmp.test.output.xml;
 
-import static japicmp.test.util.Helper.getArchive;
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.config.Options;
-import japicmp.model.JApiClass;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
+import japicmp.config.ImmutableOptions;
 import japicmp.output.xml.XmlOutputGenerator;
-
-import java.util.List;
-
-import org.junit.BeforeClass;
+import japicmp.test.output.OutputTestHelper;
 import org.junit.Test;
 
-import com.google.common.base.Optional;
-
 public class XmlOutputGeneratorTest {
-    private static List<JApiClass> jApiClasses;
-
-    @BeforeClass
-    public static void beforeClass() {
-        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
-        jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-    }
 
 	@Test
 	public void testHtmlOutput() {
+		// GIVEN
+		OutputTestHelper.Config config = OutputTestHelper.newTestConfig();
 		XmlOutputGenerator generator = new XmlOutputGenerator();
-		Options options = new Options();
-		options.setXmlOutputFile(Optional.of("target/diff.xml"));
-		options.setHtmlOutputFile(Optional.of("target/diff.html"));
-		generator.generate("/old/Path", "/new/Path", jApiClasses, options);
+		String xmlOutputFileName = "target/diff.xml";
+		String htmlOutputFileName = "target/diff.html";
+		ImmutableOptions options = config.options() //
+				.withXmlOutputFileName(xmlOutputFileName) //
+				.withHtmlOutputFileName(htmlOutputFileName) //
+				.build();
+
+		// WHEN
+		generator.generate("/old/Path", "/new/Path", config.classes(), options.copyToOptions());
+
+		// THEN
+		// TODO
+		if (false) {
+			assertEquals(toString("diff.html"), toString(new File(htmlOutputFileName)));
+			assertEquals(toString("diff.xml"), toString(new File(xmlOutputFileName)));
+		}
+	}
+
+	private String toString(String resourceName) {
+		try {
+			File file = new File(Resources.getResource(resourceName).toURI());
+			return toString(file);
+		} catch (URISyntaxException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	private String toString(File file) {
+		try {
+			return Files.toString(file, Charsets.UTF_8);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }

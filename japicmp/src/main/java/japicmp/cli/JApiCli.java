@@ -4,15 +4,18 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.config.Options;
+import japicmp.config.ImmutableOptions;
+import japicmp.config.OptionsBuilder;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
+import japicmp.output.Output;
 import japicmp.output.OutputFilter;
-import japicmp.output.OutputGenerator;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdOut;
 import japicmp.output.xml.XmlOut;
@@ -48,7 +51,7 @@ public class JApiCli {
 
 		@Override
 		public void run() {
-			Options options = OptionsBuilder.create() //
+			ImmutableOptions options = OptionsBuilder.create() //
 					.newJar(pathToNewVersionJar) //
 					.oldJar(pathToOldVersionJar) //
 					.xmlOutputFilename(pathToXmlOutputFile) //
@@ -59,7 +62,7 @@ public class JApiCli {
 					.excludePackages(packagesToExclude) //
 					.showOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications) //
 					.showOnlySeverDiff(showOnlySemverDiff) //
-					.build();
+					.buildImmutable();
 
 			File oldArchive = options.getOldArchive();
 			File newArchive = options.getNewArchive();
@@ -71,7 +74,7 @@ public class JApiCli {
 			generateOutput(options, jApiClasses);
 		}
 
-		private JarArchiveComparatorOptions copyOptions(Options options) {
+		private JarArchiveComparatorOptions copyOptions(ImmutableOptions options) {
 			JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
 			comparatorOptions.setModifierLevel(options.getAccessModifier());
 			comparatorOptions.getPackagesInclude().addAll(options.getPackagesInclude());
@@ -79,17 +82,21 @@ public class JApiCli {
 			return comparatorOptions;
 		}
 
-		private void generateOutput(Options options, List<JApiClass> jApiClasses) {
+		private void generateOutput(ImmutableOptions options, List<JApiClass> jApiClasses) {
 			OutputFilter.sortClassesAndMethods(jApiClasses);
-			OutputGenerator out = selectGenerator(options, jApiClasses);
-			out.generate();
+			ImmutableList<JApiClass> fixedjApiClasses = ImmutableList.copyOf(jApiClasses);
+			Output out = selectGenerator(options, fixedjApiClasses);
+			Optional<String> stdOut = out.generate(fixedjApiClasses);
+			if (stdOut.isPresent()) {
+				System.out.println(stdOut.get());
+			}
 		}
 
-		private OutputGenerator selectGenerator(Options options, List<JApiClass> jApiClasses) {
+		private Output selectGenerator(ImmutableOptions options, ImmutableList<JApiClass> jApiClasses) {
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
 				return new XmlOut(options, jApiClasses);
 			} else if (options.isOnlySemverDiff()) {
-				return new SemverOut(options, jApiClasses);
+				return new SemverOut();
 			} else {
 				return new StdOut(options, jApiClasses);
 			}

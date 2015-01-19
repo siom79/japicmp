@@ -1,5 +1,6 @@
 package japicmp.output;
 
+import japicmp.config.ImmutableOptions;
 import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.util.ModifierHelper;
@@ -10,9 +11,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class OutputFilter extends Filter {
-    private final Options options;
+    private final ImmutableOptions options;
 
-    public OutputFilter(Options options) {
+    public OutputFilter(ImmutableOptions options) {
         this.options = options;
     }
 

@@ -1,28 +1,35 @@
 package japicmp.output.stdout;
 
+import java.io.File;
+import java.util.List;
+
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import japicmp.config.ImmutableOptions;
 import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.model.JApiAnnotationElementValue.Type;
 import japicmp.output.OutputFilter;
 import javassist.bytecode.annotation.MemberValue;
 
-import java.io.File;
-import java.util.List;
-
 public class StdoutOutputGenerator {
-    private final Options options;
+    private final ImmutableOptions options;
 
     public StdoutOutputGenerator(Options options) {
+        this(ImmutableOptions.toImmutable(options));
+    }
+
+    public StdoutOutputGenerator(ImmutableOptions options) {
         this.options = options;
     }
 
     public String generate(File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
         OutputFilter outputFilter = new OutputFilter(options);
-        outputFilter.filter(jApiClasses);
+        List<JApiClass> classListForModification = Lists.newArrayList(jApiClasses);
+        outputFilter.filter(classListForModification);
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Comparing %s with %s:%n", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath()));
-        for (JApiClass jApiClass : jApiClasses) {
+        for (JApiClass jApiClass : classListForModification) {
             processClass(sb, jApiClass);
             processConstructors(sb, jApiClass);
             processMethods(sb, jApiClass);

@@ -1,16 +1,15 @@
-package japicmp.cli;
+package japicmp.config;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.jar.JarFile;
 
 import com.google.common.base.Optional;
-import japicmp.config.Options;
 import japicmp.exception.FormattedException;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 
-class OptionsBuilder {
+public class OptionsBuilder {
 
 	private String pathToNewVersionJar;
 	private String pathToOldVersionJar;
@@ -23,7 +22,7 @@ class OptionsBuilder {
 	private boolean onlyBinaryIncompatibleModifications;
 	private boolean showOnlySemverDiff;
 
-	static Options create(OptionsBuilder builder) {
+	public static Options create(OptionsBuilder builder) {
 		Options options = new Options();
 		try {
 			options.setNewArchive(validFile(builder.pathToNewVersionJar, "no valid new archive found"));
@@ -152,5 +151,9 @@ class OptionsBuilder {
 	public OptionsBuilder showOnlySeverDiff(boolean showOnlySemverDiff) {
 		this.showOnlySemverDiff = showOnlySemverDiff;
 		return this;
+	}
+
+	public ImmutableOptions buildImmutable() {
+		return ImmutableOptions.toImmutable(build());
 	}
 }
