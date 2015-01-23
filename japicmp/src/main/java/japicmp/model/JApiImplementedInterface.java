@@ -21,7 +21,7 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinary
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
 	}
-	
+
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {

@@ -20,7 +20,6 @@ class OptionsBuilder {
 	private String packagesToInclude;
 	private String packagesToExclude;
 	private boolean onlyBinaryIncompatibleModifications;
-	private boolean showOnlySemverDiff;
 
 	static Options create(OptionsBuilder builder) {
 		Options options = new Options();
@@ -34,7 +33,6 @@ class OptionsBuilder {
 			options.addPackageIncludeFromArgument(Optional.fromNullable(builder.packagesToInclude));
 			options.addPackagesExcludeFromArgument(Optional.fromNullable(builder.packagesToExclude));
 			options.setOutputOnlyBinaryIncompatibleModifications(builder.onlyBinaryIncompatibleModifications);
-			options.setShowOnlySemverDiff(builder.showOnlySemverDiff);
 		} catch (Exception e) {
 			throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
 		}
@@ -143,11 +141,6 @@ class OptionsBuilder {
 
 	public OptionsBuilder showOnlyBinaryIncompatibleModifications(boolean onlyBinaryIncompatible) {
 		this.onlyBinaryIncompatibleModifications = onlyBinaryIncompatible;
-		return this;
-	}
-
-	public OptionsBuilder showOnlySeverDiff(boolean showOnlySemverDiff) {
-		this.showOnlySemverDiff = showOnlySemverDiff;
 		return this;
 	}
 }

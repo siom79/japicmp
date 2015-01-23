@@ -13,6 +13,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
+import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
 
@@ -28,9 +29,9 @@ public class JApiCli {
 	public static class Compare implements Runnable {
 		@Inject
 		public HelpOption helpOption;
-		@Option(name = { "-o", "--old" }, description = "Provides the path to the old version of the jar.", required = true)
+		@Option(name = { "-o", "--old" }, description = "Provides the path to the old version of the jar.")
 		public String pathToOldVersionJar;
-		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version of the jar.", required = true)
+		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version of the jar.")
 		public String pathToNewVersionJar;
 		@Option(name = { "-m", "--only-modified" }, description = "Outputs only modified classes/methods.")
 		public boolean modifiedOnly;
@@ -46,6 +47,8 @@ public class JApiCli {
 		public String pathToXmlOutputFile;
 		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
+		@Option(name = { "-s", "--semantic-versioning" }, description ="Tells you which part of the version to increment.")
+		public boolean semanticVersioning;
 
 		@Override
 		public void run() {
@@ -73,6 +76,11 @@ public class JApiCli {
 		}
 
 		private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
+			if (semanticVersioning) {
+				SemverOut semverOut = new SemverOut(options, jApiClasses);
+				semverOut.generate();
+				return;
+			}
 			OutputFilter.sortClassesAndMethods(jApiClasses);
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
 				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
@@ -91,8 +99,8 @@ public class JApiCli {
 
 			Options options = new Options();
 			try {
-				options.setNewArchive(validFile(newArchive, "no valid new archive found"));
-				options.setOldArchive(validFile(oldArchive, "no valid old archive found"));
+				options.setNewArchive(validFile(newArchive, "Required option -n is missing."));
+				options.setOldArchive(validFile(oldArchive, "Required option -o is missing."));
 				options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
 				options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
 				options.setOutputOnlyModifications(onlyModifications);

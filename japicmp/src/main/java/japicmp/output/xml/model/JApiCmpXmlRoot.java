@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,5 +45,11 @@ public class JApiCmpXmlRoot {
 
     public void setOldJar(String oldJar) {
         this.oldJar = oldJar;
+    }
+
+    @XmlAttribute
+    public String getCreationTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        return sdf.format(new Date());
     }
 }

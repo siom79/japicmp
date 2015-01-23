@@ -46,6 +46,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * All changes between all classes/methods/fields are compared. If necessary, output can be limited to changes that are binary incompatible (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html)).
 * All changes between annotations are compared, hence japicmp can be used to track annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
+* The option `--semantic-versioning` tells you which part of the version you have to increment in order to follow [semantic versioning](http://semver.org/).
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
@@ -55,6 +56,9 @@ The comparison of annotations makes this approach suitable for annotation-based 
 
 japicmp has a set of CLI parameters that are described in the following:
 
+	NAME
+			java -jar japicmp.jar - Compares jars
+
 	SYNOPSIS
 			java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
 					[(-e <packagesToExclude> | --exclude <packagesToExclude>)]
@@ -63,6 +67,7 @@ japicmp has a set of CLI parameters that are described in the following:
 					[(-m | --only-modified)]
 					[(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
 					[(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
+					[(-s | --semantic-versioning)]
 					[(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
 	OPTIONS
@@ -96,6 +101,9 @@ japicmp has a set of CLI parameters that are described in the following:
 
 			-o <pathToOldVersionJar>, --old <pathToOldVersionJar>
 				Provides the path to the old version of the jar.
+
+			-s, --semantic-versioning
+				Tells you which part of the version to increment.
 
 			-x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
 				Provides the path to the xml output file.

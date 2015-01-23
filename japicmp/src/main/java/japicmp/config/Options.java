@@ -20,7 +20,6 @@ public class Options {
 	private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PUBLIC);
 	private List<PackageFilter> packagesInclude = new LinkedList<>();
 	private List<PackageFilter> packagesExclude = new LinkedList<>();
-	private boolean showOnlySemverDiff = false;
 
 	public File getNewArchive() {
 		return newArchive;
@@ -115,13 +114,5 @@ public class Options {
 
 	public void setHtmlOutputFile(Optional<String> htmlOutputFile) {
 		this.htmlOutputFile = htmlOutputFile;
-	}
-
-	public void setShowOnlySemverDiff(boolean showOnlySemverDiff) {
-		this.showOnlySemverDiff = showOnlySemverDiff;
-	}
-
-	public boolean isOnlySemverDiff() {
-		return showOnlySemverDiff;
 	}
 }

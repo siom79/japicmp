@@ -8,17 +8,19 @@ import java.util.List;
 public class Filter {
 
 	public interface FilterVisitor {
-		void visit(Iterator<JApiClass> iterator, JApiClass element);
+		void visit(Iterator<JApiClass> iterator, JApiClass jApiClass);
 
-		void visit(Iterator<JApiMethod> iterator, JApiMethod element);
+		void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod);
 
-		void visit(Iterator<JApiConstructor> iterator, JApiConstructor element);
+		void visit(Iterator<JApiConstructor> iterator, JApiConstructor jApiConstructor);
 
-		void visit(Iterator<JApiImplementedInterface> iterator, JApiImplementedInterface element);
+		void visit(Iterator<JApiImplementedInterface> iterator, JApiImplementedInterface jApiImplementedInterface);
 
-		void visit(Iterator<JApiField> iterator, JApiField element);
+		void visit(Iterator<JApiField> iterator, JApiField jApiField);
 
 		void visit(Iterator<JApiAnnotation> iterator, JApiAnnotation jApiAnnotation);
+
+		void visit(JApiSuperclass jApiSuperclass);
 	}
 
 	public static void filter(List<JApiClass> jApiClasses, FilterVisitor visitor) {
@@ -29,28 +31,38 @@ public class Filter {
 			while (itMethods.hasNext()) {
 				JApiMethod jApiMethod = itMethods.next();
 				visitor.visit(itMethods, jApiMethod);
+				visitAnnotations(visitor, jApiMethod);
+
 			}
 			Iterator<JApiConstructor> itConstructors = jApiClass.getConstructors().iterator();
 			while (itConstructors.hasNext()) {
 				JApiConstructor jApiConstructor = itConstructors.next();
 				visitor.visit(itConstructors, jApiConstructor);
+				visitAnnotations(visitor, jApiConstructor);
 			}
 			Iterator<JApiImplementedInterface> itInterfaces = jApiClass.getInterfaces().iterator();
 			while (itInterfaces.hasNext()) {
 				JApiImplementedInterface jApiImplementedInterface = itInterfaces.next();
 				visitor.visit(itInterfaces, jApiImplementedInterface);
 			}
+			JApiSuperclass superclass = jApiClass.getSuperclass();
+			visitor.visit(superclass);
 			Iterator<JApiField> itFields = jApiClass.getFields().iterator();
 			while (itFields.hasNext()) {
 				JApiField jApiField = itFields.next();
 				visitor.visit(itFields, jApiField);
+				visitAnnotations(visitor, jApiField);
 			}
-			Iterator<JApiAnnotation> itAnnotations = jApiClass.getAnnotations().iterator();
-			while (itAnnotations.hasNext()) {
-				JApiAnnotation jApiAnnotation = itAnnotations.next();
-				visitor.visit(itAnnotations, jApiAnnotation);
-			}
+			visitAnnotations(visitor, jApiClass);
 			visitor.visit(itClasses, jApiClass);
 		}
+	}
+
+	private static void visitAnnotations(FilterVisitor visitor, JApiHasAnnotations jApiHasAnnotations) {
+		Iterator<JApiAnnotation> itAnnotations = jApiHasAnnotations.getAnnotations().iterator();
+		while (itAnnotations.hasNext()) {
+            JApiAnnotation jApiAnnotation = itAnnotations.next();
+            visitor.visit(itAnnotations, jApiAnnotation);
+        }
 	}
 }

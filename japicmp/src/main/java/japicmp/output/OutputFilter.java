@@ -1,13 +1,11 @@
 package japicmp.output;
 
+import com.google.common.collect.ImmutableList;
 import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.util.ModifierHelper;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class OutputFilter extends Filter {
     private final Options options;
@@ -55,6 +53,11 @@ public class OutputFilter extends Filter {
                 if (remove) {
                     iterator.remove();
                 }
+            }
+
+            @Override
+            public void visit(JApiSuperclass jApiSuperclass) {
+                // cannot remove superclass
             }
 
             @Override
@@ -118,34 +121,93 @@ public class OutputFilter extends Filter {
             }
 
             @Override
-            public void visit(Iterator<JApiClass> iterator, JApiClass element) {
+            public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
                 boolean remove = false;
                 if (options.isOutputOnlyModifications()) {
-                    if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+                    if (jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
                         remove = true;
                     }
                 }
                 if (options.isOutputOnlyBinaryIncompatibleModifications()) {
-                    if (element.isBinaryCompatible()) {
+                    if (jApiClass.isBinaryCompatible()) {
                         remove = true;
                     }
                 }
-                if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {
+                if (!ModifierHelper.matchesModifierLevel(jApiClass, OutputFilter.this.options.getAccessModifier())) {
                     remove = true;
                 }
-                if (element.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-                    if (element.getMethods().size() == 0 && element.getConstructors().size() == 0 && element.getInterfaces().size() == 0 && element.getFields().size() == 0
-                            && element.getAnnotations().size() == 0 && element.getAbstractModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
-                            && element.getAccessModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
-                            && element.getFinalModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
-                            && element.getStaticModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
-                            && element.getSuperclass().getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+                if (jApiClass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+                    if (jApiClass.getMethods().size() == 0 && jApiClass.getConstructors().size() == 0 && jApiClass.getInterfaces().size() == 0 && jApiClass.getFields().size() == 0
+                            && jApiClass.getAnnotations().size() == 0 && jApiClass.getAbstractModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
+                            && jApiClass.getAccessModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
+                            && jApiClass.getFinalModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
+                            && jApiClass.getStaticModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
+                            && jApiClass.getSuperclass().getChangeStatus() == JApiChangeStatus.UNCHANGED) {
                         remove = true;
+                    }
+                    if (options.getAccessModifier().getLevel() > AccessModifier.PRIVATE.getLevel() && options.isOutputOnlyModifications()) {
+                        ImmutableList<Boolean> list = findOneChangedElement(jApiClass);
+                        if (list.isEmpty()) { //filter out this class if it does not have any changed element at this filter level
+                            remove = true;
+                        }
                     }
                 }
                 if (remove) {
                     iterator.remove();
                 }
+            }
+
+            private ImmutableList<Boolean> findOneChangedElement(JApiClass jApiClass) {
+                final ImmutableList.Builder<Boolean> builder = ImmutableList.builder();
+                Filter.filter(Arrays.asList(jApiClass), new FilterVisitor() {
+                    @Override
+                    public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
+                        // ignore this case
+                    }
+
+                    @Override
+                    public void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod) {
+                        if (jApiMethod.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                            builder.add(Boolean.TRUE);
+                        }
+                    }
+
+                    @Override
+                    public void visit(Iterator<JApiConstructor> iterator, JApiConstructor jApiConstructor) {
+                        if (jApiConstructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                            builder.add(Boolean.TRUE);
+                        }
+                    }
+
+                    @Override
+                    public void visit(Iterator<JApiImplementedInterface> iterator, JApiImplementedInterface jApiImplementedInterface) {
+                        if (jApiImplementedInterface.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                            builder.add(Boolean.TRUE);
+                        }
+                    }
+
+                    @Override
+                    public void visit(Iterator<JApiField> iterator, JApiField jApiField) {
+                        if (jApiField.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                            builder.add(Boolean.TRUE);
+                        }
+                    }
+
+                    @Override
+                    public void visit(Iterator<JApiAnnotation> iterator, JApiAnnotation jApiAnnotation) {
+                        if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                            builder.add(Boolean.TRUE);
+                        }
+                    }
+
+                    @Override
+                    public void visit(JApiSuperclass jApiSuperclass) {
+                        if (jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                            builder.add(Boolean.TRUE);
+                        }
+                    }
+                });
+                return builder.build();
             }
         });
     }
