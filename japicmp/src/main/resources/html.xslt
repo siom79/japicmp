@@ -89,12 +89,32 @@
                         list-style-type: none;
                         padding: 0px 0px;
                     }
+                    .meta-information {
+                        margin-top: 1em;
+                        margin-bottom: 1em;
+                        background: #ededed;
+                        display: inline-block;
+                    }
 				</style>
 			</head>
 			<body>
                 <span class="title">JApiCmp-Report</span><br/>
-                <span>old=<xsl:value-of select="@oldJar"/></span><br/>
-                <span>new=<xsl:value-of select="@newJar"/></span><br/>
+                <div class="meta-information">
+                    <table>
+                        <tr>
+                            <td>Old:</td>
+                            <td><xsl:value-of select="@oldJar"/></td>
+                        </tr>
+                        <tr>
+                            <td>New:</td>
+                            <td><xsl:value-of select="@newJar"/></td>
+                        </tr>
+                        <tr>
+                            <td>Created:</td>
+                            <td><xsl:value-of select="@creationTimestamp"/></td>
+                        </tr>
+                    </table>
+                </div>
                 <ul>
                     <xsl:if test="count(classes/class) > 0">
                         <li><a href="#toc">Classes</a></li>
@@ -158,7 +178,7 @@
                     <a href="#toc" class="toc_link">top</a>
                 </div>
                 <div class="class_superclass">
-                    <xsl:if test="count(superclass) > 0 and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.')">
+                    <xsl:if test="count(superclass) > 0 and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.') and superclass/@changeStatus != 'UNCHANGED'">
                         <span class="label_class_member">Superclass:</span>
                         <table>
                             <thead>
