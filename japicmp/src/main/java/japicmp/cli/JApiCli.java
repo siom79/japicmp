@@ -147,7 +147,7 @@ public class JApiCli {
 									accessModifierArg, AccessModifier.listOfAccessModifier());
 				}
 			} else {
-				return Optional.of(AccessModifier.PUBLIC);
+				return Optional.of(AccessModifier.PRIVATE);
 			}
 		}
 

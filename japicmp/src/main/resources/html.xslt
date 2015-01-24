@@ -113,6 +113,26 @@
                             <td>Created:</td>
                             <td><xsl:value-of select="@creationTimestamp"/></td>
                         </tr>
+                        <tr>
+                            <td>Access modifier filter:</td>
+                            <td><xsl:value-of select="@accessModifier"/></td>
+                        </tr>
+                        <tr>
+                            <td>Only modifications:</td>
+                            <td><xsl:value-of select="@onlyModifications"/></td>
+                        </tr>
+                        <tr>
+                            <td>Only binary incompatible modifications:</td>
+                            <td><xsl:value-of select="@onlyBinaryIncompatibleModifications"/></td>
+                        </tr>
+                        <tr>
+                            <td>Packages included:</td>
+                            <td><xsl:value-of select="@packagesInclude"/></td>
+                        </tr>
+                        <tr>
+                            <td>Packages excluded:</td>
+                            <td><xsl:value-of select="@packagesExclude"/></td>
+                        </tr>
                     </table>
                 </div>
                 <ul>
