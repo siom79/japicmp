@@ -304,7 +304,7 @@ As can bee seen from the output above, the XML attributes title and author have 
 
 ##Downloads##
 
-You can download the latest version from the [release page](https://github.com/siom79/japicmp/releases).
+You can download the latest version from the [release page](https://github.com/siom79/japicmp/releases) or directly from the [maven central repository](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22japicmp%22).
 
 ##Development##
 
