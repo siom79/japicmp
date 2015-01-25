@@ -4,6 +4,7 @@ import static japicmp.test.util.Helper.getArchive;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.io.Files;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -19,37 +20,53 @@ import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.base.Optional;
 
 public class XmlOutputGeneratorTest {
-    private static List<JApiClass> jApiClasses;
+	public static final String JAPICMP_TEST_SEMVER001 = "japicmp.test.semver001";
+	private static List<JApiClass> jApiClasses;
+	private static File htmlFile;
 
-    @BeforeClass
+	@BeforeClass
     public static void beforeClass() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getPackagesExclude().add(new PackageFilter("japicmp.test.semver001"));
+		options.getPackagesExclude().add(new PackageFilter(JAPICMP_TEST_SEMVER001));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-		generateHtmlOutput();
+		generateHtmlOutput("target/diff.xml", "target/diff.html", false);
+		generateHtmlOutput("target/diff_onlyModifications.xml", "target/diff_onlyModifications.html", true);
+		htmlFile = Paths.get(System.getProperty("user.dir"), "target", "diff.html").toFile();
     }
 
-	private static void generateHtmlOutput() {
+	private static void generateHtmlOutput(String xmlOutpuFile, String htmlOutputFile, boolean outputOnlyModifications) {
 		XmlOutputGenerator generator = new XmlOutputGenerator();
 		Options options = new Options();
-		options.setXmlOutputFile(Optional.of("target/diff.xml"));
-		options.setHtmlOutputFile(Optional.of("target/diff.html"));
+		options.setXmlOutputFile(Optional.of(xmlOutpuFile));
+		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
+		options.setOutputOnlyModifications(outputOnlyModifications);
 		generator.generate("/old/Path", "/new/Path", jApiClasses, options);
 	}
 
 	@Test
 	public void testMetaInformationTable() throws IOException {
-		File htmlFile = Paths.get(System.getProperty("user.dir"), "target", "diff.html").toFile();
 		Document document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
 		assertThat(document.select("div.meta-information > table").isEmpty(), is(false));
 		assertThat(document.select("div.meta-information > table > tbody > tr").size(), is(8));
+	}
+
+	@Test
+	public void htmlFileNotContainsPackageSemver001() throws IOException {
+		List<String> lines = Files.readLines(htmlFile, Charset.forName("UTF-8"));
+		boolean containsPackageName = false;
+		for (String line : lines) {
+			if (line.contains(JAPICMP_TEST_SEMVER001)) {
+				containsPackageName = true;
+				break;
+			}
+		}
+		assertThat(containsPackageName, is(false));
 	}
 }

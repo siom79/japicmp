@@ -198,7 +198,13 @@
                     <a href="#toc" class="toc_link">top</a>
                 </div>
                 <div class="class_superclass">
-                    <xsl:if test="count(superclass) > 0 and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.') and superclass/@changeStatus != 'UNCHANGED'">
+                    <xsl:if test="  count(superclass) > 0
+                                    and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.')
+                                    and (       (/japicmp/@onlyModifications = 'false' and /japicmp/@onlyBinaryIncompatibleModifications = 'false')
+                                            or ((/japicmp/@onlyModifications = 'true' or /japicmp/@onlyBinaryIncompatibleModifications = 'true') and superclass/@changeStatus = 'NEW' and superclass/@superclassNew != 'java.lang.Object')
+                                            or ((/japicmp/@onlyModifications = 'true' or /japicmp/@onlyBinaryIncompatibleModifications = 'true') and superclass/@changeStatus = 'REMOVED' and superclass/@superclassOld != 'java.lang.Object')
+                                            or ((/japicmp/@onlyModifications = 'true' or /japicmp/@onlyBinaryIncompatibleModifications = 'true') and superclass/@changeStatus = 'MODIFIED')
+                                            )">
                         <span class="label_class_member">Superclass:</span>
                         <table>
                             <thead>
