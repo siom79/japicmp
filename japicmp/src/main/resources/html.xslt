@@ -183,6 +183,9 @@
     <xsl:template match="class" mode="detail">
         <div>
             <div class="class">
+                <xsl:attribute name="id">
+                    <xsl:value-of select="@fullyQualifiedName" />
+                </xsl:attribute>
                 <div class="class_header">
                     <span class="label">
                         <a>

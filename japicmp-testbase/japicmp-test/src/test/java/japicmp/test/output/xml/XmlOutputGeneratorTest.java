@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,6 +30,7 @@ public class XmlOutputGeneratorTest {
 	public static final String JAPICMP_TEST_SEMVER001 = "japicmp.test.semver001";
 	private static List<JApiClass> jApiClasses;
 	private static File htmlFile;
+	private static File htmlFileOnlyModifications;
 
 	@BeforeClass
     public static void beforeClass() {
@@ -39,6 +41,7 @@ public class XmlOutputGeneratorTest {
 		generateHtmlOutput("target/diff.xml", "target/diff.html", false);
 		generateHtmlOutput("target/diff_onlyModifications.xml", "target/diff_onlyModifications.html", true);
 		htmlFile = Paths.get(System.getProperty("user.dir"), "target", "diff.html").toFile();
+		htmlFileOnlyModifications = Paths.get(System.getProperty("user.dir"), "target", "diff_onlyModifications.html").toFile();
     }
 
 	private static void generateHtmlOutput(String xmlOutpuFile, String htmlOutputFile, boolean outputOnlyModifications) {
@@ -68,5 +71,46 @@ public class XmlOutputGeneratorTest {
 			}
 		}
 		assertThat(containsPackageName, is(false));
+	}
+
+	@Test
+	public void superclassAllChangesAddedWithSuperclass() throws IOException {
+		Document document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
+		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	@Test
+	public void superclassOnlyModificationsAddedWithSuperclass() throws IOException {
+		Document document = Jsoup.parse(htmlFileOnlyModifications, Charset.forName("UTF-8").toString());
+		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	private Elements getDivForClass(Document document, String className) {
+		Elements divWithClassId = document.select("div[id= " + className + "]");
+		assertThat(divWithClassId.isEmpty(), is(false));
+		return divWithClassId;
+	}
+
+	private Elements getSuperClassDiv(Document document, String className) {
+		Elements divForClass = getDivForClass(document, className);
+		Elements divSuperclass = divForClass.select("div[class=class_superclass]");
+		assertThat(divSuperclass.isEmpty(), is(false));
+		return divSuperclass;
+	}
+
+	@Test
+	public void superclassAllChangesAdded() throws IOException {
+		Document document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
+		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Added");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	@Test
+	public void superclassOnlyModificationsAdded() throws IOException {
+		Document document = Jsoup.parse(htmlFileOnlyModifications, Charset.forName("UTF-8").toString());
+		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Added");
+		assertThat(divSuperClass.select("table").isEmpty(), is(true));
 	}
 }
