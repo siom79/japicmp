@@ -30,10 +30,14 @@ public class JApiCmpTest {
 		exit.checkAssertionAfterwards(new Assertion() {
 			public void checkAssertion() {
 				assertThat(errLog.getLog().trim(), containsString("E: Required option".trim()));
-				assertThatHelpIsPrinted();
+				assertThatUseHelpOptionIsPrinted();
 			}
 		});
 		JApiCmp.main(new String[]{});
+	}
+
+	private void assertThatUseHelpOptionIsPrinted() {
+		assertThat(outLog.getLog(), containsString(JApiCmp.USE_HELP_OR_H_FOR_MORE_INFORMATION));
 	}
 
 	private void assertThatHelpIsPrinted() {
@@ -70,7 +74,7 @@ public class JApiCmpTest {
 		exit.checkAssertionAfterwards(new Assertion() {
 			public void checkAssertion() {
 				assertThat(errLog.getLog().trim(), containsString("E: Required values for option 'pathToNewVersionJar' not provided".trim()));
-				assertThatHelpIsPrinted();
+				assertThatUseHelpOptionIsPrinted();
 			}
 		});
 		JApiCmp.main(new String[]{"-n"});
@@ -82,7 +86,7 @@ public class JApiCmpTest {
 		exit.checkAssertionAfterwards(new Assertion() {
 			public void checkAssertion() {
 				assertThat(errLog.getLog().trim(), containsString("E: Required values for option 'pathToOldVersionJar' not provided".trim()));
-				assertThatHelpIsPrinted();
+				assertThatUseHelpOptionIsPrinted();
 			}
 		});
 		JApiCmp.main(new String[]{"-o"});
@@ -97,7 +101,7 @@ public class JApiCmpTest {
 				String errLogTrimmed = errLog.getLog().trim();
 				assertThat(errLogTrimmed, containsString("E: File".trim()));
 				assertThat(errLogTrimmed, containsString("does not exist.".trim()));
-				assertThatHelpIsPrinted();
+				assertThatUseHelpOptionIsPrinted();
 			}
 		});
 		JApiCmp.main(new String[]{"-n xyz.jar"});
@@ -111,7 +115,7 @@ public class JApiCmpTest {
 				String errLogTrimmed = errLog.getLog().trim();
 				assertThat(errLogTrimmed, containsString("E: File".trim()));
 				assertThat(errLogTrimmed, containsString("does not exist.".trim()));
-				assertThatHelpIsPrinted();
+				assertThatUseHelpOptionIsPrinted();
 			}
 		});
 		JApiCmp.main(new String[]{"-n", pathTo("new.jar"), "-o", "xyz.jar"});
