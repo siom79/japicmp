@@ -10,7 +10,7 @@ public class JarArchiveComparatorOptions {
     private List<String> classPathEntries = new LinkedList<>();
     private List<PackageFilter> packagesInclude = new LinkedList<>();
     private List<PackageFilter> packagesExclude = new LinkedList<>();
-    private AccessModifier modifierLevel = AccessModifier.PRIVATE;
+    private AccessModifier modifierLevel = AccessModifier.PUBLIC;
 
     public List<PackageFilter> getPackagesExclude() {
         return packagesExclude;

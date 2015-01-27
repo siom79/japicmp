@@ -76,4 +76,24 @@ public class Helper {
         }
         throw new IllegalArgumentException("No annotation element found with name " + name + ".");
     }
+
+    public static String replaceLastDotWith$(String str) {
+        int lastIndex = str.lastIndexOf('.');
+        if (lastIndex > -1) {
+            if (lastIndex == 0) {
+                if (str.length() > 1) {
+                    str = "$" + str.substring(1);
+                } else {
+                    str = "$";
+                }
+            } else {
+                if (str.length() > lastIndex + 1) {
+                    str = str.substring(0, lastIndex) + "$" + str.substring(lastIndex + 1);
+                } else {
+                    str = str.substring(0, lastIndex) + "$";
+                }
+            }
+        }
+        return str;
+    }
 }

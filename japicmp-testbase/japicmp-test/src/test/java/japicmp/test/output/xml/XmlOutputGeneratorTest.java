@@ -87,10 +87,8 @@ public class XmlOutputGeneratorTest {
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
-	private Elements getDivForClass(Document document, String className) {
-		Elements divWithClassId = document.select("div[id= " + className + "]");
-		assertThat(divWithClassId.isEmpty(), is(false));
-		return divWithClassId;
+	static Elements getDivForClass(Document document, String className) {
+		return document.select("div[id= " + className + "]");
 	}
 
 	private Elements getSuperClassDiv(Document document, String className) {
