@@ -29,11 +29,12 @@ import com.google.common.base.Optional;
 public class XmlOutputGeneratorTest {
 	public static final String JAPICMP_TEST_SEMVER001 = "japicmp.test.semver001";
 	private static List<JApiClass> jApiClasses;
+	private static Document document;
+	private static Document documentOnlyModifications;
 	private static File htmlFile;
-	private static File htmlFileOnlyModifications;
 
 	@BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws IOException {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.getPackagesExclude().add(new PackageFilter(JAPICMP_TEST_SEMVER001));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
@@ -41,7 +42,9 @@ public class XmlOutputGeneratorTest {
 		generateHtmlOutput("target/diff.xml", "target/diff.html", false);
 		generateHtmlOutput("target/diff_onlyModifications.xml", "target/diff_onlyModifications.html", true);
 		htmlFile = Paths.get(System.getProperty("user.dir"), "target", "diff.html").toFile();
-		htmlFileOnlyModifications = Paths.get(System.getProperty("user.dir"), "target", "diff_onlyModifications.html").toFile();
+		File htmlFileOnlyModifications = Paths.get(System.getProperty("user.dir"), "target", "diff_onlyModifications.html").toFile();
+		document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
+		documentOnlyModifications = Jsoup.parse(htmlFileOnlyModifications, Charset.forName("UTF-8").toString());
     }
 
 	private static void generateHtmlOutput(String xmlOutpuFile, String htmlOutputFile, boolean outputOnlyModifications) {
@@ -55,7 +58,6 @@ public class XmlOutputGeneratorTest {
 
 	@Test
 	public void testMetaInformationTable() throws IOException {
-		Document document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
 		assertThat(document.select("div.meta-information > table").isEmpty(), is(false));
 		assertThat(document.select("div.meta-information > table > tbody > tr").size(), is(8));
 	}
@@ -75,15 +77,13 @@ public class XmlOutputGeneratorTest {
 
 	@Test
 	public void superclassAllChangesAddedWithSuperclass() throws IOException {
-		Document document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassOnlyModificationsAddedWithSuperclass() throws IOException {
-		Document document = Jsoup.parse(htmlFileOnlyModifications, Charset.forName("UTF-8").toString());
-		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
+		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$AddedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
@@ -102,15 +102,49 @@ public class XmlOutputGeneratorTest {
 
 	@Test
 	public void superclassAllChangesAdded() throws IOException {
-		Document document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Added");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassOnlyModificationsAdded() throws IOException {
-		Document document = Jsoup.parse(htmlFileOnlyModifications, Charset.forName("UTF-8").toString());
-		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Added");
+		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Added");
 		assertThat(divSuperClass.select("table").isEmpty(), is(true));
+	}
+
+	@Test
+	public void superclassAddedWithSuperclass() throws IOException {
+		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	@Test
+	public void superclassAddedWithSuperclassOnlyModifications() throws IOException {
+		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$AddedWithSuperclass");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	@Test
+	public void superclassRemovedWithSuperclass() throws IOException {
+		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$RemovedWithSuperclass");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	@Test
+	public void superclassRemovedWithSuperclassOnlyModifications() throws IOException {
+		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$RemovedWithSuperclass");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	@Test
+	public void superclassNoSuperclassToSuperclass() throws IOException {
+		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$NoSuperclassToSuperclass");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	@Test
+	public void superclassNoSuperclassToSuperclassOnlyModifications() throws IOException {
+		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$NoSuperclassToSuperclass");
+		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 }
