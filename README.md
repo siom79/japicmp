@@ -46,6 +46,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * All changes between all classes/methods/fields are compared. If necessary, output can be limited to changes that are binary incompatible (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html)).
 * All changes between annotations are compared, hence japicmp can be used to track annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
+* The option `--semantic-versioning` tells you which part of the version you have to increment in order to follow [semantic versioning](http://semver.org/).
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
@@ -55,6 +56,9 @@ The comparison of annotations makes this approach suitable for annotation-based 
 
 japicmp has a set of CLI parameters that are described in the following:
 
+	NAME
+			java -jar japicmp.jar - Compares jars
+
 	SYNOPSIS
 			java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
 					[(-e <packagesToExclude> | --exclude <packagesToExclude>)]
@@ -63,6 +67,7 @@ japicmp has a set of CLI parameters that are described in the following:
 					[(-m | --only-modified)]
 					[(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
 					[(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
+					[(-s | --semantic-versioning)]
 					[(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
 	OPTIONS
@@ -96,6 +101,9 @@ japicmp has a set of CLI parameters that are described in the following:
 
 			-o <pathToOldVersionJar>, --old <pathToOldVersionJar>
 				Provides the path to the old version of the jar.
+
+			-s, --semantic-versioning
+				Tells you which part of the version to increment.
 
 			-x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
 				Provides the path to the xml output file.
@@ -296,36 +304,7 @@ As can bee seen from the output above, the XML attributes title and author have 
 
 ##Downloads##
 
-The following releases are available:
-
-* [Version 0.2.3](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.3)
-	* Changes:
-		* [Fails to recognize changed interfaces](https://github.com/siom79/japicmp/issues/12)
-* [Version 0.2.2](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.2)
-	* Changes:
-		* [japicmp should provide a single page HTML report](https://github.com/siom79/japicmp/issues/18)
-* [Version 0.2.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.1)
-	* Changes:
-		* [japicmp should provide a boolean flag for each change that indicates if this modification breaks binary compatibility](https://github.com/siom79/japicmp/issues/16)
-		* [japicmp should track changes on annotations](https://github.com/siom79/japicmp/issues/15)
-* [Version 0.2.0](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.2.0)
-	* Changes:
-		* added support for the comparison of constructors, implemented interfaces, superclass and fields
-		* added support for the comparison of modifiers (access, final, static, abstract)
-		* added support for the synthetic attribute for classes, methods, constructors and fields
-* [Version 0.1.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.1.1)
-    * Changes:
-        * [The maven-plugin should be available in the central repository](https://github.com/siom79/japicmp/issues/8)
-* [Version 0.1.0](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.1.0)
-    * Changes:
-        * [The functionality of japicmp should be available as a maven plugin](https://github.com/siom79/japicmp/issues/6)
-* [Version 0.0.2](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.0.2)
-    * Changes:
-        * [Command-line option to filter packages](https://github.com/siom79/japicmp/issues/1)
-        * [CLI option for comparing public, package, protected or private classes/class members](https://github.com/siom79/japicmp/issues/2)
-        * ["No differences" output when comparing the same file](https://github.com/siom79/japicmp/issues/4)
-        * [Giving a non-jar file as argument should not output "Comparing..."](https://github.com/siom79/japicmp/issues/5)
-* [Version 0.0.1](https://github.com/siom79/japicmp/releases/tag/japicmp-base-0.0.1)
+You can download the latest version from the [release page](https://github.com/siom79/japicmp/releases) or directly from the [maven central repository](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22japicmp%22).
 
 ##Development##
 

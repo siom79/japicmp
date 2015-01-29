@@ -1,14 +1,14 @@
 package japicmp.config;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import japicmp.exception.FormattedException;
 import japicmp.model.AccessModifier;
-
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Options {
 	private File oldArchive;

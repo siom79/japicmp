@@ -1,6 +1,8 @@
 package japicmp.output.xml;
 
+import com.google.common.base.Joiner;
 import japicmp.config.Options;
+import japicmp.config.PackageFilter;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.JApiClass;
@@ -26,7 +28,7 @@ public class XmlOutputGenerator {
 	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());
 
 	public void generate(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
-		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, newArchivePath, jApiClasses);
+		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, newArchivePath, jApiClasses, options);
 		//analyzeJpaAnnotations(jApiCmpXmlRoot, jApiClasses);
 		filterClasses(jApiClasses, options);
 		createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
@@ -94,11 +96,28 @@ public class XmlOutputGenerator {
 		outputFilter.filter(jApiClasses);
 	}
 
-	private JApiCmpXmlRoot createRootElement(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses) {
+	private JApiCmpXmlRoot createRootElement(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
 		JApiCmpXmlRoot jApiCmpXmlRoot = new JApiCmpXmlRoot();
 		jApiCmpXmlRoot.setOldJar(oldArchivePath);
 		jApiCmpXmlRoot.setNewJar(newArchivePath);
 		jApiCmpXmlRoot.setClasses(jApiClasses);
+		jApiCmpXmlRoot.setAccessModifier(options.getAccessModifier().name());
+		jApiCmpXmlRoot.setOnlyModifications(options.isOutputOnlyModifications());
+		jApiCmpXmlRoot.setOnlyBinaryIncompatibleModifications(options.isOutputOnlyBinaryIncompatibleModifications());
+		jApiCmpXmlRoot.setPackagesInclude(packageListAsString(options.getPackagesInclude(), true));
+		jApiCmpXmlRoot.setPackagesExclude(packageListAsString(options.getPackagesExclude(), false));
 		return jApiCmpXmlRoot;
+	}
+
+	private String packageListAsString(List<PackageFilter> packagesInclude, boolean include) {
+		String join = Joiner.on(",").skipNulls().join(packagesInclude);
+		if (join.length() == 0) {
+			if (include) {
+				join = "all";
+			} else {
+				join = "n.a.";
+			}
+		}
+		return join;
 	}
 }

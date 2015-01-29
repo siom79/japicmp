@@ -85,16 +85,59 @@
                     .modifier {
                         font-style: italic;
                     }
+                    .method_return_type {
+
+                    }
                     ul {
                         list-style-type: none;
                         padding: 0px 0px;
+                    }
+                    .meta-information {
+                        margin-top: 1em;
+                        margin-bottom: 1em;
+                        background: #ededed;
+                        display: inline-block;
                     }
 				</style>
 			</head>
 			<body>
                 <span class="title">JApiCmp-Report</span><br/>
-                <span>old=<xsl:value-of select="@oldJar"/></span><br/>
-                <span>new=<xsl:value-of select="@newJar"/></span><br/>
+                <div class="meta-information">
+                    <table>
+                        <tr>
+                            <td>Old:</td>
+                            <td><xsl:value-of select="@oldJar"/></td>
+                        </tr>
+                        <tr>
+                            <td>New:</td>
+                            <td><xsl:value-of select="@newJar"/></td>
+                        </tr>
+                        <tr>
+                            <td>Created:</td>
+                            <td><xsl:value-of select="@creationTimestamp"/></td>
+                        </tr>
+                        <tr>
+                            <td>Access modifier filter:</td>
+                            <td><xsl:value-of select="@accessModifier"/></td>
+                        </tr>
+                        <tr>
+                            <td>Only modifications:</td>
+                            <td><xsl:value-of select="@onlyModifications"/></td>
+                        </tr>
+                        <tr>
+                            <td>Only binary incompatible modifications:</td>
+                            <td><xsl:value-of select="@onlyBinaryIncompatibleModifications"/></td>
+                        </tr>
+                        <tr>
+                            <td>Packages included:</td>
+                            <td><xsl:value-of select="@packagesInclude"/></td>
+                        </tr>
+                        <tr>
+                            <td>Packages excluded:</td>
+                            <td><xsl:value-of select="@packagesExclude"/></td>
+                        </tr>
+                    </table>
+                </div>
                 <ul>
                     <xsl:if test="count(classes/class) > 0">
                         <li><a href="#toc">Classes</a></li>
@@ -143,6 +186,9 @@
     <xsl:template match="class" mode="detail">
         <div>
             <div class="class">
+                <xsl:attribute name="id">
+                    <xsl:value-of select="@fullyQualifiedName" />
+                </xsl:attribute>
                 <div class="class_header">
                     <span class="label">
                         <a>
@@ -158,7 +204,13 @@
                     <a href="#toc" class="toc_link">top</a>
                 </div>
                 <div class="class_superclass">
-                    <xsl:if test="count(superclass) > 0 and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.')">
+                    <xsl:if test="  count(superclass) > 0
+                                    and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.')
+                                    and (       (/japicmp/@onlyModifications = 'false' and /japicmp/@onlyBinaryIncompatibleModifications = 'false')
+                                            or ((/japicmp/@onlyModifications = 'true' or /japicmp/@onlyBinaryIncompatibleModifications = 'true') and superclass/@changeStatus = 'NEW' and superclass/@superclassNew != 'java.lang.Object')
+                                            or ((/japicmp/@onlyModifications = 'true' or /japicmp/@onlyBinaryIncompatibleModifications = 'true') and superclass/@changeStatus = 'REMOVED' and superclass/@superclassOld != 'java.lang.Object')
+                                            or ((/japicmp/@onlyModifications = 'true' or /japicmp/@onlyBinaryIncompatibleModifications = 'true') and superclass/@changeStatus = 'MODIFIED')
+                                            )">
                         <span class="label_class_member">Superclass:</span>
                         <table>
                             <thead>
@@ -344,7 +396,7 @@
                 <xsl:call-template name="modifiers"/>
             </td>
             <td>
-                <xsl:value-of select="@returnType" />
+                <xsl:apply-templates select="returnType"/>
             </td>
             <td>
                 <xsl:value-of select="@name" />(<xsl:apply-templates select="parameters"/>)
@@ -594,6 +646,47 @@
             <xsl:if test="@binaryCompatible = 'false'">
                 (!)
             </xsl:if>
+        </span>
+    </xsl:template>
+
+    <xsl:template match="returnType">
+        <span>
+            <xsl:choose>
+                <xsl:when test="@changeStatus = 'MODIFIED'">
+                    <xsl:attribute name="class">
+                        modified method_return_type
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'UNCHANGED'">
+                    <xsl:attribute name="class">
+                        unchanged method_return_type
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'NEW'">
+                    <xsl:attribute name="class">
+                        new method_return_type
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'REMOVED'">
+                    <xsl:attribute name="class">
+                        removed method_return_type
+                    </xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="@changeStatus = 'MODIFIED'">
+                    <xsl:value-of select="@newValue"/>&#160;(&lt;-&#160;<xsl:value-of select="@oldValue"/>)
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'UNCHANGED'">
+                    <xsl:value-of select="@newValue"/>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'NEW'">
+                    <xsl:value-of select="@newValue"/>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'REMOVED'">
+                    <xsl:value-of select="@oldValue"/>
+                </xsl:when>
+            </xsl:choose>
         </span>
     </xsl:template>
 </xsl:stylesheet>

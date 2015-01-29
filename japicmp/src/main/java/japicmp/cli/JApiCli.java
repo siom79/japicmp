@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import io.airlift.command.Command;
 import io.airlift.command.HelpOption;
 import io.airlift.command.Option;
+import io.airlift.command.model.CommandMetadata;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -12,6 +13,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
+import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
 
@@ -45,14 +47,16 @@ public class JApiCli {
 		public String pathToXmlOutputFile;
 		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
+		@Option(name = { "-s", "--semantic-versioning" }, description ="Tells you which part of the version to increment.")
+		public boolean semanticVersioning;
 
 		@Override
 		public void run() {
 
-			Options options = create(pathToOldVersionJar, pathToNewVersionJar, //
-					pathToXmlOutputFile, pathToHtmlOutputFile, //
-					modifiedOnly, toModifier(accessModifier), //
-					packagesToInclude, packagesToExclude, //
+			Options options = create(pathToOldVersionJar, pathToNewVersionJar,
+					pathToXmlOutputFile, pathToHtmlOutputFile,
+					modifiedOnly, toModifier(accessModifier),
+					packagesToInclude, packagesToExclude,
 					onlyBinaryIncompatibleModifications);
 
 			File oldArchive = options.getOldArchive();
@@ -65,13 +69,17 @@ public class JApiCli {
 
 		private JarArchiveComparatorOptions copyOptions(Options options) {
 			JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
-			comparatorOptions.setModifierLevel(options.getAccessModifier());
 			comparatorOptions.getPackagesInclude().addAll(options.getPackagesInclude());
 			comparatorOptions.getPackagesExclude().addAll(options.getPackagesExclude());
 			return comparatorOptions;
 		}
 
 		private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
+			if (semanticVersioning) {
+				SemverOut semverOut = new SemverOut(options, jApiClasses);
+				semverOut.generate();
+				return;
+			}
 			OutputFilter.sortClassesAndMethods(jApiClasses);
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
 				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
@@ -82,16 +90,16 @@ public class JApiCli {
 			System.out.println(output);
 		}
 
-		private Options create(String oldArchive, String newArchive, //
-				String xmlOutputFile, String htmlOutputFile, //
-				boolean onlyModifications, Optional<AccessModifier> accessModifier, //
-				String packagesIncludeArg, String packagesExcludeArg, //
+		private Options create(String oldArchive, String newArchive,
+				String xmlOutputFile, String htmlOutputFile,
+				boolean onlyModifications, Optional<AccessModifier> accessModifier,
+				String packagesIncludeArg, String packagesExcludeArg,
 				boolean onlyBinaryIncompatibleModifications) throws IllegalArgumentException {
 
 			Options options = new Options();
 			try {
-				options.setNewArchive(validFile(newArchive, "no valid new archive found"));
-				options.setOldArchive(validFile(oldArchive, "no valid old archive found"));
+				options.setNewArchive(validFile(newArchive, "Required option -n is missing."));
+				options.setOldArchive(validFile(oldArchive, "Required option -o is missing."));
 				options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
 				options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
 				options.setOutputOnlyModifications(onlyModifications);
@@ -99,10 +107,8 @@ public class JApiCli {
 				options.addPackageIncludeFromArgument(Optional.fromNullable(packagesIncludeArg));
 				options.addPackagesExcludeFromArgument(Optional.fromNullable(packagesExcludeArg));
 				options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
-			} catch (IllegalArgumentException e) {
-				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
 			} catch (Exception e) {
-				throw new IllegalStateException(e);
+				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
 			}
 			return options;
 		}
@@ -135,8 +141,8 @@ public class JApiCli {
 				try {
 					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
 				} catch (IllegalArgumentException e) {
-					throw FormattedException //
-							.ofIAE("Invalid value for option -a: %s. Possible values are: %s.", //
+					throw FormattedException
+							.ofIAE("Invalid value for option -a: %s. Possible values are: %s.",
 									accessModifierArg, AccessModifier.listOfAccessModifier());
 				}
 			} else {
