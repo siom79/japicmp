@@ -31,9 +31,9 @@ public class XmlOutputGeneratorAccessModifierTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
-		List<JApiClass> jApiClasses = compare(AccessModifier.PUBLIC);
+		List<JApiClass> jApiClasses = compare();
 		generateHtmlOutput(jApiClasses, "target/diff_public.xml", "target/diff_public.html", AccessModifier.PUBLIC);
-		jApiClasses = compare(AccessModifier.PRIVATE);
+		jApiClasses = compare();
 		generateHtmlOutput(jApiClasses, "target/diff_private.xml", "target/diff_private.html", AccessModifier.PRIVATE);
 		File htmlFilePublic = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html").toFile();
 		File htmlFilePrivate = Paths.get(System.getProperty("user.dir"), "target", "diff_private.html").toFile();
@@ -41,9 +41,8 @@ public class XmlOutputGeneratorAccessModifierTest {
 		documentPrivate = Jsoup.parse(htmlFilePrivate, Charset.forName("UTF-8").toString());
 	}
 
-	private static List<JApiClass> compare(AccessModifier accessModifier) {
+	private static List<JApiClass> compare() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.setModifierLevel(accessModifier);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		return jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 	}

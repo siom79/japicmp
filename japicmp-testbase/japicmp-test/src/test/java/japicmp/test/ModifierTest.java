@@ -20,7 +20,6 @@ public class ModifierTest {
     @Test
     public void testOptionPublicModifier() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.setModifierLevel(AccessModifier.PUBLIC);
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         JApiClass modifierInnerClass = getJApiClass(jApiClasses, Modifier.ModifierPublicToProtected.class.getName());
@@ -32,7 +31,6 @@ public class ModifierTest {
     @Test
     public void testOptionPrivateModifier() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.setModifierLevel(AccessModifier.PRIVATE);
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         JApiClass modifierInnerClass = getJApiClass(jApiClasses, Modifier.ModifierPublicToProtected.class.getName());
@@ -44,7 +42,6 @@ public class ModifierTest {
     @Test
     public void testFinalModifierChanges() {
     	JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.setModifierLevel(AccessModifier.PRIVATE);
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         JApiClass modifierClass = getJApiClass(jApiClasses, Modifier.class.getName());
@@ -57,7 +54,6 @@ public class ModifierTest {
     @Test
     public void testStaticModifierChanges() {
     	JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.setModifierLevel(AccessModifier.PRIVATE);
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         JApiClass modifierClass = getJApiClass(jApiClasses, Modifier.class.getName());

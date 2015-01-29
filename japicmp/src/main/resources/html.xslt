@@ -85,6 +85,9 @@
                     .modifier {
                         font-style: italic;
                     }
+                    .method_return_type {
+
+                    }
                     ul {
                         list-style-type: none;
                         padding: 0px 0px;
@@ -393,7 +396,7 @@
                 <xsl:call-template name="modifiers"/>
             </td>
             <td>
-                <xsl:value-of select="@returnType" />
+                <xsl:apply-templates select="returnType"/>
             </td>
             <td>
                 <xsl:value-of select="@name" />(<xsl:apply-templates select="parameters"/>)
@@ -643,6 +646,47 @@
             <xsl:if test="@binaryCompatible = 'false'">
                 (!)
             </xsl:if>
+        </span>
+    </xsl:template>
+
+    <xsl:template match="returnType">
+        <span>
+            <xsl:choose>
+                <xsl:when test="@changeStatus = 'MODIFIED'">
+                    <xsl:attribute name="class">
+                        modified method_return_type
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'UNCHANGED'">
+                    <xsl:attribute name="class">
+                        unchanged method_return_type
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'NEW'">
+                    <xsl:attribute name="class">
+                        new method_return_type
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'REMOVED'">
+                    <xsl:attribute name="class">
+                        removed method_return_type
+                    </xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="@changeStatus = 'MODIFIED'">
+                    <xsl:value-of select="@newValue"/>&#160;(&lt;-&#160;<xsl:value-of select="@oldValue"/>)
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'UNCHANGED'">
+                    <xsl:value-of select="@newValue"/>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'NEW'">
+                    <xsl:value-of select="@newValue"/>
+                </xsl:when>
+                <xsl:when test="@changeStatus = 'REMOVED'">
+                    <xsl:value-of select="@oldValue"/>
+                </xsl:when>
+            </xsl:choose>
         </span>
     </xsl:template>
 </xsl:stylesheet>

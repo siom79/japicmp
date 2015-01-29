@@ -231,6 +231,11 @@ public class BinaryCompatibility {
 					}
 				}
 			}
+			// section 13.4.15 of "Java Language Specification" SE7 (Method Result Type)
+			if (method.getReturnType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				method.setBinaryCompatible(false);
+				changedIncompatible = true;
+			}
 			// section 13.4.16 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getAbstractModifier().hasChangedFromTo(AbstractModifier.NON_ABSTRACT, AbstractModifier.ABSTRACT)) {
 				method.setBinaryCompatible(false);

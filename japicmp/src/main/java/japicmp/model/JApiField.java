@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
-import japicmp.util.SignatureParser;
+import japicmp.util.MethodDescriptorParser;
 import javassist.CtField;
 import javassist.Modifier;
 import javassist.bytecode.AnnotationsAttribute;
@@ -77,8 +77,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     }
 
     private String signatureToType(String signature) {
-        SignatureParser signatureParser = new SignatureParser();
-        List<String> types = signatureParser.parseTypes(signature);
+        MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
+        List<String> types = methodDescriptorParser.parseTypes(signature);
         if (types.size() > 0) {
             return types.get(0);
         }

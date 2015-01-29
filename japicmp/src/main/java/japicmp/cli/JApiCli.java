@@ -69,7 +69,6 @@ public class JApiCli {
 
 		private JarArchiveComparatorOptions copyOptions(Options options) {
 			JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
-			comparatorOptions.setModifierLevel(options.getAccessModifier());
 			comparatorOptions.getPackagesInclude().addAll(options.getPackagesInclude());
 			comparatorOptions.getPackagesExclude().addAll(options.getPackagesExclude());
 			return comparatorOptions;
