@@ -40,8 +40,8 @@
         <github.account>siom79</github.account>
         <github.project>japicmp</github.project>
         <cloudbees.account>siom79</cloudbees.account>
-        <java.source>1.7</java.source>
-        <java.target>1.7</java.target>
+        <java.source>1.8</java.source>
+        <java.target>1.8</java.target>
     </properties>
 
     <modules>
