@@ -107,11 +107,21 @@ public class StdoutOutputGenerator {
     }
     
     private String returnType(JApiBehavior jApiBehavior) {
+		String returnTypeAsString = "";
     	if(jApiBehavior instanceof JApiMethod) {
     		JApiMethod method = (JApiMethod)jApiBehavior;
-    		return method.getReturnType() + " ";
+			JApiReturnType jApiReturnType = method.getReturnType();
+			if (jApiReturnType.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+				returnTypeAsString = jApiReturnType.getNewReturnType() + " ";
+			} else if(jApiReturnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				returnTypeAsString = jApiReturnType.getNewReturnType() + " (<-" + jApiReturnType.getOldReturnType() + ") ";
+			} else if(jApiReturnType.getChangeStatus() == JApiChangeStatus.NEW) {
+				returnTypeAsString = jApiReturnType.getNewReturnType() + " ";
+			} else {
+				returnTypeAsString = jApiReturnType.getOldReturnType() + " ";
+			}
     	}
-    	return "";
+    	return returnTypeAsString;
     }
 
     private void appendAnnotation(StringBuilder sb, String signs, JApiAnnotation jApiAnnotation, int numberOfTabs) {
