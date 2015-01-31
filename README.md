@@ -310,6 +310,12 @@ You can download the latest version from the [release page](https://github.com/s
 
 * ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
 
+##Code Style Guidelines for Contributors
+
+* Indentation with tab
+* Newline: LF
+* Linelength: 180
+
 ##Related work##
 
 The following projects have related goals:
