@@ -35,6 +35,7 @@
                     </newVersion>
                     <parameter>
                         <accessModifier>public</accessModifier>
+                        <onlyModified>false</onlyModified>
                     </parameter>
                     <dependencies>
                         <dependency>

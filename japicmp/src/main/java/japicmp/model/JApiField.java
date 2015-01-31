@@ -102,11 +102,6 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
             if (this.type.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
-            for (JApiAnnotation jApiAnnotation : annotations) {
-                if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                    changeStatus = JApiChangeStatus.MODIFIED;
-                }
-            }
         }
         return changeStatus;
     }

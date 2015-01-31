@@ -21,7 +21,9 @@ public class OutputFilter extends Filter {
                 boolean remove = false;
                 if (options.isOutputOnlyModifications()) {
                     if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                        remove = true;
+						if (hasOnlyUnchangedAnnotations(element)) {
+							remove = true;
+						}
                     }
                 }
                 if (options.isOutputOnlyBinaryIncompatibleModifications()) {
@@ -37,7 +39,18 @@ public class OutputFilter extends Filter {
                 }
             }
 
-            @Override
+			private boolean hasOnlyUnchangedAnnotations(JApiHasAnnotations jApiHasAnnotations) {
+				boolean hasOnlyUnchangedAnnotations = true;
+				for (JApiAnnotation jApiAnnotation : jApiHasAnnotations.getAnnotations()) {
+					if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+						hasOnlyUnchangedAnnotations = false;
+						break;
+					}
+				}
+				return hasOnlyUnchangedAnnotations;
+			}
+
+			@Override
             public void visit(Iterator<JApiAnnotation> iterator, JApiAnnotation element) {
                 boolean remove = false;
                 if (options.isOutputOnlyModifications()) {
@@ -83,7 +96,9 @@ public class OutputFilter extends Filter {
                 boolean remove = false;
                 if (options.isOutputOnlyModifications()) {
                     if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                        remove = true;
+						if (hasOnlyUnchangedAnnotations(element)) {
+							remove = true;
+						}
                     }
                 }
                 if (options.isOutputOnlyBinaryIncompatibleModifications()) {
@@ -104,7 +119,9 @@ public class OutputFilter extends Filter {
                 boolean remove = false;
                 if (options.isOutputOnlyModifications()) {
                     if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                        remove = true;
+						if (hasOnlyUnchangedAnnotations(element)) {
+							remove = true;
+						}
                     }
                 }
                 if (options.isOutputOnlyBinaryIncompatibleModifications()) {
@@ -125,7 +142,10 @@ public class OutputFilter extends Filter {
                 boolean remove = false;
                 if (options.isOutputOnlyModifications()) {
                     if (jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-                        remove = true;
+						ImmutableList<Boolean> list = findOneChangedElement(jApiClass);
+						if (list.isEmpty()) { //filter out this class if it does not have any changed element (e.g. annotations)
+							remove = true;
+						}
                     }
                 }
                 if (options.isOutputOnlyBinaryIncompatibleModifications()) {
@@ -162,21 +182,25 @@ public class OutputFilter extends Filter {
                 Filter.filter(Arrays.asList(jApiClass), new FilterVisitor() {
                     @Override
                     public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
-                        // ignore this case
+						evaluateAnnotations(jApiClass);
                     }
 
                     @Override
                     public void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod) {
                         if (jApiMethod.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                             builder.add(Boolean.TRUE);
-                        }
+                        } else {
+							evaluateAnnotations(jApiMethod);
+						}
                     }
 
                     @Override
                     public void visit(Iterator<JApiConstructor> iterator, JApiConstructor jApiConstructor) {
                         if (jApiConstructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                             builder.add(Boolean.TRUE);
-                        }
+						} else {
+							evaluateAnnotations(jApiConstructor);
+						}
                     }
 
                     @Override
@@ -190,10 +214,20 @@ public class OutputFilter extends Filter {
                     public void visit(Iterator<JApiField> iterator, JApiField jApiField) {
                         if (jApiField.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                             builder.add(Boolean.TRUE);
-                        }
+						} else {
+							evaluateAnnotations(jApiField);
+						}
                     }
 
-                    @Override
+					private void evaluateAnnotations(JApiHasAnnotations jApiHasAnnotations) {
+						for (JApiAnnotation jApiAnnotation : jApiHasAnnotations.getAnnotations()) {
+							if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+								builder.add(Boolean.TRUE);
+							}
+						}
+					}
+
+					@Override
                     public void visit(Iterator<JApiAnnotation> iterator, JApiAnnotation jApiAnnotation) {
                         if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                             builder.add(Boolean.TRUE);
@@ -202,10 +236,10 @@ public class OutputFilter extends Filter {
 
                     @Override
                     public void visit(JApiSuperclass jApiSuperclass) {
-                        if (jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                            builder.add(Boolean.TRUE);
-                        }
-                    }
+						if (jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+							builder.add(Boolean.TRUE);
+						}
+					}
                 });
                 return builder.build();
             }

@@ -99,11 +99,6 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
             if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
-            for (JApiAnnotation jApiAnnotation : annotations) {
-                if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                    changeStatus = JApiChangeStatus.MODIFIED;
-                }
-            }
         }
         return changeStatus;
     }

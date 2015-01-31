@@ -420,11 +420,6 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 					changeStatus = JApiChangeStatus.MODIFIED;
 				}
 			}
-			for (JApiAnnotation annotation : annotations) {
-				if (annotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-					changeStatus = JApiChangeStatus.MODIFIED;
-				}
-			}
 		}
 		return changeStatus;
 	}
