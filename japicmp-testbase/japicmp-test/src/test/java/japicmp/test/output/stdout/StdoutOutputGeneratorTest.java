@@ -1,5 +1,7 @@
 package japicmp.test.output.stdout;
 
+import java.util.List;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -12,11 +14,8 @@ import japicmp.model.JApiClass;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import org.junit.Test;
 
-import java.util.List;
-
 import static japicmp.test.util.Helper.getArchive;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
