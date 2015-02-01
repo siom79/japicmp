@@ -105,13 +105,23 @@ public class StdoutOutputGenerator {
         }
         sb.append(")\n");
     }
-    
+
     private String returnType(JApiBehavior jApiBehavior) {
+		String returnTypeAsString = "";
     	if(jApiBehavior instanceof JApiMethod) {
     		JApiMethod method = (JApiMethod)jApiBehavior;
-    		return method.getReturnType() + " ";
+			JApiReturnType jApiReturnType = method.getReturnType();
+			if (jApiReturnType.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+				returnTypeAsString = jApiReturnType.getNewReturnType() + " ";
+			} else if(jApiReturnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				returnTypeAsString = jApiReturnType.getNewReturnType() + " (<-" + jApiReturnType.getOldReturnType() + ") ";
+			} else if(jApiReturnType.getChangeStatus() == JApiChangeStatus.NEW) {
+				returnTypeAsString = jApiReturnType.getNewReturnType() + " ";
+			} else {
+				returnTypeAsString = jApiReturnType.getOldReturnType() + " ";
+			}
     	}
-    	return "";
+    	return returnTypeAsString;
     }
 
     private void appendAnnotation(StringBuilder sb, String signs, JApiAnnotation jApiAnnotation, int numberOfTabs) {
@@ -141,7 +151,7 @@ public class StdoutOutputGenerator {
         }
         sb.append("\n");
     }
-    
+
 	private String elementValueList2String(List<JApiAnnotationElementValue> values) {
 		StringBuilder sb = new StringBuilder();
 		for (JApiAnnotationElementValue value : values) {

@@ -1,34 +1,20 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
+import japicmp.util.MethodDescriptorParser;
 import japicmp.util.ModifierHelper;
-import japicmp.util.SignatureParser;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtField;
-import javassist.CtMethod;
-import javassist.Modifier;
-import javassist.NotFoundException;
+import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.google.common.base.Optional;
+import java.util.*;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
 		JApiBinaryCompatibility, JApiHasAnnotations {
@@ -50,6 +36,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final JApiModifier<AbstractModifier> abstractModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private boolean binaryCompatible = true;
+	private boolean changeCausedByClassElement = false;
 
 	public enum Type {
 		ANNOTATION, INTERFACE, CLASS, ENUM
@@ -292,64 +279,64 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private void sortMethodsIntoLists(Map<String, CtMethod> oldMethodsMap, Map<String, CtMethod> newMethodsMap) {
-		SignatureParser signatureParser = new SignatureParser();
+		MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
 		for (CtMethod ctMethod : oldMethodsMap.values()) {
-			signatureParser.parse(ctMethod.getSignature());
-			CtMethod foundMethod = newMethodsMap.get(toMethodKey(ctMethod, signatureParser));
+			methodDescriptorParser.parse(ctMethod.getSignature());
+			CtMethod foundMethod = newMethodsMap.get(toMethodKey(ctMethod, methodDescriptorParser));
 			if (foundMethod == null) {
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtMethod>absent(),
-						signatureParser.getReturnType());
-				addParametersToMethod(signatureParser, jApiMethod);
+						methodDescriptorParser.getReturnType());
+				addParametersToMethod(methodDescriptorParser, jApiMethod);
 				methods.add(jApiMethod);
 			} else {
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod),
-						signatureParser.getReturnType());
-				addParametersToMethod(signatureParser, jApiMethod);
+						methodDescriptorParser.getReturnType());
+				addParametersToMethod(methodDescriptorParser, jApiMethod);
 				methods.add(jApiMethod);
 			}
 		}
 		for (CtMethod ctMethod : newMethodsMap.values()) {
-			signatureParser.parse(ctMethod.getSignature());
-			CtMethod foundMethod = oldMethodsMap.get(toMethodKey(ctMethod, signatureParser));
+			methodDescriptorParser.parse(ctMethod.getSignature());
+			CtMethod foundMethod = oldMethodsMap.get(toMethodKey(ctMethod, methodDescriptorParser));
 			if (foundMethod == null) {
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod),
-						signatureParser.getReturnType());
-				addParametersToMethod(signatureParser, jApiMethod);
+						methodDescriptorParser.getReturnType());
+				addParametersToMethod(methodDescriptorParser, jApiMethod);
 				methods.add(jApiMethod);
 			}
 		}
 	}
 
 	private void sortConstructorsIntoLists(Map<String, CtConstructor> oldConstructorsMap, Map<String, CtConstructor> newConstructorsMap) {
-		SignatureParser signatureParser = new SignatureParser();
+		MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
 		for (CtConstructor ctMethod : oldConstructorsMap.values()) {
 			String longName = ctMethod.getLongName();
-			signatureParser.parse(ctMethod.getSignature());
+			methodDescriptorParser.parse(ctMethod.getSignature());
 			CtConstructor foundMethod = newConstructorsMap.get(longName);
 			if (foundMethod == null) {
 				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>absent());
-				addParametersToMethod(signatureParser, jApiConstructor);
+				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				constructors.add(jApiConstructor);
 			} else {
 				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod));
-				addParametersToMethod(signatureParser, jApiConstructor);
+				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				constructors.add(jApiConstructor);
 			}
 		}
 		for (CtConstructor ctMethod : newConstructorsMap.values()) {
 			String longName = ctMethod.getLongName();
-			signatureParser.parse(ctMethod.getSignature());
+			methodDescriptorParser.parse(ctMethod.getSignature());
 			CtConstructor foundMethod = oldConstructorsMap.get(longName);
 			if (foundMethod == null) {
 				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>absent(), Optional.of(ctMethod));
-				addParametersToMethod(signatureParser, jApiConstructor);
+				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				constructors.add(jApiConstructor);
 			}
 		}
 	}
 
-	private void addParametersToMethod(SignatureParser signatureParser, JApiBehavior jApiMethod) {
-		for (String param : signatureParser.getParameters()) {
+	private void addParametersToMethod(MethodDescriptorParser methodDescriptorParser, JApiBehavior jApiMethod) {
+		for (String param : methodDescriptorParser.getParameters()) {
 			jApiMethod.addParameter(new JApiParameter(param));
 		}
 	}
@@ -359,16 +346,16 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		if (ctClassOptional.isPresent()) {
 			CtClass ctClass = ctClassOptional.get();
 			for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
-				SignatureParser signatureParser = new SignatureParser();
-				signatureParser.parse(ctMethod.getSignature());
-				methods.put(toMethodKey(ctMethod, signatureParser), ctMethod);
+				MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
+				methodDescriptorParser.parse(ctMethod.getSignature());
+				methods.put(toMethodKey(ctMethod, methodDescriptorParser), ctMethod);
 			}
 		}
 		return methods;
 	}
 
-	private String toMethodKey(CtMethod ctMethod, SignatureParser signatureParser) {
-		return ctMethod.getLongName() + "#" + signatureParser.getReturnType();
+	private String toMethodKey(CtMethod ctMethod, MethodDescriptorParser methodDescriptorParser) {
+		return methodDescriptorParser.getMethodSignature(ctMethod.getName());
 	}
 
 	private Map<String, CtConstructor> createConstructorMap(Optional<CtClass> ctClass) {
@@ -409,21 +396,19 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			for (JApiField field : fields) {
 				if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 					changeStatus = JApiChangeStatus.MODIFIED;
+					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiMethod method : methods) {
 				if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 					changeStatus = JApiChangeStatus.MODIFIED;
+					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiConstructor constructor : constructors) {
 				if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 					changeStatus = JApiChangeStatus.MODIFIED;
-				}
-			}
-			for (JApiAnnotation annotation : annotations) {
-				if (annotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-					changeStatus = JApiChangeStatus.MODIFIED;
+					changeCausedByClassElement = true;
 				}
 			}
 		}
@@ -641,5 +626,10 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	@XmlElement(name = "annotation")
 	public List<JApiAnnotation> getAnnotations() {
 		return annotations;
+	}
+
+	@XmlTransient
+	public boolean isChangeCausedByClassElement() {
+		return changeCausedByClassElement;
 	}
 }

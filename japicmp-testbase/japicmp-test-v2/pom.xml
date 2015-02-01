@@ -9,6 +9,11 @@
 
     <artifactId>japicmp-test-v2</artifactId>
 
+    <properties>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <source.skip>true</source.skip>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -30,6 +35,7 @@
                     </newVersion>
                     <parameter>
                         <accessModifier>public</accessModifier>
+                        <onlyModified>true</onlyModified>
                     </parameter>
                     <dependencies>
                         <dependency>

@@ -122,6 +122,15 @@ public class BinaryCompatibilityTest {
 		JApiClass subclassWithMethod = getJApiClass(jApiClasses, SubclassWithMethodToBeRemovedButContainedInSuperclass.class.getName());
 		assertThat(subclassWithMethod.isBinaryCompatible(), is(true));
 	}
+
+	@Test
+	public void test_JLS_13_4_15() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, MethodReturnType.class.getName());
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodReturnTypeUnchanged");
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodReturnTypeChangesFromIntToString");
+		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+	}
 	
 	@Test
 	public void test_JLS_13_4_16() {

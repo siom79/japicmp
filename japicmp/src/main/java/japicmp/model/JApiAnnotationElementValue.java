@@ -1,5 +1,6 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
 import japicmp.util.OptionalHelper;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
@@ -8,9 +9,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.google.common.base.Optional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +18,7 @@ public class JApiAnnotationElementValue {
     private final Type type;
     private final Object value;
     private Optional<String> name = Optional.<String>absent();
-    
+
     public enum Type {
         Double, Char, Long, Integer, Float, Byte, Enum, Annotation, Class, Short, Boolean, UnsupportedType, Array, String
     }
@@ -117,12 +115,12 @@ public class JApiAnnotationElementValue {
 	public String getFullyQualifiedName() {
 		return fullyQualifiedName;
 	}
-    
+
 	@XmlTransient
 	public Optional<String> getName() {
 		return this.name;
 	}
-	
+
 	@XmlAttribute(name = "name")
 	public String getNameString() {
 		return OptionalHelper.optionalToString(this.name);

@@ -4,9 +4,9 @@ import japicmp.model.JApiClass;
 import javassist.CtClass;
 
 public class ClassHelper {
-	
+
 	private ClassHelper() {
-		
+
 	}
 
     public static JApiClass.Type getType(CtClass ctClass) {

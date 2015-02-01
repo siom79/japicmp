@@ -64,26 +64,6 @@ public class IntefacesTest {
         assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), Serializable.class.getCanonicalName()).getChangeStatus(), is(JApiChangeStatus.NEW));
     }
 
-    private String replaceLastDotWith$(String str) {
-        int lastIndex = str.lastIndexOf('.');
-        if (lastIndex > -1) {
-            if (lastIndex == 0) {
-                if (str.length() > 1) {
-                    str = "$" + str.substring(1);
-                } else {
-                    str = "$";
-                }
-            } else {
-                if (str.length() > lastIndex + 1) {
-                    str = str.substring(0, lastIndex) + "$" + str.substring(lastIndex + 1);
-                } else {
-                    str = str.substring(0, lastIndex) + "$";
-                }
-            }
-        }
-        return str;
-    }
-
     @Test
     public void testNewClassWithNewInterface() {
         JApiClass newClassWithNewInterface = getJApiClass(jApiClasses, "japicmp.test.Interfaces$NewClassWithNewInterface");

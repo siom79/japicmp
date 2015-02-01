@@ -1,14 +1,9 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import javassist.CtBehavior;
 import javassist.CtConstructor;
 import javassist.CtMethod;
@@ -19,8 +14,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations {
     private final String name;
@@ -98,11 +95,6 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
             }
             if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
-            }
-            for (JApiAnnotation jApiAnnotation : annotations) {
-                if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                    changeStatus = JApiChangeStatus.MODIFIED;
-                }
             }
         }
         return changeStatus;

@@ -1,37 +1,21 @@
 package japicmp.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javassist.bytecode.annotation.Annotation;
-import javassist.bytecode.annotation.AnnotationMemberValue;
-import javassist.bytecode.annotation.ArrayMemberValue;
-import javassist.bytecode.annotation.BooleanMemberValue;
-import javassist.bytecode.annotation.ByteMemberValue;
-import javassist.bytecode.annotation.CharMemberValue;
-import javassist.bytecode.annotation.ClassMemberValue;
-import javassist.bytecode.annotation.DoubleMemberValue;
-import javassist.bytecode.annotation.EnumMemberValue;
-import javassist.bytecode.annotation.FloatMemberValue;
-import javassist.bytecode.annotation.IntegerMemberValue;
-import javassist.bytecode.annotation.LongMemberValue;
-import javassist.bytecode.annotation.MemberValue;
-import javassist.bytecode.annotation.ShortMemberValue;
-import javassist.bytecode.annotation.StringMemberValue;
+import com.google.common.base.Optional;
+import javassist.bytecode.annotation.*;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JApiAnnotationElement implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final String name;
 	private final Optional<MemberValue> oldValue;
 	private final Optional<MemberValue> newValue;
 	private final JApiChangeStatus changeStatus;
-	
+
 	public JApiAnnotationElement(String name, Optional<MemberValue> oldValue, Optional<MemberValue> newValue, JApiChangeStatus changeStatus) {
 		this.name = name;
 		this.oldValue = oldValue;

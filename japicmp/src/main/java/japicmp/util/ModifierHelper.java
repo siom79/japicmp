@@ -11,7 +11,7 @@ public class ModifierHelper {
     private ModifierHelper() {
 
     }
-    
+
     public static boolean matchesModifierLevel(AccessModifier modifierLevelOfElement, AccessModifier modifierLevel) {
     	return (modifierLevelOfElement.getLevel() >= modifierLevel.getLevel());
     }
@@ -32,7 +32,7 @@ public class ModifierHelper {
             return AccessModifier.PACKAGE_PROTECTED;
         }
     }
-    
+
 	public static boolean isNotPrivate(JApiHasAccessModifier jApiHasAccessModifier) {
 		JApiModifier<AccessModifier> accessModifier = jApiHasAccessModifier.getAccessModifier();
 		if(accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
@@ -50,7 +50,7 @@ public class ModifierHelper {
 		}
 		return false;
 	}
-	
+
 	public static boolean hasModifierLevelDecreased(JApiHasAccessModifier hasAccessModifier) {
 		JApiModifier<AccessModifier> accessModifier = hasAccessModifier.getAccessModifier();
 		if(accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {

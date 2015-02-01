@@ -39,7 +39,7 @@ import com.google.common.base.Optional;
 public class SyntheticTest {
 
 	@Test
-	public void test() throws ZipException, IOException, CannotCompileException, NotFoundException {
+	public void test() throws IOException, CannotCompileException, NotFoundException {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
 		File archiveV1 = getArchive("japicmp-test-v1.jar");
 		File archiveV2 = getArchive("japicmp-test-v2.jar");

@@ -1,16 +1,15 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
 import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
-
-import com.google.common.base.Optional;
 
 public class JApiModifier<T> {
 	private final Optional<T> oldModifier;
 	private final Optional<T> newModifier;
 	private final JApiChangeStatus changeStatus;
-	
+
 	public JApiModifier(Optional<T> oldModifier, Optional<T> newModifier, JApiChangeStatus changeStatus) {
 		this.oldModifier = oldModifier;
 		this.newModifier = newModifier;
@@ -29,17 +28,17 @@ public class JApiModifier<T> {
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
 	}
-	
+
 	@XmlAttribute(name = "oldValue")
 	public String getValueOld() {
 		return OptionalHelper.optionalToString(this.oldModifier);
 	}
-	
+
 	@XmlAttribute(name = "newValue")
 	public String getValueNew() {
 		return OptionalHelper.optionalToString(this.newModifier);
 	}
-	
+
 	public boolean hasChangedFromTo(T oldValue, T newValue) {
 		boolean hasChanged = false;
 		if(oldModifier.isPresent() && newModifier.isPresent()) {
@@ -49,7 +48,7 @@ public class JApiModifier<T> {
 		}
 		return hasChanged;
 	}
-	
+
 	public boolean hasChangedFrom(T oldValue) {
 		boolean hasChanged = false;
 		if(oldModifier.isPresent() && newModifier.isPresent()) {

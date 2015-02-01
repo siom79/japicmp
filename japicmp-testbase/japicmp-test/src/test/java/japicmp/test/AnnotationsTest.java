@@ -44,7 +44,7 @@ public class AnnotationsTest {
     public void testFieldAnnotationRemoved() {
         JApiClass annotations = getJApiClass(jApiClasses, Annotations.class.getName());
         JApiField fieldAnnotationRemoved = getJApiField(annotations.getFields(), "fieldAnnotationRemoved");
-        assertThat(fieldAnnotationRemoved.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(fieldAnnotationRemoved.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
         JApiAnnotation fieldAnnotation = getJApiAnnotation(fieldAnnotationRemoved.getAnnotations(), Annotations.FieldAnnotation.class.getName());
         assertThat(fieldAnnotation.getChangeStatus(), is(JApiChangeStatus.REMOVED));
     }
@@ -53,7 +53,7 @@ public class AnnotationsTest {
     public void testFieldAnnotationAdded() {
         JApiClass annotations = getJApiClass(jApiClasses, Annotations.class.getName());
         JApiField fieldAnnotationAdded = getJApiField(annotations.getFields(), "fieldAnnotationAdded");
-        assertThat(fieldAnnotationAdded.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(fieldAnnotationAdded.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
         JApiAnnotation fieldAnnotation = getJApiAnnotation(fieldAnnotationAdded.getAnnotations(), Annotations.FieldAnnotation.class.getName());
         assertThat(fieldAnnotation.getChangeStatus(), is(JApiChangeStatus.NEW));
     }
@@ -71,7 +71,7 @@ public class AnnotationsTest {
     public void testFieldAnnotationValueNew() {
         JApiClass annotations = getJApiClass(jApiClasses, Annotations.class.getName());
         JApiField fieldAnnotationValueNew = getJApiField(annotations.getFields(), "fieldAnnotationValueNew");
-        assertThat(fieldAnnotationValueNew.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(fieldAnnotationValueNew.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
         JApiAnnotation fieldAnnotation = getJApiAnnotation(fieldAnnotationValueNew.getAnnotations(), Annotations.FieldAnnotation.class.getName());
         assertThat(fieldAnnotation.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
         JApiAnnotationElement element = getJApiAnnotationElement(fieldAnnotation.getElements(), "value");
@@ -82,7 +82,7 @@ public class AnnotationsTest {
     public void testFieldAnnotationValueRemoved() {
         JApiClass annotations = getJApiClass(jApiClasses, Annotations.class.getName());
         JApiField fieldAnnotationValueRemoved = getJApiField(annotations.getFields(), "fieldAnnotationValueRemoved");
-        assertThat(fieldAnnotationValueRemoved.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+        assertThat(fieldAnnotationValueRemoved.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
         JApiAnnotation fieldAnnotation = getJApiAnnotation(fieldAnnotationValueRemoved.getAnnotations(), Annotations.FieldAnnotation.class.getName());
         assertThat(fieldAnnotation.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
         JApiAnnotationElement element = getJApiAnnotationElement(fieldAnnotation.getElements(), "value");

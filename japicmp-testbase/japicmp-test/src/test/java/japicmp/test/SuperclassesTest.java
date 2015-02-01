@@ -21,7 +21,6 @@ public class SuperclassesTest {
 	@Test
 	public void test() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.setModifierLevel(AccessModifier.PRIVATE);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		assertThat(getJApiClass(jApiClasses, Superclasses.class.getName()).getChangeStatus(), is(JApiChangeStatus.UNCHANGED));

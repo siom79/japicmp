@@ -1,12 +1,12 @@
 package japicmp.model;
 
-import static japicmp.util.ModifierHelper.isNotPrivate;
-import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
+import static japicmp.util.ModifierHelper.isNotPrivate;
 
 public class BinaryCompatibility {
 
@@ -105,7 +105,7 @@ public class BinaryCompatibility {
 				}
 			}
 			// section 13.4.9 of "Java Language Specification" SE7
-			if (field.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
+			if (isNotPrivate(field) && field.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
 				field.setBinaryCompatible(false);
 				changedIncompatible = true;
 			}
@@ -230,6 +230,11 @@ public class BinaryCompatibility {
 						changedIncompatible = true;
 					}
 				}
+			}
+			// section 13.4.15 of "Java Language Specification" SE7 (Method Result Type)
+			if (method.getReturnType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				method.setBinaryCompatible(false);
+				changedIncompatible = true;
 			}
 			// section 13.4.16 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getAbstractModifier().hasChangedFromTo(AbstractModifier.NON_ABSTRACT, AbstractModifier.ABSTRACT)) {

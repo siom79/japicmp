@@ -19,7 +19,6 @@ public class AccessModifierLevelTest {
 	@BeforeClass
 	public static void beforeClass() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.setModifierLevel(AccessModifier.PUBLIC);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 	}

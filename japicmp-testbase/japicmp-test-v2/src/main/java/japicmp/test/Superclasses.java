@@ -29,4 +29,8 @@ public class Superclasses {
 	public static class SuperClassChanges extends SuperclassB {
 		
 	}
+
+	public static class AddedWithSuperclass extends SuperclassA {
+
+	}
 }
