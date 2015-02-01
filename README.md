@@ -310,11 +310,17 @@ You can download the latest version from the [release page](https://github.com/s
 
 * ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
 
-##Code Style Guidelines for Contributors
+##Contributions
 
-* Indentation with tab
-* Newline: LF
-* Linelength: 180
+Pull requests are welcome, but please ensure the following rules:
+
+* Use `Java Conventions` as provided by your IDE for formatting with the following settings:
+    * Indentation with tab
+    * Newline: LF
+    * Line length: 180
+* Provide a unit test for every change
+* [Clean Code](http://www.amazon.de/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
+    * Especially name the classes/methods/fields under `japicmp-test-v1` and `japicmp-test-v2` expressively
 
 ##Related work##
 
