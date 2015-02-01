@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-	
+
 	<xsl:output method="html" />
-	
+
 	<xsl:template match="/japicmp">
 		<html>
 			<head>
@@ -147,7 +147,7 @@
 			</body>
 		</html>
 	</xsl:template>
-	
+
 	<xsl:template match="classes">
 		<div class="toc">
             <a name="toc"/>
@@ -168,7 +168,7 @@
             <xsl:apply-templates select="class" mode="detail"><xsl:sort select="@fullyQualifiedName"/></xsl:apply-templates>
         </div>
 	</xsl:template>
-	
+
 	<xsl:template match="class" mode="toc">
         <tr>
             <td>
@@ -386,7 +386,7 @@
             </td>
         </tr>
     </xsl:template>
-	
+
 	<xsl:template match="method">
 		<tr>
             <td>

@@ -105,7 +105,7 @@ public class StdoutOutputGenerator {
         }
         sb.append(")\n");
     }
-    
+
     private String returnType(JApiBehavior jApiBehavior) {
 		String returnTypeAsString = "";
     	if(jApiBehavior instanceof JApiMethod) {
@@ -151,7 +151,7 @@ public class StdoutOutputGenerator {
         }
         sb.append("\n");
     }
-    
+
 	private String elementValueList2String(List<JApiAnnotationElementValue> values) {
 		StringBuilder sb = new StringBuilder();
 		for (JApiAnnotationElementValue value : values) {
