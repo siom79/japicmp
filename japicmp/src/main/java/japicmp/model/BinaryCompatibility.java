@@ -105,7 +105,7 @@ public class BinaryCompatibility {
 				}
 			}
 			// section 13.4.9 of "Java Language Specification" SE7
-			if (field.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
+			if (isNotPrivate(field) && field.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
 				field.setBinaryCompatible(false);
 				changedIncompatible = true;
 			}

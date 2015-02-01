@@ -1,29 +1,18 @@
 package japicmp.output.semver;
 
+import com.google.common.collect.ImmutableSet;
+import japicmp.config.Options;
+import japicmp.model.*;
+import japicmp.output.Filter;
+import japicmp.output.OutputGenerator;
+import japicmp.util.ModifierHelper;
+
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.collect.ImmutableSet;
-import japicmp.config.Options;
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiAnnotation;
-import japicmp.model.JApiAnnotationElement;
-import japicmp.model.JApiBinaryCompatibility;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiConstructor;
-import japicmp.model.JApiField;
-import japicmp.model.JApiHasAnnotations;
-import japicmp.model.JApiHasChangeStatus;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiSuperclass;
-import japicmp.output.Filter;
-import japicmp.output.OutputFilter;
-import japicmp.output.OutputGenerator;
+import static japicmp.util.ModifierHelper.isNotPrivate;
 
 public class SemverOut extends OutputGenerator {
-
 	private enum SemverStatus {
 		UNCHANGED, CHANGED_BINARY_COMPATIBLE, CHANGED_BINARY_INCOMPATIBLE;
 	}
@@ -98,7 +87,24 @@ public class SemverOut extends OutputGenerator {
 				if (hasChangeStatus instanceof JApiBinaryCompatibility) {
 					JApiBinaryCompatibility binaryCompatibility = (JApiBinaryCompatibility) hasChangeStatus;
 					if (binaryCompatibility.isBinaryCompatible()) {
-						return SemverStatus.CHANGED_BINARY_COMPATIBLE;
+						if (hasChangeStatus instanceof JApiHasAccessModifier) {
+							JApiHasAccessModifier jApiHasAccessModifier = (JApiHasAccessModifier) hasChangeStatus;
+							if (isNotPrivate(jApiHasAccessModifier)) {
+								if (jApiHasAccessModifier instanceof JApiClass) {
+									JApiClass jApiClass = (JApiClass) jApiHasAccessModifier;
+									if (jApiClass.isChangeCausedByClassElement()) {
+										return SemverStatus.UNCHANGED;
+									} else {
+										return SemverStatus.CHANGED_BINARY_COMPATIBLE;
+									}
+								}
+								return SemverStatus.CHANGED_BINARY_COMPATIBLE;
+							} else {
+								return SemverStatus.UNCHANGED;
+							}
+						} else {
+							return SemverStatus.CHANGED_BINARY_COMPATIBLE;
+						}
 					} else {
 						return SemverStatus.CHANGED_BINARY_INCOMPATIBLE;
 					}

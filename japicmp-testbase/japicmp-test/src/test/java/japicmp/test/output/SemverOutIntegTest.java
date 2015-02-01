@@ -42,55 +42,42 @@ public class SemverOutIntegTest {
 	@Test
 	public void testSemver100_change_method() {
 		String lastPackage = "semver100.a";
-
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("1.0.0", string);
 	}
 
 	@Test
 	public void testSemver100_reduce_class_visibility() {
 		String lastPackage = "semver100.b";
-
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("1.0.0", string);
 	}
 
 	@Test
 	public void testSemver100_reduce_method_visibility() {
 		String lastPackage = "semver100.c";
-
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("1.0.0", string);
 	}
 
 	@Test
 	public void testSemver100_superclass_with_field() {
 		String lastPackage = "semver100.d";
-
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("1.0.0", string);
 	}
 
 	@Test
 	public void testSemver_class_with_private_final_field() {
 		String lastPackage = "semver.finalfield";
-
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("0.0.1", string);
 	}
-
 
 	@Test
 	public void testSemver_class_with_public_final_method() {
 		String lastPackage = "semver.finalpublicmethod";
-
 		String string = getSemverDiff(lastPackage);
-
 		assertEquals("1.0.0", string);
 	}
 

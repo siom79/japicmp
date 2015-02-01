@@ -31,7 +31,7 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiBinaryCom
 	private final Optional<MemberValue> oldValue;
 	private final Optional<MemberValue> newValue;
 	private final JApiChangeStatus changeStatus;
-	
+
 	public JApiAnnotationElement(String name, Optional<MemberValue> oldValue, Optional<MemberValue> newValue, JApiChangeStatus changeStatus) {
 		this.name = name;
 		this.oldValue = oldValue;

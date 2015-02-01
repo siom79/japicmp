@@ -11,7 +11,7 @@ public class JApiAttribute<T> {
 	private final Optional<T> oldAttribute;
 	private final Optional<T> newAttribute;
 	private final JApiChangeStatus changeStatus;
-	
+
 	public JApiAttribute(JApiChangeStatus changeStatus, Optional<T> oldAttribute, Optional<T> newAttribute) {
 		this.changeStatus = changeStatus;
 		this.oldAttribute = oldAttribute;
@@ -32,12 +32,12 @@ public class JApiAttribute<T> {
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
 	}
-	
+
 	@XmlAttribute(name = "oldValue")
 	public String getOldValue() {
 		return OptionalHelper.optionalToString(this.oldAttribute);
 	}
-	
+
 	@XmlAttribute(name = "newValue")
 	public String getNewValue() {
 		return OptionalHelper.optionalToString(this.newAttribute);

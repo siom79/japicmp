@@ -49,6 +49,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final JApiModifier<AbstractModifier> abstractModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private boolean binaryCompatible = true;
+	private boolean changeCausedByClassElement = false;
 
 	public enum Type {
 		ANNOTATION, INTERFACE, CLASS, ENUM
@@ -408,16 +409,19 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			for (JApiField field : fields) {
 				if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 					changeStatus = JApiChangeStatus.MODIFIED;
+					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiMethod method : methods) {
 				if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 					changeStatus = JApiChangeStatus.MODIFIED;
+					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiConstructor constructor : constructors) {
 				if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 					changeStatus = JApiChangeStatus.MODIFIED;
+					changeCausedByClassElement = true;
 				}
 			}
 		}
@@ -635,5 +639,10 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	@XmlElement(name = "annotation")
 	public List<JApiAnnotation> getAnnotations() {
 		return annotations;
+	}
+
+	@XmlTransient
+	public boolean isChangeCausedByClassElement() {
+		return changeCausedByClassElement;
 	}
 }

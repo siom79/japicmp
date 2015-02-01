@@ -2,10 +2,9 @@ package japicmp.test.semver.finalfield;
 
 public class PublicClassWithFinalField {
 
-	private String string;
+	private String fieldChangesFromPrivateToPrivateFinal;
 
-	public PublicClassWithFinalField(String string) {
-		this.string = string;
+	public PublicClassWithFinalField(String fieldChangesFromPrivateToPrivateFinal) {
+		this.fieldChangesFromPrivateToPrivateFinal = fieldChangesFromPrivateToPrivateFinal;
 	}
-
 }
