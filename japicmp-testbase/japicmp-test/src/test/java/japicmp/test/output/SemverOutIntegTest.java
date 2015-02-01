@@ -1,10 +1,9 @@
 package japicmp.test.output;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.util.List;
 
+import com.google.common.base.Strings;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -13,8 +12,9 @@ import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.semver.SemverOut;
 import japicmp.test.util.Helper;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class SemverOutIntegTest {
 
@@ -75,11 +75,33 @@ public class SemverOutIntegTest {
 		assertEquals("1.0.0", string);
 	}
 
+	@Test
+	public void testSemver_class_with_private_final_field() {
+		String lastPackage = "semver.finalfield";
+
+		String string = getSemverDiff(lastPackage);
+
+		assertEquals("0.0.1", string);
+	}
+
+
+	@Test
+	public void testSemver_class_with_public_final_method() {
+		String lastPackage = "semver.finalpublicmethod";
+
+		String string = getSemverDiff(lastPackage);
+
+		assertEquals("1.0.0", string);
+	}
+
 	private String getSemverDiff(String lastPackage) {
-		JarArchiveComparator jarArchiveComparator = newComparator(lastPackage);
 		File oldFile = Helper.getArchive("japicmp-test-v1.jar");
 		File newFile = Helper.getArchive("japicmp-test-v2.jar");
+		return getSemverDiff(lastPackage, oldFile, newFile);
+	}
 
+	private String getSemverDiff(String lastPackage, File oldFile, File newFile) {
+		JarArchiveComparator jarArchiveComparator = newComparator(lastPackage);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldFile, newFile);
 		Options options = new Options();
 		options.setNewArchive(newFile);
@@ -91,8 +113,10 @@ public class SemverOutIntegTest {
 
 	private JarArchiveComparator newComparator(String lastPackage) {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		String packageName = "japicmp.test." + lastPackage;
-		options.getPackagesInclude().add(new PackageFilter(packageName));
+		if (!Strings.isNullOrEmpty(lastPackage)) {
+			String packageName = "japicmp.test." + lastPackage;
+			options.getPackagesInclude().add(new PackageFilter(packageName));
+		}
 		return new JarArchiveComparator(options);
 	}
 }
