@@ -1,9 +1,16 @@
 package japicmp.cli;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.jar.JarFile;
+
+import javax.inject.Inject;
+
 import com.google.common.base.Optional;
-import io.airlift.command.Command;
-import io.airlift.command.HelpOption;
-import io.airlift.command.Option;
+import io.airlift.airline.Command;
+import io.airlift.airline.HelpOption;
+import io.airlift.airline.Option;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -15,12 +22,6 @@ import japicmp.output.OutputFilter;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
-
-import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.jar.JarFile;
 
 public class JApiCli {
 
