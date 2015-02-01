@@ -1,10 +1,10 @@
 package japicmp.output.xml;
 
-import java.util.List;
-
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputGenerator;
+
+import java.util.List;
 
 public class XmlOut extends OutputGenerator {
 	public XmlOut(Options options, List<JApiClass> jApiClasses) {

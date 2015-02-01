@@ -1,10 +1,9 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
 import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
-
-import com.google.common.base.Optional;
 
 public class JApiModifier<T> {
 	private final Optional<T> oldModifier;

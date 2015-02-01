@@ -1,12 +1,12 @@
 package japicmp.model;
 
-import static japicmp.util.ModifierHelper.isNotPrivate;
-import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
+import static japicmp.util.ModifierHelper.isNotPrivate;
 
 public class BinaryCompatibility {
 

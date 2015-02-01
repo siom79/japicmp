@@ -1,5 +1,6 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
 import japicmp.util.OptionalHelper;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
@@ -8,9 +9,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.google.common.base.Optional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

@@ -1,14 +1,14 @@
 package japicmp.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.jar.JarFile;
-
 import com.google.common.base.Optional;
 import japicmp.config.Options;
 import japicmp.exception.FormattedException;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.jar.JarFile;
 
 class OptionsBuilder {
 	private String pathToNewVersionJar;

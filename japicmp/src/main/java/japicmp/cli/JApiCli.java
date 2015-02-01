@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import io.airlift.command.Command;
 import io.airlift.command.HelpOption;
 import io.airlift.command.Option;
-import io.airlift.command.model.CommandMetadata;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;

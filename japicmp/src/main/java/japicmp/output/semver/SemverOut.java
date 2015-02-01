@@ -5,7 +5,6 @@ import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.output.Filter;
 import japicmp.output.OutputGenerator;
-import japicmp.util.ModifierHelper;
 
 import java.util.Iterator;
 import java.util.List;

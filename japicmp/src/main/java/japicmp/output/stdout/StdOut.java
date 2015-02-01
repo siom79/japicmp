@@ -1,11 +1,10 @@
 package japicmp.output.stdout;
 
-import java.util.List;
-
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputGenerator;
-import japicmp.output.stdout.StdoutOutputGenerator;
+
+import java.util.List;
 
 public class StdOut extends OutputGenerator {
 

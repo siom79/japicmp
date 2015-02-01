@@ -1,6 +1,5 @@
 package japicmp;
 
-import io.airlift.command.Help;
 import io.airlift.command.ParseException;
 import io.airlift.command.SingleCommand;
 import japicmp.cli.JApiCli;

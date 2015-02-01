@@ -1,9 +1,9 @@
 package japicmp.output;
 
-import java.util.List;
-
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
+
+import java.util.List;
 
 public abstract class OutputGenerator {
 

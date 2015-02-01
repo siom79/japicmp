@@ -1,14 +1,12 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.MethodDescriptorParser;
 import javassist.CtMethod;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.google.common.base.Optional;
 
 public class JApiMethod extends JApiBehavior {
     private final Optional<CtMethod> oldMethod;
