@@ -129,4 +129,8 @@ public class JarArchiveComparator {
     public JarArchiveComparatorOptions getJarArchiveComparatorOptions() {
         return this.options;
     }
+
+	ClassPool getClassPool() {
+		return classPool;
+	}
 }
