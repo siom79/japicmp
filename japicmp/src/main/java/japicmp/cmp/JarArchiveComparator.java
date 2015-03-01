@@ -5,6 +5,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.BinaryCompatibility;
 import japicmp.model.JApiClass;
+import japicmp.model.JavaObjectSerializationCompatibility;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
@@ -34,10 +35,16 @@ public class JarArchiveComparator {
         ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
         List<JApiClass> classList = classesComparator.getClasses();
         checkBinaryCompatibility(classList);
+		checkJavaObjectSerializationCompatibility(classList, classPool);
 		return classList;
     }
 
-    private void setupClasspath() {
+	private void checkJavaObjectSerializationCompatibility(List<JApiClass> jApiClasses, ClassPool classPool) {
+		JavaObjectSerializationCompatibility javaObjectSerializationCompatibility = new JavaObjectSerializationCompatibility();
+		javaObjectSerializationCompatibility.evaluate(jApiClasses, classPool);
+	}
+
+	private void setupClasspath() {
         classPool.appendSystemPath();
         classPath += System.getProperty("java.class.path");
         for (String classPathEntry : options.getClassPathEntries()) {
