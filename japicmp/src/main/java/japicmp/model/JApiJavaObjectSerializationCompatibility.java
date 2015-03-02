@@ -7,10 +7,30 @@ package japicmp.model;
  * http://docs.oracle.com/javase/7/docs/platform/serialization/spec/serialTOC.html.
  */
 public interface JApiJavaObjectSerializationCompatibility {
+
+	public enum JApiJavaObjectSerializationChangeStatus {
+		/**
+		 * The class is not serializable.
+		 */
+		NOT_SERIALIZABLE,
+		/**
+		 * The class is serializable and changed in a compatible way.
+		 */
+		SERIALIZABLE_COMPATIBLE,
+		/**
+		 * The class is serializable but changed in an incompatible way.
+		 */
+		SERIALIZABLE_INCOMPATIBLE,
+		/**
+		 * The class is serializable but changed in an incompatible way
+		 * and the serialVersionUID has not been changed.
+		 */
+		SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL
+	}
 	/**
-	 * Returns true if this element has changed in a way that is compatible
-	 * with the Java Object Serialization Specification.
-	 * @return true if this element has changed in a compatible way
+	 * Returns if this class is serializable and if it has changed in a compatible
+	 * or incompatible way.
+	 * @return the type of change
 	 */
-	boolean isJavaObjectSerializationCompatible();
+	JApiJavaObjectSerializationChangeStatus getJavaObjectSerializationCompatible();
 }

@@ -41,7 +41,7 @@ public class JarArchiveComparator {
 
 	private void checkJavaObjectSerializationCompatibility(List<JApiClass> jApiClasses, ClassPool classPool) {
 		JavaObjectSerializationCompatibility javaObjectSerializationCompatibility = new JavaObjectSerializationCompatibility();
-		javaObjectSerializationCompatibility.evaluate(jApiClasses, classPool);
+		javaObjectSerializationCompatibility.evaluate(jApiClasses);
 	}
 
 	private void setupClasspath() {

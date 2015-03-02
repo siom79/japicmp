@@ -1,13 +1,9 @@
-package japicmp.test.serialversion.unchanged;
+package japicmp.test.serialversion;
 
 import java.io.Serializable;
 
 public class SerialVersionUnchanged implements Serializable {
 	private int intField = 0;
-
-	public SerialVersionUnchanged(int intField) {
-		this.intField = intField;
-	}
 
 	public int getIntField() {
 		return intField;

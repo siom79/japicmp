@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.*;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
-		JApiBinaryCompatibility, JApiHasAnnotations {
+		JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility {
 	private JarArchiveComparator jarArchiveComparator;
 	private final String fullyQualifiedName;
 	private final Type type;
@@ -37,6 +37,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private boolean binaryCompatible = true;
 	private boolean changeCausedByClassElement = false;
+	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
 
 	public enum Type {
 		ANNOTATION, INTERFACE, CLASS, ENUM
@@ -517,6 +518,15 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		}
 		return new JApiModifier<AbstractModifier>(Optional.<AbstractModifier>absent(), Optional.<AbstractModifier>absent(), JApiChangeStatus.UNCHANGED);
+	}
+
+	@Override
+	public JApiJavaObjectSerializationChangeStatus getJavaObjectSerializationCompatible() {
+		return jApiJavaObjectSerializationChangeStatus;
+	}
+
+	void setJavaObjectSerializationCompatible(JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus) {
+		this.jApiJavaObjectSerializationChangeStatus = jApiJavaObjectSerializationChangeStatus;
 	}
 
 	@XmlAttribute
