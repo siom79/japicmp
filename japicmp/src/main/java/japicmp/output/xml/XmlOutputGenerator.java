@@ -64,7 +64,7 @@ public class XmlOutputGenerator {
 							schemaFile = new File(schemaFile + File.separator + XSD_FILENAME);
 						}
 						StreamResult result = new StreamResult(schemaFile);
-						result.setSystemId(schemaFile.toURI().toURL().toString());
+						result.setSystemId(schemaFile.getAbsolutePath());
 						return result;
 					}
 				};
