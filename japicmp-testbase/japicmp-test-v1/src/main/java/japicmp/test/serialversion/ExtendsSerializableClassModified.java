@@ -1,7 +1,7 @@
 package japicmp.test.serialversion;
 
-import java.applet.Applet;
+import java.util.Random;
 
-public class ExtendsSerializableClassModified extends Applet {
+public class ExtendsSerializableClassModified extends Random {
 	private int fieldRemoved = 42;
 }
