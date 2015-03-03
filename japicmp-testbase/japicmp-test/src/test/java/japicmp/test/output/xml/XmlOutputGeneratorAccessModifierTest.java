@@ -48,13 +48,13 @@ public class XmlOutputGeneratorAccessModifierTest {
 	}
 
 	private static void generateHtmlOutput(List<JApiClass> jApiClasses, String xmlOutputFile, String htmlOutputFile, AccessModifier accessModifier) {
-		XmlOutputGenerator generator = new XmlOutputGenerator();
 		Options options = new Options();
 		options.setXmlOutputFile(Optional.of(xmlOutputFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(true);
 		options.setAccessModifier(Optional.of(accessModifier));
-		generator.generate("/old/Path", "/new/Path", jApiClasses, options);
+		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options);
+		generator.generate();
 	}
 
 	@Test

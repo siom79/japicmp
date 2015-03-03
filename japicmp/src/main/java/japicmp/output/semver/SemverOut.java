@@ -11,7 +11,7 @@ import java.util.List;
 
 import static japicmp.util.ModifierHelper.isNotPrivate;
 
-public class SemverOut extends OutputGenerator {
+public class SemverOut extends OutputGenerator<Void> {
 	private enum SemverStatus {
 		UNCHANGED, CHANGED_BINARY_COMPATIBLE, CHANGED_BINARY_INCOMPATIBLE;
 	}
@@ -21,8 +21,9 @@ public class SemverOut extends OutputGenerator {
 	}
 
 	@Override
-	public void generate() {
+	public Void generate() {
 		System.out.println(value());
+		return null;
 	}
 
 	public String value() {

@@ -82,11 +82,11 @@ public class JApiCli {
 			}
 			OutputFilter.sortClassesAndMethods(jApiClasses);
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
-				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
-				xmlGenerator.generate(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
+				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
+				xmlGenerator.generate();
 			}
-			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
-			String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses);
+			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses, oldArchive, newArchive);
+			String output = stdoutOutputGenerator.generate();
 			System.out.println(output);
 		}
 
