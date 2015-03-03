@@ -172,7 +172,11 @@ public class OutputFilter extends Filter {
                         }
                     }
                 }
-                if (remove) {
+				if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE ||
+						jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL) {
+					remove = false;
+				}
+				if (remove) {
                     iterator.remove();
                 }
             }

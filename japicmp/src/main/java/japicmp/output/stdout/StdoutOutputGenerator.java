@@ -98,8 +98,9 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
     }
 
     private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiBehavior, String classMemberType) {
-        sb.append("\t" + signs + " " + jApiBehavior.getChangeStatus() + " " + classMemberType + " " + accessModifierAsString(jApiBehavior) + abstractModifierAsString(jApiBehavior)
-                + staticModifierAsString(jApiBehavior) + finalModifierAsString(jApiBehavior) + returnType(jApiBehavior) + jApiBehavior.getName() + "(");
+        sb.append("\t").append(signs).append(" ").append(jApiBehavior.getChangeStatus()).append(" ").append(classMemberType).append(" ")
+				.append(accessModifierAsString(jApiBehavior)).append(abstractModifierAsString(jApiBehavior)).append(staticModifierAsString(jApiBehavior))
+				.append(finalModifierAsString(jApiBehavior)).append(returnType(jApiBehavior)).append(jApiBehavior.getName()).append("(");
         int paramCount = 0;
         for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {
             if (paramCount > 0) {
@@ -200,12 +201,32 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
     }
 
     private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
-        sb.append(signs + " " + jApiClass.getChangeStatus() + " " + jApiClass.getType() + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
-                + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + "\n");
+        sb.append(signs).append(" ").append(jApiClass.getChangeStatus()).append(" ").append(jApiClass.getType()).append(javaObjectSerializationStatus(jApiClass)).append(": ")
+				.append(accessModifierAsString(jApiClass)).append(abstractModifierAsString(jApiClass)).append(staticModifierAsString(jApiClass))
+				.append(finalModifierAsString(jApiClass)).append(jApiClass.getFullyQualifiedName()).append("\n");
         processInterfaceChanges(sb, jApiClass);
         processSuperclassChanges(sb, jApiClass);
         processFieldChanges(sb, jApiClass);
     }
+
+	private String javaObjectSerializationStatus(JApiClass jApiClass) {
+		String returnValue;
+		JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus status = jApiClass.getJavaObjectSerializationCompatible();
+		switch (status) {
+			case SERIALIZABLE_COMPATIBLE:
+				returnValue = " (serialization compatible)";
+				break;
+			case SERIALIZABLE_INCOMPATIBLE:
+				returnValue = " (serialization incompatible)";
+				break;
+			case SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL:
+				returnValue = " (serialization incompatible but serialVersionUID equal)";
+				break;
+			default:
+				returnValue = "";
+		}
+		return returnValue;
+	}
 
     private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
         List<JApiField> fields = jApiClass.getFields();

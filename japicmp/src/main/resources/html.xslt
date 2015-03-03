@@ -61,6 +61,9 @@
                     .class_interfaces {
                         margin-top: 1em;
                     }
+                    .class_fields {
+                        margin-top: 1em;
+                    }
                     .class_constructors {
                         margin-top: 1em;
                     }
@@ -97,6 +100,9 @@
                         margin-bottom: 1em;
                         background: #ededed;
                         display: inline-block;
+                    }
+                    .notes {
+                        font-size: 0.75em;
                     }
 				</style>
 			</head>
@@ -138,6 +144,13 @@
                         </tr>
                     </table>
                 </div>
+                <xsl:if test="@accessModifier != 'PRIVATE'">
+                    <div class="notes">
+                        You have set the access modifier filter to a level higher than <code>PRIVATE</code>. It may
+                        happen that a class is marked <code>MODIFIED</code> but you do not see the related field or method
+                        that caused this status. The same is true for serialization compatibility.
+                    </div>
+                </xsl:if>
                 <ul>
                     <xsl:if test="count(classes/class) > 0">
                         <li><a href="#toc">Classes</a></li>
@@ -196,7 +209,8 @@
                                 <xsl:value-of select="@fullyQualifiedName" />
                             </xsl:attribute>
                         </a>
-                        <xsl:call-template name="outputChangeStatus"/>&#160;
+                        <xsl:call-template name="outputChangeStatus"/>
+                        <xsl:call-template name="javaObjectSerializationCompatible"/>
                         <xsl:call-template name="modifiers"/>
                         <xsl:value-of select="translate(@type,'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />&#160;
                         <xsl:value-of select="@fullyQualifiedName" />
@@ -685,6 +699,36 @@
                 </xsl:when>
                 <xsl:when test="@changeStatus = 'REMOVED'">
                     <xsl:value-of select="@oldValue"/>
+                </xsl:when>
+            </xsl:choose>
+        </span>
+    </xsl:template>
+
+    <xsl:template name="javaObjectSerializationCompatible">
+        <span>
+            <xsl:choose>
+                <xsl:when test="@javaObjectSerializationCompatible = 'NOT_SERIALIZABLE'">
+                    <xsl:attribute name="class">
+                    </xsl:attribute>
+                    &#160;
+                </xsl:when>
+                <xsl:when test="@javaObjectSerializationCompatible = 'SERIALIZABLE_COMPATIBLE'">
+                    <xsl:attribute name="class">
+                        new
+                    </xsl:attribute>
+                    (Serializable compatible)&#160;
+                </xsl:when>
+                <xsl:when test="@javaObjectSerializationCompatible = 'SERIALIZABLE_INCOMPATIBLE'">
+                    <xsl:attribute name="class">
+                        removed
+                    </xsl:attribute>
+                    (Serializable incompatible(!))&#160;
+                </xsl:when>
+                <xsl:when test="@javaObjectSerializationCompatible = 'SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL'">
+                    <xsl:attribute name="class">
+                        removed
+                    </xsl:attribute>
+                    (Serializable incompatible(!) but serialVersionUID equal)&#160;
                 </xsl:when>
             </xsl:choose>
         </span>

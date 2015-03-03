@@ -520,6 +520,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return new JApiModifier<AbstractModifier>(Optional.<AbstractModifier>absent(), Optional.<AbstractModifier>absent(), JApiChangeStatus.UNCHANGED);
 	}
 
+	@XmlAttribute
 	@Override
 	public JApiJavaObjectSerializationChangeStatus getJavaObjectSerializationCompatible() {
 		return jApiJavaObjectSerializationChangeStatus;
