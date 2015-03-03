@@ -20,6 +20,7 @@ import java.util.List;
 import static japicmp.test.util.Helper.getArchive;
 import static japicmp.test.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class JavaObjectSerializationTest {
@@ -89,6 +90,14 @@ public class JavaObjectSerializationTest {
 	}
 
 	@Test
+	public void testModifiedFieldAddedButSerialVersionUidUnchanged() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ModifiedFieldAddedButSerialVersionUidUnchanged.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL));
+		assertThat(testSerialization(jApiClass), is(true));
+	}
+
+	@Test
 	public void testModifiedAndSerialVersionUidModified() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, ModifiedAndSerialVersionUidModified.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
@@ -115,7 +124,8 @@ public class JavaObjectSerializationTest {
 				oos.flush();
 				oos.close();
 				ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(byteOutputStream.toByteArray()));
-				ois.readObject();
+				Object readObject = ois.readObject();
+				assertThat(readObject, notNullValue());
 				successful = true;
 			}
 		} catch (Exception e) {
