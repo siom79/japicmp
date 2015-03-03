@@ -80,7 +80,6 @@ public class JApiCli {
 				semverOut.generate();
 				return;
 			}
-			OutputFilter.sortClassesAndMethods(jApiClasses);
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
 				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
 				xmlGenerator.generate();

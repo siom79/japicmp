@@ -6,6 +6,7 @@ import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.BinaryCompatibility;
 import japicmp.model.JApiClass;
 import japicmp.model.JavaObjectSerializationCompatibility;
+import japicmp.output.OutputFilter;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
@@ -35,6 +36,7 @@ public class JarArchiveComparator {
         ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
         List<JApiClass> classList = classesComparator.getClasses();
         checkBinaryCompatibility(classList);
+		OutputFilter.sortClassesAndMethods(classList);
 		checkJavaObjectSerializationCompatibility(classList, classPool);
 		return classList;
     }
