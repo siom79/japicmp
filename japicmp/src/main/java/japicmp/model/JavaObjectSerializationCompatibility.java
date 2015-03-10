@@ -2,8 +2,11 @@ package japicmp.model;
 
 import com.google.common.base.Optional;
 import japicmp.exception.JApiCmpException;
+import japicmp.util.ModifierHelper;
 import javassist.*;
 
+import java.io.Externalizable;
+import java.io.Serializable;
 import java.util.List;
 
 public class JavaObjectSerializationCompatibility {
@@ -42,7 +45,12 @@ public class JavaObjectSerializationCompatibility {
 		if (serializable) {
 			if (serialVersionUidOld == serialVersionUidNew) {
 				if (serialVersionUidOldDefault != serialVersionUidNewDefault) {
-					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL;
+					JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChanges = checkChanges(jApiClass);
+					if (checkChanges == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE) {
+						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL;
+					} else {
+						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
+					}
 				} else {
 					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
 				}
@@ -50,6 +58,63 @@ public class JavaObjectSerializationCompatibility {
 				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
 			}
 		}
+		return state;
+	}
+
+	/**
+	 * Checks compatibility of changes according to http://docs.oracle.com/javase/7/docs/platform/serialization/spec/version.html#5172.
+	 * @param jApiClass the class to check
+	 * @return either SERIALIZABLE_INCOMPATIBLE or SERIALIZABLE_COMPATIBLE
+	 */
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChanges(JApiClass jApiClass) {
+		JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
+		for (JApiField field : jApiClass.getFields()) {
+			if (field.getChangeStatus() == JApiChangeStatus.REMOVED) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+			}
+			if (field.getStaticModifier().getChangeStatus() == JApiChangeStatus.NEW) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+			}
+			if (field.getTransientModifier().getChangeStatus() == JApiChangeStatus.NEW) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+			}
+			if (field.getType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+			}
+		}
+		boolean serializableAdded = false;
+		boolean serializableRemoved = false;
+		boolean externalizableAdded = false;
+		boolean externalizableRemoved = false;
+		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {
+			if (Serializable.class.getCanonicalName().equals(implementedInterface.getFullyQualifiedName())) {
+				if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
+					serializableAdded = true;
+				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.REMOVED) {
+					serializableRemoved = true;
+				}
+			}
+			if (Externalizable.class.getCanonicalName().equals(implementedInterface.getFullyQualifiedName())) {
+				if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
+					externalizableAdded = true;
+				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.REMOVED) {
+					externalizableRemoved = true;
+				}
+			}
+		}
+		if (serializableRemoved && externalizableAdded) {
+			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+		}
+		if (serializableAdded && externalizableRemoved) {
+			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+		}
+		if (serializableRemoved) {
+			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+		}
+		if (externalizableRemoved) {
+			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+		}
+		//TODO: type of class changes
 		return state;
 	}
 
