@@ -143,6 +143,11 @@ public class JApiCmpMojo extends AbstractMojo {
 					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()));
 				}
 			}
+			String onlyBinaryIncompatible = parameter.getOnlyBinaryIncompatible();
+			if (onlyBinaryIncompatible != null) {
+				Boolean booleanOnlyBinaryIncompatible = Boolean.valueOf(onlyBinaryIncompatible);
+				options.setOutputOnlyBinaryIncompatibleModifications(booleanOnlyBinaryIncompatible);
+			}
 			String onlyModified = parameter.getOnlyModified();
 			if (onlyModified != null) {
 				Boolean booleanOnlyModified = Boolean.valueOf(onlyModified);
