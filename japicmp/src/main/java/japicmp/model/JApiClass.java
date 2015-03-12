@@ -20,7 +20,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		JApiBinaryCompatibility, JApiHasAnnotations {
 	private JarArchiveComparator jarArchiveComparator;
 	private final String fullyQualifiedName;
-	private final Type type;
+	private final JApiClassType classType;
 	private final Optional<CtClass> oldClass;
 	private final Optional<CtClass> newClass;
 	private final JApiChangeStatus changeStatus;
@@ -38,16 +38,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private boolean binaryCompatible = true;
 	private boolean changeCausedByClassElement = false;
 
-	public enum Type {
-		ANNOTATION, INTERFACE, CLASS, ENUM
-	}
-
-	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, Type type) {
+	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
 		this.jarArchiveComparator = jarArchiveComparator;
 		this.fullyQualifiedName = fullyQualifiedName;
 		this.newClass = newClass;
 		this.oldClass = oldClass;
-		this.type = type;
+		this.classType = classType;
 		this.superclass = extractSuperclass(oldClass, newClass);
 		computeMethodChanges(oldClass, newClass);
 		computeInterfaceChanges(this.interfaces, oldClass, newClass);
@@ -574,9 +570,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return fields;
 	}
 
-	@XmlAttribute
-	public Type getType() {
-		return type;
+	@XmlElement(name = "classType")
+	public JApiClassType getClassType() {
+		return classType;
 	}
 
 	@XmlTransient

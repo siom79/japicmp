@@ -27,17 +27,17 @@
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.18.2-GA</version>
+			<version>3.19.0-GA</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>17.0</version>
+			<version>18.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.airlift</groupId>
 			<artifactId>airline</artifactId>
-			<version>0.6</version>
+			<version>0.7</version>
 		</dependency>
 	</dependencies>
 

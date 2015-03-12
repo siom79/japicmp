@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.3.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.3.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository. The corresponding dependen
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.3.0</version>
+		<version>0.3.1</version>
 	</dependency>
 
 ##Motivation##
@@ -111,7 +111,7 @@ japicmp has a set of CLI parameters that are described in the following:
 When your library under investigation implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
-	java -cp japicmp-0.3.0-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.3.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
 ###Usage maven plugin###
 
@@ -122,13 +122,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.3.0</version>
+                <version>0.3.1</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.3.0</version>
+                            <version>0.3.1</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -143,6 +143,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+                        <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
                     </parameter>
 					<dependencies>
 						<dependency>
@@ -326,6 +327,6 @@ Pull requests are welcome, but please ensure the following rules:
 
 The following projects have related goals:
 
-* [Java API Compliance Checker](http://ispras.linuxbase.org/index.php/Java_API_Compliance_Checker): A Perl script that uses javap to compare two jar archives. This approach cannot compare annotations and requires an installation of Perl.
+* [Java API Compliance Checker](http://ispras.linuxbase.org/index.php/Java_API_Compliance_Checker): A Perl script that uses javap to compare two jar archives. This approach cannot compare annotations and you need to have Perl installed.
 * [Clirr](http://clirr.sourceforge.net/): A tool written in Java that compares two libraries for binary compatibility. Tracking of API changes is implemented only partially, tracking of annotations is not supported.
 * [JDiff](http://javadiff.sourceforge.net/): A Javadoc doclet that generates an HTML report of all API changes. The source code for both versions has to be available, the differences are not distinguished between binary incompatible or not. Comparison of annotations is not supported.

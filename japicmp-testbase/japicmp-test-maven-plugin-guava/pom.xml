@@ -42,6 +42,7 @@
 						<packagesToExclude>*</packagesToExclude>
 						<accessModifier>public</accessModifier>
 						<breakBuildOnModifications>false</breakBuildOnModifications>
+                        <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
 					</parameter>
 				</configuration>
 				<executions>

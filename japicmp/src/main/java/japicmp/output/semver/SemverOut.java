@@ -105,7 +105,16 @@ public class SemverOut extends OutputGenerator {
 							return SemverStatus.CHANGED_BINARY_COMPATIBLE;
 						}
 					} else {
-						return SemverStatus.CHANGED_BINARY_INCOMPATIBLE;
+						if (hasChangeStatus instanceof JApiHasAccessModifier) {
+							JApiHasAccessModifier jApiHasAccessModifier = (JApiHasAccessModifier) hasChangeStatus;
+							if (isNotPrivate(jApiHasAccessModifier)) {
+								return SemverStatus.CHANGED_BINARY_INCOMPATIBLE;
+							} else {
+								return SemverStatus.CHANGED_BINARY_COMPATIBLE;
+							}
+						} else {
+							return SemverStatus.CHANGED_BINARY_INCOMPATIBLE;
+						}
 					}
 				} else {
 					throw new IllegalStateException("Element '" + hasChangeStatus.getClass().getCanonicalName() + " does not implement '" + JApiBinaryCompatibility.class.getCanonicalName() + "'.");

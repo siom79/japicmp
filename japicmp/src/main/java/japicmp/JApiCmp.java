@@ -1,7 +1,7 @@
 package japicmp;
 
-import io.airlift.command.ParseException;
-import io.airlift.command.SingleCommand;
+import io.airlift.airline.ParseException;
+import io.airlift.airline.SingleCommand;
 import japicmp.cli.JApiCli;
 import japicmp.exception.JApiCmpException;
 

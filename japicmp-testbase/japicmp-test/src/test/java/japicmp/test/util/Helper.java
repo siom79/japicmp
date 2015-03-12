@@ -8,14 +8,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import japicmp.model.JApiAnnotation;
-import japicmp.model.JApiAnnotationElement;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiField;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.config.Options;
+import japicmp.model.*;
+import japicmp.output.xml.XmlOutputGenerator;
 
 public class Helper {
 
@@ -96,4 +96,20 @@ public class Helper {
         }
         return str;
     }
+
+	public static List<JApiClass> compareTestV1WithTestV2() {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
+		return jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+	}
+
+	public static void generateHtmlOutput(List<JApiClass> jApiClasses, String xmlOutputFile, String htmlOutputFile, boolean outputOnlyModifications, AccessModifier accessModifier) {
+		XmlOutputGenerator generator = new XmlOutputGenerator();
+		Options options = new Options();
+		options.setXmlOutputFile(Optional.of(xmlOutputFile));
+		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
+		options.setOutputOnlyModifications(outputOnlyModifications);
+		options.setAccessModifier(Optional.of(accessModifier));
+		generator.generate("/old/Path", "/new/Path", jApiClasses, options);
+	}
 }
