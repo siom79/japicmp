@@ -101,4 +101,84 @@ public class ClassTypeTest {
 		assertThat(jApiClass.getClassType().getOldType(), is("INTERFACE"));
 		assertThat(jApiClass.getClassType().getNewType(), is("ENUM"));
 	}
+
+	@Test
+	 public void testAnnotationToClass() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.AnnotationToClass.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getClassType().getOldType(), is("ANNOTATION"));
+		assertThat(jApiClass.getClassType().getNewType(), is("CLASS"));
+	}
+
+	@Test
+	public void testAnnotationToInterface() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.AnnotationToInterface.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getClassType().getOldType(), is("ANNOTATION"));
+		assertThat(jApiClass.getClassType().getNewType(), is("INTERFACE"));
+	}
+
+	@Test
+	public void testAnnotationToAnnotation() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.AnnotationToAnnotation.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.getClassType().getOldType(), is("ANNOTATION"));
+		assertThat(jApiClass.getClassType().getNewType(), is("ANNOTATION"));
+	}
+
+	@Test
+	public void testAnnotationToEnum() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.AnnotationToEnum.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getClassType().getOldType(), is("ANNOTATION"));
+		assertThat(jApiClass.getClassType().getNewType(), is("ENUM"));
+	}
+
+	@Test
+	public void testEnumToClass() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.EnumToClass.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getClassType().getOldType(), is("ENUM"));
+		assertThat(jApiClass.getClassType().getNewType(), is("CLASS"));
+	}
+
+	@Test
+	public void testEnumToInterface() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.EnumToInterface.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getClassType().getOldType(), is("ENUM"));
+		assertThat(jApiClass.getClassType().getNewType(), is("INTERFACE"));
+	}
+
+	@Test
+	public void testEnumToAnnotation() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.EnumToAnnotation.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getClassType().getOldType(), is("ENUM"));
+		assertThat(jApiClass.getClassType().getNewType(), is("ANNOTATION"));
+	}
+
+	@Test
+	public void testEnumToEnum() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.EnumToEnum.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.getClassType().getOldType(), is("ENUM"));
+		assertThat(jApiClass.getClassType().getNewType(), is("ENUM"));
+	}
 }

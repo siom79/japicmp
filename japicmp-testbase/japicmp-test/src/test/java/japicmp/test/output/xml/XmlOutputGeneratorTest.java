@@ -1,5 +1,6 @@
 package japicmp.test.output.xml;
 
+import static japicmp.test.output.xml.XmlHelper.getDivForClass;
 import static japicmp.test.util.Helper.getArchive;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -85,10 +86,6 @@ public class XmlOutputGeneratorTest {
 	public void superclassOnlyModificationsAddedWithSuperclass() throws IOException {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$AddedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
-	}
-
-	static Elements getDivForClass(Document document, String className) {
-		return document.select("div[id= " + className + "]");
 	}
 
 	private Elements getSuperClassDiv(Document document, String className) {
