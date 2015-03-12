@@ -1,6 +1,8 @@
 package japicmp.util;
 
 import japicmp.model.JApiClass;
+import japicmp.model.JApiClassType;
+import japicmp.model.JApiHasChangeStatus;
 import javassist.CtClass;
 
 public class ClassHelper {
@@ -9,15 +11,15 @@ public class ClassHelper {
 
 	}
 
-    public static JApiClass.Type getType(CtClass ctClass) {
+    public static JApiClassType.ClassType getType(CtClass ctClass) {
         if(ctClass.isAnnotation()) {
-            return JApiClass.Type.ANNOTATION;
+            return JApiClassType.ClassType.ANNOTATION;
         } else if(ctClass.isEnum()) {
-            return JApiClass.Type.ENUM;
+            return JApiClassType.ClassType.ENUM;
         } else if(ctClass.isInterface()) {
-            return JApiClass.Type.INTERFACE;
+            return JApiClassType.ClassType.INTERFACE;
         } else {
-            return JApiClass.Type.CLASS;
+            return JApiClassType.ClassType.CLASS;
         }
     }
 }

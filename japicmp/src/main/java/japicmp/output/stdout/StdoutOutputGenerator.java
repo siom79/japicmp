@@ -195,11 +195,26 @@ public class StdoutOutputGenerator {
     }
 
     private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
-        sb.append(signs + " " + jApiClass.getChangeStatus() + " " + jApiClass.getType() + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
+        sb.append(signs + " " + jApiClass.getChangeStatus() + " " + processClassType(jApiClass) + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
                 + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + "\n");
         processInterfaceChanges(sb, jApiClass);
         processSuperclassChanges(sb, jApiClass);
         processFieldChanges(sb, jApiClass);
+    }
+
+    private String processClassType(JApiClass jApiClass) {
+        JApiClassType classType = jApiClass.getClassType();
+        switch (classType.getChangeStatus()) {
+            case NEW:
+                return classType.getNewType();
+            case REMOVED:
+                return classType.getOldType();
+            case MODIFIED:
+                return classType.getNewType() + " (<- " + classType.getOldType() + ") ";
+            case UNCHANGED:
+                return classType.getOldType();
+        }
+        return "n.a.";
     }
 
     private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
