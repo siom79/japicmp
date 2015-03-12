@@ -15,7 +15,9 @@ public class ClassType {
 	}
 
 	public class ClassToEnum {
+		public void methodRemoved() {
 
+		}
 	}
 
 	public interface InterfaceToClass {

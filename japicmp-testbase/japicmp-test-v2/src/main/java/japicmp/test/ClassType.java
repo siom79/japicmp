@@ -15,7 +15,7 @@ public class ClassType {
 	}
 
 	public enum ClassToEnum {
-
+		VALUE_ADDED
 	}
 
 	public class InterfaceToClass {
