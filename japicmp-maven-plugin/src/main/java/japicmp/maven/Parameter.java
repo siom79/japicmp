@@ -4,6 +4,7 @@ public class Parameter {
     private String accessModifier;
     private String packagesToInclude;
     private String packagesToExclude;
+    private String onlyBinaryIncompatible;
     private String onlyModified;
     private String breakBuildOnModifications;
     private String breakBuildOnBinaryIncompatibleModifications;
@@ -40,6 +41,13 @@ public class Parameter {
         this.onlyModified = onlyModified;
     }
 
+    public String getOnlyBinaryIncompatible() {
+        return onlyBinaryIncompatible;
+    }
+
+    public void setOnlyBinaryIncompatible(String onlyBinaryIncompatible) {
+        this.onlyBinaryIncompatible = onlyBinaryIncompatible;
+    }
     public String getBreakBuildOnModifications() {
         return breakBuildOnModifications;
     }
