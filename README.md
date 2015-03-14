@@ -224,7 +224,7 @@ In the following you see the beginning of the differences between the versions 1
 			---  REMOVED ANNOTATION: java.lang.Deprecated
 	...
 
-Optionally japicmp can also create an HTML report. An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/development/doc/japicmp_guava.html).
+Optionally japicmp can also create an HTML report. An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.html).
 
 You can also let japicmp create an XML report like the following one:
 
