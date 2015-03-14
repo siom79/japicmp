@@ -14,48 +14,74 @@ public class JavaObjectSerializationCompatibility {
 
 	public void evaluate(List<JApiClass> classes) {
 		for (JApiClass jApiClass : classes) {
-			JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus changeStatus = computeChangeStatus(jApiClass);
-			jApiClass.setJavaObjectSerializationCompatible(changeStatus);
+			computeChangeStatus(jApiClass);
 		}
 	}
 
-	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus computeChangeStatus(JApiClass jApiClass) {
+	private void computeChangeStatus(JApiClass jApiClass) {
 		JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
-		long serialVersionUidOld = -1L;
-		long serialVersionUidOldDefault = -1L;
-		long serialVersionUidNew = -1L;
-		long serialVersionUidNewDefault = -1L;
-		boolean serializable = false;
+		Optional<Long> serialVersionUidOldOptional = Optional.absent();
+		long serialVersionUidOldDefault = -1;
+		Optional<Long> serialVersionUidNewOptional = Optional.absent();
+		long serialVersionUidNewDefault = -1;
+		boolean serializableOld = false;
+		boolean serializableNew = false;
 		Optional<CtClass> oldClassOptional = jApiClass.getOldClass();
 		if (oldClassOptional.isPresent()) {
 			CtClass ctClass = oldClassOptional.get();
-			SerialVersionUidResult serialVersionUidResult = new SerialVersionUidResult(serialVersionUidOld, serialVersionUidOldDefault, ctClass).invoke();
-			serializable = serialVersionUidResult.isSerializable();
-			serialVersionUidOld = serialVersionUidResult.getSerialVersionUid();
+			SerialVersionUidResult serialVersionUidResult = new SerialVersionUidResult(ctClass).invoke();
+			serializableOld = serialVersionUidResult.isSerializable();
+			serialVersionUidOldOptional = serialVersionUidResult.getSerialVersionUid();
 			serialVersionUidOldDefault = serialVersionUidResult.getSerialVersionUidDefault();
 		}
 		Optional<CtClass> newClassOptional = jApiClass.getNewClass();
 		if (newClassOptional.isPresent()) {
 			CtClass ctClass = newClassOptional.get();
-			SerialVersionUidResult serialVersionUidResult = new SerialVersionUidResult(serialVersionUidNew, serialVersionUidNewDefault, ctClass).invoke();
-			serializable = serialVersionUidResult.isSerializable();
-			serialVersionUidNew = serialVersionUidResult.getSerialVersionUid();
+			SerialVersionUidResult serialVersionUidResult = new SerialVersionUidResult(ctClass).invoke();
+			serializableNew = serialVersionUidResult.isSerializable();
+			serialVersionUidNewOptional = serialVersionUidResult.getSerialVersionUid();
 			serialVersionUidNewDefault = serialVersionUidResult.getSerialVersionUidDefault();
 		}
-		if (serializable) {
-			if (serialVersionUidOld == serialVersionUidNew) {
-				if (serialVersionUidOldDefault != serialVersionUidNewDefault) {
-					JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChanges = checkChanges(jApiClass);
-					if (checkChanges == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE) {
-						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL;
-					} else {
-						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
-					}
+		JApiSerialVersionUid jApiSerialVersionUid = new JApiSerialVersionUid(serializableOld, serializableNew, serialVersionUidOldDefault, serialVersionUidNewDefault, serialVersionUidOldOptional, serialVersionUidNewOptional);
+		jApiClass.setSerialVersionUid(jApiSerialVersionUid);
+		if (serializableOld || serializableNew) {
+			if (serialVersionUidOldOptional.isPresent() && serialVersionUidNewOptional.isPresent()) {
+				Long suidOld = serialVersionUidOldOptional.get();
+				Long suidNew = serialVersionUidNewOptional.get();
+				if (suidOld.equals(suidNew)) {
+					state = checkChanges(jApiClass, serialVersionUidOldDefault, serialVersionUidNewDefault);
 				} else {
-					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
+					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
 				}
+			} else if(serialVersionUidOldOptional.isPresent()) {
+				Long suidOld = serialVersionUidOldOptional.get();
+				if (suidOld.equals(serialVersionUidNewDefault)) {
+					state = checkChanges(jApiClass, serialVersionUidOldDefault, serialVersionUidNewDefault);
+				} else {
+					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+				}
+			} else if(serialVersionUidNewOptional.isPresent()) {
+				Long suidNew = serialVersionUidNewOptional.get();
+				if (suidNew.equals(serialVersionUidOldDefault)) {
+					state = checkChanges(jApiClass, serialVersionUidOldDefault, serialVersionUidNewDefault);
+				} else {
+					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+				}
+			}
+		}
+		jApiClass.setJavaObjectSerializationCompatible(state);
+	}
+
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChanges(JApiClass jApiClass, long serialVersionUidOldDefault, long serialVersionUidNewDefault) {
+		JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state;
+		if (serialVersionUidOldDefault == serialVersionUidNewDefault) {
+			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
+		} else {
+			JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChanges = checkChanges(jApiClass);
+			if (checkChanges == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL;
 			} else {
-				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
 			}
 		}
 		return state;
@@ -68,20 +94,25 @@ public class JavaObjectSerializationCompatibility {
 	 */
 	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChanges(JApiClass jApiClass) {
 		JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
-		for (JApiField field : jApiClass.getFields()) {
-			if (field.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
-			}
-			if (field.getStaticModifier().getChangeStatus() == JApiChangeStatus.NEW) {
-				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
-			}
-			if (field.getTransientModifier().getChangeStatus() == JApiChangeStatus.NEW) {
-				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
-			}
-			if (field.getType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
+		state = checkChangesForFields(jApiClass, state);
+		state = checkChangesForInterfaces(jApiClass, state);
+		state = checkChangesForClassType(jApiClass, state);
+		return state;
+	}
+
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForClassType(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
+		JApiClassType classType = jApiClass.getClassType();
+		if (classType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+			JApiClassType.ClassType oldClassType = classType.getOldTypeOptional().get();
+			JApiClassType.ClassType newClassType = classType.getNewTypeOptional().get();
+			if (oldClassType != newClassType) {
 				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
 			}
 		}
+		return state;
+	}
+
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForInterfaces(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
 		boolean serializableAdded = false;
 		boolean serializableRemoved = false;
 		boolean externalizableAdded = false;
@@ -114,7 +145,24 @@ public class JavaObjectSerializationCompatibility {
 		if (externalizableRemoved) {
 			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
 		}
-		//TODO: type of class changes
+		return state;
+	}
+
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForFields(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
+		for (JApiField field : jApiClass.getFields()) {
+			if (field.getChangeStatus() == JApiChangeStatus.REMOVED) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+			}
+			if (field.getStaticModifier().getChangeStatus() == JApiChangeStatus.NEW && field.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+			}
+			if (field.getTransientModifier().getChangeStatus() == JApiChangeStatus.NEW && field.getTransientModifier().getNewModifier().get() == TransientModifier.TRANSIENT) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+			}
+			if (field.getType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE;
+			}
+		}
 		return state;
 	}
 
@@ -128,18 +176,16 @@ public class JavaObjectSerializationCompatibility {
 	}
 
 	private class SerialVersionUidResult {
-		private long serialVersionUid;
-		private long serialVersionUidDefault;
+		private Optional<Long> serialVersionUid = Optional.absent();
+		private long serialVersionUidDefault = -1;
 		private boolean serializable;
 		private CtClass ctClass;
 
-		public SerialVersionUidResult(long serialVersionUid, long serialVersionUidDefault, CtClass ctClass) {
-			this.serialVersionUid = serialVersionUid;
-			this.serialVersionUidDefault = serialVersionUidDefault;
+		public SerialVersionUidResult(CtClass ctClass) {
 			this.ctClass = ctClass;
 		}
 
-		public long getSerialVersionUid() {
+		public Optional<Long> getSerialVersionUid() {
 			return serialVersionUid;
 		}
 
@@ -158,7 +204,7 @@ public class JavaObjectSerializationCompatibility {
 					CtField declaredField = ctClass.getDeclaredField(SERIAL_VERSION_UID);
 					Object constantValue = declaredField.getConstantValue();
 					if (constantValue instanceof Long) {
-						serialVersionUid = (Long)constantValue;
+						serialVersionUid = Optional.of((Long)constantValue);
 					}
 				} catch (NotFoundException e) {
 					try {
@@ -166,13 +212,13 @@ public class JavaObjectSerializationCompatibility {
 						CtField declaredField = ctClass.getDeclaredField(SERIAL_VERSION_UID);
 						Object constantValue = declaredField.getConstantValue();
 						if (constantValue instanceof Long) {
-							serialVersionUid = (Long)constantValue;
-							serialVersionUidDefault = serialVersionUid;
+							serialVersionUid = Optional.of((Long)constantValue);
+							serialVersionUidDefault = (Long)constantValue;
 						}
 						ctClass.removeField(declaredField);
 					} catch (Exception ignored) {}
 				}
-				if (serialVersionUidDefault == -1L) {
+				if (serialVersionUidDefault == -1) {
 					try {
 						CtField declaredFieldOriginal = ctClass.getDeclaredField(SERIAL_VERSION_UID);
 						ctClass.removeField(declaredFieldOriginal);

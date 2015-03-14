@@ -38,6 +38,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private boolean binaryCompatible = true;
 	private boolean changeCausedByClassElement = false;
 	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
+	private JApiSerialVersionUid jApiSerialVersionUid;
 
 	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
 		this.jarArchiveComparator = jarArchiveComparator;
@@ -520,6 +521,17 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	@Override
 	public JApiJavaObjectSerializationChangeStatus getJavaObjectSerializationCompatible() {
 		return jApiJavaObjectSerializationChangeStatus;
+	}
+
+	@Override
+	public void setSerialVersionUid(JApiSerialVersionUid jApiSerialVersionUid) {
+		this.jApiSerialVersionUid = jApiSerialVersionUid;
+	}
+
+	@XmlElement
+	@Override
+	public JApiSerialVersionUid getSerialVersionUid() {
+		return this.jApiSerialVersionUid;
 	}
 
 	void setJavaObjectSerializationCompatible(JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus) {

@@ -93,7 +93,7 @@ public class JavaObjectSerializationTest {
 	public void testModifiedFieldAddedButSerialVersionUidUnchanged() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, ModifiedFieldAddedButSerialVersionUidUnchanged.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL));
+		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE));
 		assertThat(testSerialization(jApiClass), is(true));
 	}
 

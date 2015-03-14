@@ -27,10 +27,23 @@ public interface JApiJavaObjectSerializationCompatibility {
 		 */
 		SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL
 	}
+
 	/**
 	 * Returns if this class is serializable and if it has changed in a compatible
 	 * or incompatible way.
 	 * @return the type of change
 	 */
 	JApiJavaObjectSerializationChangeStatus getJavaObjectSerializationCompatible();
+
+	/**
+	 * Sets the {@link JApiSerialVersionUid} for this class.
+	 * @param jApiSerialVersionUid the serialVersionUID
+	 */
+	void setSerialVersionUid(JApiSerialVersionUid jApiSerialVersionUid);
+
+	/**
+	 * Returns the {@link japicmp.model.JApiSerialVersionUid}
+	 * @return the serialVersionUID
+	 */
+	JApiSerialVersionUid getSerialVersionUid();
 }

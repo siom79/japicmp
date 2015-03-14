@@ -48,6 +48,10 @@
                     table thead {
                         background-color: #dee3e9;
                     }
+                    table tbody tr td.matrix_layout {
+                        background-color: #dee3e9;
+                        font-weight: bold;
+                    }
                     .class {
                         margin-bottom: 2em;
                         border: 1px solid #dcdcdc;
@@ -62,6 +66,9 @@
                         margin-top: 1em;
                     }
                     .class_fields {
+                        margin-top: 1em;
+                    }
+                    .class_serialVersionUid {
                         margin-top: 1em;
                     }
                     .class_constructors {
@@ -255,6 +262,76 @@
                         </table>
                     </xsl:if>
                 </div>
+                <xsl:if test="serialVersionUid/@serializableOld = 'true' or serialVersionUid/@serializableNew = 'true'">
+                    <div class="class_serialVersionUid">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td> </td>
+                                    <td>Serializable</td>
+                                    <td>serialVersionUidDefault</td>
+                                    <td>serialVersionUidInClass</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="matrix_layout">Old</td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serializableOld != serialVersionUid/@serializableNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serializableOld"/>
+                                    </td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serialVersionUidDefaultOld != serialVersionUid/@serialVersionUidDefaultNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serialVersionUidDefaultOld"/>
+                                    </td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serialVersionUidInClassOld != serialVersionUid/@serialVersionUidInClassNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serialVersionUidInClassOld"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="matrix_layout">New</td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serializableOld != serialVersionUid/@serializableNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serializableNew"/>
+                                    </td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serialVersionUidDefaultOld != serialVersionUid/@serialVersionUidDefaultNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serialVersionUidDefaultNew"/>
+                                    </td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serialVersionUidInClassOld != serialVersionUid/@serialVersionUidInClassNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serialVersionUidInClassNew"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </xsl:if>
                 <div class="class_fields">
                     <xsl:if test="count(fields/field) > 0">
                         <span class="label_class_member">Fields:</span>
