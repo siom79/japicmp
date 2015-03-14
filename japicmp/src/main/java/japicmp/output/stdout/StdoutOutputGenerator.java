@@ -201,12 +201,26 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
     }
 
     private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
-        sb.append(signs).append(" ").append(jApiClass.getChangeStatus()).append(" ").append(jApiClass.getType()).append(javaObjectSerializationStatus(jApiClass)).append(": ")
-				.append(accessModifierAsString(jApiClass)).append(abstractModifierAsString(jApiClass)).append(staticModifierAsString(jApiClass))
-				.append(finalModifierAsString(jApiClass)).append(jApiClass.getFullyQualifiedName()).append("\n");
+        sb.append(signs + " " + jApiClass.getChangeStatus() + " " + processClassType(jApiClass) + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
+                + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + "\n");
         processInterfaceChanges(sb, jApiClass);
         processSuperclassChanges(sb, jApiClass);
         processFieldChanges(sb, jApiClass);
+    }
+
+    private String processClassType(JApiClass jApiClass) {
+        JApiClassType classType = jApiClass.getClassType();
+        switch (classType.getChangeStatus()) {
+            case NEW:
+                return classType.getNewType();
+            case REMOVED:
+                return classType.getOldType();
+            case MODIFIED:
+                return classType.getNewType() + " (<- " + classType.getOldType() + ") ";
+            case UNCHANGED:
+                return classType.getOldType();
+        }
+        return "n.a.";
     }
 
 	private String javaObjectSerializationStatus(JApiClass jApiClass) {

@@ -212,7 +212,7 @@
                         <xsl:call-template name="outputChangeStatus"/>
                         <xsl:call-template name="javaObjectSerializationCompatible"/>
                         <xsl:call-template name="modifiers"/>
-                        <xsl:value-of select="translate(@type,'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />&#160;
+                        <xsl:call-template name="classType"/>&#160;
                         <xsl:value-of select="@fullyQualifiedName" />
                     </span>
                     <a href="#toc" class="toc_link">top</a>
@@ -699,6 +699,47 @@
                 </xsl:when>
                 <xsl:when test="@changeStatus = 'REMOVED'">
                     <xsl:value-of select="@oldValue"/>
+                </xsl:when>
+            </xsl:choose>
+        </span>
+    </xsl:template>
+
+    <xsl:template name="classType">
+        <span>
+            <xsl:choose>
+                <xsl:when test="classType/@changeStatus = 'MODIFIED'">
+                    <xsl:attribute name="class">
+                        modified
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="classType/@changeStatus = 'UNCHANGED'">
+                    <xsl:attribute name="class">
+                        unchanged
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="classType/@changeStatus = 'NEW'">
+                    <xsl:attribute name="class">
+                        new
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="classType/@changeStatus = 'REMOVED'">
+                    <xsl:attribute name="class">
+                        removed
+                    </xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="classType/@changeStatus = 'MODIFIED'">
+                    <xsl:value-of select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>&#160;(&lt;-&#160;<xsl:value-of select="translate(classType/@oldType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>)
+                </xsl:when>
+                <xsl:when test="classType/@changeStatus = 'UNCHANGED'">
+                    <xsl:value-of select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+                </xsl:when>
+                <xsl:when test="classType/@changeStatus = 'NEW'">
+                    <xsl:value-of select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+                </xsl:when>
+                <xsl:when test="classType/@changeStatus = 'REMOVED'">
+                    <xsl:value-of select="translate(classType/@oldType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
                 </xsl:when>
             </xsl:choose>
         </span>

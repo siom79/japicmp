@@ -56,6 +56,9 @@ public class BinaryCompatibility {
 		if (fieldsHaveChangedIncompatible(jApiClass, classMap)) {
 			binaryCompatible = false;
 		}
+		if (jApiClass.getClassType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
+			binaryCompatible = false;
+		}
 		jApiClass.setBinaryCompatible(binaryCompatible);
 	}
 
