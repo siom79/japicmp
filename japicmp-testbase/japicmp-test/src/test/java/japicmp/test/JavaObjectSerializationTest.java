@@ -61,7 +61,7 @@ public class JavaObjectSerializationTest {
 	public void testUnchangedWithSerialVersionUidChange() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, UnchangedWithSerialVersionUidChange.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE));
+		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_MODIFIED));
 		assertThat(testSerialization(jApiClass), is(false));
 	}
 
@@ -77,7 +77,7 @@ public class JavaObjectSerializationTest {
 	public void testExtendsSerializableClassModified() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, ExtendsSerializableClassModified.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE));
+		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE));
 		assertThat(testSerialization(jApiClass), is(false));
 	}
 
@@ -101,14 +101,21 @@ public class JavaObjectSerializationTest {
 	public void testModifiedAndSerialVersionUidModified() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, ModifiedAndSerialVersionUidModified.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE));
+		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_MODIFIED));
 	}
 
 	@Test
 	public void testSerializableClassRemoved() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.test.serialversion.SerializableClassRemoved");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.REMOVED));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE));
+		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_REMOVED));
+	}
+
+	@Test
+	public void testFieldRemoved() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, IncompatibleChanges.FieldRemoved.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED));
 	}
 
 	private boolean testSerialization(JApiClass jApiClass) {

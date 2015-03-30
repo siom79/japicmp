@@ -202,7 +202,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 
     private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
         sb.append(signs + " " + jApiClass.getChangeStatus() + " " + processClassType(jApiClass) + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
-                + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + "\n");
+                + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + " " + javaObjectSerializationStatus(jApiClass) + "\n");
         processInterfaceChanges(sb, jApiClass);
         processSuperclassChanges(sb, jApiClass);
         processFieldChanges(sb, jApiClass);
@@ -224,22 +224,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
     }
 
 	private String javaObjectSerializationStatus(JApiClass jApiClass) {
-		String returnValue;
-		JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus status = jApiClass.getJavaObjectSerializationCompatible();
-		switch (status) {
-			case SERIALIZABLE_COMPATIBLE:
-				returnValue = " (serialization compatible)";
-				break;
-			case SERIALIZABLE_INCOMPATIBLE:
-				returnValue = " (serialization incompatible)";
-				break;
-			case SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL:
-				returnValue = " (serialization incompatible but serialVersionUID equal)";
-				break;
-			default:
-				returnValue = "";
-		}
-		return returnValue;
+		return " (" + jApiClass.getJavaObjectSerializationCompatible().getDescription() + ")";
 	}
 
     private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {

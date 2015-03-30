@@ -13,12 +13,12 @@ import javax.xml.bind.annotation.XmlTransient;
 public class JApiSerialVersionUid {
 	private final boolean serializableOld;
 	private final boolean serializableNew;
-	private final long serialVersionUidDefaultOld;
-	private final long serialVersionUidDefaultNew;
+	private final Optional<Long> serialVersionUidDefaultOld;
+	private final Optional<Long> serialVersionUidDefaultNew;
 	private final Optional<Long> serialVersionUidInClassOld;
 	private final Optional<Long> serialVersionUidInClassNew;
 
-	public JApiSerialVersionUid(boolean serializableOld, boolean serializableNew, long serialVersionUidDefaultOld, long serialVersionUidDefaultNew, Optional<Long> serialVersionUidInClassOld, Optional<Long> serialVersionUidInClassNew) {
+	public JApiSerialVersionUid(boolean serializableOld, boolean serializableNew, Optional<Long> serialVersionUidDefaultOld, Optional<Long> serialVersionUidDefaultNew, Optional<Long> serialVersionUidInClassOld, Optional<Long> serialVersionUidInClassNew) {
 		this.serializableOld = serializableOld;
 		this.serializableNew = serializableNew;
 		this.serialVersionUidDefaultOld = serialVersionUidDefaultOld;
@@ -50,8 +50,8 @@ public class JApiSerialVersionUid {
 	 * old version of the class.
 	 * @return the default serialVersionUID
 	 */
-	@XmlAttribute
-	public long getSerialVersionUidDefaultOld() {
+	@XmlTransient
+	public Optional<Long> getSerialVersionUidDefaultOld() {
 		return serialVersionUidDefaultOld;
 	}
 
@@ -60,8 +60,8 @@ public class JApiSerialVersionUid {
 	 * new version of the class.
 	 * @return the default serialVersionUID
 	 */
-	@XmlAttribute
-	public long getSerialVersionUidDefaultNew() {
+	@XmlTransient
+	public Optional<Long> getSerialVersionUidDefaultNew() {
 		return serialVersionUidDefaultNew;
 	}
 
@@ -91,5 +91,15 @@ public class JApiSerialVersionUid {
 	@XmlAttribute(name = "serialVersionUidInClassNew")
 	public String getSerialVersionUidInClassNewAsString() {
 		return OptionalHelper.optionalToString(serialVersionUidInClassNew);
+	}
+
+	@XmlAttribute(name = "serialVersionUidDefaultOld")
+	public String getSerialVersionUidDefaultOldAsString() {
+		return OptionalHelper.optionalToString(serialVersionUidDefaultOld);
+	}
+
+	@XmlAttribute(name = "serialVersionUidDefaultNew")
+	public String getSerialVersionUidDefaultNewAsString() {
+		return OptionalHelper.optionalToString(serialVersionUidDefaultNew);
 	}
 }
