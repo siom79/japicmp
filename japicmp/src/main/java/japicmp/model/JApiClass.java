@@ -35,10 +35,10 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final JApiModifier<StaticModifier> staticModifier;
 	private final JApiModifier<AbstractModifier> abstractModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
+	private final JApiSerialVersionUid jApiSerialVersionUid;
 	private boolean binaryCompatible = true;
-	private boolean changeCausedByClassElement = false;
 	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
-	private JApiSerialVersionUid jApiSerialVersionUid;
+	private boolean changeCausedByClassElement = false;
 
 	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
 		this.jarArchiveComparator = jarArchiveComparator;
@@ -56,6 +56,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		this.staticModifier = extractStaticModifier(oldClass, newClass);
 		this.abstractModifier = extractAbstractModifier(oldClass, newClass);
 		this.syntheticAttribute = extractSyntheticAttribute(oldClass, newClass);
+		this.jApiSerialVersionUid = JavaObjectSerializationCompatibility.extractSerialVersionUid(oldClass, newClass);
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 	}
 
@@ -523,9 +524,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return jApiJavaObjectSerializationChangeStatus;
 	}
 
-	@Override
-	public void setSerialVersionUid(JApiSerialVersionUid jApiSerialVersionUid) {
-		this.jApiSerialVersionUid = jApiSerialVersionUid;
+	@XmlAttribute
+	public String getJavaObjectSerializationCompatibleAsString() {
+		return jApiJavaObjectSerializationChangeStatus.getDescription();
 	}
 
 	@XmlElement

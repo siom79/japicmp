@@ -78,7 +78,11 @@ public interface JApiJavaObjectSerializationCompatibility {
 		/**
 		 * The default serialVersionUID has changed.
 		 */
-		SERIALIZABLE_INCOMPATIBLE_DEFAULT_SERIALVERSIONUID_CHANGED("default serialVersionUID changed");
+		SERIALIZABLE_INCOMPATIBLE_DEFAULT_SERIALVERSIONUID_CHANGED("default serialVersionUID changed"),
+		/**
+		 * The superclass has changed.
+		 */
+		SERIALIZABLE_INCOMPATIBLE_SUPERCLASS_MODIFIED("superclass modified");
 
 		private final String description;
 
@@ -104,12 +108,6 @@ public interface JApiJavaObjectSerializationCompatibility {
 	 * @return the type of change
 	 */
 	JApiJavaObjectSerializationChangeStatus getJavaObjectSerializationCompatible();
-
-	/**
-	 * Sets the {@link JApiSerialVersionUid} for this class.
-	 * @param jApiSerialVersionUid the serialVersionUID
-	 */
-	void setSerialVersionUid(JApiSerialVersionUid jApiSerialVersionUid);
 
 	/**
 	 * Returns the {@link japicmp.model.JApiSerialVersionUid}

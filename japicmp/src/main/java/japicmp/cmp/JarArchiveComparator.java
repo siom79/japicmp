@@ -36,12 +36,12 @@ public class JarArchiveComparator {
         ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
         List<JApiClass> classList = classesComparator.getClasses();
         checkBinaryCompatibility(classList);
-		OutputFilter.sortClassesAndMethods(classList);
-		checkJavaObjectSerializationCompatibility(classList, classPool);
-		return classList;
+		checkJavaObjectSerializationCompatibility(classList);
+        OutputFilter.sortClassesAndMethods(classList);
+        return classList;
     }
 
-	private void checkJavaObjectSerializationCompatibility(List<JApiClass> jApiClasses, ClassPool classPool) {
+	private void checkJavaObjectSerializationCompatibility(List<JApiClass> jApiClasses) {
 		JavaObjectSerializationCompatibility javaObjectSerializationCompatibility = new JavaObjectSerializationCompatibility();
 		javaObjectSerializationCompatibility.evaluate(jApiClasses);
 	}

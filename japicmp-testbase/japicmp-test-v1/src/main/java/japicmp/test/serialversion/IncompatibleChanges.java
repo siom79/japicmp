@@ -5,6 +5,7 @@ import java.io.*;
 public class IncompatibleChanges {
 
 	public static class FieldRemoved implements Serializable {
+		private static final long serialVersionUID = 1;
 		public int fieldRemoved;
 	}
 
@@ -17,7 +18,7 @@ public class IncompatibleChanges {
 	}
 
 	public static class TypeOfFieldChanges implements Serializable {
-		public String fieldFromStringToInteger;
+		public int fieldFromIntToLong;
 	}
 
 	public static class SerializableToExternalizable implements Serializable {

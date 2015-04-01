@@ -269,8 +269,8 @@
                                 <tr>
                                     <td> </td>
                                     <td>Serializable</td>
-                                    <td>serialVersionUidDefault</td>
-                                    <td>serialVersionUidInClass</td>
+                                    <td>default serialVersionUid</td>
+                                    <td>serialVersionUid in class</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -836,18 +836,12 @@
                     </xsl:attribute>
                     (Serializable compatible)&#160;
                 </xsl:when>
-                <xsl:when test="@javaObjectSerializationCompatible = 'SERIALIZABLE_INCOMPATIBLE'">
+                <xsl:otherwise>
                     <xsl:attribute name="class">
                         removed
                     </xsl:attribute>
-                    (Serializable incompatible(!))&#160;
-                </xsl:when>
-                <xsl:when test="@javaObjectSerializationCompatible = 'SERIALIZABLE_INCOMPATIBLE_BUT_SUID_EQUAL'">
-                    <xsl:attribute name="class">
-                        removed
-                    </xsl:attribute>
-                    (Serializable incompatible(!) but serialVersionUID equal)&#160;
-                </xsl:when>
+                    (Serializable incompatible(!): <xsl:value-of select="@javaObjectSerializationCompatibleAsString"/>)&#160;
+                </xsl:otherwise>
             </xsl:choose>
         </span>
     </xsl:template>
