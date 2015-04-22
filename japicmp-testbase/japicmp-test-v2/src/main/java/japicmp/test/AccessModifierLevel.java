@@ -30,4 +30,11 @@ public class AccessModifierLevel {
 
 		}
 	}
+
+	public static class AccessModifierNotChangesForPrivate {
+		private int fieldRemainsPrivate;
+		int fieldRemainsPackageProtected;
+		protected int fieldRemainsProtected;
+		public int fieldRemainsPublic;
+	}
 }

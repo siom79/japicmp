@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiBinaryCompatibility, JApiHasAnnotations {
+public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasTransientModifier, JApiBinaryCompatibility, JApiHasAnnotations {
     private final JApiChangeStatus changeStatus;
     private final Optional<CtField> oldFieldOptional;
     private final Optional<CtField> newFieldOptional;
@@ -26,18 +26,20 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     private final JApiModifier<AccessModifier> accessModifier;
     private final JApiModifier<StaticModifier> staticModifier;
     private final JApiModifier<FinalModifier> finalModifier;
-    private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
-    private final JApiType type;
-    private boolean binaryCompatible = true;
+	private final JApiModifier<TransientModifier> transientModifier;
+	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
+	private final JApiType type;
+	private boolean binaryCompatible = true;
 
-    public JApiField(JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
+	public JApiField(JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
         this.oldFieldOptional = oldFieldOptional;
         this.newFieldOptional = newFieldOptional;
         computeAnnotationChanges(this.annotations, oldFieldOptional, newFieldOptional);
         this.accessModifier = extractAccessModifier(oldFieldOptional, newFieldOptional);
         this.staticModifier = extractStaticModifier(oldFieldOptional, newFieldOptional);
         this.finalModifier = extractFinalModifier(oldFieldOptional, newFieldOptional);
-        this.syntheticAttribute = extractSyntheticAttribute(oldFieldOptional, newFieldOptional);
+		this.transientModifier = extractTransientModifier(oldFieldOptional, newFieldOptional);
+		this.syntheticAttribute = extractSyntheticAttribute(oldFieldOptional, newFieldOptional);
         this.type = extractType(oldFieldOptional, newFieldOptional);
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
@@ -96,6 +98,9 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
             if (this.finalModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
+			if (this.transientModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				changeStatus = JApiChangeStatus.MODIFIED;
+			}
             if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
@@ -216,6 +221,30 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
         }
     }
 
+	private JApiModifier<TransientModifier> extractTransientModifier(Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
+		if (oldFieldOptional.isPresent() && newFieldOptional.isPresent()) {
+			CtField oldField = oldFieldOptional.get();
+			CtField newField = newFieldOptional.get();
+			TransientModifier oldFieldModifier = Modifier.isTransient(oldField.getModifiers()) ? TransientModifier.TRANSIENT : TransientModifier.NON_TRANSIENT;
+			TransientModifier newFieldModifier = Modifier.isTransient(newField.getModifiers()) ? TransientModifier.TRANSIENT : TransientModifier.NON_TRANSIENT;
+			if (oldFieldModifier != newFieldModifier) {
+				return new JApiModifier<TransientModifier>(Optional.of(oldFieldModifier), Optional.of(newFieldModifier), JApiChangeStatus.MODIFIED);
+			} else {
+				return new JApiModifier<TransientModifier>(Optional.of(oldFieldModifier), Optional.of(newFieldModifier), JApiChangeStatus.UNCHANGED);
+			}
+		} else {
+			if (oldFieldOptional.isPresent()) {
+				CtField ctField = oldFieldOptional.get();
+				TransientModifier modifier = Modifier.isFinal(ctField.getModifiers()) ? TransientModifier.TRANSIENT : TransientModifier.NON_TRANSIENT;
+				return new JApiModifier<TransientModifier>(Optional.of(modifier), Optional.<TransientModifier>absent(), JApiChangeStatus.REMOVED);
+			} else {
+				CtField ctField = newFieldOptional.get();
+				TransientModifier modifier = Modifier.isFinal(ctField.getModifiers()) ? TransientModifier.TRANSIENT : TransientModifier.NON_TRANSIENT;
+				return new JApiModifier<TransientModifier>(Optional.<TransientModifier>absent(), Optional.of(modifier), JApiChangeStatus.NEW);
+			}
+		}
+	}
+
     @XmlAttribute(name = "changeStatus")
     public JApiChangeStatus getChangeStatus() {
         return changeStatus;
@@ -258,6 +287,11 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     public JApiModifier<FinalModifier> getFinalModifier() {
         return finalModifier;
     }
+
+	@XmlTransient
+	public JApiModifier<TransientModifier> getTransientModifier() {
+		return transientModifier;
+	}
 
     @XmlTransient
     public JApiModifier<AccessModifier> getAccessModifier() {

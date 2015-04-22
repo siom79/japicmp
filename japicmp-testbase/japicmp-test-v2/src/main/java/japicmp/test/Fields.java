@@ -19,4 +19,6 @@ public class Fields {
 	public final int finalRemainsFinalField = 0;
 	public Integer stringToInt;
 	public Integer hasBeenAdded;
+	public int transientToNonTransient;
+	public transient int nonTransientToTransient;
 }

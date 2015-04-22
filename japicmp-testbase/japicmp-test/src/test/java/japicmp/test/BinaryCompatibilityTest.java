@@ -1,38 +1,27 @@
 package japicmp.test;
 
-import static japicmp.test.util.Helper.getArchive;
-import static japicmp.test.util.Helper.getJApiClass;
-import static japicmp.test.util.Helper.getJApiField;
-import static japicmp.test.util.Helper.getJApiMethod;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
 import japicmp.model.JApiMethod;
-import japicmp.test.ClassMembers.ClassConstructorChangesAccessibility;
-import japicmp.test.ClassMembers.ClassFieldChangesAccessibility;
-import japicmp.test.ClassMembers.ClassLosesConstructor;
-import japicmp.test.ClassMembers.ClassLosesField;
-import japicmp.test.ClassMembers.ClassLosesMethod;
-import japicmp.test.ClassMembers.ClassMethodChangesAccessibility;
-import japicmp.test.ClassMembers.SubclassExtendsSuperclassWithField;
-import japicmp.test.ClassMembers.SubclassWithMethodToBeRemovedButContainedInSuperclass;
+import japicmp.test.ClassMembers.*;
 import japicmp.test.ClassModifier.AbstractToNonAbstractClass;
 import japicmp.test.ClassModifier.FinalToNonFinalInnerClass;
 import japicmp.test.ClassModifier.NonAbstractToAbstractClass;
 import japicmp.test.ClassModifier.NonFinalToFinalInnerClass;
-import japicmp.test.ClassModifier.PublicToPrivateInnerClass;
 import japicmp.test.Enums.AbcToAb;
 import japicmp.test.Enums.AbcToAbcd;
 import japicmp.test.Interfaces.ClassWithInterfaceLosesMethod;
 import japicmp.test.Interfaces.SubclassWithSuperclassLosesMethod;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static japicmp.test.util.Helper.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class BinaryCompatibilityTest {
 	private static List<JApiClass> jApiClasses;
@@ -61,7 +50,7 @@ public class BinaryCompatibilityTest {
 	
 	@Test
 	public void test_JLS_13_4_3() {
-		JApiClass publicToPrivateInnerClass = getJApiClass(jApiClasses, PublicToPrivateInnerClass.class.getName());
+		JApiClass publicToPrivateInnerClass = getJApiClass(jApiClasses, "japicmp.test.ClassModifier$PublicToPrivateInnerClass");
 		assertThat(publicToPrivateInnerClass.isBinaryCompatible(), is(false));
 	}
 	

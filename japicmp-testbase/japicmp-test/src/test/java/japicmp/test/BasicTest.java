@@ -19,7 +19,7 @@ public class BasicTest {
     public void test() {
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-        JApiClass jApiClassRemoved = getJApiClass(jApiClasses, Removed.class.getName());
+        JApiClass jApiClassRemoved = getJApiClass(jApiClasses, "japicmp.test.Removed");
         JApiClass jApiClassAdded = getJApiClass(jApiClasses, Added.class.getName());
         JApiClass jApiClassUnchanged = getJApiClass(jApiClasses, Unchanged.class.getName());
         assertThat(jApiClassRemoved, is(notNullValue()));

@@ -26,21 +26,21 @@
 						<dependency>
 							<groupId>com.google.guava</groupId>
 							<artifactId>guava</artifactId>
-							<version>16.0</version>
+							<version>17.0</version>
 						</dependency>
 					</oldVersion>
 					<newVersion>
 						<dependency>
 							<groupId>com.google.guava</groupId>
 							<artifactId>guava</artifactId>
-							<version>17.0</version>
+							<version>18.0</version>
 						</dependency>
 					</newVersion>
 					<parameter>
 						<onlyModified>true</onlyModified>
 						<packagesToInclude>*</packagesToInclude>
 						<packagesToExclude>*</packagesToExclude>
-						<accessModifier>public</accessModifier>
+						<accessModifier>private</accessModifier>
 						<breakBuildOnModifications>false</breakBuildOnModifications>
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
 					</parameter>

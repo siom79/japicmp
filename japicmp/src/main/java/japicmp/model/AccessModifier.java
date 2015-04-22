@@ -1,7 +1,7 @@
 package japicmp.model;
 
 public enum AccessModifier {
-    PUBLIC(3), PACKAGE_PROTECTED(2), PROTECTED(1), PRIVATE(0);
+    PUBLIC(3), PROTECTED(2), PACKAGE_PROTECTED(1), PRIVATE(0);
 
     private int level;
 

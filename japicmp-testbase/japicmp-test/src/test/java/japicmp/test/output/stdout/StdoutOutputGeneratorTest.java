@@ -30,8 +30,8 @@ public class StdoutOutputGeneratorTest {
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		Options options = new Options();
 		options.setOutputOnlyModifications(true);
-		StdoutOutputGenerator generator = new StdoutOutputGenerator(options);
-		String string = generator.generate(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"), jApiClasses);
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses, getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		String string = generator.generate();
 		assertThat(string, containsString("+++  NEW CLASS: PUBLIC(+) japicmp.test.Added"));
 		assertThat(string, containsString("---! REMOVED CLASS: PUBLIC(-) japicmp.test.Removed"));
 		assertThat(string, containsString("***! MODIFIED CLASS: PUBLIC STATIC japicmp.test.Superclasses$SuperClassChanges"));
@@ -62,8 +62,8 @@ public class StdoutOutputGeneratorTest {
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		Options options = new Options();
 		options.setOutputOnlyModifications(true);
-		StdoutOutputGenerator generator = new StdoutOutputGenerator(options);
-		String string = generator.generate(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"), jApiClasses);
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses, getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		String string = generator.generate();
 		assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.annotation.AnnotationAddedToConstructor"));
 	}
 }

@@ -19,4 +19,6 @@ public class Fields {
 	public final int finalRemainsFinalField = 0;
 	public String stringToInt;
 	public Integer toBeRemoved;
+	public transient int transientToNonTransient;
+	public int nonTransientToTransient;
 }

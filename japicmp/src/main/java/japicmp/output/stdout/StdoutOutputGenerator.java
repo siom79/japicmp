@@ -5,19 +5,24 @@ import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.model.JApiAnnotationElementValue.Type;
 import japicmp.output.OutputFilter;
+import japicmp.output.OutputGenerator;
 import javassist.bytecode.annotation.MemberValue;
 
 import java.io.File;
 import java.util.List;
 
-public class StdoutOutputGenerator {
-    private final Options options;
+public class StdoutOutputGenerator extends OutputGenerator<String> {
+	private final File oldArchive;
+	private final File newArchive;
 
-    public StdoutOutputGenerator(Options options) {
-        this.options = options;
-    }
+	public StdoutOutputGenerator(Options options, List<JApiClass> jApiClasses, File oldArchive, File newArchive) {
+        super(options, jApiClasses);
+		this.oldArchive = oldArchive;
+		this.newArchive = newArchive;
+	}
 
-    public String generate(File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
+	@Override
+	public String generate() {
         OutputFilter outputFilter = new OutputFilter(options);
         outputFilter.filter(jApiClasses);
         StringBuilder sb = new StringBuilder();
@@ -93,8 +98,9 @@ public class StdoutOutputGenerator {
     }
 
     private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiBehavior, String classMemberType) {
-        sb.append("\t" + signs + " " + jApiBehavior.getChangeStatus() + " " + classMemberType + " " + accessModifierAsString(jApiBehavior) + abstractModifierAsString(jApiBehavior)
-                + staticModifierAsString(jApiBehavior) + finalModifierAsString(jApiBehavior) + returnType(jApiBehavior) + jApiBehavior.getName() + "(");
+        sb.append("\t").append(signs).append(" ").append(jApiBehavior.getChangeStatus()).append(" ").append(classMemberType).append(" ")
+				.append(accessModifierAsString(jApiBehavior)).append(abstractModifierAsString(jApiBehavior)).append(staticModifierAsString(jApiBehavior))
+				.append(finalModifierAsString(jApiBehavior)).append(returnType(jApiBehavior)).append(jApiBehavior.getName()).append("(");
         int paramCount = 0;
         for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {
             if (paramCount > 0) {
@@ -196,7 +202,7 @@ public class StdoutOutputGenerator {
 
     private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
         sb.append(signs + " " + jApiClass.getChangeStatus() + " " + processClassType(jApiClass) + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
-                + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + "\n");
+                + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + " " + javaObjectSerializationStatus(jApiClass) + "\n");
         processInterfaceChanges(sb, jApiClass);
         processSuperclassChanges(sb, jApiClass);
         processFieldChanges(sb, jApiClass);
@@ -216,6 +222,10 @@ public class StdoutOutputGenerator {
         }
         return "n.a.";
     }
+
+	private String javaObjectSerializationStatus(JApiClass jApiClass) {
+		return " (" + jApiClass.getJavaObjectSerializationCompatible().getDescription() + ")";
+	}
 
     private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
         List<JApiField> fields = jApiClass.getFields();

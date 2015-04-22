@@ -24,14 +24,8 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtField;
-import javassist.CtMethod;
-import javassist.CtNewMethod;
-import javassist.NotFoundException;
-
+import javassist.*;
+import javassist.Modifier;
 import org.junit.Test;
 
 import com.google.common.base.Optional;
@@ -77,6 +71,7 @@ public class SyntheticTest {
 						ctClass.addMethod(method);
 						CtField newField = new CtField(classPool.get(String.class.getCanonicalName()), "newField", ctClass);
 						newField.setAttribute(syntheticAttribute.getName(), syntheticAttribute.get());
+						newField.setModifiers(Modifier.PUBLIC);
 						ctClass.addField(newField);
 						byte[] bytecode = ctClass.toBytecode();
 						ZipEntry newEntry = new ZipEntry(zipEntry.getName());

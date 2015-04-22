@@ -2,3 +2,5 @@ language: java
 script: mvn integration-test
 jdk:
     - oraclejdk8
+    - oraclejdk7
+    - openjdk7

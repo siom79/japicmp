@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class JApiClassType {
 	private final Optional<ClassType> oldTypeOptional;
@@ -33,5 +34,15 @@ public class JApiClassType {
 	@XmlAttribute
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
+	}
+
+	@XmlTransient
+	public Optional<ClassType> getOldTypeOptional() {
+		return oldTypeOptional;
+	}
+
+	@XmlTransient
+	public Optional<ClassType> getNewTypeOptional() {
+		return newTypeOptional;
 	}
 }

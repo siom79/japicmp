@@ -172,7 +172,10 @@ public class OutputFilter extends Filter {
                         }
                     }
                 }
-                if (remove) {
+				if (jApiClass.getJavaObjectSerializationCompatible().isIncompatible()) {
+					remove = false;
+				}
+				if (remove) {
                     iterator.remove();
                 }
             }

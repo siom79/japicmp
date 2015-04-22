@@ -5,8 +5,7 @@ import japicmp.model.JApiClass;
 
 import java.util.List;
 
-public abstract class OutputGenerator {
-
+public abstract class OutputGenerator<T> {
 	protected final Options options;
 	protected final List<JApiClass> jApiClasses;
 
@@ -15,5 +14,5 @@ public abstract class OutputGenerator {
 		this.jApiClasses = jApiClasses;
 	}
 
-	public abstract void generate();
+	public abstract T generate();
 }

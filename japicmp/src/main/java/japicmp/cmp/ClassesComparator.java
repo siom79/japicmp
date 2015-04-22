@@ -5,6 +5,7 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiClassType;
 import japicmp.util.ClassHelper;
+import japicmp.util.ModifierHelper;
 import javassist.CtClass;
 
 import java.util.HashMap;
@@ -15,9 +16,11 @@ import java.util.Map;
 public class ClassesComparator {
     private List<JApiClass> classes = new LinkedList<>();
     private JarArchiveComparator jarArchiveComparator;
+    private final JarArchiveComparatorOptions options;
 
-    public ClassesComparator(JarArchiveComparator jarArchiveComparator) {
+    public ClassesComparator(JarArchiveComparator jarArchiveComparator, JarArchiveComparatorOptions options) {
         this.jarArchiveComparator = jarArchiveComparator;
+        this.options = options;
     }
 
     public void compare(List<CtClass> oldClassesArg, List<CtClass> newClassesArg) {
@@ -32,7 +35,10 @@ public class ClassesComparator {
             CtClass newCtClass = newClassesMap.get(oldCtClass.getName());
             if(newCtClass == null) {
                 JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldCtClass)), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-                classes.add(new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType));
+                JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType, options);
+                if (ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier())) {
+                    classes.add(jApiClass);
+                }
             } else {
                 JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;
                 JApiClassType.ClassType oldType = ClassHelper.getType(oldCtClass);
@@ -41,7 +47,10 @@ public class ClassesComparator {
                     changeStatus = JApiChangeStatus.MODIFIED;
                 }
                 JApiClassType classType = new JApiClassType(Optional.of(oldType), Optional.of(newType), changeStatus);
-                classes.add(new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.of(newCtClass), changeStatus, classType));
+                JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.of(newCtClass), changeStatus, classType, options);
+                if (ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier())) {
+                    classes.add(jApiClass);
+                }
             }
         }
         for(CtClass newCtClass : newClassesMap.values()) {
@@ -49,7 +58,10 @@ public class ClassesComparator {
             if(oldCtClass == null) {
                 JApiClassType.ClassType newType = ClassHelper.getType(newCtClass);
                 JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(newType), JApiChangeStatus.NEW);
-                classes.add(new JApiClass(this.jarArchiveComparator, newCtClass.getName(), Optional.<CtClass>absent(), Optional.<CtClass>of(newCtClass), JApiChangeStatus.NEW, classType));
+                JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, newCtClass.getName(), Optional.<CtClass>absent(), Optional.<CtClass>of(newCtClass), JApiChangeStatus.NEW, classType, options);
+                if (ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier())) {
+                    classes.add(jApiClass);
+                }
             }
         }
     }
