@@ -118,14 +118,14 @@ public class JarArchiveComparator {
 
     private boolean packageMatches(JarArchiveComparatorOptions options, CtClass ctClass) {
         String packageName = ctClass.getPackageName();
-        for (PackageFilter packageFilter : options.getPackagesInclude()) {
-            if (packageFilter.matches(packageName)) {
-                return true;
-            }
-        }
         for (PackageFilter packageFilter : options.getPackagesExclude()) {
             if (packageFilter.matches(packageName)) {
                 return false;
+            }
+        }
+        for (PackageFilter packageFilter : options.getPackagesInclude()) {
+            if (packageFilter.matches(packageName)) {
+                return true;
             }
         }
         int noInclude = options.getPackagesInclude().size();
