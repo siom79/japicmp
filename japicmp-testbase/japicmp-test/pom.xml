@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-testbase</artifactId>
-        <version>0.3.2-SNAPSHOT</version>
+        <version>0.4.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>japicmp-test</artifactId>
@@ -15,11 +15,6 @@
             <artifactId>japicmp</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.siom79.japicmp</groupId>
-            <artifactId>japicmp-test-v1</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.siom79.japicmp</groupId>

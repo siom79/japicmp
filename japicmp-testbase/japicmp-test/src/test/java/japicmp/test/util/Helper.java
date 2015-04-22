@@ -1,16 +1,13 @@
 package japicmp.test.util;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -97,19 +94,35 @@ public class Helper {
         return str;
     }
 
-	public static List<JApiClass> compareTestV1WithTestV2() {
+	public static List<JApiClass> compareTestV1WithTestV2(AccessModifier accessModifier) {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+        options.setAccessModifier(accessModifier);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		return jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 	}
 
 	public static void generateHtmlOutput(List<JApiClass> jApiClasses, String xmlOutputFile, String htmlOutputFile, boolean outputOnlyModifications, AccessModifier accessModifier) {
-		XmlOutputGenerator generator = new XmlOutputGenerator();
 		Options options = new Options();
 		options.setXmlOutputFile(Optional.of(xmlOutputFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
 		options.setAccessModifier(Optional.of(accessModifier));
-		generator.generate("/old/Path", "/new/Path", jApiClasses, options);
+		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options);
+		generator.generate();
 	}
+
+    public interface SimpleExceptionVerifier {
+        void execute();
+    }
+
+    public static void assertThatExceptionIsThrown(SimpleExceptionVerifier verifier, Class<? extends Exception> exceptionClass) {
+        boolean exceptionThrown = false;
+        try {
+            verifier.execute();
+        } catch (Exception e) {
+            exceptionThrown = true;
+            assertThat(e.getClass().isAssignableFrom(exceptionClass), is(true));
+        }
+        assertThat(exceptionThrown, is(true));
+    }
 }

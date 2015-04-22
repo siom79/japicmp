@@ -5,6 +5,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.BinaryCompatibility;
 import japicmp.model.JApiClass;
+import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -35,11 +36,17 @@ public class JarArchiveComparator {
         ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
         List<JApiClass> classList = classesComparator.getClasses();
         checkBinaryCompatibility(classList);
-		OutputFilter.sortClassesAndMethods(classList);
-		return classList;
+		checkJavaObjectSerializationCompatibility(classList);
+        OutputFilter.sortClassesAndMethods(classList);
+        return classList;
     }
 
-    private void setupClasspath() {
+	private void checkJavaObjectSerializationCompatibility(List<JApiClass> jApiClasses) {
+		JavaObjectSerializationCompatibility javaObjectSerializationCompatibility = new JavaObjectSerializationCompatibility();
+		javaObjectSerializationCompatibility.evaluate(jApiClasses);
+	}
+
+	private void setupClasspath() {
         classPool.appendSystemPath();
         classPath += System.getProperty("java.class.path");
         for (String classPathEntry : options.getClassPathEntries()) {
@@ -67,7 +74,7 @@ public class JarArchiveComparator {
 	private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) {
         List<CtClass> oldClasses = createListOfCtClasses(oldArchive, classPool, options);
         List<CtClass> newClasses = createListOfCtClasses(newArchive, classPool, options);
-        ClassesComparator classesComparator = new ClassesComparator(this);
+        ClassesComparator classesComparator = new ClassesComparator(this, options);
         classesComparator.compare(oldClasses, newClasses);
         if (logger.isLoggable(Level.FINE)) {
             for (JApiClass jApiClass : classesComparator.getClasses()) {
@@ -111,14 +118,14 @@ public class JarArchiveComparator {
 
     private boolean packageMatches(JarArchiveComparatorOptions options, CtClass ctClass) {
         String packageName = ctClass.getPackageName();
-        for (PackageFilter packageFilter : options.getPackagesInclude()) {
-            if (packageFilter.matches(packageName)) {
-                return true;
-            }
-        }
         for (PackageFilter packageFilter : options.getPackagesExclude()) {
             if (packageFilter.matches(packageName)) {
                 return false;
+            }
+        }
+        for (PackageFilter packageFilter : options.getPackagesInclude()) {
+            if (packageFilter.matches(packageName)) {
+                return true;
             }
         }
         int noInclude = options.getPackagesInclude().size();

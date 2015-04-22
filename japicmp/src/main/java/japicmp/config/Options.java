@@ -17,7 +17,7 @@ public class Options {
 	private boolean outputOnlyBinaryIncompatibleModifications = false;
 	private Optional<String> xmlOutputFile = Optional.absent();
 	private Optional<String> htmlOutputFile = Optional.absent();
-	private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PUBLIC);
+	private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PROTECTED);
 	private List<PackageFilter> packagesInclude = new LinkedList<>();
 	private List<PackageFilter> packagesExclude = new LinkedList<>();
 

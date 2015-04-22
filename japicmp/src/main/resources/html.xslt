@@ -48,6 +48,10 @@
                     table thead {
                         background-color: #dee3e9;
                     }
+                    table tbody tr td.matrix_layout {
+                        background-color: #dee3e9;
+                        font-weight: bold;
+                    }
                     .class {
                         margin-bottom: 2em;
                         border: 1px solid #dcdcdc;
@@ -59,6 +63,12 @@
                         margin-top: 1em;
                     }
                     .class_interfaces {
+                        margin-top: 1em;
+                    }
+                    .class_fields {
+                        margin-top: 1em;
+                    }
+                    .class_serialVersionUid {
                         margin-top: 1em;
                     }
                     .class_constructors {
@@ -97,6 +107,9 @@
                         margin-bottom: 1em;
                         background: #ededed;
                         display: inline-block;
+                    }
+                    .notes {
+                        font-size: 0.75em;
                     }
 				</style>
 			</head>
@@ -196,7 +209,8 @@
                                 <xsl:value-of select="@fullyQualifiedName" />
                             </xsl:attribute>
                         </a>
-                        <xsl:call-template name="outputChangeStatus"/>&#160;
+                        <xsl:call-template name="outputChangeStatus"/>
+                        <xsl:call-template name="javaObjectSerializationCompatible"/>
                         <xsl:call-template name="modifiers"/>
                         <xsl:call-template name="classType"/>&#160;
                         <xsl:value-of select="@fullyQualifiedName" />
@@ -241,6 +255,76 @@
                         </table>
                     </xsl:if>
                 </div>
+                <xsl:if test="serialVersionUid/@serializableOld = 'true' or serialVersionUid/@serializableNew = 'true'">
+                    <div class="class_serialVersionUid">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td> </td>
+                                    <td>Serializable</td>
+                                    <td>default serialVersionUID</td>
+                                    <td>serialVersionUID in class</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="matrix_layout">Old</td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serializableOld != serialVersionUid/@serializableNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serializableOld"/>
+                                    </td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serialVersionUidDefaultOld != serialVersionUid/@serialVersionUidDefaultNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serialVersionUidDefaultOld"/>
+                                    </td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serialVersionUidInClassOld != serialVersionUid/@serialVersionUidInClassNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serialVersionUidInClassOld"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="matrix_layout">New</td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serializableOld != serialVersionUid/@serializableNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serializableNew"/>
+                                    </td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serialVersionUidDefaultOld != serialVersionUid/@serialVersionUidDefaultNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serialVersionUidDefaultNew"/>
+                                    </td>
+                                    <td>
+                                        <xsl:if test="serialVersionUid/@serialVersionUidInClassOld != serialVersionUid/@serialVersionUidInClassNew">
+                                            <xsl:attribute name="class">
+                                                modified
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <xsl:value-of select="serialVersionUid/@serialVersionUidInClassNew"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </xsl:if>
                 <div class="class_fields">
                     <xsl:if test="count(fields/field) > 0">
                         <span class="label_class_member">Fields:</span>
@@ -727,6 +811,30 @@
                 <xsl:when test="classType/@changeStatus = 'REMOVED'">
                     <xsl:value-of select="translate(classType/@oldType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
                 </xsl:when>
+            </xsl:choose>
+        </span>
+    </xsl:template>
+
+    <xsl:template name="javaObjectSerializationCompatible">
+        <span>
+            <xsl:choose>
+                <xsl:when test="@javaObjectSerializationCompatible = 'NOT_SERIALIZABLE'">
+                    <xsl:attribute name="class">
+                    </xsl:attribute>
+                    &#160;
+                </xsl:when>
+                <xsl:when test="@javaObjectSerializationCompatible = 'SERIALIZABLE_COMPATIBLE'">
+                    <xsl:attribute name="class">
+                        new
+                    </xsl:attribute>
+                    (Serializable compatible)&#160;
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="class">
+                        removed
+                    </xsl:attribute>
+                    (Serializable incompatible(!): <xsl:value-of select="@javaObjectSerializationCompatibleAsString"/>)&#160;
+                </xsl:otherwise>
             </xsl:choose>
         </span>
     </xsl:template>

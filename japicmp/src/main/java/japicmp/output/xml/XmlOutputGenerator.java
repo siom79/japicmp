@@ -7,6 +7,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
+import japicmp.output.OutputGenerator;
 import japicmp.output.extapi.jpa.JpaAnalyzer;
 import japicmp.output.extapi.jpa.model.JpaTable;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
@@ -22,16 +23,26 @@ import java.io.*;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class XmlOutputGenerator {
+public class XmlOutputGenerator extends OutputGenerator<Void> {
 	private static final String XSD_FILENAME = "japicmp.xsd";
 	private static final String XML_SCHEMA = XSD_FILENAME;
 	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());
+	private final String oldArchivePath;
+	private final String newArchivePath;
 
-	public void generate(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
+	public XmlOutputGenerator(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
+		super(options, jApiClasses);
+		this.oldArchivePath = oldArchivePath;
+		this.newArchivePath = newArchivePath;
+	}
+
+	@Override
+	public Void generate() {
 		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, newArchivePath, jApiClasses, options);
 		//analyzeJpaAnnotations(jApiCmpXmlRoot, jApiClasses);
 		filterClasses(jApiClasses, options);
 		createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
+		return null;
 	}
 
 	private void analyzeJpaAnnotations(JApiCmpXmlRoot jApiCmpXmlRoot, List<JApiClass> jApiClasses) {

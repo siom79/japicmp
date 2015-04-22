@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>
 
     <groupId>com.github.siom79.japicmp</groupId>
     <artifactId>japicmp-base</artifactId>
-    <version>0.3.2-SNAPSHOT</version>
+    <version>0.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>japicmp-base</name>

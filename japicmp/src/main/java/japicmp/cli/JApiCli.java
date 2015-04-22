@@ -71,6 +71,7 @@ public class JApiCli {
 			JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
 			comparatorOptions.getPackagesInclude().addAll(options.getPackagesInclude());
 			comparatorOptions.getPackagesExclude().addAll(options.getPackagesExclude());
+			comparatorOptions.setAccessModifier(options.getAccessModifier());
 			return comparatorOptions;
 		}
 
@@ -81,11 +82,11 @@ public class JApiCli {
 				return;
 			}
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
-				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator();
-				xmlGenerator.generate(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
+				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
+				xmlGenerator.generate();
 			}
-			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options);
-			String output = stdoutOutputGenerator.generate(oldArchive, newArchive, jApiClasses);
+			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses, oldArchive, newArchive);
+			String output = stdoutOutputGenerator.generate();
 			System.out.println(output);
 		}
 
@@ -145,7 +146,7 @@ public class JApiCli {
 									accessModifierArg, AccessModifier.listOfAccessModifier());
 				}
 			} else {
-				return Optional.of(AccessModifier.PUBLIC);
+				return Optional.of(AccessModifier.PROTECTED);
 			}
 		}
 

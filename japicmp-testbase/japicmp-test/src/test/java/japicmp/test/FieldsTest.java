@@ -13,6 +13,7 @@ import japicmp.model.JApiClass;
 
 import java.util.List;
 
+import japicmp.model.TransientModifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,6 +25,7 @@ public class FieldsTest {
     @BeforeClass
     public static void beforeClass() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+        options.setAccessModifier(AccessModifier.PRIVATE);
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
     }
@@ -63,4 +65,24 @@ public class FieldsTest {
         assertThat(getJApiField(fieldsClass.getFields(), "privateRemainsPrivateField").getAccessModifier().getOldModifier(), is(Optional.of(AccessModifier.PRIVATE)));
         assertThat(getJApiField(fieldsClass.getFields(), "privateRemainsPrivateField").getAccessModifier().getNewModifier(), is(Optional.of(AccessModifier.PRIVATE)));
     }
+
+	@Test
+		 public void testTransientToNonTransient() {
+		JApiClass fieldsClass = getJApiClass(jApiClasses, Fields.class.getName());
+		assertThat(fieldsClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(getJApiField(fieldsClass.getFields(), "transientToNonTransient").getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(getJApiField(fieldsClass.getFields(), "transientToNonTransient").getTransientModifier().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(getJApiField(fieldsClass.getFields(), "transientToNonTransient").getTransientModifier().getOldModifier(), is(Optional.of(TransientModifier.TRANSIENT)));
+		assertThat(getJApiField(fieldsClass.getFields(), "transientToNonTransient").getTransientModifier().getNewModifier(), is(Optional.of(TransientModifier.NON_TRANSIENT)));
+	}
+
+	@Test
+	public void testNonTransientToTransient() {
+		JApiClass fieldsClass = getJApiClass(jApiClasses, Fields.class.getName());
+		assertThat(fieldsClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(getJApiField(fieldsClass.getFields(), "nonTransientToTransient").getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(getJApiField(fieldsClass.getFields(), "nonTransientToTransient").getTransientModifier().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(getJApiField(fieldsClass.getFields(), "nonTransientToTransient").getTransientModifier().getOldModifier(), is(Optional.of(TransientModifier.NON_TRANSIENT)));
+		assertThat(getJApiField(fieldsClass.getFields(), "nonTransientToTransient").getTransientModifier().getNewModifier(), is(Optional.of(TransientModifier.TRANSIENT)));
+	}
 }

@@ -95,18 +95,20 @@ public class SemverOutIntegTest {
 	}
 
 	private String getSemverDiff(String lastPackage, File oldFile, File newFile) {
-		JarArchiveComparator jarArchiveComparator = newComparator(lastPackage);
+		AccessModifier accessModifier = AccessModifier.PRIVATE;
+		JarArchiveComparator jarArchiveComparator = newComparator(lastPackage, accessModifier);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldFile, newFile);
 		Options options = new Options();
 		options.setNewArchive(newFile);
 		options.setOldArchive(oldFile);
-		options.setAccessModifier(AccessModifier.PRIVATE);
+		options.setAccessModifier(accessModifier);
 		options.setOutputOnlyModifications(false);
 		return new SemverOut(options, jApiClasses).value();
 	}
 
-	private JarArchiveComparator newComparator(String lastPackage) {
+	private JarArchiveComparator newComparator(String lastPackage, AccessModifier accessModifier) {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setAccessModifier(accessModifier);
 		if (!Strings.isNullOrEmpty(lastPackage)) {
 			String packageName = "japicmp.test." + lastPackage;
 			options.getPackagesInclude().add(new PackageFilter(packageName));

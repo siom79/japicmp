@@ -49,12 +49,12 @@ public class XmlOutputGeneratorTest {
     }
 
 	private static void generateHtmlOutput(String xmlOutpuFile, String htmlOutputFile, boolean outputOnlyModifications) {
-		XmlOutputGenerator generator = new XmlOutputGenerator();
 		Options options = new Options();
 		options.setXmlOutputFile(Optional.of(xmlOutpuFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
-		generator.generate("/old/Path", "/new/Path", jApiClasses, options);
+		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options);
+		generator.generate();
 	}
 
 	@Test
