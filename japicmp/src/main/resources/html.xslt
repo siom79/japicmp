@@ -269,8 +269,8 @@
                                 <tr>
                                     <td> </td>
                                     <td>Serializable</td>
-                                    <td>default serialVersionUid</td>
-                                    <td>serialVersionUid in class</td>
+                                    <td>default serialVersionUID</td>
+                                    <td>serialVersionUID in class</td>
                                 </tr>
                             </thead>
                             <tbody>
