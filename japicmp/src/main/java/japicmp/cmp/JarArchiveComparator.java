@@ -74,7 +74,7 @@ public class JarArchiveComparator {
 	private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) {
         List<CtClass> oldClasses = createListOfCtClasses(oldArchive, classPool, options);
         List<CtClass> newClasses = createListOfCtClasses(newArchive, classPool, options);
-        ClassesComparator classesComparator = new ClassesComparator(this);
+        ClassesComparator classesComparator = new ClassesComparator(this, options);
         classesComparator.compare(oldClasses, newClasses);
         if (logger.isLoggable(Level.FINE)) {
             for (JApiClass jApiClass : classesComparator.getClasses()) {

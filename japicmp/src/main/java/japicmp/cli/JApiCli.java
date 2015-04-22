@@ -71,6 +71,7 @@ public class JApiCli {
 			JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
 			comparatorOptions.getPackagesInclude().addAll(options.getPackagesInclude());
 			comparatorOptions.getPackagesExclude().addAll(options.getPackagesExclude());
+			comparatorOptions.setAccessModifier(options.getAccessModifier());
 			return comparatorOptions;
 		}
 
@@ -145,7 +146,7 @@ public class JApiCli {
 									accessModifierArg, AccessModifier.listOfAccessModifier());
 				}
 			} else {
-				return Optional.of(AccessModifier.PUBLIC);
+				return Optional.of(AccessModifier.PROTECTED);
 			}
 		}
 

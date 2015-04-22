@@ -32,9 +32,9 @@ public class XmlOutputGeneratorAccessModifierTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
-		List<JApiClass> jApiClasses = Helper.compareTestV1WithTestV2();
+		List<JApiClass> jApiClasses = Helper.compareTestV1WithTestV2(AccessModifier.PUBLIC);
 		Helper.generateHtmlOutput(jApiClasses, "target/diff_public.xml", "target/diff_public.html", true, AccessModifier.PUBLIC);
-		jApiClasses = Helper.compareTestV1WithTestV2();
+		jApiClasses = Helper.compareTestV1WithTestV2(AccessModifier.PRIVATE);
 		Helper.generateHtmlOutput(jApiClasses, "target/diff_private.xml", "target/diff_private.html", true, AccessModifier.PRIVATE);
 		File htmlFilePublic = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html").toFile();
 		File htmlFilePrivate = Paths.get(System.getProperty("user.dir"), "target", "diff_private.html").toFile();

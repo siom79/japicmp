@@ -27,7 +27,7 @@ public class XmlOutputGeneratorClassTypeTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
-		List<JApiClass> jApiClasses = Helper.compareTestV1WithTestV2();
+		List<JApiClass> jApiClasses = Helper.compareTestV1WithTestV2(AccessModifier.PUBLIC);
 		Helper.generateHtmlOutput(jApiClasses, "target/diff_public.xml", "target/diff_public.html", false, AccessModifier.PUBLIC);
 		File htmlFilePublic = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html").toFile();
 		documentPublic = Jsoup.parse(htmlFilePublic, Charset.forName("UTF-8").toString());

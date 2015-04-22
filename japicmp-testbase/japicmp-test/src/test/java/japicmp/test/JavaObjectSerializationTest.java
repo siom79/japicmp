@@ -3,6 +3,7 @@ package japicmp.test;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiJavaObjectSerializationCompatibility;
@@ -31,6 +32,7 @@ public class JavaObjectSerializationTest {
 	@BeforeClass
 	public static void beforeClass() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setAccessModifier(AccessModifier.PRIVATE);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 	}

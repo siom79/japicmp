@@ -40,8 +40,8 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * Comparison of two jar archives without the need to add all of their dependencies to the classpath.
 * Differences are printed on the command line in a simple diff format.
 * Differences can optionally be printed as XML or HTML file.
-* Per default only public classes and class members are compared. If necessary, the access modifier of the classes and class members to be
-  compared can be set to package, protected or private.
+* Per default private and package protected classes and class members are not compared. If necessary, the access modifier of the classes and class members to be
+  compared can be set to public, protected, package or private.
 * Per default classes from all packages are compared. If necessary, certain packages can be excluded or only specific packages can be included.
 * All changes between all classes/methods/fields are compared. If necessary, output can be limited to changes that are binary incompatible (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html)).
 * All changes between annotations are compared, hence japicmp can be used to track annotation-based APIs like JAXB, JPA, JAX-RS, etc.

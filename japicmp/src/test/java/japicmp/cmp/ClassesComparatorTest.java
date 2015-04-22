@@ -15,9 +15,10 @@ public class ClassesComparatorTest {
 
 	@Test
 	public void testMethodAdded() throws NotFoundException, CannotCompileException {
-		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		ClassPool classPool = jarArchiveComparator.getClassPool();
-		ClassesComparator classesComparator = new ClassesComparator(jarArchiveComparator);
+		ClassesComparator classesComparator = new ClassesComparator(jarArchiveComparator, options);
 		CtClass classWithoutMethod = createClassWithoutMethod(classPool);
 		CtClass classWithMethod = createClassWithMethod(classPool);
 		classesComparator.compare(Arrays.asList(classWithoutMethod), Arrays.asList(classWithMethod));

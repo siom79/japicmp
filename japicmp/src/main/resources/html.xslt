@@ -151,13 +151,6 @@
                         </tr>
                     </table>
                 </div>
-                <xsl:if test="@accessModifier != 'PRIVATE'">
-                    <div class="notes">
-                        You have set the access modifier filter to a level higher than <code>PRIVATE</code>. It may
-                        happen that a class is marked <code>MODIFIED</code> but you do not see the related field or method
-                        that caused this status. The same is true for serialization compatibility.
-                    </div>
-                </xsl:if>
                 <ul>
                     <xsl:if test="count(classes/class) > 0">
                         <li><a href="#toc">Classes</a></li>
