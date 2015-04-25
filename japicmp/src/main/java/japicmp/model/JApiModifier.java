@@ -55,7 +55,7 @@ public class JApiModifier<T> {
 			if(oldModifier.get() == oldValue && newModifier.get() != oldValue) {
 				hasChanged = true;
 			}
-		} else if(oldModifier.isPresent() && !newModifier.isPresent()) {
+		} else if(oldModifier.isPresent()) {
 			if(oldModifier.get() == oldValue) {
 				hasChanged = true;
 			}

@@ -3,7 +3,7 @@ package japicmp.config;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import japicmp.exception.FormattedException;
+import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 
 import java.io.File;
@@ -94,7 +94,7 @@ public class Options {
 			try {
 				packages.add(new PackageFilter(part));
 			} catch (Exception e) {
-				throw FormattedException.ofIAE(format, part, e.getMessage());
+				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, String.format(format, part, e.getMessage()));
 			}
 		}
 		return packages;

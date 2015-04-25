@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface JApiHasModifiers extends JApiHasChangeStatus {
 
-	List<JApiModifier<? extends Enum<?>>> getModifiers();
+	List<? extends JApiModifier<? extends Enum<? extends Enum<?>>>> getModifiers();
 }

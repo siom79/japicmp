@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations {
+public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiHasBridgeModifier, JApiHasSyntheticModifier {
     private final String name;
     private final List<JApiParameter> parameters = new LinkedList<>();
     private final List<JApiAnnotation> annotations = new LinkedList<>();
@@ -27,6 +27,8 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private final JApiModifier<FinalModifier> finalModifier;
     private final JApiModifier<StaticModifier> staticModifier;
     private final JApiModifier<AbstractModifier> abstractModifier;
+    private final JApiModifier<BridgeModifier> bridgeModifier;
+    private final JApiModifier<SyntheticModifier> syntheticModifier;
     private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
     protected JApiChangeStatus changeStatus;
     private boolean binaryCompatible = true;
@@ -38,6 +40,8 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         this.finalModifier = extractFinalModifier(oldBehavior, newBehavior);
         this.staticModifier = extractStaticModifier(oldBehavior, newBehavior);
         this.abstractModifier = extractAbstractModifier(oldBehavior, newBehavior);
+        this.bridgeModifier = extractBridgeModifier(oldBehavior, newBehavior);
+        this.syntheticModifier = extractSyntheticModifier(oldBehavior, newBehavior);
         this.syntheticAttribute = extractSyntheticAttribute(oldBehavior, newBehavior);
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
@@ -138,78 +142,6 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
     }
 
-    protected JApiModifier<StaticModifier> extractStaticModifier(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional) {
-        if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-            CtBehavior oldClass = oldClassOptional.get();
-            CtBehavior newClass = newClassOptional.get();
-            StaticModifier oldClassFinalModifier = Modifier.isStatic(oldClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
-            StaticModifier newClassFinalModifier = Modifier.isStatic(newClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
-            if (oldClassFinalModifier != newClassFinalModifier) {
-                return new JApiModifier<StaticModifier>(Optional.of(oldClassFinalModifier), Optional.of(newClassFinalModifier), JApiChangeStatus.MODIFIED);
-            } else {
-                return new JApiModifier<StaticModifier>(Optional.of(oldClassFinalModifier), Optional.of(newClassFinalModifier), JApiChangeStatus.UNCHANGED);
-            }
-        } else {
-            if (oldClassOptional.isPresent()) {
-                CtBehavior ctClass = oldClassOptional.get();
-                StaticModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
-                return new JApiModifier<StaticModifier>(Optional.of(finalModifier), Optional.<StaticModifier>absent(), JApiChangeStatus.REMOVED);
-            } else {
-                CtBehavior ctClass = newClassOptional.get();
-                StaticModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
-                return new JApiModifier<StaticModifier>(Optional.<StaticModifier>absent(), Optional.of(finalModifier), JApiChangeStatus.NEW);
-            }
-        }
-    }
-
-    protected JApiModifier<FinalModifier> extractFinalModifier(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional) {
-        if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-            CtBehavior oldClass = oldClassOptional.get();
-            CtBehavior newClass = newClassOptional.get();
-            FinalModifier oldClassFinalModifier = Modifier.isFinal(oldClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
-            FinalModifier newClassFinalModifier = Modifier.isFinal(newClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
-            if (oldClassFinalModifier != newClassFinalModifier) {
-                return new JApiModifier<FinalModifier>(Optional.of(oldClassFinalModifier), Optional.of(newClassFinalModifier), JApiChangeStatus.MODIFIED);
-            } else {
-                return new JApiModifier<FinalModifier>(Optional.of(oldClassFinalModifier), Optional.of(newClassFinalModifier), JApiChangeStatus.UNCHANGED);
-            }
-        } else {
-            if (oldClassOptional.isPresent()) {
-                CtBehavior ctClass = oldClassOptional.get();
-                FinalModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
-                return new JApiModifier<FinalModifier>(Optional.of(finalModifier), Optional.<FinalModifier>absent(), JApiChangeStatus.REMOVED);
-            } else {
-                CtBehavior ctClass = newClassOptional.get();
-                FinalModifier finalModifier = Modifier.isFinal(ctClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
-                return new JApiModifier<FinalModifier>(Optional.<FinalModifier>absent(), Optional.of(finalModifier), JApiChangeStatus.NEW);
-            }
-        }
-    }
-
-    protected JApiModifier<AccessModifier> extractAccessModifier(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional) {
-        if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-            CtBehavior oldClass = oldClassOptional.get();
-            CtBehavior newClass = newClassOptional.get();
-            AccessModifier oldClassAccessModifier = ModifierHelper.translateToModifierLevel(oldClass.getModifiers());
-            AccessModifier newClassAccessModifier = ModifierHelper.translateToModifierLevel(newClass.getModifiers());
-            if (oldClassAccessModifier != newClassAccessModifier) {
-                return new JApiModifier<AccessModifier>(Optional.of(oldClassAccessModifier), Optional.of(newClassAccessModifier), JApiChangeStatus.MODIFIED);
-            } else {
-                return new JApiModifier<AccessModifier>(Optional.of(oldClassAccessModifier), Optional.of(newClassAccessModifier), JApiChangeStatus.UNCHANGED);
-            }
-        } else {
-            if (oldClassOptional.isPresent()) {
-                CtBehavior ctClass = oldClassOptional.get();
-                AccessModifier accessModifier = ModifierHelper.translateToModifierLevel(ctClass.getModifiers());
-                return new JApiModifier<AccessModifier>(Optional.of(accessModifier), Optional.<AccessModifier>absent(), JApiChangeStatus.REMOVED);
-            } else {
-                CtBehavior ctClass = newClassOptional.get();
-                AccessModifier accessModifier = ModifierHelper.translateToModifierLevel(ctClass.getModifiers());
-                return new JApiModifier<AccessModifier>(Optional.<AccessModifier>absent(), Optional.of(accessModifier), JApiChangeStatus.NEW);
-            }
-        }
-    }
-
     public boolean hasSameParameter(JApiMethod method) {
         boolean haveSameParameter = true;
         List<JApiParameter> parameters1 = getParameters();
@@ -227,34 +159,94 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         return haveSameParameter;
     }
 
-    private JApiModifier<AbstractModifier> extractAbstractModifier(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional) {
-        if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-            CtBehavior oldClass = oldClassOptional.get();
-            CtBehavior newClass = newClassOptional.get();
-            AbstractModifier oldClassAccessModifier = Modifier.isAbstract(oldClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
-            AbstractModifier newClassAccessModifier = Modifier.isAbstract(newClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
-            if (oldClassAccessModifier != newClassAccessModifier) {
-                return new JApiModifier<AbstractModifier>(Optional.of(oldClassAccessModifier), Optional.of(newClassAccessModifier), JApiChangeStatus.MODIFIED);
-            } else {
-                return new JApiModifier<AbstractModifier>(Optional.of(oldClassAccessModifier), Optional.of(newClassAccessModifier), JApiChangeStatus.UNCHANGED);
+    private JApiModifier<StaticModifier> extractStaticModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+        return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback<StaticModifier>() {
+            @Override
+            public StaticModifier getModifierForOld(CtBehavior oldBehavior) {
+                return Modifier.isStatic(oldBehavior.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
             }
-        } else {
-            if (oldClassOptional.isPresent()) {
-                CtBehavior ctClass = oldClassOptional.get();
-                AbstractModifier abstractModifier = Modifier.isAbstract(ctClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
-                return new JApiModifier<AbstractModifier>(Optional.of(abstractModifier), Optional.<AbstractModifier>absent(), JApiChangeStatus.REMOVED);
-            } else {
-                CtBehavior ctClass = newClassOptional.get();
-                AbstractModifier abstractModifier = Modifier.isAbstract(ctClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
-                return new JApiModifier<AbstractModifier>(Optional.<AbstractModifier>absent(), Optional.of(abstractModifier), JApiChangeStatus.NEW);
+
+            @Override
+            public StaticModifier getModifierForNew(CtBehavior newBehavior) {
+                return Modifier.isStatic(newBehavior.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
             }
-        }
+        });
+    }
+
+    private JApiModifier<FinalModifier> extractFinalModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+        return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback<FinalModifier>() {
+            @Override
+            public FinalModifier getModifierForOld(CtBehavior oldBehavior) {
+                return Modifier.isFinal(oldBehavior.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
+            }
+
+            @Override
+            public FinalModifier getModifierForNew(CtBehavior newBehavior) {
+                return Modifier.isFinal(newBehavior.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
+            }
+        });
+    }
+
+    private JApiModifier<AccessModifier> extractAccessModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+        return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback<AccessModifier>() {
+            @Override
+            public AccessModifier getModifierForOld(CtBehavior oldBehavior) {
+                return ModifierHelper.translateToModifierLevel(oldBehavior.getModifiers());
+            }
+
+            @Override
+            public AccessModifier getModifierForNew(CtBehavior newBehavior) {
+                return ModifierHelper.translateToModifierLevel(newBehavior.getModifiers());
+            }
+        });
+    }
+
+    private JApiModifier<AbstractModifier> extractAbstractModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+        return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback<AbstractModifier>() {
+            @Override
+            public AbstractModifier getModifierForOld(CtBehavior oldBehavior) {
+                return Modifier.isAbstract(oldBehavior.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
+            }
+
+            @Override
+            public AbstractModifier getModifierForNew(CtBehavior newBehavior) {
+                return Modifier.isAbstract(newBehavior.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
+            }
+        });
+    }
+
+    private JApiModifier<BridgeModifier> extractBridgeModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+        return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback<BridgeModifier>() {
+            @Override
+            public BridgeModifier getModifierForOld(CtBehavior oldBehavior) {
+                return ModifierHelper.isBridge(oldBehavior.getModifiers()) ? BridgeModifier.BRIDGE : BridgeModifier.NON_BRIDGE;
+            }
+
+            @Override
+            public BridgeModifier getModifierForNew(CtBehavior newBehavior) {
+                return ModifierHelper.isBridge(newBehavior.getModifiers()) ? BridgeModifier.BRIDGE : BridgeModifier.NON_BRIDGE;
+            }
+        });
+    }
+
+    private JApiModifier<SyntheticModifier> extractSyntheticModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+        return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback<SyntheticModifier>() {
+            @Override
+            public SyntheticModifier getModifierForOld(CtBehavior oldBehavior) {
+                return ModifierHelper.isSynthetic(oldBehavior.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;
+            }
+
+            @Override
+            public SyntheticModifier getModifierForNew(CtBehavior newBehavior) {
+                return ModifierHelper.isSynthetic(newBehavior.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;
+            }
+        });
     }
 
     @XmlElementWrapper(name = "modifiers")
     @XmlElement(name = "modifier")
-    public List<JApiModifier<? extends Enum<?>>> getModifiers() {
-        return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier);
+    public List<? extends JApiModifier<? extends Enum<? extends Enum<?>>>> getModifiers() {
+        return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier, this.bridgeModifier, this.syntheticModifier);
     }
 
     @XmlAttribute
@@ -302,6 +294,16 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         List<JApiAttribute<? extends Enum<?>>> list = new ArrayList<>();
         list.add(this.syntheticAttribute);
         return list;
+    }
+
+    @XmlTransient
+    public JApiModifier<BridgeModifier> getBridgeModifier() {
+        return this.bridgeModifier;
+    }
+
+    @XmlTransient
+    public JApiModifier<SyntheticModifier> getSyntheticModifier() {
+        return this.syntheticModifier;
     }
 
     @XmlTransient

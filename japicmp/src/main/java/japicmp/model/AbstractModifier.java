@@ -1,5 +1,5 @@
 package japicmp.model;
 
-public enum AbstractModifier {
+public enum AbstractModifier implements JApiModifierBase {
 	ABSTRACT, NON_ABSTRACT
 }

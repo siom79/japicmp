@@ -1,12 +1,5 @@
 package japicmp.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.jar.JarFile;
-
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import io.airlift.airline.Command;
 import io.airlift.airline.HelpOption;
@@ -14,14 +7,18 @@ import io.airlift.airline.Option;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.exception.FormattedException;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
-import japicmp.output.OutputFilter;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.jar.JarFile;
 
 public class JApiCli {
 
@@ -141,9 +138,8 @@ public class JApiCli {
 				try {
 					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
 				} catch (IllegalArgumentException e) {
-					throw FormattedException
-							.ofIAE("Invalid value for option -a: %s. Possible values are: %s.",
-									accessModifierArg, AccessModifier.listOfAccessModifier());
+					throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, String.format("Invalid value for option -a: %s. Possible values are: %s.",
+							accessModifierArg, AccessModifier.listOfAccessModifier()));
 				}
 			} else {
 				return Optional.of(AccessModifier.PROTECTED);
