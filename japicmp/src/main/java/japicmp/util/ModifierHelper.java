@@ -1,6 +1,7 @@
 package japicmp.util;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.*;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -9,8 +10,10 @@ import javassist.CtField;
 import java.lang.reflect.Modifier;
 
 public class ModifierHelper {
+	public static final int ACC_BRIDGE = 0x00000040;
+	public static final int ACC_SYNTHETIC = 0x00001000;
 
-    private ModifierHelper() {
+	private ModifierHelper() {
 
     }
 
@@ -176,10 +179,70 @@ public class ModifierHelper {
 	}
 
 	public static boolean isBridge(int modifier) {
-		return (modifier & 0x00000040) != 0;
+		return (modifier & ACC_BRIDGE) != 0;
 	}
 
 	public static boolean isSynthetic(int modifier) {
-		return (modifier & 0x00001000) != 0;
+		return (modifier & ACC_SYNTHETIC) != 0;
+	}
+
+	public static boolean includeSynthetic(JApiCanBeSynthetic jApiClass, JarArchiveComparatorOptions options) {
+		return options.isIncludeSynthetic() || !isSynthetic(jApiClass);
+	}
+
+	public static boolean isSynthetic(JApiCanBeSynthetic jApiClass) {
+		boolean isSynthetic = false;
+		JApiModifier<SyntheticModifier> syntheticModifier = jApiClass.getSyntheticModifier();
+		JApiAttribute<SyntheticAttribute> syntheticAttribute = jApiClass.getSyntheticAttribute();
+		boolean hasSyntheticModifier = hasSyntheticModifier(syntheticModifier);
+		boolean hasSyntheticAttribute = hasSyntheticAttribute(syntheticAttribute);
+		if (hasSyntheticModifier || hasSyntheticAttribute) {
+			isSynthetic = true;
+		}
+		return isSynthetic;
+	}
+
+	private static boolean hasSyntheticAttribute(JApiAttribute<SyntheticAttribute> syntheticAttribute) {
+		boolean hasSyntheticAttribute = false;
+		if (syntheticAttribute.getOldAttribute().isPresent() && syntheticAttribute.getNewAttribute().isPresent()) {
+			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();
+			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();
+			if (oldAttribute == SyntheticAttribute.SYNTHETIC && newAttribute == SyntheticAttribute.SYNTHETIC) {
+				hasSyntheticAttribute = true;
+			}
+		} else if (syntheticAttribute.getOldAttribute().isPresent()) {
+			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();
+			if (oldAttribute == SyntheticAttribute.SYNTHETIC) {
+				hasSyntheticAttribute = true;
+			}
+		} else if (syntheticAttribute.getNewAttribute().isPresent()) {
+			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();
+			if (newAttribute == SyntheticAttribute.SYNTHETIC) {
+				hasSyntheticAttribute = true;
+			}
+		}
+		return hasSyntheticAttribute;
+	}
+
+	private static boolean hasSyntheticModifier(JApiModifier<SyntheticModifier> syntheticModifier) {
+		boolean hasSyntheticModifer = false;
+		if(syntheticModifier.getOldModifier().isPresent() && syntheticModifier.getNewModifier().isPresent()) {
+			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();
+			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();
+			if (oldModifier == SyntheticModifier.SYNTHETIC && newModifier == SyntheticModifier.SYNTHETIC) {
+				hasSyntheticModifer = true;
+			}
+		} else if(syntheticModifier.getOldModifier().isPresent()) {
+			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();
+			if (oldModifier == SyntheticModifier.SYNTHETIC) {
+				hasSyntheticModifer = true;
+			}
+		} else if(syntheticModifier.getNewModifier().isPresent()) {
+			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();
+			if (newModifier == SyntheticModifier.SYNTHETIC) {
+				hasSyntheticModifer = true;
+			}
+		}
+		return hasSyntheticModifer;
 	}
 }

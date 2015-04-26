@@ -100,7 +100,8 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
     private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiBehavior, String classMemberType) {
         sb.append("\t").append(signs).append(" ").append(jApiBehavior.getChangeStatus()).append(" ").append(classMemberType).append(" ")
 				.append(accessModifierAsString(jApiBehavior)).append(abstractModifierAsString(jApiBehavior)).append(staticModifierAsString(jApiBehavior))
-				.append(finalModifierAsString(jApiBehavior)).append(returnType(jApiBehavior)).append(jApiBehavior.getName()).append("(");
+				.append(finalModifierAsString(jApiBehavior)).append(syntheticModifierAsString(jApiBehavior)).append(bridgeModifierAsString(jApiBehavior))
+                .append(returnType(jApiBehavior)).append(jApiBehavior.getName()).append("(");
         int paramCount = 0;
         for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {
             if (paramCount > 0) {
@@ -202,7 +203,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 
     private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
         sb.append(signs + " " + jApiClass.getChangeStatus() + " " + processClassType(jApiClass) + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
-                + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + " " + javaObjectSerializationStatus(jApiClass) + "\n");
+                + staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + syntheticModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + " " + javaObjectSerializationStatus(jApiClass) + "\n");
         processInterfaceChanges(sb, jApiClass);
         processSuperclassChanges(sb, jApiClass);
         processFieldChanges(sb, jApiClass);
@@ -228,11 +229,13 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	}
 
     private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
-        List<JApiField> fields = jApiClass.getFields();
-        for (JApiField field : fields) {
-            sb.append(tabs(1) + signs(field) + " " + field.getChangeStatus() + " FIELD: " + accessModifierAsString(field) + staticModifierAsString(field)
-                    + finalModifierAsString(field) + fieldTypeChangeAsString(field) + field.getName() + "\n");
-            processAnnotations(sb, field, 2);
+        List<JApiField> jApiFields = jApiClass.getFields();
+        for (JApiField jApiField : jApiFields) {
+            sb.append(tabs(1)).append(signs(jApiField)).append(" ").append(jApiField.getChangeStatus()).append(" FIELD: ")
+                    .append(accessModifierAsString(jApiField)).append(staticModifierAsString(jApiField))
+                    .append(finalModifierAsString(jApiField)).append(syntheticModifierAsString(jApiField))
+                    .append(fieldTypeChangeAsString(jApiField)).append(jApiField.getName()).append("\n");
+            processAnnotations(sb, jApiField, 2);
         }
     }
 
@@ -256,30 +259,40 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
         return modifierAsString(accessModifier, AccessModifier.PACKAGE_PROTECTED);
     }
 
-    private <T> String modifierAsString(JApiModifier<T> accessModifier, T notPrintValue) {
-        if (accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
-            if (accessModifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-                return accessModifier.getNewModifier().get() + " (<- " + accessModifier.getOldModifier().get() + ") ";
-            } else if (accessModifier.getChangeStatus() == JApiChangeStatus.NEW) {
-                if (accessModifier.getNewModifier().get() != notPrintValue) {
-                    return accessModifier.getNewModifier().get() + "(+) ";
+    private String syntheticModifierAsString(JApiHasSyntheticModifier modifier) {
+        JApiModifier<SyntheticModifier> syntheticModifier = modifier.getSyntheticModifier();
+        return modifierAsString(syntheticModifier, SyntheticModifier.NON_SYNTHETIC);
+    }
+
+    private String bridgeModifierAsString(JApiHasBridgeModifier modifier) {
+        JApiModifier<BridgeModifier> bridgeModifier = modifier.getBridgeModifier();
+        return modifierAsString(bridgeModifier, BridgeModifier.NON_BRIDGE);
+    }
+
+    private <T> String modifierAsString(JApiModifier<T> modifier, T notPrintValue) {
+        if (modifier.getOldModifier().isPresent() && modifier.getNewModifier().isPresent()) {
+            if (modifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+                return modifier.getNewModifier().get() + " (<- " + modifier.getOldModifier().get() + ") ";
+            } else if (modifier.getChangeStatus() == JApiChangeStatus.NEW) {
+                if (modifier.getNewModifier().get() != notPrintValue) {
+                    return modifier.getNewModifier().get() + "(+) ";
                 }
-            } else if (accessModifier.getChangeStatus() == JApiChangeStatus.REMOVED) {
-                if (accessModifier.getOldModifier().get() != notPrintValue) {
-                    return accessModifier.getOldModifier().get() + "(-) ";
+            } else if (modifier.getChangeStatus() == JApiChangeStatus.REMOVED) {
+                if (modifier.getOldModifier().get() != notPrintValue) {
+                    return modifier.getOldModifier().get() + "(-) ";
                 }
             } else {
-                if (accessModifier.getNewModifier().get() != notPrintValue) {
-                    return accessModifier.getNewModifier().get() + " ";
+                if (modifier.getNewModifier().get() != notPrintValue) {
+                    return modifier.getNewModifier().get() + " ";
                 }
             }
-        } else if (accessModifier.getOldModifier().isPresent() && !accessModifier.getNewModifier().isPresent()) {
-            if (accessModifier.getOldModifier().get() != notPrintValue) {
-                return accessModifier.getOldModifier().get() + "(-) ";
+        } else if (modifier.getOldModifier().isPresent()) {
+            if (modifier.getOldModifier().get() != notPrintValue) {
+                return modifier.getOldModifier().get() + "(-) ";
             }
-        } else if (!accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
-            if (accessModifier.getNewModifier().get() != notPrintValue) {
-                return accessModifier.getNewModifier().get() + "(+) ";
+        } else if (modifier.getNewModifier().isPresent()) {
+            if (modifier.getNewModifier().get() != notPrintValue) {
+                return modifier.getNewModifier().get() + "(+) ";
             }
         }
         return "";

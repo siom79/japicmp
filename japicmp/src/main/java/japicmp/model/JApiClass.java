@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.*;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
-		JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiHasSyntheticModifier {
+		JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
 	private JarArchiveComparator jarArchiveComparator;
 	private final String fullyQualifiedName;
 	private final JApiClassType classType;
@@ -123,12 +123,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				CtField newField = newFieldsMap.get(oldFieldName);
 				if (newField != null) {
 					JApiField jApiField = new JApiField(JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField));
-					if (ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier())) {
+					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				} else {
 					JApiField jApiField = new JApiField(JApiChangeStatus.REMOVED, Optional.of(oldField), Optional.<CtField>absent());
-					if (ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier())) {
+					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				}
@@ -137,7 +137,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				CtField oldField = oldFieldsMap.get(newField.getName());
 				if (oldField == null) {
 					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(newField));
-					if (ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier())) {
+					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				}
@@ -147,7 +147,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				Map<String, CtField> fieldMap = buildFieldMap(oldClassOptional.get());
 				for (CtField field : fieldMap.values()) {
 					JApiField jApiField = new JApiField(JApiChangeStatus.REMOVED, Optional.of(field), Optional.<CtField>absent());
-					if (ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier())) {
+					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				}
@@ -156,12 +156,16 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				Map<String, CtField> fieldMap = buildFieldMap(newClassOptional.get());
 				for (CtField field : fieldMap.values()) {
 					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(field));
-					if (ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier())) {
+					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				}
 			}
 		}
+	}
+
+	private boolean includeField(JApiField jApiField) {
+		return ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier()) && ModifierHelper.includeSynthetic(jApiField, options);
 	}
 
 	private Map<String, CtField> buildFieldMap(CtClass ctClass) {
@@ -299,14 +303,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtMethod>absent(),
 						methodDescriptorParser.getReturnType());
 				addParametersToMethod(methodDescriptorParser, jApiMethod);
-				if (ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier())) {
+				if (includeMethod(jApiMethod)) {
 					methods.add(jApiMethod);
 				}
 			} else {
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod),
 						methodDescriptorParser.getReturnType());
 				addParametersToMethod(methodDescriptorParser, jApiMethod);
-				if (ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier())) {
+				if (includeMethod(jApiMethod)) {
 					methods.add(jApiMethod);
 				}
 			}
@@ -318,11 +322,15 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod),
 						methodDescriptorParser.getReturnType());
 				addParametersToMethod(methodDescriptorParser, jApiMethod);
-				if (ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier())) {
+				if (includeMethod(jApiMethod)) {
 					methods.add(jApiMethod);
 				}
 			}
 		}
+	}
+
+	private boolean includeMethod(JApiMethod jApiMethod) {
+		return ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier()) && ModifierHelper.includeSynthetic(jApiMethod, options);
 	}
 
 	private void sortConstructorsIntoLists(Map<String, CtConstructor> oldConstructorsMap, Map<String, CtConstructor> newConstructorsMap) {
@@ -334,13 +342,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (foundMethod == null) {
 				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>absent());
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
-				if (ModifierHelper.matchesModifierLevel(jApiConstructor, options.getAccessModifier())) {
+				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
 				}
 			} else {
 				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod));
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
-				if (ModifierHelper.matchesModifierLevel(jApiConstructor, options.getAccessModifier())) {
+				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
 				}
 			}
@@ -352,11 +360,15 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (foundMethod == null) {
 				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>absent(), Optional.of(ctMethod));
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
-				if (ModifierHelper.matchesModifierLevel(jApiConstructor, options.getAccessModifier())) {
+				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
 				}
 			}
 		}
+	}
+
+	private boolean includeConstructor(JApiConstructor jApiConstructor) {
+		return ModifierHelper.matchesModifierLevel(jApiConstructor, options.getAccessModifier()) && ModifierHelper.includeSynthetic(jApiConstructor, options);
 	}
 
 	private void addParametersToMethod(MethodDescriptorParser methodDescriptorParser, JApiBehavior jApiMethod) {
