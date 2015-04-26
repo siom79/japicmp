@@ -1,12 +1,14 @@
 package japicmp.test;
 
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.compareTestV1WithTestV2;
+import static japicmp.test.util.Helper.getArchive;
 import static japicmp.test.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -16,7 +18,10 @@ public class BridgeMethodsTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		jApiClasses = compareTestV1WithTestV2(AccessModifier.PROTECTED);
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
+		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 	}
 
 	@Test
@@ -24,6 +29,8 @@ public class BridgeMethodsTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, BridgeMethods.MyNode.class.getName());
 		boolean setDataWithObjectArgFound = false;
 		boolean setDataWithIntegerArgFound = false;
+		boolean getDataWithObjectReturnTypeFound = false;
+		boolean getDataWithIntegerReturnTypeFound = false;
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
 			String name = jApiMethod.getName();
 			if (name.equals("setData")) {
@@ -42,8 +49,26 @@ public class BridgeMethodsTest {
 					assertThat(jApiMethod.getSyntheticModifier().getNewModifier().get(), is(SyntheticModifier.NON_SYNTHETIC));
 				}
 			}
+//			if (name.equals("getData")) {
+//				if (jApiMethod.getReturnType().getOldReturnType().equals("java.lang.Object")) {
+//					getDataWithObjectReturnTypeFound = true;
+//					assertThat(jApiMethod.getBridgeModifier().getOldModifier().get(), is(BridgeModifier.BRIDGE));
+//					assertThat(jApiMethod.getBridgeModifier().getNewModifier().get(), is(BridgeModifier.BRIDGE));
+//					assertThat(jApiMethod.getSyntheticModifier().getOldModifier().get(), is(SyntheticModifier.SYNTHETIC));
+//					assertThat(jApiMethod.getSyntheticModifier().getNewModifier().get(), is(SyntheticModifier.SYNTHETIC));
+//				}
+//				if (jApiMethod.getReturnType().getOldReturnType().equals("java.lang.Integer")) {
+//					getDataWithIntegerReturnTypeFound = true;
+//					assertThat(jApiMethod.getBridgeModifier().getOldModifier().get(), is(BridgeModifier.NON_BRIDGE));
+//					assertThat(jApiMethod.getBridgeModifier().getNewModifier().get(), is(BridgeModifier.NON_BRIDGE));
+//					assertThat(jApiMethod.getSyntheticModifier().getOldModifier().get(), is(SyntheticModifier.NON_SYNTHETIC));
+//					assertThat(jApiMethod.getSyntheticModifier().getNewModifier().get(), is(SyntheticModifier.NON_SYNTHETIC));
+//				}
+//			}
 		}
 		assertThat(setDataWithObjectArgFound, is(true));
 		assertThat(setDataWithIntegerArgFound, is(true));
+//		assertThat(getDataWithObjectReturnTypeFound, is(true));
+//		assertThat(getDataWithIntegerReturnTypeFound, is(true));
 	}
 }

@@ -5,12 +5,13 @@ public class JApiCmpException extends RuntimeException {
 	private final Reason reason;
 
 	public enum Reason {
-		IllegalArgument,
+		CliError,
 		NormalTermination,
 		IoException,
 		JaxbException,
 		ClassLoading,
-		IllegalState, XsltError
+		IllegalState,
+		XsltError
 	}
 
 	public JApiCmpException(Reason reason, String msg) {
@@ -27,8 +28,8 @@ public class JApiCmpException extends RuntimeException {
 		return reason;
 	}
 
-	public static JApiCmpException of(String format, Object... args) {
+	public static JApiCmpException of(Reason reason, String format, Object... args) {
 		String msg = String.format(format, args);
-		return new JApiCmpException(JApiCmpException.Reason.IllegalArgument, msg);
+		return new JApiCmpException(reason, msg);
 	}
 }
