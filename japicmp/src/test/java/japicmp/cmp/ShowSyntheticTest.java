@@ -9,8 +9,6 @@ import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtField;
-import javassist.CtMethod;
 import org.junit.Test;
 
 import java.io.File;
@@ -33,18 +31,16 @@ public class ShowSyntheticTest {
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = new CtClassBuilder().build(classPool);
+				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = new CtClassBuilder().build(classPool);
-				CtMethod ctMethod = new CtMethodBuilder().syntheticModifier().declaringClass(ctClass).build(classPool);
-				ctClass.addMethod(ctMethod);
-				CtField ctField = new CtFieldBuilder().syntheticModifier().declaringClass(ctClass).build(classPool);
-				ctClass.addField(ctField);
-				CtClass syntheticClass = new CtClassBuilder().syntheticModifier().name("japicmp.SyntheticClass").build(classPool);
+				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().syntheticModifier().addToClass(ctClass);
+				CtFieldBuilder.create().syntheticModifier().addToClass(ctClass);
+				CtClass syntheticClass = new CtClassBuilder().syntheticModifier().name("japicmp.SyntheticClass").addToClassPool(classPool);
 				return Arrays.asList(ctClass, syntheticClass);
 			}
 		});
@@ -68,18 +64,16 @@ public class ShowSyntheticTest {
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = new CtClassBuilder().build(classPool);
+				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = new CtClassBuilder().build(classPool);
-				CtMethod ctMethod = new CtMethodBuilder().syntheticModifier().declaringClass(ctClass).build(classPool);
-				ctClass.addMethod(ctMethod);
-				CtField ctField = new CtFieldBuilder().syntheticModifier().declaringClass(ctClass).build(classPool);
-				ctClass.addField(ctField);
-				CtClass syntheticClass = new CtClassBuilder().syntheticModifier().name("japicmp.SyntheticClass").build(classPool);
+				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
+				CtMethodBuilder.create().syntheticModifier().addToClass(ctClass);
+				CtFieldBuilder.create().syntheticModifier().addToClass(ctClass);
+				CtClass syntheticClass = new CtClassBuilder().syntheticModifier().name("japicmp.SyntheticClass").addToClassPool(classPool);
 				return Arrays.asList(ctClass, syntheticClass);
 			}
 		});

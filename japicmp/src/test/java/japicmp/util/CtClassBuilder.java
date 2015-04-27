@@ -19,9 +19,13 @@ public class CtClassBuilder {
 		return this;
 	}
 
-	public CtClass build(ClassPool classPool) {
+	public CtClass addToClassPool(ClassPool classPool) {
 		CtClass ctClass = classPool.makeClass(name);
 		ctClass.setModifiers(this.modifier);
 		return ctClass;
+	}
+
+	public static CtClassBuilder create() {
+		return new CtClassBuilder();
 	}
 }

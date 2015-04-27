@@ -49,26 +49,22 @@ public class BridgeMethodsTest {
 					assertThat(jApiMethod.getSyntheticModifier().getNewModifier().get(), is(SyntheticModifier.NON_SYNTHETIC));
 				}
 			}
-//			if (name.equals("getData")) {
-//				if (jApiMethod.getReturnType().getOldReturnType().equals("java.lang.Object")) {
-//					getDataWithObjectReturnTypeFound = true;
-//					assertThat(jApiMethod.getBridgeModifier().getOldModifier().get(), is(BridgeModifier.BRIDGE));
-//					assertThat(jApiMethod.getBridgeModifier().getNewModifier().get(), is(BridgeModifier.BRIDGE));
-//					assertThat(jApiMethod.getSyntheticModifier().getOldModifier().get(), is(SyntheticModifier.SYNTHETIC));
-//					assertThat(jApiMethod.getSyntheticModifier().getNewModifier().get(), is(SyntheticModifier.SYNTHETIC));
-//				}
-//				if (jApiMethod.getReturnType().getOldReturnType().equals("java.lang.Integer")) {
-//					getDataWithIntegerReturnTypeFound = true;
-//					assertThat(jApiMethod.getBridgeModifier().getOldModifier().get(), is(BridgeModifier.NON_BRIDGE));
-//					assertThat(jApiMethod.getBridgeModifier().getNewModifier().get(), is(BridgeModifier.NON_BRIDGE));
-//					assertThat(jApiMethod.getSyntheticModifier().getOldModifier().get(), is(SyntheticModifier.NON_SYNTHETIC));
-//					assertThat(jApiMethod.getSyntheticModifier().getNewModifier().get(), is(SyntheticModifier.NON_SYNTHETIC));
-//				}
-//			}
+			if (name.equals("getData")) {
+				if (jApiMethod.getReturnType().getNewReturnType().equals("java.lang.Object")) {
+					getDataWithObjectReturnTypeFound = true;
+					assertThat(jApiMethod.getBridgeModifier().getNewModifier().get(), is(BridgeModifier.BRIDGE));
+					assertThat(jApiMethod.getSyntheticModifier().getNewModifier().get(), is(SyntheticModifier.SYNTHETIC));
+				}
+				if (jApiMethod.getReturnType().getNewReturnType().equals("java.lang.Integer")) {
+					getDataWithIntegerReturnTypeFound = true;
+					assertThat(jApiMethod.getBridgeModifier().getNewModifier().get(), is(BridgeModifier.NON_BRIDGE));
+					assertThat(jApiMethod.getSyntheticModifier().getNewModifier().get(), is(SyntheticModifier.NON_SYNTHETIC));
+				}
+			}
 		}
 		assertThat(setDataWithObjectArgFound, is(true));
 		assertThat(setDataWithIntegerArgFound, is(true));
-//		assertThat(getDataWithObjectReturnTypeFound, is(true));
-//		assertThat(getDataWithIntegerReturnTypeFound, is(true));
+		assertThat(getDataWithObjectReturnTypeFound, is(true));
+		assertThat(getDataWithIntegerReturnTypeFound, is(true));
 	}
 }

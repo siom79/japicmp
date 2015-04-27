@@ -139,10 +139,17 @@ public class JApiCli {
 		}
 
 		private void verifyJarArchive(File file) {
+			JarFile jarFile = null;
 			try {
-				new JarFile(file);
+				jarFile = new JarFile(file);
 			} catch (IOException e) {
 				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+			} finally {
+				if (jarFile != null) {
+					try {
+						jarFile.close();
+					} catch (IOException e) {}
+				}
 			}
 		}
 	}

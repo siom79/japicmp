@@ -37,14 +37,12 @@ public class ClassesComparatorTest {
 	}
 
 	private CtClass createClassWithoutMethod(ClassPool classPool) {
-		return new CtClassBuilder().name("japicmp.test.Testee").build(classPool);
+		return new CtClassBuilder().name("japicmp.Test").addToClassPool(classPool);
 	}
 
 	private CtClass createClassWithMethod(ClassPool classPool) throws NotFoundException, CannotCompileException {
-		CtClass ctClass = new CtClassBuilder().name("japicmp.test.Testee").build(classPool);
-		CtMethod ctMethod = new CtMethodBuilder().publicAccess().returnType(classPool.get("java.lang.String"))
-				.name("method").body("return null;").declaringClass(ctClass).build(classPool);
-		ctClass.addMethod(ctMethod);
+		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+		CtMethodBuilder.create().publicAccess().returnType(CtClass.intType).name("method").body("return 42;").addToClass(ctClass);
 		return ctClass;
 	}
 }
