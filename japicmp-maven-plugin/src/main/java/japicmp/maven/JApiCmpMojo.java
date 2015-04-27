@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
+import japicmp.config.PackageFilter;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
@@ -169,6 +170,11 @@ public class JApiCmpMojo extends AbstractMojo {
 					throw new MojoFailureException(e.getMessage());
 				}
 			}
+			String includeSyntheticString = parameter.getIncludeSynthetic();
+			if (includeSyntheticString != null) {
+				Boolean includeSynthetic = Boolean.valueOf(includeSyntheticString);
+				options.setIncludeSynthetic(includeSynthetic);
+			}
 		}
 		return options;
 	}
@@ -194,9 +200,12 @@ public class JApiCmpMojo extends AbstractMojo {
 		writeToFile(diffOutput, outputfile);
 	}
 
-	private File createJapiCmpBaseDir() throws IOException {
+	private File createJapiCmpBaseDir() throws IOException, MojoFailureException {
 		File jApiCmpBuildDir = new File(projectBuildDir.getCanonicalPath() + File.separator + "japicmp");
-		jApiCmpBuildDir.mkdirs();
+		boolean mkdirs = jApiCmpBuildDir.mkdirs();
+		if (!mkdirs) {
+			throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
+		}
 		return jApiCmpBuildDir;
 	}
 
@@ -215,10 +224,47 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private List<JApiClass> compareArchives(File newVersionFile, File oldVersionFile) throws MojoFailureException {
-		JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
+		JarArchiveComparatorOptions comparatorOptions = createJarArchiveComparatorOptions();
 		setUpClassPath(comparatorOptions);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 		return jarArchiveComparator.compare(oldVersionFile, newVersionFile);
+	}
+
+	private JarArchiveComparatorOptions createJarArchiveComparatorOptions() throws MojoFailureException {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		if (parameter != null) {
+			String accessModifierArg = parameter.getAccessModifier();
+			if (accessModifierArg != null) {
+				try {
+					AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
+					options.setAccessModifier(accessModifier);
+				} catch (IllegalArgumentException e) {
+					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()));
+				}
+			}
+			String packagesToExclude = parameter.getPackagesToExclude();
+			if (packagesToExclude != null) {
+				try {
+					options.getPackagesExclude().add(new PackageFilter(packagesToExclude));
+				} catch (Exception e) {
+					throw new MojoFailureException(e.getMessage());
+				}
+			}
+			String packagesToInclude = parameter.getPackagesToInclude();
+			if (packagesToInclude != null) {
+				try {
+					options.getPackagesInclude().add(new PackageFilter(packagesToInclude));
+				} catch (Exception e) {
+					throw new MojoFailureException(e.getMessage());
+				}
+			}
+			String includeSyntheticString = parameter.getIncludeSynthetic();
+			if (includeSyntheticString != null) {
+				Boolean includeSynthetic = Boolean.valueOf(includeSyntheticString);
+				options.setIncludeSynthetic(includeSynthetic);
+			}
+		}
+		return options;
 	}
 
 	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions) throws MojoFailureException {

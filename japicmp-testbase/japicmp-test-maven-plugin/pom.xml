@@ -40,11 +40,10 @@
                     </newVersion>
                     <parameter>
                         <onlyModified>true</onlyModified>
-                        <packagesToInclude>*</packagesToInclude>
-                        <packagesToExclude>*</packagesToExclude>
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+                        <includeSynthetic>true</includeSynthetic>
                     </parameter>
                     <dependencies>
                         <dependency>

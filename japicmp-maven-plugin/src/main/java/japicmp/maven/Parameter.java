@@ -8,6 +8,7 @@ public class Parameter {
     private String onlyModified;
     private String breakBuildOnModifications;
     private String breakBuildOnBinaryIncompatibleModifications;
+    private String includeSynthetic;
 
     public String getAccessModifier() {
         return accessModifier;
@@ -62,5 +63,13 @@ public class Parameter {
 
 	public void setBreakBuildOnBinaryIncompatibleModifications(String breakBuildOnBinaryIncompatibleModifications) {
 		this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;
+	}
+
+	public String getIncludeSynthetic() {
+		return includeSynthetic;
+	}
+
+	public void setIncludeSynthetic(String includeSynthetic) {
+		this.includeSynthetic = includeSynthetic;
 	}
 }

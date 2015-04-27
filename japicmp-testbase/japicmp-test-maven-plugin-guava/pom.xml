@@ -38,8 +38,6 @@
 					</newVersion>
 					<parameter>
 						<onlyModified>true</onlyModified>
-						<packagesToInclude>*</packagesToInclude>
-						<packagesToExclude>*</packagesToExclude>
 						<accessModifier>private</accessModifier>
 						<breakBuildOnModifications>false</breakBuildOnModifications>
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>

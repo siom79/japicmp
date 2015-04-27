@@ -53,4 +53,13 @@ public class PackageFilterTest {
         assertThat(pf.matches("de.test.package.packageOne.test"), is(true));
         assertThat(pf.matches("de.test.package.packageOne.test2"), is(false));
     }
+
+    @Test
+    public void testWithOnlyWildcard() {
+        PackageFilter pf = new PackageFilter("*");
+        assertThat(pf.matches("de.test.package"), is(true));
+        assertThat(pf.matches("de.test.package.p.test"), is(true));
+        assertThat(pf.matches("de.test.package.packageOne.test"), is(true));
+        assertThat(pf.matches("de.test.package.packageOne.test2"), is(true));
+    }
 }

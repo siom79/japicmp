@@ -42,9 +42,8 @@
 					</newVersion>
 					<parameter>
 						<onlyModified>true</onlyModified>
-						<packagesToInclude>*</packagesToInclude>
-						<packagesToExclude>*</packagesToExclude>
 						<breakBuildOnModifications>false</breakBuildOnModifications>
+						<includeSynthetic>true</includeSynthetic>
 					</parameter>
 					<dependencies>
 						<dependency>

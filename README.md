@@ -145,6 +145,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
+                        <includeSynthetic>false</includeSynthetic>
                     </parameter>
 					<dependencies>
 						<dependency>
@@ -175,6 +176,8 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
+* onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
+* includeSynthetic: When set to true, synthetic classes and class members are tracked.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element. The &lt;systemPath&gt; element of the &lt;dependency&gt; element allows you to add local files as a dependency:
