@@ -36,7 +36,7 @@ public class ClassesComparator {
             if(newCtClass == null) {
                 JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldCtClass)), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
                 JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType, options);
-                if (ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier())) {
+                if (includeClass(jApiClass)) {
                     classes.add(jApiClass);
                 }
             } else {
@@ -48,7 +48,7 @@ public class ClassesComparator {
                 }
                 JApiClassType classType = new JApiClassType(Optional.of(oldType), Optional.of(newType), changeStatus);
                 JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.of(newCtClass), changeStatus, classType, options);
-                if (ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier())) {
+                if (includeClass(jApiClass)) {
                     classes.add(jApiClass);
                 }
             }
@@ -59,11 +59,15 @@ public class ClassesComparator {
                 JApiClassType.ClassType newType = ClassHelper.getType(newCtClass);
                 JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(newType), JApiChangeStatus.NEW);
                 JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, newCtClass.getName(), Optional.<CtClass>absent(), Optional.<CtClass>of(newCtClass), JApiChangeStatus.NEW, classType, options);
-                if (ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier())) {
+                if (includeClass(jApiClass)) {
                     classes.add(jApiClass);
                 }
             }
         }
+    }
+
+    private boolean includeClass(JApiClass jApiClass) {
+        return ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier()) && ModifierHelper.includeSynthetic(jApiClass, options);
     }
 
     private Map<String, CtClass> createClassMap(List<CtClass> oldClassesArg) {

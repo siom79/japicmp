@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-testbase</artifactId>
-        <version>0.4.1-SNAPSHOT</version>
+        <version>0.4.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>japicmp-test-v2</artifactId>
@@ -13,6 +13,19 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <source.skip>true</source.skip>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.4</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -37,13 +50,6 @@
                         <accessModifier>public</accessModifier>
                         <onlyModified>true</onlyModified>
                     </parameter>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.commons</groupId>
-                            <artifactId>commons-math3</artifactId>
-                            <version>3.4</version>
-                        </dependency>
-                    </dependencies>
                 </configuration>
                 <executions>
                     <execution>
@@ -56,17 +62,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.4</version>
-        </dependency>
-    </dependencies>
 </project>

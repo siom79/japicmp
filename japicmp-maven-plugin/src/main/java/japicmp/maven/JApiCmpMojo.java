@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
+import japicmp.config.PackageFilter;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -169,6 +171,11 @@ public class JApiCmpMojo extends AbstractMojo {
 					throw new MojoFailureException(e.getMessage());
 				}
 			}
+			String includeSyntheticString = parameter.getIncludeSynthetic();
+			if (includeSyntheticString != null) {
+				Boolean includeSynthetic = Boolean.valueOf(includeSyntheticString);
+				options.setIncludeSynthetic(includeSynthetic);
+			}
 		}
 		return options;
 	}
@@ -194,9 +201,12 @@ public class JApiCmpMojo extends AbstractMojo {
 		writeToFile(diffOutput, outputfile);
 	}
 
-	private File createJapiCmpBaseDir() throws IOException {
+	private File createJapiCmpBaseDir() throws IOException, MojoFailureException {
 		File jApiCmpBuildDir = new File(projectBuildDir.getCanonicalPath() + File.separator + "japicmp");
-		jApiCmpBuildDir.mkdirs();
+		boolean mkdirs = jApiCmpBuildDir.mkdirs();
+		if (!mkdirs) {
+			throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
+		}
 		return jApiCmpBuildDir;
 	}
 
@@ -215,25 +225,80 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private List<JApiClass> compareArchives(File newVersionFile, File oldVersionFile) throws MojoFailureException {
-		JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
+		JarArchiveComparatorOptions comparatorOptions = createJarArchiveComparatorOptions();
 		setUpClassPath(comparatorOptions);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 		return jarArchiveComparator.compare(oldVersionFile, newVersionFile);
 	}
 
-	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions) throws MojoFailureException {
-		if (dependencies != null) {
-			for (Dependency dependency : dependencies) {
-				File file = resolveDependencyToFile("dependencies", dependency);
-				if (getLog().isDebugEnabled()) {
-					getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+	private JarArchiveComparatorOptions createJarArchiveComparatorOptions() throws MojoFailureException {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		if (parameter != null) {
+			String accessModifierArg = parameter.getAccessModifier();
+			if (accessModifierArg != null) {
+				try {
+					AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
+					options.setAccessModifier(accessModifier);
+				} catch (IllegalArgumentException e) {
+					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()));
 				}
-				comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
+			}
+			String packagesToExclude = parameter.getPackagesToExclude();
+			if (packagesToExclude != null) {
+				try {
+					options.getPackagesExclude().add(new PackageFilter(packagesToExclude));
+				} catch (Exception e) {
+					throw new MojoFailureException(e.getMessage());
+				}
+			}
+			String packagesToInclude = parameter.getPackagesToInclude();
+			if (packagesToInclude != null) {
+				try {
+					options.getPackagesInclude().add(new PackageFilter(packagesToInclude));
+				} catch (Exception e) {
+					throw new MojoFailureException(e.getMessage());
+				}
+			}
+			String includeSyntheticString = parameter.getIncludeSynthetic();
+			if (includeSyntheticString != null) {
+				Boolean includeSynthetic = Boolean.valueOf(includeSyntheticString);
+				options.setIncludeSynthetic(includeSynthetic);
 			}
 		}
+		return options;
 	}
 
-	private File retrieveFileFromConfiguration(Version version, String parameterName) throws MojoFailureException {
+	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions) throws MojoFailureException {
+		if (dependencies != null) {
+            for (Dependency dependency : dependencies) {
+                File file = resolveDependencyToFile("dependencies", dependency);
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+                }
+                comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
+            }
+        }
+        setUpClassPathUsingMavenProject(comparatorOptions);
+    }
+
+    private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions) throws MojoFailureException {
+        notNull(mavenProject, "Maven parameter mavenProject should be provided by maven container.");
+        Set<Artifact> dependencyArtifacts = mavenProject.getDependencyArtifacts();
+        for (Artifact artifact : dependencyArtifacts) {
+            String scope = artifact.getScope();
+            if (!"test".equals(scope)) {
+                File file = resolveArtifact(artifact);
+                if (file != null) {
+                    getLog().info(file.getAbsolutePath() + "; scope: " + scope);
+                    comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
+                } else {
+                    getLog().error("Could not resolve artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion());
+                }
+            }
+        }
+    }
+
+    private File retrieveFileFromConfiguration(Version version, String parameterName) throws MojoFailureException {
 		if (version != null) {
 			Dependency dependency = version.getDependency();
 			if (dependency != null) {
@@ -312,20 +377,23 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private File resolveArtifact(Dependency dependency) throws MojoFailureException {
-		notNull(artifactRepositories, "Maven parameter artifactRepositories should be provided by maven container.");
-		notNull(artifactResolver, "Maven parameter artifactResolver should be provided by maven container.");
-		notNull(localRepository, "Maven parameter localRepository should be provided by maven container.");
-		notNull(artifactRepositories, "Maven parameter artifactRepositories should be provided by maven container.");
-		Artifact artifact = artifactFactory.createBuildArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "jar");
-		ArtifactResolutionRequest request = new ArtifactResolutionRequest();
-		request.setArtifact(artifact);
-		request.setLocalRepository(localRepository);
-		request.setRemoteRepositories(artifactRepositories);
-		artifactResolver.resolve(request);
-		return artifact.getFile();
+        notNull(artifactRepositories, "Maven parameter artifactRepositories should be provided by maven container.");
+        Artifact artifact = artifactFactory.createBuildArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "jar");
+        return resolveArtifact(artifact);
 	}
 
-	private static <T> T notNull(T value, String msg) throws MojoFailureException {
+    private File resolveArtifact(Artifact artifact) throws MojoFailureException {
+        notNull(localRepository, "Maven parameter localRepository should be provided by maven container.");
+        notNull(artifactResolver, "Maven parameter artifactResolver should be provided by maven container.");
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+        request.setArtifact(artifact);
+        request.setLocalRepository(localRepository);
+        request.setRemoteRepositories(artifactRepositories);
+        artifactResolver.resolve(request);
+        return artifact.getFile();
+    }
+
+    private static <T> T notNull(T value, String msg) throws MojoFailureException {
 		if (value == null) {
 			throw new MojoFailureException(msg);
 		}

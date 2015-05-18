@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-testbase</artifactId>
-        <version>0.4.1-SNAPSHOT</version>
+        <version>0.4.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -40,11 +40,10 @@
                     </newVersion>
                     <parameter>
                         <onlyModified>true</onlyModified>
-                        <packagesToInclude>*</packagesToInclude>
-                        <packagesToExclude>*</packagesToExclude>
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+                        <includeSynthetic>true</includeSynthetic>
                     </parameter>
                     <dependencies>
                         <dependency>

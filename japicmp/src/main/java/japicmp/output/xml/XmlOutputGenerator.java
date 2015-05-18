@@ -52,17 +52,19 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 	}
 
 	private void createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
+		ByteArrayOutputStream baos = null;
+		FileOutputStream fos = null;
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(JApiCmpXmlRoot.class);
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, XML_SCHEMA);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			baos = new ByteArrayOutputStream();
 			marshaller.marshal(jApiCmpXmlRoot, baos);
 			if (options.getXmlOutputFile().isPresent()) {
 				final File xmlFile = new File(options.getXmlOutputFile().get());
-				FileOutputStream fos = new FileOutputStream(xmlFile);
+				fos = new FileOutputStream(xmlFile);
 				baos.writeTo(fos);
 				SchemaOutputResolver outputResolver = new SchemaOutputResolver() {
 					@Override
@@ -89,7 +91,8 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 				}
 				Transformer transformer = transformerFactory.newTransformer(new StreamSource(inputStream));
 				ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-				transformer.transform(new StreamSource(bais), new StreamResult(new FileOutputStream(options.getHtmlOutputFile().get())));
+				fos = new FileOutputStream(options.getHtmlOutputFile().get());
+				transformer.transform(new StreamSource(bais), new StreamResult(fos));
 			}
 		} catch (JAXBException e) {
 			throw new JApiCmpException(Reason.JaxbException, String.format("Marshalling of XML document failed: %s", e.getMessage()), e);
@@ -99,6 +102,15 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 			throw new JApiCmpException(Reason.XsltError, String.format("Configuration of XSLT transformer failed: %s", e.getMessage()), e);
 		} catch (TransformerException e) {
 			throw new JApiCmpException(Reason.XsltError, String.format("XSLT transformation failed: %s", e.getMessage()), e);
+		} finally {
+			try {
+				if (baos != null) {
+					baos.close();
+				}
+				if (fos != null) {
+					fos.close();
+				}
+			} catch (IOException e) {}
 		}
 	}
 

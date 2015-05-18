@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp-testbase</artifactId>
-		<version>0.4.1-SNAPSHOT</version>
+		<version>0.4.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>japicmp-test-maven-plugin-guava</artifactId>
 
@@ -38,8 +38,6 @@
 					</newVersion>
 					<parameter>
 						<onlyModified>true</onlyModified>
-						<packagesToInclude>*</packagesToInclude>
-						<packagesToExclude>*</packagesToExclude>
 						<accessModifier>private</accessModifier>
 						<breakBuildOnModifications>false</breakBuildOnModifications>
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>

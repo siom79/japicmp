@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.4.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.4.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -10,12 +10,12 @@ It can also be used as a library:
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
     
-japicmp is available in the Maven Central Repository. The corresponding dependency is:
+japicmp is available in the Maven Central Repository:
 
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.4.0</version>
+		<version>0.4.1</version>
 	</dependency>
 
 ##Motivation##
@@ -48,6 +48,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 * The option `--semantic-versioning` tells you which part of the version you have to increment in order to follow [semantic versioning](http://semver.org/).
 * If a class is serializable, changes are evaluated regarding the [Java Object Serialization Specification](http://docs.oracle.com/javase/7/docs/platform/serialization/spec/serialTOC.html).
+* Per default synthetic classes and class members (e.g. [bridge methods](https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html)) are hidden. They can be listed by using the option `--include-synthetic`.
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
@@ -55,64 +56,63 @@ The comparison of annotations makes this approach suitable for annotation-based 
 
 ###Usage CLI tool###
 
-japicmp has a set of CLI parameters that are described in the following:
+SYNOPSIS
+        java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
+                [(-e <packagesToExclude> | --exclude <packagesToExclude>)]
+                [(-h | --help)] [--html-file <pathToHtmlOutputFile>]
+                [(-i <packagesToInclude> | --include <packagesToInclude>)]
+                [--include-synthetic] [(-m | --only-modified)]
+                [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
+                [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
+                [(-s | --semantic-versioning)]
+                [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
-	NAME
-			java -jar japicmp.jar - Compares jars
+OPTIONS
+        -a <accessModifier>
+            Sets the access modifier level (public, package, protected,
+            private), which should be used.
 
-	SYNOPSIS
-			java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
-					[(-e <packagesToExclude> | --exclude <packagesToExclude>)]
-					[(-h | --help)] [--html-file <pathToHtmlOutputFile>]
-					[(-i <packagesToInclude> | --include <packagesToInclude>)]
-					[(-m | --only-modified)]
-					[(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
-					[(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
-					[(-s | --semantic-versioning)]
-					[(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
+        -b, --only-incompatible
+            Outputs only classes/methods that are binary incompatible. If not
+            given, all classes and methods are printed.
 
-	OPTIONS
-			-a <accessModifier>
-				Sets the access modifier level (public, package, protected,
-				private), which should be used.
+        -e <packagesToExclude>, --exclude <packagesToExclude>
+            Comma separated list of package names to exclude, * can be used as
+            wildcard.
 
-			-b, --only-incompatible
-				Outputs only classes/methods that are binary incompatible. If not
-				given, all classes and methods are printed.
+        -h, --help
+            Display help information
 
-			-e <packagesToExclude>, --exclude <packagesToExclude>
-				Comma separated list of package names to exclude, * can be used as
-				wildcard.
+        --html-file <pathToHtmlOutputFile>
+            Provides the path to the html output file.
 
-			-h, --help
-				Display help information
+        -i <packagesToInclude>, --include <packagesToInclude>
+            Comma separated list of package names to include, * can be used as
+            wildcard.
 
-			--html-file <pathToHtmlOutputFile>
-				Provides the path to the html output file.
+        --include-synthetic
+            Include synthetic classes and class members that are hidden per
+            default.
 
-			-i <packagesToInclude>, --include <packagesToInclude>
-				Comma separated list of package names to include, * can be used as
-				wildcard.
+        -m, --only-modified
+            Outputs only modified classes/methods.
 
-			-m, --only-modified
-				Outputs only modified classes/methods.
+        -n <pathToNewVersionJar>, --new <pathToNewVersionJar>
+            Provides the path to the new version of the jar.
 
-			-n <pathToNewVersionJar>, --new <pathToNewVersionJar>
-				Provides the path to the new version of the jar.
+        -o <pathToOldVersionJar>, --old <pathToOldVersionJar>
+            Provides the path to the old version of the jar.
 
-			-o <pathToOldVersionJar>, --old <pathToOldVersionJar>
-				Provides the path to the old version of the jar.
+        -s, --semantic-versioning
+            Tells you which part of the version to increment.
 
-			-s, --semantic-versioning
-				Tells you which part of the version to increment.
+        -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
+            Provides the path to the xml output file.
 
-			-x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
-				Provides the path to the xml output file.
-
-When your library under investigation implements interfaces or extends classes from other libraries than the JDK, you will
+When your library implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
-	java -cp japicmp-0.4.0-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.4.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
 ###Usage maven plugin###
 
@@ -123,13 +123,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.4.0</version>
+                <version>0.4.1</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.4.0</version>
+                            <version>0.4.1</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -145,6 +145,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
+                        <includeSynthetic>false</includeSynthetic>
                     </parameter>
 					<dependencies>
 						<dependency>
@@ -175,19 +176,24 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
+* onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
+* includeSynthetic: When set to true, changes for synthetic classes and class members are tracked.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
-&lt;dependencies&gt; element. The &lt;systemPath&gt; element of the &lt;dependency&gt; element allows you to add local files as a dependency:
+&lt;dependencies&gt; element:
 
 ```
-<dependency>
-	<groupId>com.sun</groupId>
-	<artifactId>tools</artifactId>
-	<version>1.4.2</version>
-	<scope>system</scope>
-	<systemPath>${java.home}/../lib/tools.jar</systemPath>
-</dependency>
+<dependencies>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-math3</artifactId>
+		<version>3.4</version>
+	</dependency>
+</dependencies>
 ```
+
+Dependecies declared in the enclosing pom.xml and its parents are added automatically. The dependencies declared explicitly for this plugin
+are appended to the classpath before the ones from the enclosing pom.xml.
 
 The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
 of your artifact.
@@ -225,7 +231,9 @@ In the following you see the beginning of the differences between the versions 1
 			---  REMOVED ANNOTATION: java.lang.Deprecated
 	...
 
-Optionally japicmp can also create an HTML report. An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.html).
+Optionally japicmp can also create an HTML report. An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.html):
+
+<img src="https://raw.github.com/siom79/japicmp/master/doc/japicmp_guava.png" alt="HTML Report"></img>
 
 You can also let japicmp create an XML report like the following one:
 
@@ -314,15 +322,14 @@ You can download the latest version from the [release page](https://github.com/s
 
 ##Contributions
 
-Pull requests are welcome, but please ensure the following rules:
+Pull requests are welcome, but please follow these rules:
 
 * Use `Java Conventions` as provided by your IDE for formatting with the following settings:
     * Indentation with tab
     * Newline: LF
     * Line length: 180
 * Provide a unit test for every change
-* [Clean Code](http://www.amazon.de/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
-    * Especially name the classes/methods/fields under `japicmp-test-v1` and `japicmp-test-v2` expressively
+* Name classes/methods/fields expressively
 
 ##Related work##
 

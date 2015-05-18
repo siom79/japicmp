@@ -1,12 +1,5 @@
 package japicmp.cli;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.jar.JarFile;
-
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import io.airlift.airline.Command;
 import io.airlift.airline.HelpOption;
@@ -14,14 +7,18 @@ import io.airlift.airline.Option;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.exception.FormattedException;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
-import japicmp.output.OutputFilter;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutputGenerator;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.jar.JarFile;
 
 public class JApiCli {
 
@@ -48,31 +45,19 @@ public class JApiCli {
 		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
 		@Option(name = { "-s", "--semantic-versioning" }, description ="Tells you which part of the version to increment.")
-		public boolean semanticVersioning;
+		public boolean semanticVersioning = false;
+		@Option(name = { "--include-synthetic" }, description = "Include synthetic classes and class members that are hidden per default.")
+		public boolean includeSynthetic = false;
 
 		@Override
 		public void run() {
-
-			Options options = create(pathToOldVersionJar, pathToNewVersionJar,
-					pathToXmlOutputFile, pathToHtmlOutputFile,
-					modifiedOnly, toModifier(accessModifier),
-					packagesToInclude, packagesToExclude,
-					onlyBinaryIncompatibleModifications);
-
+			Options options = createOptions();
 			File oldArchive = options.getOldArchive();
 			File newArchive = options.getNewArchive();
 			verifyFiles(oldArchive, newArchive);
-			JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(copyOptions(options));
+			JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));
 			List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
 			generateOutput(options, oldArchive, newArchive, jApiClasses);
-		}
-
-		private JarArchiveComparatorOptions copyOptions(Options options) {
-			JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
-			comparatorOptions.getPackagesInclude().addAll(options.getPackagesInclude());
-			comparatorOptions.getPackagesExclude().addAll(options.getPackagesExclude());
-			comparatorOptions.setAccessModifier(options.getAccessModifier());
-			return comparatorOptions;
 		}
 
 		private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
@@ -90,26 +75,18 @@ public class JApiCli {
 			System.out.println(output);
 		}
 
-		private Options create(String oldArchive, String newArchive,
-				String xmlOutputFile, String htmlOutputFile,
-				boolean onlyModifications, Optional<AccessModifier> accessModifier,
-				String packagesIncludeArg, String packagesExcludeArg,
-				boolean onlyBinaryIncompatibleModifications) throws IllegalArgumentException {
-
+		private Options createOptions() {
 			Options options = new Options();
-			try {
-				options.setNewArchive(validFile(newArchive, "Required option -n is missing."));
-				options.setOldArchive(validFile(oldArchive, "Required option -o is missing."));
-				options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
-				options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
-				options.setOutputOnlyModifications(onlyModifications);
-				options.setAccessModifier(accessModifier);
-				options.addPackageIncludeFromArgument(Optional.fromNullable(packagesIncludeArg));
-				options.addPackagesExcludeFromArgument(Optional.fromNullable(packagesExcludeArg));
-				options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
-			} catch (Exception e) {
-				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, e.getMessage());
-			}
+			options.setNewArchive(validFile(pathToNewVersionJar, "Required option -n is missing."));
+			options.setOldArchive(validFile(pathToOldVersionJar, "Required option -o is missing."));
+			options.setXmlOutputFile(Optional.fromNullable(pathToXmlOutputFile));
+			options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
+			options.setOutputOnlyModifications(modifiedOnly);
+			options.setAccessModifier(toModifier(accessModifier));
+			options.addPackageIncludeFromArgument(Optional.fromNullable(packagesToInclude));
+			options.addPackagesExcludeFromArgument(Optional.fromNullable(packagesToExclude));
+			options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
+			options.setIncludeSynthetic(includeSynthetic);
 			return options;
 		}
 
@@ -123,13 +100,13 @@ public class JApiCli {
 
 		private void verifyCanRead(File file) {
 			if (!file.canRead()) {
-				throw JApiCmpException.of("Cannot read file '%s'.", file.getAbsolutePath());
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Cannot read file '%s'.", file.getAbsolutePath());
 			}
 		}
 
 		private <T> T checkNonNull(T in, String errorMessage) {
 			if (in == null) {
-				throw new IllegalArgumentException(errorMessage);
+				throw new JApiCmpException(JApiCmpException.Reason.CliError, errorMessage);
 			} else {
 				return in;
 			}
@@ -141,9 +118,8 @@ public class JApiCli {
 				try {
 					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
 				} catch (IllegalArgumentException e) {
-					throw FormattedException
-							.ofIAE("Invalid value for option -a: %s. Possible values are: %s.",
-									accessModifierArg, AccessModifier.listOfAccessModifier());
+					throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option -a: %s. Possible values are: %s.",
+							accessModifierArg, AccessModifier.listOfAccessModifier()));
 				}
 			} else {
 				return Optional.of(AccessModifier.PROTECTED);
@@ -152,21 +128,28 @@ public class JApiCli {
 
 		private void verifyFiles(File oldArchive, File newArchive) {
 			if (oldArchive.equals(newArchive)) {
-				throw JApiCmpException.of("Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
 			}
 		}
 
 		private void verifyExisting(File newArchive) {
 			if (!newArchive.exists()) {
-				throw JApiCmpException.of("File '%s' does not exist.", newArchive.getAbsolutePath());
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
 			}
 		}
 
 		private void verifyJarArchive(File file) {
+			JarFile jarFile = null;
 			try {
-				new JarFile(file);
+				jarFile = new JarFile(file);
 			} catch (IOException e) {
-				throw JApiCmpException.of("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+			} finally {
+				if (jarFile != null) {
+					try {
+						jarFile.close();
+					} catch (IOException e) {}
+				}
 			}
 		}
 	}

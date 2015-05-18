@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp-base</artifactId>
-		<version>0.4.1-SNAPSHOT</version>
+		<version>0.4.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>japicmp</artifactId>
@@ -75,15 +75,43 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.5.2</version>
-				<configuration>
-					<xmlOutput>true</xmlOutput>
-					<xmlOutputDirectory>target/site</xmlOutputDirectory>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>code-quality</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cobertura-maven-plugin</artifactId>
+						<version>2.7</version>
+						<configuration>
+							<formats>
+								<format>html</format>
+								<format>xml</format>
+							</formats>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>findbugs-maven-plugin</artifactId>
+						<version>3.0.1</version>
+						<configuration>
+							<xmlOutput>true</xmlOutput>
+							<xmlOutputDirectory>target/site</xmlOutputDirectory>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>findbugs</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

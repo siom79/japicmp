@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
@@ -30,11 +29,13 @@ import org.junit.Test;
 
 import com.google.common.base.Optional;
 
-public class SyntheticTest {
+public class SyntheticAttributeTest {
 
 	@Test
 	public void test() throws IOException, CannotCompileException, NotFoundException {
-		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		File archiveV1 = getArchive("japicmp-test-v1.jar");
 		File archiveV2 = getArchive("japicmp-test-v2.jar");
 		File instrumentedArchiveV2 = instrumentClass(archiveV2);

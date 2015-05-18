@@ -1,5 +1,6 @@
 package japicmp.cmp;
 
+import japicmp.config.Options;
 import japicmp.config.PackageFilter;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
@@ -139,7 +140,7 @@ public class JarArchiveComparator {
         return this.options;
     }
 
-	ClassPool getClassPool() {
+	public ClassPool getClassPool() {
 		return classPool;
 	}
 }
