@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.4.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.4.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository. The corresponding dependen
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.4.0</version>
+		<version>0.4.1</version>
 	</dependency>
 
 ##Motivation##
@@ -48,7 +48,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 * The option `--semantic-versioning` tells you which part of the version you have to increment in order to follow [semantic versioning](http://semver.org/).
 * If a class is serializable, changes are evaluated regarding the [Java Object Serialization Specification](http://docs.oracle.com/javase/7/docs/platform/serialization/spec/serialTOC.html).
-* Per default synthetic classes and class members (e.g. [bridge methods](https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html)) are hidden. You can list them using the option `--include-synthetic`
+* Per default synthetic classes and class members (e.g. [bridge methods](https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html)) are hidden. They can be listed by using the option `--include-synthetic`.
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
@@ -112,7 +112,7 @@ OPTIONS
 When your library under investigation implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
-	java -cp japicmp-0.4.0-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.4.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
 ###Usage maven plugin###
 
@@ -123,13 +123,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.4.0</version>
+                <version>0.4.1</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.4.0</version>
+                            <version>0.4.1</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -177,19 +177,19 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
 * onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
-* includeSynthetic: When set to true, synthetic classes and class members are tracked.
+* includeSynthetic: When set to true, changes for synthetic classes and class members are tracked.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
-&lt;dependencies&gt; element. The &lt;systemPath&gt; element of the &lt;dependency&gt; element allows you to add local files as a dependency:
+&lt;dependencies&gt; element:
 
 ```
-<dependency>
-	<groupId>com.sun</groupId>
-	<artifactId>tools</artifactId>
-	<version>1.4.2</version>
-	<scope>system</scope>
-	<systemPath>${java.home}/../lib/tools.jar</systemPath>
-</dependency>
+<dependencies>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-math3</artifactId>
+		<version>3.4</version>
+	</dependency>
+</dependencies>
 ```
 
 The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
@@ -228,7 +228,9 @@ In the following you see the beginning of the differences between the versions 1
 			---  REMOVED ANNOTATION: java.lang.Deprecated
 	...
 
-Optionally japicmp can also create an HTML report. An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.html).
+Optionally japicmp can also create an HTML report. An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.html):
+
+<img src="https://raw.github.com/siom79/japicmp/master/doc/japicmp_guava.png" alt="HTML Report"></img>
 
 You can also let japicmp create an XML report like the following one:
 
@@ -317,15 +319,14 @@ You can download the latest version from the [release page](https://github.com/s
 
 ##Contributions
 
-Pull requests are welcome, but please ensure the following rules:
+Pull requests are welcome, but please follow these rules:
 
 * Use `Java Conventions` as provided by your IDE for formatting with the following settings:
     * Indentation with tab
     * Newline: LF
     * Line length: 180
 * Provide a unit test for every change
-* [Clean Code](http://www.amazon.de/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
-    * Especially name the classes/methods/fields under `japicmp-test-v1` and `japicmp-test-v2` expressively
+* Name classes/methods/fields expressively
 
 ##Related work##
 
