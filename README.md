@@ -56,6 +56,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 
 ###Usage CLI tool###
 
+```
 SYNOPSIS
         java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
                 [(-e <packagesToExclude> | --exclude <packagesToExclude>)]
@@ -108,6 +109,7 @@ OPTIONS
 
         -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
             Provides the path to the xml output file.
+```
 
 When your library implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
