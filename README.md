@@ -10,7 +10,7 @@ It can also be used as a library:
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
     
-japicmp is available in the Maven Central Repository. The corresponding dependency is:
+japicmp is available in the Maven Central Repository:
 
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
@@ -109,7 +109,7 @@ OPTIONS
         -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
             Provides the path to the xml output file.
 
-When your library under investigation implements interfaces or extends classes from other libraries than the JDK, you will
+When your library implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
 	java -cp japicmp-0.4.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
@@ -191,6 +191,9 @@ If your library implements interfaces or extends classes from other libraries th
 	</dependency>
 </dependencies>
 ```
+
+Dependecies declared in the enclosing pom.xml and its parents are added automatically. The dependencies declared explicitly for this plugin
+are appended to the classpath before the ones from the enclosing pom.xml.
 
 The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
 of your artifact.
