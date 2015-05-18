@@ -14,6 +14,19 @@
         <source.skip>true</source.skip>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.4</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -37,13 +50,6 @@
                         <accessModifier>public</accessModifier>
                         <onlyModified>true</onlyModified>
                     </parameter>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.commons</groupId>
-                            <artifactId>commons-math3</artifactId>
-                            <version>3.4</version>
-                        </dependency>
-                    </dependencies>
                 </configuration>
                 <executions>
                     <execution>
@@ -56,17 +62,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.4</version>
-        </dependency>
-    </dependencies>
 </project>
