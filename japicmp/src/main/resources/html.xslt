@@ -684,6 +684,8 @@
             <xsl:when test="$modifier = 'NON_FINAL'"><xsl:if test="$changeStatus = 'MODIFIED'">not_final</xsl:if></xsl:when>
             <xsl:when test="$modifier = 'NON_STATIC'"><xsl:if test="$changeStatus = 'MODIFIED'">not_static</xsl:if></xsl:when>
             <xsl:when test="$modifier = 'NON_ABSTRACT'"><xsl:if test="$changeStatus = 'MODIFIED'">not_abstract</xsl:if></xsl:when>
+            <xsl:when test="$modifier = 'NON_BRIDGE'"><xsl:if test="$changeStatus = 'MODIFIED'">not_bridge</xsl:if></xsl:when>
+            <xsl:when test="$modifier = 'NON_SYNTHETIC'"><xsl:if test="$changeStatus = 'MODIFIED'">not_synthetic</xsl:if></xsl:when>
             <xsl:when test="$modifier = 'PACKAGE_PROTECTED'"><xsl:if test="$changeStatus = 'MODIFIED'">package_protected</xsl:if></xsl:when>
             <xsl:otherwise><xsl:value-of select="translate($modifier, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" /><xsl:if test="$changeStatus != 'MODIFIED'">&#160;</xsl:if></xsl:otherwise>
         </xsl:choose>

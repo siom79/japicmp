@@ -1,6 +1,6 @@
 package japicmp.model;
 
-public enum AccessModifier {
+public enum AccessModifier implements JApiModifierBase {
     PUBLIC(3), PROTECTED(2), PACKAGE_PROTECTED(1), PRIVATE(0);
 
     private int level;

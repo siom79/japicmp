@@ -13,7 +13,7 @@ public class JApiMethod extends JApiBehavior {
     private final Optional<CtMethod> newMethod;
     private final JApiReturnType returnType;
 
-    public JApiMethod(String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod, String returnType) {
+    public JApiMethod(String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod) {
     	super(name, oldMethod, newMethod, changeStatus);
         this.oldMethod = oldMethod;
         this.newMethod = newMethod;

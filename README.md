@@ -48,6 +48,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 * The option `--semantic-versioning` tells you which part of the version you have to increment in order to follow [semantic versioning](http://semver.org/).
 * If a class is serializable, changes are evaluated regarding the [Java Object Serialization Specification](http://docs.oracle.com/javase/7/docs/platform/serialization/spec/serialTOC.html).
+* Per default synthetic classes and class members (e.g. [bridge methods](https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html)) are hidden. You can list them using the option `--include-synthetic`
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
@@ -55,59 +56,58 @@ The comparison of annotations makes this approach suitable for annotation-based 
 
 ###Usage CLI tool###
 
-japicmp has a set of CLI parameters that are described in the following:
+SYNOPSIS
+        java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
+                [(-e <packagesToExclude> | --exclude <packagesToExclude>)]
+                [(-h | --help)] [--html-file <pathToHtmlOutputFile>]
+                [(-i <packagesToInclude> | --include <packagesToInclude>)]
+                [--include-synthetic] [(-m | --only-modified)]
+                [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
+                [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
+                [(-s | --semantic-versioning)]
+                [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
-	NAME
-			java -jar japicmp.jar - Compares jars
+OPTIONS
+        -a <accessModifier>
+            Sets the access modifier level (public, package, protected,
+            private), which should be used.
 
-	SYNOPSIS
-			java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
-					[(-e <packagesToExclude> | --exclude <packagesToExclude>)]
-					[(-h | --help)] [--html-file <pathToHtmlOutputFile>]
-					[(-i <packagesToInclude> | --include <packagesToInclude>)]
-					[(-m | --only-modified)]
-					[(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
-					[(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
-					[(-s | --semantic-versioning)]
-					[(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
+        -b, --only-incompatible
+            Outputs only classes/methods that are binary incompatible. If not
+            given, all classes and methods are printed.
 
-	OPTIONS
-			-a <accessModifier>
-				Sets the access modifier level (public, package, protected,
-				private), which should be used.
+        -e <packagesToExclude>, --exclude <packagesToExclude>
+            Comma separated list of package names to exclude, * can be used as
+            wildcard.
 
-			-b, --only-incompatible
-				Outputs only classes/methods that are binary incompatible. If not
-				given, all classes and methods are printed.
+        -h, --help
+            Display help information
 
-			-e <packagesToExclude>, --exclude <packagesToExclude>
-				Comma separated list of package names to exclude, * can be used as
-				wildcard.
+        --html-file <pathToHtmlOutputFile>
+            Provides the path to the html output file.
 
-			-h, --help
-				Display help information
+        -i <packagesToInclude>, --include <packagesToInclude>
+            Comma separated list of package names to include, * can be used as
+            wildcard.
 
-			--html-file <pathToHtmlOutputFile>
-				Provides the path to the html output file.
+        --include-synthetic
+            Include synthetic classes and class members that are hidden per
+            default.
 
-			-i <packagesToInclude>, --include <packagesToInclude>
-				Comma separated list of package names to include, * can be used as
-				wildcard.
+        -m, --only-modified
+            Outputs only modified classes/methods.
 
-			-m, --only-modified
-				Outputs only modified classes/methods.
+        -n <pathToNewVersionJar>, --new <pathToNewVersionJar>
+            Provides the path to the new version of the jar.
 
-			-n <pathToNewVersionJar>, --new <pathToNewVersionJar>
-				Provides the path to the new version of the jar.
+        -o <pathToOldVersionJar>, --old <pathToOldVersionJar>
+            Provides the path to the old version of the jar.
 
-			-o <pathToOldVersionJar>, --old <pathToOldVersionJar>
-				Provides the path to the old version of the jar.
+        -s, --semantic-versioning
+            Tells you which part of the version to increment.
 
-			-s, --semantic-versioning
-				Tells you which part of the version to increment.
-
-			-x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
-				Provides the path to the xml output file.
+        -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
+            Provides the path to the xml output file.
 
 When your library under investigation implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
@@ -145,6 +145,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
+                        <includeSynthetic>false</includeSynthetic>
                     </parameter>
 					<dependencies>
 						<dependency>
@@ -175,6 +176,8 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
+* onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
+* includeSynthetic: When set to true, synthetic classes and class members are tracked.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element. The &lt;systemPath&gt; element of the &lt;dependency&gt; element allows you to add local files as a dependency:

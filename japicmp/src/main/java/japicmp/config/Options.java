@@ -3,7 +3,7 @@ package japicmp.config;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import japicmp.exception.FormattedException;
+import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 
 import java.io.File;
@@ -20,6 +20,7 @@ public class Options {
 	private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PROTECTED);
 	private List<PackageFilter> packagesInclude = new LinkedList<>();
 	private List<PackageFilter> packagesExclude = new LinkedList<>();
+	private boolean includeSynthetic = false;
 
 	public File getNewArchive() {
 		return newArchive;
@@ -94,7 +95,7 @@ public class Options {
 			try {
 				packages.add(new PackageFilter(part));
 			} catch (Exception e) {
-				throw FormattedException.ofIAE(format, part, e.getMessage());
+				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(format, part, e.getMessage()));
 			}
 		}
 		return packages;
@@ -114,5 +115,13 @@ public class Options {
 
 	public void setHtmlOutputFile(Optional<String> htmlOutputFile) {
 		this.htmlOutputFile = htmlOutputFile;
+	}
+
+	public void setIncludeSynthetic(boolean showSynthetic) {
+		this.includeSynthetic = showSynthetic;
+	}
+
+	public boolean isIncludeSynthetic() {
+		return includeSynthetic;
 	}
 }
