@@ -1,5 +1,6 @@
 package japicmp.filter;
 
+import com.google.common.base.Splitter;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.SignatureParser;
 import javassist.CtBehavior;
@@ -44,8 +45,8 @@ public class BehaviorFilter implements Filter {
         methodPattern = Pattern.compile(methodName);
         String paramList = methodPart.substring(indexOpeningBracket + 1, indexClosingBracket);
         if (paramList.length() > 0) {
-            String[] params = paramList.split(",");
-            for (String param : params) {
+            for (String param : Splitter.on(",").trimResults().omitEmptyStrings().split(paramList)) {
+                param = param.replaceAll("\\s+","");
                 parameterPatterns.add(Pattern.compile(param));
             }
         }
