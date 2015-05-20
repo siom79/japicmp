@@ -2,7 +2,8 @@ package japicmp.output.xml;
 
 import com.google.common.base.Joiner;
 import japicmp.config.Options;
-import japicmp.config.PackageFilter;
+import japicmp.filter.Filter;
+import japicmp.filter.PackageFilter;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.JApiClass;
@@ -127,12 +128,12 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 		jApiCmpXmlRoot.setAccessModifier(options.getAccessModifier().name());
 		jApiCmpXmlRoot.setOnlyModifications(options.isOutputOnlyModifications());
 		jApiCmpXmlRoot.setOnlyBinaryIncompatibleModifications(options.isOutputOnlyBinaryIncompatibleModifications());
-		jApiCmpXmlRoot.setPackagesInclude(packageListAsString(options.getPackagesInclude(), true));
-		jApiCmpXmlRoot.setPackagesExclude(packageListAsString(options.getPackagesExclude(), false));
+		jApiCmpXmlRoot.setPackagesInclude(packageListAsString(options.getIncludes(), true));
+		jApiCmpXmlRoot.setPackagesExclude(packageListAsString(options.getExcludes(), false));
 		return jApiCmpXmlRoot;
 	}
 
-	private String packageListAsString(List<PackageFilter> packagesInclude, boolean include) {
+	private String packageListAsString(List<Filter> packagesInclude, boolean include) {
 		String join = Joiner.on(",").skipNulls().join(packagesInclude);
 		if (join.length() == 0) {
 			if (include) {

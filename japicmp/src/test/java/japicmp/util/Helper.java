@@ -6,6 +6,9 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.output.xml.XmlOutputGenerator;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 import java.io.File;
 import java.util.List;
@@ -35,6 +38,54 @@ public class Helper {
             }
         }
         throw new IllegalArgumentException("No method found with name " + name + ".");
+    }
+
+    public static Matcher<JApiClass> hasJApiMethodWithName(final String methodName) {
+        return new TypeSafeMatcher<JApiClass>() {
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("JApiClass should have a method with name '").appendValue(methodName)
+                        .appendText("'.");
+            }
+
+            @Override
+            protected boolean matchesSafely(JApiClass jApiClass) {
+                List<JApiMethod> jApiMethods = jApiClass.getMethods();
+                boolean found = false;
+                for (JApiMethod jApiMethod : jApiMethods) {
+                    if (methodName.equals(jApiMethod.getName())) {
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+            }
+        };
+    }
+
+    public static Matcher<JApiClass> hasNoJApiMethodWithName(final String methodName) {
+        return new TypeSafeMatcher<JApiClass>() {
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("JApiClass should not have a method with name '").appendValue(methodName)
+                        .appendText("'.");
+            }
+
+            @Override
+            protected boolean matchesSafely(JApiClass jApiClass) {
+                List<JApiMethod> jApiMethods = jApiClass.getMethods();
+                boolean found = false;
+                for (JApiMethod jApiMethod : jApiMethods) {
+                    if (methodName.equals(jApiMethod.getName())) {
+                        found = true;
+                        break;
+                    }
+                }
+                return !found;
+            }
+        };
     }
 
     public static JApiField getJApiField(List<JApiField> jApiFields, String name) {

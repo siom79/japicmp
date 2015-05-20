@@ -2,8 +2,8 @@ package japicmp.maven;
 
 public class Parameter {
     private String accessModifier;
-    private String packagesToInclude;
-    private String packagesToExclude;
+    private String include;
+    private String exclude;
     private String onlyBinaryIncompatible;
     private String onlyModified;
     private String breakBuildOnModifications;
@@ -18,20 +18,20 @@ public class Parameter {
         this.accessModifier = accessModifier;
     }
 
-    public String getPackagesToInclude() {
-        return packagesToInclude;
+    public String getInclude() {
+        return include;
     }
 
-    public void setPackagesToInclude(String packagesToInclude) {
-        this.packagesToInclude = packagesToInclude;
+    public void setInclude(String include) {
+        this.include = include;
     }
 
-    public String getPackagesToExclude() {
-        return packagesToExclude;
+    public String getExclude() {
+        return exclude;
     }
 
-    public void setPackagesToExclude(String packagesToExclude) {
-        this.packagesToExclude = packagesToExclude;
+    public void setExclude(String exclude) {
+        this.exclude = exclude;
     }
 
     public String getOnlyModified() {

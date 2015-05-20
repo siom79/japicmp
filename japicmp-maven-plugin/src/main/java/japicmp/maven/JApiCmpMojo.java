@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.config.PackageFilter;
+import japicmp.filter.PackageFilter;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
@@ -155,7 +155,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				Boolean booleanOnlyModified = Boolean.valueOf(onlyModified);
 				options.setOutputOnlyModifications(booleanOnlyModified);
 			}
-			String packagesToExclude = parameter.getPackagesToExclude();
+			String packagesToExclude = parameter.getExclude();
 			if (packagesToExclude != null) {
 				try {
 					options.addPackagesExcludeFromArgument(packagesToExclude);
@@ -163,7 +163,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					throw new MojoFailureException(e.getMessage());
 				}
 			}
-			String packagesToInclude = parameter.getPackagesToInclude();
+			String packagesToInclude = parameter.getInclude();
 			if (packagesToInclude != null) {
 				try {
 					options.addPackageIncludeFromArgument(packagesToInclude);
@@ -243,18 +243,18 @@ public class JApiCmpMojo extends AbstractMojo {
 					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()));
 				}
 			}
-			String packagesToExclude = parameter.getPackagesToExclude();
+			String packagesToExclude = parameter.getExclude();
 			if (packagesToExclude != null) {
 				try {
-					options.getPackagesExclude().add(new PackageFilter(packagesToExclude));
+					options.getFilters().getExcludes().add(new PackageFilter(packagesToExclude));
 				} catch (Exception e) {
 					throw new MojoFailureException(e.getMessage());
 				}
 			}
-			String packagesToInclude = parameter.getPackagesToInclude();
+			String packagesToInclude = parameter.getInclude();
 			if (packagesToInclude != null) {
 				try {
-					options.getPackagesInclude().add(new PackageFilter(packagesToInclude));
+                    options.getFilters().getIncludes().add(new PackageFilter(packagesToInclude));
 				} catch (Exception e) {
 					throw new MojoFailureException(e.getMessage());
 				}

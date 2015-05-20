@@ -1,5 +1,7 @@
 package japicmp.util;
 
+import japicmp.exception.JApiCmpException;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +24,14 @@ public class SignatureParser {
     }
 
     private void parseParameters(String signature, int parenthesisCloseIndex) {
-        String paramPart = signature.substring(1, parenthesisCloseIndex);
+        int parenthesisOpenIndex = signature.indexOf('(');
+        if (parenthesisOpenIndex < 0) {
+            throw new JApiCmpException(JApiCmpException.Reason.IllegalState, "Signature does not contain '('.");
+        }
+        if (parenthesisCloseIndex - parenthesisOpenIndex < 1) {
+            throw new JApiCmpException(JApiCmpException.Reason.IllegalState, "Signature must contain the char '(' before the char ')'.");
+        }
+        String paramPart = signature.substring(parenthesisOpenIndex + 1, parenthesisCloseIndex);
         List<String> paramTypes = parseTypes(paramPart);
         parameters.clear();
         parameters.addAll(paramTypes);
