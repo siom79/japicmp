@@ -1,0 +1,22 @@
+package japicmp.output.stdout;
+
+import japicmp.config.Options;
+import japicmp.model.JApiClass;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+
+public class StdoutOutputGeneratorTest {
+
+	@Test
+	public void testNoChanges() {
+		Options options = new Options();
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0), new File("/tmp"), new File("/tmp"));
+		String generated = generator.generate();
+		assertThat(generated, containsString(StdoutOutputGenerator.NO_CHANGES));
+	}
+}
