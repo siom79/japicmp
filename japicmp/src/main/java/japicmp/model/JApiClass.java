@@ -4,10 +4,7 @@ import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
-import japicmp.util.AnnotationHelper;
-import japicmp.util.Constants;
-import japicmp.util.MethodDescriptorParser;
-import japicmp.util.ModifierHelper;
+import japicmp.util.*;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 
@@ -366,50 +363,48 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 
 	private Optional<CtMethod> findMatchingMethod(CtMethod method, List<CtMethod> candidates) {
 		Optional<CtMethod> found = Optional.absent();
+		SignatureParser methodSignatureParser = new SignatureParser();
+		methodSignatureParser.parse(method.getSignature());
 		List<CtMethod> methodsWithSameParameters = new ArrayList<>();
 		for (CtMethod candidate : candidates) {
-			try {
-				boolean parameterListsEqual = true;
-				CtClass[] candidateParameterTypes = candidate.getParameterTypes();
-				CtClass[] probeParameterTypes = method.getParameterTypes();
-				if (candidateParameterTypes.length != probeParameterTypes.length) {
-					parameterListsEqual = false;
-				}
-				if (parameterListsEqual) {
-					for (int i = 0; i < probeParameterTypes.length; i++) {
-						CtClass probeParameterType = probeParameterTypes[i];
-						CtClass candidateParameterType = candidateParameterTypes[i];
-						if (!probeParameterType.getName().equals(candidateParameterType.getName())) {
-							parameterListsEqual = false;
-						}
+			boolean parameterListsEqual = true;
+			List<String> probeParameters = methodSignatureParser.getParameters();
+			SignatureParser candidateSignatureParser = new SignatureParser();
+			candidateSignatureParser.parse(candidate.getSignature());
+			List<String> candidateParameters = candidateSignatureParser.getParameters();
+			if (probeParameters.size() != candidateParameters.size()) {
+				parameterListsEqual = false;
+			}
+			if (parameterListsEqual) {
+				for (int i = 0; i < probeParameters.size(); i++) {
+					String probeParameter = probeParameters.get(i);
+					String candidateParameter = candidateParameters.get(i);
+					if (!probeParameter.equals(candidateParameter)) {
+						parameterListsEqual = false;
 					}
 				}
-				if (parameterListsEqual) {
-					methodsWithSameParameters.add(candidate);
-				}
-			} catch (NotFoundException e) {
-				//parameter lists cannot be compared
+			}
+			if (parameterListsEqual) {
+				methodsWithSameParameters.add(candidate);
 			}
 		}
 		if (methodsWithSameParameters.size() == 1) {
 			found = Optional.of(methodsWithSameParameters.get(0));
 		} else if (methodsWithSameParameters.size() > 1) {
-			try {
-				CtMethod methodWithSameReturnType = null;
-				CtClass probeReturnType = method.getReturnType();
-				for (CtMethod candidate : methodsWithSameParameters) {
-					CtClass candidateReturnType = candidate.getReturnType();
-					if (probeReturnType.getName().equals(candidateReturnType.getName())) {
-						methodWithSameReturnType = candidate;
-					}
+			CtMethod methodWithSameReturnType = null;
+			String probeReturnType = methodSignatureParser.getReturnType();
+			for (CtMethod candidate : methodsWithSameParameters) {
+				SignatureParser candidateSignatureParser = new SignatureParser();
+				candidateSignatureParser.parse(candidate.getSignature());
+				String candidateReturnType = candidateSignatureParser.getReturnType();
+				if (probeReturnType.equals(candidateReturnType)) {
+					methodWithSameReturnType = candidate;
 				}
-				if (methodWithSameReturnType != null) {
-					found = Optional.of(methodWithSameReturnType);
-				} else {
-					found = Optional.of(methodsWithSameParameters.get(0));
-				}
-			} catch (NotFoundException e) {
-				//return types cannot be compared
+			}
+			if (methodWithSameReturnType != null) {
+				found = Optional.of(methodWithSameReturnType);
+			} else {
+				found = Optional.of(methodsWithSameParameters.get(0));
 			}
 		}
 		return found;

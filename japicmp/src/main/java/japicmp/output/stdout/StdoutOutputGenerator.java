@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.List;
 
 public class StdoutOutputGenerator extends OutputGenerator<String> {
+	static final String NO_CHANGES = "No changes.";
 	private final File oldArchive;
 	private final File newArchive;
 
@@ -27,12 +28,16 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
         outputFilter.filter(jApiClasses);
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Comparing %s with %s:%n", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath()));
-        for (JApiClass jApiClass : jApiClasses) {
-            processClass(sb, jApiClass);
-            processConstructors(sb, jApiClass);
-            processMethods(sb, jApiClass);
-            processAnnotations(sb, jApiClass, 1);
-        }
+		if (jApiClasses.size() > 0) {
+			for (JApiClass jApiClass : jApiClasses) {
+				processClass(sb, jApiClass);
+				processConstructors(sb, jApiClass);
+				processMethods(sb, jApiClass);
+				processAnnotations(sb, jApiClass, 1);
+			}
+		} else {
+			sb.append(NO_CHANGES);
+		}
         return sb.toString();
     }
 
