@@ -76,16 +76,8 @@ public class Options {
         return ImmutableList.copyOf(excludes);
     }
 
-    public void addPackagesExcludeFromArgument(String packagesExcludeArg) {
-        addExcludeFromArgument(Optional.of(packagesExcludeArg));
-    }
-
     public void addExcludeFromArgument(Optional<String> packagesExcludeArg) {
         excludes = createFilterList(packagesExcludeArg, excludes, "Wrong syntax for exclude option '%s': %s");
-    }
-
-    public void addPackageIncludeFromArgument(String packagesIncludeArg) {
-        addIncludeFromArgument(Optional.of(packagesIncludeArg));
     }
 
     public void addIncludeFromArgument(Optional<String> packagesIncludeArg) {
