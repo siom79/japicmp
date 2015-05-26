@@ -14,6 +14,7 @@ public class ClassFilter implements Filter {
         this.className = className;
         String regEx = className.replace(".", "\\.");
         regEx = regEx.replace("*", ".*");
+        regEx += "(\\$.*)?";
         pattern = Pattern.compile(regEx);
     }
 

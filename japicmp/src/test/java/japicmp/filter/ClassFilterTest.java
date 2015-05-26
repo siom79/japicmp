@@ -23,4 +23,11 @@ public class ClassFilterTest {
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(new ClassPool());
         assertThat(classFilter.matches(ctClass), is(false));
     }
+
+    @Test
+	public void testInnerClass() {
+		ClassFilter classFilter = new ClassFilter("japicmp.Homer");
+		CtClass ctClass = CtClassBuilder.create().name("japicmp.Homer$InnerHomer").addToClassPool(new ClassPool());
+		assertThat(classFilter.matches(ctClass), is(true));
+	}
 }
