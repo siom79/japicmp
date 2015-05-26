@@ -49,7 +49,17 @@
                     <parameter>
                         <accessModifier>public</accessModifier>
                         <onlyModified>true</onlyModified>
+                        <includes>
+                            <include>package.to.include</include>
+                            <include>package.ClassToInclude</include>
+                            <include>package.Class#methodToInclude(long,int)</include>
+                            <include>package.Class#fieldToInclude</include>
+                        </includes>
                         <excludes>
+                            <exclude>package.to.Exclude</exclude>
+                            <exclude>package.ClassToExclude</exclude>
+                            <exclude>package.Class#methodToExclude(long,int)</exclude>
+                            <exclude>package.Class#fieldToExclude</exclude>
                             <exclude>japicmp.test.ModifierTest#methodToExclude()</exclude>
                             <exclude>japicmp.test.ModifierTest#anotherMethodToExclude()</exclude>
                         </excludes>
