@@ -59,10 +59,10 @@ The comparison of annotations makes this approach suitable for annotation-based 
 ```
 SYNOPSIS
         java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
-                [(-e <packagesToExclude> | --exclude <packagesToExclude>)]
-                [(-h | --help)] [--html-file <pathToHtmlOutputFile>]
-                [(-i <packagesToInclude> | --include <packagesToInclude>)]
-                [--include-synthetic] [(-m | --only-modified)]
+                [(-e <excludes> | --exclude <excludes>)] [(-h | --help)]
+                [--html-file <pathToHtmlOutputFile>]
+                [(-i <includes> | --include <includes>)] [--include-synthetic]
+                [(-m | --only-modified)]
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
                 [(-s | --semantic-versioning)]
@@ -77,9 +77,10 @@ OPTIONS
             Outputs only classes/methods that are binary incompatible. If not
             given, all classes and methods are printed.
 
-        -e <packagesToExclude>, --exclude <packagesToExclude>
-            Comma separated list of package names to exclude, * can be used as
-            wildcard.
+        -e <excludes>, --exclude <excludes>
+            Semicolon separated list of elements to exclude in the form
+            package.Class#classMember, * can be used as wildcard. Examples:
+            mypackage;my.Class;other.Class#method(int,long);foo.Class#field
 
         -h, --help
             Display help information
@@ -87,9 +88,10 @@ OPTIONS
         --html-file <pathToHtmlOutputFile>
             Provides the path to the html output file.
 
-        -i <packagesToInclude>, --include <packagesToInclude>
-            Comma separated list of package names to include, * can be used as
-            wildcard.
+        -i <includes>, --include <includes>
+            Semicolon separated list of elements to include in the form
+            package.Class#classMember, * can be used as wildcard. Examples:
+            mypackage;my.Class;other.Class#method(int,long);foo.Class#field
 
         --include-synthetic
             Include synthetic classes and class members that are hidden per
@@ -141,8 +143,8 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                     </newVersion>
                     <parameter>
                         <onlyModified>true</onlyModified>
-                        <packagesToInclude>example</packagesToInclude>
-                        <packagesToExclude>excludeMe</packagesToExclude>
+                        <include>package.to.include</include>
+                        <exclude>japicmp.test.ModifierTest#methodToExclude()</exclude>
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
@@ -173,8 +175,8 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
  support either a &lt;dependency&gt; or a &lt;file&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
   
 * onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
-* packagesToInclude: Comma separated list of package names to include, * can be used as wildcard.
-* packagesToExclude: Comma separated list of package names to exclude, * can be used as wildcard.
+* include: Comma separated list of package names to include, * can be used as wildcard.
+* exclude: Comma separated list of package names to exclude, * can be used as wildcard.
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.

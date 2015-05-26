@@ -1,7 +1,6 @@
 package japicmp.cmp;
 
 import japicmp.model.*;
-import japicmp.util.ClassesHelper;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;

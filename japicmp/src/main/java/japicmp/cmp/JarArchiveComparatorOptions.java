@@ -1,7 +1,8 @@
 package japicmp.cmp;
 
+import japicmp.filter.Filter;
 import japicmp.config.Options;
-import japicmp.config.PackageFilter;
+import japicmp.filter.Filters;
 import japicmp.model.AccessModifier;
 
 import java.util.LinkedList;
@@ -9,29 +10,28 @@ import java.util.List;
 
 public class JarArchiveComparatorOptions {
 	private List<String> classPathEntries = new LinkedList<>();
-	private List<PackageFilter> packagesInclude = new LinkedList<>();
-	private List<PackageFilter> packagesExclude = new LinkedList<>();
 	private AccessModifier accessModifier = AccessModifier.PROTECTED;
+    private Filters filters = new Filters();
 	private boolean includeSynthetic = false;
 
 	public static JarArchiveComparatorOptions of(Options options) {
 		JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
-		comparatorOptions.getPackagesInclude().addAll(options.getPackagesInclude());
-		comparatorOptions.getPackagesExclude().addAll(options.getPackagesExclude());
+        comparatorOptions.getFilters().getExcludes().addAll(options.getExcludes());
+        comparatorOptions.getFilters().getIncludes().addAll(options.getIncludes());
 		comparatorOptions.setAccessModifier(options.getAccessModifier());
 		comparatorOptions.setIncludeSynthetic(options.isIncludeSynthetic());
 		return comparatorOptions;
 	}
 
-	public List<PackageFilter> getPackagesExclude() {
-		return packagesExclude;
-	}
+    public Filters getFilters() {
+        return filters;
+    }
 
-	public List<PackageFilter> getPackagesInclude() {
-		return packagesInclude;
-	}
+    public void setFilters(Filters filters) {
+        this.filters = filters;
+    }
 
-	public List<String> getClassPathEntries() {
+    public List<String> getClassPathEntries() {
 		return classPathEntries;
 	}
 

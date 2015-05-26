@@ -1,9 +1,11 @@
 package japicmp.maven;
 
+import java.util.List;
+
 public class Parameter {
     private String accessModifier;
-    private String packagesToInclude;
-    private String packagesToExclude;
+    private List<String> includes;
+    private List<String> excludes;
     private String onlyBinaryIncompatible;
     private String onlyModified;
     private String breakBuildOnModifications;
@@ -16,22 +18,6 @@ public class Parameter {
 
     public void setAccessModifier(String accessModifier) {
         this.accessModifier = accessModifier;
-    }
-
-    public String getPackagesToInclude() {
-        return packagesToInclude;
-    }
-
-    public void setPackagesToInclude(String packagesToInclude) {
-        this.packagesToInclude = packagesToInclude;
-    }
-
-    public String getPackagesToExclude() {
-        return packagesToExclude;
-    }
-
-    public void setPackagesToExclude(String packagesToExclude) {
-        this.packagesToExclude = packagesToExclude;
     }
 
     public String getOnlyModified() {
@@ -71,5 +57,21 @@ public class Parameter {
 
 	public void setIncludeSynthetic(String includeSynthetic) {
 		this.includeSynthetic = includeSynthetic;
+	}
+
+	public List<String> getIncludes() {
+		return includes;
+	}
+
+	public void setIncludes(List<String> includes) {
+		this.includes = includes;
+	}
+
+	public List<String> getExcludes() {
+		return excludes;
+	}
+
+	public void setExcludes(List<String> excludes) {
+		this.excludes = excludes;
 	}
 }

@@ -36,10 +36,10 @@ public class JApiCli {
 		public boolean onlyBinaryIncompatibleModifications;
 		@Option(name = "-a", description = "Sets the access modifier level (public, package, protected, private), which should be used.")
 		public String accessModifier;
-		@Option(name = { "-i", "--include" }, description = "Comma separated list of package names to include, * can be used as wildcard.")
-		public String packagesToInclude;
-		@Option(name = { "-e", "--exclude" }, description = "Comma separated list of package names to exclude, * can be used as wildcard.")
-		public String packagesToExclude;
+		@Option(name = { "-i", "--include" }, description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
+		public String includes;
+		@Option(name = { "-e", "--exclude" }, description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
+		public String excludes;
 		@Option(name = { "-x", "--xml-file" }, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;
 		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
@@ -83,8 +83,8 @@ public class JApiCli {
 			options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
 			options.setOutputOnlyModifications(modifiedOnly);
 			options.setAccessModifier(toModifier(accessModifier));
-			options.addPackageIncludeFromArgument(Optional.fromNullable(packagesToInclude));
-			options.addPackagesExcludeFromArgument(Optional.fromNullable(packagesToExclude));
+			options.addIncludeFromArgument(Optional.fromNullable(includes));
+			options.addExcludeFromArgument(Optional.fromNullable(excludes));
 			options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
 			options.setIncludeSynthetic(includeSynthetic);
 			return options;

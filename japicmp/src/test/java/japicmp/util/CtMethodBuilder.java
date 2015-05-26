@@ -2,18 +2,13 @@ package japicmp.util;
 
 import javassist.*;
 
-import java.util.Arrays;
-
-public class CtMethodBuilder {
+public class CtMethodBuilder extends CtBehaviorBuilder {
 	public static final String DEFAULT_METHOD_NAME = "method";
-	private String name = DEFAULT_METHOD_NAME;
-	private int modifier = 0;
-	private CtClass returnType;
-	private CtClass[] parameters = new CtClass[]{};
-	private CtClass[] exceptions = new CtClass[]{};
-	private String body = "return null;";
+    protected String body = "return null;";
+    private String name = DEFAULT_METHOD_NAME;
+    private CtClass returnType;
 
-	public CtMethodBuilder name(String name) {
+    public CtMethodBuilder name(String name) {
 		this.name = name;
 		return this;
 	}
@@ -28,47 +23,35 @@ public class CtMethodBuilder {
 		return this;
 	}
 
-	public CtMethodBuilder parameters(CtClass[] parameters) {
-		this.parameters = parameters;
-		return this;
-	}
-
-	public CtMethodBuilder parameter(CtClass parameter) {
-		if (this.parameters == null) {
-			this.parameters = new CtClass[]{parameter};
-		} else {
-			CtClass[] newParameters = new CtClass[this.parameters.length + 1];
-			System.arraycopy(this.parameters, 0, newParameters, 0, this.parameters.length);
-			newParameters[this.parameters.length] = parameter;
-			this.parameters = newParameters;
-		}
-		return this;
-	}
-
-	public CtMethodBuilder exceptions(CtClass[] exceptions) {
-		this.exceptions = exceptions;
-		return this;
-	}
-
-	public CtMethodBuilder body(String body) {
-		this.body = body;
-		return this;
-	}
-
-	public CtMethodBuilder publicAccess() {
-		this.modifier = this.modifier | Modifier.PUBLIC;
-		return this;
-	}
-
-	public CtMethodBuilder privateAccess() {
-		this.modifier = this.modifier | Modifier.PRIVATE;
-		return this;
-	}
-
-	public CtMethodBuilder syntheticModifier() {
+    public CtMethodBuilder syntheticModifier() {
 		this.modifier = this.modifier | ModifierHelper.ACC_SYNTHETIC;
 		return this;
 	}
+
+    public CtMethodBuilder parameters(CtClass[] parameters) {
+        return (CtMethodBuilder) super.parameters(parameters);
+    }
+
+    public CtMethodBuilder parameter(CtClass parameter) {
+        return (CtMethodBuilder) super.parameter(parameter);
+    }
+
+    public CtMethodBuilder exceptions(CtClass[] exceptions) {
+        return (CtMethodBuilder) super.exceptions(exceptions);
+    }
+
+    public CtMethodBuilder body(String body) {
+        this.body = body;
+        return this;
+    }
+
+    public CtMethodBuilder publicAccess() {
+        return (CtMethodBuilder) super.publicAccess();
+    }
+
+    public CtMethodBuilder privateAccess() {
+        return (CtMethodBuilder) super.privateAccess();
+    }
 
 	public CtMethod addToClass(CtClass declaringClass) throws CannotCompileException {
 		if (this.returnType == null) {

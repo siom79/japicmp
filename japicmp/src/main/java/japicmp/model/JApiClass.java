@@ -169,8 +169,10 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		Map<String, CtField> fieldMap = new HashMap<>();
 		CtField[] declaredFields = ctClass.getDeclaredFields();
 		for (CtField field : declaredFields) {
-			String name = field.getName();
-			fieldMap.put(name, field);
+			if (options.getFilters().includeField(field)) {
+				String name = field.getName();
+				fieldMap.put(name, field);
+			}
 		}
 		return fieldMap;
 	}
@@ -461,13 +463,15 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		if (ctClassOptional.isPresent()) {
 			CtClass ctClass = ctClassOptional.get();
 			for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
-				String name = ctMethod.getName();
-				List<CtMethod> ctMethods = methods.get(name);
-				if (ctMethods == null) {
-					ctMethods = new ArrayList<CtMethod>();
-					methods.put(name, ctMethods);
+				if (options.getFilters().includeBehavior(ctMethod)) {
+					String name = ctMethod.getName();
+					List<CtMethod> ctMethods = methods.get(name);
+					if (ctMethods == null) {
+						ctMethods = new ArrayList<CtMethod>();
+						methods.put(name, ctMethods);
+					}
+					ctMethods.add(ctMethod);
 				}
-				ctMethods.add(ctMethod);
 			}
 		}
 		return methods;
@@ -477,7 +481,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		Map<String, CtConstructor> methods = new HashMap<>();
 		if (ctClass.isPresent()) {
 			for (CtConstructor ctConstructor : ctClass.get().getDeclaredConstructors()) {
-				methods.put(ctConstructor.getLongName(), ctConstructor);
+				if (options.getFilters().includeBehavior(ctConstructor)) {
+					methods.put(ctConstructor.getLongName(), ctConstructor);
+				}
 			}
 		}
 		return methods;

@@ -2,7 +2,7 @@ package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.config.PackageFilter;
+import japicmp.filter.PackageFilter;
 import japicmp.model.JApiClass;
 import japicmp.test.packageOne.PackageOne;
 import japicmp.test.packageTwo.PackageTwo;
@@ -21,7 +21,7 @@ public class PackageFilterTest {
     @Test
     public void onlyIncludeOnePackage() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.getPackagesInclude().add(new PackageFilter("japicmp.test.packageOne"));
+        options.getFilters().getIncludes().add(new PackageFilter("japicmp.test.packageOne"));
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         getJApiClass(jApiClasses, PackageOne.class.getName());
@@ -31,8 +31,8 @@ public class PackageFilterTest {
     @Test
     public void onlyIncludeTwoPackages() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.getPackagesInclude().add(new PackageFilter("japicmp.test.packageOne"));
-        options.getPackagesInclude().add(new PackageFilter("japicmp.test.packageTwo"));
+        options.getFilters().getIncludes().add(new PackageFilter("japicmp.test.packageOne"));
+        options.getFilters().getIncludes().add(new PackageFilter("japicmp.test.packageTwo"));
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         getJApiClass(jApiClasses, PackageOne.class.getName());
@@ -43,7 +43,7 @@ public class PackageFilterTest {
     @Test
     public void onlyExcludeOnePackage() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.getPackagesExclude().add(new PackageFilter("japicmp.test.packageOne"));
+        options.getFilters().getExcludes().add(new PackageFilter("japicmp.test.packageOne"));
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         assertThatExceptionIsThrown(new Callback() {
@@ -56,7 +56,7 @@ public class PackageFilterTest {
     @Test
     public void excludePackageJapicmpTest() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.getPackagesExclude().add(new PackageFilter("japicmp.test"));
+        options.getFilters().getExcludes().add(new PackageFilter("japicmp.test"));
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         assertThat(jApiClasses.size(), is(0));
@@ -65,7 +65,7 @@ public class PackageFilterTest {
     @Test
     public void includePackageJapicmpTest() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.getPackagesInclude().add(new PackageFilter("japicmp.test"));
+        options.getFilters().getIncludes().add(new PackageFilter("japicmp.test"));
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         assertThat(getJApiClass(jApiClasses, PackageOne.class.getName()), is(notNullValue()));
@@ -74,7 +74,7 @@ public class PackageFilterTest {
     @Test
     public void includePackageOneWithWildcard() {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.getPackagesInclude().add(new PackageFilter("japicmp.*.packageOne"));
+        options.getFilters().getIncludes().add(new PackageFilter("japicmp.*.packageOne"));
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         assertThat(getJApiClass(jApiClasses, PackageOne.class.getName()), is(notNullValue()));

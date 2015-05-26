@@ -49,6 +49,10 @@
                     <parameter>
                         <accessModifier>public</accessModifier>
                         <onlyModified>true</onlyModified>
+                        <excludes>
+                            <exclude>japicmp.test.ModifierTest#methodToExclude()</exclude>
+                            <exclude>japicmp.test.ModifierTest#anotherMethodToExclude()</exclude>
+                        </excludes>
                     </parameter>
                 </configuration>
                 <executions>

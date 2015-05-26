@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.config.PackageFilter;
+import japicmp.filter.PackageFilter;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
@@ -99,11 +99,11 @@ public class JApiCmpMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		File newVersionFile = retrieveFileFromConfiguration(newVersion, "newVersion");
 		File oldVersionFile = retrieveFileFromConfiguration(oldVersion, "oldVersion");
-		List<JApiClass> jApiClasses = compareArchives(newVersionFile, oldVersionFile);
+		Options options = createOptions();
+		List<JApiClass> jApiClasses = compareArchives(newVersionFile, oldVersionFile, options);
 		if (projectBuildDir != null && projectBuildDir.exists()) {
 			try {
 				File jApiCmpBuildDir = createJapiCmpBaseDir();
-				Options options = createOptions();
 				String diffOutput = generateDiffOutput(newVersionFile, oldVersionFile, jApiClasses, options);
 				createFileAndWriteTo(diffOutput, jApiCmpBuildDir);
 				generateXmlOutput(newVersionFile, oldVersionFile, jApiClasses, jApiCmpBuildDir, options);
@@ -155,20 +155,16 @@ public class JApiCmpMojo extends AbstractMojo {
 				Boolean booleanOnlyModified = Boolean.valueOf(onlyModified);
 				options.setOutputOnlyModifications(booleanOnlyModified);
 			}
-			String packagesToExclude = parameter.getPackagesToExclude();
-			if (packagesToExclude != null) {
-				try {
-					options.addPackagesExcludeFromArgument(packagesToExclude);
-				} catch (Exception e) {
-					throw new MojoFailureException(e.getMessage());
+			List<String> excludes = parameter.getExcludes();
+			if (excludes != null) {
+				for (String exclude : excludes) {
+					options.addExcludeFromArgument(Optional.fromNullable(exclude));
 				}
 			}
-			String packagesToInclude = parameter.getPackagesToInclude();
-			if (packagesToInclude != null) {
-				try {
-					options.addPackageIncludeFromArgument(packagesToInclude);
-				} catch (Exception e) {
-					throw new MojoFailureException(e.getMessage());
+			List<String> includes = parameter.getIncludes();
+			if (includes != null) {
+				for (String include : includes) {
+					options.addExcludeFromArgument(Optional.fromNullable(include));
 				}
 			}
 			String includeSyntheticString = parameter.getIncludeSynthetic();
@@ -224,48 +220,11 @@ public class JApiCmpMojo extends AbstractMojo {
 		xmlGenerator.generate();
 	}
 
-	private List<JApiClass> compareArchives(File newVersionFile, File oldVersionFile) throws MojoFailureException {
-		JarArchiveComparatorOptions comparatorOptions = createJarArchiveComparatorOptions();
+	private List<JApiClass> compareArchives(File newVersionFile, File oldVersionFile, Options options) throws MojoFailureException {
+		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
 		setUpClassPath(comparatorOptions);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 		return jarArchiveComparator.compare(oldVersionFile, newVersionFile);
-	}
-
-	private JarArchiveComparatorOptions createJarArchiveComparatorOptions() throws MojoFailureException {
-		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		if (parameter != null) {
-			String accessModifierArg = parameter.getAccessModifier();
-			if (accessModifierArg != null) {
-				try {
-					AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
-					options.setAccessModifier(accessModifier);
-				} catch (IllegalArgumentException e) {
-					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()));
-				}
-			}
-			String packagesToExclude = parameter.getPackagesToExclude();
-			if (packagesToExclude != null) {
-				try {
-					options.getPackagesExclude().add(new PackageFilter(packagesToExclude));
-				} catch (Exception e) {
-					throw new MojoFailureException(e.getMessage());
-				}
-			}
-			String packagesToInclude = parameter.getPackagesToInclude();
-			if (packagesToInclude != null) {
-				try {
-					options.getPackagesInclude().add(new PackageFilter(packagesToInclude));
-				} catch (Exception e) {
-					throw new MojoFailureException(e.getMessage());
-				}
-			}
-			String includeSyntheticString = parameter.getIncludeSynthetic();
-			if (includeSyntheticString != null) {
-				Boolean includeSynthetic = Boolean.valueOf(includeSyntheticString);
-				options.setIncludeSynthetic(includeSynthetic);
-			}
-		}
-		return options;
 	}
 
 	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions) throws MojoFailureException {
