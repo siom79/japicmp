@@ -185,8 +185,8 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
  support either a &lt;dependency&gt; or a &lt;file&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
   
 * onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
-* include: Comma separated list of package names to include, * can be used as wildcard.
-* exclude: Comma separated list of package names to exclude, * can be used as wildcard.
+* includes: List of package, classes, methods and field that should be included. The syntax is similar to the one use for javadoc references.
+* excludes: List of package, classes, methods and field that should be excluded. The syntax is similar to the one use for javadoc references.
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
@@ -206,7 +206,7 @@ If your library implements interfaces or extends classes from other libraries th
 </dependencies>
 ```
 
-Dependecies declared in the enclosing pom.xml and its parents are added automatically. The dependencies declared explicitly for this plugin
+Dependencies declared in the enclosing pom.xml and its parents are added automatically. The dependencies declared explicitly for this plugin
 are appended to the classpath before the ones from the enclosing pom.xml.
 
 The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
