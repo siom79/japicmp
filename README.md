@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.4.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.5.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository:
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.4.1</version>
+		<version>0.5.0</version>
 	</dependency>
 
 ##Motivation##
@@ -42,7 +42,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * Differences can optionally be printed as XML or HTML file.
 * Per default private and package protected classes and class members are not compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to public, protected, package or private.
-* Per default classes from all packages are compared. If necessary, certain packages can be excluded or only specific packages can be included.
+* Per default all classes are tracked. If necessary, certain packages, classes, methods or fields can be excluded or explicitly included.
 * All changes between all classes/methods/fields are compared. If necessary, output can be limited to changes that are binary incompatible (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html)).
 * All changes between annotations are compared, hence japicmp can be used to track annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
@@ -116,7 +116,7 @@ OPTIONS
 When your library implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
-	java -cp japicmp-0.4.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.5.0-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
 ###Usage maven plugin###
 
@@ -127,13 +127,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.4.1</version>
+                <version>0.5.0</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.4.1</version>
+                            <version>0.5.0</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -143,8 +143,18 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                     </newVersion>
                     <parameter>
                         <onlyModified>true</onlyModified>
-                        <include>package.to.include</include>
-                        <exclude>japicmp.test.ModifierTest#methodToExclude()</exclude>
+                        <includes>
+                        	<include>package.to.include</include>
+                        	<include>package.ClassToInclude</include>
+                        	<include>package.Class#methodToInclude(long,int)</include>
+                        	<include>package.Class#fieldToInclude</include>
+                        </includes>
+                        <excludes>
+							<exclude>package.to.exclude</exclude>
+							<exclude>package.ClassToExclude</exclude>
+							<exclude>package.Class#methodToExclude(long,int)</exclude>
+							<exclude>package.Class#fieldToExclude</exclude>
+						</excludes>
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
