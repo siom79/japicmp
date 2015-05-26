@@ -3,7 +3,6 @@ package japicmp.cmp;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
 import japicmp.output.stdout.StdoutOutputGenerator;
-import japicmp.util.ClassesHelper;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;

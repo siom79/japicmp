@@ -9,7 +9,7 @@ import com.google.common.io.Files;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.config.PackageFilter;
+import japicmp.filter.PackageFilter;
 import japicmp.model.JApiClass;
 import japicmp.output.xml.XmlOutputGenerator;
 
@@ -37,7 +37,7 @@ public class XmlOutputGeneratorTest {
 	@BeforeClass
     public static void beforeClass() throws IOException {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getPackagesExclude().add(new PackageFilter(JAPICMP_TEST_SEMVER001));
+		options.getFilters().getExcludes().add(new PackageFilter(JAPICMP_TEST_SEMVER001));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		generateHtmlOutput("target/diff.xml", "target/diff.html", false);

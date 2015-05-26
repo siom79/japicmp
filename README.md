@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.4.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.5.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository:
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.4.1</version>
+		<version>0.5.0</version>
 	</dependency>
 
 ##Motivation##
@@ -42,7 +42,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * Differences can optionally be printed as XML or HTML file.
 * Per default private and package protected classes and class members are not compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to public, protected, package or private.
-* Per default classes from all packages are compared. If necessary, certain packages can be excluded or only specific packages can be included.
+* Per default all classes are tracked. If necessary, certain packages, classes, methods or fields can be excluded or explicitly included.
 * All changes between all classes/methods/fields are compared. If necessary, output can be limited to changes that are binary incompatible (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html)).
 * All changes between annotations are compared, hence japicmp can be used to track annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
@@ -59,10 +59,10 @@ The comparison of annotations makes this approach suitable for annotation-based 
 ```
 SYNOPSIS
         java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
-                [(-e <packagesToExclude> | --exclude <packagesToExclude>)]
-                [(-h | --help)] [--html-file <pathToHtmlOutputFile>]
-                [(-i <packagesToInclude> | --include <packagesToInclude>)]
-                [--include-synthetic] [(-m | --only-modified)]
+                [(-e <excludes> | --exclude <excludes>)] [(-h | --help)]
+                [--html-file <pathToHtmlOutputFile>]
+                [(-i <includes> | --include <includes>)] [--include-synthetic]
+                [(-m | --only-modified)]
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
                 [(-s | --semantic-versioning)]
@@ -77,9 +77,10 @@ OPTIONS
             Outputs only classes/methods that are binary incompatible. If not
             given, all classes and methods are printed.
 
-        -e <packagesToExclude>, --exclude <packagesToExclude>
-            Comma separated list of package names to exclude, * can be used as
-            wildcard.
+        -e <excludes>, --exclude <excludes>
+            Semicolon separated list of elements to exclude in the form
+            package.Class#classMember, * can be used as wildcard. Examples:
+            mypackage;my.Class;other.Class#method(int,long);foo.Class#field
 
         -h, --help
             Display help information
@@ -87,9 +88,10 @@ OPTIONS
         --html-file <pathToHtmlOutputFile>
             Provides the path to the html output file.
 
-        -i <packagesToInclude>, --include <packagesToInclude>
-            Comma separated list of package names to include, * can be used as
-            wildcard.
+        -i <includes>, --include <includes>
+            Semicolon separated list of elements to include in the form
+            package.Class#classMember, * can be used as wildcard. Examples:
+            mypackage;my.Class;other.Class#method(int,long);foo.Class#field
 
         --include-synthetic
             Include synthetic classes and class members that are hidden per
@@ -114,7 +116,7 @@ OPTIONS
 When your library implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
-	java -cp japicmp-0.4.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.5.0-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
 ###Usage maven plugin###
 
@@ -125,13 +127,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.4.1</version>
+                <version>0.5.0</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.4.1</version>
+                            <version>0.5.0</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -141,8 +143,18 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                     </newVersion>
                     <parameter>
                         <onlyModified>true</onlyModified>
-                        <packagesToInclude>example</packagesToInclude>
-                        <packagesToExclude>excludeMe</packagesToExclude>
+                        <includes>
+                        	<include>package.to.include</include>
+                        	<include>package.ClassToInclude</include>
+                        	<include>package.Class#methodToInclude(long,int)</include>
+                        	<include>package.Class#fieldToInclude</include>
+                        </includes>
+                        <excludes>
+							<exclude>package.to.exclude</exclude>
+							<exclude>package.ClassToExclude</exclude>
+							<exclude>package.Class#methodToExclude(long,int)</exclude>
+							<exclude>package.Class#fieldToExclude</exclude>
+						</excludes>
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
@@ -173,8 +185,8 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
  support either a &lt;dependency&gt; or a &lt;file&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
   
 * onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
-* packagesToInclude: Comma separated list of package names to include, * can be used as wildcard.
-* packagesToExclude: Comma separated list of package names to exclude, * can be used as wildcard.
+* include: Comma separated list of package names to include, * can be used as wildcard.
+* exclude: Comma separated list of package names to exclude, * can be used as wildcard.
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.

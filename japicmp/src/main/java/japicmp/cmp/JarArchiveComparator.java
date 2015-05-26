@@ -1,7 +1,5 @@
 package japicmp.cmp;
 
-import japicmp.config.Options;
-import japicmp.config.PackageFilter;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.BinaryCompatibility;
@@ -14,6 +12,7 @@ import javassist.NotFoundException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,24 +21,33 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class provides the basic methods to compare the classes within to jar archives.
+ */
 public class JarArchiveComparator {
-    private static final Logger logger = Logger.getLogger(JarArchiveComparator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());
     private final ClassPool classPool = new ClassPool();
     private String classPath = "";
     private JarArchiveComparatorOptions options;
 
+    /**
+     * Constructs an instance of this class and does a setup of the classpath
+     * @param options the options used in the further processing
+     */
     public JarArchiveComparator(JarArchiveComparatorOptions options) {
         this.options = options;
         setupClasspath();
     }
 
+    /**
+     * Compares the two given jar archives.
+     * @param oldArchive the old version of the archive
+     * @param newArchive the new version of the archive
+     * @return a list which contains one instance of {@link japicmp.model.JApiClass} for each class found in one of the two archives
+     * @throws JApiCmpException if the comparison fails
+     */
     public List<JApiClass> compare(File oldArchive, File newArchive) {
-        ClassesComparator classesComparator = compareClassLists(oldArchive, newArchive, classPool, options);
-        List<JApiClass> classList = classesComparator.getClasses();
-        checkBinaryCompatibility(classList);
-		checkJavaObjectSerializationCompatibility(classList);
-        OutputFilter.sortClassesAndMethods(classList);
-        return classList;
+        return createAndCompareClassLists(oldArchive, newArchive, classPool, options);
     }
 
 	private void checkJavaObjectSerializationCompatibility(List<JApiClass> jApiClasses) {
@@ -63,6 +71,10 @@ public class JarArchiveComparator {
         }
     }
 
+    /**
+     * Returns the classpath used by {@link japicmp.cmp.JarArchiveComparator}
+     * @return the classpath as String
+     */
     public String getClasspath() {
         return classPath;
     }
@@ -72,17 +84,44 @@ public class JarArchiveComparator {
 		binaryCompatibility.evaluate(classList);
 	}
 
-	private ClassesComparator compareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) {
+	private List<JApiClass> createAndCompareClassLists(File oldArchive, File newArchive, ClassPool classPool, JarArchiveComparatorOptions options) {
         List<CtClass> oldClasses = createListOfCtClasses(oldArchive, classPool, options);
         List<CtClass> newClasses = createListOfCtClasses(newArchive, classPool, options);
+        return compareClassLists(options, oldClasses, newClasses);
+    }
+
+    /**
+     * Compares the two lists with CtClass objects using the provided options instance.
+     * @param options the options to use
+     * @param oldClasses a list of CtClasses that represent the old version
+     * @param newClasses a list of CtClasses that represent the new version
+     * @return a list of {@link japicmp.model.JApiClass} that represent the changes
+     */
+    List<JApiClass> compareClassLists(JarArchiveComparatorOptions options, List<CtClass> oldClasses, List<CtClass> newClasses) {
+        List<CtClass> oldClassesFiltered = applyFilter(options, oldClasses);
+        List<CtClass> newClassesFiltered = applyFilter(options, newClasses);
         ClassesComparator classesComparator = new ClassesComparator(this, options);
-        classesComparator.compare(oldClasses, newClasses);
-        if (logger.isLoggable(Level.FINE)) {
-            for (JApiClass jApiClass : classesComparator.getClasses()) {
-                logger.fine(jApiClass.toString());
+        classesComparator.compare(oldClassesFiltered, newClassesFiltered);
+        List<JApiClass> classList = classesComparator.getClasses();
+        if (LOGGER.isLoggable(Level.FINE)) {
+            for (JApiClass jApiClass : classList) {
+                LOGGER.fine(jApiClass.toString());
             }
         }
-        return classesComparator;
+        checkBinaryCompatibility(classList);
+        checkJavaObjectSerializationCompatibility(classList);
+        OutputFilter.sortClassesAndMethods(classList);
+        return classList;
+    }
+
+    private List<CtClass> applyFilter(JarArchiveComparatorOptions options, List<CtClass> ctClasses) {
+        List<CtClass> newList = new ArrayList<>(ctClasses.size());
+        for (CtClass ctClass : ctClasses) {
+            if (options.getFilters().includeClass(ctClass)) {
+                newList.add(ctClass);
+            }
+        }
+        return newList;
     }
 
     private List<CtClass> createListOfCtClasses(File archive, ClassPool classPool, JarArchiveComparatorOptions options) {
@@ -93,21 +132,19 @@ public class JarArchiveComparator {
                 JarEntry jarEntry = entryEnumeration.nextElement();
                 String name = jarEntry.getName();
                 if (name.endsWith(".class")) {
-                    CtClass ctClass = null;
+                    CtClass ctClass;
                     try {
                         ctClass = classPool.makeClass(jarFile.getInputStream(jarEntry));
                     } catch (Exception e) {
                     	throw new JApiCmpException(Reason.IoException, String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()), e);
                     }
-                    if(packageMatches(options, ctClass)) {
-                        classes.add(ctClass);
-                    }
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.fine(String.format("Adding class '%s' with jar name '%s' to list.", ctClass.getName(), name));
+                    classes.add(ctClass);
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.fine(String.format("Adding class '%s' with jar name '%s' to list.", ctClass.getName(), name));
                     }
                 } else {
-                	if (logger.isLoggable(Level.FINE)) {
-                		logger.fine(String.format("Skipping file '%s' because filename does not end with '.class'.", name));
+                	if (LOGGER.isLoggable(Level.FINE)) {
+                		LOGGER.fine(String.format("Skipping file '%s' because filename does not end with '.class'.", name));
                 	}
                 }
             }
@@ -117,29 +154,19 @@ public class JarArchiveComparator {
         return classes;
     }
 
-    private boolean packageMatches(JarArchiveComparatorOptions options, CtClass ctClass) {
-        String packageName = ctClass.getPackageName();
-        for (PackageFilter packageFilter : options.getPackagesExclude()) {
-            if (packageFilter.matches(packageName)) {
-                return false;
-            }
-        }
-        for (PackageFilter packageFilter : options.getPackagesInclude()) {
-            if (packageFilter.matches(packageName)) {
-                return true;
-            }
-        }
-        int noInclude = options.getPackagesInclude().size();
-        if (noInclude > 0) {
-            return false;
-        }
-        return true;
-    }
-
+    /**
+     * Returns the instance of {@link japicmp.cmp.JarArchiveComparatorOptions} that is used.
+     * @return an instance of {@link japicmp.cmp.JarArchiveComparatorOptions}
+     */
     public JarArchiveComparatorOptions getJarArchiveComparatorOptions() {
         return this.options;
     }
 
+    /**
+     * Returns the javassist ClassPool instance that is used by this instance. This can be used in unit tests to define
+     * artificial CtClass instances for the same ClassPool.
+     * @return an instance of ClassPool
+     */
 	public ClassPool getClassPool() {
 		return classPool;
 	}

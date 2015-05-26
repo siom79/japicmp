@@ -142,11 +142,11 @@
                             <td><xsl:value-of select="@onlyBinaryIncompatibleModifications"/></td>
                         </tr>
                         <tr>
-                            <td>Packages included:</td>
+                            <td>Includes:</td>
                             <td><xsl:value-of select="@packagesInclude"/></td>
                         </tr>
                         <tr>
-                            <td>Packages excluded:</td>
+                            <td>Excludes:</td>
                             <td><xsl:value-of select="@packagesExclude"/></td>
                         </tr>
                     </table>

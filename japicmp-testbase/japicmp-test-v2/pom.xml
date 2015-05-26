@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-testbase</artifactId>
-        <version>0.4.2-SNAPSHOT</version>
+        <version>0.5.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>japicmp-test-v2</artifactId>
@@ -49,6 +49,20 @@
                     <parameter>
                         <accessModifier>public</accessModifier>
                         <onlyModified>true</onlyModified>
+                        <includes>
+                            <include>package.to.include</include>
+                            <include>package.ClassToInclude</include>
+                            <include>package.Class#methodToInclude(long,int)</include>
+                            <include>package.Class#fieldToInclude</include>
+                        </includes>
+                        <excludes>
+                            <exclude>package.to.Exclude</exclude>
+                            <exclude>package.ClassToExclude</exclude>
+                            <exclude>package.Class#methodToExclude(long,int)</exclude>
+                            <exclude>package.Class#fieldToExclude</exclude>
+                            <exclude>japicmp.test.ModifierTest#methodToExclude()</exclude>
+                            <exclude>japicmp.test.ModifierTest#anotherMethodToExclude()</exclude>
+                        </excludes>
                     </parameter>
                 </configuration>
                 <executions>
