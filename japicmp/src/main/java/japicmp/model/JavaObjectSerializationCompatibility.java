@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
 import javassist.*;
 
@@ -11,9 +12,9 @@ import java.util.List;
 public class JavaObjectSerializationCompatibility {
 	public static final String SERIAL_VERSION_UID = "serialVersionUID";
 
-	public static JApiSerialVersionUid extractSerialVersionUid(Optional<CtClass> oldClass, Optional<CtClass> newClass) {
-		SerialVersionUidResult resultOld = computeSerialVersionUid(oldClass);
-		SerialVersionUidResult resultNew = computeSerialVersionUid(newClass);
+	public static JApiSerialVersionUid extractSerialVersionUid(JarArchiveComparatorOptions options, Optional<CtClass> oldClass, Optional<CtClass> newClass) {
+		SerialVersionUidResult resultOld = computeSerialVersionUid(options, oldClass);
+		SerialVersionUidResult resultNew = computeSerialVersionUid(options, newClass);
 		return new JApiSerialVersionUid(resultOld.serializable, resultNew.serializable, resultOld.serialVersionUidDefault,
 				resultNew.serialVersionUidDefault, resultOld.serialVersionUid, resultNew.serialVersionUid);
 	}
@@ -30,11 +31,11 @@ public class JavaObjectSerializationCompatibility {
 		Optional<Long> serialVersionUidDefault = Optional.absent();
 	}
 
-	private static SerialVersionUidResult computeSerialVersionUid(Optional<CtClass> ctClassOptional) {
+	private static SerialVersionUidResult computeSerialVersionUid(JarArchiveComparatorOptions options, Optional<CtClass> ctClassOptional) {
 		SerialVersionUidResult result = new SerialVersionUidResult();
 		if (ctClassOptional.isPresent()) {
 			CtClass ctClass = ctClassOptional.get();
-			if (isCtClassSerializable(ctClass)) {
+			if (isCtClassSerializable(options, ctClass)) {
 				result.serializable = true;
 				try {
 					CtField declaredField = ctClass.getDeclaredField(SERIAL_VERSION_UID);
@@ -74,12 +75,16 @@ public class JavaObjectSerializationCompatibility {
 		return result;
 	}
 
-	private static boolean isCtClassSerializable(CtClass clazz) {
+	private static boolean isCtClassSerializable(JarArchiveComparatorOptions options, CtClass clazz) {
 		ClassPool pool = clazz.getClassPool();
 		try {
 			return clazz.subtypeOf(pool.get("java.io.Serializable"));
 		} catch (NotFoundException e) {
-			throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Failed to determine whether the class '" + clazz.getName() + "' is serializable: " + e.getMessage(), e);
+			if (options.isIgnoreMissingClasses()) {
+				return false;
+			} else {
+				throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Failed to determine whether the class '" + clazz.getName() + "' is serializable: " + e.getMessage(), e);
+			}
 		}
 	}
 

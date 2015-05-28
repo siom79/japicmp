@@ -1,5 +1,6 @@
 package japicmp.output.stdout;
 
+import japicmp.cli.JApiCli;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
 import org.junit.Test;
@@ -18,5 +19,15 @@ public class StdoutOutputGeneratorTest {
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0), new File("/tmp"), new File("/tmp"));
 		String generated = generator.generate();
 		assertThat(generated, containsString(StdoutOutputGenerator.NO_CHANGES));
+	}
+
+	@Test
+	public void testWarningWhenIgnoreMissingClasses() {
+		Options options = new Options();
+		options.setIgnoreMissingClasses(true);
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0), new File("/tmp"), new File("/tmp"));
+		String generated = generator.generate();
+		assertThat(generated, containsString(StdoutOutputGenerator.WARNING));
+		assertThat(generated, containsString(JApiCli.IGNORE_MISSING_CLASSES));
 	}
 }

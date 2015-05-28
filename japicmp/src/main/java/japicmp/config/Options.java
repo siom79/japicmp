@@ -23,8 +23,10 @@ public class Options {
     private List<Filter> excludes = new ArrayList<>();
     private List<ClassFilter> classesExclude = new ArrayList<>();
     private boolean includeSynthetic = false;
+	private boolean ignoreMissingClasses = false;
+	private Optional<String> htmlStylesheet = Optional.absent();
 
-    public File getNewArchive() {
+	public File getNewArchive() {
         return newArchive;
     }
 
@@ -147,4 +149,20 @@ public class Options {
     public List<ClassFilter> getClassesExclude() {
         return classesExclude;
     }
+
+	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
+		this.ignoreMissingClasses = ignoreMissingClasses;
+	}
+
+	public boolean isIgnoreMissingClasses() {
+		return ignoreMissingClasses;
+	}
+
+	public void setHtmlStylesheet(Optional<String> htmlStylesheet) {
+		this.htmlStylesheet = htmlStylesheet;
+	}
+
+	public Optional<String> getHtmlStylesheet() {
+		return htmlStylesheet;
+	}
 }

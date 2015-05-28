@@ -1,9 +1,9 @@
 package japicmp.output.xml;
 
 import com.google.common.base.Joiner;
+import com.google.common.io.Resources;
 import japicmp.config.Options;
 import japicmp.filter.Filter;
-import japicmp.filter.PackageFilter;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.model.JApiClass;
@@ -12,6 +12,7 @@ import japicmp.output.OutputGenerator;
 import japicmp.output.extapi.jpa.JpaAnalyzer;
 import japicmp.output.extapi.jpa.model.JpaTable;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
+import japicmp.util.Streams;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -21,7 +22,14 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class XmlOutputGenerator extends OutputGenerator<Void> {
@@ -55,6 +63,8 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 	private void createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
 		ByteArrayOutputStream baos = null;
 		FileOutputStream fos = null;
+		InputStream styleSheetAsInputStream = null;
+		InputStream xsltAsInputStream = null;
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(JApiCmpXmlRoot.class);
 			Marshaller marshaller = jaxbContext.createMarshaller();
@@ -86,14 +96,23 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 			}
 			if (options.getHtmlOutputFile().isPresent()) {
 				TransformerFactory transformerFactory = TransformerFactory.newInstance();
-				InputStream inputStream = XmlOutputGenerator.class.getResourceAsStream("/html.xslt");
-				if(inputStream == null) {
+				xsltAsInputStream = XmlOutputGenerator.class.getResourceAsStream("/html.xslt");
+				if (xsltAsInputStream == null) {
 					throw new JApiCmpException(Reason.XsltError, "Failed to load XSLT.");
 				}
-				Transformer transformer = transformerFactory.newTransformer(new StreamSource(inputStream));
-				ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+				if (options.getHtmlStylesheet().isPresent()) {
+					styleSheetAsInputStream = new FileInputStream(options.getHtmlStylesheet().get());
+				} else {
+					styleSheetAsInputStream = XmlOutputGenerator.class.getResourceAsStream("/style.css");
+					if (styleSheetAsInputStream == null) {
+						throw new JApiCmpException(Reason.XsltError, "Failed to load stylesheet.");
+					}
+				}
+				String xsltAsString = integrateStylesheetIntoXslt(xsltAsInputStream, styleSheetAsInputStream);
+				Transformer transformer = transformerFactory.newTransformer(new StreamSource(new StringReader(xsltAsString)));
+				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
 				fos = new FileOutputStream(options.getHtmlOutputFile().get());
-				transformer.transform(new StreamSource(bais), new StreamResult(fos));
+				transformer.transform(new StreamSource(byteArrayInputStream), new StreamResult(fos));
 			}
 		} catch (JAXBException e) {
 			throw new JApiCmpException(Reason.JaxbException, String.format("Marshalling of XML document failed: %s", e.getMessage()), e);
@@ -111,8 +130,29 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 				if (fos != null) {
 					fos.close();
 				}
-			} catch (IOException e) {}
+				if (styleSheetAsInputStream != null) {
+					styleSheetAsInputStream.close();
+				}
+				if (xsltAsInputStream != null) {
+					xsltAsInputStream.close();
+				}
+			} catch (IOException ignored) {
+			}
 		}
+	}
+
+	private String integrateStylesheetIntoXslt(InputStream xsltAsInputStream, InputStream styleSheetAsInputStream) {
+		String xsltAsString = Streams.asString(xsltAsInputStream);
+		String styleSheetAsString = Streams.asString(styleSheetAsInputStream);
+		xsltAsString = xsltAsString.replace("<style type=\"text/css\"></style>", "<style type=\"text/css\">\n" + styleSheetAsString + "\n</style>");
+		if (System.getProperty("japicmp.dump.xslt") != null) {
+			try {
+				Files.write(Paths.get(System.getProperty("japicmp.dump.xslt")), Arrays.asList(xsltAsString), Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING, "Could not dump XSLT file: " + e.getMessage(), e);
+			}
+		}
+		return xsltAsString;
 	}
 
 	private void filterClasses(List<JApiClass> jApiClasses, Options options) {
@@ -128,19 +168,22 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 		jApiCmpXmlRoot.setAccessModifier(options.getAccessModifier().name());
 		jApiCmpXmlRoot.setOnlyModifications(options.isOutputOnlyModifications());
 		jApiCmpXmlRoot.setOnlyBinaryIncompatibleModifications(options.isOutputOnlyBinaryIncompatibleModifications());
-		jApiCmpXmlRoot.setPackagesInclude(packageListAsString(options.getIncludes(), true));
-		jApiCmpXmlRoot.setPackagesExclude(packageListAsString(options.getExcludes(), false));
+		jApiCmpXmlRoot.setPackagesInclude(filtersAsString(options.getIncludes(), true));
+		jApiCmpXmlRoot.setPackagesExclude(filtersAsString(options.getExcludes(), false));
+		jApiCmpXmlRoot.setIgnoreMissingClasses(options.isIgnoreMissingClasses());
 		return jApiCmpXmlRoot;
 	}
 
-	private String packageListAsString(List<Filter> packagesInclude, boolean include) {
-		String join = Joiner.on(",").skipNulls().join(packagesInclude);
-		if (join.length() == 0) {
+	private String filtersAsString(List<Filter> filters, boolean include) {
+		String join;
+		if (filters.size() == 0) {
 			if (include) {
 				join = "all";
 			} else {
 				join = "n.a.";
 			}
+		} else {
+			join = Joiner.on(";").skipNulls().join(filters);
 		}
 		return join;
 	}

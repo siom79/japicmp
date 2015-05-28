@@ -13,13 +13,15 @@ public class JarArchiveComparatorOptions {
 	private AccessModifier accessModifier = AccessModifier.PROTECTED;
     private Filters filters = new Filters();
 	private boolean includeSynthetic = false;
+	private boolean ignoreMissingClasses = false;
 
 	public static JarArchiveComparatorOptions of(Options options) {
 		JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
-        comparatorOptions.getFilters().getExcludes().addAll(options.getExcludes());
-        comparatorOptions.getFilters().getIncludes().addAll(options.getIncludes());
+		comparatorOptions.getFilters().getExcludes().addAll(options.getExcludes());
+		comparatorOptions.getFilters().getIncludes().addAll(options.getIncludes());
 		comparatorOptions.setAccessModifier(options.getAccessModifier());
 		comparatorOptions.setIncludeSynthetic(options.isIncludeSynthetic());
+		comparatorOptions.setIgnoreMissingClasses(options.isIgnoreMissingClasses());
 		return comparatorOptions;
 	}
 
@@ -49,5 +51,13 @@ public class JarArchiveComparatorOptions {
 
 	public boolean isIncludeSynthetic() {
 		return includeSynthetic;
+	}
+
+	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
+		this.ignoreMissingClasses = ignoreMissingClasses;
+	}
+
+	public boolean isIgnoreMissingClasses() {
+		return ignoreMissingClasses;
 	}
 }

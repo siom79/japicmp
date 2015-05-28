@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 
 public class JApiCli {
+	public static final String IGNORE_MISSING_CLASSES = "--ignore-missing-classes";
 
 	@Command(name = "java -jar japicmp.jar", description = "Compares jars")
 	public static class Compare implements Runnable {
@@ -48,16 +49,18 @@ public class JApiCli {
 		public boolean semanticVersioning = false;
 		@Option(name = { "--include-synthetic" }, description = "Include synthetic classes and class members that are hidden per default.")
 		public boolean includeSynthetic = false;
+		@Option(name = { IGNORE_MISSING_CLASSES }, description = "Ignores superclasses/interfaces missing on the classpath.")
+		public boolean ignoreMissingClasses = false;
+		@Option(name = { "--html-stylesheet" }, description = "Provides the path to your own stylesheet.")
+		public String pathToHtmlStylesheet;
 
 		@Override
 		public void run() {
 			Options options = createOptions();
-			File oldArchive = options.getOldArchive();
-			File newArchive = options.getNewArchive();
-			verifyFiles(oldArchive, newArchive);
+			verifyOptions(options);
 			JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));
-			List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
-			generateOutput(options, oldArchive, newArchive, jApiClasses);
+			List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchive(), options.getNewArchive());
+			generateOutput(options, options.getOldArchive(), options.getNewArchive(), jApiClasses);
 		}
 
 		private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
@@ -77,8 +80,8 @@ public class JApiCli {
 
 		private Options createOptions() {
 			Options options = new Options();
-			options.setNewArchive(validFile(pathToNewVersionJar, "Required option -n is missing."));
-			options.setOldArchive(validFile(pathToOldVersionJar, "Required option -o is missing."));
+			options.setNewArchive(new File(checkNonNull(pathToNewVersionJar, "Required option -n is missing.")));
+			options.setOldArchive(new File(checkNonNull(pathToOldVersionJar, "Required option -o is missing.")));
 			options.setXmlOutputFile(Optional.fromNullable(pathToXmlOutputFile));
 			options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
 			options.setOutputOnlyModifications(modifiedOnly);
@@ -87,15 +90,32 @@ public class JApiCli {
 			options.addExcludeFromArgument(Optional.fromNullable(excludes));
 			options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
 			options.setIncludeSynthetic(includeSynthetic);
+			options.setIgnoreMissingClasses(ignoreMissingClasses);
+			options.setHtmlStylesheet(Optional.fromNullable(pathToHtmlStylesheet));
 			return options;
 		}
 
-		private File validFile(String archive, String errorMessage) {
-			File file = new File(checkNonNull(archive, errorMessage));
+		private void verifyOptions(Options options) {
+			File oldArchive = options.getOldArchive();
+			File newArchive = options.getNewArchive();
+			verifyJarFileExists(oldArchive);
+			verifyJarFileExists(newArchive);
+			if (oldArchive.equals(newArchive)) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
+			}
+			if (options.getHtmlStylesheet().isPresent()) {
+				String pathname = options.getHtmlStylesheet().get();
+				File stylesheetFile = new File(pathname);
+				if (!stylesheetFile.exists()) {
+					throw JApiCmpException.of(JApiCmpException.Reason.CliError, "HTML stylesheet '%s' does not exist.", pathname);
+				}
+			}
+		}
+
+		private void verifyJarFileExists(File file) {
 			verifyExisting(file);
 			verifyCanRead(file);
 			verifyJarArchive(file);
-			return file;
 		}
 
 		private void verifyCanRead(File file) {
@@ -126,12 +146,6 @@ public class JApiCli {
 			}
 		}
 
-		private void verifyFiles(File oldArchive, File newArchive) {
-			if (oldArchive.equals(newArchive)) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
-			}
-		}
-
 		private void verifyExisting(File newArchive) {
 			if (!newArchive.exists()) {
 				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
@@ -148,7 +162,7 @@ public class JApiCli {
 				if (jarFile != null) {
 					try {
 						jarFile.close();
-					} catch (IOException e) {}
+					} catch (IOException ignored) {}
 				}
 			}
 		}

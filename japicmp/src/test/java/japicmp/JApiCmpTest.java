@@ -103,7 +103,7 @@ public class JApiCmpTest {
 				assertThatUseHelpOptionIsPrinted();
 			}
 		});
-		JApiCmp.main(new String[]{"-n xyz.jar"});
+		JApiCmp.main(new String[]{"-n", "xyz.jar", "-o", "zyx.jar"});
 	}
 
 	@Test

@@ -23,6 +23,7 @@ public class JApiCmpXmlRoot {
     private boolean onlyBinaryIncompatibleModifications;
     private String packagesInclude;
     private String packagesExclude;
+	private boolean ignoreMissingClasses;
 
     @XmlElementWrapper(name = "classes")
     @XmlElement(name = "class")
@@ -102,4 +103,13 @@ public class JApiCmpXmlRoot {
     public String getPackagesExclude() {
         return packagesExclude;
     }
+
+	@XmlAttribute
+	public boolean isIgnoreMissingClasses() {
+		return ignoreMissingClasses;
+	}
+
+	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
+		this.ignoreMissingClasses = ignoreMissingClasses;
+	}
 }

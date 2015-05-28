@@ -11,6 +11,7 @@ public class Parameter {
     private String breakBuildOnModifications;
     private String breakBuildOnBinaryIncompatibleModifications;
     private String includeSynthetic;
+	private String ignoreMissingClasses;
 
     public String getAccessModifier() {
         return accessModifier;
@@ -73,5 +74,13 @@ public class Parameter {
 
 	public void setExcludes(List<String> excludes) {
 		this.excludes = excludes;
+	}
+
+	public String getIgnoreMissingClasses() {
+		return ignoreMissingClasses;
+	}
+
+	public void setIgnoreMissingClasses(String ignoreMissingClasses) {
+		this.ignoreMissingClasses = ignoreMissingClasses;
 	}
 }

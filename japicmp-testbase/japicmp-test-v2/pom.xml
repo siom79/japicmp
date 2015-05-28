@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.siom79.japicmp</groupId>
@@ -56,7 +57,7 @@
                             <include>package.Class#fieldToInclude</include>
                         </includes>
                         <excludes>
-                            <exclude>package.to.Exclude</exclude>
+                            <exclude>package.to.exclude</exclude>
                             <exclude>package.ClassToExclude</exclude>
                             <exclude>package.Class#methodToExclude(long,int)</exclude>
                             <exclude>package.Class#fieldToExclude</exclude>
@@ -64,6 +65,7 @@
                             <exclude>japicmp.test.ModifierTest#anotherMethodToExclude()</exclude>
                         </excludes>
                     </parameter>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -76,4 +78,59 @@
             </plugin>
         </plugins>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>com.github.siom79.japicmp</groupId>
+                            <artifactId>japicmp-test-v1</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </oldVersion>
+                    <newVersion>
+                        <file>
+                            <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+                        </file>
+                    </newVersion>
+                    <parameter>
+                        <accessModifier>public</accessModifier>
+                        <onlyModified>true</onlyModified>
+                        <includes>
+                            <include>package.to.include</include>
+                            <include>package.ClassToInclude</include>
+                            <include>package.Class#methodToInclude(long,int)</include>
+                            <include>package.Class#fieldToInclude</include>
+                        </includes>
+                        <excludes>
+                            <exclude>package.to.exclude</exclude>
+                            <exclude>package.ClassToExclude</exclude>
+                            <exclude>package.Class#methodToExclude(long,int)</exclude>
+                            <exclude>package.Class#fieldToExclude</exclude>
+                            <exclude>japicmp.test.ModifierTest#methodToExclude()</exclude>
+                            <exclude>japicmp.test.ModifierTest#anotherMethodToExclude()</exclude>
+                        </excludes>
+                    </parameter>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.15</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

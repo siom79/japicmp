@@ -8,110 +8,7 @@
 		<html>
 			<head>
 				<title>japicmp (oldJar: <xsl:value-of select="@oldJar"/>, newJar: <xsl:value-of select="@newJar"/>)</title>
-				<style type="text/css">
-                    body {
-                        font-family: Verdana;
-                    }
-                    .title {
-                        font-weight: bold;
-                    }
-					.new {
-						color: green;
-					}
-					.removed {
-						color: red;
-					}
-					.modified {
-						color: orange;
-					}
-					.unchanged {
-						color: black;
-					}
-					thead tr td {
-                        font-weight: bold;
-                    }
-                    .toc {
-                        margin-top: 1em;
-                        margin-bottom: 1em;
-                        border: 1px solid #dcdcdc;
-                        padding: 5px;
-                        background: #ededed;
-                        display: inline-block;
-                    }
-                    table {
-                        border-collapse: collapse;
-                    }
-                    table tr td {
-                        border: 1px solid black;
-                        padding: 5px;
-                    }
-                    table thead {
-                        background-color: #dee3e9;
-                    }
-                    table tbody tr td.matrix_layout {
-                        background-color: #dee3e9;
-                        font-weight: bold;
-                    }
-                    .class {
-                        margin-bottom: 2em;
-                        border: 1px solid #dcdcdc;
-                        padding: 5px;
-                        background: #ededed;
-                        display: inline-block;
-                    }
-                    .class_superclass {
-                        margin-top: 1em;
-                    }
-                    .class_interfaces {
-                        margin-top: 1em;
-                    }
-                    .class_fields {
-                        margin-top: 1em;
-                    }
-                    .class_serialVersionUid {
-                        margin-top: 1em;
-                    }
-                    .class_constructors {
-                        margin-top: 1em;
-                    }
-                    .class_methods {
-                        margin-top: 1em;
-                    }
-                    .class_annotations {
-                        margin-top: 1em;
-                    }
-                    .label {
-                        font-weight: bold;
-                    }
-                    .label_class_member {
-                        background-color: #4d7a97;
-                        display: inline-block;
-                        padding: 5px;
-                    }
-                    .toc_link {
-                        margin-left: 10px;
-                        font-size: 0.5em;
-                    }
-                    .modifier {
-                        font-style: italic;
-                    }
-                    .method_return_type {
-
-                    }
-                    ul {
-                        list-style-type: none;
-                        padding: 0px 0px;
-                    }
-                    .meta-information {
-                        margin-top: 1em;
-                        margin-bottom: 1em;
-                        background: #ededed;
-                        display: inline-block;
-                    }
-                    .notes {
-                        font-size: 0.75em;
-                    }
-				</style>
+				<style type="text/css"></style>
 			</head>
 			<body>
                 <span class="title">JApiCmp-Report</span><br/>
@@ -142,6 +39,10 @@
                             <td><xsl:value-of select="@onlyBinaryIncompatibleModifications"/></td>
                         </tr>
                         <tr>
+                            <td>Ignore missing classes:</td>
+                            <td><xsl:value-of select="@ignoreMissingClasses"/></td>
+                        </tr>
+                        <tr>
                             <td>Includes:</td>
                             <td><xsl:value-of select="@packagesInclude"/></td>
                         </tr>
@@ -150,6 +51,14 @@
                             <td><xsl:value-of select="@packagesExclude"/></td>
                         </tr>
                     </table>
+                    <xsl:if test="@ignoreMissingClasses = 'true'">
+                        <div class="warnings">
+                            <span>
+                                WARNING: You are using the option '--ignore-missing-classes', i.e. superclasses and interfaces that could not
+                                be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.
+                            </span>
+                        </div>
+                    </xsl:if>
                 </div>
                 <ul>
                     <xsl:if test="count(classes/class) > 0">

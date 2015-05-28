@@ -1,6 +1,7 @@
 package japicmp.output.stdout;
 
 import com.google.common.base.Optional;
+import japicmp.cli.JApiCli;
 import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.model.JApiAnnotationElementValue.Type;
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class StdoutOutputGenerator extends OutputGenerator<String> {
 	static final String NO_CHANGES = "No changes.";
+	static final String WARNING = "WARNING";
 	private final File oldArchive;
 	private final File newArchive;
 
@@ -28,6 +30,10 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
         outputFilter.filter(jApiClasses);
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Comparing %s with %s:%n", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath()));
+		if (options.isIgnoreMissingClasses()) {
+			sb.append(WARNING + ": You are using the option '" + JApiCli.IGNORE_MISSING_CLASSES + "', i.e. superclasses and interfaces that could not " +
+					"be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
+		}
 		if (jApiClasses.size() > 0) {
 			for (JApiClass jApiClass : jApiClasses) {
 				processClass(sb, jApiClass);

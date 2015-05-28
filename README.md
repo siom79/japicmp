@@ -61,8 +61,9 @@ SYNOPSIS
         java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
                 [(-e <excludes> | --exclude <excludes>)] [(-h | --help)]
                 [--html-file <pathToHtmlOutputFile>]
-                [(-i <includes> | --include <includes>)] [--include-synthetic]
-                [(-m | --only-modified)]
+                [--html-stylesheet <pathToHtmlStylesheet>]
+                [(-i <includes> | --include <includes>)] [--ignore-missing-classes]
+                [--include-synthetic] [(-m | --only-modified)]
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
                 [(-s | --semantic-versioning)]
@@ -88,10 +89,16 @@ OPTIONS
         --html-file <pathToHtmlOutputFile>
             Provides the path to the html output file.
 
+        --html-stylesheet <pathToHtmlStylesheet>
+            Provides the path to your own stylesheet.
+
         -i <includes>, --include <includes>
             Semicolon separated list of elements to include in the form
             package.Class#classMember, * can be used as wildcard. Examples:
             mypackage;my.Class;other.Class#method(int,long);foo.Class#field
+
+        --ignore-missing-classes
+            Ignores superclasses/interfaces missing on the classpath.
 
         --include-synthetic
             Include synthetic classes and class members that are hidden per
@@ -160,6 +167,8 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
                         <includeSynthetic>false</includeSynthetic>
+                        <ignoreMissingClasses>false</ignoreMissingClasses>
+                        <skip>false</skip>
                     </parameter>
 					<dependencies>
 						<dependency>
@@ -168,6 +177,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 							<version>3.4</version>
 						</dependency>
 					</dependencies>
+					<skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -192,6 +202,8 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
 * onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
 * includeSynthetic: When set to true, changes for synthetic classes and class members are tracked.
+* ignoreMissingClasses: When set to true, superclasses and interfaces that cannot be resolved are ignored. Pleases note that in this case the results for the affected classes may not be accurate.
+* skip: Setting this parameter to true will skip execution of the plugin.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:
@@ -210,7 +222,30 @@ Dependencies declared in the enclosing pom.xml and its parents are added automat
 are appended to the classpath before the ones from the enclosing pom.xml.
 
 The maven plugin produces the two files japicmp.diff and japicmp.xml within the directory ${project.build.directory}/japicmp
-of your artifact.
+of your artifact. Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
+[maven-site-plugin](https://maven.apache.org/plugins/maven-site-plugin/) and therewith to be integrated into the site report:
+
+```
+<reporting>
+	<plugins>
+		<plugin>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-maven-plugin</artifactId>
+			<version>0.5.0</version>
+			<reportSets>
+				<reportSet>
+					<reports>
+						<report>cmp-report</report>
+					</reports>
+				</reportSet>
+			</reportSets>
+			<configuration>
+				<!-- see above -->
+			</configuration>
+		</plugin>
+	</plugins>
+</reporting>
+```
 	
 ##Examples##
 
