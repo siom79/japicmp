@@ -66,7 +66,7 @@ public class JarArchiveComparator {
                 }
                 classPath += classPathEntry;
             } catch (NotFoundException e) {
-                throw new JApiCmpException(Reason.ClassLoading, "Could not find class path entry '" + classPathEntry + "': " + e.getMessage(), e);
+                throw JApiCmpException.forClassNotFound(e, classPathEntry, this);
             }
         }
     }

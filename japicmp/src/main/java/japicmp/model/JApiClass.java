@@ -58,7 +58,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		this.abstractModifier = extractAbstractModifier(oldClass, newClass);
 		this.syntheticModifier = extractSyntheticModifier(oldClass, newClass);
 		this.syntheticAttribute = extractSyntheticAttribute(oldClass, newClass);
-		this.jApiSerialVersionUid = JavaObjectSerializationCompatibility.extractSerialVersionUid(options, oldClass, newClass);
+		this.jApiSerialVersionUid = JavaObjectSerializationCompatibility.extractSerialVersionUid(options, jarArchiveComparator, oldClass, newClass);
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 	}
 
@@ -226,7 +226,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (options.isIgnoreMissingClasses()) {
 				return Optional.absent();
 			} else {
-				throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load superclass for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + constructClasspath() + ").", e);
+				throw JApiCmpException.forClassNotFound(e, ctClass.getName(), jarArchiveComparator);
 			}
 		}
 	}
@@ -284,7 +284,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} catch (NotFoundException e) {
 			if (!options.isIgnoreMissingClasses()) {
-				throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load interfaces for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + constructClasspath() + ").", e);
+				throw JApiCmpException.forClassNotFound(e, ctClass.getName(), jarArchiveComparator);
 			}
 		}
 		return map;
