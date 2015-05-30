@@ -8,6 +8,7 @@ import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.output.stdout.StdoutOutputGenerator;
+import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -92,14 +93,14 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject);
-		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent());
+		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
-	void executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
+	Optional<XmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
 		if (Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getSkipParam())) {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
-			return;
+			return Optional.absent();
 		}
 		File newVersionFile = retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters);
 		File oldVersionFile = retrieveFileFromConfiguration(pluginParameters.getOldVersionParam(), "oldVersion", mavenParameters);
@@ -109,8 +110,12 @@ public class JApiCmpMojo extends AbstractMojo {
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
 			String diffOutput = generateDiffOutput(newVersionFile, oldVersionFile, jApiClasses, options);
 			createFileAndWriteTo(diffOutput, jApiCmpBuildDir);
-			generateXmlOutput(newVersionFile, oldVersionFile, jApiClasses, jApiCmpBuildDir, options);
+			XmlOutput xmlOutput = generateXmlOutput(newVersionFile, oldVersionFile, jApiClasses, jApiCmpBuildDir, options);
+			if (pluginParameters.isWriteToFiles()) {
+				XmlOutputGenerator.writeToFiles(options, xmlOutput);
+			}
 			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam());
+			return Optional.of(xmlOutput);
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
 		}
@@ -245,11 +250,11 @@ public class JApiCmpMojo extends AbstractMojo {
 		return diffOutput;
 	}
 
-	private void generateXmlOutput(File newVersionFile, File oldVersionFile, List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options) throws IOException {
-		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldVersionFile.getAbsolutePath(), newVersionFile.getAbsolutePath(), jApiClasses, options);
+	private XmlOutput generateXmlOutput(File newVersionFile, File oldVersionFile, List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options) throws IOException, MojoFailureException {
 		options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + "japicmp.xml"));
 		options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + "japicmp.html"));
-		xmlGenerator.generate();
+		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldVersionFile.getAbsolutePath(), newVersionFile.getAbsolutePath(), jApiClasses, options, false);
+		return xmlGenerator.generate();
 	}
 
 	private List<JApiClass> compareArchives(File newVersionFile, File oldVersionFile, Options options, List<Dependency> dependenciesParam, MavenParameters mavenParameters) throws MojoFailureException {
@@ -261,35 +266,35 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions, List<Dependency> dependenciesParam, MavenParameters mavenParameters) throws MojoFailureException {
 		if (dependenciesParam != null) {
-            for (Dependency dependency : dependenciesParam) {
-                File file = resolveDependencyToFile("dependencies", dependency, mavenParameters);
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
-                }
-                comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
-            }
-        }
-        setUpClassPathUsingMavenProject(comparatorOptions, mavenParameters);
-    }
+			for (Dependency dependency : dependenciesParam) {
+				File file = resolveDependencyToFile("dependencies", dependency, mavenParameters);
+				if (getLog().isDebugEnabled()) {
+					getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+				}
+				comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
+			}
+		}
+		setUpClassPathUsingMavenProject(comparatorOptions, mavenParameters);
+	}
 
-    private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters) throws MojoFailureException {
-        notNull(mavenParameters.getMavenProject(), "Maven parameter mavenProject should be provided by maven container.");
-        Set<Artifact> dependencyArtifacts = mavenParameters.getMavenProject().getDependencyArtifacts();
-        for (Artifact artifact : dependencyArtifacts) {
-            String scope = artifact.getScope();
-            if (!"test".equals(scope)) {
-                File file = resolveArtifact(artifact, mavenParameters);
-                if (file != null) {
-                    getLog().info(file.getAbsolutePath() + "; scope: " + scope);
-                    comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
-                } else {
-                    getLog().error("Could not resolve artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion());
-                }
-            }
-        }
-    }
+	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters) throws MojoFailureException {
+		notNull(mavenParameters.getMavenProject(), "Maven parameter mavenProject should be provided by maven container.");
+		Set<Artifact> dependencyArtifacts = mavenParameters.getMavenProject().getDependencyArtifacts();
+		for (Artifact artifact : dependencyArtifacts) {
+			String scope = artifact.getScope();
+			if (!"test".equals(scope)) {
+				File file = resolveArtifact(artifact, mavenParameters);
+				if (file != null) {
+					getLog().info(file.getAbsolutePath() + "; scope: " + scope);
+					comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
+				} else {
+					getLog().error("Could not resolve artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion());
+				}
+			}
+		}
+	}
 
-    private File retrieveFileFromConfiguration(Version version, String parameterName, MavenParameters mavenParameters) throws MojoFailureException {
+	private File retrieveFileFromConfiguration(Version version, String parameterName, MavenParameters mavenParameters) throws MojoFailureException {
 		if (version != null) {
 			Dependency dependency = version.getDependency();
 			if (dependency != null) {
@@ -368,23 +373,23 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private File resolveArtifact(Dependency dependency, MavenParameters mavenParameters) throws MojoFailureException {
-        notNull(mavenParameters.getArtifactRepositories(), "Maven parameter artifactRepositories should be provided by maven container.");
-        Artifact artifact = mavenParameters.getArtifactFactory().createBuildArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "jar");
-        return resolveArtifact(artifact, mavenParameters);
+		notNull(mavenParameters.getArtifactRepositories(), "Maven parameter artifactRepositories should be provided by maven container.");
+		Artifact artifact = mavenParameters.getArtifactFactory().createBuildArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "jar");
+		return resolveArtifact(artifact, mavenParameters);
 	}
 
-    private File resolveArtifact(Artifact artifact, MavenParameters mavenParameters) throws MojoFailureException {
-        notNull(mavenParameters.getLocalRepository(), "Maven parameter localRepository should be provided by maven container.");
-        notNull(mavenParameters.getArtifactResolver(), "Maven parameter artifactResolver should be provided by maven container.");
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
-        request.setArtifact(artifact);
-        request.setLocalRepository(mavenParameters.getLocalRepository());
-        request.setRemoteRepositories(mavenParameters.getArtifactRepositories());
+	private File resolveArtifact(Artifact artifact, MavenParameters mavenParameters) throws MojoFailureException {
+		notNull(mavenParameters.getLocalRepository(), "Maven parameter localRepository should be provided by maven container.");
+		notNull(mavenParameters.getArtifactResolver(), "Maven parameter artifactResolver should be provided by maven container.");
+		ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+		request.setArtifact(artifact);
+		request.setLocalRepository(mavenParameters.getLocalRepository());
+		request.setRemoteRepositories(mavenParameters.getArtifactRepositories());
 		mavenParameters.getArtifactResolver().resolve(request);
-        return artifact.getFile();
-    }
+		return artifact.getFile();
+	}
 
-    private static <T> T notNull(T value, String msg) throws MojoFailureException {
+	private static <T> T notNull(T value, String msg) throws MojoFailureException {
 		if (value == null) {
 			throw new MojoFailureException(msg);
 		}

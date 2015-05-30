@@ -11,6 +11,7 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.filter.PackageFilter;
 import japicmp.model.JApiClass;
+import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 
 import java.io.File;
@@ -53,8 +54,9 @@ public class XmlOutputGeneratorTest {
 		options.setXmlOutputFile(Optional.of(xmlOutpuFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
-		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options);
-		generator.generate();
+		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options, true);
+		XmlOutput xmlOutput = generator.generate();
+		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}
 
 	@Test

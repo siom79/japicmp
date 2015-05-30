@@ -12,6 +12,7 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.*;
+import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -158,8 +159,9 @@ public class Helper {
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
 		options.setAccessModifier(Optional.of(accessModifier));
-		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options);
-		generator.generate();
+		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options, true);
+		XmlOutput xmlOutput = generator.generate();
+		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}
 
     public interface SimpleExceptionVerifier {

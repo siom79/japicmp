@@ -1,15 +1,16 @@
 package japicmp.maven;
 
 import com.google.common.base.Optional;
+import japicmp.output.xml.XmlOutput;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -93,22 +94,29 @@ public class JApiCmpReport extends AbstractMavenReport {
 		try {
 			JApiCmpMojo mojo = new JApiCmpMojo();
 			MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject);
-			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory));
-			mojo.executeWithParameters(pluginParameters, mavenParameters);
-			Sink sink = getSink();
-			List<String> lines = Files.readAllLines(Paths.get(outputDirectory, "japicmp.html"), Charset.forName("UTF-8"));
-			for (String line : lines) {
-				line = line.replace("<html>", "");
-				line = line.replace("</html>", "");
-				line = line.replace("<body>", "");
-				line = line.replace("</body>", "");
-				line = line.replace("<head>", "");
-				line = line.replace("</head>", "");
-				sink.rawText(line);
+			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false);
+			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(pluginParameters, mavenParameters);
+			if (xmlOutputOptional.isPresent()) {
+				XmlOutput xmlOutput = xmlOutputOptional.get();
+				if (xmlOutput.getHtmlOutputStream().isPresent()) {
+					ByteArrayOutputStream htmlOutputStream = xmlOutput.getHtmlOutputStream().get();
+					String htmlString = htmlOutputStream.toString("UTF-8");
+					htmlString = htmlString.replaceAll("</?html>", "");
+					htmlString = htmlString.replaceAll("</?body>", "");
+					htmlString = htmlString.replaceAll("</?head>", "");
+					htmlString = htmlString.replaceAll("<title>[^<]*</title>", "");
+					htmlString = htmlString.replaceAll("<META[^>]*>", "");
+					Sink sink = getSink();
+					sink.rawText(htmlString);
+					sink.close();
+				}
 			}
-			sink.close();
 		} catch (Exception e) {
-			throw new MavenReportException("Failed to generate report: " + e.getMessage(), e);
+			String msg = "Failed to generate report: " + e.getMessage();
+			Sink sink = getSink();
+			sink.text(msg);
+			sink.close();
+			throw new MavenReportException(msg, e);
 		}
 	}
 

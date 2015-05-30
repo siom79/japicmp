@@ -13,8 +13,9 @@ public class PluginParameters {
 	private final List<Dependency> dependenciesParam;
 	private final Optional<File> projectBuildDirParam;
 	private final Optional<String> outputDirectory;
+	private final boolean writeToFiles;
 
-	public PluginParameters(String skipParam, Version newVersionParam, Version oldVersionParam, Parameter parameterParam, List<Dependency> dependenciesParam, Optional<File> projectBuildDirParam, Optional<String> outputDirectory) {
+	public PluginParameters(String skipParam, Version newVersionParam, Version oldVersionParam, Parameter parameterParam, List<Dependency> dependenciesParam, Optional<File> projectBuildDirParam, Optional<String> outputDirectory, boolean writeToFiles) {
 		this.skipParam = skipParam;
 		this.newVersionParam = newVersionParam;
 		this.oldVersionParam = oldVersionParam;
@@ -22,6 +23,7 @@ public class PluginParameters {
 		this.dependenciesParam = dependenciesParam;
 		this.projectBuildDirParam = projectBuildDirParam;
 		this.outputDirectory = outputDirectory;
+		this.writeToFiles = writeToFiles;
 	}
 
 	public String getSkipParam() {
@@ -50,5 +52,9 @@ public class PluginParameters {
 
 	public Optional<String> getOutputDirectory() {
 		return outputDirectory;
+	}
+
+	public boolean isWriteToFiles() {
+		return writeToFiles;
 	}
 }

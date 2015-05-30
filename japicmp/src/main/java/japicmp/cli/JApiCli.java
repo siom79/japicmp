@@ -12,11 +12,11 @@ import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
+import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.jar.JarFile;
 
@@ -70,8 +70,12 @@ public class JApiCli {
 				return;
 			}
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
-				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options);
-				xmlGenerator.generate();
+				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options, true);
+				try (XmlOutput xmlOutput = xmlGenerator.generate()) {
+					XmlOutputGenerator.writeToFiles(options, xmlOutput);
+				} catch (Exception e) {
+					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Could not close output streams: " + e.getMessage(), e);
+				}
 			}
 			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses, oldArchive, newArchive);
 			String output = stdoutOutputGenerator.generate();

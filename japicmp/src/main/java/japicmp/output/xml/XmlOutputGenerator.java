@@ -1,6 +1,7 @@
 package japicmp.output.xml;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import japicmp.config.Options;
 import japicmp.filter.Filter;
@@ -32,26 +33,54 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class XmlOutputGenerator extends OutputGenerator<Void> {
+public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 	private static final String XSD_FILENAME = "japicmp.xsd";
 	private static final String XML_SCHEMA = XSD_FILENAME;
 	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());
 	private final String oldArchivePath;
 	private final String newArchivePath;
+	private final boolean createSchemaFile;
 
-	public XmlOutputGenerator(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
+	public XmlOutputGenerator(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options, boolean createSchemaFile) {
 		super(options, jApiClasses);
 		this.oldArchivePath = oldArchivePath;
 		this.newArchivePath = newArchivePath;
+		this.createSchemaFile = createSchemaFile;
 	}
 
 	@Override
-	public Void generate() {
+	public XmlOutput generate() {
 		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, newArchivePath, jApiClasses, options);
 		//analyzeJpaAnnotations(jApiCmpXmlRoot, jApiClasses);
 		filterClasses(jApiClasses, options);
-		createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
-		return null;
+		return createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
+	}
+
+	public static void writeToFiles(Options options, XmlOutput xmlOutput) {
+		try {
+			if (xmlOutput.getXmlOutputStream().isPresent() && options.getXmlOutputFile().isPresent()) {
+				File xmlFile = new File(options.getXmlOutputFile().get());
+				try (FileOutputStream fos = new FileOutputStream(xmlFile)) {
+					ByteArrayOutputStream outputStream = xmlOutput.getXmlOutputStream().get();
+					outputStream.writeTo(fos);
+				} catch (IOException e) {
+					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to write XML file '" + xmlFile.getAbsolutePath() + "': " + e.getMessage(), e);
+				}
+			}
+			if (xmlOutput.getHtmlOutputStream().isPresent() && options.getHtmlOutputFile().isPresent()) {
+				File htmlFile = new File(options.getHtmlOutputFile().get());
+				try (FileOutputStream fos = new FileOutputStream(htmlFile)) {
+					ByteArrayOutputStream outputStream = xmlOutput.getHtmlOutputStream().get();
+					outputStream.writeTo(fos);
+				} catch (IOException e) {
+					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to write HTML file '" + htmlFile.getAbsolutePath() + "': " + e.getMessage(), e);
+				}
+			}
+		} finally {
+			try {
+				xmlOutput.close();
+			} catch (Exception ignored) {}
+		}
 	}
 
 	private void analyzeJpaAnnotations(JApiCmpXmlRoot jApiCmpXmlRoot, List<JApiClass> jApiClasses) {
@@ -60,9 +89,9 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 		//jApiCmpXmlRoot.setJpaTables(jpaEntities);
 	}
 
-	private void createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
-		ByteArrayOutputStream baos = null;
-		FileOutputStream fos = null;
+	private XmlOutput createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
+		XmlOutput xmlOutput = new XmlOutput();
+		ByteArrayOutputStream xmlBaos = null;
 		InputStream styleSheetAsInputStream = null;
 		InputStream xsltAsInputStream = null;
 		try {
@@ -71,28 +100,29 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, XML_SCHEMA);
-			baos = new ByteArrayOutputStream();
-			marshaller.marshal(jApiCmpXmlRoot, baos);
+			xmlBaos = new ByteArrayOutputStream();
+			marshaller.marshal(jApiCmpXmlRoot, xmlBaos);
 			if (options.getXmlOutputFile().isPresent()) {
-				final File xmlFile = new File(options.getXmlOutputFile().get());
-				fos = new FileOutputStream(xmlFile);
-				baos.writeTo(fos);
-				SchemaOutputResolver outputResolver = new SchemaOutputResolver() {
-					@Override
-					public Result createOutput(String namespaceUri, String suggestedFileName) throws IOException {
-						File schemaFile = xmlFile.getParentFile();
-						if (schemaFile == null) {
-							LOGGER.warning(String.format("File '%s' has no parent file. Using instead: '%s'.", xmlFile.getAbsolutePath(), XSD_FILENAME));
-							schemaFile = new File(XSD_FILENAME);
-						} else {
-							schemaFile = new File(schemaFile + File.separator + XSD_FILENAME);
+				xmlOutput.setXmlOutputStream(Optional.of(xmlBaos));
+				if (this.createSchemaFile) {
+					final File xmlFile = new File(options.getXmlOutputFile().get());
+					SchemaOutputResolver outputResolver = new SchemaOutputResolver() {
+						@Override
+						public Result createOutput(String namespaceUri, String suggestedFileName) throws IOException {
+							File schemaFile = xmlFile.getParentFile();
+							if (schemaFile == null) {
+								LOGGER.warning(String.format("File '%s' has no parent file. Using instead: '%s'.", xmlFile.getAbsolutePath(), XSD_FILENAME));
+								schemaFile = new File(XSD_FILENAME);
+							} else {
+								schemaFile = new File(schemaFile + File.separator + XSD_FILENAME);
+							}
+							StreamResult result = new StreamResult(schemaFile);
+							result.setSystemId(schemaFile.getAbsolutePath());
+							return result;
 						}
-						StreamResult result = new StreamResult(schemaFile);
-						result.setSystemId(schemaFile.getAbsolutePath());
-						return result;
-					}
-				};
-				jaxbContext.generateSchema(outputResolver);
+					};
+					jaxbContext.generateSchema(outputResolver);
+				}
 			}
 			if (options.getHtmlOutputFile().isPresent()) {
 				TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -110,9 +140,10 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 				}
 				String xsltAsString = integrateStylesheetIntoXslt(xsltAsInputStream, styleSheetAsInputStream);
 				Transformer transformer = transformerFactory.newTransformer(new StreamSource(new StringReader(xsltAsString)));
-				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
-				fos = new FileOutputStream(options.getHtmlOutputFile().get());
-				transformer.transform(new StreamSource(byteArrayInputStream), new StreamResult(fos));
+				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(xmlBaos.toByteArray());
+				ByteArrayOutputStream htmlOutputStream = new ByteArrayOutputStream();
+				transformer.transform(new StreamSource(byteArrayInputStream), new StreamResult(htmlOutputStream));
+				xmlOutput.setHtmlOutputStream(Optional.of(htmlOutputStream));
 			}
 		} catch (JAXBException e) {
 			throw new JApiCmpException(Reason.JaxbException, String.format("Marshalling of XML document failed: %s", e.getMessage()), e);
@@ -124,12 +155,6 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 			throw new JApiCmpException(Reason.XsltError, String.format("XSLT transformation failed: %s", e.getMessage()), e);
 		} finally {
 			try {
-				if (baos != null) {
-					baos.close();
-				}
-				if (fos != null) {
-					fos.close();
-				}
 				if (styleSheetAsInputStream != null) {
 					styleSheetAsInputStream.close();
 				}
@@ -139,6 +164,7 @@ public class XmlOutputGenerator extends OutputGenerator<Void> {
 			} catch (IOException ignored) {
 			}
 		}
+		return xmlOutput;
 	}
 
 	private String integrateStylesheetIntoXslt(InputStream xsltAsInputStream, InputStream styleSheetAsInputStream) {

@@ -157,7 +157,7 @@ public class Helper {
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
 		options.setAccessModifier(Optional.of(accessModifier));
-		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options);
+		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options, true);
 		generator.generate();
 	}
 

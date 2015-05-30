@@ -39,7 +39,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.account>siom79</github.account>
         <github.project>japicmp</github.project>
-        <cloudbees.account>siom79</cloudbees.account>
         <java.source>1.7</java.source>
         <java.target>1.7</java.target>
     </properties>
@@ -143,30 +142,6 @@
                 <version>1.0-beta-7</version>
             </extension>
         </extensions>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>cobertura-maven-plugin</artifactId>
-                    <version>2.5.2</version>
-                    <configuration>
-                        <formats>
-                            <format>html</format>
-                            <format>xml</format>
-                        </formats>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>clean</goal>
-                                <goal>cobertura</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <scm>

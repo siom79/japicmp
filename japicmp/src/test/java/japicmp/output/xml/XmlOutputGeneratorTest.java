@@ -76,7 +76,8 @@ public class XmlOutputGeneratorTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
 		jApiClasses.add(new JApiClass(new JarArchiveComparator(jarArchiveComparatorOptions), "japicmp.Test", Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.NEW, classType, jarArchiveComparatorOptions));
-		XmlOutputGenerator generator = new XmlOutputGenerator("/tmp/old.jar", "/tmp/new.jar", jApiClasses, options);
-		generator.generate();
+		XmlOutputGenerator generator = new XmlOutputGenerator("/tmp/old.jar", "/tmp/new.jar", jApiClasses, options, true);
+		XmlOutput xmlOutput = generator.generate();
+		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}
 }

@@ -85,4 +85,14 @@ public class BehaviorFilterTest {
         CtConstructor ctConstructor = CtConstructorBuilder.create().parameter(classPool.get("java.lang.Double")).addToClass(ctClass);
         assertThat(filter.matches(ctConstructor), is(false));
     }
+
+	@Test
+	public void testCoberturaMethodWithWildcards() throws CannotCompileException, NotFoundException {
+		BehaviorFilter filter = new BehaviorFilter("japicmp.*#__cobertura*()");
+		ClassPool classPool = new ClassPool();
+		classPool.appendSystemPath();
+		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+		CtMethod ctMethod = CtMethodBuilder.create().name("__cobertura_classmap").addToClass(ctClass);
+		assertThat(filter.matches(ctMethod), is(true));
+	}
 }
