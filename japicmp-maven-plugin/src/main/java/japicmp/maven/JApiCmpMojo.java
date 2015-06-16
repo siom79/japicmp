@@ -169,7 +169,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			List<String> includes = parameterParam.getIncludes();
 			if (includes != null) {
 				for (String include : includes) {
-					options.addExcludeFromArgument(Optional.fromNullable(include));
+					options.addIncludeFromArgument(Optional.fromNullable(include));
 				}
 			}
 			String includeSyntheticString = parameterParam.getIncludeSynthetic();
