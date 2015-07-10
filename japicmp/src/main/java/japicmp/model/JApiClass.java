@@ -221,7 +221,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private Optional<CtClass> getSuperclass(CtClass ctClass) {
 		try {
 			CtClass superClass = ctClass.getSuperclass();
-			return Optional.of(superClass);
+			return Optional.fromNullable(superClass);
 		} catch (NotFoundException e) {
 			throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load superclass for class '" + ctClass.getName() + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + constructClasspath() + ").", e);
 		}
