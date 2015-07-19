@@ -221,7 +221,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private Optional<CtClass> getSuperclass(CtClass ctClass) {
 		try {
 			CtClass superClass = ctClass.getSuperclass();
-			return Optional.of(superClass);
+			return Optional.fromNullable(superClass);
 		} catch (NotFoundException e) {
 			if (options.isIgnoreMissingClasses()) {
 				return Optional.absent();
