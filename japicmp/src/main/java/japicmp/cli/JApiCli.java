@@ -16,43 +16,54 @@ import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 
 import javax.inject.Inject;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.jar.JarFile;
 
 public class JApiCli {
 	public static final String IGNORE_MISSING_CLASSES = "--ignore-missing-classes";
+	static final String OLD_CLASSPATH = "--old-classpath";
+	static final String NEW_CLASSPATH = "--new-classpath";
+
+	public enum ClassPathMode {
+		ONE_COMMON_CLASSPATH, TWO_SEPARATE_CLASSPATHS
+	}
 
 	@Command(name = "java -jar japicmp.jar", description = "Compares jars")
 	public static class Compare implements Runnable {
 		@Inject
 		public HelpOption helpOption;
-		@Option(name = { "-o", "--old" }, description = "Provides the path to the old version of the jar.")
+		@Option(name = {"-o", "--old"}, description = "Provides the path to the old version of the jar.")
 		public String pathToOldVersionJar;
-		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version of the jar.")
+		@Option(name = {"-n", "--new"}, description = "Provides the path to the new version of the jar.")
 		public String pathToNewVersionJar;
-		@Option(name = { "-m", "--only-modified" }, description = "Outputs only modified classes/methods.")
+		@Option(name = {"-m", "--only-modified"}, description = "Outputs only modified classes/methods.")
 		public boolean modifiedOnly;
-		@Option(name = { "-b", "--only-incompatible" }, description = "Outputs only classes/methods that are binary incompatible. If not given, all classes and methods are printed.")
+		@Option(name = {"-b", "--only-incompatible"}, description = "Outputs only classes/methods that are binary incompatible. If not given, all classes and methods are printed.")
 		public boolean onlyBinaryIncompatibleModifications;
 		@Option(name = "-a", description = "Sets the access modifier level (public, package, protected, private), which should be used.")
 		public String accessModifier;
-		@Option(name = { "-i", "--include" }, description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
+		@Option(name = {"-i", "--include"}, description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
 		public String includes;
-		@Option(name = { "-e", "--exclude" }, description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
+		@Option(name = {"-e", "--exclude"}, description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
 		public String excludes;
-		@Option(name = { "-x", "--xml-file" }, description = "Provides the path to the xml output file.")
+		@Option(name = {"-x", "--xml-file"}, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;
-		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
+		@Option(name = {"--html-file"}, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
-		@Option(name = { "-s", "--semantic-versioning" }, description ="Tells you which part of the version to increment.")
+		@Option(name = {"-s", "--semantic-versioning"}, description = "Tells you which part of the version to increment.")
 		public boolean semanticVersioning = false;
-		@Option(name = { "--include-synthetic" }, description = "Include synthetic classes and class members that are hidden per default.")
+		@Option(name = {"--include-synthetic"}, description = "Include synthetic classes and class members that are hidden per default.")
 		public boolean includeSynthetic = false;
-		@Option(name = { IGNORE_MISSING_CLASSES }, description = "Ignores superclasses/interfaces missing on the classpath.")
+		@Option(name = {IGNORE_MISSING_CLASSES}, description = "Ignores superclasses/interfaces missing on the classpath.")
 		public boolean ignoreMissingClasses = false;
-		@Option(name = { "--html-stylesheet" }, description = "Provides the path to your own stylesheet.")
+		@Option(name = {"--html-stylesheet"}, description = "Provides the path to your own stylesheet.")
 		public String pathToHtmlStylesheet;
+		@Option(name = {OLD_CLASSPATH}, description = "The classpath for the old version.")
+		public String oldClassPath;
+		@Option(name = {NEW_CLASSPATH}, description = "The classpath for the new version.")
+		public String newClassPath;
 
 		@Override
 		public void run() {
@@ -96,6 +107,8 @@ public class JApiCli {
 			options.setIncludeSynthetic(includeSynthetic);
 			options.setIgnoreMissingClasses(ignoreMissingClasses);
 			options.setHtmlStylesheet(Optional.fromNullable(pathToHtmlStylesheet));
+			options.setOldClassPath(Optional.fromNullable(oldClassPath));
+			options.setNewClassPath(Optional.fromNullable(newClassPath));
 			return options;
 		}
 
@@ -112,6 +125,15 @@ public class JApiCli {
 				File stylesheetFile = new File(pathname);
 				if (!stylesheetFile.exists()) {
 					throw JApiCmpException.of(JApiCmpException.Reason.CliError, "HTML stylesheet '%s' does not exist.", pathname);
+				}
+			}
+			if (options.getOldClassPath().isPresent() && options.getNewClassPath().isPresent()) {
+				options.setClassPathMode(ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+			} else {
+				if (options.getOldClassPath().isPresent() || options.getNewClassPath().isPresent()) {
+					throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Please provide both options: " + OLD_CLASSPATH + " and " + NEW_CLASSPATH);
+				} else {
+					options.setClassPathMode(ClassPathMode.ONE_COMMON_CLASSPATH);
 				}
 			}
 		}
@@ -166,7 +188,8 @@ public class JApiCli {
 				if (jarFile != null) {
 					try {
 						jarFile.close();
-					} catch (IOException ignored) {}
+					} catch (IOException ignored) {
+					}
 				}
 			}
 		}

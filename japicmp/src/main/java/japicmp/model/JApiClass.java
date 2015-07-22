@@ -226,13 +226,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (options.isIgnoreMissingClasses()) {
 				return Optional.absent();
 			} else {
-				throw JApiCmpException.forClassNotFound(e, ctClass.getName(), jarArchiveComparator);
+				throw JApiCmpException.forClassLoading(e, ctClass.getName(), jarArchiveComparator);
 			}
 		}
 	}
 
 	private String constructClasspath() {
-		return this.jarArchiveComparator.getClasspath();
+		return this.jarArchiveComparator.getCommonClasspathAsString();
 	}
 
 	private void computeInterfaceChanges(List<JApiImplementedInterface> interfacesArg, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -284,7 +284,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} catch (NotFoundException e) {
 			if (!options.isIgnoreMissingClasses()) {
-				throw JApiCmpException.forClassNotFound(e, ctClass.getName(), jarArchiveComparator);
+				throw JApiCmpException.forClassLoading(e, ctClass.getName(), jarArchiveComparator);
 			}
 		}
 		return map;

@@ -1,11 +1,4 @@
-package japicmp.test.util;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.util.List;
+package japicmp.test.service.util;
 
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
@@ -19,6 +12,9 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
+
+import java.io.File;
+import java.util.List;
 
 public class Helper {
 

@@ -3,6 +3,7 @@ package japicmp.config;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import japicmp.cli.JApiCli;
 import japicmp.exception.JApiCmpException;
 import japicmp.filter.*;
 import japicmp.model.AccessModifier;
@@ -25,6 +26,9 @@ public class Options {
     private boolean includeSynthetic = false;
 	private boolean ignoreMissingClasses = false;
 	private Optional<String> htmlStylesheet = Optional.absent();
+	private Optional<String> oldClassPath = Optional.absent();
+	private Optional<String> newClassPath = Optional.absent();
+	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
 
 	public File getNewArchive() {
         return newArchive;
@@ -164,5 +168,29 @@ public class Options {
 
 	public Optional<String> getHtmlStylesheet() {
 		return htmlStylesheet;
+	}
+
+	public void setOldClassPath(Optional<String> oldClassPath) {
+		this.oldClassPath = oldClassPath;
+	}
+
+	public Optional<String> getOldClassPath() {
+		return oldClassPath;
+	}
+
+	public void setNewClassPath(Optional<String> newClassPath) {
+		this.newClassPath = newClassPath;
+	}
+
+	public Optional<String> getNewClassPath() {
+		return newClassPath;
+	}
+
+	public void setClassPathMode(JApiCli.ClassPathMode classPathMode) {
+		this.classPathMode = classPathMode;
+	}
+
+	public JApiCli.ClassPathMode getClassPathMode() {
+		return classPathMode;
 	}
 }

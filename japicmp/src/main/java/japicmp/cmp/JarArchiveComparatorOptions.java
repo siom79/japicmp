@@ -1,19 +1,37 @@
 package japicmp.cmp;
 
-import japicmp.filter.Filter;
+import com.google.common.base.Optional;
 import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
 import japicmp.filter.Filters;
 import japicmp.model.AccessModifier;
 
+import java.io.File;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class represents all options for the comparison.
+ */
 public class JarArchiveComparatorOptions {
 	private List<String> classPathEntries = new LinkedList<>();
 	private AccessModifier accessModifier = AccessModifier.PROTECTED;
-    private Filters filters = new Filters();
+	private Filters filters = new Filters();
 	private boolean includeSynthetic = false;
 	private boolean ignoreMissingClasses = false;
+	private ClassPathMode classPathMode = ClassPathMode.ONE_COMMON_CLASSPATH;
+	private List<String> oldClassPath = new LinkedList<>();
+	private List<String> newClassPath = new LinkedList<>();
+
+	/**
+	 * When both versions of the archives under comparison use the exact same classpath
+	 * only one classpath has to be provided. If the two class paths differ, both separate class paths
+	 * can be provided.
+	 */
+	public enum ClassPathMode {
+		ONE_COMMON_CLASSPATH, TWO_SEPARATE_CLASSPATHS
+	}
 
 	public static JarArchiveComparatorOptions of(Options options) {
 		JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
@@ -22,18 +40,41 @@ public class JarArchiveComparatorOptions {
 		comparatorOptions.setAccessModifier(options.getAccessModifier());
 		comparatorOptions.setIncludeSynthetic(options.isIncludeSynthetic());
 		comparatorOptions.setIgnoreMissingClasses(options.isIgnoreMissingClasses());
+		toJarArchiveComparatorClassPathMode(options, comparatorOptions);
+		toJarArchiveComparatorClassPath(options.getOldClassPath(), comparatorOptions.getOldClassPath());
+		toJarArchiveComparatorClassPath(options.getNewClassPath(), comparatorOptions.getNewClassPath());
 		return comparatorOptions;
 	}
 
-    public Filters getFilters() {
-        return filters;
-    }
+	private static void toJarArchiveComparatorClassPathMode(Options options, JarArchiveComparatorOptions comparatorOptions) {
+		switch (options.getClassPathMode()) {
+			case TWO_SEPARATE_CLASSPATHS:
+				comparatorOptions.setClassPathMode(ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+				break;
+			case ONE_COMMON_CLASSPATH:
+				comparatorOptions.setClassPathMode(ClassPathMode.ONE_COMMON_CLASSPATH);
+				break;
+			default:
+				throw new JApiCmpException(JApiCmpException.Reason.IllegalState, "Unknown classPathMode: " + options.getClassPathMode());
+		}
+	}
 
-    public void setFilters(Filters filters) {
-        this.filters = filters;
-    }
+	private static void toJarArchiveComparatorClassPath(Optional<String> classPathOptional, List<String> comparatorClassPath) {
+		if (classPathOptional.isPresent()) {
+			String classPathAsString = classPathOptional.get();
+			Collections.addAll(comparatorClassPath, classPathAsString.split(File.pathSeparator));
+		}
+	}
 
-    public List<String> getClassPathEntries() {
+	public Filters getFilters() {
+		return filters;
+	}
+
+	public void setFilters(Filters filters) {
+		this.filters = filters;
+	}
+
+	public List<String> getClassPathEntries() {
 		return classPathEntries;
 	}
 
@@ -59,5 +100,29 @@ public class JarArchiveComparatorOptions {
 
 	public boolean isIgnoreMissingClasses() {
 		return ignoreMissingClasses;
+	}
+
+	public void setClassPathMode(ClassPathMode classPathMode) {
+		this.classPathMode = classPathMode;
+	}
+
+	public ClassPathMode getClassPathMode() {
+		return classPathMode;
+	}
+
+	public void setOldClassPath(List<String> oldClassPath) {
+		this.oldClassPath = oldClassPath;
+	}
+
+	public List<String> getOldClassPath() {
+		return oldClassPath;
+	}
+
+	public void setNewClassPath(List<String> newClassPath) {
+		this.newClassPath = newClassPath;
+	}
+
+	public List<String> getNewClassPath() {
+		return newClassPath;
 	}
 }

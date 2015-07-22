@@ -37,7 +37,11 @@ public class JApiCmpException extends RuntimeException {
 		return new JApiCmpException(reason, msg);
 	}
 
-	public static JApiCmpException forClassNotFound(NotFoundException e, String name, JarArchiveComparator jarArchiveComparator) {
-		return new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load '" + name + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath (CLASSPATH=" + jarArchiveComparator.getClasspath() + ") or try the option '--ignore-missing-classes'.", e);
+	public static JApiCmpException forClassLoading(NotFoundException e, String name, JarArchiveComparator jarArchiveComparator) {
+		String classPathAsString = "(CLASSPATH=" + jarArchiveComparator.getCommonClasspathAsString() + ")";
+		if (jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {
+			classPathAsString = "(OLD CLASSPATH=" + jarArchiveComparator.getOldClassPathAsString() + " / NEW CLASSPATH=" + jarArchiveComparator.getNewClassPathAsString() + ")";
+		}
+		return new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load '" + name + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath " + classPathAsString + " or try the option '--ignore-missing-classes'.", e);
 	}
 }
