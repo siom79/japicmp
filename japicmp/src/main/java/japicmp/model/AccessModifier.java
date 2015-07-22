@@ -1,5 +1,8 @@
 package japicmp.model;
 
+/**
+ * Represents the access modifiers as defined in the Java Language Specification.
+ */
 public enum AccessModifier implements JApiModifierBase {
     PUBLIC(3), PROTECTED(2), PACKAGE_PROTECTED(1), PRIVATE(0);
 
