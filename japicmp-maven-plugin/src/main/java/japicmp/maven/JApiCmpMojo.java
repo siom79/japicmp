@@ -224,9 +224,11 @@ public class JApiCmpMojo extends AbstractMojo {
 				File projectBuildDirParam = pluginParameters.getProjectBuildDirParam().get();
 				if (projectBuildDirParam != null) {
 					File jApiCmpBuildDir = new File(projectBuildDirParam.getCanonicalPath() + File.separator + "japicmp");
-					boolean mkdirs = jApiCmpBuildDir.mkdirs();
-					if (!mkdirs) {
-						throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
+					if (!jApiCmpBuildDir.exists()) {
+						boolean mkdirs = jApiCmpBuildDir.mkdirs();
+						if (!mkdirs) {
+							throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
+						}
 					}
 					return jApiCmpBuildDir;
 				} else {
