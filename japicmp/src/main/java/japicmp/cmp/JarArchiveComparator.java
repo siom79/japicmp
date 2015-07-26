@@ -74,23 +74,36 @@ public class JarArchiveComparator {
 	}
 
 	private String setupClasspath(ClassPool classPool, List<String> classPathEntries) {
-        classPool.appendSystemPath();
-        String classPathAsString = System.getProperty("java.class.path");
-        for (String classPathEntry : classPathEntries) {
-            try {
-				classPool.appendClassPath(classPathEntry);
-                if (!classPathAsString.endsWith(File.pathSeparator)) {
-					classPathAsString += File.pathSeparator;
-                }
-				classPathAsString += classPathEntry;
-            } catch (NotFoundException e) {
-                throw JApiCmpException.forClassLoading(e, classPathEntry, this);
-            }
-        }
-		return classPathAsString;
+		String classPathAsString = appendUserDefinedClassPathEntries(classPool, classPathEntries);
+		return appendSystemClassPath(classPool, classPathAsString);
     }
 
-    /**
+	private String appendSystemClassPath(ClassPool classPool, String classPathAsString) {
+		classPool.appendSystemPath();
+		if (!classPathAsString.endsWith(File.pathSeparator)) {
+			classPathAsString += File.pathSeparator;
+		}
+		classPathAsString += classPathAsString;
+		return classPathAsString;
+	}
+
+	private String appendUserDefinedClassPathEntries(ClassPool classPool, List<String> classPathEntries) {
+		String classPathAsString = "";
+		for (String classPathEntry : classPathEntries) {
+			try {
+				classPool.appendClassPath(classPathEntry);
+				if (!classPathAsString.endsWith(File.pathSeparator)) {
+					classPathAsString += File.pathSeparator;
+				}
+				classPathAsString += classPathEntry;
+			} catch (NotFoundException e) {
+				throw JApiCmpException.forClassLoading(e, classPathEntry, this);
+			}
+		}
+		return classPathAsString;
+	}
+
+	/**
      * Returns the common classpath used by {@link japicmp.cmp.JarArchiveComparator}
      * @return the common classpath as String
      */
@@ -171,6 +184,9 @@ public class JarArchiveComparator {
 
     private List<CtClass> createListOfCtClasses(File archive, ClassPool classPool, JarArchiveComparatorOptions options) {
         List<CtClass> classes = new LinkedList<CtClass>();
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Loading classes from jar file '" + archive.getAbsolutePath() + "'");
+		}
         try (JarFile jarFile = new JarFile(archive)) {
             Enumeration<JarEntry> entryEnumeration = jarFile.entries();
             while (entryEnumeration.hasMoreElements()) {
@@ -194,9 +210,9 @@ public class JarArchiveComparator {
                 }
             }
         } catch (IOException e) {
-        	throw new JApiCmpException(Reason.IoException, String.format("Processing of jar file %s failed: %s", archive.getAbsolutePath(), e.getMessage()), e);
+			throw new JApiCmpException(Reason.IoException, String.format("Processing of jar file %s failed: %s", archive.getAbsolutePath(), e.getMessage()), e);
 		}
-        return classes;
+		return classes;
     }
 
     /**

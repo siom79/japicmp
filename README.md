@@ -65,8 +65,9 @@ SYNOPSIS
                 [(-i <includes> | --include <includes>)] [--ignore-missing-classes]
                 [--include-synthetic] [(-m | --only-modified)]
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
+                [--new-classpath <newClassPath>]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
-                [(-s | --semantic-versioning)]
+                [--old-classpath <oldClassPath>] [(-s | --semantic-versioning)]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
 OPTIONS
@@ -110,8 +111,14 @@ OPTIONS
         -n <pathToNewVersionJar>, --new <pathToNewVersionJar>
             Provides the path to the new version of the jar.
 
+        --new-classpath <newClassPath>
+            The classpath for the new version.
+
         -o <pathToOldVersionJar>, --old <pathToOldVersionJar>
             Provides the path to the old version of the jar.
+
+        --old-classpath <oldClassPath>
+            The classpath for the old version.
 
         -s, --semantic-versioning
             Tells you which part of the version to increment.
@@ -120,8 +127,13 @@ OPTIONS
             Provides the path to the xml output file.
 ```
 
-When your library implements interfaces or extends classes from other libraries than the JDK, you will
-have to add these to the class path:
+When your library implements interfaces or extends classes from other libraries than the JDK and you want to evaluate binary
+compatibility you must specify the classpath for the two different versions:
+
+    java -jar japicmp-0.5.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar --new-classpath other-library-v2.jar
+        --old-classpath other-library-v1.jar
+
+In case the classpath for both versions did not change, you can add the library using the standard way:
 
 	java -cp japicmp-0.5.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
@@ -219,7 +231,26 @@ If your library implements interfaces or extends classes from other libraries th
 ```
 
 Dependencies declared in the enclosing pom.xml and its parents are added automatically. The dependencies declared explicitly for this plugin
-are appended to the classpath before the ones from the enclosing pom.xml.
+are appended to the classpath before the ones from the enclosing pom.xml, hence you can override them.
+
+In case the classpath between both versions differs, you can add the dependencies for the new and old version separately:
+
+```
+<oldClassPathDependencies>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-math3</artifactId>
+		<version>3.4</version>
+	</dependency>
+</oldClassPathDependencies>
+<newClassPathDependencies>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-math3</artifactId>
+		<version>3.5</version>
+	</dependency>
+</newClassPathDependencies>
+```
 
 The maven plugin produces the two files `japicmp.diff` and `japicmp.xml` within the directory `${project.build.directory}/japicmp`
 of your artifact. Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the

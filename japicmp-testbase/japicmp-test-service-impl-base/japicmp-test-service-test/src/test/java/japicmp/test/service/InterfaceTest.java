@@ -11,9 +11,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static japicmp.test.service.util.Helper.getArchive;
-import static japicmp.test.service.util.Helper.getJApiClass;
-import static japicmp.test.service.util.Helper.getJApiMethod;
+import static japicmp.test.service.util.Helper.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -28,13 +26,6 @@ public class InterfaceTest {
 		options.setNewClassPath(createClassPath("v2"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-service-impl-v1.jar"), getArchive("japicmp-test-service-impl-v2.jar"));
-	}
-
-	private static List<String> createClassPath(String version) {
-		List<String> classPath = new ArrayList<>();
-		classPath.add(getArchive("japicmp-test-service-" + version + ".jar").getAbsolutePath());
-		classPath.add(getArchive("japicmp-test-service-impl-" + version + ".jar").getAbsolutePath());
-		return classPath;
 	}
 
 	@Test

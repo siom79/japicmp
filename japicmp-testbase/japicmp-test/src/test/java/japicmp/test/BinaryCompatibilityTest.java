@@ -14,6 +14,7 @@ import japicmp.test.Enums.AbcToAb;
 import japicmp.test.Enums.AbcToAbcd;
 import japicmp.test.Interfaces.ClassWithInterfaceLosesMethod;
 import japicmp.test.Interfaces.SubclassWithSuperclassLosesMethod;
+import japicmp.test.binarycompatiblity.SubclassOverridesStaticField;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -84,7 +85,7 @@ public class BinaryCompatibilityTest {
 	
 	@Test
 	public void test_JLS_13_4_8() {
-		JApiClass subclassExtendsSuperclassWithField = getJApiClass(jApiClasses, SubclassExtendsSuperclassWithField.class.getName());
+		JApiClass subclassExtendsSuperclassWithField = getJApiClass(jApiClasses, SubclassOverridesStaticField.class.getName());
 		assertThat(subclassExtendsSuperclassWithField.isBinaryCompatible(), is(false));
 	}
 	

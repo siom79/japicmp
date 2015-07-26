@@ -30,14 +30,6 @@ public class ClassMembers {
 		}
 	}
 
-	public class SuperclassWithField {
-		public int field;
-	}
-
-	public class SubclassExtendsSuperclassWithField extends SuperclassWithField {
-		protected int field;
-	}
-
 	public class SuperclassWithMethod {
 
 		public void method(int i, String s) {

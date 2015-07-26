@@ -40,13 +40,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
 	private boolean changeCausedByClassElement = false;
 
-	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType, JarArchiveComparatorOptions options) {
+	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
 		this.jarArchiveComparator = jarArchiveComparator;
 		this.fullyQualifiedName = fullyQualifiedName;
 		this.newClass = newClass;
 		this.oldClass = oldClass;
 		this.classType = classType;
-		this.options = options;
+		this.options = jarArchiveComparator.getJarArchiveComparatorOptions();
 		this.superclass = extractSuperclass(oldClass, newClass);
 		computeMethodChanges(oldClass, newClass);
 		computeInterfaceChanges(this.interfaces, oldClass, newClass);
@@ -187,33 +187,33 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (superclassOldOptional.isPresent() && superclassNewOptional.isPresent()) {
 				String nameOld = superclassOldOptional.get().getName();
 				String nameNew = superclassNewOptional.get().getName();
-				retVal = new JApiSuperclass(Optional.of(nameOld), Optional.of(nameNew), nameOld.equals(nameNew) ? JApiChangeStatus.UNCHANGED : JApiChangeStatus.MODIFIED);
+				retVal = new JApiSuperclass(superclassOldOptional, superclassNewOptional, nameOld.equals(nameNew) ? JApiChangeStatus.UNCHANGED : JApiChangeStatus.MODIFIED, this.jarArchiveComparator);
 			} else if (superclassOldOptional.isPresent()) {
-				retVal = new JApiSuperclass(Optional.of(superclassOldOptional.get().getName()), Optional.<String>absent(), JApiChangeStatus.REMOVED);
+				retVal = new JApiSuperclass(superclassOldOptional, superclassNewOptional, JApiChangeStatus.REMOVED, this.jarArchiveComparator);
 			} else if (superclassNewOptional.isPresent()) {
-				retVal = new JApiSuperclass(Optional.<String>absent(), Optional.of(superclassNewOptional.get().getName()), JApiChangeStatus.NEW);
+				retVal = new JApiSuperclass(superclassOldOptional, superclassNewOptional, JApiChangeStatus.NEW, this.jarArchiveComparator);
 			} else {
-				retVal = new JApiSuperclass(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
+				retVal = new JApiSuperclass(superclassOldOptional, superclassNewOptional, JApiChangeStatus.UNCHANGED, this.jarArchiveComparator);
 			}
 		} else {
 			if (oldClassOptional.isPresent()) {
 				Optional<CtClass> superclassOldOptional = getSuperclass(oldClassOptional.get());
 				if (superclassOldOptional.isPresent()) {
-					retVal = new JApiSuperclass(Optional.of(superclassOldOptional.get().getName()), Optional.<String>absent(), JApiChangeStatus.REMOVED);
+					retVal = new JApiSuperclass(superclassOldOptional, Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, this.jarArchiveComparator);
 				} else {
-					retVal = new JApiSuperclass(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
+					retVal = new JApiSuperclass(Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.UNCHANGED, this.jarArchiveComparator);
 				}
 			} else if (newClassOptional.isPresent()) {
 				Optional<CtClass> superclassNewOptional = getSuperclass(newClassOptional.get());
 				if (superclassNewOptional.isPresent()) {
-					retVal = new JApiSuperclass(Optional.<String>absent(), Optional.of(superclassNewOptional.get().getName()), JApiChangeStatus.NEW);
+					retVal = new JApiSuperclass(Optional.<CtClass>absent(), superclassNewOptional, JApiChangeStatus.NEW, this.jarArchiveComparator);
 				} else {
-					retVal = new JApiSuperclass(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
+					retVal = new JApiSuperclass(Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.UNCHANGED, this.jarArchiveComparator);
 				}
 			}
 		}
 		if (retVal == null) {
-			retVal = new JApiSuperclass(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
+			retVal = new JApiSuperclass(Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.UNCHANGED, this.jarArchiveComparator);
 		}
 		return retVal;
 	}

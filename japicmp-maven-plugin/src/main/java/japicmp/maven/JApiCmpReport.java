@@ -12,9 +12,6 @@ import org.apache.maven.reporting.MavenReportException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,6 +41,16 @@ public class JApiCmpReport extends AbstractMavenReport {
 	 * @parameter
 	 */
 	private List<Dependency> dependencies;
+
+	/**
+	 * @parameter
+	 */
+	private List<Dependency> newClassPathDependencies;
+
+	/**
+	 * @parameter
+	 */
+	private List<Dependency> oldClassPathDependencies;
 
 	/**
 	 * @parameter
@@ -94,7 +101,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 		try {
 			JApiCmpMojo mojo = new JApiCmpMojo();
 			MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject);
-			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false);
+			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, oldClassPathDependencies, newClassPathDependencies, Optional.<File>absent(), Optional.of(outputDirectory), false);
 			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(pluginParameters, mavenParameters);
 			if (xmlOutputOptional.isPresent()) {
 				XmlOutput xmlOutput = xmlOutputOptional.get();

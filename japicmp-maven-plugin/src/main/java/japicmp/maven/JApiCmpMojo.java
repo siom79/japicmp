@@ -1,6 +1,7 @@
 package japicmp.maven;
 
 import com.google.common.base.Optional;
+import japicmp.cli.JApiCli;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -53,6 +54,16 @@ public class JApiCmpMojo extends AbstractMojo {
 	/**
 	 * @parameter
 	 */
+	private List<Dependency> newClassPathDependencies;
+
+	/**
+	 * @parameter
+	 */
+	private List<Dependency> oldClassPathDependencies;
+
+	/**
+	 * @parameter
+	 */
 	private List<Dependency> dependencies;
 
 	/**
@@ -93,7 +104,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject);
-		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true);
+		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, oldClassPathDependencies, newClassPathDependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
@@ -105,7 +116,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		File newVersionFile = retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters);
 		File oldVersionFile = retrieveFileFromConfiguration(pluginParameters.getOldVersionParam(), "oldVersion", mavenParameters);
 		Options options = createOptions(pluginParameters.getParameterParam());
-		List<JApiClass> jApiClasses = compareArchives(newVersionFile, oldVersionFile, options, pluginParameters.getDependenciesParam(), mavenParameters);
+		List<JApiClass> jApiClasses = compareArchives(newVersionFile, oldVersionFile, options, pluginParameters, mavenParameters);
 		try {
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
 			String diffOutput = generateDiffOutput(newVersionFile, oldVersionFile, jApiClasses, options);
@@ -257,21 +268,63 @@ public class JApiCmpMojo extends AbstractMojo {
 		return xmlGenerator.generate();
 	}
 
-	private List<JApiClass> compareArchives(File newVersionFile, File oldVersionFile, Options options, List<Dependency> dependenciesParam, MavenParameters mavenParameters) throws MojoFailureException {
+	private List<JApiClass> compareArchives(File newVersionFile, File oldVersionFile, Options options, PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
 		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
-		setUpClassPath(comparatorOptions, dependenciesParam, mavenParameters);
+		setUpClassPath(comparatorOptions, pluginParameters, mavenParameters);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 		return jarArchiveComparator.compare(oldVersionFile, newVersionFile);
 	}
 
-	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions, List<Dependency> dependenciesParam, MavenParameters mavenParameters) throws MojoFailureException {
-		if (dependenciesParam != null) {
-			for (Dependency dependency : dependenciesParam) {
-				File file = resolveDependencyToFile("dependencies", dependency, mavenParameters);
-				if (getLog().isDebugEnabled()) {
-					getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions, PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
+		if (pluginParameters != null) {
+			if (pluginParameters.getDependenciesParam() != null) {
+				if (pluginParameters.getOldClassPathDependencies() != null || pluginParameters.getNewClassPathDependencies() != null) {
+					throw new MojoFailureException("Please specify either a <dependencies/> element or the two elements <oldClassPathDependencies/> and <newClassPathDependencies/>. " +
+							"With <dependencies/> you can specify one common classpath for both versions and with <oldClassPathDependencies/> and <newClassPathDependencies/> a " +
+							"separate classpath for the new and old version.");
+				} else {
+					if (getLog().isDebugEnabled()) {
+						getLog().debug("Element <dependencies/> found. Using " + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
+					}
+					for (Dependency dependency : pluginParameters.getDependenciesParam()) {
+						File file = resolveDependencyToFile("dependencies", dependency, mavenParameters);
+						if (getLog().isDebugEnabled()) {
+							getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+						}
+						comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
+						comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH);
+					}
 				}
-				comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
+			} else {
+				if (pluginParameters.getOldClassPathDependencies() != null || pluginParameters.getNewClassPathDependencies() != null) {
+					if (getLog().isDebugEnabled()) {
+						getLog().debug("At least one of the elements <oldClassPathDependencies/> or <newClassPathDependencies/> found. Using " + JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+					}
+					if (pluginParameters.getOldClassPathDependencies() != null) {
+						for (Dependency dependency : pluginParameters.getOldClassPathDependencies()) {
+							File file = resolveDependencyToFile("oldClassPathDependencies", dependency, mavenParameters);
+							if (getLog().isDebugEnabled()) {
+								getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+							}
+							comparatorOptions.getOldClassPath().add(file.getAbsolutePath());
+						}
+					}
+					if (pluginParameters.getNewClassPathDependencies() != null) {
+						for (Dependency dependency : pluginParameters.getNewClassPathDependencies()) {
+							File file = resolveDependencyToFile("newClassPathDependencies", dependency, mavenParameters);
+							if (getLog().isDebugEnabled()) {
+								getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+							}
+							comparatorOptions.getNewClassPath().add(file.getAbsolutePath());
+						}
+					}
+					comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+				} else {
+					if (getLog().isDebugEnabled()) {
+						getLog().debug("None of the elements <oldClassPathDependencies/>, <newClassPathDependencies/> or <dependencies/> found. Using " + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
+					}
+					comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH);
+				}
 			}
 		}
 		setUpClassPathUsingMavenProject(comparatorOptions, mavenParameters);

@@ -337,12 +337,12 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
     }
 
     private String superclassChangeAsString(JApiSuperclass jApiSuperclass) {
-        if (jApiSuperclass.getOldSuperclass().isPresent() && jApiSuperclass.getNewSuperclass().isPresent()) {
-            return jApiSuperclass.getNewSuperclass().get() + " (<- " + jApiSuperclass.getOldSuperclass().get() + ")";
-        } else if (jApiSuperclass.getOldSuperclass().isPresent() && !jApiSuperclass.getNewSuperclass().isPresent()) {
-            return jApiSuperclass.getOldSuperclass().get();
-        } else if (!jApiSuperclass.getOldSuperclass().isPresent() && jApiSuperclass.getNewSuperclass().isPresent()) {
-            return jApiSuperclass.getNewSuperclass().get();
+        if (jApiSuperclass.getOldSuperclassName().isPresent() && jApiSuperclass.getNewSuperclassName().isPresent()) {
+            return jApiSuperclass.getNewSuperclassName().get() + " (<- " + jApiSuperclass.getOldSuperclassName().get() + ")";
+        } else if (jApiSuperclass.getOldSuperclassName().isPresent() && !jApiSuperclass.getNewSuperclassName().isPresent()) {
+            return jApiSuperclass.getOldSuperclassName().get();
+        } else if (!jApiSuperclass.getOldSuperclassName().isPresent() && jApiSuperclass.getNewSuperclassName().isPresent()) {
+            return jApiSuperclass.getNewSuperclassName().get();
         }
         return "n.a.";
     }

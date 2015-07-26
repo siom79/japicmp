@@ -36,14 +36,6 @@ public class ClassMembers {
 		}
 	}
 	
-	public class SuperclassWithField {
-		public int field;
-	}
-	
-	public class SubclassExtendsSuperclassWithField extends SuperclassWithField {
-		
-	}
-	
 	public class SuperclassWithMethod {
 		
 		public void method(int i, String s) {

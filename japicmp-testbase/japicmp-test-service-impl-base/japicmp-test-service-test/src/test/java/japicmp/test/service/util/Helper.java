@@ -14,6 +14,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Helper {
@@ -176,4 +177,11 @@ public class Helper {
         }
         Assert.assertThat(exceptionThrown, CoreMatchers.is(true));
     }
+
+	public static List<String> createClassPath(String version) {
+		List<String> classPath = new ArrayList<>();
+		classPath.add(getArchive("japicmp-test-service-" + version + ".jar").getAbsolutePath());
+		classPath.add(getArchive("japicmp-test-service-impl-" + version + ".jar").getAbsolutePath());
+		return classPath;
+	}
 }
