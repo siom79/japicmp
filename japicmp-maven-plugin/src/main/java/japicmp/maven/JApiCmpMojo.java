@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 /**
  * @goal cmp
  * @phase verify
+ * @requiresDependencyResolution compile
  */
 public class JApiCmpMojo extends AbstractMojo {
 	/**
@@ -279,7 +280,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters) throws MojoFailureException {
 		notNull(mavenParameters.getMavenProject(), "Maven parameter mavenProject should be provided by maven container.");
-		Set<Artifact> dependencyArtifacts = mavenParameters.getMavenProject().getDependencyArtifacts();
+		Set<Artifact> dependencyArtifacts = mavenParameters.getMavenProject().getArtifacts();
 		for (Artifact artifact : dependencyArtifacts) {
 			String scope = artifact.getScope();
 			if (!"test".equals(scope)) {
