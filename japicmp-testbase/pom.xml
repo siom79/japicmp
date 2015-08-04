@@ -29,6 +29,40 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>com.github.siom79.japicmp</groupId>
+                            <artifactId>japicmp-test-v1</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </oldVersion>
+                    <newVersion>
+                        <file>
+                            <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+                        </file>
+                    </newVersion>
+                    <parameter>
+                        <accessModifier>public</accessModifier>
+                        <onlyModified>true</onlyModified>
+                        <!-- Test that japicmp-maven-plugin skips execution as this is a pom module -->
+                        <skipPomModules>true</skipPomModules>
+                    </parameter>
+                    <skip>false</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cmp</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

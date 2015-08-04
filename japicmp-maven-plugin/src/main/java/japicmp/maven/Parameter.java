@@ -12,6 +12,7 @@ public class Parameter {
     private String breakBuildOnBinaryIncompatibleModifications;
     private String includeSynthetic;
 	private String ignoreMissingClasses;
+	private String skipPomModules;
 
     public String getAccessModifier() {
         return accessModifier;
@@ -82,5 +83,13 @@ public class Parameter {
 
 	public void setIgnoreMissingClasses(String ignoreMissingClasses) {
 		this.ignoreMissingClasses = ignoreMissingClasses;
+	}
+
+	public String getSkipPomModules() {
+		return skipPomModules;
+	}
+
+	public void setSkipPomModules(String skipPomModules) {
+		this.skipPomModules = skipPomModules;
 	}
 }

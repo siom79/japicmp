@@ -168,7 +168,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
                         <includeSynthetic>false</includeSynthetic>
                         <ignoreMissingClasses>false</ignoreMissingClasses>
-                        <skip>false</skip>
+                        <skipPomModules>true</skipPomModules>
                     </parameter>
 					<dependencies>
 						<dependency>
@@ -203,6 +203,7 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
 * includeSynthetic: When set to true, changes for synthetic classes and class members are tracked.
 * ignoreMissingClasses: When set to true, superclasses and interfaces that cannot be resolved are ignored. Pleases note that in this case the results for the affected classes may not be accurate.
+* skipPomModules: Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.
 * skip: Setting this parameter to true will skip execution of the plugin.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
