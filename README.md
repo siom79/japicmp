@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.5.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.5.2-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository:
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.5.1</version>
+		<version>0.5.2</version>
 	</dependency>
 
 ##Motivation##
@@ -123,7 +123,7 @@ OPTIONS
 When your library implements interfaces or extends classes from other libraries than the JDK, you will
 have to add these to the class path:
 
-	java -cp japicmp-0.5.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.5.2-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
     
 ###Usage maven plugin###
 
@@ -134,13 +134,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.5.1</version>
+                <version>0.5.2</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.5.1</version>
+                            <version>0.5.2</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -232,7 +232,7 @@ of your artifact. Alternatively it can be used inside the `<reporting/>` tag in 
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.5.1</version>
+			<version>0.5.2</version>
 			<reportSets>
 				<reportSet>
 					<reports>
@@ -369,6 +369,19 @@ You can download the latest version from the [release page](https://github.com/s
 ##Development##
 
 * ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
+
+###Release###
+
+This is the release procedure:
+* Increment version in README.md
+* Run release build (substitute passphrase with your GPG password):
+```
+mvn release:clean release:prepare -DautoVersionSubmodules=true -Dgpg.passphrase=passphrase
+mvn release:perform -Dgpg.passphrase=passphrase
+```
+* Login to [Sonatype's Nexus repository](https://oss.sonatype.org/)
+	* Download released artifact from staging repository.
+	* Close and release staging repository if manual tests are successful.
 
 ##Contributions
 
