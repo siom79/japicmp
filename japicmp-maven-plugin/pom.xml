@@ -25,7 +25,7 @@
     </licenses>
 
     <properties>
-        <maven.version>3.1.0</maven.version>
+        <maven.version>3.0.5</maven.version>
     </properties>
 
     <prerequisites>
