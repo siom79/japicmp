@@ -231,10 +231,11 @@ public class JApiCmpMojo extends AbstractMojo {
 				if (projectBuildDirParam != null) {
 					File jApiCmpBuildDir = new File(projectBuildDirParam.getCanonicalPath() + File.separator + "japicmp");
 					boolean mkdirs = jApiCmpBuildDir.mkdirs();
-					if (!mkdirs) {
-						throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
+					if (mkdirs || jApiCmpBuildDir.isDirectory() && jApiCmpBuildDir.canWrite()) {
+						return jApiCmpBuildDir;
 					}
-					return jApiCmpBuildDir;
+
+					throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
 				} else {
 					throw new MojoFailureException("Maven parameter projectBuildDir is not set.");
 				}
@@ -245,13 +246,12 @@ public class JApiCmpMojo extends AbstractMojo {
 			String outputDirectory = pluginParameters.getOutputDirectory().get();
 			if (outputDirectory != null) {
 				File outputDirFile = new File(outputDirectory);
-				if (!outputDirFile.exists()) {
-					boolean mkdirs = outputDirFile.mkdirs();
-					if (!mkdirs) {
-						throw new MojoFailureException(String.format("Failed to create directory '%s'.", outputDirFile.getAbsolutePath()));
-					}
+				boolean mkdirs = outputDirFile.mkdirs();
+				if (mkdirs || outputDirFile.isDirectory() && outputDirFile.canWrite()) {
+					return outputDirFile;
 				}
-				return outputDirFile;
+
+				throw new MojoFailureException(String.format("Failed to create directory '%s'.", outputDirFile.getAbsolutePath()));
 			} else {
 				throw new MojoFailureException("Maven parameter outputDirectory is not set.");
 			}
