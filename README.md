@@ -370,6 +370,14 @@ You can download the latest version from the [release page](https://github.com/s
 
 * ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
 
+###Reports###
+
+Use the maven site plugin to generate the following reports:
+ * findbugs
+ * checkstyle
+ * japicmp
+ * cobertura test coverage
+
 ###Release###
 
 This is the release procedure:
