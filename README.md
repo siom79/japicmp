@@ -372,7 +372,7 @@ You can download the latest version from the [release page](https://github.com/s
 
 ###Reports###
 
-Use the maven site plugin to generate the following reports:
+Use the maven site plugin (`mvn site`) to generate the following reports:
  * findbugs
  * checkstyle
  * japicmp
@@ -389,7 +389,7 @@ mvn release:perform -Dgpg.passphrase=passphrase
 ```
 * Login to [Sonatype's Nexus repository](https://oss.sonatype.org/)
 	* Download released artifact from staging repository.
-	* Close and release staging repository if manual tests are successful.
+	* Close and release staging repository if sanity checks are successful.
 
 ##Contributions
 
