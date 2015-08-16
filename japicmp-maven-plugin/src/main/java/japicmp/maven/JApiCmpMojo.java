@@ -19,6 +19,10 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -29,68 +33,29 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @goal cmp
- * @phase verify
- * @requiresDependencyResolution compile
- */
+@Mojo(name = "cmp", requiresDependencyResolution = ResolutionScope.COMPILE, defaultPhase = LifecyclePhase.VERIFY)
 public class JApiCmpMojo extends AbstractMojo {
-	/**
-	 * @parameter
-	 * @required
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = true)
 	private Version oldVersion;
-
-	/**
-	 * @parameter
-	 * @required
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = true)
 	private Version newVersion;
-
-	/**
-	 * @parameter
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private Parameter parameter;
-
-	/**
-	 * @parameter
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<Dependency> dependencies;
-
-	/**
-	 * @parameter
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String skip;
-
-	/**
-	 * @parameter property="project.build.directory"
-	 * @required
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(property = "project.build.directory", required = true)
 	private File projectBuildDir;
-
-	/**
-	 * @component
-	 */
+	@Component
 	private ArtifactFactory artifactFactory;
-
-	/**
-	 * @component
-	 */
+	@Component
 	private ArtifactResolver artifactResolver;
-
-	/**
-	 * @parameter default-value="${localRepository}"
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${localRepository}")
 	private ArtifactRepository localRepository;
-
-	/**
-	 * @parameter default-value="${project.remoteArtifactRepositories}"
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteArtifactRepositories}")
 	private List<ArtifactRepository> artifactRepositories;
-
-	/**
-	 * @parameter default-value="${project}"
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project}")
 	private MavenProject mavenProject;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -100,12 +65,11 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	Optional<XmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
-		Preconditions.checkNotNull(mavenProject, "MavenProject has not been injected.");
 		if (Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getSkipParam())) {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
 			return Optional.absent();
 		}
-		if ("pom".equals(mavenProject.getPackaging())) {
+		if (mavenProject != null && "pom".equals(mavenProject.getPackaging())) {
 			boolean skipPomModules = true;
 			Parameter parameterParam = pluginParameters.getParameterParam();
 			if (parameterParam != null) {
@@ -231,10 +195,11 @@ public class JApiCmpMojo extends AbstractMojo {
 				if (projectBuildDirParam != null) {
 					File jApiCmpBuildDir = new File(projectBuildDirParam.getCanonicalPath() + File.separator + "japicmp");
 					boolean mkdirs = jApiCmpBuildDir.mkdirs();
-					if (!mkdirs) {
-						throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
+					if (mkdirs || jApiCmpBuildDir.isDirectory() && jApiCmpBuildDir.canWrite()) {
+						return jApiCmpBuildDir;
 					}
-					return jApiCmpBuildDir;
+
+					throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
 				} else {
 					throw new MojoFailureException("Maven parameter projectBuildDir is not set.");
 				}
@@ -245,13 +210,12 @@ public class JApiCmpMojo extends AbstractMojo {
 			String outputDirectory = pluginParameters.getOutputDirectory().get();
 			if (outputDirectory != null) {
 				File outputDirFile = new File(outputDirectory);
-				if (!outputDirFile.exists()) {
-					boolean mkdirs = outputDirFile.mkdirs();
-					if (!mkdirs) {
-						throw new MojoFailureException(String.format("Failed to create directory '%s'.", outputDirFile.getAbsolutePath()));
-					}
+				boolean mkdirs = outputDirFile.mkdirs();
+				if (mkdirs || outputDirFile.isDirectory() && outputDirFile.canWrite()) {
+					return outputDirFile;
 				}
-				return outputDirFile;
+
+				throw new MojoFailureException(String.format("Failed to create directory '%s'.", outputDirFile.getAbsolutePath()));
 			} else {
 				throw new MojoFailureException("Maven parameter outputDirectory is not set.");
 			}
