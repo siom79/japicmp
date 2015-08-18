@@ -56,28 +56,29 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     }
 
     private JApiType extractType(Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
+        JApiType jApiType = new JApiType(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
         if (oldFieldOptional.isPresent() && newFieldOptional.isPresent()) {
             CtField oldField = oldFieldOptional.get();
             CtField newField = newFieldOptional.get();
             String oldType = signatureToType(oldField.getSignature());
             String newType = signatureToType(newField.getSignature());
             if (oldType.equals(newType)) {
-                return new JApiType(Optional.of(oldType), Optional.of(newType), JApiChangeStatus.UNCHANGED);
+				jApiType = new JApiType(Optional.of(oldType), Optional.of(newType), JApiChangeStatus.UNCHANGED);
             } else {
-                return new JApiType(Optional.of(oldType), Optional.of(newType), JApiChangeStatus.MODIFIED);
+				jApiType = new JApiType(Optional.of(oldType), Optional.of(newType), JApiChangeStatus.MODIFIED);
             }
         } else {
             if (oldFieldOptional.isPresent()) {
                 CtField oldField = oldFieldOptional.get();
                 String oldType = signatureToType(oldField.getSignature());
-                return new JApiType(Optional.of(oldType), Optional.<String>absent(), JApiChangeStatus.REMOVED);
+				jApiType = new JApiType(Optional.of(oldType), Optional.<String>absent(), JApiChangeStatus.REMOVED);
             } else if (newFieldOptional.isPresent()) {
                 CtField newField = newFieldOptional.get();
                 String newType = signatureToType(newField.getSignature());
-                return new JApiType(Optional.<String>absent(), Optional.of(newType), JApiChangeStatus.NEW);
+				jApiType = new JApiType(Optional.<String>absent(), Optional.of(newType), JApiChangeStatus.NEW);
             }
         }
-        return new JApiType(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
+		return jApiType;
     }
 
     private String signatureToType(String signature) {
@@ -114,41 +115,42 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     }
 
     private JApiAttribute<SyntheticAttribute> extractSyntheticAttribute(Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
+		JApiAttribute<SyntheticAttribute> jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
         if (oldFieldOptional.isPresent() && newFieldOptional.isPresent()) {
             CtField oldField = oldFieldOptional.get();
             CtField newField = newFieldOptional.get();
             byte[] attributeOldField = oldField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
             byte[] attributeNewField = newField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
             if (attributeOldField != null && attributeNewField != null) {
-                return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
             } else if (attributeOldField != null) {
-                return new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
             } else if (attributeNewField != null) {
-                return new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
             } else {
-                return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
             }
         } else {
             if (oldFieldOptional.isPresent()) {
                 CtField ctField = oldFieldOptional.get();
                 byte[] attribute = ctField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
                 if (attribute != null) {
-                    return new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>absent());
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>absent());
                 } else {
-                    return new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>absent());
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>absent());
                 }
             }
             if (newFieldOptional.isPresent()) {
                 CtField ctField = newFieldOptional.get();
                 byte[] attribute = ctField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
                 if (attribute != null) {
-                    return new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
                 } else {
-                    return new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
                 }
             }
         }
-        return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+        return jApiAttribute;
     }
 
     private JApiModifier<StaticModifier> extractStaticModifier(Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
