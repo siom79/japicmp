@@ -163,6 +163,10 @@ public class JApiCmpMojo extends AbstractMojo {
 				Boolean ignoreMissingClasses = Boolean.valueOf(ignoreMissingClassesString);
 				options.setIgnoreMissingClasses(ignoreMissingClasses);
 			}
+			String htmlStylesheet = parameterParam.getHtmlStylesheet();
+			if (htmlStylesheet != null) {
+				options.setHtmlStylesheet(Optional.of(htmlStylesheet));
+			}
 		}
 		return options;
 	}
@@ -297,7 +301,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 				return file;
 			} else {
-				throw new MojoFailureException(String.format("Missing configuration parameter 'dependency'."));
+				throw new MojoFailureException("Missing configuration parameter 'dependency'.");
 			}
 		}
 		throw new MojoFailureException(String.format("Missing configuration parameter: %s", parameterName));

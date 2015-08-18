@@ -13,6 +13,8 @@ public class Parameter {
     private String includeSynthetic;
 	private String ignoreMissingClasses;
 	private String skipPomModules;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String htmlStylesheet;
 
     public String getAccessModifier() {
         return accessModifier;
@@ -91,5 +93,13 @@ public class Parameter {
 
 	public void setSkipPomModules(String skipPomModules) {
 		this.skipPomModules = skipPomModules;
+	}
+
+	public String getHtmlStylesheet() {
+		return htmlStylesheet;
+	}
+
+	public void setHtmlStylesheet(String htmlStylesheet) {
+		this.htmlStylesheet = htmlStylesheet;
 	}
 }
