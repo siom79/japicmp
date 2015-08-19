@@ -9,7 +9,7 @@ It can also be used as a library:
 	JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
-    
+
 japicmp is available in the Maven Central Repository:
 
 	<dependency>
@@ -25,10 +25,10 @@ has changed in comparison to the last release. Without the appropriate tooling, 
 This tool/library helps you to determine the differences between the java class files that are contained in two given
 jar archives.
 
-This library does not use the Java Reflection API to compute the differences, as the usage of the Reflection API makes 
-it necessary to include all classes the jar archive under investigation depends on are available on the classpath. 
-To prevent the inclusion of all dependencies, which can be a lot of work for bigger applications, this library makes 
-use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/) library to inspect the class files. 
+This library does not use the Java Reflection API to compute the differences, as the usage of the Reflection API makes
+it necessary to include all classes the jar archive under investigation depends on are available on the classpath.
+To prevent the inclusion of all dependencies, which can be a lot of work for bigger applications, this library makes
+use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/) library to inspect the class files.
 This way you only have to provide the two jar archives on the command line (and eventually libraries that contain
 classes/interfaces you have extended/implemented).
 
@@ -124,7 +124,7 @@ When your library implements interfaces or extends classes from other libraries 
 have to add these to the class path:
 
 	java -cp japicmp-0.5.3-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
-    
+
 ###Usage maven plugin###
 
 The maven plugin can be included in the pom.xml file of your artifact in the following way (requires maven >= 3.0.3):
@@ -190,10 +190,10 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             </plugin>
         </plugins>
     </build>
-    
+
 The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify which version you want to compare. Both elements
  support either a &lt;dependency&gt; or a &lt;file&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
-  
+
 * onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
 * includes: List of package, classes, methods and field that should be included. The syntax is similar to the one use for javadoc references.
 * excludes: List of package, classes, methods and field that should be excluded. The syntax is similar to the one use for javadoc references.
@@ -247,12 +247,12 @@ of your artifact. Alternatively it can be used inside the `<reporting/>` tag in 
 	</plugins>
 </reporting>
 ```
-	
+
 ##Examples##
 
 ###Comparing two versions of the guava library###
 
-In the following you see the beginning of the differences between the versions 16.0 and 17.0 of Google's guava library. The differences between the two Java APIs are also printed on the command line for a quick overview. Please note that binary incompatible changes are flagged with an exclamation mark. 
+In the following you see the beginning of the differences between the versions 16.0 and 17.0 of Google's guava library. The differences between the two Java APIs are also printed on the command line for a quick overview. Please note that binary incompatible changes are flagged with an exclamation mark.
 
 	***! MODIFIED CLASS: PUBLIC FINAL com.google.common.base.Stopwatch
 		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch()
@@ -345,7 +345,7 @@ You can also let japicmp create an XML report like the following one:
 				<superclass binaryCompatible="true" changeStatus="UNCHANGED" superclassNew="n.a." superclassOld="n.a."/>
 			</class>
 		...
-    
+
 ###Tracking changes of an XML document marshalled with JAXB###
 
 The following output shows the changes of a model class with some JAXB bindings:
@@ -359,7 +359,7 @@ The following output shows the changes of a model class with some JAXB bindings:
 			+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlElement
 		***  MODIFIED ANNOTATION: javax.xml.bind.annotation.XmlRootElement
 			***  MODIFIED ELEMENT: name=document (<- simpleDocument)
-			
+
 As can bee seen from the output above, the XML attributes title and author have changed to an XML element. The name of the XML root element has also changed from "simpleDocument" to "document".
 
 ##Downloads##
@@ -369,6 +369,14 @@ You can download the latest version from the [release page](https://github.com/s
 ##Development##
 
 * ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
+
+###Reports###
+
+Use the maven site plugin (`mvn site`) to generate the following reports:
+ * findbugs
+ * checkstyle
+ * japicmp
+ * cobertura test coverage
 
 ###Release###
 
@@ -381,18 +389,16 @@ mvn release:perform -Dgpg.passphrase=passphrase
 ```
 * Login to [Sonatype's Nexus repository](https://oss.sonatype.org/)
 	* Download released artifact from staging repository.
-	* Close and release staging repository if manual tests are successful.
+	* Close and release staging repository if sanity checks are successful.
 
 ##Contributions
 
 Pull requests are welcome, but please follow these rules:
 
-* Use `Java Conventions` as provided by your IDE for formatting with the following settings:
-    * Indentation with tab
-    * Newline: LF
-    * Line length: 180
-* Provide a unit test for every change
-* Name classes/methods/fields expressively
+* The basic editor settings (indentation, newline, etc.) are described in the `.editorconfig` file (see [EditorConfig](http://editorconfig.org/)).
+* Provide a unit test for every change.
+* Name classes/methods/fields expressively.
+* Fork the repo and create a pull request (see [GitHub Flow](https://guides.github.com/introduction/flow/index.html)).
 
 ##Related work##
 

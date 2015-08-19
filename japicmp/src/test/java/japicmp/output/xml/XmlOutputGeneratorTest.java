@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -33,7 +34,7 @@ public class XmlOutputGeneratorTest {
 		Options options = new Options();
 		options.setHtmlStylesheet(Optional.of(stylesheetPath.toString()));
 		options.setHtmlOutputFile(Optional.of(htmlReportPath.toString()));
-		Files.write(stylesheetPath, Arrays.asList(stylesheetContent), Charset.forName("UTF-8"));
+		Files.write(stylesheetPath, Collections.singletonList(stylesheetContent), Charset.forName("UTF-8"));
 		generateHtmlReport(options);
 		boolean foundStyleSheet = false;
 		List<String> lines = Files.readAllLines(htmlReportPath, Charset.forName("UTF-8"));

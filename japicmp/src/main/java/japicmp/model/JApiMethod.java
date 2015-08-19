@@ -31,6 +31,7 @@ public class JApiMethod extends JApiBehavior {
     }
 
     private JApiReturnType computeReturnTypeChanges(Optional<CtMethod> oldMethodOptional, Optional<CtMethod> newMethodOptional) {
+        JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.<String>absent(), Optional.<String>absent());
         if(oldMethodOptional.isPresent() && newMethodOptional.isPresent()) {
             String oldReturnType = computeReturnType(oldMethodOptional.get());
             String newReturnType = computeReturnType(newMethodOptional.get());
@@ -38,18 +39,18 @@ public class JApiMethod extends JApiBehavior {
             if (!oldReturnType.equals(newReturnType)) {
                 changeStatusReturnType = JApiChangeStatus.MODIFIED;
             }
-            return new JApiReturnType(changeStatusReturnType, Optional.of(oldReturnType), Optional.of(newReturnType));
+            jApiReturnType = new JApiReturnType(changeStatusReturnType, Optional.of(oldReturnType), Optional.of(newReturnType));
         } else {
             if (oldMethodOptional.isPresent()) {
                 String oldReturnType = computeReturnType(oldMethodOptional.get());
-                return new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType), Optional.<String>absent());
+                jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType), Optional.<String>absent());
             }
             if (newMethodOptional.isPresent()) {
                 String newReturnType = computeReturnType(newMethodOptional.get());
-                return new JApiReturnType(JApiChangeStatus.NEW, Optional.<String>absent(), Optional.of(newReturnType));
+                jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.<String>absent(), Optional.of(newReturnType));
             }
         }
-        throw new JApiCmpException(JApiCmpException.Reason.IllegalState, "Cannot compute return type change for method when old and new method is absent.");
+        return jApiReturnType;
     }
 
     private String computeReturnType(CtMethod oldMethod) {
