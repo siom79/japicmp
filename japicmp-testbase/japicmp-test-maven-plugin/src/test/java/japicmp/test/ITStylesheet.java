@@ -4,6 +4,7 @@ import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,17 +22,12 @@ public class ITStylesheet {
 	public void testStylesheetIsUsed() throws IOException {
 		Path htmlPath = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "japicmp.html");
 		assertThat(Files.exists(htmlPath), is(true));
-		List<String> htmlLines = Files.readAllLines(htmlPath);
-		List<String> cssLines = Files.readAllLines(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "css", "stylesheet.css"));
+		List<String> htmlLines = Files.readAllLines(htmlPath, Charset.forName("UTF-8"));
+		List<String> cssLines = Files.readAllLines(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "css", "stylesheet.css"), Charset.forName("UTF-8"));
 		assertThat(htmlLines.size(), not(is(0)));
 		assertThat(cssLines.size(), not(is(0)));
 		for (String cssLine : cssLines) {
 			assertThat(htmlLines, hasItem(cssLine));
 		}
-	}
-
-	private String readFileAsString(Path htmlPath) throws IOException {
-		byte[] htmlBytes = Files.readAllBytes(htmlPath);
-		return new String(htmlBytes, "UTF-8");
 	}
 }
