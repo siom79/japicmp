@@ -192,7 +192,8 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
     </build>
 
 The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify which version you want to compare. Both elements
- support either a &lt;dependency&gt; or a &lt;file&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
+support either a &lt;dependency&gt; or a &lt;file&gt; element. If necessary you can select the artifact by providing a &lt;classifier&gt; element inside
+the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
 
 * onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
 * includes: List of package, classes, methods and field that should be included. The syntax is similar to the one use for javadoc references.
