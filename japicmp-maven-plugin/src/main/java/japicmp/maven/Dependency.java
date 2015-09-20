@@ -6,6 +6,7 @@ public class Dependency {
     private String version;
     private String scope;
     private String systemPath;
+	private String classifier;
 
     public String getGroupId() {
         return groupId;
@@ -47,14 +48,24 @@ public class Dependency {
         this.systemPath = systemPath;
     }
 
-    @Override
-    public String toString() {
-        return "Dependency{" +
-                "groupId='" + groupId + '\'' +
-                ", artifactId='" + artifactId + '\'' +
-                ", version='" + version + '\'' +
-                ", scope='" + scope + '\'' +
-                ", systemPath='" + systemPath + '\'' +
-                '}';
-    }
+	public String getClassifier() {
+		return classifier;
+	}
+
+	public void setClassifier(String classifier) {
+		this.classifier = classifier;
+	}
+
+	@Override
+	public String toString() {
+		return "Dependency{" +
+			"groupId='" + groupId + '\'' +
+			", artifactId='" + artifactId + '\'' +
+			", version='" + version + '\'' +
+			", scope='" + scope + '\'' +
+			", systemPath='" + systemPath + '\'' +
+			", classifier='" + classifier + '\'' +
+			'}';
+	}
+
 }

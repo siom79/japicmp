@@ -361,7 +361,13 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private Optional<File> resolveArtifact(Dependency dependency, MavenParameters mavenParameters) throws MojoFailureException {
 		notNull(mavenParameters.getArtifactRepositories(), "Maven parameter artifactRepositories should be provided by maven container.");
-		Artifact artifact = mavenParameters.getArtifactFactory().createBuildArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "jar");
+		Artifact artifact;
+		ArtifactFactory artifactFactory = mavenParameters.getArtifactFactory();
+		if (dependency.getClassifier() != null && dependency.getClassifier().trim().length() > 0) {
+			artifact = artifactFactory.createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "jar", dependency.getClassifier());
+		} else {
+			artifact = artifactFactory.createBuildArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "jar");
+		}
 		return resolveArtifact(artifact, mavenParameters);
 	}
 

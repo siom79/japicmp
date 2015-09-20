@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>japicmp-test-maven-plugin</artifactId>
+    <artifactId>japicmp-test-maven-plugin-classifier</artifactId>
 
     <dependencies>
         <dependency>
@@ -27,7 +27,7 @@
                     <oldVersion>
                         <dependency>
                             <groupId>com.github.siom79.japicmp</groupId>
-                            <artifactId>japicmp-test-v1</artifactId>
+							<artifactId>japicmp-test-v2</artifactId>
                             <version>${project.version}</version>
                         </dependency>
                     </oldVersion>
@@ -36,15 +36,15 @@
                             <groupId>com.github.siom79.japicmp</groupId>
                             <artifactId>japicmp-test-v2</artifactId>
                             <version>${project.version}</version>
+							<classifier>added</classifier>
                         </dependency>
                     </newVersion>
                     <parameter>
-                        <onlyModified>true</onlyModified>
+                        <onlyModified>false</onlyModified>
                         <accessModifier>public</accessModifier>
                         <breakBuildOnModifications>false</breakBuildOnModifications>
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
                         <includeSynthetic>true</includeSynthetic>
-                        <htmlStylesheet>${project.basedir}/src/main/resources/css/stylesheet.css</htmlStylesheet>
                     </parameter>
                     <dependencies>
                         <dependency>
