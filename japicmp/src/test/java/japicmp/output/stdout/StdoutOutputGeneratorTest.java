@@ -5,7 +5,6 @@ import japicmp.config.Options;
 import japicmp.model.JApiClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -16,7 +15,7 @@ public class StdoutOutputGeneratorTest {
 	@Test
 	public void testNoChanges() {
 		Options options = new Options();
-		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0), new File("/tmp"), new File("/tmp"));
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0));
 		String generated = generator.generate();
 		assertThat(generated, containsString(StdoutOutputGenerator.NO_CHANGES));
 	}
@@ -25,7 +24,7 @@ public class StdoutOutputGeneratorTest {
 	public void testWarningWhenIgnoreMissingClasses() {
 		Options options = new Options();
 		options.setIgnoreMissingClasses(true);
-		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0), new File("/tmp"), new File("/tmp"));
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0));
 		String generated = generator.generate();
 		assertThat(generated, containsString(StdoutOutputGenerator.WARNING));
 		assertThat(generated, containsString(JApiCli.IGNORE_MISSING_CLASSES));

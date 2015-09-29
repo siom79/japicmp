@@ -54,7 +54,7 @@ public class XmlOutputGeneratorTest {
 		options.setXmlOutputFile(Optional.of(xmlOutpuFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
-		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options, true);
+		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, true);
 		XmlOutput xmlOutput = generator.generate();
 		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}

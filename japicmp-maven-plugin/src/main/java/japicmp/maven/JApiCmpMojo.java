@@ -1,7 +1,6 @@
 package japicmp.maven;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -85,13 +84,13 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 		File newVersionFile = retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters);
 		File oldVersionFile = retrieveFileFromConfiguration(pluginParameters.getOldVersionParam(), "oldVersion", mavenParameters);
-		Options options = createOptions(pluginParameters.getParameterParam());
+		Options options = createOptions(pluginParameters.getParameterParam(), oldVersionFile, newVersionFile);
 		List<JApiClass> jApiClasses = compareArchives(newVersionFile, oldVersionFile, options, pluginParameters.getDependenciesParam(), mavenParameters);
 		try {
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
-			String diffOutput = generateDiffOutput(newVersionFile, oldVersionFile, jApiClasses, options);
+			String diffOutput = generateDiffOutput(jApiClasses, options);
 			createFileAndWriteTo(diffOutput, jApiCmpBuildDir);
-			XmlOutput xmlOutput = generateXmlOutput(newVersionFile, oldVersionFile, jApiClasses, jApiCmpBuildDir, options);
+			XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options);
 			if (pluginParameters.isWriteToFiles()) {
 				XmlOutputGenerator.writeToFiles(options, xmlOutput);
 			}
@@ -119,8 +118,10 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private Options createOptions(Parameter parameterParam) throws MojoFailureException {
+	private Options createOptions(Parameter parameterParam, File oldVersion, File newVersion) throws MojoFailureException {
 		Options options = new Options();
+		options.getOldArchives().add(oldVersion);
+		options.getNewArchives().add(newVersion);
 		if (parameterParam != null) {
 			String accessModifierArg = parameterParam.getAccessModifier();
 			if (accessModifierArg != null) {
@@ -228,17 +229,17 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private String generateDiffOutput(File newVersionFile, File oldVersionFile, List<JApiClass> jApiClasses, Options options) {
-		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses, oldVersionFile, newVersionFile);
+	private String generateDiffOutput(List<JApiClass> jApiClasses, Options options) {
+		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
 		String diffOutput = stdoutOutputGenerator.generate();
 		getLog().info(diffOutput);
 		return diffOutput;
 	}
 
-	private XmlOutput generateXmlOutput(File newVersionFile, File oldVersionFile, List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options) throws IOException, MojoFailureException {
+	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options) throws IOException, MojoFailureException {
 		options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + "japicmp.xml"));
 		options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + "japicmp.html"));
-		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldVersionFile.getAbsolutePath(), newVersionFile.getAbsolutePath(), jApiClasses, options, false);
+		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, false);
 		return xmlGenerator.generate();
 	}
 
