@@ -21,6 +21,16 @@
             <artifactId>japicmp-test-v2</artifactId>
             <version>${project.version}</version>
         </dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test2-v1</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test2-v2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
@@ -60,6 +70,22 @@
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                     <destFileName>japicmp-test-v2.jar</destFileName>
                                 </artifactItem>
+								<artifactItem>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test2-v1</artifactId>
+									<version>${project.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>japicmp-test2-v1.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test2-v2</artifactId>
+									<version>${project.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>japicmp-test2-v2.jar</destFileName>
+								</artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>

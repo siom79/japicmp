@@ -28,10 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,13 +51,15 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		return createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
 	}
 
-	public static void writeToFiles(Options options, XmlOutput xmlOutput) {
+	public static List<File> writeToFiles(Options options, XmlOutput xmlOutput) {
+		List<File> filesWritten = new ArrayList<>();
 		try {
 			if (xmlOutput.getXmlOutputStream().isPresent() && options.getXmlOutputFile().isPresent()) {
 				File xmlFile = new File(options.getXmlOutputFile().get());
 				try (FileOutputStream fos = new FileOutputStream(xmlFile)) {
 					ByteArrayOutputStream outputStream = xmlOutput.getXmlOutputStream().get();
 					outputStream.writeTo(fos);
+					filesWritten.add(xmlFile);
 				} catch (IOException e) {
 					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to write XML file '" + xmlFile.getAbsolutePath() + "': " + e.getMessage(), e);
 				}
@@ -70,6 +69,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 				try (FileOutputStream fos = new FileOutputStream(htmlFile)) {
 					ByteArrayOutputStream outputStream = xmlOutput.getHtmlOutputStream().get();
 					outputStream.writeTo(fos);
+					filesWritten.add(htmlFile);
 				} catch (IOException e) {
 					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to write HTML file '" + htmlFile.getAbsolutePath() + "': " + e.getMessage(), e);
 				}
@@ -79,6 +79,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 				xmlOutput.close();
 			} catch (Exception ignored) {}
 		}
+		return filesWritten;
 	}
 
 	private void analyzeJpaAnnotations(JApiCmpXmlRoot jApiCmpXmlRoot, List<JApiClass> jApiClasses) {
@@ -89,6 +90,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 
 	private XmlOutput createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
 		XmlOutput xmlOutput = new XmlOutput();
+		xmlOutput.setJApiCmpXmlRoot(jApiCmpXmlRoot);
 		ByteArrayOutputStream xmlBaos = null;
 		InputStream styleSheetAsInputStream = null;
 		InputStream xsltAsInputStream = null;

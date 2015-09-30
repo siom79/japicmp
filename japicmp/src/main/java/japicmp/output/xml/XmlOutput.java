@@ -1,12 +1,14 @@
 package japicmp.output.xml;
 
 import com.google.common.base.Optional;
+import japicmp.output.xml.model.JApiCmpXmlRoot;
 
 import java.io.ByteArrayOutputStream;
 
 public class XmlOutput implements AutoCloseable {
 	private Optional<ByteArrayOutputStream> xmlOutputStream = Optional.absent();
 	private Optional<ByteArrayOutputStream> htmlOutputStream = Optional.absent();
+	private japicmp.output.xml.model.JApiCmpXmlRoot JApiCmpXmlRoot;
 
 	public Optional<ByteArrayOutputStream> getXmlOutputStream() {
 		return xmlOutputStream;
@@ -32,5 +34,13 @@ public class XmlOutput implements AutoCloseable {
 		if (this.htmlOutputStream.isPresent()) {
 			this.htmlOutputStream.get().close();
 		}
+	}
+
+	public void setJApiCmpXmlRoot(JApiCmpXmlRoot JApiCmpXmlRoot) {
+		this.JApiCmpXmlRoot = JApiCmpXmlRoot;
+	}
+
+	public JApiCmpXmlRoot getJApiCmpXmlRoot() {
+		return JApiCmpXmlRoot;
 	}
 }

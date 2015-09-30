@@ -20,7 +20,7 @@ public class ITStylesheet {
 
 	@Test
 	public void testStylesheetIsUsed() throws IOException {
-		Path htmlPath = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "japicmp.html");
+		Path htmlPath = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "single-version.html");
 		assertThat(Files.exists(htmlPath), is(true));
 		List<String> htmlLines = Files.readAllLines(htmlPath, Charset.forName("UTF-8"));
 		List<String> cssLines = Files.readAllLines(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "css", "stylesheet.css"), Charset.forName("UTF-8"));

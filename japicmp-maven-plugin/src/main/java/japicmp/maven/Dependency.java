@@ -1,6 +1,6 @@
 package japicmp.maven;
 
-public class Dependency {
+public class Dependency implements DependencyDescriptor {
     private String groupId;
     private String artifactId;
     private String version;

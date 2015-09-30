@@ -8,7 +8,7 @@ It can also be used as a library:
 
 	JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
-	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
+	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchives);
 
 japicmp is available in the Maven Central Repository:
 
@@ -108,10 +108,12 @@ OPTIONS
             Outputs only modified classes/methods.
 
         -n <pathToNewVersionJar>, --new <pathToNewVersionJar>
-            Provides the path to the new version of the jar.
+            Provides the path to the new version(s) of the jar(s). Use ; to
+            separate jar files.
 
         -o <pathToOldVersionJar>, --old <pathToOldVersionJar>
-            Provides the path to the old version of the jar.
+            Provides the path to the old version(s) of the jar(s). Use ; to
+            separate jar files.
 
         -s, --semantic-versioning
             Tells you which part of the version to increment.
@@ -124,6 +126,10 @@ When your library implements interfaces or extends classes from other libraries 
 have to add these to the class path:
 
 	java -cp japicmp-0.5.3-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+
+For reporting purposes you can also provide more than one jar as old or new version(s):
+
+	java -jar japicmp-0.5.3-jar-with-dependencies.jar -o lib1-old.jar;lib2-old.jar -n lib1-new.jar;lib2-new.jar
 
 ###Usage maven plugin###
 
@@ -224,7 +230,10 @@ Dependencies declared in the enclosing pom.xml and its parents are added automat
 are appended to the classpath before the ones from the enclosing pom.xml.
 
 The maven plugin produces the two files `japicmp.diff` and `japicmp.xml` within the directory `${project.build.directory}/japicmp`
-of your artifact. Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
+of your artifact. If you run the plugin multiple times within the same module using the &lt;executions&gt; element, the reports
+are named after the execution id.
+
+Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
 [maven-site-plugin](https://maven.apache.org/plugins/maven-site-plugin/) and therewith to be integrated into the site report:
 
 ```
@@ -247,6 +256,36 @@ of your artifact. Alternatively it can be used inside the `<reporting/>` tag in 
 		</plugin>
 	</plugins>
 </reporting>
+```
+To create a summary report, you can also provide multiple old and new versions:
+```
+<configuration>
+	<oldVersions>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test-v1</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test2-v1</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</oldVersions>
+	<newVersions>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test-v2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test2-v2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</newVersions>
+	...
+</configuration>
 ```
 
 ##Examples##
