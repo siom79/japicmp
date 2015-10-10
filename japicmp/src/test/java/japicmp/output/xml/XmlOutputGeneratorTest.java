@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -33,7 +33,7 @@ public class XmlOutputGeneratorTest {
 		Options options = new Options();
 		options.setHtmlStylesheet(Optional.of(stylesheetPath.toString()));
 		options.setHtmlOutputFile(Optional.of(htmlReportPath.toString()));
-		Files.write(stylesheetPath, Arrays.asList(stylesheetContent), Charset.forName("UTF-8"));
+		Files.write(stylesheetPath, Collections.singletonList(stylesheetContent), Charset.forName("UTF-8"));
 		generateHtmlReport(options);
 		boolean foundStyleSheet = false;
 		List<String> lines = Files.readAllLines(htmlReportPath, Charset.forName("UTF-8"));
@@ -75,8 +75,8 @@ public class XmlOutputGeneratorTest {
 		List<JApiClass> jApiClasses = new ArrayList<>();
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-		jApiClasses.add(new JApiClass(new JarArchiveComparator(jarArchiveComparatorOptions), "japicmp.Test", Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.NEW, classType));
-		XmlOutputGenerator generator = new XmlOutputGenerator("/tmp/old.jar", "/tmp/new.jar", jApiClasses, options, true);
+		jApiClasses.add(new JApiClass(new JarArchiveComparator(jarArchiveComparatorOptions), "japicmp.Test", Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.NEW, classType, jarArchiveComparatorOptions));
+		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, true);
 		XmlOutput xmlOutput = generator.generate();
 		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}

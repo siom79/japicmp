@@ -6,6 +6,10 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
@@ -15,93 +19,47 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * @goal cmp-report
- * @phase site
- */
+@Mojo(name = "cmp-report", defaultPhase = LifecyclePhase.SITE)
 public class JApiCmpReport extends AbstractMavenReport {
-	/**
-	 * @parameter
-	 * @required
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private Version oldVersion;
-
-	/**
-	 * @parameter
-	 * @required
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<DependencyDescriptor> oldVersions;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private Version newVersion;
-
-	/**
-	 * @parameter
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<DependencyDescriptor> newVersions;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private Parameter parameter;
-
-	/**
-	 * @parameter
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<Dependency> dependencies;
-
-	/**
-	 * @parameter
-	 */
-	private List<Dependency> newClassPathDependencies;
-
-	/**
-	 * @parameter
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<Dependency> oldClassPathDependencies;
-
-	/**
-	 * @parameter
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<Dependency> newClassPathDependencies;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String skip;
-
-	/**
-	 * Directory where reports will go.
-	 *
-	 * @parameter property="project.reporting.outputDirectory"
-	 * @required
-	 * @readonly
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = true, readonly = true, property = "project.reporting.outputDirectory")
 	private String outputDirectory;
-
-	/**
-	 * @component
-	 * @required
-	 */
+	@Component
 	private ArtifactFactory artifactFactory;
-
-	/**
-	 * @component
-	 * @required
-	 */
+	@Component
 	private ArtifactResolver artifactResolver;
-
-	/**
-	 * @parameter default-value="${localRepository}"
-	 * @required
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${localRepository}")
 	private ArtifactRepository localRepository;
-
-	/**
-	 * @parameter default-value="${project.remoteArtifactRepositories}"
-	 * @required
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project.remoteArtifactRepositories}")
 	private List<ArtifactRepository> artifactRepositories;
-
-	/**
-	 * @parameter default-value="${project}"
-	 * @required
-	 */
+	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project}")
 	private MavenProject mavenProject;
+	@org.apache.maven.plugins.annotations.Parameter( defaultValue = "${mojoExecution}", readonly = true )
+	private MojoExecution mojoExecution;
 
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
 		try {
 			JApiCmpMojo mojo = new JApiCmpMojo();
-			MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject);
-			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, oldClassPathDependencies, newClassPathDependencies, Optional.<File>absent(), Optional.of(outputDirectory), false);
+			MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution);
+			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(pluginParameters, mavenParameters);
 			if (xmlOutputOptional.isPresent()) {
 				XmlOutput xmlOutput = xmlOutputOptional.get();

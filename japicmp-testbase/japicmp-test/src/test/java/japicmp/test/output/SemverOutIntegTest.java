@@ -1,6 +1,7 @@
 package japicmp.test.output;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Strings;
@@ -99,8 +100,8 @@ public class SemverOutIntegTest {
 		JarArchiveComparator jarArchiveComparator = newComparator(lastPackage, accessModifier);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldFile, newFile);
 		Options options = new Options();
-		options.setNewArchive(newFile);
-		options.setOldArchive(oldFile);
+		options.setNewArchives(Collections.singletonList(newFile));
+		options.setOldArchives(Collections.singletonList(oldFile));
 		options.setAccessModifier(accessModifier);
 		options.setOutputOnlyModifications(false);
 		return new SemverOut(options, jApiClasses).value();

@@ -18,6 +18,7 @@ import japicmp.output.xml.XmlOutputGenerator;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 
@@ -34,9 +35,9 @@ public class JApiCli {
 	public static class Compare implements Runnable {
 		@Inject
 		public HelpOption helpOption;
-		@Option(name = {"-o", "--old"}, description = "Provides the path to the old version of the jar.")
+		@Option(name = { "-o", "--old" }, description = "Provides the path to the old version(s) of the jar(s). Use ; to separate jar files.")
 		public String pathToOldVersionJar;
-		@Option(name = {"-n", "--new"}, description = "Provides the path to the new version of the jar.")
+		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version(s) of the jar(s). Use ; to separate jar files.")
 		public String pathToNewVersionJar;
 		@Option(name = {"-m", "--only-modified"}, description = "Outputs only modified classes/methods.")
 		public boolean modifiedOnly;
@@ -70,33 +71,33 @@ public class JApiCli {
 			Options options = createOptions();
 			verifyOptions(options);
 			JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));
-			List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchive(), options.getNewArchive());
-			generateOutput(options, options.getOldArchive(), options.getNewArchive(), jApiClasses);
+			List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
+			generateOutput(options, jApiClasses);
 		}
 
-		private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
+		private void generateOutput(Options options, List<JApiClass> jApiClasses) {
 			if (semanticVersioning) {
 				SemverOut semverOut = new SemverOut(options, jApiClasses);
 				semverOut.generate();
 				return;
 			}
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
-				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options, true);
+				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, true);
 				try (XmlOutput xmlOutput = xmlGenerator.generate()) {
 					XmlOutputGenerator.writeToFiles(options, xmlOutput);
 				} catch (Exception e) {
 					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Could not close output streams: " + e.getMessage(), e);
 				}
 			}
-			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses, oldArchive, newArchive);
+			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
 			String output = stdoutOutputGenerator.generate();
 			System.out.println(output);
 		}
 
 		private Options createOptions() {
 			Options options = new Options();
-			options.setNewArchive(new File(checkNonNull(pathToNewVersionJar, "Required option -n is missing.")));
-			options.setOldArchive(new File(checkNonNull(pathToOldVersionJar, "Required option -o is missing.")));
+			options.getOldArchives().addAll(createFileList(checkNonNull(pathToOldVersionJar, "Required option -o is missing.")));
+			options.getNewArchives().addAll(createFileList(checkNonNull(pathToNewVersionJar, "Required option -n is missing.")));
 			options.setXmlOutputFile(Optional.fromNullable(pathToXmlOutputFile));
 			options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
 			options.setOutputOnlyModifications(modifiedOnly);
@@ -112,13 +113,22 @@ public class JApiCli {
 			return options;
 		}
 
+		private List<File> createFileList(String option) {
+			String[] parts = option.split(";");
+			List<File> files = new ArrayList<>(parts.length);
+			for (String part : parts) {
+				File file = new File(part);
+				files.add(file);
+			}
+			return files;
+		}
+
 		private void verifyOptions(Options options) {
-			File oldArchive = options.getOldArchive();
-			File newArchive = options.getNewArchive();
-			verifyJarFileExists(oldArchive);
-			verifyJarFileExists(newArchive);
-			if (oldArchive.equals(newArchive)) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
+			for (File file : options.getOldArchives()) {
+				verifyExistsCanReadAndJar(file);
+			}
+			for (File file : options.getNewArchives()) {
+				verifyExistsCanReadAndJar(file);
 			}
 			if (options.getHtmlStylesheet().isPresent()) {
 				String pathname = options.getHtmlStylesheet().get();
@@ -138,15 +148,36 @@ public class JApiCli {
 			}
 		}
 
-		private void verifyJarFileExists(File file) {
+		private void verifyExistsCanReadAndJar(File file) {
 			verifyExisting(file);
 			verifyCanRead(file);
 			verifyJarArchive(file);
 		}
 
+		private void verifyExisting(File newArchive) {
+			if (!newArchive.exists()) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
+			}
+		}
+
 		private void verifyCanRead(File file) {
 			if (!file.canRead()) {
 				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Cannot read file '%s'.", file.getAbsolutePath());
+			}
+		}
+
+		private void verifyJarArchive(File file) {
+			JarFile jarFile = null;
+			try {
+				jarFile = new JarFile(file);
+			} catch (IOException e) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+			} finally {
+				if (jarFile != null) {
+					try {
+						jarFile.close();
+					} catch (IOException ignored) {}
+				}
 			}
 		}
 
@@ -169,28 +200,6 @@ public class JApiCli {
 				}
 			} else {
 				return Optional.of(AccessModifier.PROTECTED);
-			}
-		}
-
-		private void verifyExisting(File newArchive) {
-			if (!newArchive.exists()) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
-			}
-		}
-
-		private void verifyJarArchive(File file) {
-			JarFile jarFile = null;
-			try {
-				jarFile = new JarFile(file);
-			} catch (IOException e) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
-			} finally {
-				if (jarFile != null) {
-					try {
-						jarFile.close();
-					} catch (IOException ignored) {
-					}
-				}
 			}
 		}
 	}

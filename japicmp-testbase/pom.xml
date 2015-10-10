@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-base</artifactId>
-        <version>0.5.2-SNAPSHOT</version>
+        <version>0.5.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>japicmp-testbase</artifactId>
@@ -18,7 +18,11 @@
         <module>japicmp-test-maven-plugin-guava</module>
 		<module>japicmp-test-maven-plugin-japicmp</module>
         <module>japicmp-test-service-impl-base</module>
-    </modules>
+		<module>japicmp-test-maven-plugin-classifier</module>
+		<module>japicmp-test2-v1</module>
+		<module>japicmp-test2-v2</module>
+		<module>japicmp-test-maven-plugin-pom-module</module>
+	</modules>
 
     <build>
         <plugins>

@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Options {
-    private File oldArchive;
-    private File newArchive;
+    private List<File> oldArchives = new ArrayList<>();
+    private List<File> newArchives = new ArrayList<>();
     private boolean outputOnlyModifications = false;
     private boolean outputOnlyBinaryIncompatibleModifications = false;
     private Optional<String> xmlOutputFile = Optional.absent();
@@ -30,20 +30,20 @@ public class Options {
 	private Optional<String> newClassPath = Optional.absent();
 	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
 
-	public File getNewArchive() {
-        return newArchive;
+	public List<File> getNewArchives() {
+        return newArchives;
     }
 
-    public void setNewArchive(File newArchive) {
-        this.newArchive = newArchive;
+    public void setNewArchives(List<File> newArchives) {
+        this.newArchives = newArchives;
     }
 
-    public File getOldArchive() {
-        return oldArchive;
+    public List<File> getOldArchives() {
+        return oldArchives;
     }
 
-    public void setOldArchive(File oldArchive) {
-        this.oldArchive = oldArchive;
+    public void setOldArchives(List<File> oldArchives) {
+        this.oldArchives = oldArchives;
     }
 
     public boolean isOutputOnlyModifications() {

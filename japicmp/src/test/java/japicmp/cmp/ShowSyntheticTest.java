@@ -10,7 +10,6 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +48,7 @@ public class ShowSyntheticTest {
 		assertThat(jApiClass.getFields().size(), is(1));
 		Options configOptions = new Options();
 		configOptions.setIncludeSynthetic(true);
-		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses, new File("v1.jar"), new File("v2.jar"));
+		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses);
 		String output = stdoutOutputGenerator.generate();
 		assertThat(output, containsString("+++  NEW CLASS: PUBLIC(+) SYNTHETIC(+) japicmp.SyntheticClass"));
 		assertThat(output, containsString("+++  NEW FIELD: PUBLIC(+) SYNTHETIC(+) int field"));
@@ -82,7 +81,7 @@ public class ShowSyntheticTest {
 		assertThat(jApiClass.getFields().size(), is(0));
 		Options configOptions = new Options();
 		configOptions.setIncludeSynthetic(true);
-		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses, new File("v1.jar"), new File("v2.jar"));
+		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses);
 		String output = stdoutOutputGenerator.generate();
 		assertThat(output, not(containsString("+++  NEW CLASS: PUBLIC(+) SYNTHETIC(+) japicmp.SyntheticClass")));
 		assertThat(output, not(containsString("+++  NEW FIELD: PUBLIC(+) SYNTHETIC(+) int field")));

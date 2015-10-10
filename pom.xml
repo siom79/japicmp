@@ -10,7 +10,7 @@
 
     <groupId>com.github.siom79.japicmp</groupId>
     <artifactId>japicmp-base</artifactId>
-    <version>0.5.2-SNAPSHOT</version>
+    <version>0.5.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>japicmp-base</name>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>com.github.stefanbirkner</groupId>
             <artifactId>system-rules</artifactId>
-            <version>1.9.0</version>
+            <version>1.12.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

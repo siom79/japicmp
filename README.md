@@ -2,20 +2,20 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.5.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.5.3-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
 	JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
-	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
-    
+	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchives);
+
 japicmp is available in the Maven Central Repository:
 
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.5.1</version>
+		<version>0.5.3</version>
 	</dependency>
 
 ##Motivation##
@@ -25,10 +25,10 @@ has changed in comparison to the last release. Without the appropriate tooling, 
 This tool/library helps you to determine the differences between the java class files that are contained in two given
 jar archives.
 
-This library does not use the Java Reflection API to compute the differences, as the usage of the Reflection API makes 
-it necessary to include all classes the jar archive under investigation depends on are available on the classpath. 
-To prevent the inclusion of all dependencies, which can be a lot of work for bigger applications, this library makes 
-use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/) library to inspect the class files. 
+This library does not use the Java Reflection API to compute the differences, as the usage of the Reflection API makes
+it necessary to include all classes the jar archive under investigation depends on are available on the classpath.
+To prevent the inclusion of all dependencies, which can be a lot of work for bigger applications, this library makes
+use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/) library to inspect the class files.
 This way you only have to provide the two jar archives on the command line (and eventually libraries that contain
 classes/interfaces you have extended/implemented).
 
@@ -109,13 +109,15 @@ OPTIONS
             Outputs only modified classes/methods.
 
         -n <pathToNewVersionJar>, --new <pathToNewVersionJar>
-            Provides the path to the new version of the jar.
+            Provides the path to the new version(s) of the jar(s). Use ; to
+            separate jar files.
 
         --new-classpath <newClassPath>
             The classpath for the new version.
 
         -o <pathToOldVersionJar>, --old <pathToOldVersionJar>
-            Provides the path to the old version of the jar.
+            Provides the path to the old version(s) of the jar(s). Use ; to
+            separate jar files.
 
         --old-classpath <oldClassPath>
             The classpath for the old version.
@@ -135,24 +137,28 @@ compatibility you must specify the classpath for the two different versions:
 
 In case the classpath for both versions did not change, you can add the library using the standard way:
 
-	java -cp japicmp-0.5.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
-    
+	java -cp japicmp-0.5.3-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+
+For reporting purposes you can also provide more than one jar as old or new version(s):
+
+	java -jar japicmp-0.5.3-jar-with-dependencies.jar -o lib1-old.jar;lib2-old.jar -n lib1-new.jar;lib2-new.jar
+
 ###Usage maven plugin###
 
-The maven plugin can be included in the pom.xml file of your artifact in the following way:
+The maven plugin can be included in the pom.xml file of your artifact in the following way (requires maven >= 3.0.3):
 
     <build>
         <plugins>
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.5.1</version>
+                <version>0.5.3</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.5.1</version>
+                            <version>0.5.3</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -180,7 +186,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
                         <includeSynthetic>false</includeSynthetic>
                         <ignoreMissingClasses>false</ignoreMissingClasses>
-                        <skip>false</skip>
+                        <skipPomModules>true</skipPomModules>
                     </parameter>
 					<dependencies>
 						<dependency>
@@ -202,10 +208,11 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             </plugin>
         </plugins>
     </build>
-    
+
 The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify which version you want to compare. Both elements
- support either a &lt;dependency&gt; or a &lt;file&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
-  
+support either a &lt;dependency&gt; or a &lt;file&gt; element. If necessary you can select the artifact by providing a &lt;classifier&gt; element inside
+the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
+
 * onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
 * includes: List of package, classes, methods and field that should be included. The syntax is similar to the one use for javadoc references.
 * excludes: List of package, classes, methods and field that should be excluded. The syntax is similar to the one use for javadoc references.
@@ -215,6 +222,7 @@ The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify 
 * onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
 * includeSynthetic: When set to true, changes for synthetic classes and class members are tracked.
 * ignoreMissingClasses: When set to true, superclasses and interfaces that cannot be resolved are ignored. Pleases note that in this case the results for the affected classes may not be accurate.
+* skipPomModules: Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.
 * skip: Setting this parameter to true will skip execution of the plugin.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
@@ -253,7 +261,10 @@ In case the classpath between both versions differs, you can add the dependencie
 ```
 
 The maven plugin produces the two files `japicmp.diff` and `japicmp.xml` within the directory `${project.build.directory}/japicmp`
-of your artifact. Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
+of your artifact. If you run the plugin multiple times within the same module using the &lt;executions&gt; element, the reports
+are named after the execution id.
+
+Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
 [maven-site-plugin](https://maven.apache.org/plugins/maven-site-plugin/) and therewith to be integrated into the site report:
 
 ```
@@ -262,7 +273,7 @@ of your artifact. Alternatively it can be used inside the `<reporting/>` tag in 
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.5.1</version>
+			<version>0.5.3</version>
 			<reportSets>
 				<reportSet>
 					<reports>
@@ -277,12 +288,42 @@ of your artifact. Alternatively it can be used inside the `<reporting/>` tag in 
 	</plugins>
 </reporting>
 ```
-	
+To create a summary report, you can also provide multiple old and new versions:
+```
+<configuration>
+	<oldVersions>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test-v1</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test2-v1</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</oldVersions>
+	<newVersions>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test-v2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test2-v2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</newVersions>
+	...
+</configuration>
+```
+
 ##Examples##
 
 ###Comparing two versions of the guava library###
 
-In the following you see the beginning of the differences between the versions 16.0 and 17.0 of Google's guava library. The differences between the two Java APIs are also printed on the command line for a quick overview. Please note that binary incompatible changes are flagged with an exclamation mark. 
+In the following you see the beginning of the differences between the versions 16.0 and 17.0 of Google's guava library. The differences between the two Java APIs are also printed on the command line for a quick overview. Please note that binary incompatible changes are flagged with an exclamation mark.
 
 	***! MODIFIED CLASS: PUBLIC FINAL com.google.common.base.Stopwatch
 		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch()
@@ -375,7 +416,7 @@ You can also let japicmp create an XML report like the following one:
 				<superclass binaryCompatible="true" changeStatus="UNCHANGED" superclassNew="n.a." superclassOld="n.a."/>
 			</class>
 		...
-    
+
 ###Tracking changes of an XML document marshalled with JAXB###
 
 The following output shows the changes of a model class with some JAXB bindings:
@@ -389,7 +430,7 @@ The following output shows the changes of a model class with some JAXB bindings:
 			+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlElement
 		***  MODIFIED ANNOTATION: javax.xml.bind.annotation.XmlRootElement
 			***  MODIFIED ELEMENT: name=document (<- simpleDocument)
-			
+
 As can bee seen from the output above, the XML attributes title and author have changed to an XML element. The name of the XML root element has also changed from "simpleDocument" to "document".
 
 ##Downloads##
@@ -400,16 +441,35 @@ You can download the latest version from the [release page](https://github.com/s
 
 * ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
 
+###Reports###
+
+Use the maven site plugin (`mvn site`) to generate the following reports:
+ * findbugs
+ * checkstyle
+ * japicmp
+ * cobertura test coverage
+
+###Release###
+
+This is the release procedure:
+* Increment version in README.md
+* Run release build (substitute passphrase with your GPG password):
+```
+mvn release:clean release:prepare -DautoVersionSubmodules=true -Dgpg.passphrase=passphrase
+mvn release:perform -Dgpg.passphrase=passphrase
+```
+* Login to [Sonatype's Nexus repository](https://oss.sonatype.org/)
+	* Download released artifact from staging repository.
+	* Close and release staging repository if sanity checks are successful.
+
 ##Contributions
 
 Pull requests are welcome, but please follow these rules:
 
-* Use `Java Conventions` as provided by your IDE for formatting with the following settings:
-    * Indentation with tab
-    * Newline: LF
-    * Line length: 180
-* Provide a unit test for every change
-* Name classes/methods/fields expressively
+* The basic editor settings (indentation, newline, etc.) are described in the `.editorconfig` file (see [EditorConfig](http://editorconfig.org/)).
+* Provide a unit test for every change.
+* Name classes/methods/fields expressively.
+* Fork the repo and create a pull request (see [GitHub Flow](https://guides.github.com/introduction/flow/index.html)).
 
 ##Related work##
 
