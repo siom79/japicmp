@@ -15,6 +15,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -29,9 +30,7 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -120,22 +119,22 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private void populateArchivesListsFromParameters(PluginParameters pluginParameters, MavenParameters mavenParameters, List<File> oldArchives, List<File> newArchives) throws MojoFailureException {
 		if (pluginParameters.getOldVersionParam() != null) {
-			oldArchives.add(retrieveFileFromConfiguration(pluginParameters.getOldVersionParam(), "oldVersion", mavenParameters));
+			oldArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getOldVersionParam(), "oldVersion", mavenParameters));
 		}
 		if (pluginParameters.getOldVersionsParam() != null) {
 			for (DependencyDescriptor dependencyDescriptor : pluginParameters.getOldVersionsParam()) {
 				if (dependencyDescriptor != null) {
-					oldArchives.add(retrieveFileFromConfiguration(dependencyDescriptor, "oldVersions", mavenParameters));
+					oldArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "oldVersions", mavenParameters));
 				}
 			}
 		}
 		if (pluginParameters.getNewVersionParam() != null) {
-			newArchives.add(retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters));
+			newArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters));
 		}
 		if (pluginParameters.getNewVersionsParam() != null) {
 			for (DependencyDescriptor dependencyDescriptor : pluginParameters.getNewVersionsParam()) {
 				if (dependencyDescriptor != null) {
-					newArchives.add(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions", mavenParameters));
+					newArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions", mavenParameters));
 				}
 			}
 		}
@@ -316,11 +315,10 @@ public class JApiCmpMojo extends AbstractMojo {
 						getLog().debug("Element <dependencies/> found. Using " + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
 					}
 					for (Dependency dependency : pluginParameters.getDependenciesParam()) {
-						File file = resolveDependencyToFile("dependencies", dependency, mavenParameters);
-						if (getLog().isDebugEnabled()) {
-							getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+						List<File> files = resolveDependencyToFile("dependencies", dependency, mavenParameters, true);
+						for (File file : files) {
+							comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
 						}
-						comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
 						comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH);
 					}
 				}
@@ -331,20 +329,18 @@ public class JApiCmpMojo extends AbstractMojo {
 					}
 					if (pluginParameters.getOldClassPathDependencies() != null) {
 						for (Dependency dependency : pluginParameters.getOldClassPathDependencies()) {
-							File file = resolveDependencyToFile("oldClassPathDependencies", dependency, mavenParameters);
-							if (getLog().isDebugEnabled()) {
-								getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+							List<File> files = resolveDependencyToFile("oldClassPathDependencies", dependency, mavenParameters, true);
+							for (File file : files) {
+								comparatorOptions.getOldClassPath().add(file.getAbsolutePath());
 							}
-							comparatorOptions.getOldClassPath().add(file.getAbsolutePath());
 						}
 					}
 					if (pluginParameters.getNewClassPathDependencies() != null) {
 						for (Dependency dependency : pluginParameters.getNewClassPathDependencies()) {
-							File file = resolveDependencyToFile("newClassPathDependencies", dependency, mavenParameters);
-							if (getLog().isDebugEnabled()) {
-								getLog().debug("Resolved dependency " + dependency + " to file '" + file.getAbsolutePath() + "'.");
+							List<File> files = resolveDependencyToFile("newClassPathDependencies", dependency, mavenParameters, true);
+							for (File file : files) {
+								comparatorOptions.getNewClassPath().add(file.getAbsolutePath());
 							}
-							comparatorOptions.getNewClassPath().add(file.getAbsolutePath());
 						}
 					}
 					comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
@@ -365,39 +361,37 @@ public class JApiCmpMojo extends AbstractMojo {
 		for (Artifact artifact : dependencyArtifacts) {
 			String scope = artifact.getScope();
 			if (!"test".equals(scope)) {
-				Optional<File> file = resolveArtifact(artifact, mavenParameters);
-				if (file.isPresent()) {
+				Set<Artifact> artifacts = resolveArtifact(artifact, mavenParameters, true);
+				for (Artifact resolvedArtifact : artifacts) {
+					File resolvedFile = resolvedArtifact.getFile();
 					if (getLog().isDebugEnabled()) {
-						getLog().debug("Adding to classpath: " + file.get().getAbsolutePath() + "; scope: " + scope);
+						getLog().debug("Adding to classpath: " + resolvedFile.getAbsolutePath() + "; scope: " + scope);
 					}
-					comparatorOptions.getClassPathEntries().add(file.get().getAbsolutePath());
-				} else {
-					getLog().error("Could not resolve artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion());
+					comparatorOptions.getClassPathEntries().add(resolvedFile.getAbsolutePath());
 				}
 			}
 		}
 	}
 
-	private File retrieveFileFromConfiguration(DependencyDescriptor dependencyDescriptor, String parameterName, MavenParameters mavenParameters) throws MojoFailureException {
-		File file = null;
+	private List<File> retrieveFileFromConfiguration(DependencyDescriptor dependencyDescriptor, String parameterName, MavenParameters mavenParameters) throws MojoFailureException {
+		List<File> files;
 		if (dependencyDescriptor instanceof Dependency) {
 			Dependency dependency = (Dependency) dependencyDescriptor;
-			file = resolveDependencyToFile(parameterName, dependency, mavenParameters);
+			files = resolveDependencyToFile(parameterName, dependency, mavenParameters, false);
 		} else if(dependencyDescriptor instanceof ConfigurationFile) {
 			ConfigurationFile configurationFile = (ConfigurationFile) dependencyDescriptor;
-			file = resolveConfigurationFileToFile(parameterName, configurationFile);
-		}
-		if (file == null) {
+			files = resolveConfigurationFileToFile(parameterName, configurationFile);
+		} else {
 			throw new MojoFailureException("DependencyDescriptor is not of type <dependency/> nor of type <configurationFile/>.");
 		}
-		return file;
+		return files;
 	}
 
-	private File retrieveFileFromConfiguration(Version version, String parameterName, MavenParameters mavenParameters) throws MojoFailureException {
+	private List<File> retrieveFileFromConfiguration(Version version, String parameterName, MavenParameters mavenParameters) throws MojoFailureException {
 		if (version != null) {
 			Dependency dependency = version.getDependency();
 			if (dependency != null) {
-				return resolveDependencyToFile(parameterName, dependency, mavenParameters);
+				return resolveDependencyToFile(parameterName, dependency, mavenParameters, false);
 			} else if (version.getFile() != null) {
 				ConfigurationFile configurationFile = version.getFile();
 				return resolveConfigurationFileToFile(parameterName, configurationFile);
@@ -408,7 +402,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		throw new MojoFailureException(String.format("Missing configuration parameter: %s", parameterName));
 	}
 
-	private File resolveConfigurationFileToFile(String parameterName, ConfigurationFile configurationFile) throws MojoFailureException {
+	private List<File> resolveConfigurationFileToFile(String parameterName, ConfigurationFile configurationFile) throws MojoFailureException {
 		String path = configurationFile.getPath();
 		if (path == null) {
 			throw new MojoFailureException(String.format("The path element in the configuration of the plugin is missing for %s.", parameterName));
@@ -420,21 +414,29 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (!file.isFile() || !file.canRead()) {
 			throw new MojoFailureException(String.format("The file given by path '%s' is either not a file or is not readable.", path));
 		}
-		return file;
+		return Collections.singletonList(file);
 	}
 
-	private File resolveDependencyToFile(String parameterName, Dependency dependency, MavenParameters mavenParameters) throws MojoFailureException {
+	private List<File> resolveDependencyToFile(String parameterName, Dependency dependency, MavenParameters mavenParameters, boolean transitively) throws MojoFailureException {
+		List<File> files = new ArrayList<>();
 		if (getLog().isDebugEnabled()) {
 			getLog().debug("Trying to resolve dependency '" + dependency + "' to file.");
 		}
 		if (dependency.getSystemPath() == null) {
 			String descriptor = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
 			getLog().debug(parameterName + ": " + descriptor);
-			Optional<File> file = resolveArtifact(dependency, mavenParameters);
-			if (!file.isPresent()) {
+			Set<Artifact> artifacts = resolveArtifact(dependency, mavenParameters, transitively);
+			for (Artifact artifact : artifacts) {
+				File file = artifact.getFile();
+				if (file != null) {
+					files.add(file);
+				} else {
+					throw new MojoFailureException(String.format("Could not resolve dependency with descriptor '%s'.", descriptor));
+				}
+			}
+			if (files.size() == 0) {
 				throw new MojoFailureException(String.format("Could not resolve dependency with descriptor '%s'.", descriptor));
 			}
-			return file.get();
 		} else {
 			String systemPath = dependency.getSystemPath();
 			Pattern pattern = Pattern.compile("\\$\\{([^\\}])");
@@ -457,8 +459,9 @@ public class JApiCmpMojo extends AbstractMojo {
 			if (!file.canRead()) {
 				throw new MojoFailureException("File '" + file.getAbsolutePath() + "' is not readable.");
 			}
-			return file;
+			files.add(file);
 		}
+		return files;
 	}
 
 	private void writeToFile(String output, File outputfile) throws MojoFailureException, IOException {
@@ -476,21 +479,32 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private Optional<File> resolveArtifact(Dependency dependency, MavenParameters mavenParameters) throws MojoFailureException {
+	private Set<Artifact> resolveArtifact(Dependency dependency, MavenParameters mavenParameters, boolean transitively) throws MojoFailureException {
 		notNull(mavenParameters.getArtifactRepositories(), "Maven parameter artifactRepositories should be provided by maven container.");
 		Artifact artifact = mavenParameters.getArtifactFactory().createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "jar", dependency.getClassifier());
-		return resolveArtifact(artifact, mavenParameters);
+		return resolveArtifact(artifact, mavenParameters, transitively);
 	}
 
-	private Optional<File> resolveArtifact(Artifact artifact, MavenParameters mavenParameters) throws MojoFailureException {
+	private Set<Artifact> resolveArtifact(Artifact artifact, MavenParameters mavenParameters, boolean transitively) throws MojoFailureException {
 		notNull(mavenParameters.getLocalRepository(), "Maven parameter localRepository should be provided by maven container.");
 		notNull(mavenParameters.getArtifactResolver(), "Maven parameter artifactResolver should be provided by maven container.");
 		ArtifactResolutionRequest request = new ArtifactResolutionRequest();
 		request.setArtifact(artifact);
 		request.setLocalRepository(mavenParameters.getLocalRepository());
 		request.setRemoteRepositories(mavenParameters.getArtifactRepositories());
-		mavenParameters.getArtifactResolver().resolve(request);
-		return Optional.fromNullable(artifact.getFile());
+		if (transitively) {
+			request.setResolveTransitively(true);
+		}
+		ArtifactResolutionResult resolutionResult = mavenParameters.getArtifactResolver().resolve(request);
+		if (resolutionResult.hasExceptions()) {
+			List<Exception> exceptions = resolutionResult.getExceptions();
+			throw new MojoFailureException("Could not resolve " + artifact, exceptions.get(0));
+		}
+		Set<Artifact> artifacts = resolutionResult.getArtifacts();
+		if (artifacts.size() == 0) {
+			throw new MojoFailureException("Could not resolve " + artifact);
+		}
+		return artifacts;
 	}
 
 	private static <T> T notNull(T value, String msg) throws MojoFailureException {

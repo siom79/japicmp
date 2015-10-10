@@ -278,7 +278,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} catch (NotFoundException e) {
 			if (!options.isIgnoreMissingClasses()) {
-				throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, e.getMessage(), e);
+				throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Class not found: " + e.getMessage(), e);
 			}
 		}
 		return map;
