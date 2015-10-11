@@ -16,76 +16,88 @@ import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 
 import javax.inject.Inject;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 
 public class JApiCli {
 	public static final String IGNORE_MISSING_CLASSES = "--ignore-missing-classes";
+	static final String OLD_CLASSPATH = "--old-classpath";
+	static final String NEW_CLASSPATH = "--new-classpath";
+
+	public enum ClassPathMode {
+		ONE_COMMON_CLASSPATH, TWO_SEPARATE_CLASSPATHS
+	}
 
 	@Command(name = "java -jar japicmp.jar", description = "Compares jars")
 	public static class Compare implements Runnable {
 		@Inject
 		public HelpOption helpOption;
-		@Option(name = { "-o", "--old" }, description = "Provides the path to the old version of the jar.")
+		@Option(name = { "-o", "--old" }, description = "Provides the path to the old version(s) of the jar(s). Use ; to separate jar files.")
 		public String pathToOldVersionJar;
-		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version of the jar.")
+		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version(s) of the jar(s). Use ; to separate jar files.")
 		public String pathToNewVersionJar;
-		@Option(name = { "-m", "--only-modified" }, description = "Outputs only modified classes/methods.")
+		@Option(name = {"-m", "--only-modified"}, description = "Outputs only modified classes/methods.")
 		public boolean modifiedOnly;
-		@Option(name = { "-b", "--only-incompatible" }, description = "Outputs only classes/methods that are binary incompatible. If not given, all classes and methods are printed.")
+		@Option(name = {"-b", "--only-incompatible"}, description = "Outputs only classes/methods that are binary incompatible. If not given, all classes and methods are printed.")
 		public boolean onlyBinaryIncompatibleModifications;
 		@Option(name = "-a", description = "Sets the access modifier level (public, package, protected, private), which should be used.")
 		public String accessModifier;
-		@Option(name = { "-i", "--include" }, description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
+		@Option(name = {"-i", "--include"}, description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
 		public String includes;
-		@Option(name = { "-e", "--exclude" }, description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
+		@Option(name = {"-e", "--exclude"}, description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
 		public String excludes;
-		@Option(name = { "-x", "--xml-file" }, description = "Provides the path to the xml output file.")
+		@Option(name = {"-x", "--xml-file"}, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;
-		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
+		@Option(name = {"--html-file"}, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
-		@Option(name = { "-s", "--semantic-versioning" }, description ="Tells you which part of the version to increment.")
+		@Option(name = {"-s", "--semantic-versioning"}, description = "Tells you which part of the version to increment.")
 		public boolean semanticVersioning = false;
-		@Option(name = { "--include-synthetic" }, description = "Include synthetic classes and class members that are hidden per default.")
+		@Option(name = {"--include-synthetic"}, description = "Include synthetic classes and class members that are hidden per default.")
 		public boolean includeSynthetic = false;
-		@Option(name = { IGNORE_MISSING_CLASSES }, description = "Ignores superclasses/interfaces missing on the classpath.")
+		@Option(name = {IGNORE_MISSING_CLASSES}, description = "Ignores superclasses/interfaces missing on the classpath.")
 		public boolean ignoreMissingClasses = false;
-		@Option(name = { "--html-stylesheet" }, description = "Provides the path to your own stylesheet.")
+		@Option(name = {"--html-stylesheet"}, description = "Provides the path to your own stylesheet.")
 		public String pathToHtmlStylesheet;
+		@Option(name = {OLD_CLASSPATH}, description = "The classpath for the old version.")
+		public String oldClassPath;
+		@Option(name = {NEW_CLASSPATH}, description = "The classpath for the new version.")
+		public String newClassPath;
 
 		@Override
 		public void run() {
 			Options options = createOptions();
 			verifyOptions(options);
 			JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));
-			List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchive(), options.getNewArchive());
-			generateOutput(options, options.getOldArchive(), options.getNewArchive(), jApiClasses);
+			List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
+			generateOutput(options, jApiClasses);
 		}
 
-		private void generateOutput(Options options, File oldArchive, File newArchive, List<JApiClass> jApiClasses) {
+		private void generateOutput(Options options, List<JApiClass> jApiClasses) {
 			if (semanticVersioning) {
 				SemverOut semverOut = new SemverOut(options, jApiClasses);
 				semverOut.generate();
 				return;
 			}
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
-				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(oldArchive.getAbsolutePath(), newArchive.getAbsolutePath(), jApiClasses, options, true);
+				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, true);
 				try (XmlOutput xmlOutput = xmlGenerator.generate()) {
 					XmlOutputGenerator.writeToFiles(options, xmlOutput);
 				} catch (Exception e) {
 					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Could not close output streams: " + e.getMessage(), e);
 				}
 			}
-			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses, oldArchive, newArchive);
+			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
 			String output = stdoutOutputGenerator.generate();
 			System.out.println(output);
 		}
 
 		private Options createOptions() {
 			Options options = new Options();
-			options.setNewArchive(new File(checkNonNull(pathToNewVersionJar, "Required option -n is missing.")));
-			options.setOldArchive(new File(checkNonNull(pathToOldVersionJar, "Required option -o is missing.")));
+			options.getOldArchives().addAll(createFileList(checkNonNull(pathToOldVersionJar, "Required option -o is missing.")));
+			options.getNewArchives().addAll(createFileList(checkNonNull(pathToNewVersionJar, "Required option -n is missing.")));
 			options.setXmlOutputFile(Optional.fromNullable(pathToXmlOutputFile));
 			options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
 			options.setOutputOnlyModifications(modifiedOnly);
@@ -96,16 +108,27 @@ public class JApiCli {
 			options.setIncludeSynthetic(includeSynthetic);
 			options.setIgnoreMissingClasses(ignoreMissingClasses);
 			options.setHtmlStylesheet(Optional.fromNullable(pathToHtmlStylesheet));
+			options.setOldClassPath(Optional.fromNullable(oldClassPath));
+			options.setNewClassPath(Optional.fromNullable(newClassPath));
 			return options;
 		}
 
+		private List<File> createFileList(String option) {
+			String[] parts = option.split(";");
+			List<File> files = new ArrayList<>(parts.length);
+			for (String part : parts) {
+				File file = new File(part);
+				files.add(file);
+			}
+			return files;
+		}
+
 		private void verifyOptions(Options options) {
-			File oldArchive = options.getOldArchive();
-			File newArchive = options.getNewArchive();
-			verifyJarFileExists(oldArchive);
-			verifyJarFileExists(newArchive);
-			if (oldArchive.equals(newArchive)) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Files '%s' and '%s' are the same.", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath());
+			for (File file : options.getOldArchives()) {
+				verifyExistsCanReadAndJar(file);
+			}
+			for (File file : options.getNewArchives()) {
+				verifyExistsCanReadAndJar(file);
 			}
 			if (options.getHtmlStylesheet().isPresent()) {
 				String pathname = options.getHtmlStylesheet().get();
@@ -114,17 +137,47 @@ public class JApiCli {
 					throw JApiCmpException.of(JApiCmpException.Reason.CliError, "HTML stylesheet '%s' does not exist.", pathname);
 				}
 			}
+			if (options.getOldClassPath().isPresent() && options.getNewClassPath().isPresent()) {
+				options.setClassPathMode(ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+			} else {
+				if (options.getOldClassPath().isPresent() || options.getNewClassPath().isPresent()) {
+					throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Please provide both options: " + OLD_CLASSPATH + " and " + NEW_CLASSPATH);
+				} else {
+					options.setClassPathMode(ClassPathMode.ONE_COMMON_CLASSPATH);
+				}
+			}
 		}
 
-		private void verifyJarFileExists(File file) {
+		private void verifyExistsCanReadAndJar(File file) {
 			verifyExisting(file);
 			verifyCanRead(file);
 			verifyJarArchive(file);
 		}
 
+		private void verifyExisting(File newArchive) {
+			if (!newArchive.exists()) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
+			}
+		}
+
 		private void verifyCanRead(File file) {
 			if (!file.canRead()) {
 				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Cannot read file '%s'.", file.getAbsolutePath());
+			}
+		}
+
+		private void verifyJarArchive(File file) {
+			JarFile jarFile = null;
+			try {
+				jarFile = new JarFile(file);
+			} catch (IOException e) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+			} finally {
+				if (jarFile != null) {
+					try {
+						jarFile.close();
+					} catch (IOException ignored) {}
+				}
 			}
 		}
 
@@ -147,27 +200,6 @@ public class JApiCli {
 				}
 			} else {
 				return Optional.of(AccessModifier.PROTECTED);
-			}
-		}
-
-		private void verifyExisting(File newArchive) {
-			if (!newArchive.exists()) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
-			}
-		}
-
-		private void verifyJarArchive(File file) {
-			JarFile jarFile = null;
-			try {
-				jarFile = new JarFile(file);
-			} catch (IOException e) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
-			} finally {
-				if (jarFile != null) {
-					try {
-						jarFile.close();
-					} catch (IOException ignored) {}
-				}
 			}
 		}
 	}

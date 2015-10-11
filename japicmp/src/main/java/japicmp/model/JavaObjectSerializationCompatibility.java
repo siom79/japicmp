@@ -84,7 +84,7 @@ public class JavaObjectSerializationCompatibility {
 			if (options.isIgnoreMissingClasses()) {
 				return false;
 			} else {
-				throw JApiCmpException.forClassNotFound(e, clazz.getName(), jarArchiveComparator);
+				throw JApiCmpException.forClassLoading(e, clazz.getName(), jarArchiveComparator);
 			}
 		}
 	}

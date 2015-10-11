@@ -7,21 +7,19 @@ import japicmp.model.*;
 import japicmp.model.JApiAnnotationElementValue.Type;
 import japicmp.output.OutputFilter;
 import japicmp.output.OutputGenerator;
+import japicmp.util.ListJoiner;
 import javassist.bytecode.annotation.MemberValue;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 
 public class StdoutOutputGenerator extends OutputGenerator<String> {
 	static final String NO_CHANGES = "No changes.";
 	static final String WARNING = "WARNING";
-	private final File oldArchive;
-	private final File newArchive;
 
-	public StdoutOutputGenerator(Options options, List<JApiClass> jApiClasses, File oldArchive, File newArchive) {
+	public StdoutOutputGenerator(Options options, List<JApiClass> jApiClasses) {
         super(options, jApiClasses);
-		this.oldArchive = oldArchive;
-		this.newArchive = newArchive;
 	}
 
 	@Override
@@ -29,7 +27,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
         OutputFilter outputFilter = new OutputFilter(options);
         outputFilter.filter(jApiClasses);
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Comparing %s with %s:%n", oldArchive.getAbsolutePath(), newArchive.getAbsolutePath()));
+        sb.append(String.format("Comparing %s with %s:%n", joinFileLists(options.getOldArchives()), joinFileLists(options.getNewArchives())));
 		if (options.isIgnoreMissingClasses()) {
 			sb.append(WARNING + ": You are using the option '" + JApiCli.IGNORE_MISSING_CLASSES + "', i.e. superclasses and interfaces that could not " +
 					"be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
@@ -46,6 +44,21 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		}
         return sb.toString();
     }
+
+	private String joinFileLists(List<File> files) {
+		ListJoiner<File> joiner = new ListJoiner<File>().on(";").sort(new Comparator<File>() {
+			@Override
+			public int compare(File o1, File o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		}).toStringBuilder(new ListJoiner.ListJoinerToString<File>() {
+			@Override
+			public String toString(File file) {
+				return file.getAbsolutePath();
+			}
+		});
+		return joiner.join(files);
+	}
 
     private void processAnnotations(StringBuilder sb, JApiHasAnnotations jApiClass, int numberofTabs) {
         List<JApiAnnotation> annotations = jApiClass.getAnnotations();
@@ -337,12 +350,12 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
     }
 
     private String superclassChangeAsString(JApiSuperclass jApiSuperclass) {
-        if (jApiSuperclass.getOldSuperclass().isPresent() && jApiSuperclass.getNewSuperclass().isPresent()) {
-            return jApiSuperclass.getNewSuperclass().get() + " (<- " + jApiSuperclass.getOldSuperclass().get() + ")";
-        } else if (jApiSuperclass.getOldSuperclass().isPresent() && !jApiSuperclass.getNewSuperclass().isPresent()) {
-            return jApiSuperclass.getOldSuperclass().get();
-        } else if (!jApiSuperclass.getOldSuperclass().isPresent() && jApiSuperclass.getNewSuperclass().isPresent()) {
-            return jApiSuperclass.getNewSuperclass().get();
+        if (jApiSuperclass.getOldSuperclassName().isPresent() && jApiSuperclass.getNewSuperclassName().isPresent()) {
+            return jApiSuperclass.getNewSuperclassName().get() + " (<- " + jApiSuperclass.getOldSuperclassName().get() + ")";
+        } else if (jApiSuperclass.getOldSuperclassName().isPresent() && !jApiSuperclass.getNewSuperclassName().isPresent()) {
+            return jApiSuperclass.getOldSuperclassName().get();
+        } else if (!jApiSuperclass.getOldSuperclassName().isPresent() && jApiSuperclass.getNewSuperclassName().isPresent()) {
+            return jApiSuperclass.getNewSuperclassName().get();
         }
         return "n.a.";
     }

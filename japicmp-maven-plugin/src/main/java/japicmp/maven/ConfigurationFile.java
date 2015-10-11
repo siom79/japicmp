@@ -1,6 +1,6 @@
 package japicmp.maven;
 
-public class ConfigurationFile {
+public class ConfigurationFile implements DependencyDescriptor {
     private String path;
 
     public String getPath() {

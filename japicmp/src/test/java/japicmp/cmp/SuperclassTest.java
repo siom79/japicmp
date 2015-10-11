@@ -61,7 +61,7 @@ public class SuperclassTest {
 		assertThat(jApiClass.getSuperclass().getChangeStatus(), is(JApiChangeStatus.NEW));
 		assertThat(jApiClass.getSuperclass().getOldSuperclass().isPresent(), is(false));
 		assertThat(jApiClass.getSuperclass().getNewSuperclass().isPresent(), is(true));
-		assertThat(jApiClass.getSuperclass().getNewSuperclass().get(), is("japicmp.Super"));
+		assertThat(jApiClass.getSuperclass().getNewSuperclass().get().getName(), is("japicmp.Super"));
 	}
 
 	@Test
@@ -87,6 +87,6 @@ public class SuperclassTest {
 		assertThat(jApiClass.getSuperclass().getChangeStatus(), is(JApiChangeStatus.REMOVED));
 		assertThat(jApiClass.getSuperclass().getOldSuperclass().isPresent(), is(true));
 		assertThat(jApiClass.getSuperclass().getNewSuperclass().isPresent(), is(false));
-		assertThat(jApiClass.getSuperclass().getOldSuperclass().get(), is("japicmp.Super"));
+		assertThat(jApiClass.getSuperclass().getOldSuperclass().get().getName(), is("japicmp.Super"));
 	}
 }

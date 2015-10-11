@@ -58,7 +58,7 @@ public class ClassesComparator {
 			if (oldCtClass == null) {
 				JApiClassType.ClassType newType = ClassHelper.getType(newCtClass);
 				JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(newType), JApiChangeStatus.NEW);
-				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, newCtClass.getName(), Optional.<CtClass>absent(), Optional.<CtClass>of(newCtClass), JApiChangeStatus.NEW, classType, options);
+				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, newCtClass.getName(), Optional.<CtClass>absent(), Optional.of(newCtClass), JApiChangeStatus.NEW, classType, options);
 				if (includeClass(jApiClass)) {
 					classes.add(jApiClass);
 				}

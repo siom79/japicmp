@@ -14,9 +14,11 @@ import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Assert;
 
 public class Helper {
 
@@ -159,7 +161,7 @@ public class Helper {
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
 		options.setAccessModifier(Optional.of(accessModifier));
-		XmlOutputGenerator generator = new XmlOutputGenerator("/old/Path", "/new/Path", jApiClasses, options, true);
+		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, true);
 		XmlOutput xmlOutput = generator.generate();
 		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}
@@ -174,8 +176,8 @@ public class Helper {
             verifier.execute();
         } catch (Exception e) {
             exceptionThrown = true;
-            assertThat(e.getClass().isAssignableFrom(exceptionClass), is(true));
+            Assert.assertThat(e.getClass().isAssignableFrom(exceptionClass), CoreMatchers.is(true));
         }
-        assertThat(exceptionThrown, is(true));
+        Assert.assertThat(exceptionThrown, CoreMatchers.is(true));
     }
 }

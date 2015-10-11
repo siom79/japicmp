@@ -2,20 +2,20 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.5.3-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.6.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
 	JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
 	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
-	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
+	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchives);
 
 japicmp is available in the Maven Central Repository:
 
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.5.3</version>
+		<version>0.6.0</version>
 	</dependency>
 
 ##Motivation##
@@ -65,8 +65,9 @@ SYNOPSIS
                 [(-i <includes> | --include <includes>)] [--ignore-missing-classes]
                 [--include-synthetic] [(-m | --only-modified)]
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
+                [--new-classpath <newClassPath>]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
-                [(-s | --semantic-versioning)]
+                [--old-classpath <oldClassPath>] [(-s | --semantic-versioning)]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
 OPTIONS
@@ -108,10 +109,18 @@ OPTIONS
             Outputs only modified classes/methods.
 
         -n <pathToNewVersionJar>, --new <pathToNewVersionJar>
-            Provides the path to the new version of the jar.
+            Provides the path to the new version(s) of the jar(s). Use ; to
+            separate jar files.
+
+        --new-classpath <newClassPath>
+            The classpath for the new version.
 
         -o <pathToOldVersionJar>, --old <pathToOldVersionJar>
-            Provides the path to the old version of the jar.
+            Provides the path to the old version(s) of the jar(s). Use ; to
+            separate jar files.
+
+        --old-classpath <oldClassPath>
+            The classpath for the old version.
 
         -s, --semantic-versioning
             Tells you which part of the version to increment.
@@ -120,10 +129,19 @@ OPTIONS
             Provides the path to the xml output file.
 ```
 
-When your library implements interfaces or extends classes from other libraries than the JDK, you will
-have to add these to the class path:
+When your library implements interfaces or extends classes from other libraries than the JDK and you want to evaluate binary
+compatibility you must specify the classpath for the two different versions:
 
-	java -cp japicmp-0.5.3-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+    java -jar japicmp-0.6.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar --new-classpath other-library-v2.jar
+        --old-classpath other-library-v1.jar
+
+In case the classpath for both versions did not change, you can add the library using the standard way:
+
+	java -cp japicmp-0.6.0-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+
+For reporting purposes you can also provide more than one jar as old or new version(s):
+
+	java -jar japicmp-0.6.0-jar-with-dependencies.jar -o lib1-old.jar;lib2-old.jar -n lib1-new.jar;lib2-new.jar
 
 ###Usage maven plugin###
 
@@ -134,13 +152,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.5.3</version>
+                <version>0.6.0</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.5.3</version>
+                            <version>0.6.0</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -192,7 +210,8 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
     </build>
 
 The elements &lt;oldVersion&gt; and &lt;newVersion&gt; elements let you specify which version you want to compare. Both elements
- support either a &lt;dependency&gt; or a &lt;file&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
+support either a &lt;dependency&gt; or a &lt;file&gt; element. If necessary you can select the artifact by providing a &lt;classifier&gt; element inside
+the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can provide the following options:
 
 * onlyModified: Outputs only modified classes/methods. If not set to true, all classes and methods are printed.
 * includes: List of package, classes, methods and field that should be included. The syntax is similar to the one use for javadoc references.
@@ -220,10 +239,32 @@ If your library implements interfaces or extends classes from other libraries th
 ```
 
 Dependencies declared in the enclosing pom.xml and its parents are added automatically. The dependencies declared explicitly for this plugin
-are appended to the classpath before the ones from the enclosing pom.xml.
+are appended to the classpath before the ones from the enclosing pom.xml, hence you can override them.
+
+In case the classpath between both versions differs, you can add the dependencies for the new and old version separately:
+
+```
+<oldClassPathDependencies>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-math3</artifactId>
+		<version>3.4</version>
+	</dependency>
+</oldClassPathDependencies>
+<newClassPathDependencies>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-math3</artifactId>
+		<version>3.5</version>
+	</dependency>
+</newClassPathDependencies>
+```
 
 The maven plugin produces the two files `japicmp.diff` and `japicmp.xml` within the directory `${project.build.directory}/japicmp`
-of your artifact. Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
+of your artifact. If you run the plugin multiple times within the same module using the &lt;executions&gt; element, the reports
+are named after the execution id.
+
+Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
 [maven-site-plugin](https://maven.apache.org/plugins/maven-site-plugin/) and therewith to be integrated into the site report:
 
 ```
@@ -232,7 +273,7 @@ of your artifact. Alternatively it can be used inside the `<reporting/>` tag in 
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.5.3</version>
+			<version>0.6.0</version>
 			<reportSets>
 				<reportSet>
 					<reports>
@@ -246,6 +287,36 @@ of your artifact. Alternatively it can be used inside the `<reporting/>` tag in 
 		</plugin>
 	</plugins>
 </reporting>
+```
+To create a summary report, you can also provide multiple old and new versions:
+```
+<configuration>
+	<oldVersions>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test-v1</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test2-v1</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</oldVersions>
+	<newVersions>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test-v2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test2-v2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</newVersions>
+	...
+</configuration>
 ```
 
 ##Examples##

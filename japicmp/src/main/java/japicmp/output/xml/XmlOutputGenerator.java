@@ -13,6 +13,7 @@ import japicmp.output.OutputGenerator;
 import japicmp.output.extapi.jpa.JpaAnalyzer;
 import japicmp.output.extapi.jpa.model.JpaTable;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
+import japicmp.util.ListJoiner;
 import japicmp.util.Streams;
 
 import javax.xml.bind.JAXBContext;
@@ -27,9 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,32 +36,30 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 	private static final String XSD_FILENAME = "japicmp.xsd";
 	private static final String XML_SCHEMA = XSD_FILENAME;
 	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());
-	private final String oldArchivePath;
-	private final String newArchivePath;
 	private final boolean createSchemaFile;
 
-	public XmlOutputGenerator(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options, boolean createSchemaFile) {
+	public XmlOutputGenerator(List<JApiClass> jApiClasses, Options options, boolean createSchemaFile) {
 		super(options, jApiClasses);
-		this.oldArchivePath = oldArchivePath;
-		this.newArchivePath = newArchivePath;
 		this.createSchemaFile = createSchemaFile;
 	}
 
 	@Override
 	public XmlOutput generate() {
-		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(oldArchivePath, newArchivePath, jApiClasses, options);
+		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(jApiClasses, options);
 		//analyzeJpaAnnotations(jApiCmpXmlRoot, jApiClasses);
 		filterClasses(jApiClasses, options);
 		return createXmlDocumentAndSchema(options, jApiCmpXmlRoot);
 	}
 
-	public static void writeToFiles(Options options, XmlOutput xmlOutput) {
+	public static List<File> writeToFiles(Options options, XmlOutput xmlOutput) {
+		List<File> filesWritten = new ArrayList<>();
 		try {
 			if (xmlOutput.getXmlOutputStream().isPresent() && options.getXmlOutputFile().isPresent()) {
 				File xmlFile = new File(options.getXmlOutputFile().get());
 				try (FileOutputStream fos = new FileOutputStream(xmlFile)) {
 					ByteArrayOutputStream outputStream = xmlOutput.getXmlOutputStream().get();
 					outputStream.writeTo(fos);
+					filesWritten.add(xmlFile);
 				} catch (IOException e) {
 					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to write XML file '" + xmlFile.getAbsolutePath() + "': " + e.getMessage(), e);
 				}
@@ -72,6 +69,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 				try (FileOutputStream fos = new FileOutputStream(htmlFile)) {
 					ByteArrayOutputStream outputStream = xmlOutput.getHtmlOutputStream().get();
 					outputStream.writeTo(fos);
+					filesWritten.add(htmlFile);
 				} catch (IOException e) {
 					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to write HTML file '" + htmlFile.getAbsolutePath() + "': " + e.getMessage(), e);
 				}
@@ -81,6 +79,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 				xmlOutput.close();
 			} catch (Exception ignored) {}
 		}
+		return filesWritten;
 	}
 
 	private void analyzeJpaAnnotations(JApiCmpXmlRoot jApiCmpXmlRoot, List<JApiClass> jApiClasses) {
@@ -91,6 +90,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 
 	private XmlOutput createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
 		XmlOutput xmlOutput = new XmlOutput();
+		xmlOutput.setJApiCmpXmlRoot(jApiCmpXmlRoot);
 		ByteArrayOutputStream xmlBaos = null;
 		InputStream styleSheetAsInputStream = null;
 		InputStream xsltAsInputStream = null;
@@ -186,10 +186,21 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		outputFilter.filter(jApiClasses);
 	}
 
-	private JApiCmpXmlRoot createRootElement(String oldArchivePath, String newArchivePath, List<JApiClass> jApiClasses, Options options) {
+	private JApiCmpXmlRoot createRootElement(List<JApiClass> jApiClasses, Options options) {
+		ListJoiner<File> joiner = new ListJoiner<File>().on(";").sort(new Comparator<File>() {
+			@Override
+			public int compare(File o1, File o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		}).toStringBuilder(new ListJoiner.ListJoinerToString<File>() {
+			@Override
+			public String toString(File file) {
+				return file.getAbsolutePath();
+			}
+		});
 		JApiCmpXmlRoot jApiCmpXmlRoot = new JApiCmpXmlRoot();
-		jApiCmpXmlRoot.setOldJar(oldArchivePath);
-		jApiCmpXmlRoot.setNewJar(newArchivePath);
+		jApiCmpXmlRoot.setOldJar(joiner.join(options.getOldArchives()));
+		jApiCmpXmlRoot.setNewJar(joiner.join(options.getNewArchives()));
 		jApiCmpXmlRoot.setClasses(jApiClasses);
 		jApiCmpXmlRoot.setAccessModifier(options.getAccessModifier().name());
 		jApiCmpXmlRoot.setOnlyModifications(options.isOutputOnlyModifications());

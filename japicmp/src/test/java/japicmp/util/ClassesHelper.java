@@ -18,7 +18,7 @@ public class ClassesHelper {
 
 	public static List<JApiClass> compareClasses(JarArchiveComparatorOptions options, ClassesGenerator classesGenerator) throws Exception {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		ClassPool classPool = jarArchiveComparator.getClassPool();
+		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
 		ClassesComparator classesComparator = new ClassesComparator(jarArchiveComparator, options);
 		List<CtClass> oldClasses = classesGenerator.createOldClasses(classPool);
 		List<CtClass> newClasses = classesGenerator.createNewClasses(classPool);

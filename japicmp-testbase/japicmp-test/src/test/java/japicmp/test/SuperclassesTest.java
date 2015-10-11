@@ -6,7 +6,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 
@@ -26,9 +25,9 @@ public class SuperclassesTest {
 		assertThat(getJApiClass(jApiClasses, Superclasses.class.getName()).getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiClass(jApiClasses, Superclasses.class.getName()).getSuperclass().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiClass(jApiClasses, Superclasses.SuperClassChanges.class.getName()).getSuperclass().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(getJApiClass(jApiClasses, Superclasses.SuperClassChanges.class.getName()).getSuperclass().getOldSuperclass(),
+		assertThat(getJApiClass(jApiClasses, Superclasses.SuperClassChanges.class.getName()).getSuperclass().getOldSuperclassName(),
 				is(Optional.of(Superclasses.SuperclassA.class.getCanonicalName().replace(Superclasses.class.getSimpleName() + ".", Superclasses.class.getSimpleName() + "$"))));
-		assertThat(getJApiClass(jApiClasses, Superclasses.SuperClassChanges.class.getName()).getSuperclass().getNewSuperclass(),
+		assertThat(getJApiClass(jApiClasses, Superclasses.SuperClassChanges.class.getName()).getSuperclass().getNewSuperclassName(),
 				is(Optional.of(Superclasses.SuperclassB.class.getCanonicalName().replace(Superclasses.class.getSimpleName() + ".", Superclasses.class.getSimpleName() + "$"))));
 	}
 }

@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-testbase</artifactId>
-        <version>0.5.4-SNAPSHOT</version>
+		<version>0.6.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,44 +23,92 @@
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
                 <version>${project.version}</version>
-                <configuration>
-                    <oldVersion>
-                        <dependency>
-                            <groupId>com.github.siom79.japicmp</groupId>
-                            <artifactId>japicmp-test-v1</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </oldVersion>
-                    <newVersion>
-                        <dependency>
-                            <groupId>com.github.siom79.japicmp</groupId>
-                            <artifactId>japicmp-test-v2</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </newVersion>
-                    <parameter>
-                        <onlyModified>true</onlyModified>
-                        <accessModifier>public</accessModifier>
-                        <breakBuildOnModifications>false</breakBuildOnModifications>
-                        <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
-                        <includeSynthetic>true</includeSynthetic>
-                        <htmlStylesheet>${project.basedir}/src/main/resources/css/stylesheet.css</htmlStylesheet>
-                    </parameter>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.commons</groupId>
-                            <artifactId>commons-math3</artifactId>
-                            <version>3.4</version>
-                        </dependency>
-                    </dependencies>
-                </configuration>
                 <executions>
                     <execution>
+						<id>single-version</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>cmp</goal>
                         </goals>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersion>
+							<parameter>
+								<onlyModified>true</onlyModified>
+								<accessModifier>public</accessModifier>
+								<breakBuildOnModifications>false</breakBuildOnModifications>
+								<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+								<includeSynthetic>true</includeSynthetic>
+								<htmlStylesheet>${project.basedir}/src/main/resources/css/stylesheet.css</htmlStylesheet>
+							</parameter>
+							<dependencies>
+								<dependency>
+									<groupId>org.apache.commons</groupId>
+									<artifactId>commons-math3</artifactId>
+									<version>3.4</version>
+								</dependency>
+							</dependencies>
+						</configuration>
                     </execution>
+					<execution>
+						<id>multiple-versions</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<oldVersions>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test2-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersions>
+							<newVersions>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test2-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersions>
+							<parameter>
+								<onlyModified>true</onlyModified>
+								<accessModifier>public</accessModifier>
+								<breakBuildOnModifications>false</breakBuildOnModifications>
+								<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+								<includeSynthetic>true</includeSynthetic>
+							</parameter>
+							<dependencies>
+								<dependency>
+									<groupId>org.apache.commons</groupId>
+									<artifactId>commons-math3</artifactId>
+									<version>3.4</version>
+								</dependency>
+							</dependencies>
+						</configuration>
+					</execution>
                 </executions>
             </plugin>
             <plugin>

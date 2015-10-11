@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-base</artifactId>
-        <version>0.5.4-SNAPSHOT</version>
+		<version>0.6.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>japicmp-testbase</artifactId>
@@ -17,7 +17,12 @@
         <module>japicmp-test-maven-plugin</module>
         <module>japicmp-test-maven-plugin-guava</module>
 		<module>japicmp-test-maven-plugin-japicmp</module>
-    </modules>
+        <module>japicmp-test-service-impl-base</module>
+		<module>japicmp-test-maven-plugin-classifier</module>
+		<module>japicmp-test2-v1</module>
+		<module>japicmp-test2-v2</module>
+		<module>japicmp-test-maven-plugin-pom-module</module>
+	</modules>
 
     <build>
         <plugins>
@@ -28,40 +33,6 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.github.siom79.japicmp</groupId>
-                <artifactId>japicmp-maven-plugin</artifactId>
-                <version>${project.version}</version>
-                <configuration>
-                    <oldVersion>
-                        <dependency>
-                            <groupId>com.github.siom79.japicmp</groupId>
-                            <artifactId>japicmp-test-v1</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </oldVersion>
-                    <newVersion>
-                        <file>
-                            <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
-                        </file>
-                    </newVersion>
-                    <parameter>
-                        <accessModifier>public</accessModifier>
-                        <onlyModified>true</onlyModified>
-                        <!-- Test that japicmp-maven-plugin skips execution as this is a pom module -->
-                        <skipPomModules>true</skipPomModules>
-                    </parameter>
-                    <skip>false</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>cmp</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

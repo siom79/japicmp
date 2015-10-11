@@ -3,6 +3,7 @@ package japicmp.util;
 import com.google.common.base.Optional;
 
 public class OptionalHelper {
+	public static final String N_A = "n.a.";
 
 	private OptionalHelper() {
 
@@ -12,6 +13,6 @@ public class OptionalHelper {
     	if(optional.isPresent()) {
     		return optional.get().toString();
     	}
-    	return "n.a.";
+    	return N_A;
     }
 }

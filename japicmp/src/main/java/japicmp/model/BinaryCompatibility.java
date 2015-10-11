@@ -1,5 +1,7 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,17 +82,26 @@ public class BinaryCompatibility {
 				ArrayList<Boolean> returnValues = new ArrayList<Boolean>();
 				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
 					@Override
-					public boolean callback(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+					public boolean callback(JApiClass superclass, Map<String, JApiClass> classMap) {
 						boolean changedIncompatible = false;
-						for (JApiField foundField : jApiClass.getFields()) {
-							if (foundField.getName().equals(field.getName()) && fieldTypeMatches(foundField, field)) {
-								JApiModifier<StaticModifier> staticModifierNew = foundField.getStaticModifier();
-								if (staticModifierNew.getNewModifier().isPresent() && staticModifierNew.getNewModifier().get() == StaticModifier.STATIC) {
-									field.setBinaryCompatible(false);
-									changedIncompatible = true;
+						for (JApiField superclassField : superclass.getFields()) {
+							if (superclassField.getName().equals(field.getName()) && fieldTypeMatches(superclassField, field)) {
+								boolean superclassFieldIsStatic = false;
+								boolean subclassFieldIsStatic = false;
+								boolean accessModifierSubclassLess = false;
+								if (field.getStaticModifier().getNewModifier().isPresent() && field.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
+									subclassFieldIsStatic = true;
 								}
-								if (field.getAccessModifier().getNewModifier().isPresent() && foundField.getAccessModifier().getNewModifier().isPresent()) {
-									if (field.getAccessModifier().getNewModifier().get().getLevel() < foundField.getAccessModifier().getNewModifier().get().getLevel()) {
+								if (superclassField.getStaticModifier().getNewModifier().isPresent() && superclassField.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
+									superclassFieldIsStatic = true;
+								}
+								if (field.getAccessModifier().getNewModifier().isPresent() && superclassField.getAccessModifier().getNewModifier().isPresent()) {
+									if (field.getAccessModifier().getNewModifier().get().getLevel() < superclassField.getAccessModifier().getNewModifier().get().getLevel()) {
+										accessModifierSubclassLess = true;
+									}
+								}
+								if (superclassFieldIsStatic) {
+									if (subclassFieldIsStatic || accessModifierSubclassLess) {
 										field.setBinaryCompatible(false);
 										changedIncompatible = true;
 									}
@@ -126,17 +137,25 @@ public class BinaryCompatibility {
 	}
 
 	private interface OnSuperclassCallback {
-		boolean callback(JApiClass jApiClass, Map<String, JApiClass> classMap);
+		boolean callback(JApiClass superclass, Map<String, JApiClass> classMap);
 	}
 
 	private void forAllSuperclasses(JApiClass jApiClass, Map<String, JApiClass> classMap, List<Boolean> returnValues, OnSuperclassCallback onSuperclassCallback) {
 		JApiSuperclass superclass = jApiClass.getSuperclass();
-		if (superclass.getNewSuperclass().isPresent()) {
-			JApiClass foundClass = classMap.get(superclass.getNewSuperclass().get());
+		if (superclass.getNewSuperclassName().isPresent()) {
+			JApiClass foundClass = classMap.get(superclass.getNewSuperclassName().get());
 			if (foundClass != null) {
 				boolean returnValue = onSuperclassCallback.callback(foundClass, classMap);
 				returnValues.add(returnValue);
 				forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
+			} else {
+				Optional<JApiClass> superclassJApiClassOptional = superclass.getJApiClass();
+				if (superclassJApiClassOptional.isPresent()) {
+					JApiClass superclassJApiClass = superclassJApiClassOptional.get();
+					boolean returnValue = onSuperclassCallback.callback(superclassJApiClass, classMap);
+					returnValues.add(returnValue);
+					forAllSuperclasses(superclassJApiClass, classMap, returnValues, onSuperclassCallback);
+				}
 			}
 		}
 	}
@@ -178,8 +197,8 @@ public class BinaryCompatibility {
 				List<Boolean> returnValues = new ArrayList<Boolean>();
 				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
 					@Override
-					public boolean callback(JApiClass jApiClass, Map<String, JApiClass> classMap) {
-						for (JApiMethod superMethod : jApiClass.getMethods()) {
+					public boolean callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+						for (JApiMethod superMethod : superclass.getMethods()) {
 							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
 								return true;
 							}
@@ -208,8 +227,8 @@ public class BinaryCompatibility {
 				List<Boolean> returnValues = new ArrayList<Boolean>();
 				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
 					@Override
-					public boolean callback(JApiClass jApiClass, Map<String, JApiClass> classMap) {
-						for (JApiMethod superMethod : jApiClass.getMethods()) {
+					public boolean callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+						for (JApiMethod superMethod : superclass.getMethods()) {
 							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
 								if (superMethod.getAccessModifier().getNewModifier().isPresent() && method.getAccessModifier().getNewModifier().isPresent()) {
 									if (superMethod.getAccessModifier().getNewModifier().get().getLevel() > method.getAccessModifier().getNewModifier().get().getLevel()) {
@@ -273,17 +292,17 @@ public class BinaryCompatibility {
 			List<Boolean> returnValues = new ArrayList<Boolean>();
 			forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
 				@Override
-				public boolean callback(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+				public boolean callback(JApiClass superclass, Map<String, JApiClass> classMap) {
 					boolean changedIncompatible = false;
-					if (methodsHaveChangedIncompatible(jApiClass, classMap)) {
+					if (methodsHaveChangedIncompatible(superclass, classMap)) {
 						superclass.setBinaryCompatible(false);
 						changedIncompatible = true;
 					}
-					if (constructorsHaveChangedIncompatible(jApiClass, classMap)) {
+					if (constructorsHaveChangedIncompatible(superclass, classMap)) {
 						superclass.setBinaryCompatible(false);
 						changedIncompatible = true;
 					}
-					if (fieldsHaveChangedIncompatible(jApiClass, classMap)) {
+					if (fieldsHaveChangedIncompatible(superclass, classMap)) {
 						superclass.setBinaryCompatible(false);
 						changedIncompatible = true;
 					}
@@ -295,15 +314,15 @@ public class BinaryCompatibility {
 					changedIncompatible = true;
 				}
 			}
-			if(superclass.getOldSuperclass().isPresent() && superclass.getNewSuperclass().isPresent()) {
-				if(!superclass.getOldSuperclass().get().equals(superclass.getNewSuperclass().get())) {
+			if(superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
+				if(!superclass.getOldSuperclassName().get().equals(superclass.getNewSuperclassName().get())) {
 					superclass.setBinaryCompatible(false);
 					changedIncompatible = true;
 				}
-			} else if(superclass.getOldSuperclass().isPresent() && !superclass.getNewSuperclass().isPresent()) {
+			} else if(superclass.getOldSuperclassName().isPresent() && !superclass.getNewSuperclassName().isPresent()) {
 				superclass.setBinaryCompatible(false);
 				changedIncompatible = true;
-			} else if(!superclass.getOldSuperclass().isPresent() && superclass.getNewSuperclass().isPresent()) {
+			} else if(!superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
 				superclass.setBinaryCompatible(false);
 				changedIncompatible = true;
 			}
