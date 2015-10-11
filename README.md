@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.5.3-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.6.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository:
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.5.3</version>
+		<version>0.6.0</version>
 	</dependency>
 
 ##Motivation##
@@ -132,16 +132,16 @@ OPTIONS
 When your library implements interfaces or extends classes from other libraries than the JDK and you want to evaluate binary
 compatibility you must specify the classpath for the two different versions:
 
-    java -jar japicmp-0.5.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar --new-classpath other-library-v2.jar
+    java -jar japicmp-0.6.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar --new-classpath other-library-v2.jar
         --old-classpath other-library-v1.jar
 
 In case the classpath for both versions did not change, you can add the library using the standard way:
 
-	java -cp japicmp-0.5.3-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+	java -cp japicmp-0.6.0-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
 
 For reporting purposes you can also provide more than one jar as old or new version(s):
 
-	java -jar japicmp-0.5.3-jar-with-dependencies.jar -o lib1-old.jar;lib2-old.jar -n lib1-new.jar;lib2-new.jar
+	java -jar japicmp-0.6.0-jar-with-dependencies.jar -o lib1-old.jar;lib2-old.jar -n lib1-new.jar;lib2-new.jar
 
 ###Usage maven plugin###
 
@@ -152,13 +152,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.5.3</version>
+                <version>0.6.0</version>
                 <configuration>
                     <oldVersion>
                         <dependency>
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
-                            <version>0.5.3</version>
+                            <version>0.6.0</version>
                         </dependency>
                     </oldVersion>
                     <newVersion>
@@ -273,7 +273,7 @@ Alternatively it can be used inside the `<reporting/>` tag in order to be invoke
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.5.3</version>
+			<version>0.6.0</version>
 			<reportSets>
 				<reportSet>
 					<reports>
