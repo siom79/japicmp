@@ -10,7 +10,7 @@
 
     <groupId>com.github.siom79.japicmp</groupId>
     <artifactId>japicmp-base</artifactId>
-    <version>0.5.4-SNAPSHOT</version>
+    <version>0.6.0</version>
     <packaging>pom</packaging>
 
     <name>japicmp-base</name>
@@ -149,7 +149,7 @@
         <connection>scm:git:git@github.com:${github.account}/${github.project}.git</connection>
         <developerConnection>scm:git:git@github.com:${github.account}/${github.project}.git</developerConnection>
         <url>git@github.com:${github.account}/${github.project}.git</url>
-        <tag>HEAD</tag>
+        <tag>japicmp-base-0.6.0</tag>
     </scm>
 
     <profiles>
