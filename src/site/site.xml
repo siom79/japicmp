@@ -28,7 +28,7 @@
 			<item name="japicmp" href="https://siom79.github.io/japicmp"/>
 		</breadcrumbs>
 		<menu name="Overview">
-			<item href="Introduction.html" name="Introduction" />
+			<item href="index.html" name="Introduction"/>
 			<item href="CliTool.html" name="CliTool" />
 			<item href="MavenPlugin.html" name="MavenPlugin" />
 			<item href="Examples.html" name="Examples" />
