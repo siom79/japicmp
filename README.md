@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive.
 
-The official website is located at [https://siom79.github.io/japicmp](https://siom79.github.io/japicmp).
+The official website is located at [https://siom79.github.io/japicmp](https://siom79.github.io/japicmp/Introduction.html).
 
 ##Downloads##
 
