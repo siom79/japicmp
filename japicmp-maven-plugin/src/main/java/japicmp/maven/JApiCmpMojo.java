@@ -358,6 +358,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters) throws MojoFailureException {
 		notNull(mavenParameters.getMavenProject(), "Maven parameter mavenProject should be provided by maven container.");
 		Set<Artifact> dependencyArtifacts = mavenParameters.getMavenProject().getArtifacts();
+		Set<String> classPathEntries = new HashSet<>();
 		for (Artifact artifact : dependencyArtifacts) {
 			String scope = artifact.getScope();
 			if (!"test".equals(scope)) {
@@ -367,9 +368,14 @@ public class JApiCmpMojo extends AbstractMojo {
 					if (getLog().isDebugEnabled()) {
 						getLog().debug("Adding to classpath: " + resolvedFile.getAbsolutePath() + "; scope: " + scope);
 					}
-					comparatorOptions.getClassPathEntries().add(resolvedFile.getAbsolutePath());
+					if (!classPathEntries.contains(resolvedFile.getAbsolutePath())) {
+						classPathEntries.add(resolvedFile.getAbsolutePath());
+					}
 				}
 			}
+		}
+		for (String classPathEntry : classPathEntries) {
+			comparatorOptions.getClassPathEntries().add(classPathEntry);
 		}
 	}
 
