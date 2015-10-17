@@ -22,7 +22,12 @@
 		<module>japicmp-test2-v1</module>
 		<module>japicmp-test2-v2</module>
 		<module>japicmp-test-maven-plugin-pom-module</module>
+		<module>japicmp-test-maven-plugin-jackson</module>
 	</modules>
+
+	<properties>
+		<maven.site.plugin.skip>true</maven.site.plugin.skip>
+	</properties>
 
     <build>
         <plugins>

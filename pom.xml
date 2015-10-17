@@ -42,6 +42,7 @@
         <github.project>japicmp</github.project>
         <java.source>1.7</java.source>
         <java.target>1.7</java.target>
+		<maven.site.plugin.skip>false</maven.site.plugin.skip>
     </properties>
 
     <modules>
@@ -135,6 +136,21 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<skip>${maven.site.plugin.skip}</skip>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.doxia</groupId>
+						<artifactId>doxia-module-markdown</artifactId>
+						<version>1.3</version>
+					</dependency>
+				</dependencies>
+			</plugin>
         </plugins>
         <extensions>
             <extension>
@@ -151,6 +167,13 @@
         <url>git@github.com:${github.account}/${github.project}.git</url>
         <tag>japicmp-base-0.6.0</tag>
     </scm>
+
+	<distributionManagement>
+		<site>
+			<id>japicmp</id>
+			<url>file://${user.dir}/target/deploy/site</url>
+		</site>
+	</distributionManagement>
 
     <profiles>
         <profile>

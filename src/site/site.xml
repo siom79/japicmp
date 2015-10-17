@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+	<publishDate format="yyyy-MM-dd" position="right" />
+	<version position="right" />
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-fluido-skin</artifactId>
+		<version>1.4</version>
+	</skin>
+
+	<custom>
+		<fluidoSkin>
+			<gitHub>
+				<projectId>siom79/japicmp</projectId>
+				<ribbonOrientation>right</ribbonOrientation>
+				<ribbonColor>gray</ribbonColor>
+			</gitHub>
+		</fluidoSkin>
+	</custom>
+
+	<body>
+		<links>
+			<item name="Maven" href="http://maven.apache.org/"/>
+		</links>
+		<breadcrumbs>
+			<item name="japicmp" href="https://siom79.github.io/japicmp"/>
+		</breadcrumbs>
+		<menu name="Overview">
+			<item href="Introduction.html" name="Introduction" />
+			<item href="CliTool.html" name="CliTool" />
+			<item href="MavenPlugin.html" name="MavenPlugin" />
+			<item href="Examples.html" name="Examples" />
+		</menu>
+		<menu ref="reports" inherit="bottom" />
+	</body>
+</project>
