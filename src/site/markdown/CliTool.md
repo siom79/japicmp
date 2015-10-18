@@ -1,5 +1,7 @@
 #CLI-Tool#
 
+The command line tool has the following options:
+
 ```
 SYNOPSIS
         java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
