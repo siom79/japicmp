@@ -14,9 +14,7 @@
     <packaging>pom</packaging>
 
     <name>japicmp-base</name>
-    <description>japicmp is a library/maven plugin that computes the differences between two
-        versions of a jar file/artifact in order to ease the API documentation for clients/customers.
-    </description>
+    <description>japicmp is a tool/maven plugin that compares two versions of a jar archive for binary compatibility.</description>
     <url>https://github.com/siom79/japicmp</url>
 
     <licenses>

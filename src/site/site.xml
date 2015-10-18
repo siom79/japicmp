@@ -29,8 +29,8 @@
 		</breadcrumbs>
 		<menu name="Overview">
 			<item href="index.html" name="Introduction"/>
-			<item href="CliTool.html" name="CliTool" />
-			<item href="MavenPlugin.html" name="MavenPlugin" />
+			<item href="CliTool.html" name="Cli-Tool" />
+			<item href="MavenPlugin.html" name="Maven Plugin" />
 			<item href="Examples.html" name="Examples" />
 		</menu>
 		<menu ref="reports" inherit="bottom" />
