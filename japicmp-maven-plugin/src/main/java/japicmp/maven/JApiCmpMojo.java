@@ -362,15 +362,18 @@ public class JApiCmpMojo extends AbstractMojo {
 		Set<String> classPathEntries = new HashSet<>();
 		for (Artifact artifact : dependencyArtifacts) {
 			String scope = artifact.getScope();
-			if (!"test".equals(scope)) {
+			if (!"test".equals(scope) && !artifact.isOptional()) {
 				Set<Artifact> artifacts = resolveArtifact(artifact, mavenParameters, true);
 				for (Artifact resolvedArtifact : artifacts) {
 					File resolvedFile = resolvedArtifact.getFile();
-					if (getLog().isDebugEnabled()) {
-						getLog().debug("Adding to classpath: " + resolvedFile.getAbsolutePath() + "; scope: " + scope);
-					}
-					if (!classPathEntries.contains(resolvedFile.getAbsolutePath())) {
-						classPathEntries.add(resolvedFile.getAbsolutePath());
+					if (resolvedFile != null) {
+						String absolutePath = resolvedFile.getAbsolutePath();
+						if (!classPathEntries.contains(absolutePath)) {
+							if (getLog().isDebugEnabled()) {
+								getLog().debug("Adding to classpath: " + absolutePath + "; scope: " + scope);
+							}
+							classPathEntries.add(absolutePath);
+						}
 					}
 				}
 			}
@@ -502,7 +505,11 @@ public class JApiCmpMojo extends AbstractMojo {
 		request.setResolutionFilter(new ArtifactFilter() {
 			@Override
 			public boolean include(Artifact artifact) {
-				return !artifact.isOptional();
+				boolean include = true;
+				if (artifact != null && artifact.isOptional()) {
+					include = false;
+				}
+				return include;
 			}
 		});
 		if (transitively) {
