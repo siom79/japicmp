@@ -17,6 +17,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -498,6 +499,12 @@ public class JApiCmpMojo extends AbstractMojo {
 		request.setArtifact(artifact);
 		request.setLocalRepository(mavenParameters.getLocalRepository());
 		request.setRemoteRepositories(mavenParameters.getArtifactRepositories());
+		request.setResolutionFilter(new ArtifactFilter() {
+			@Override
+			public boolean include(Artifact artifact) {
+				return !artifact.isOptional();
+			}
+		});
 		if (transitively) {
 			request.setResolveTransitively(true);
 		}
