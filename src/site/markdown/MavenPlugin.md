@@ -16,7 +16,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                     </oldVersion>
                     <newVersion>
                         <file>
-                            <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+                            <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
                         </file>
                     </newVersion>
                     <parameter>
