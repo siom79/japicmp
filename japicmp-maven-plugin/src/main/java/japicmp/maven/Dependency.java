@@ -7,6 +7,7 @@ public class Dependency implements DependencyDescriptor {
     private String scope;
     private String systemPath;
 	private String classifier;
+    private String type = "jar";
 
     public String getGroupId() {
         return groupId;
@@ -56,6 +57,14 @@ public class Dependency implements DependencyDescriptor {
 		this.classifier = classifier;
 	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	@Override
 	public String toString() {
 		return "Dependency{" +
@@ -65,6 +74,7 @@ public class Dependency implements DependencyDescriptor {
 			", scope='" + scope + '\'' +
 			", systemPath='" + systemPath + '\'' +
 			", classifier='" + classifier + '\'' +
+			", type='" + type + '\'' +
 			'}';
 	}
 
