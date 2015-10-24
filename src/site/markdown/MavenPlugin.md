@@ -12,11 +12,12 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                             <groupId>japicmp</groupId>
                             <artifactId>japicmp-test-v1</artifactId>
                             <version>0.6.0</version>
+                            <type>jar</type>
                         </dependency>
                     </oldVersion>
                     <newVersion>
                         <file>
-                            <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+                            <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
                         </file>
                     </newVersion>
                     <parameter>
