@@ -32,6 +32,32 @@
             <email>martin.mois@gmail.com</email>
         </developer>
     </developers>
+	<contributors>
+		<contributor>
+			<name>Loki</name>
+			<url>https://github.com/eldur</url>
+		</contributor>
+		<contributor>
+			<name>Mario Zechner</name>
+			<url>https://github.com/badlogic</url>
+		</contributor>
+		<contributor>
+			<name>Daniel Norberg</name>
+			<url>https://github.com/danielnorberg</url>
+		</contributor>
+		<contributor>
+			<name>Mike Duigou</name>
+			<url>https://github.com/mike-duigou</url>
+		</contributor>
+		<contributor>
+			<name>Guy Rooms</name>
+			<url>https://github.com/roomsg</url>
+		</contributor>
+		<contributor>
+			<name>earcam</name>
+			<url>https://github.com/earcam</url>
+		</contributor>
+	</contributors>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

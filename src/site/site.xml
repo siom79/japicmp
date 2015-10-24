@@ -21,9 +21,6 @@
 	</custom>
 
 	<body>
-		<links>
-			<item name="Maven" href="http://maven.apache.org/"/>
-		</links>
 		<breadcrumbs>
 			<item name="japicmp" href="https://siom79.github.io/japicmp"/>
 		</breadcrumbs>

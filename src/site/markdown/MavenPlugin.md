@@ -1,3 +1,5 @@
+#Maven Plugin#
+
 The maven plugin can be included in the pom.xml file of your artifact in the following way (requires maven >= 3.0.3):
 
     <build>

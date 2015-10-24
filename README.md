@@ -38,7 +38,7 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
 ##Release##
 
 This is the release procedure:
-* Increment version in README.md
+* Increment version in README.md.
 * Run release build (substitute passphrase with your GPG password):
 ```
 mvn release:clean release:prepare -DautoVersionSubmodules=true -Dgpg.passphrase=passphrase
@@ -47,6 +47,7 @@ mvn release:perform -Dgpg.passphrase=passphrase
 * Login to [Sonatype's Nexus repository](https://oss.sonatype.org/)
 	* Download released artifact from staging repository.
 	* Close and release staging repository if sanity checks are successful.
+* Update maven site report.
 
 ##Contributions##
 
