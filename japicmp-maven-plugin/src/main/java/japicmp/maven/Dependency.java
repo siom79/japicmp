@@ -7,9 +7,9 @@ public class Dependency implements DependencyDescriptor {
     private String scope;
     private String systemPath;
 	private String classifier;
-	private String type = "jar";
+    private String type = "jar";
 
-	public String getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
@@ -57,7 +57,7 @@ public class Dependency implements DependencyDescriptor {
 		this.classifier = classifier;
 	}
 
-    public String getType() {
+	public String getType() {
 		return type;
 	}
 
