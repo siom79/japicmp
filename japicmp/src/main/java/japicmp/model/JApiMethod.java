@@ -1,7 +1,6 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
-import japicmp.exception.JApiCmpException;
 import japicmp.util.MethodDescriptorParser;
 import javassist.CtMethod;
 
@@ -17,11 +16,11 @@ public class JApiMethod extends JApiBehavior {
     	super(name, oldMethod, newMethod, changeStatus);
         this.oldMethod = oldMethod;
         this.newMethod = newMethod;
-        this.returnType = computeReturnTypeChanges(oldMethod, newMethod);
-        this.changeStatus = evaluateChangeStatus(this.changeStatus);
-    }
+		this.returnType = computeReturnTypeChanges(oldMethod, newMethod);
+		this.changeStatus = evaluateChangeStatus(this.changeStatus);
+	}
 
-    private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+	private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
         if (changeStatus == JApiChangeStatus.UNCHANGED) {
             if (this.returnType.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;

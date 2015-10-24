@@ -18,7 +18,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasTransientModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiCanBeSynthetic {
+public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier,
+	JApiHasFinalModifier, JApiHasTransientModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiCanBeSynthetic {
     private final JApiChangeStatus changeStatus;
     private final Optional<CtField> oldFieldOptional;
     private final Optional<CtField> newFieldOptional;

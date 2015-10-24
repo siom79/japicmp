@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
+import japicmp.util.OptionalHelper;
 import javassist.CtBehavior;
 import javassist.CtConstructor;
 import javassist.CtMethod;
@@ -19,7 +20,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiHasBridgeModifier, JApiCanBeSynthetic {
+public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier,
+	JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiHasBridgeModifier,
+	JApiCanBeSynthetic, JApiHasLineNumber {
     private final String name;
     private final List<JApiParameter> parameters = new LinkedList<>();
     private final List<JApiAnnotation> annotations = new LinkedList<>();
@@ -32,6 +35,8 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
     protected JApiChangeStatus changeStatus;
     private boolean binaryCompatible = true;
+	private final Optional<Integer> oldLineNumber;
+	private final Optional<Integer> newLineNumber;
 
     public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus) {
         this.name = name;
@@ -44,7 +49,21 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         this.syntheticModifier = extractSyntheticModifier(oldBehavior, newBehavior);
         this.syntheticAttribute = extractSyntheticAttribute(oldBehavior, newBehavior);
         this.changeStatus = evaluateChangeStatus(changeStatus);
+		this.oldLineNumber = getLineNumber(oldBehavior);
+		this.newLineNumber = getLineNumber(newBehavior);
     }
+
+	private Optional<Integer> getLineNumber(Optional<? extends CtBehavior> methodOptional) {
+		Optional<Integer> lineNumberOptional = Optional.absent();
+		if (methodOptional.isPresent()) {
+			CtBehavior ctMethod = methodOptional.get();
+			int lineNumber = ctMethod.getMethodInfo().getLineNumber(0);
+			if (lineNumber >= 0) {
+				lineNumberOptional = Optional.of(lineNumber);
+			}
+		}
+		return lineNumberOptional;
+	}
 
     @SuppressWarnings("unchecked")
 	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior) {
@@ -327,4 +346,24 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     public List<JApiAnnotation> getAnnotations() {
         return annotations;
     }
+
+	@Override
+	public Optional<Integer> getOldLineNumber() {
+		return this.oldLineNumber;
+	}
+
+	@Override
+	public Optional<Integer> geNewLineNumber() {
+		return this.newLineNumber;
+	}
+
+	@XmlAttribute(name = "oldLineNumber")
+	public String getOldLineNumberAsString() {
+		return OptionalHelper.optionalToString(this.oldLineNumber);
+	}
+
+	@XmlAttribute(name = "newLineNumber")
+	public String getNewLineNumberAsString() {
+		return OptionalHelper.optionalToString(this.newLineNumber);
+	}
 }

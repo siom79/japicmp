@@ -261,6 +261,7 @@
                                     <td>Status</td>
                                     <td>Modifier</td>
                                     <td>Constructor</td>
+									<td>Line Number</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -279,6 +280,7 @@
                                     <td>Modifier</td>
                                     <td>Type</td>
                                     <td>Method</td>
+									<td>Line Number</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -377,6 +379,22 @@
                 <xsl:value-of select="@name" />(<xsl:apply-templates select="parameters"/>)
                 <xsl:call-template name="annotations"/>
             </td>
+			<td>
+				<table>
+					<thead>
+						<tr>
+							<td>Old file</td>
+							<td>New file</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><xsl:value-of select="@oldLineNumber" /></td>
+							<td><xsl:value-of select="@newLineNumber" /></td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
         </tr>
     </xsl:template>
 
@@ -395,6 +413,22 @@
                 <xsl:value-of select="@name" />(<xsl:apply-templates select="parameters"/>)
                 <xsl:call-template name="annotations"/>
             </td>
+			<td>
+				<table>
+					<thead>
+						<tr>
+							<td>Old file</td>
+							<td>New file</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><xsl:value-of select="@oldLineNumber" /></td>
+							<td><xsl:value-of select="@newLineNumber" /></td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
         </tr>
 	</xsl:template>
 
