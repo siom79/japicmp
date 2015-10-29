@@ -363,7 +363,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		for (Artifact artifact : dependencyArtifacts) {
 			String scope = artifact.getScope();
 			if (!"test".equals(scope) && !artifact.isOptional()) {
-				Set<Artifact> artifacts = resolveArtifact(artifact, mavenParameters, true);
+				Set<Artifact> artifacts = resolveArtifact(artifact, mavenParameters, false);
 				for (Artifact resolvedArtifact : artifacts) {
 					File resolvedFile = resolvedArtifact.getFile();
 					if (resolvedFile != null) {
