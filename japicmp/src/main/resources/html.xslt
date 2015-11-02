@@ -7,11 +7,11 @@
 	<xsl:template match="/japicmp">
 		<html>
 			<head>
-				<title>japicmp (oldJar: <xsl:value-of select="@oldJar"/>, newJar: <xsl:value-of select="@newJar"/>)</title>
+				<title><xsl:value-of select="@title"/></title>
 				<style type="text/css"></style>
 			</head>
 			<body>
-                <span class="title">JApiCmp-Report</span><br/>
+                <span class="title"><xsl:value-of select="@title"/></span><br/>
                 <div class="meta-information">
                     <table>
                         <tr>

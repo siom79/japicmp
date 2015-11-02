@@ -15,6 +15,8 @@ public class Parameter {
 	private String skipPomModules;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String htmlStylesheet;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String htmlTitle;
 
     public String getAccessModifier() {
         return accessModifier;
@@ -101,5 +103,13 @@ public class Parameter {
 
 	public void setHtmlStylesheet(String htmlStylesheet) {
 		this.htmlStylesheet = htmlStylesheet;
+	}
+
+	public String getHtmlTitle() {
+		return htmlTitle;
+	}
+
+	public void setHtmlTitle(String htmlTitle) {
+		this.htmlTitle = htmlTitle;
 	}
 }

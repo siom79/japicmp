@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.List;
 
+import japicmp.output.xml.XmlOutputGeneratorOptions;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -30,6 +31,7 @@ import com.google.common.base.Optional;
 
 public class XmlOutputGeneratorTest {
 	public static final String JAPICMP_TEST_SEMVER001 = "japicmp.test.semver001";
+	private static final String TITLE = "Title with Ümläüte";
 	private static List<JApiClass> jApiClasses;
 	private static Document document;
 	private static Document documentOnlyModifications;
@@ -54,7 +56,9 @@ public class XmlOutputGeneratorTest {
 		options.setXmlOutputFile(Optional.of(xmlOutpuFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
-		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, true);
+		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
+		xmlOutputGeneratorOptions.setTitle(TITLE);
+		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 		XmlOutput xmlOutput = generator.generate();
 		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}
@@ -143,5 +147,12 @@ public class XmlOutputGeneratorTest {
 	public void superclassNoSuperclassToSuperclassOnlyModifications() throws IOException {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$NoSuperclassToSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+	}
+
+	@Test
+	public void titleSetProperly() {
+		Elements title = document.select("title");
+		assertThat(title.isEmpty(), is(false));
+		assertThat(title.text(), is("Title with Ümläüte"));
 	}
 }

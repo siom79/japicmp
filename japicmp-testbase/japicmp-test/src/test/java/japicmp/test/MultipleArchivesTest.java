@@ -10,6 +10,7 @@ import japicmp.model.JApiClass;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
+import japicmp.output.xml.XmlOutputGeneratorOptions;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -75,7 +76,9 @@ public class MultipleArchivesTest {
 		options.getNewArchives().addAll(createListOfNewArchives());
 		Path xmlOutputPath = Paths.get(System.getProperty("user.dir"), "target", "MultipleArchivesTest.xml");
 		options.setXmlOutputFile(Optional.of(xmlOutputPath.toString()));
-		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, false);
+		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
+		xmlOutputGeneratorOptions.setCreateSchemaFile(false);
+		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 		XmlOutput xmlOutput = generator.generate();
 		JApiCmpXmlRoot jApiCmpXmlRoot = xmlOutput.getJApiCmpXmlRoot();
 		assertThat(jApiCmpXmlRoot.getOldJar().contains("japicmp-test-v1.jar"), is(true));

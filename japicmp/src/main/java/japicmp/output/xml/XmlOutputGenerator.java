@@ -2,11 +2,10 @@ package japicmp.output.xml;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.io.Resources;
 import japicmp.config.Options;
-import japicmp.filter.Filter;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
+import japicmp.filter.Filter;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.OutputGenerator;
@@ -28,7 +27,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,11 +38,18 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 	private static final String XSD_FILENAME = "japicmp.xsd";
 	private static final String XML_SCHEMA = XSD_FILENAME;
 	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());
-	private final boolean createSchemaFile;
+	private final XmlOutputGeneratorOptions xmlOutputGeneratorOptions;
 
+	@Deprecated
 	public XmlOutputGenerator(List<JApiClass> jApiClasses, Options options, boolean createSchemaFile) {
 		super(options, jApiClasses);
-		this.createSchemaFile = createSchemaFile;
+		this.xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
+		this.xmlOutputGeneratorOptions.setCreateSchemaFile(createSchemaFile);
+	}
+
+	public XmlOutputGenerator(List<JApiClass> jApiClasses, Options options, XmlOutputGeneratorOptions xmlOutputGeneratorOptions) {
+		super(options, jApiClasses);
+		this.xmlOutputGeneratorOptions = xmlOutputGeneratorOptions;
 	}
 
 	@Override
@@ -104,7 +113,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 			marshaller.marshal(jApiCmpXmlRoot, xmlBaos);
 			if (options.getXmlOutputFile().isPresent()) {
 				xmlOutput.setXmlOutputStream(Optional.of(xmlBaos));
-				if (this.createSchemaFile) {
+				if (xmlOutputGeneratorOptions.isCreateSchemaFile()) {
 					final File xmlFile = new File(options.getXmlOutputFile().get());
 					SchemaOutputResolver outputResolver = new SchemaOutputResolver() {
 						@Override
@@ -208,6 +217,9 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		jApiCmpXmlRoot.setPackagesInclude(filtersAsString(options.getIncludes(), true));
 		jApiCmpXmlRoot.setPackagesExclude(filtersAsString(options.getExcludes(), false));
 		jApiCmpXmlRoot.setIgnoreMissingClasses(options.isIgnoreMissingClasses());
+		if (xmlOutputGeneratorOptions.getTitle().isPresent()) {
+			jApiCmpXmlRoot.setTitle(xmlOutputGeneratorOptions.getTitle().get());
+		}
 		return jApiCmpXmlRoot;
 	}
 

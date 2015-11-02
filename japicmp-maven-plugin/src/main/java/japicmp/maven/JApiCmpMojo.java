@@ -11,6 +11,7 @@ import japicmp.model.JApiClass;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
+import japicmp.output.xml.XmlOutputGeneratorOptions;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -104,7 +105,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
 			String diffOutput = generateDiffOutput(jApiClasses, options);
 			createFileAndWriteTo(diffOutput, jApiCmpBuildDir, mavenParameters);
-			XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters);
+			XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters);
 			if (pluginParameters.isWriteToFiles()) {
 				List<File> filesWritten = XmlOutputGenerator.writeToFiles(options, xmlOutput);
 				for (File file : filesWritten) {
@@ -280,11 +281,16 @@ public class JApiCmpMojo extends AbstractMojo {
 		return stdoutOutputGenerator.generate();
 	}
 
-	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters) throws IOException, MojoFailureException {
+	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters, PluginParameters pluginParameters) throws IOException, MojoFailureException {
 		String filename = createFilename(mavenParameters);
 		options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
 		options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
-		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, false);
+		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
+		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
+		if (pluginParameters.getParameterParam() != null) {
+			xmlOutputGeneratorOptions.setTitle(pluginParameters.getParameterParam().getHtmlTitle());
+		}
+		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 		return xmlGenerator.generate();
 	}
 

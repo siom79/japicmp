@@ -7,6 +7,7 @@ import japicmp.config.Options;
 import japicmp.model.*;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
+import japicmp.output.xml.XmlOutputGeneratorOptions;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -158,7 +159,9 @@ public class Helper {
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
 		options.setAccessModifier(Optional.of(accessModifier));
-		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, true);
+		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
+		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
+		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 		XmlOutput xmlOutput = generator.generate();
 		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}

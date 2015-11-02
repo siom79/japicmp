@@ -28,6 +28,15 @@
 		<maven.site.plugin.skip>true</maven.site.plugin.skip>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
     <build>
         <plugins>
             <plugin>

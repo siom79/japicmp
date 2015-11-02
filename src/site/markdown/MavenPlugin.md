@@ -43,6 +43,8 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
                         <includeSynthetic>false</includeSynthetic>
                         <ignoreMissingClasses>false</ignoreMissingClasses>
                         <skipPomModules>true</skipPomModules>
+                        <htmlStylesheet>path/to/stylesheet.css</htmlStylesheet>
+                        <htmlTitle>Title of report</htmlTitle>
                     </parameter>
 					<dependencies>
 						<dependency>
@@ -80,6 +82,8 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 * ignoreMissingClasses: When set to true, superclasses and interfaces that cannot be resolved are ignored. Pleases note that in this case the results for the affected classes may not be accurate.
 * skipPomModules: Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.
 * skip: Setting this parameter to true will skip execution of the plugin.
+* htmlStylesheet: Path to an individual CSS stylesheet for the HTML report.
+* htmlTitle: A title for the HTML report (optional).
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:

@@ -76,7 +76,9 @@ public class XmlOutputGeneratorTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
 		jApiClasses.add(new JApiClass(new JarArchiveComparator(jarArchiveComparatorOptions), "japicmp.Test", Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.NEW, classType, jarArchiveComparatorOptions));
-		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, true);
+		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
+		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
+		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 		XmlOutput xmlOutput = generator.generate();
 		XmlOutputGenerator.writeToFiles(options, xmlOutput);
 	}

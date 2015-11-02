@@ -14,6 +14,7 @@ import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
+import japicmp.output.xml.XmlOutputGeneratorOptions;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -82,7 +83,9 @@ public class JApiCli {
 				return;
 			}
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
-				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, true);
+				XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
+				xmlOutputGeneratorOptions.setCreateSchemaFile(true);
+				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 				try (XmlOutput xmlOutput = xmlGenerator.generate()) {
 					XmlOutputGenerator.writeToFiles(options, xmlOutput);
 				} catch (Exception e) {
