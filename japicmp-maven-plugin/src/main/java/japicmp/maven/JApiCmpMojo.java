@@ -8,6 +8,7 @@ import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
@@ -285,8 +286,10 @@ public class JApiCmpMojo extends AbstractMojo {
 		String filename = createFilename(mavenParameters);
 		options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
 		options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
+		SemverOut semverOut = new SemverOut(options, jApiClasses);
 		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
 		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
+		xmlOutputGeneratorOptions.setSemanticVersioningInformation(semverOut.generate());
 		if (pluginParameters.getParameterParam() != null) {
 			xmlOutputGeneratorOptions.setTitle(pluginParameters.getParameterParam().getHtmlTitle());
 		}

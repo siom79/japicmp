@@ -50,6 +50,10 @@
                             <td>Excludes:</td>
                             <td><xsl:value-of select="@packagesExclude"/></td>
                         </tr>
+						<tr>
+							<td>Semantic Versioning:</td>
+							<td><xsl:value-of select="@semanticVersioning"/></td>
+						</tr>
                     </table>
                     <xsl:if test="@ignoreMissingClasses = 'true'">
                         <div class="warnings">

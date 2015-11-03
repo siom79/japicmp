@@ -104,7 +104,7 @@ public class SemverOutIntegTest {
 		options.setOldArchives(Collections.singletonList(oldFile));
 		options.setAccessModifier(accessModifier);
 		options.setOutputOnlyModifications(false);
-		return new SemverOut(options, jApiClasses).value();
+		return new SemverOut(options, jApiClasses).generate();
 	}
 
 	private JarArchiveComparator newComparator(String lastPackage, AccessModifier accessModifier) {

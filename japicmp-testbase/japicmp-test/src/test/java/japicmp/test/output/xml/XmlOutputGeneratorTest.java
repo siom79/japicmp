@@ -66,7 +66,7 @@ public class XmlOutputGeneratorTest {
 	@Test
 	public void testMetaInformationTable() throws IOException {
 		assertThat(document.select("div.meta-information > table").isEmpty(), is(false));
-		assertThat(document.select("div.meta-information > table > tbody > tr").size(), is(9));
+		assertThat(document.select("div.meta-information > table > tbody > tr").size(), is(10));
 	}
 
 	@Test

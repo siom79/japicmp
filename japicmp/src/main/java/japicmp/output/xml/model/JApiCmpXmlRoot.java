@@ -24,6 +24,7 @@ public class JApiCmpXmlRoot {
 	private String packagesExclude;
 	private boolean ignoreMissingClasses;
 	private Optional<String> titleOptional = Optional.absent();
+	private String semanticVersioning = "n.a.";
 
 	@XmlElementWrapper(name = "classes")
 	@XmlElement(name = "class")
@@ -126,5 +127,14 @@ public class JApiCmpXmlRoot {
 
 	public void setTitle(String title) {
 		this.titleOptional = Optional.fromNullable(title);
+	}
+
+	@XmlAttribute
+	public String getSemanticVersioning() {
+		return semanticVersioning;
+	}
+
+	public void setSemanticVersioning(String semanticVersioning) {
+		this.semanticVersioning = semanticVersioning;
 	}
 }

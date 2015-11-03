@@ -79,12 +79,15 @@ public class JApiCli {
 		private void generateOutput(Options options, List<JApiClass> jApiClasses) {
 			if (semanticVersioning) {
 				SemverOut semverOut = new SemverOut(options, jApiClasses);
-				semverOut.generate();
+				String output = semverOut.generate();
+				System.out.println(output);
 				return;
 			}
 			if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {
+				SemverOut semverOut = new SemverOut(options, jApiClasses);
 				XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
 				xmlOutputGeneratorOptions.setCreateSchemaFile(true);
+				xmlOutputGeneratorOptions.setSemanticVersioningInformation(semverOut.generate());
 				XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 				try (XmlOutput xmlOutput = xmlGenerator.generate()) {
 					XmlOutputGenerator.writeToFiles(options, xmlOutput);

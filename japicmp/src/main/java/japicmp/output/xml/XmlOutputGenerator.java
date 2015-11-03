@@ -220,6 +220,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		if (xmlOutputGeneratorOptions.getTitle().isPresent()) {
 			jApiCmpXmlRoot.setTitle(xmlOutputGeneratorOptions.getTitle().get());
 		}
+		jApiCmpXmlRoot.setSemanticVersioning(xmlOutputGeneratorOptions.getSemanticVersioningInformation());
 		return jApiCmpXmlRoot;
 	}
 

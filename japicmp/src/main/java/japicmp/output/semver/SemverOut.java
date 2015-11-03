@@ -11,7 +11,7 @@ import java.util.List;
 
 import static japicmp.util.ModifierHelper.isNotPrivate;
 
-public class SemverOut extends OutputGenerator<Void> {
+public class SemverOut extends OutputGenerator<String> {
 	private enum SemverStatus {
 		UNCHANGED, CHANGED_BINARY_COMPATIBLE, CHANGED_BINARY_INCOMPATIBLE;
 	}
@@ -21,12 +21,7 @@ public class SemverOut extends OutputGenerator<Void> {
 	}
 
 	@Override
-	public Void generate() {
-		System.out.println(value());
-		return null;
-	}
-
-	public String value() {
+	public String generate() {
 		final ImmutableSet.Builder<SemverStatus> builder = ImmutableSet.builder();
 		Filter.filter(jApiClasses, new Filter.FilterVisitor() {
 			@Override
