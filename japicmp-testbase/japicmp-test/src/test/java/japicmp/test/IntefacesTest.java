@@ -4,6 +4,7 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiMethod;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -70,4 +71,16 @@ public class IntefacesTest {
         assertThat(getJApiImplementedInterface(newClassWithNewInterface.getInterfaces(), Interfaces.TestInterface.class.getName()).getChangeStatus(), is(JApiChangeStatus.NEW));
         assertThat(getJApiImplementedInterface(newClassWithNewInterface.getInterfaces(), Interfaces.TestInterface.class.getName()).isBinaryCompatible(), is(true));
     }
+
+	@Test
+	public void testMethodPulledUpToSuperInterface() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, Interfaces.MethodPulledToSuperInterfaceBase.class.getName());
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		JApiMethod methodPulledUp = getJApiMethod(jApiClass.getMethods(), "methodPulledUp");
+		assertThat(methodPulledUp.isBinaryCompatible(), is(true));
+		jApiClass = getJApiClass(jApiClasses, Interfaces.MethodPulledToSuperInterfaceChild.class.getName());
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		methodPulledUp = getJApiMethod(jApiClass.getMethods(), "methodPulledUp");
+		assertThat(methodPulledUp.isBinaryCompatible(), is(true));
+	}
 }

@@ -111,8 +111,8 @@ public class BinaryCompatibility {
 						return changedIncompatible;
 					}
 				});
-				for(boolean returnValue : returnValues) {
-					if(returnValue) {
+				for (boolean returnValue : returnValues) {
+					if (returnValue) {
 						field.setBinaryCompatible(false);
 						changedIncompatible = true;
 					}
@@ -138,6 +138,10 @@ public class BinaryCompatibility {
 
 	private interface OnSuperclassCallback {
 		boolean callback(JApiClass superclass, Map<String, JApiClass> classMap);
+	}
+
+	private interface OnImplementedInterfaceCallback {
+		boolean callback(JApiClass implementedInterface, Map<String, JApiClass> classMap);
 	}
 
 	private void forAllSuperclasses(JApiClass jApiClass, Map<String, JApiClass> classMap, List<Boolean> returnValues, OnSuperclassCallback onSuperclassCallback) {
@@ -194,7 +198,7 @@ public class BinaryCompatibility {
 		for (final JApiMethod method : jApiClass.getMethods()) {
 			// section 13.4.6 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				List<Boolean> returnValues = new ArrayList<Boolean>();
+				final List<Boolean> returnValues = new ArrayList<Boolean>();
 				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
 					@Override
 					public boolean callback(JApiClass superclass, Map<String, JApiClass> classMap) {
@@ -206,6 +210,7 @@ public class BinaryCompatibility {
 						return false;
 					}
 				});
+				checkIfMethodHasBeenPulledUp(jApiClass, classMap, method, returnValues);
 				boolean superclassHasSameMethod = false;
 				for (boolean returnValue : returnValues) {
 					if (returnValue) {
@@ -237,7 +242,7 @@ public class BinaryCompatibility {
 								}
 								if (superMethod.getStaticModifier().getNewModifier().isPresent() && method.getStaticModifier().getNewModifier().isPresent()) {
 									if (superMethod.getStaticModifier().getNewModifier().get() == StaticModifier.NON_STATIC
-											&& method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
+										&& method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
 										return true;
 									}
 								}
@@ -272,13 +277,51 @@ public class BinaryCompatibility {
 			}
 			// section 13.4.18 of "Java Language Specification" SE7
 			if (isNotPrivate(method)
-					&& (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC) || method.getStaticModifier().hasChangedFromTo(
-							StaticModifier.STATIC, StaticModifier.NON_STATIC))) {
+				&& (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC) || method.getStaticModifier().hasChangedFromTo(
+				StaticModifier.STATIC, StaticModifier.NON_STATIC))) {
 				method.setBinaryCompatible(false);
 				changedIncompatible = true;
 			}
 		}
 		return changedIncompatible;
+	}
+
+	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map<String, JApiClass> classMap, final JApiMethod method, List<Boolean> returnValues) {
+		JApiClassType classType = jApiClass.getClassType();
+		Optional<JApiClassType.ClassType> newTypeOptional = classType.getNewTypeOptional();
+		Optional<JApiClassType.ClassType> oldTypeOptional = classType.getOldTypeOptional();
+		if (newTypeOptional.isPresent() && oldTypeOptional.isPresent()) {
+			JApiClassType.ClassType newType = newTypeOptional.get();
+			JApiClassType.ClassType oldType = oldTypeOptional.get();
+			if (newType == JApiClassType.ClassType.INTERFACE && oldType == JApiClassType.ClassType.INTERFACE) {
+				forAllImplementedInterfaces(jApiClass, classMap, returnValues, new OnImplementedInterfaceCallback() {
+					@Override
+					public boolean callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
+						for (JApiMethod superMethod : implementedInterface.getMethods()) {
+							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+								return true;
+							}
+						}
+						return false;
+					}
+				});
+			}
+		}
+	}
+
+	private void forAllImplementedInterfaces(JApiClass jApiClass, Map<String, JApiClass> classMap, List<Boolean> returnValues, OnImplementedInterfaceCallback onImplementedInterfaceCallback) {
+		List<JApiImplementedInterface> interfaces = jApiClass.getInterfaces();
+		for (JApiImplementedInterface implementedInterface : interfaces) {
+			String fullyQualifiedName = implementedInterface.getFullyQualifiedName();
+			JApiClass foundClass = classMap.get(fullyQualifiedName);
+			if (foundClass != null) {
+				boolean returnValue = onImplementedInterfaceCallback.callback(foundClass, classMap);
+				returnValues.add(returnValue);
+				forAllImplementedInterfaces(foundClass, classMap, returnValues, onImplementedInterfaceCallback);
+			} else {
+				//TODO
+			}
+		}
 	}
 
 	private boolean superclassesOrInterfacesChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
@@ -314,15 +357,15 @@ public class BinaryCompatibility {
 					changedIncompatible = true;
 				}
 			}
-			if(superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
-				if(!superclass.getOldSuperclassName().get().equals(superclass.getNewSuperclassName().get())) {
+			if (superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
+				if (!superclass.getOldSuperclassName().get().equals(superclass.getNewSuperclassName().get())) {
 					superclass.setBinaryCompatible(false);
 					changedIncompatible = true;
 				}
-			} else if(superclass.getOldSuperclassName().isPresent() && !superclass.getNewSuperclassName().isPresent()) {
+			} else if (superclass.getOldSuperclassName().isPresent() && !superclass.getNewSuperclassName().isPresent()) {
 				superclass.setBinaryCompatible(false);
 				changedIncompatible = true;
-			} else if(!superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
+			} else if (!superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
 				superclass.setBinaryCompatible(false);
 				changedIncompatible = true;
 			}
@@ -348,7 +391,7 @@ public class BinaryCompatibility {
 						changedIncompatible = true;
 					}
 				}
-				if(implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				if (implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 					implementedInterface.setBinaryCompatible(false);
 					changedIncompatible = true;
 				}

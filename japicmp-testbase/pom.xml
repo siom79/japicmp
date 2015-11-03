@@ -22,6 +22,7 @@
 		<module>japicmp-test2-v1</module>
 		<module>japicmp-test2-v2</module>
 		<module>japicmp-test-maven-plugin-pom-module</module>
+		<module>japicmp-test-vx-client</module>
 	</modules>
 
 	<properties>

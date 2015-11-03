@@ -47,8 +47,8 @@
 						</file>
 					</newVersion>
 					<parameter>
-						<accessModifier>public</accessModifier>
 						<onlyModified>true</onlyModified>
+						<!--
 						<includes>
 							<include>package.to.include</include>
 							<include>package.ClassToInclude</include>
@@ -63,7 +63,15 @@
 							<exclude>japicmp.test.ModifierTest#methodToExclude()</exclude>
 							<exclude>japicmp.test.ModifierTest#anotherMethodToExclude()</exclude>
 						</excludes>
+						-->
 					</parameter>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.commons</groupId>
+							<artifactId>commons-math3</artifactId>
+							<version>3.5</version>
+						</dependency>
+					</dependencies>
 					<skip>false</skip>
 				</configuration>
 				<executions>
