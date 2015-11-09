@@ -2,7 +2,7 @@
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.6.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+	java -jar japicmp-0.6.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 
 It can also be used as a library:
 
@@ -15,7 +15,7 @@ japicmp is available in the Maven Central Repository:
 	<dependency>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp</artifactId>
-		<version>0.6.0</version>
+		<version>0.6.1</version>
 	</dependency>
 
 ##Motivation##
