@@ -10,7 +10,7 @@
 
     <groupId>com.github.siom79.japicmp</groupId>
     <artifactId>japicmp-base</artifactId>
-    <version>0.6.2-SNAPSHOT</version>
+    <version>0.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>japicmp-base</name>
