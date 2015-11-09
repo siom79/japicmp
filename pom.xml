@@ -114,6 +114,7 @@
                 <configuration>
                     <remoteTagging>false</remoteTagging>
                     <suppressCommitBeforeTag>false</suppressCommitBeforeTag>
+					<goals>deploy</goals>
                 </configuration>
             </plugin>
             <plugin>
