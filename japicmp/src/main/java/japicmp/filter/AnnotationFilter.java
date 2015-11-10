@@ -6,8 +6,7 @@ import javassist.CtClass;
 import javassist.CtField;
 
 public class AnnotationFilter implements Filter {
-
-	private Class annotation = null;
+	private final Class annotation;
 
 	public AnnotationFilter(String filterString) {
 		String clazz = filterString.substring(1);

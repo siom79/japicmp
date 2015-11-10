@@ -46,9 +46,9 @@ public class JApiCli {
 		public boolean onlyBinaryIncompatibleModifications;
 		@Option(name = "-a", description = "Sets the access modifier level (public, package, protected, private), which should be used.")
 		public String accessModifier;
-		@Option(name = {"-i", "--include"}, description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
+		@Option(name = {"-i", "--include"}, description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Annotations are given as FQN starting with @. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.")
 		public String includes;
-		@Option(name = {"-e", "--exclude"}, description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field")
+		@Option(name = {"-e", "--exclude"}, description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Annotations are given as FQN starting with @. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.")
 		public String excludes;
 		@Option(name = {"-x", "--xml-file"}, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;

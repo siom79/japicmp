@@ -6,7 +6,7 @@ package japicmp.test.annotation.filter;
 @PublicAPI
 public class AnnotatedClass {
 	public int f;
-	public AnnotatedClass(int a, String b) {
+	public AnnotatedClass(int a, String removed) {
 		System.out.println("a = " + a);
 		this.f = a;
 	}

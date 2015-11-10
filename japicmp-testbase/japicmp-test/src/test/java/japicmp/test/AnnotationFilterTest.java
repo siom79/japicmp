@@ -6,7 +6,9 @@ import japicmp.filter.AnnotationFilter;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.test.annotation.filter.AnnotatedClass;
+import japicmp.test.annotation.filter.ClassWithMembersToExclude;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -31,7 +33,6 @@ public class AnnotationFilterTest {
 		assertThat(jApiClasses.size(), is(1));
 	}
 
-
 	@Test
 	public void detectChangeOnAnnotatedClass() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
@@ -42,18 +43,14 @@ public class AnnotationFilterTest {
 		Assert.assertEquals(JApiChangeStatus.MODIFIED, jApiClasses.get(0).getChangeStatus());
 	}
 
-
-	private interface Callback {
-		void callback();
-	}
-
-	private void assertThatExceptionIsThrown(Callback callback) {
-		boolean exception = false;
-		try {
-			callback.callback();
-		} catch (Exception e) {
-			exception = true;
-		}
-		assertThat(exception, is(true));
+	@Test
+	@Ignore
+	public void testElementsOnClassAreExcluded() {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getExcludes().add(new AnnotationFilter("@japicmp.test.annotation.filter.Exclude"));
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
+		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		JApiClass jApiClass = getJApiClass(jApiClasses, ClassWithMembersToExclude.class.getName());
+		assertThat(jApiClass.getFields().size(), is(0));
 	}
 }
