@@ -21,39 +21,39 @@ import static org.junit.Assert.assertThat;
  */
 public class AnnotationFilterTest {
 
-    @Test
-    public void testFilterSelection() {
-        JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.getFilters().getIncludes().add(new AnnotationFilter("@japicmp.test.annotation.filter.PublicAPI"));
-        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-        List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-        getJApiClass(jApiClasses, AnnotatedClass.class.getName());
-        assertThat(jApiClasses.size(), is(1));
-    }
+	@Test
+	public void testFilterSelection() {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getIncludes().add(new AnnotationFilter("@japicmp.test.annotation.filter.PublicAPI"));
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
+		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		getJApiClass(jApiClasses, AnnotatedClass.class.getName());
+		assertThat(jApiClasses.size(), is(1));
+	}
 
 
-    @Test
-    public void detectChangeOnAnnotatedClass() {
-        JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-        options.getFilters().getIncludes().add(new AnnotationFilter("@japicmp.test.annotation.filter.PublicAPI"));
-        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-        final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+	@Test
+	public void detectChangeOnAnnotatedClass() {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getIncludes().add(new AnnotationFilter("@japicmp.test.annotation.filter.PublicAPI"));
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
+		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		Assert.assertEquals(1, jApiClasses.size());
 		Assert.assertEquals(JApiChangeStatus.MODIFIED, jApiClasses.get(0).getChangeStatus());
-    }
+	}
 
 
-    private interface Callback {
-        void callback();
-    }
+	private interface Callback {
+		void callback();
+	}
 
-    private void assertThatExceptionIsThrown(Callback callback) {
-        boolean exception = false;
-        try {
-            callback.callback();
-        } catch (Exception e) {
-            exception = true;
-        }
-        assertThat(exception, is(true));
-    }
+	private void assertThatExceptionIsThrown(Callback callback) {
+		boolean exception = false;
+		try {
+			callback.callback();
+		} catch (Exception e) {
+			exception = true;
+		}
+		assertThat(exception, is(true));
+	}
 }
