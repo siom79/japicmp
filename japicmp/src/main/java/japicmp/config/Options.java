@@ -93,6 +93,11 @@ public class Options {
     private List<Filter> createFilterList(Optional<String> argumentString, List<Filter> filters, String errorMessage) {
         for (String filterString : Splitter.on(";").trimResults().omitEmptyStrings().split(argumentString.or(""))) {
             try {
+				// filter based on annotations
+				if (filterString.startsWith("@")) {
+					AnnotationFilter annotationFilter = new AnnotationFilter(filterString);
+					filters.add(annotationFilter);
+				}
                 if (filterString.contains("#")) {
                     if (filterString.contains("(")) {
                         BehaviorFilter behaviorFilter = new BehaviorFilter(filterString);
