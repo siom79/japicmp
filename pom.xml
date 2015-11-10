@@ -57,6 +57,10 @@
 			<name>earcam</name>
 			<url>https://github.com/earcam</url>
 		</contributor>
+		<contributor>
+			<name>Robert Metzger</name>
+			<url>https://github.com/rmetzger</url>
+		</contributor>
 	</contributors>
 
     <properties>
