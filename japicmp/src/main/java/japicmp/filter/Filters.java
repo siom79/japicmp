@@ -23,7 +23,7 @@ public class Filters {
 	public boolean includeClass(CtClass ctClass) {
 		String name = ctClass.getName();
 		for (Filter filter : excludes) {
-			if (filter instanceof ClassFilter && !(filter instanceof BehaviorFilter) && !(filter instanceof FieldFilter)) {
+			if (filter instanceof ClassFilter) {
 				ClassFilter classFilter = (ClassFilter) filter;
 				if (classFilter.matches(ctClass)) {
 					if (LOGGER.isLoggable(Level.FINE)) {
@@ -35,39 +35,37 @@ public class Filters {
 		}
 		int includeCount = 0;
 		for (Filter filter : includes) {
-			if (filter instanceof ClassFilter) {
-				includeCount++;
-				if (filter instanceof BehaviorFilter) {
-					BehaviorFilter behaviorFilter = (BehaviorFilter) filter;
-					CtMethod[] methods = ctClass.getDeclaredMethods();
-					for (CtMethod method : methods) {
-						if (behaviorFilter.matches(method)) {
-							return true;
-						}
-					}
-					CtConstructor[] constructors = ctClass.getDeclaredConstructors();
-					for (CtConstructor constructor : constructors) {
-						if (behaviorFilter.matches(constructor)) {
-							return true;
-						}
-					}
-				} else if (filter instanceof  FieldFilter) {
-					FieldFilter fieldFilter = (FieldFilter) filter;
-					CtField[] fields = ctClass.getDeclaredFields();
-					for (CtField field : fields) {
-						if (fieldFilter.matches(field)) {
-							return true;
-						}
-					}
-				} else {
-					ClassFilter classFilter = (ClassFilter) filter;
-					if (classFilter.matches(ctClass)) {
-						if (LOGGER.isLoggable(Level.FINE)) {
-							LOGGER.log(Level.FINE, "Including class '" + name + "' because class filter '" + filter + "' matches.");
-						}
-
+			includeCount++;
+			if (filter instanceof BehaviorFilter) {
+				BehaviorFilter behaviorFilter = (BehaviorFilter) filter;
+				CtMethod[] methods = ctClass.getDeclaredMethods();
+				for (CtMethod method : methods) {
+					if (behaviorFilter.matches(method)) {
 						return true;
 					}
+				}
+				CtConstructor[] constructors = ctClass.getDeclaredConstructors();
+				for (CtConstructor constructor : constructors) {
+					if (behaviorFilter.matches(constructor)) {
+						return true;
+					}
+				}
+			} else if (filter instanceof FieldFilter) {
+				FieldFilter fieldFilter = (FieldFilter) filter;
+				CtField[] fields = ctClass.getDeclaredFields();
+				for (CtField field : fields) {
+					if (fieldFilter.matches(field)) {
+						return true;
+					}
+				}
+			} else {
+				ClassFilter classFilter = (ClassFilter) filter;
+				if (classFilter.matches(ctClass)) {
+					if (LOGGER.isLoggable(Level.FINE)) {
+						LOGGER.log(Level.FINE, "Including class '" + name + "' because class filter '" + filter + "' matches.");
+					}
+
+					return true;
 				}
 			}
 		}

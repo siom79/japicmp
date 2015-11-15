@@ -20,9 +20,4 @@ public class AnnotationBehaviorFilter implements BehaviorFilter {
 	public boolean matches(CtBehavior ctBehavior) {
 		return ctBehavior.hasAnnotation(annotation);
 	}
-
-	@Override
-	public boolean matches(CtClass ctClass) {
-		return true;
-	}
 }

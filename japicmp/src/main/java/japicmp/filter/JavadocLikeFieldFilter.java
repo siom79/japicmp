@@ -39,13 +39,4 @@ public class JavadocLikeFieldFilter implements FieldFilter {
     public String toString() {
         return this.filterString;
     }
-
-	@Override
-	public boolean matches(CtClass ctClass) {
-		boolean classMatches = true;
-		if (!patternClass.matcher(ctClass.getName()).matches()) {
-			classMatches = false;
-		}
-		return classMatches;
-	}
 }

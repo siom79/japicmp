@@ -86,13 +86,4 @@ public class JavadocLikeBehaviorFilter implements BehaviorFilter {
     public String toString() {
         return this.filterString;
     }
-
-	@Override
-	public boolean matches(CtClass ctClass) {
-		boolean classMatches = true;
-		if (!classPattern.matcher(ctClass.getName()).matches()) {
-			classMatches = false;
-		}
-		return classMatches;
-	}
 }

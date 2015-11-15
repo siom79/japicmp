@@ -20,9 +20,4 @@ public class AnnotationFieldFilter implements FieldFilter {
 	public boolean matches(CtField ctField) {
 		return ctField.hasAnnotation(annotation);
 	}
-
-	@Override
-	public boolean matches(CtClass ctClass) {
-		return true;
-	}
 }
