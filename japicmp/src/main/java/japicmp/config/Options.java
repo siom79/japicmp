@@ -22,7 +22,7 @@ public class Options {
     private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PROTECTED);
     private List<Filter> includes = new ArrayList<>();
     private List<Filter> excludes = new ArrayList<>();
-    private List<ClassFilter> classesExclude = new ArrayList<>();
+    private List<JavaDocLikeClassFilter> classesExclude = new ArrayList<>();
     private boolean includeSynthetic = false;
 	private boolean ignoreMissingClasses = false;
 	private Optional<String> htmlStylesheet = Optional.absent();
@@ -95,21 +95,21 @@ public class Options {
             try {
 				// filter based on annotations
 				if (filterString.startsWith("@")) {
-					AnnotationFilter annotationFilter = new AnnotationFilter(filterString);
-					filters.add(annotationFilter);
+					filters.add(new AnnotationClassFilter(filterString));
+					filters.add(new AnnotationFieldFilter(filterString));
 				}
                 if (filterString.contains("#")) {
                     if (filterString.contains("(")) {
-                        BehaviorFilter behaviorFilter = new BehaviorFilter(filterString);
+                        JavadocLikeBehaviorFilter behaviorFilter = new JavadocLikeBehaviorFilter(filterString);
                         filters.add(behaviorFilter);
                     } else {
-                        FieldFilter fieldFilter = new FieldFilter(filterString);
+                        JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter(filterString);
                         filters.add(fieldFilter);
                     }
                 } else {
-                    ClassFilter classFilter = new ClassFilter(filterString);
+                    JavaDocLikeClassFilter classFilter = new JavaDocLikeClassFilter(filterString);
                     filters.add(classFilter);
-                    PackageFilter packageFilter = new PackageFilter(filterString);
+                    JavadocLikePackageFilter packageFilter = new JavadocLikePackageFilter(filterString);
                     filters.add(packageFilter);
                 }
             } catch (Exception e) {
@@ -147,7 +147,7 @@ public class Options {
         Iterable<String> classesAsStrings = Splitter.on(",").trimResults().omitEmptyStrings().split(stringOptional.or(""));
         for (String classAsString : classesAsStrings) {
             try {
-                ClassFilter classFilter = new ClassFilter(classAsString);
+                JavaDocLikeClassFilter classFilter = new JavaDocLikeClassFilter(classAsString);
                 this.classesExclude.add(classFilter);
             } catch (Exception e) {
                 throw new JApiCmpException(JApiCmpException.Reason.CliError, "Wrong syntax for class exclude option '" + classAsString + "': " + e.getMessage());
@@ -155,7 +155,7 @@ public class Options {
         }
     }
 
-    public List<ClassFilter> getClassesExclude() {
+    public List<JavaDocLikeClassFilter> getClassesExclude() {
         return classesExclude;
     }
 

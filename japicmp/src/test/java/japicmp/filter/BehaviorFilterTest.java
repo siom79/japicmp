@@ -14,7 +14,7 @@ public class BehaviorFilterTest {
 
     @Test
     public void testMethodTwoParamsIntLongSuccessful() throws CannotCompileException {
-        BehaviorFilter filter = new BehaviorFilter("japicmp.Test#method(int,long)");
+        JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method(int,long)");
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
         CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new CtClass[]{CtClass.intType, CtClass.longType}).addToClass(ctClass);
         assertThat(filter.matches(ctBehavior), is(true));
@@ -22,7 +22,7 @@ public class BehaviorFilterTest {
 
     @Test
     public void testMethodOneParamsStringSuccessful() throws CannotCompileException {
-        BehaviorFilter filter = new BehaviorFilter("japicmp.Test#method(japicmp.Param)");
+        JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method(japicmp.Param)");
         ClassPool classPool = new ClassPool();
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
         CtClass paramCtClass = CtClassBuilder.create().name("japicmp.Param").addToClassPool(classPool);
@@ -32,7 +32,7 @@ public class BehaviorFilterTest {
 
     @Test
     public void testMethodNoParamsSuccessful() throws CannotCompileException {
-        BehaviorFilter filter = new BehaviorFilter("japicmp.Test#method()");
+        JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method()");
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
         CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new CtClass[]{}).addToClass(ctClass);
         assertThat(filter.matches(ctBehavior), is(true));
@@ -40,7 +40,7 @@ public class BehaviorFilterTest {
 
     @Test(expected = JApiCmpException.class)
     public void testMethodMissingParenthesis() throws CannotCompileException {
-        BehaviorFilter filter = new BehaviorFilter("japicmp.Test#method(");
+        JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method(");
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
         CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new CtClass[]{}).addToClass(ctClass);
         assertThat(filter.matches(ctBehavior), is(true));
@@ -48,7 +48,7 @@ public class BehaviorFilterTest {
 
     @Test
     public void testConstructorNoParamsSuccessful() throws CannotCompileException {
-        BehaviorFilter filter = new BehaviorFilter("japicmp.Test#Test()");
+        JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#Test()");
         ClassPool classPool = new ClassPool();
         classPool.appendSystemPath();
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
@@ -58,7 +58,7 @@ public class BehaviorFilterTest {
 
     @Test
     public void testConstructorOneParamLongSuccessful() throws CannotCompileException, NotFoundException {
-        BehaviorFilter filter = new BehaviorFilter("japicmp.Test#Test(java.lang.Long)");
+        JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#Test(java.lang.Long)");
         ClassPool classPool = new ClassPool();
         classPool.appendSystemPath();
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
@@ -68,7 +68,7 @@ public class BehaviorFilterTest {
 
     @Test
     public void testConstructorOneParamLongUnsuccessful() throws CannotCompileException, NotFoundException {
-        BehaviorFilter filter = new BehaviorFilter("japicmp.Test#Test(java.lang.Long)");
+        JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#Test(java.lang.Long)");
         ClassPool classPool = new ClassPool();
         classPool.appendSystemPath();
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
@@ -78,7 +78,7 @@ public class BehaviorFilterTest {
 
     @Test
     public void testConstructorNoParamLongUnsuccessful() throws CannotCompileException, NotFoundException {
-        BehaviorFilter filter = new BehaviorFilter("japicmp.Test#Test()");
+        JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#Test()");
         ClassPool classPool = new ClassPool();
         classPool.appendSystemPath();
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
@@ -88,7 +88,7 @@ public class BehaviorFilterTest {
 
 	@Test
 	public void testCoberturaMethodWithWildcards() throws CannotCompileException, NotFoundException {
-		BehaviorFilter filter = new BehaviorFilter("japicmp.*#__cobertura*()");
+		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.*#__cobertura*()");
 		ClassPool classPool = new ClassPool();
 		classPool.appendSystemPath();
 		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);

@@ -25,8 +25,9 @@ public class Filters {
     public boolean includeClass(CtClass ctClass) {
         String name = ctClass.getName();
         for (Filter filter : excludes) {
-            if (filter instanceof ClassFilter || filter instanceof PackageFilter) {
-                if (filter.matches(ctClass)) {
+            if (filter instanceof ClassFilter && !(filter instanceof BehaviorFilter) && !(filter instanceof FieldFilter)) {
+				ClassFilter classFilter = (ClassFilter) filter;
+                if (classFilter.matches(ctClass)) {
                     if (LOGGER.isLoggable(Level.FINE)) {
                         LOGGER.log(Level.FINE, "Excluding class '" + name + "' because class filter '" + filter + "' matches.");
                     }
@@ -36,13 +37,16 @@ public class Filters {
         }
         int includeCount = 0;
         for (Filter filter : includes) {
-            includeCount++;
-            if (filter.matches(ctClass)) {
-                if (LOGGER.isLoggable(Level.FINE)) {
-                    LOGGER.log(Level.FINE, "Including class '" + name + "' because class filter '" + filter + "' matches.");
-                }
-                return true;
-            }
+			if (filter instanceof ClassFilter) {
+				includeCount++;
+				ClassFilter classFilter = (ClassFilter) filter;
+				if (classFilter.matches(ctClass)) {
+					if (LOGGER.isLoggable(Level.FINE)) {
+						LOGGER.log(Level.FINE, "Including class '" + name + "' because class filter '" + filter + "' matches.");
+					}
+					return true;
+				}
+			}
         }
         if (includeCount > 0) {
             if (LOGGER.isLoggable(Level.FINE)) {
@@ -56,7 +60,8 @@ public class Filters {
     public boolean includeBehavior(CtBehavior ctMethod) {
         for (Filter filter : excludes) {
             if (filter instanceof BehaviorFilter) {
-                if (filter.matches(ctMethod)) {
+				BehaviorFilter behaviorFilter = (BehaviorFilter)filter;
+                if (behaviorFilter.matches(ctMethod)) {
                     if (LOGGER.isLoggable(Level.FINE)) {
                         LOGGER.log(Level.FINE, "Excluding method '" + ctMethod.getLongName() + "' because exclude method filter did match.");
                     }
@@ -66,13 +71,16 @@ public class Filters {
         }
         int includesCount = 0;
         for (Filter filter : includes) {
-            includesCount++;
-            if (filter.matches(ctMethod)) {
-                if (LOGGER.isLoggable(Level.FINE)) {
-                    LOGGER.log(Level.FINE, "Including method '" + ctMethod.getLongName() + "' because include method filter matched.");
-                }
-                return true;
-            }
+			if (filter instanceof BehaviorFilter) {
+				includesCount++;
+				BehaviorFilter behaviorFilter = (BehaviorFilter) filter;
+				if (behaviorFilter.matches(ctMethod)) {
+					if (LOGGER.isLoggable(Level.FINE)) {
+						LOGGER.log(Level.FINE, "Including method '" + ctMethod.getLongName() + "' because include method filter matched.");
+					}
+					return true;
+				}
+			}
         }
         if (includesCount > 0) {
             if (LOGGER.isLoggable(Level.FINE)) {
@@ -86,7 +94,8 @@ public class Filters {
     public boolean includeField(CtField ctField) {
         for (Filter filter : excludes) {
             if (filter instanceof FieldFilter) {
-                if (filter.matches(ctField)) {
+				FieldFilter fieldFilter = (FieldFilter) filter;
+                if (fieldFilter.matches(ctField)) {
                     if (LOGGER.isLoggable(Level.FINE)) {
                         LOGGER.log(Level.FINE, "Excluding field '" + ctField.getName() + "' because exclude field filter did match.");
                     }
@@ -96,13 +105,16 @@ public class Filters {
         }
         int includesCount = 0;
         for (Filter filter : includes) {
-            includesCount++;
-            if (filter.matches(ctField)) {
-                if (LOGGER.isLoggable(Level.FINE)) {
-                    LOGGER.log(Level.FINE, "Including field '" + ctField.getName() + "' because include field filter matched.");
-                }
-                return true;
-            }
+			if (filter instanceof FieldFilter) {
+				FieldFilter fieldFilter = (FieldFilter) filter;
+				includesCount++;
+				if (fieldFilter.matches(ctField)) {
+					if (LOGGER.isLoggable(Level.FINE)) {
+						LOGGER.log(Level.FINE, "Including field '" + ctField.getName() + "' because include field filter matched.");
+					}
+					return true;
+				}
+			}
         }
         if (includesCount > 0) {
             if (LOGGER.isLoggable(Level.FINE)) {

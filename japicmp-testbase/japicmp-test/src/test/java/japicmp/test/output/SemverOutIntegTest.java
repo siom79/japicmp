@@ -8,7 +8,7 @@ import com.google.common.base.Strings;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.filter.PackageFilter;
+import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.semver.SemverOut;
@@ -112,7 +112,7 @@ public class SemverOutIntegTest {
 		options.setAccessModifier(accessModifier);
 		if (!Strings.isNullOrEmpty(lastPackage)) {
 			String packageName = "japicmp.test." + lastPackage;
-			options.getFilters().getIncludes().add(new PackageFilter(packageName));
+			options.getFilters().getIncludes().add(new JavadocLikePackageFilter(packageName));
 		}
 		return new JarArchiveComparator(options);
 	}

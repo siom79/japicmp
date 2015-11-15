@@ -16,7 +16,7 @@ public class FieldFilterTest {
 
     @Test
     public void testOneFieldMatches() throws CannotCompileException {
-        FieldFilter fieldFilter = new FieldFilter("japicmp.Test#field");
+        JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter("japicmp.Test#field");
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
         CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
         assertThat(fieldFilter.matches(ctField), is(true));
@@ -24,7 +24,7 @@ public class FieldFilterTest {
 
     @Test
     public void testOneFieldMatchesNot() throws CannotCompileException {
-        FieldFilter fieldFilter = new FieldFilter("japicmp.Test#field42");
+        JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter("japicmp.Test#field42");
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
         CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
         assertThat(fieldFilter.matches(ctField), is(false));
@@ -32,7 +32,7 @@ public class FieldFilterTest {
 
     @Test(expected = JApiCmpException.class)
     public void testTwoHashSigns() throws CannotCompileException {
-        FieldFilter fieldFilter = new FieldFilter("japicmp.Test##field42");
+        JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter("japicmp.Test##field42");
         CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
         CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
         assertThat(fieldFilter.matches(ctField), is(false));

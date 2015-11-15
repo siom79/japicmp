@@ -89,6 +89,30 @@ public class Helper {
         };
     }
 
+	public static Matcher<JApiClass> hasNoJApiFieldWithName(final String fieldName) {
+		return new TypeSafeMatcher<JApiClass>() {
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("JApiClass should not have a field with name '").appendValue(fieldName)
+					.appendText("'.");
+			}
+
+			@Override
+			protected boolean matchesSafely(JApiClass jApiClass) {
+				boolean found = false;
+				List<JApiField> fields = jApiClass.getFields();
+				for (JApiField field : fields) {
+					if (field.getName().equals(fieldName)) {
+						found = true;
+						break;
+					}
+				}
+				return !found;
+			}
+		};
+	}
+
     public static JApiField getJApiField(List<JApiField> jApiFields, String name) {
     	for(JApiField jApiField : jApiFields) {
     		if(jApiField.getName().equals(name)) {

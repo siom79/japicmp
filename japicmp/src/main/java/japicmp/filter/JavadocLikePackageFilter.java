@@ -6,11 +6,11 @@ import javassist.CtField;
 
 import java.util.regex.Pattern;
 
-public class PackageFilter implements Filter {
+public class JavadocLikePackageFilter implements ClassFilter {
     private final Pattern pattern;
     private final String packageName;
 
-    public PackageFilter(String packageName) {
+    public JavadocLikePackageFilter(String packageName) {
         this.packageName = packageName;
         String regEx = packageName.replace(".", "\\.");
         regEx = regEx.replace("*", ".*");
@@ -27,17 +27,5 @@ public class PackageFilter implements Filter {
     public boolean matches(CtClass ctClass) {
         String name = ctClass.getPackageName();
         return pattern.matcher(name).matches();
-    }
-
-    @Override
-    public boolean matches(CtBehavior ctBehavior) {
-        CtClass declaringClass = ctBehavior.getDeclaringClass();
-        return matches(declaringClass);
-    }
-
-    @Override
-    public boolean matches(CtField ctField) {
-        CtClass declaringClass = ctField.getDeclaringClass();
-        return matches(declaringClass);
     }
 }

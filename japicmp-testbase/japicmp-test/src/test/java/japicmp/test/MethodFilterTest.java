@@ -3,7 +3,7 @@ package japicmp.test;
 import japicmp.JApiCmp;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.filter.BehaviorFilter;
+import japicmp.filter.JavadocLikeBehaviorFilter;
 import japicmp.model.JApiClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class MethodFilterTest {
 	@Test
 	public void testMethodIsExcluded() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getExcludes().add(new BehaviorFilter(MethodFilter.class.getName() + "#methodToExclude()"));
+		options.getFilters().getExcludes().add(new JavadocLikeBehaviorFilter(MethodFilter.class.getName() + "#methodToExclude()"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		JApiClass jApiClass = getJApiClass(jApiClasses, MethodFilter.class.getName());
@@ -34,7 +34,7 @@ public class MethodFilterTest {
 	@Test
 	public void testMethodIsIncluded() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getIncludes().add(new BehaviorFilter(MethodFilter.class.getName() + "#methodToInclude()"));
+		options.getFilters().getIncludes().add(new JavadocLikeBehaviorFilter(MethodFilter.class.getName() + "#methodToInclude()"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		assertThat(jApiClasses.size(), is(1));

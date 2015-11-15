@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableList;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.filter.PackageFilter;
+import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiClass;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class StdoutOutputGeneratorTest {
 	@Test
 	public void testOnlyModificationsAnnotationAddedToConstructor() {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
-		jarArchiveComparatorOptions.getFilters().getIncludes().add(new PackageFilter("japicmp.test.annotation"));
+		jarArchiveComparatorOptions.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.annotation"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(jarArchiveComparatorOptions);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		Options options = new Options();
