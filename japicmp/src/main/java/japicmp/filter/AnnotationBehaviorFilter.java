@@ -23,6 +23,6 @@ public class AnnotationBehaviorFilter implements BehaviorFilter {
 
 	@Override
 	public boolean matches(CtClass ctClass) {
-		return false;
+		return true;
 	}
 }

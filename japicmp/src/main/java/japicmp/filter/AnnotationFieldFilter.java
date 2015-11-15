@@ -23,6 +23,6 @@ public class AnnotationFieldFilter implements FieldFilter {
 
 	@Override
 	public boolean matches(CtClass ctClass) {
-		return false;
+		return true;
 	}
 }

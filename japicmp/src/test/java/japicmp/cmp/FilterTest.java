@@ -444,4 +444,92 @@ public class FilterTest {
 		assertThat(jApiClasses.size(), is(2));
 		assertThat(getJApiClass(jApiClasses, "big.bang.theory.Sheldon"), hasNoJApiFieldWithName("age"));
 	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD})
+	public @interface Include {
+
+	}
+
+	@Test
+	public void testAnnotationClassIncluded() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getIncludes().add(new AnnotationClassFilter("@" + Include.class.getName()));
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+		});
+		assertThat(jApiClasses.size(), is(1));
+		assertThat(jApiClasses.get(0).getFullyQualifiedName(), is("big.bang.theory.Sheldon"));
+	}
+
+	@Test
+	public void testAnnotationMethodIncluded() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getIncludes().add(new AnnotationBehaviorFilter("@" + Include.class.getName()));
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+		});
+		assertThat(jApiClasses.size(), is(1));
+		assertThat(jApiClasses.get(0).getMethods().size(), is(1));
+		assertThat(getJApiClass(jApiClasses, "big.bang.theory.Sheldon"), hasJApiMethodWithName("study"));
+	}
+
+	@Test
+	public void testAnnotationFieldIncluded() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getIncludes().add(new AnnotationFieldFilter("@" + Include.class.getName()));
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
+				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtFieldBuilder.create().name("name").type(classPool.getCtClass(String.class.getName())).addToClass(ctClass1);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
+				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtFieldBuilder.create().name("name").type(classPool.getCtClass(String.class.getName())).addToClass(ctClass1);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+		});
+		assertThat(jApiClasses.size(), is(1));
+		assertThat(getJApiClass(jApiClasses, "big.bang.theory.Sheldon"), hasJApiFieldWithName("age"));
+	}
 }
