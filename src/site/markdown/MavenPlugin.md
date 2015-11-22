@@ -48,6 +48,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 					<skipPomModules>true</skipPomModules>
 					<htmlStylesheet>path/to/stylesheet.css</htmlStylesheet>
 					<htmlTitle>Title of report</htmlTitle>
+					<noAnnotations>false</noAnnotations>
 				</parameter>
 				<dependencies>
 					<dependency>
@@ -88,6 +89,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 * skip: Setting this parameter to true will skip execution of the plugin.
 * htmlStylesheet: Path to an individual CSS stylesheet for the HTML report.
 * htmlTitle: A title for the HTML report (optional).
+* noAnnotations: Setting this option to true disables the evaluation of annotations completely.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:

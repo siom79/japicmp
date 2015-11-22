@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
@@ -38,9 +39,9 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	private final Optional<Integer> oldLineNumber;
 	private final Optional<Integer> newLineNumber;
 
-    public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus) {
+    public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus, JarArchiveComparatorOptions options) {
         this.name = name;
-        computeAnnotationChanges(annotations, oldBehavior, newBehavior);
+        computeAnnotationChanges(annotations, oldBehavior, newBehavior, options);
         this.accessModifier = extractAccessModifier(oldBehavior, newBehavior);
         this.finalModifier = extractFinalModifier(oldBehavior, newBehavior);
         this.staticModifier = extractStaticModifier(oldBehavior, newBehavior);
@@ -66,26 +67,26 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	}
 
     @SuppressWarnings("unchecked")
-	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior) {
+	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JarArchiveComparatorOptions options) {
         if (oldBehavior.isPresent()) {
             CtBehavior ctBehavior = oldBehavior.get();
             if (ctBehavior instanceof CtMethod) {
-                computeAnnotationChangesMethod(annotations, (Optional<CtMethod>) oldBehavior, (Optional<CtMethod>) newBehavior);
+                computeAnnotationChangesMethod(annotations, (Optional<CtMethod>) oldBehavior, (Optional<CtMethod>) newBehavior, options);
             } else if (ctBehavior instanceof CtConstructor) {
-                computeAnnotationChangesConstructor(annotations, (Optional<CtConstructor>) oldBehavior, (Optional<CtConstructor>) newBehavior);
+                computeAnnotationChangesConstructor(annotations, (Optional<CtConstructor>) oldBehavior, (Optional<CtConstructor>) newBehavior, options);
             }
         } else if (newBehavior.isPresent()) {
             CtBehavior ctBehavior = newBehavior.get();
             if (ctBehavior instanceof CtMethod) {
-                computeAnnotationChangesMethod(annotations, (Optional<CtMethod>) oldBehavior, (Optional<CtMethod>) newBehavior);
+                computeAnnotationChangesMethod(annotations, (Optional<CtMethod>) oldBehavior, (Optional<CtMethod>) newBehavior, options);
             } else if (ctBehavior instanceof CtConstructor) {
-                computeAnnotationChangesConstructor(annotations, (Optional<CtConstructor>) oldBehavior, (Optional<CtConstructor>) newBehavior);
+                computeAnnotationChangesConstructor(annotations, (Optional<CtConstructor>) oldBehavior, (Optional<CtConstructor>) newBehavior, options);
             }
         }
     }
 
-    private void computeAnnotationChangesMethod(List<JApiAnnotation> annotations, Optional<CtMethod> oldBehavior, Optional<CtMethod> newBehavior) {
-        AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, new AnnotationHelper.AnnotationsAttributeCallback<CtMethod>() {
+    private void computeAnnotationChangesMethod(List<JApiAnnotation> annotations, Optional<CtMethod> oldBehavior, Optional<CtMethod> newBehavior, JarArchiveComparatorOptions options) {
+        AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, options, new AnnotationHelper.AnnotationsAttributeCallback<CtMethod>() {
             @Override
             public AnnotationsAttribute getAnnotationsAttribute(CtMethod method) {
                 return (AnnotationsAttribute) method.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
@@ -93,8 +94,8 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         });
     }
 
-    private void computeAnnotationChangesConstructor(List<JApiAnnotation> annotations, Optional<CtConstructor> oldBehavior, Optional<CtConstructor> newBehavior) {
-        AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, new AnnotationHelper.AnnotationsAttributeCallback<CtConstructor>() {
+    private void computeAnnotationChangesConstructor(List<JApiAnnotation> annotations, Optional<CtConstructor> oldBehavior, Optional<CtConstructor> newBehavior, JarArchiveComparatorOptions options) {
+        AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, options, new AnnotationHelper.AnnotationsAttributeCallback<CtConstructor>() {
             @Override
             public AnnotationsAttribute getAnnotationsAttribute(CtConstructor method) {
                 return (AnnotationsAttribute) method.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);

@@ -11,7 +11,7 @@ SYNOPSIS
                 [(-i <includes> | --include <includes>)] [--ignore-missing-classes]
                 [--include-synthetic] [(-m | --only-modified)]
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
-                [--new-classpath <newClassPath>]
+                [--new-classpath <newClassPath>] [--no-annotations]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
                 [--old-classpath <oldClassPath>] [(-s | --semantic-versioning)]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
@@ -27,8 +27,9 @@ OPTIONS
 
         -e <excludes>, --exclude <excludes>
             Semicolon separated list of elements to exclude in the form
-            package.Class#classMember, * can be used as wildcard. Examples:
-            mypackage;my.Class;other.Class#method(int,long);foo.Class#field
+            package.Class#classMember, * can be used as wildcard. Annotations
+            are given as FQN starting with @. Examples:
+            mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.
 
         -h, --help
             Display help information
@@ -41,8 +42,9 @@ OPTIONS
 
         -i <includes>, --include <includes>
             Semicolon separated list of elements to include in the form
-            package.Class#classMember, * can be used as wildcard. Examples:
-            mypackage;my.Class;other.Class#method(int,long);foo.Class#field
+            package.Class#classMember, * can be used as wildcard. Annotations
+            are given as FQN starting with @. Examples:
+            mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.
 
         --ignore-missing-classes
             Ignores superclasses/interfaces missing on the classpath.
@@ -61,6 +63,9 @@ OPTIONS
         --new-classpath <newClassPath>
             The classpath for the new version.
 
+        --no-annotations
+            Do not evaluate annotations.
+
         -o <pathToOldVersionJar>, --old <pathToOldVersionJar>
             Provides the path to the old version(s) of the jar(s). Use ; to
             separate jar files.
@@ -73,6 +78,7 @@ OPTIONS
 
         -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
             Provides the path to the xml output file.
+
 ```
 
 When your library implements interfaces or extends classes from other libraries than the JDK and you want to evaluate binary

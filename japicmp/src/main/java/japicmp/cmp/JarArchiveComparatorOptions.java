@@ -23,6 +23,7 @@ public class JarArchiveComparatorOptions {
 	private ClassPathMode classPathMode = ClassPathMode.ONE_COMMON_CLASSPATH;
 	private List<String> oldClassPath = new LinkedList<>();
 	private List<String> newClassPath = new LinkedList<>();
+	private boolean noAnnotations = false;
 
 	/**
 	 * When both versions of the archives under comparison use the exact same classpath
@@ -43,6 +44,7 @@ public class JarArchiveComparatorOptions {
 		toJarArchiveComparatorClassPathMode(options, comparatorOptions);
 		toJarArchiveComparatorClassPath(options.getOldClassPath(), comparatorOptions.getOldClassPath());
 		toJarArchiveComparatorClassPath(options.getNewClassPath(), comparatorOptions.getNewClassPath());
+		comparatorOptions.setNoAnnotations(options.isNoAnnotations());
 		return comparatorOptions;
 	}
 
@@ -68,10 +70,6 @@ public class JarArchiveComparatorOptions {
 
 	public Filters getFilters() {
 		return filters;
-	}
-
-	public void setFilters(Filters filters) {
-		this.filters = filters;
 	}
 
 	public List<String> getClassPathEntries() {
@@ -124,5 +122,13 @@ public class JarArchiveComparatorOptions {
 
 	public List<String> getNewClassPath() {
 		return newClassPath;
+	}
+
+	public void setNoAnnotations(boolean noAnnotations) {
+		this.noAnnotations = noAnnotations;
+	}
+
+	public boolean isNoAnnotations() {
+		return noAnnotations;
 	}
 }

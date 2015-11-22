@@ -17,8 +17,18 @@ public class Parameter {
 	private String htmlStylesheet;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String htmlTitle;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String noAnnotations;
 
-    public String getAccessModifier() {
+	public String getNoAnnotations() {
+		return noAnnotations;
+	}
+
+	public void setNoAnnotations(String noAnnotations) {
+		this.noAnnotations = noAnnotations;
+	}
+
+	public String getAccessModifier() {
         return accessModifier;
     }
 

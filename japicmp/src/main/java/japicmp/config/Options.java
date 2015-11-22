@@ -29,6 +29,7 @@ public class Options {
 	private Optional<String> oldClassPath = Optional.absent();
 	private Optional<String> newClassPath = Optional.absent();
 	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
+	private boolean noAnnotations = false;
 
 	public List<File> getNewArchives() {
         return newArchives;
@@ -197,5 +198,13 @@ public class Options {
 
 	public JApiCli.ClassPathMode getClassPathMode() {
 		return classPathMode;
+	}
+
+	public void setNoAnnotations(boolean noAnnotations) {
+		this.noAnnotations = noAnnotations;
+	}
+
+	public boolean isNoAnnotations() {
+		return noAnnotations;
 	}
 }

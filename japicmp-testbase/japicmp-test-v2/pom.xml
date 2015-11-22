@@ -33,53 +33,71 @@
 				<groupId>com.github.siom79.japicmp</groupId>
 				<artifactId>japicmp-maven-plugin</artifactId>
 				<version>${project.version}</version>
-				<configuration>
-					<oldVersion>
-						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-v1</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</oldVersion>
-					<newVersion>
-						<file>
-							<path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
-						</file>
-					</newVersion>
-					<parameter>
-						<onlyModified>true</onlyModified>
-						<!--
-						<includes>
-							<include>package.to.include</include>
-							<include>package.ClassToInclude</include>
-							<include>package.Class#methodToInclude(long,int)</include>
-							<include>package.Class#fieldToInclude</include>
-						</includes>
-						<excludes>
-							<exclude>package.to.exclude</exclude>
-							<exclude>package.ClassToExclude</exclude>
-							<exclude>package.Class#methodToExclude(long,int)</exclude>
-							<exclude>package.Class#fieldToExclude</exclude>
-							<exclude>japicmp.test.ModifierTest#methodToExclude()</exclude>
-							<exclude>japicmp.test.ModifierTest#anotherMethodToExclude()</exclude>
-						</excludes>
-						-->
-					</parameter>
-					<dependencies>
-						<dependency>
-							<groupId>org.apache.commons</groupId>
-							<artifactId>commons-math3</artifactId>
-							<version>3.5</version>
-						</dependency>
-					</dependencies>
-					<skip>false</skip>
-				</configuration>
 				<executions>
 					<execution>
+						<id>normal</id>
 						<phase>verify</phase>
 						<goals>
 							<goal>cmp</goal>
 						</goals>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<file>
+									<path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+								</file>
+							</newVersion>
+							<parameter>
+								<onlyModified>true</onlyModified>
+							</parameter>
+							<dependencies>
+								<dependency>
+									<groupId>org.apache.commons</groupId>
+									<artifactId>commons-math3</artifactId>
+									<version>3.5</version>
+								</dependency>
+							</dependencies>
+							<skip>false</skip>
+						</configuration>
+					</execution>
+					<execution>
+						<id>noAnnotations</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<file>
+									<path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+								</file>
+							</newVersion>
+							<parameter>
+								<onlyModified>true</onlyModified>
+								<noAnnotations>true</noAnnotations>
+							</parameter>
+							<dependencies>
+								<dependency>
+									<groupId>org.apache.commons</groupId>
+									<artifactId>commons-math3</artifactId>
+									<version>3.5</version>
+								</dependency>
+							</dependencies>
+							<skip>false</skip>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

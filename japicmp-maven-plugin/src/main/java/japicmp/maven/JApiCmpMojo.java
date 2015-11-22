@@ -216,6 +216,11 @@ public class JApiCmpMojo extends AbstractMojo {
 			if (htmlStylesheet != null) {
 				options.setHtmlStylesheet(Optional.of(htmlStylesheet));
 			}
+			String noAnnotationsString = parameterParam.getNoAnnotations();
+			if (noAnnotationsString != null) {
+				Boolean noAnnotations = Boolean.valueOf(noAnnotationsString);
+				options.setNoAnnotations(noAnnotations);
+			}
 		}
 		return options;
 	}

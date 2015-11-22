@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.MethodDescriptorParser;
@@ -33,10 +34,10 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	private final JApiType type;
 	private boolean binaryCompatible = true;
 
-	public JApiField(JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
+	public JApiField(JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional, JarArchiveComparatorOptions options) {
         this.oldFieldOptional = oldFieldOptional;
         this.newFieldOptional = newFieldOptional;
-        computeAnnotationChanges(this.annotations, oldFieldOptional, newFieldOptional);
+        computeAnnotationChanges(this.annotations, oldFieldOptional, newFieldOptional, options);
         this.accessModifier = extractAccessModifier(oldFieldOptional, newFieldOptional);
         this.staticModifier = extractStaticModifier(oldFieldOptional, newFieldOptional);
         this.finalModifier = extractFinalModifier(oldFieldOptional, newFieldOptional);
@@ -47,8 +48,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
 
-    private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtField> oldBehavior, Optional<CtField> newBehavior) {
-        AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, new AnnotationHelper.AnnotationsAttributeCallback<CtField>() {
+    private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtField> oldBehavior, Optional<CtField> newBehavior, JarArchiveComparatorOptions options) {
+        AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, options, new AnnotationHelper.AnnotationsAttributeCallback<CtField>() {
             @Override
             public AnnotationsAttribute getAnnotationsAttribute(CtField field) {
                 return (AnnotationsAttribute) field.getFieldInfo().getAttribute(AnnotationsAttribute.visibleTag);

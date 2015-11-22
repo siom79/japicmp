@@ -63,7 +63,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
-		AnnotationHelper.computeAnnotationChanges(annotations, oldClassOptional, newClassOptional, new AnnotationHelper.AnnotationsAttributeCallback<CtClass>() {
+		AnnotationHelper.computeAnnotationChanges(annotations, oldClassOptional, newClassOptional, options, new AnnotationHelper.AnnotationsAttributeCallback<CtClass>() {
 			@Override
 			public AnnotationsAttribute getAnnotationsAttribute(CtClass ctClass) {
 				return (AnnotationsAttribute) ctClass.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
@@ -120,12 +120,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				String oldFieldName = oldField.getName();
 				CtField newField = newFieldsMap.get(oldFieldName);
 				if (newField != null) {
-					JApiField jApiField = new JApiField(JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField));
+					JApiField jApiField = new JApiField(JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				} else {
-					JApiField jApiField = new JApiField(JApiChangeStatus.REMOVED, Optional.of(oldField), Optional.<CtField>absent());
+					JApiField jApiField = new JApiField(JApiChangeStatus.REMOVED, Optional.of(oldField), Optional.<CtField>absent(), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -134,7 +134,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			for (CtField newField : newFieldsMap.values()) {
 				CtField oldField = oldFieldsMap.get(newField.getName());
 				if (oldField == null) {
-					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(newField));
+					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(newField), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -144,7 +144,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (oldClassOptional.isPresent()) {
 				Map<String, CtField> fieldMap = buildFieldMap(oldClassOptional.get());
 				for (CtField field : fieldMap.values()) {
-					JApiField jApiField = new JApiField(JApiChangeStatus.REMOVED, Optional.of(field), Optional.<CtField>absent());
+					JApiField jApiField = new JApiField(JApiChangeStatus.REMOVED, Optional.of(field), Optional.<CtField>absent(), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -153,7 +153,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (newClassOptional.isPresent()) {
 				Map<String, CtField> fieldMap = buildFieldMap(newClassOptional.get());
 				for (CtField field : fieldMap.values()) {
-					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(field));
+					JApiField jApiField = new JApiField(JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(field), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -303,7 +303,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				methodDescriptorParser.parse(oldMethod.getSignature());
 				List<CtMethod> newMethodsWithSameName = newMethodsMap.get(methodName);
 				if (newMethodsWithSameName == null) {
-					JApiMethod jApiMethod = new JApiMethod(oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>absent());
+					JApiMethod jApiMethod = new JApiMethod(oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>absent(), options);
 					addParametersToMethod(methodDescriptorParser, jApiMethod);
 					if (includeMethod(jApiMethod)) {
 						methods.add(jApiMethod);
@@ -312,7 +312,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 					Optional<CtMethod> matchingMethodOptional = findMatchingMethod(oldMethod, newMethodsWithSameName);
 					if (matchingMethodOptional.isPresent()) {
 						CtMethod matchingMethod = matchingMethodOptional.get();
-						JApiMethod jApiMethod = new JApiMethod(oldMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(oldMethod), Optional.of(matchingMethod));
+						JApiMethod jApiMethod = new JApiMethod(oldMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(oldMethod), Optional.of(matchingMethod), options);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
 						if (includeMethod(jApiMethod)) {
 							methods.add(jApiMethod);
@@ -320,7 +320,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 						oldMethodsWithSameNameIterator.remove();
 						newMethodsWithSameName.remove(matchingMethod);
 					} else {
-						JApiMethod jApiMethod = new JApiMethod(oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>absent());
+						JApiMethod jApiMethod = new JApiMethod(oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>absent(), options);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
 						if (includeMethod(jApiMethod)) {
 							methods.add(jApiMethod);
@@ -335,7 +335,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				methodDescriptorParser.parse(ctMethod.getSignature());
 				List<CtMethod> methodsWithSameName = oldMethodsMap.get(ctMethod.getName());
 				if (methodsWithSameName == null) {
-					JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod));
+					JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod), options);
 					addParametersToMethod(methodDescriptorParser, jApiMethod);
 					if (includeMethod(jApiMethod)) {
 						methods.add(jApiMethod);
@@ -344,13 +344,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 					Optional<CtMethod> matchingMethodOptional = findMatchingMethod(ctMethod, methodsWithSameName);
 					if (matchingMethodOptional.isPresent()) {
 						CtMethod matchingMethod = matchingMethodOptional.get();
-						JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(matchingMethod));
+						JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(matchingMethod), options);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
 						if (includeMethod(jApiMethod)) {
 							methods.add(jApiMethod);
 						}
 					} else {
-						JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod));
+						JApiMethod jApiMethod = new JApiMethod(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod), options);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
 						if (includeMethod(jApiMethod)) {
 							methods.add(jApiMethod);
@@ -421,13 +421,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			methodDescriptorParser.parse(ctMethod.getSignature());
 			CtConstructor foundMethod = newConstructorsMap.get(longName);
 			if (foundMethod == null) {
-				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>absent());
+				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>absent(), options);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
 				}
 			} else {
-				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod));
+				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod), options);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
@@ -439,7 +439,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			methodDescriptorParser.parse(ctMethod.getSignature());
 			CtConstructor foundMethod = oldConstructorsMap.get(longName);
 			if (foundMethod == null) {
-				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>absent(), Optional.of(ctMethod));
+				JApiConstructor jApiConstructor = new JApiConstructor(ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>absent(), Optional.of(ctMethod), options);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
@@ -467,7 +467,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 					String name = ctMethod.getName();
 					List<CtMethod> ctMethods = methods.get(name);
 					if (ctMethods == null) {
-						ctMethods = new ArrayList<CtMethod>();
+						ctMethods = new ArrayList<>();
 						methods.put(name, ctMethods);
 					}
 					ctMethods.add(ctMethod);

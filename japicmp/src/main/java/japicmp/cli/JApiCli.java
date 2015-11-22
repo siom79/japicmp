@@ -66,6 +66,8 @@ public class JApiCli {
 		public String oldClassPath;
 		@Option(name = {NEW_CLASSPATH}, description = "The classpath for the new version.")
 		public String newClassPath;
+		@Option(name = "--no-annotations", description = "Do not evaluate annotations.")
+		public boolean noAnnotations = false;
 
 		@Override
 		public void run() {
@@ -116,6 +118,7 @@ public class JApiCli {
 			options.setHtmlStylesheet(Optional.fromNullable(pathToHtmlStylesheet));
 			options.setOldClassPath(Optional.fromNullable(oldClassPath));
 			options.setNewClassPath(Optional.fromNullable(newClassPath));
+			options.setNoAnnotations(noAnnotations);
 			return options;
 		}
 
