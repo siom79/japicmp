@@ -23,6 +23,7 @@
 		<module>japicmp-test2-v2</module>
 		<module>japicmp-test-maven-plugin-pom-module</module>
 		<module>japicmp-test-vx-client</module>
+		<module>japicmp-test-maven-plugin-ignoremissingartifact</module>
 	</modules>
 
 	<properties>

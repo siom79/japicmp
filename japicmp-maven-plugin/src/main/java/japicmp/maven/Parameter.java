@@ -19,6 +19,8 @@ public class Parameter {
 	private String htmlTitle;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String noAnnotations;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String ignoreNonResolvableArtifacts;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -121,5 +123,13 @@ public class Parameter {
 
 	public void setHtmlTitle(String htmlTitle) {
 		this.htmlTitle = htmlTitle;
+	}
+
+	public String getIgnoreNonResolvableArtifacts() {
+		return ignoreNonResolvableArtifacts;
+	}
+
+	public void setIgnoreNonResolvableArtifacts(String ignoreNonResolvableArtifacts) {
+		this.ignoreNonResolvableArtifacts = ignoreNonResolvableArtifacts;
 	}
 }
