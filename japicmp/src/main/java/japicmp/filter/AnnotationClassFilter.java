@@ -1,9 +1,8 @@
 package japicmp.filter;
 
+import japicmp.cmp.JarArchiveComparator;
 import japicmp.exception.JApiCmpException;
-import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtField;
 
 public class AnnotationClassFilter implements ClassFilter {
 	private final Class annotation;
@@ -13,7 +12,7 @@ public class AnnotationClassFilter implements ClassFilter {
 		try {
 			annotation = Class.forName(clazz);
 		} catch (ClassNotFoundException e) {
-			throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Unable to load specified annotation filter: " + clazz, e);
+			throw JApiCmpException.forClassLoading(e, clazz);
 		}
 	}
 

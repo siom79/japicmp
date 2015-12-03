@@ -88,10 +88,9 @@ public class JarArchiveComparator {
 
 	private String appendSystemClassPath(ClassPool classPool, String classPathAsString) {
 		classPool.appendSystemPath();
-		if (!classPathAsString.endsWith(File.pathSeparator)) {
+		if (classPathAsString.length() > 0 && !classPathAsString.endsWith(File.pathSeparator)) {
 			classPathAsString += File.pathSeparator;
 		}
-		classPathAsString += classPathAsString;
 		return classPathAsString;
 	}
 

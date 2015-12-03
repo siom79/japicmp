@@ -224,7 +224,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (options.isIgnoreMissingClasses()) {
 				return Optional.absent();
 			} else {
-				throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, e.getMessage(), e);
+				throw JApiCmpException.forClassLoading(e, e.getMessage(), jarArchiveComparator);
 			}
 		}
 	}
@@ -278,7 +278,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} catch (NotFoundException e) {
 			if (!options.isIgnoreMissingClasses()) {
-				throw new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Class not found: " + e.getMessage(), e);
+				throw JApiCmpException.forClassLoading(e, "Class not found: " + e.getMessage(), jarArchiveComparator);
 			}
 		}
 		return map;

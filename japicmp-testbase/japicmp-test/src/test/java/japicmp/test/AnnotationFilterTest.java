@@ -9,7 +9,6 @@ import japicmp.model.JApiClass;
 import japicmp.test.annotation.filter.AnnotatedClass;
 import japicmp.test.annotation.filter.ClassWithMembersToExclude;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
