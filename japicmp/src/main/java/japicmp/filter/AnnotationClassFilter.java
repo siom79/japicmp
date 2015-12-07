@@ -20,6 +20,6 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 
 	@Override
 	public String toString() {
-		return "Annotation filter: @" + annotation.getName();
+		return "Annotation filter: @" + annotationClassName;
 	}
 }
