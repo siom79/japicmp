@@ -98,6 +98,7 @@ public class Options {
 				if (filterString.startsWith("@")) {
 					filters.add(new AnnotationClassFilter(filterString));
 					filters.add(new AnnotationFieldFilter(filterString));
+					filters.add(new AnnotationBehaviorFilter(filterString));
 				}
                 if (filterString.contains("#")) {
                     if (filterString.contains("(")) {

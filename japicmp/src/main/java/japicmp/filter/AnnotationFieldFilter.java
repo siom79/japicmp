@@ -2,22 +2,16 @@ package japicmp.filter;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.exception.JApiCmpException;
-import javassist.CtField;
+import javassist.*;
 
-public class AnnotationFieldFilter implements FieldFilter {
-	private final Class<?> annotation;
+public class AnnotationFieldFilter extends AnnotationFilterBase implements FieldFilter {
 
 	public AnnotationFieldFilter(String filterString) {
-		String clazz = filterString.substring(1);
-		try {
-			annotation = Class.forName(clazz);
-		} catch (ClassNotFoundException e) {
-			throw JApiCmpException.forClassLoading(e, clazz);
-		}
+		super(filterString.substring(1));
 	}
 
 	@Override
 	public boolean matches(CtField ctField) {
-		return ctField.hasAnnotation(annotation);
+		return ctField.hasAnnotation(resolveAnnotation(ctField.getDeclaringClass().getClassPool()));
 	}
 }

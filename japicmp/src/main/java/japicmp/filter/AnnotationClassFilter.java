@@ -2,23 +2,20 @@ package japicmp.filter;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.exception.JApiCmpException;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.NotFoundException;
 
-public class AnnotationClassFilter implements ClassFilter {
-	private final Class annotation;
+public class AnnotationClassFilter extends AnnotationFilterBase implements ClassFilter {
 
 	public AnnotationClassFilter(String filterString) {
-		String clazz = filterString.substring(1);
-		try {
-			annotation = Class.forName(clazz);
-		} catch (ClassNotFoundException e) {
-			throw JApiCmpException.forClassLoading(e, clazz);
-		}
+		super(filterString.substring(1));
 	}
 
 	@Override
 	public boolean matches(CtClass ctClass) {
-		return ctClass.hasAnnotation(annotation);
+		return ctClass.hasAnnotation(resolveAnnotation(ctClass.getClassPool()));
 	}
 
 	@Override
