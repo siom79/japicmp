@@ -17,11 +17,11 @@ public class AnnotationFilterBase {
 	protected Class resolveAnnotation(ClassPool classPool) {
 		if (annotation == null) {
 			try {
-				CtClass annotationCtClass = classPool.get(annotationClassName);
 				try {
 					annotation = Class.forName(annotationClassName);
 				} catch (ClassNotFoundException e) {
 					try {
+						CtClass annotationCtClass = classPool.get(annotationClassName);
 						annotation = annotationCtClass.toClass();
 					} catch (CannotCompileException e1) {
 						throw JApiCmpException.forClassLoading(e1, annotationClassName);
