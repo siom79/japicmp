@@ -1,8 +1,5 @@
 package japicmp.maven;
 
-import com.google.common.base.Optional;
-
-import java.io.File;
 import java.util.List;
 
 public class PluginParameters {
@@ -15,11 +12,10 @@ public class PluginParameters {
 	private final List<Dependency> dependenciesParam;
 	private final List<Dependency> oldClassPathDependencies;
 	private final List<Dependency> newClassPathDependencies;
-	private final Optional<File> projectBuildDirParam;
-	private final Optional<String> outputDirectory;
+	private final String outputDirectory;
 	private final boolean writeToFiles;
 
-	public PluginParameters(String skipParam, Version newVersionParam, Version oldVersionParam, Parameter parameterParam, List<Dependency> dependenciesParam, Optional<File> projectBuildDirParam, Optional<String> outputDirectory, boolean writeToFiles, List<DependencyDescriptor> oldVersionsParam, List<DependencyDescriptor> newVersionsParam, List<Dependency> oldClassPathDependencies, List<Dependency> newClassPathDependencies) {
+	public PluginParameters(String skipParam, Version newVersionParam, Version oldVersionParam, Parameter parameterParam, List<Dependency> dependenciesParam, String outputDirectory, boolean writeToFiles, List<DependencyDescriptor> oldVersionsParam, List<DependencyDescriptor> newVersionsParam, List<Dependency> oldClassPathDependencies, List<Dependency> newClassPathDependencies) {
 		this.skipParam = skipParam;
 		this.newVersionParam = newVersionParam;
 		this.oldVersionParam = oldVersionParam;
@@ -27,7 +23,6 @@ public class PluginParameters {
 		this.dependenciesParam = dependenciesParam;
 		this.oldClassPathDependencies = oldClassPathDependencies;
 		this.newClassPathDependencies = newClassPathDependencies;
-		this.projectBuildDirParam = projectBuildDirParam;
 		this.outputDirectory = outputDirectory;
 		this.writeToFiles = writeToFiles;
 		this.oldVersionsParam = oldVersionsParam;
@@ -54,11 +49,9 @@ public class PluginParameters {
 		return dependenciesParam;
 	}
 
-	public Optional<File> getProjectBuildDirParam() {
-		return projectBuildDirParam;
-	}
 
-	public Optional<String> getOutputDirectory() {
+
+	public String getOutputDirectory() {
 		return outputDirectory;
 	}
 
