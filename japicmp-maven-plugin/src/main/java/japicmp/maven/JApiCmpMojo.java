@@ -82,24 +82,6 @@ public class JApiCmpMojo extends AbstractMojo {
 	protected MavenProject mavenProject;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-
-		if (oldVersion == null) {
-			oldVersion = new Version();
-			Dependency oldDependency = new Dependency();
-			oldDependency.setGroupId(mavenProject.getGroupId());
-			oldDependency.setArtifactId(mavenProject.getArtifactId());
-
-			// version are supposed to be A.B.C{-|.}Qualifier
-			// by default compare to A.0.0.RELEASE
-
-			String currentVersion = mavenProject.getVersion();
-			String major = currentVersion.substring(0, currentVersion.indexOf('.'));
-			String setupVersion = major + ".0.0.RELEASE";
-			oldDependency.setVersion(setupVersion);
-			oldVersion.setDependency(oldDependency);
-			getLog().info("No old version set, default it to" + setupVersion);
-
-		}
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution);
 		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, outputDirectory, true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
