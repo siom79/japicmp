@@ -1,6 +1,5 @@
 package japicmp.test;
 
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,9 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
@@ -26,7 +23,7 @@ public class ITAdded {
 	 */
 	@Test
 	public void testStylesheetIsUsed() throws IOException {
-		Path htmlPath = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "japicmp.diff");
+		Path htmlPath = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "japicmp_com.github.siom79.japicmp_japicmp-test-maven-plugin-classifier.diff");
 		assertThat(Files.exists(htmlPath), is(true));
 		List<String> allLines = Files.readAllLines(htmlPath, Charset.forName("UTF-8"));
 		assertThat(allLines.size(), not(is(0)));

@@ -73,7 +73,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<String> packagingSupporteds;
 
-	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project.build.directory}")
+	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project.build.directory}/")
 	private String outputDirectory;
 	/**
 	 * The maven project.
@@ -290,7 +290,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 		String outputDirectory = pluginParameters.getOutputDirectory();
 		try {
-			File outputDirFile = new File(outputDirectory);
+			File outputDirFile = new File(outputDirectory+ File.separator + "japicmp");
 			boolean mkdirs = outputDirFile.mkdirs();
 			if (mkdirs || outputDirFile.isDirectory() && outputDirFile.canWrite()) {
 				return outputDirFile;
@@ -327,7 +327,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 		String filename = "japicmp";
 		if (mavenProject !=null) {
-			filename = filename +"-" + mavenProject.getGroupId() + "-" + mavenProject.getArtifactId();
+			filename = filename +"_" + mavenProject.getGroupId() + "_" + mavenProject.getArtifactId();
 		}
 
 		String executionId = mavenParameters.getMojoExecution().getExecutionId();
