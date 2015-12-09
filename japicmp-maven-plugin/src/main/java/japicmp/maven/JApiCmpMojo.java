@@ -93,14 +93,8 @@ public class JApiCmpMojo extends AbstractMojo {
 			return Optional.absent();
 		}
 
-		if ((packagingSupporteds != null) && (packagingSupporteds.isEmpty() == false)) {
-			if (packagingSupporteds.contains(mavenProject.getPackaging()) == false) {
-				getLog().info("Filtered according to packagingFilter");
-				return Optional.absent();
-			}
-		} else {
-			getLog().info("No packaging support defined, no filtering");
-		}
+		if (filterModule(pluginParameters)) return Optional.absent();
+
 
 		List<File> oldArchives = new ArrayList<>();
 		List<File> newArchives = new ArrayList<>();
@@ -123,6 +117,36 @@ public class JApiCmpMojo extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
 		}
+	}
+
+	private boolean filterModule(PluginParameters pluginParameters) {
+		if (mavenProject != null) {
+
+			if ((packagingSupporteds != null) && (packagingSupporteds.isEmpty() == false)) {
+				if (packagingSupporteds.contains(mavenProject.getPackaging()) == false) {
+					getLog().info("Filtered according to packagingFilter");
+					return true;
+				}
+			} else {
+				getLog().debug("No packaging support defined, no filtering");
+			}
+
+			if ("pom".equals(mavenProject.getPackaging())) {
+				boolean skipPomModules = true;
+				Parameter parameterParam = pluginParameters.getParameterParam();
+				if (parameterParam != null) {
+					String skipPomModulesAsString = parameterParam.getSkipPomModules();
+					if (skipPomModulesAsString != null) {
+						skipPomModules = Boolean.valueOf(skipPomModulesAsString);
+					}
+				}
+				if (skipPomModules) {
+					getLog().info("Skipping execution because packaging of this module is 'pom'.");
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private void populateArchivesListsFromParameters(PluginParameters pluginParameters, MavenParameters mavenParameters, List<File> oldArchives, List<File> newArchives) throws MojoFailureException {
