@@ -1,36 +1,29 @@
 package japicmp.filter;
 
-import japicmp.exception.JApiCmpException;
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.annotation.Annotation;
+
+import java.util.List;
 
 public class AnnotationFilterBase {
 	protected final String annotationClassName;
-	protected Class<?> annotation;
 
-	protected AnnotationFilterBase(String className) {
-		this.annotationClassName = className;
+	public AnnotationFilterBase(String annotationClassName) {
+		this.annotationClassName = annotationClassName;
 	}
 
-	protected Class resolveAnnotation(ClassPool classPool) {
-		if (annotation == null) {
-			try {
-				try {
-					annotation = Class.forName(annotationClassName);
-				} catch (ClassNotFoundException e) {
-					try {
-						CtClass annotationCtClass = classPool.get(annotationClassName);
-						annotation = annotationCtClass.toClass();
-					} catch (CannotCompileException e1) {
-						throw JApiCmpException.forClassLoading(e1, annotationClassName);
+	protected boolean hasAnnotation(List attributes) {
+		for (Object obj : attributes) {
+			if (obj instanceof AnnotationsAttribute) {
+				AnnotationsAttribute annotationsAttribute = (AnnotationsAttribute) obj;
+				Annotation[] annotations = annotationsAttribute.getAnnotations();
+				for (Annotation annotation : annotations) {
+					if (annotation.getTypeName().equals(annotationClassName)) {
+						return true;
 					}
 				}
-			} catch (NotFoundException e) {
-				throw JApiCmpException.forClassLoading(e, annotationClassName);
 			}
 		}
-		return annotation;
+		return false;
 	}
 }

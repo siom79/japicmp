@@ -1,8 +1,8 @@
 package japicmp.filter;
 
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.exception.JApiCmpException;
-import javassist.*;
+import javassist.CtField;
+
+import java.util.List;
 
 public class AnnotationFieldFilter extends AnnotationFilterBase implements FieldFilter {
 
@@ -12,6 +12,12 @@ public class AnnotationFieldFilter extends AnnotationFilterBase implements Field
 
 	@Override
 	public boolean matches(CtField ctField) {
-		return ctField.hasAnnotation(resolveAnnotation(ctField.getDeclaringClass().getClassPool()));
+		List attributes = ctField.getFieldInfo().getAttributes();
+		return hasAnnotation(attributes);
+	}
+
+	@Override
+	public String toString() {
+		return "Annotation filter: @" + annotationClassName;
 	}
 }

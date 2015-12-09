@@ -1,8 +1,9 @@
 package japicmp.filter;
 
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.exception.JApiCmpException;
 import javassist.*;
+import javassist.bytecode.ClassFile;
+
+import java.util.List;
 
 public class AnnotationBehaviorFilter extends AnnotationFilterBase implements BehaviorFilter {
 
@@ -12,6 +13,12 @@ public class AnnotationBehaviorFilter extends AnnotationFilterBase implements Be
 
 	@Override
 	public boolean matches(CtBehavior ctBehavior) {
-		return ctBehavior.hasAnnotation(resolveAnnotation(ctBehavior.getDeclaringClass().getClassPool()));
+		List attributes = ctBehavior.getMethodInfo().getAttributes();
+		return hasAnnotation(attributes);
+	}
+
+	@Override
+	public String toString() {
+		return "Annotation filter: @" + annotationClassName;
 	}
 }

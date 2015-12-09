@@ -1,11 +1,8 @@
 package japicmp.filter;
 
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.exception.JApiCmpException;
-import javassist.CannotCompileException;
-import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.NotFoundException;
+
+import java.util.List;
 
 public class AnnotationClassFilter extends AnnotationFilterBase implements ClassFilter {
 
@@ -15,7 +12,8 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 
 	@Override
 	public boolean matches(CtClass ctClass) {
-		return ctClass.hasAnnotation(resolveAnnotation(ctClass.getClassPool()));
+		List attributes = ctClass.getClassFile().getAttributes();
+		return hasAnnotation(attributes);
 	}
 
 	@Override
