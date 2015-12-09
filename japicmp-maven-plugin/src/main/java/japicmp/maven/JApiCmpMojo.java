@@ -57,8 +57,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private List<Dependency> newClassPathDependencies;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String skip;
-	@org.apache.maven.plugins.annotations.Parameter(property = "project.build.directory", required = true)
-	private File projectBuildDir;
+
 	@Component
 	private ArtifactFactory artifactFactory;
 	@Component
@@ -74,6 +73,8 @@ public class JApiCmpMojo extends AbstractMojo {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<String> packagingSupporteds;
 
+	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project.build.directory}")
+	private String outputDirectory;
 	/**
 	 * The maven project.
 	 */
@@ -100,7 +101,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 		}
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution);
-		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, outputDirectory, true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
@@ -116,7 +117,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				return Optional.absent();
 			}
 		} else {
-			getLog().info("No packaging support defined");
+			getLog().info("No packaging support defined, no filtering");
 		}
 
 		List<File> oldArchives = new ArrayList<>();
@@ -279,39 +280,21 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private File createJapiCmpBaseDir(PluginParameters pluginParameters) throws MojoFailureException {
-		if (pluginParameters.getProjectBuildDirParam().isPresent()) {
-			try {
-				File projectBuildDirParam = pluginParameters.getProjectBuildDirParam().get();
-				if (projectBuildDirParam != null) {
-					File jApiCmpBuildDir = new File(projectBuildDirParam.getCanonicalPath() + File.separator + "japicmp");
-					boolean mkdirs = jApiCmpBuildDir.mkdirs();
-					if (mkdirs || jApiCmpBuildDir.isDirectory() && jApiCmpBuildDir.canWrite()) {
-						return jApiCmpBuildDir;
-					}
 
-					throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
-				} else {
-					throw new MojoFailureException("Maven parameter projectBuildDir is not set.");
-				}
-			} catch (IOException e) {
-				throw new MojoFailureException("Failed to create output directory: " + e.getMessage(), e);
-			}
-		} else if (pluginParameters.getOutputDirectory().isPresent()) {
-			String outputDirectory = pluginParameters.getOutputDirectory().get();
-			if (outputDirectory != null) {
-				File outputDirFile = new File(outputDirectory);
-				boolean mkdirs = outputDirFile.mkdirs();
-				if (mkdirs || outputDirFile.isDirectory() && outputDirFile.canWrite()) {
-					return outputDirFile;
-				}
 
-				throw new MojoFailureException(String.format("Failed to create directory '%s'.", outputDirFile.getAbsolutePath()));
-			} else {
-				throw new MojoFailureException("Maven parameter outputDirectory is not set.");
+		String outputDirectory = pluginParameters.getOutputDirectory();
+		try {
+			File outputDirFile = new File(outputDirectory);
+			boolean mkdirs = outputDirFile.mkdirs();
+			if (mkdirs || outputDirFile.isDirectory() && outputDirFile.canWrite()) {
+				return outputDirFile;
 			}
-		} else {
-			throw new MojoFailureException("None of the two parameters projectBuildDir and outputDirectory are present");
 		}
+		catch (Exception e)
+		{
+			throw new MojoFailureException(String.format("Failed to create directory '%s'.", outputDirectory));
+		}
+		return null;
 	}
 
 	private String generateDiffOutput(List<JApiClass> jApiClasses, Options options) {
@@ -335,7 +318,12 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private String createFilename(MavenParameters mavenParameters) {
+
 		String filename = "japicmp";
+		if (mavenProject !=null) {
+			filename = filename +"-" + mavenProject.getGroupId() + "-" + mavenProject.getArtifactId();
+		}
+
 		String executionId = mavenParameters.getMojoExecution().getExecutionId();
 		if (executionId != null && !"default".equals(executionId)) {
 			filename = executionId;
