@@ -11,11 +11,10 @@ import org.junit.Test;
 import java.util.List;
 
 import static japicmp.test.service.util.Helper.*;
-import static japicmp.test.service.util.Helper.getArchive;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class InterfaceTest {
+public class InterfaceImplTest {
 	private static List<JApiClass> jApiClasses;
 
 	@BeforeClass
@@ -25,15 +24,22 @@ public class InterfaceTest {
 		options.setOldClassPath(createClassPath("v1"));
 		options.setNewClassPath(createClassPath("v2"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-service-v1.jar"), getArchive("japicmp-test-service-v2.jar"));
+		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-service-impl-v1.jar"), getArchive("japicmp-test-service-impl-v2.jar"));
 	}
 
 	@Test
-	public void  testMethodRemovedFromInterface()
-	{
-		JApiClass jApiClass = getJApiClass(jApiClasses, InterfaceMethodAdded.class.getName());
+	public void testMethodAdded() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, InterfaceMethodAddedImpl.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.isSourceCompatible(), is(false));
+	}
+
+	@Test
+	public void testMethodRemoved() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, InterfaceMethodRemovedImpl.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodRemoved");
+		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
 }

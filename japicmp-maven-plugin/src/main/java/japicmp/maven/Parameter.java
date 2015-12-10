@@ -10,6 +10,7 @@ public class Parameter {
     private String onlyModified;
     private String breakBuildOnModifications;
     private String breakBuildOnBinaryIncompatibleModifications;
+	private String breakBuildOnSourceIncompatibleModifications;
     private String includeSynthetic;
 	private String ignoreMissingClasses;
 	private String skipPomModules;
@@ -131,5 +132,13 @@ public class Parameter {
 
 	public void setIgnoreNonResolvableArtifacts(String ignoreNonResolvableArtifacts) {
 		this.ignoreNonResolvableArtifacts = ignoreNonResolvableArtifacts;
+	}
+
+	public String getBreakBuildOnSourceIncompatibleModifications() {
+		return breakBuildOnSourceIncompatibleModifications;
+	}
+
+	public void setBreakBuildOnSourceIncompatibleModifications(String breakBuildOnSourceIncompatibleModifications) {
+		this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;
 	}
 }

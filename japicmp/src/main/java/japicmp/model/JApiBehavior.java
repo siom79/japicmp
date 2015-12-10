@@ -36,6 +36,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
     protected JApiChangeStatus changeStatus;
     private boolean binaryCompatible = true;
+	private boolean sourceCompatible = true;
 	private final Optional<Integer> oldLineNumber;
 	private final Optional<Integer> newLineNumber;
 

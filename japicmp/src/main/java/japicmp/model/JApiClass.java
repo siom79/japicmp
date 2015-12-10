@@ -37,6 +37,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private final JApiSerialVersionUid jApiSerialVersionUid;
 	private boolean binaryCompatible = true;
+	private boolean sourceCompatible = true;
 	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
 	private boolean changeCausedByClassElement = false;
 
@@ -733,6 +734,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 
 	void setBinaryCompatible(boolean binaryCompatible) {
 		this.binaryCompatible = binaryCompatible;
+		if (binaryCompatible == false)
+			sourceCompatible = false;
 	}
 
 	@XmlElementWrapper(name = "annotations")
@@ -745,4 +748,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	public boolean isChangeCausedByClassElement() {
 		return changeCausedByClassElement;
 	}
+
+	public boolean isSourceCompatible() {
+		return sourceCompatible;
+	}
+
+	void setSourceCompatible(boolean sourceCompatible) {
+		this.sourceCompatible = sourceCompatible;
+
+	}
+
 }
