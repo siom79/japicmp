@@ -62,6 +62,10 @@ public class BinaryCompatibility {
 			binaryCompatible = false;
 		}
 		jApiClass.setBinaryCompatible(binaryCompatible);
+
+		jApiClass.setSourceCompatible(SourceCompatibility.sourceCompatible(jApiClass));
+
+
 	}
 
 	private boolean fieldsHaveChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
