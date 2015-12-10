@@ -23,6 +23,22 @@ public class Parameter {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreNonResolvableArtifacts;
 
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipNoChange;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipXml;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipHtml;
+
+	public boolean isSkipNoChange() {
+		return skipNoChange;
+	}
+
+	public void setSkipNoChange(boolean skipNoChange) {
+		this.skipNoChange = skipNoChange;
+	}
+
+
 	public String getNoAnnotations() {
 		return noAnnotations;
 	}
@@ -140,5 +156,21 @@ public class Parameter {
 
 	public void setBreakBuildOnSourceIncompatibleModifications(String breakBuildOnSourceIncompatibleModifications) {
 		this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;
+	}
+
+	public boolean isSkipXml() {
+		return skipXml;
+	}
+
+	public void setSkipXml(boolean skipXml) {
+		this.skipXml = skipXml;
+	}
+
+	public boolean isSkipHtml() {
+		return skipHtml;
+	}
+
+	public void setSkipHtml(boolean skipHtml) {
+		this.skipHtml = skipHtml;
 	}
 }
