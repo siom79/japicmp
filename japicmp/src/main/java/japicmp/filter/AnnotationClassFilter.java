@@ -1,6 +1,7 @@
 package japicmp.filter;
 
 import javassist.CtClass;
+import javassist.NotFoundException;
 
 import java.util.List;
 
@@ -13,7 +14,17 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 	@Override
 	public boolean matches(CtClass ctClass) {
 		List attributes = ctClass.getClassFile().getAttributes();
-		return hasAnnotation(attributes);
+		boolean hasAnnotation = hasAnnotation(attributes);
+		if (!hasAnnotation) {
+			try {
+				CtClass declaringClass = ctClass.getDeclaringClass();
+				if (declaringClass != null) {
+					attributes = declaringClass.getClassFile().getAttributes();
+					hasAnnotation = hasAnnotation(attributes);
+				}
+			} catch (NotFoundException ignored) {}
+		}
+		return hasAnnotation;
 	}
 
 	@Override
