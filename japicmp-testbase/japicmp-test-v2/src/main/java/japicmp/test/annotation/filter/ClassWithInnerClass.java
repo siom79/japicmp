@@ -6,4 +6,8 @@ public class ClassWithInnerClass {
 	public static class NewInnerClass {
 
 	}
+
+	public void newMethod() {
+
+	}
 }
