@@ -1,7 +1,10 @@
 package japicmp.cmp;
 
 import japicmp.filter.*;
+import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiField;
+import japicmp.model.JApiMethod;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
@@ -531,5 +534,63 @@ public class FilterTest {
 		});
 		assertThat(jApiClasses.size(), is(1));
 		assertThat(getJApiClass(jApiClasses, "big.bang.theory.Sheldon"), hasJApiFieldWithName("age"));
+	}
+
+	@Test
+	public void testAnnotationClassIncludedChangesDetected() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getIncludes().add(new AnnotationClassFilter("@" + Include.class.getName()));
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(classPool.getCtClass(String.class.getName())).name("getName").addToClass(ctClass1);
+				CtFieldBuilder.create().type(classPool.getCtClass(Integer.class.getName())).name("age").addToClass(ctClass1);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+		});
+		assertThat(jApiClasses.size(), is(1));
+		JApiClass jApiClass = getJApiClass(jApiClasses, "big.bang.theory.Sheldon");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "getName");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+		JApiField jApiField = getJApiField(jApiClass.getFields(), "age");
+		assertThat(jApiField.getChangeStatus(), is(JApiChangeStatus.NEW));
+	}
+
+	@Test
+	public void testClassIncludedButMethodExcluded() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getIncludes().add(new AnnotationClassFilter("@" + Include.class.getName()));
+		options.getFilters().getExcludes().add(new AnnotationBehaviorFilter("@" + Exclude.class.getName()));
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
+				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).addToClass(ctClass1);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
+				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(classPool.getCtClass(String.class.getName())).name("getName").withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
+				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+				return Arrays.asList(ctClass1, ctClass2);
+			}
+		});
+		assertThat(jApiClasses.size(), is(1));
+		JApiClass jApiClass = getJApiClass(jApiClasses, "big.bang.theory.Sheldon");
+		getJApiField(jApiClass.getFields(), "age");
+		assertThat(jApiClass.getMethods().size(), is(0));
 	}
 }
