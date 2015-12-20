@@ -9,8 +9,10 @@ import japicmp.filter.*;
 import japicmp.model.AccessModifier;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.JarFile;
 
 public class Options {
 	private List<File> oldArchives = new ArrayList<>();
@@ -37,6 +39,65 @@ public class Options {
 
 	public static Options newDefault() {
 		return new Options();
+	}
+
+	public static void verify(Options options) {
+		for (File file : options.getOldArchives()) {
+			verifyExistsCanReadAndJar(file);
+		}
+		for (File file : options.getNewArchives()) {
+			verifyExistsCanReadAndJar(file);
+		}
+		if (options.getHtmlStylesheet().isPresent()) {
+			String pathname = options.getHtmlStylesheet().get();
+			File stylesheetFile = new File(pathname);
+			if (!stylesheetFile.exists()) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "HTML stylesheet '%s' does not exist.", pathname);
+			}
+		}
+		if (options.getOldClassPath().isPresent() && options.getNewClassPath().isPresent()) {
+			options.setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+		} else {
+			if (options.getOldClassPath().isPresent() || options.getNewClassPath().isPresent()) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Please provide both options: " + JApiCli.OLD_CLASSPATH + " and " + JApiCli.NEW_CLASSPATH);
+			} else {
+				options.setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
+			}
+		}
+	}
+
+	private static void verifyExistsCanReadAndJar(File file) {
+		verifyExisting(file);
+		verifyCanRead(file);
+		verifyJarArchive(file);
+	}
+
+	private static void verifyExisting(File newArchive) {
+		if (!newArchive.exists()) {
+			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
+		}
+	}
+
+	private static void verifyCanRead(File file) {
+		if (!file.canRead()) {
+			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Cannot read file '%s'.", file.getAbsolutePath());
+		}
+	}
+
+	private static void verifyJarArchive(File file) {
+		JarFile jarFile = null;
+		try {
+			jarFile = new JarFile(file);
+		} catch (IOException e) {
+			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+		} finally {
+			if (jarFile != null) {
+				try {
+					jarFile.close();
+				} catch (IOException ignored) {
+				}
+			}
+		}
 	}
 
 	public List<File> getNewArchives() {
