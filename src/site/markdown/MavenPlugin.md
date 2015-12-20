@@ -8,13 +8,13 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.6.1</version>
+			<version>0.6.2</version>
 			<configuration>
 				<oldVersion>
 					<dependency>
 						<groupId>japicmp</groupId>
 						<artifactId>japicmp-test-v1</artifactId>
-						<version>0.6.1</version>
+						<version>0.6.2</version>
 						<type>jar</type>
 					</dependency>
 				</oldVersion>
@@ -141,7 +141,7 @@ Alternatively it can be used inside the `<reporting/>` tag in order to be invoke
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.6.1</version>
+			<version>0.6.2</version>
 			<reportSets>
 				<reportSet>
 					<reports>
