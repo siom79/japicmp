@@ -2,6 +2,7 @@ package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import org.junit.Test;
@@ -17,7 +18,10 @@ public class BasicTest {
 
     @Test
     public void test() {
-        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setAccessModifier(AccessModifier.PACKAGE_PROTECTED);
+		options.setIncludeSynthetic(true);
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
         JApiClass jApiClassRemoved = getJApiClass(jApiClasses, "japicmp.test.Removed");
         JApiClass jApiClassAdded = getJApiClass(jApiClasses, Added.class.getName());

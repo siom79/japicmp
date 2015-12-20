@@ -33,6 +33,6 @@ public class AnnotationFieldFilter extends AnnotationFilterBase implements Field
 
 	@Override
 	public String toString() {
-		return "Annotation filter: @" + annotationClassName;
+		return "@" + annotationClassName;
 	}
 }

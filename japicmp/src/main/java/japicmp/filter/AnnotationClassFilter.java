@@ -29,6 +29,6 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 
 	@Override
 	public String toString() {
-		return "Annotation filter: @" + annotationClassName;
+		return "@" + annotationClassName;
 	}
 }

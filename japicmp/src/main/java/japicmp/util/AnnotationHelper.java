@@ -5,6 +5,7 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiChangeStatus;
 import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
 import javassist.bytecode.annotation.Annotation;
 
 import java.util.HashMap;
@@ -13,11 +14,11 @@ import java.util.Map;
 
 public class AnnotationHelper {
 
-    public interface AnnotationsAttributeCallback<T> {
-        AnnotationsAttribute getAnnotationsAttribute(T t);
-    }
+	public interface AnnotationsAttributeCallback<T> {
+		AnnotationsAttribute getAnnotationsAttribute(T t);
+	}
 
-    public static <T> void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<T> oldClassOptional, Optional<T> newClassOptional,
+	public static <T> void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<T> oldClassOptional, Optional<T> newClassOptional,
 													JarArchiveComparatorOptions options, AnnotationsAttributeCallback<T> annotationsAttributeCallback) {
 		if (!options.isNoAnnotations()) {
 			if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
@@ -80,13 +81,36 @@ public class AnnotationHelper {
 				}
 			}
 		}
-    }
+	}
 
-    private static Map<String, Annotation> buildAnnotationMap(Annotation[] annotations) {
-        Map<String, Annotation> map = new HashMap<>();
-        for (Annotation annotation : annotations) {
-            map.put(annotation.getTypeName(), annotation);
-        }
-        return map;
-    }
+	private static Map<String, Annotation> buildAnnotationMap(Annotation[] annotations) {
+		Map<String, Annotation> map = new HashMap<>();
+		for (Annotation annotation : annotations) {
+			map.put(annotation.getTypeName(), annotation);
+		}
+		return map;
+	}
+
+	public static boolean hasAnnotation(ClassFile classFile, String annotationClassName) {
+		List attributes = classFile.getAttributes();
+		if (hasAnnotation(attributes, annotationClassName)) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean hasAnnotation(List attributes, String annotationClassName) {
+		for (Object obj : attributes) {
+			if (obj instanceof AnnotationsAttribute) {
+				AnnotationsAttribute annotationsAttribute = (AnnotationsAttribute) obj;
+				Annotation[] annotations = annotationsAttribute.getAnnotations();
+				for (Annotation annotation : annotations) {
+					if (annotation.getTypeName().equals(annotationClassName)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 }

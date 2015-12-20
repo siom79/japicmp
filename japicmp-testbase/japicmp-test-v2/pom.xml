@@ -55,6 +55,8 @@
 							</newVersion>
 							<parameter>
 								<onlyModified>true</onlyModified>
+								<accessModifier>PACKAGE_PROTECTED</accessModifier>
+								<includeSynthetic>true</includeSynthetic>
 							</parameter>
 							<dependencies>
 								<dependency>

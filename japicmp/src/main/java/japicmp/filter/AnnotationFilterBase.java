@@ -1,5 +1,7 @@
 package japicmp.filter;
 
+import japicmp.exception.JApiCmpException;
+import japicmp.util.AnnotationHelper;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 
@@ -13,17 +15,13 @@ public class AnnotationFilterBase {
 	}
 
 	protected boolean hasAnnotation(List attributes) {
-		for (Object obj : attributes) {
-			if (obj instanceof AnnotationsAttribute) {
-				AnnotationsAttribute annotationsAttribute = (AnnotationsAttribute) obj;
-				Annotation[] annotations = annotationsAttribute.getAnnotations();
-				for (Annotation annotation : annotations) {
-					if (annotation.getTypeName().equals(annotationClassName)) {
-						return true;
-					}
-				}
-			}
+		if (AnnotationHelper.hasAnnotation(attributes, annotationClassName)) {
+			return true;
 		}
 		return false;
+	}
+
+	public String getClassName() {
+		return annotationClassName;
 	}
 }

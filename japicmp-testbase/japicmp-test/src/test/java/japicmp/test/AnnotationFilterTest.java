@@ -10,6 +10,8 @@ import japicmp.model.JApiMethod;
 import japicmp.test.annotation.filter.AnnotatedClass;
 import japicmp.test.annotation.filter.ClassWithInnerClass;
 import japicmp.test.annotation.filter.ClassWithMembersToExclude;
+import japicmp.test.annotation.filter.exclpckg.Excluded;
+import japicmp.test.annotation.filter.inclpckg.Included;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -79,5 +81,33 @@ public class AnnotationFilterTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "newMethod");
 		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+	}
+
+	@Test
+	public void testPackagesAreExcluded() {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getExcludes().add(new AnnotationClassFilter("@japicmp.test.annotation.filter.Exclude"));
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
+		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		boolean exceptionCaught = false;
+		try {
+			getJApiClass(jApiClasses, Excluded.class.getName());
+		} catch (IllegalArgumentException e) {
+			exceptionCaught = true;
+		}
+		assertThat(exceptionCaught, is(true));
+	}
+
+	@Test
+	public void testPackagesAreIncluded() {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getIncludes().add(new AnnotationClassFilter("@japicmp.test.annotation.filter.Include"));
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
+		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		assertThat(jApiClasses.size(), is(1));
+		JApiClass jApiClass = getJApiClass(jApiClasses, Included.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		JApiMethod methodAdded = getJApiMethod(jApiClass.getMethods(), "methodAdded");
+		assertThat(methodAdded.getChangeStatus(), is(JApiChangeStatus.NEW));
 	}
 }

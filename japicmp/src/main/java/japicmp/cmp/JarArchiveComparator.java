@@ -2,10 +2,15 @@ package japicmp.cmp;
 
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
+import japicmp.filter.AnnotationFilterBase;
+import japicmp.filter.Filter;
+import japicmp.filter.Filters;
+import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.BinaryCompatibility;
 import japicmp.model.JApiClass;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
+import japicmp.util.AnnotationHelper;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
@@ -211,6 +216,9 @@ public class JarArchiveComparator {
 						if (LOGGER.isLoggable(Level.FINE)) {
 							LOGGER.fine(String.format("Adding class '%s' with jar name '%s' to list.", ctClass.getName(), name));
 						}
+						if (name.endsWith("package-info.class")) {
+							updatePackageFilter(ctClass);
+						}
 					} else {
 						if (LOGGER.isLoggable(Level.FINE)) {
 							LOGGER.fine(String.format("Skipping file '%s' because filename does not end with '.class'.", name));
@@ -224,7 +232,36 @@ public class JarArchiveComparator {
 		return classes;
 	}
 
-    /**
+	private void updatePackageFilter(CtClass ctClass) {
+		Filters filters = options.getFilters();
+		List<Filter> newFilters = new LinkedList<>();
+		for (Filter filter : filters.getIncludes()) {
+			if (filter instanceof AnnotationFilterBase) {
+				String className = ((AnnotationFilterBase) filter).getClassName();
+				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {
+					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName()));
+				}
+			}
+		}
+		if (newFilters.size() > 0) {
+			filters.getIncludes().addAll(newFilters);
+			newFilters.clear();
+		}
+		for (Filter filter : filters.getExcludes()) {
+			if (filter instanceof AnnotationFilterBase) {
+				String className = ((AnnotationFilterBase) filter).getClassName();
+				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {
+					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName()));
+				}
+			}
+		}
+		if (newFilters.size() > 0) {
+			filters.getExcludes().addAll(newFilters);
+			newFilters.clear();
+		}
+	}
+
+	/**
      * Returns the instance of {@link japicmp.cmp.JarArchiveComparatorOptions} that is used.
      * @return an instance of {@link japicmp.cmp.JarArchiveComparatorOptions}
      */

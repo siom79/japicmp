@@ -32,6 +32,6 @@ public class AnnotationBehaviorFilter extends AnnotationFilterBase implements Be
 
 	@Override
 	public String toString() {
-		return "Annotation filter: @" + annotationClassName;
+		return "@" + annotationClassName;
 	}
 }
