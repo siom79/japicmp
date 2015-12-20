@@ -103,7 +103,7 @@ public class JApiCli {
 		}
 
 		private Options createOptions() {
-			Options options = new Options();
+			Options options = Options.newDefault();
 			options.getOldArchives().addAll(createFileList(checkNonNull(pathToOldVersionJar, "Required option -o is missing.")));
 			options.getNewArchives().addAll(createFileList(checkNonNull(pathToNewVersionJar, "Required option -n is missing.")));
 			options.setXmlOutputFile(Optional.fromNullable(pathToXmlOutputFile));

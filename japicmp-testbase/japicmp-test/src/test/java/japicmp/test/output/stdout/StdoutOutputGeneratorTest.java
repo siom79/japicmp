@@ -26,7 +26,7 @@ public class StdoutOutputGeneratorTest {
 	public void test() {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.setOutputOnlyModifications(true);
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String string = generator.generate();
@@ -58,7 +58,7 @@ public class StdoutOutputGeneratorTest {
 		jarArchiveComparatorOptions.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.annotation"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(jarArchiveComparatorOptions);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.setOutputOnlyModifications(true);
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String string = generator.generate();

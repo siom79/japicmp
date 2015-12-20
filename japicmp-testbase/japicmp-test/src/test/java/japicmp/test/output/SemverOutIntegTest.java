@@ -99,7 +99,7 @@ public class SemverOutIntegTest {
 		AccessModifier accessModifier = AccessModifier.PRIVATE;
 		JarArchiveComparator jarArchiveComparator = newComparator(lastPackage, accessModifier);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldFile, newFile);
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.setNewArchives(Collections.singletonList(newFile));
 		options.setOldArchives(Collections.singletonList(oldFile));
 		options.setAccessModifier(accessModifier);
