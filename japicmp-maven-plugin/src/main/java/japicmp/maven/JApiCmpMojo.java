@@ -90,20 +90,6 @@ public class JApiCmpMojo extends AbstractMojo {
 
 		if (filterModule(pluginParameters)) return Optional.absent();
 
-		if (mavenProject != null && "pom".equals(mavenProject.getPackaging())) {
-			boolean skipPomModules = true;
-			Parameter parameterParam = pluginParameters.getParameterParam();
-			if (parameterParam != null) {
-				String skipPomModulesAsString = parameterParam.getSkipPomModules();
-				if (skipPomModulesAsString != null) {
-					skipPomModules = Boolean.valueOf(skipPomModulesAsString);
-				}
-			}
-			if (skipPomModules) {
-				getLog().info("Skipping execution because packaging of this module is 'pom'.");
-				return Optional.absent();
-			}
-		}
 		List<File> oldArchives = new ArrayList<>();
 		List<File> newArchives = new ArrayList<>();
 		populateArchivesListsFromParameters(pluginParameters, mavenParameters, oldArchives, newArchives);
