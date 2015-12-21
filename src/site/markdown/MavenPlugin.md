@@ -50,6 +50,9 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 					<htmlTitle>Title of report</htmlTitle>
 					<noAnnotations>false</noAnnotations>
 					<ignoreNonResolvableArtifacts>false</ignoreNonResolvableArtifacts>
+					<packagingSupporteds>
+						<packagingSupported>jar</packagingSupported>
+					</packagingSupporteds>
 				</parameter>
 				<dependencies>
 					<dependency>
@@ -92,6 +95,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 * htmlTitle: A title for the HTML report (optional).
 * noAnnotations: Setting this option to true disables the evaluation of annotations completely.
 * ignoreNonResolvableArtifacts: Set this to true in order to ignore artifacts that cannot be resolved, i.e. the build does not break in case a dependency cannto be resolved to a file.
+* packagingSupported: List all packaging type for which the plugin should be executed. Helpful if you define the plugin in a root pom.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:

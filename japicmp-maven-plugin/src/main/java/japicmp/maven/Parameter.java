@@ -21,6 +21,8 @@ public class Parameter {
 	private String noAnnotations;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreNonResolvableArtifacts;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<String> packagingSupporteds;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -131,5 +133,13 @@ public class Parameter {
 
 	public void setIgnoreNonResolvableArtifacts(String ignoreNonResolvableArtifacts) {
 		this.ignoreNonResolvableArtifacts = ignoreNonResolvableArtifacts;
+	}
+
+	public List<String> getPackagingSupporteds() {
+		return packagingSupporteds;
+	}
+
+	public void setPackagingSupporteds(List<String> packagingSupporteds) {
+		this.packagingSupporteds = packagingSupporteds;
 	}
 }
