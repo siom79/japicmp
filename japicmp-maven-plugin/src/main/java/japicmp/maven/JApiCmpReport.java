@@ -15,7 +15,6 @@ import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,7 +58,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 		try {
 			JApiCmpMojo mojo = new JApiCmpMojo();
 			MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution);
-			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, outputDirectory, false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(pluginParameters, mavenParameters);
 			if (xmlOutputOptional.isPresent()) {
 				XmlOutput xmlOutput = xmlOutputOptional.get();

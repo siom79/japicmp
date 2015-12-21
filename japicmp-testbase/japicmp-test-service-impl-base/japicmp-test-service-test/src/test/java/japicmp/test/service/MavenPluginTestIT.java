@@ -17,7 +17,7 @@ public class MavenPluginTestIT {
 
 	@Test
 	public void testTextOutput() throws IOException {
-		Path path = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "japicmp.diff");
+		Path path = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "japicmp_com.github.siom79.japicmp_japicmp-test-service-test.diff");
 		List<String> lines = Files.readAllLines(path, Charset.forName("UTF-8"));
 		Optional<String> lineOptional = findLineThatContains(lines, "SubclassAddsNewStaticField");
 		assertThat(lineOptional.isPresent(), is(true));

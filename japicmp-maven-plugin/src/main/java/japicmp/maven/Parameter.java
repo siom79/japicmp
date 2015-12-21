@@ -10,6 +10,7 @@ public class Parameter {
     private String onlyModified;
     private String breakBuildOnModifications;
     private String breakBuildOnBinaryIncompatibleModifications;
+	private String breakBuildOnSourceIncompatibleModifications;
     private String includeSynthetic;
 	private String ignoreMissingClasses;
 	private String skipPomModules;
@@ -21,6 +22,22 @@ public class Parameter {
 	private String noAnnotations;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreNonResolvableArtifacts;
+
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipNoChange;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipXml;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipHtml;
+
+	public boolean isSkipNoChange() {
+		return skipNoChange;
+	}
+
+	public void setSkipNoChange(boolean skipNoChange) {
+		this.skipNoChange = skipNoChange;
+	}
+
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -131,5 +148,29 @@ public class Parameter {
 
 	public void setIgnoreNonResolvableArtifacts(String ignoreNonResolvableArtifacts) {
 		this.ignoreNonResolvableArtifacts = ignoreNonResolvableArtifacts;
+	}
+
+	public String getBreakBuildOnSourceIncompatibleModifications() {
+		return breakBuildOnSourceIncompatibleModifications;
+	}
+
+	public void setBreakBuildOnSourceIncompatibleModifications(String breakBuildOnSourceIncompatibleModifications) {
+		this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;
+	}
+
+	public boolean isSkipXml() {
+		return skipXml;
+	}
+
+	public void setSkipXml(boolean skipXml) {
+		this.skipXml = skipXml;
+	}
+
+	public boolean isSkipHtml() {
+		return skipHtml;
+	}
+
+	public void setSkipHtml(boolean skipHtml) {
+		this.skipHtml = skipHtml;
 	}
 }
