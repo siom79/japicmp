@@ -13,6 +13,19 @@ public class Parameter {
     private String includeSynthetic;
 	private String ignoreMissingClasses;
 	private String skipPomModules;
+
+	//skip generation of outputfile generation if flag is set to true
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipNoChange;
+
+	// skip XML file production
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipXml;
+
+	// skip HTML file production
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipHtml;
+
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String htmlStylesheet;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
@@ -107,6 +120,30 @@ public class Parameter {
 
 	public void setSkipPomModules(String skipPomModules) {
 		this.skipPomModules = skipPomModules;
+	}
+
+	public boolean isSkipNoChange() {
+		return skipNoChange;
+	}
+
+	public void setSkipNoChange(boolean skipNoChange) {
+			this.skipNoChange = skipNoChange;
+	}
+
+	public boolean isSkipXml() {
+		return skipXml;
+	}
+
+	public void setSkipXml(boolean skipXml) {
+		this.skipXml = skipXml;
+	}
+
+	public boolean isSkipHtml() {
+		return skipHtml;
+	}
+
+	public void setSkipHtml(boolean skipHtml) {
+		this.skipHtml = skipHtml;
 	}
 
 	public String getHtmlStylesheet() {

@@ -105,6 +105,20 @@ public class JApiCmpMojo extends AbstractMojo {
 		try {
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
 			String diffOutput = generateDiffOutput(jApiClasses, options);
+			if (parameter.isSkipNoChange()) {
+				boolean noModif = true;
+				for ( JApiClass curr : jApiClasses) {
+					if (curr.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+						noModif =false;
+						break;
+					}
+				}
+				if (noModif) {
+					getLog().info("Skip no change ");
+					return Optional.absent();
+				}
+			}
+
 			createFileAndWriteTo(diffOutput, jApiCmpBuildDir, mavenParameters);
 			XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters);
 			if (pluginParameters.isWriteToFiles()) {
@@ -299,8 +313,15 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters, PluginParameters pluginParameters) throws IOException, MojoFailureException {
 		String filename = createFilename(mavenParameters);
-		options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
-		options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
+
+		if (parameter.isSkipHtml() == false)
+		{
+			options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
+		}
+		if (parameter.isSkipXml() == false) {
+			options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
+		}
+
 		SemverOut semverOut = new SemverOut(options, jApiClasses);
 		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
 		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
