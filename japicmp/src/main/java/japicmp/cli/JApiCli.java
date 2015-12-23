@@ -1,5 +1,6 @@
 package japicmp.cli;
 
+import javax.inject.Inject;
 import com.google.common.base.Optional;
 import io.airlift.airline.Command;
 import io.airlift.airline.HelpOption;
@@ -16,7 +17,6 @@ import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,31 +40,33 @@ public class JApiCli {
 		public String pathToOldVersionJar;
 		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version(s) of the jar(s). Use ; to separate jar files.")
 		public String pathToNewVersionJar;
-		@Option(name = {"-m", "--only-modified"}, description = "Outputs only modified classes/methods.")
+		@Option(name = { "-m", "--only-modified" }, description = "Outputs only modified classes/methods.")
 		public boolean modifiedOnly;
-		@Option(name = {"-b", "--only-incompatible"}, description = "Outputs only classes/methods that are binary incompatible. If not given, all classes and methods are printed.")
+		@Option(name = { "-b", "--only-incompatible" }, description = "Outputs only classes/methods that are binary incompatible. If not given, all classes and methods are printed.")
 		public boolean onlyBinaryIncompatibleModifications;
 		@Option(name = "-a", description = "Sets the access modifier level (public, package, protected, private), which should be used.")
 		public String accessModifier;
-		@Option(name = {"-i", "--include"}, description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Annotations are given as FQN starting with @. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.")
+		@Option(name = { "-i", "--include" },
+			description = "Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Annotations are given as FQN starting with @. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.")
 		public String includes;
-		@Option(name = {"-e", "--exclude"}, description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Annotations are given as FQN starting with @. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.")
+		@Option(name = { "-e", "--exclude" },
+			description = "Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Annotations are given as FQN starting with @. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.")
 		public String excludes;
-		@Option(name = {"-x", "--xml-file"}, description = "Provides the path to the xml output file.")
+		@Option(name = { "-x", "--xml-file" }, description = "Provides the path to the xml output file.")
 		public String pathToXmlOutputFile;
-		@Option(name = {"--html-file"}, description = "Provides the path to the html output file.")
+		@Option(name = { "--html-file" }, description = "Provides the path to the html output file.")
 		public String pathToHtmlOutputFile;
-		@Option(name = {"-s", "--semantic-versioning"}, description = "Tells you which part of the version to increment.")
+		@Option(name = { "-s", "--semantic-versioning" }, description = "Tells you which part of the version to increment.")
 		public boolean semanticVersioning = false;
-		@Option(name = {"--include-synthetic"}, description = "Include synthetic classes and class members that are hidden per default.")
+		@Option(name = { "--include-synthetic" }, description = "Include synthetic classes and class members that are hidden per default.")
 		public boolean includeSynthetic = false;
-		@Option(name = {IGNORE_MISSING_CLASSES}, description = "Ignores superclasses/interfaces missing on the classpath.")
+		@Option(name = { IGNORE_MISSING_CLASSES }, description = "Ignores superclasses/interfaces missing on the classpath.")
 		public boolean ignoreMissingClasses = false;
-		@Option(name = {"--html-stylesheet"}, description = "Provides the path to your own stylesheet.")
+		@Option(name = { "--html-stylesheet" }, description = "Provides the path to your own stylesheet.")
 		public String pathToHtmlStylesheet;
-		@Option(name = {OLD_CLASSPATH}, description = "The classpath for the old version.")
+		@Option(name = { OLD_CLASSPATH }, description = "The classpath for the old version.")
 		public String oldClassPath;
-		@Option(name = {NEW_CLASSPATH}, description = "The classpath for the new version.")
+		@Option(name = { NEW_CLASSPATH }, description = "The classpath for the new version.")
 		public String newClassPath;
 		@Option(name = "--no-annotations", description = "Do not evaluate annotations.")
 		public boolean noAnnotations = false;
@@ -185,7 +187,8 @@ public class JApiCli {
 				if (jarFile != null) {
 					try {
 						jarFile.close();
-					} catch (IOException ignored) {}
+					} catch (IOException e) {
+					}
 				}
 			}
 		}
@@ -204,8 +207,7 @@ public class JApiCli {
 				try {
 					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
 				} catch (IllegalArgumentException e) {
-					throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option -a: %s. Possible values are: %s.",
-							accessModifierArg, AccessModifier.listOfAccessModifier()));
+					throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option -a: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()));
 				}
 			} else {
 				return Optional.of(AccessModifier.PROTECTED);
