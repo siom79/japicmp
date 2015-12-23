@@ -3,14 +3,14 @@ package japicmp.maven;
 import java.util.List;
 
 public class Parameter {
-    private String accessModifier;
-    private List<String> includes;
-    private List<String> excludes;
-    private String onlyBinaryIncompatible;
-    private String onlyModified;
-    private String breakBuildOnModifications;
-    private String breakBuildOnBinaryIncompatibleModifications;
-    private String includeSynthetic;
+	private String accessModifier;
+	private List<String> includes;
+	private List<String> excludes;
+	private String onlyBinaryIncompatible;
+	private String onlyModified;
+	private String breakBuildOnModifications;
+	private String breakBuildOnBinaryIncompatibleModifications;
+	private String includeSynthetic;
 	private String ignoreMissingClasses;
 	private String skipPomModules;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
@@ -21,6 +21,8 @@ public class Parameter {
 	private String noAnnotations;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreNonResolvableArtifacts;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<String> packagingSupporteds;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -31,35 +33,36 @@ public class Parameter {
 	}
 
 	public String getAccessModifier() {
-        return accessModifier;
-    }
+		return accessModifier;
+	}
 
-    public void setAccessModifier(String accessModifier) {
-        this.accessModifier = accessModifier;
-    }
+	public void setAccessModifier(String accessModifier) {
+		this.accessModifier = accessModifier;
+	}
 
-    public String getOnlyModified() {
-        return onlyModified;
-    }
+	public String getOnlyModified() {
+		return onlyModified;
+	}
 
-    public void setOnlyModified(String onlyModified) {
-        this.onlyModified = onlyModified;
-    }
+	public void setOnlyModified(String onlyModified) {
+		this.onlyModified = onlyModified;
+	}
 
-    public String getOnlyBinaryIncompatible() {
-        return onlyBinaryIncompatible;
-    }
+	public String getOnlyBinaryIncompatible() {
+		return onlyBinaryIncompatible;
+	}
 
-    public void setOnlyBinaryIncompatible(String onlyBinaryIncompatible) {
-        this.onlyBinaryIncompatible = onlyBinaryIncompatible;
-    }
-    public String getBreakBuildOnModifications() {
-        return breakBuildOnModifications;
-    }
+	public void setOnlyBinaryIncompatible(String onlyBinaryIncompatible) {
+		this.onlyBinaryIncompatible = onlyBinaryIncompatible;
+	}
 
-    public void setBreakBuildOnModifications(String breakBuildOnModifications) {
-        this.breakBuildOnModifications = breakBuildOnModifications;
-    }
+	public String getBreakBuildOnModifications() {
+		return breakBuildOnModifications;
+	}
+
+	public void setBreakBuildOnModifications(String breakBuildOnModifications) {
+		this.breakBuildOnModifications = breakBuildOnModifications;
+	}
 
 	public String getBreakBuildOnBinaryIncompatibleModifications() {
 		return breakBuildOnBinaryIncompatibleModifications;
@@ -131,5 +134,13 @@ public class Parameter {
 
 	public void setIgnoreNonResolvableArtifacts(String ignoreNonResolvableArtifacts) {
 		this.ignoreNonResolvableArtifacts = ignoreNonResolvableArtifacts;
+	}
+
+	public List<String> getPackagingSupporteds() {
+		return packagingSupporteds;
+	}
+
+	public void setPackagingSupporteds(List<String> packagingSupporteds) {
+		this.packagingSupporteds = packagingSupporteds;
 	}
 }

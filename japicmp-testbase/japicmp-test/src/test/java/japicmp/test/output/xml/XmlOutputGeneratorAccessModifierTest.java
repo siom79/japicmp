@@ -1,12 +1,7 @@
 package japicmp.test.output.xml;
 
-import com.google.common.base.Optional;
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
-import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.test.AccessModifierLevel;
 import japicmp.test.util.Helper;
 import org.jsoup.Jsoup;
@@ -21,7 +16,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static japicmp.test.util.Helper.getArchive;
 import static japicmp.test.util.Helper.replaceLastDotWith$;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;

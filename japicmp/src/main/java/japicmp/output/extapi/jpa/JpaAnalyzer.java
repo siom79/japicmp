@@ -13,11 +13,11 @@ public class JpaAnalyzer {
 
 	public List<JpaTable> analyze(List<JApiClass> classes) {
 		List<JpaTable> jpaTables = new LinkedList<>();
-		for(JApiClass jApiClass : classes) {
+		for (JApiClass jApiClass : classes) {
 			List<JApiAnnotation> annotations = jApiClass.getAnnotations();
-			for(JApiAnnotation jApiAnnotation : annotations) {
+			for (JApiAnnotation jApiAnnotation : annotations) {
 				String fullyQualifiedName = jApiAnnotation.getFullyQualifiedName();
-				if(JPA_ANNOTATION_ENTITY.equals(fullyQualifiedName)) {
+				if (JPA_ANNOTATION_ENTITY.equals(fullyQualifiedName)) {
 					JpaTable jpaTable = new JpaTable(jApiClass, jApiAnnotation);
 					jpaTables.add(jpaTable);
 				}

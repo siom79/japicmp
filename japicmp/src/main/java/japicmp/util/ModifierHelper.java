@@ -2,7 +2,15 @@ package japicmp.util;
 
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.model.*;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiAttribute;
+import japicmp.model.JApiCanBeSynthetic;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiHasAccessModifier;
+import japicmp.model.JApiModifier;
+import japicmp.model.JApiModifierBase;
+import japicmp.model.SyntheticAttribute;
+import japicmp.model.SyntheticModifier;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
@@ -15,41 +23,41 @@ public class ModifierHelper {
 
 	private ModifierHelper() {
 
-    }
+	}
 
-    public static boolean matchesModifierLevel(AccessModifier modifierLevelOfElement, AccessModifier modifierLevel) {
-    	return (modifierLevelOfElement.getLevel() >= modifierLevel.getLevel());
-    }
+	public static boolean matchesModifierLevel(AccessModifier modifierLevelOfElement, AccessModifier modifierLevel) {
+		return (modifierLevelOfElement.getLevel() >= modifierLevel.getLevel());
+	}
 
-    public static boolean matchesModifierLevel(int modifierOfElement, AccessModifier modifierLevel) {
-        AccessModifier modifierLevelOfElement = translateToModifierLevel(modifierOfElement);
-        return matchesModifierLevel(modifierLevelOfElement, modifierLevel);
-    }
+	public static boolean matchesModifierLevel(int modifierOfElement, AccessModifier modifierLevel) {
+		AccessModifier modifierLevelOfElement = translateToModifierLevel(modifierOfElement);
+		return matchesModifierLevel(modifierLevelOfElement, modifierLevel);
+	}
 
-    public static AccessModifier translateToModifierLevel(int modifier) {
-        if(Modifier.isPublic(modifier)) {
-            return AccessModifier.PUBLIC;
-        } else if(Modifier.isProtected(modifier)) {
-            return AccessModifier.PROTECTED;
-        } else if(Modifier.isPrivate(modifier)) {
-            return AccessModifier.PRIVATE;
-        } else {
-            return AccessModifier.PACKAGE_PROTECTED;
-        }
-    }
+	public static AccessModifier translateToModifierLevel(int modifier) {
+		if (Modifier.isPublic(modifier)) {
+			return AccessModifier.PUBLIC;
+		} else if (Modifier.isProtected(modifier)) {
+			return AccessModifier.PROTECTED;
+		} else if (Modifier.isPrivate(modifier)) {
+			return AccessModifier.PRIVATE;
+		} else {
+			return AccessModifier.PACKAGE_PROTECTED;
+		}
+	}
 
 	public static boolean isNotPrivate(JApiHasAccessModifier jApiHasAccessModifier) {
 		JApiModifier<AccessModifier> accessModifier = jApiHasAccessModifier.getAccessModifier();
-		if(accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
-			if(accessModifier.getNewModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel() || accessModifier.getOldModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
+		if (accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
+			if (accessModifier.getNewModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel() || accessModifier.getOldModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
 				return true;
 			}
-		} else if(!accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
-			if(accessModifier.getNewModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
+		} else if (!accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
+			if (accessModifier.getNewModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
 				return true;
 			}
-		} else if(accessModifier.getOldModifier().isPresent() && !accessModifier.getNewModifier().isPresent()) {
-			if(accessModifier.getOldModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
+		} else if (accessModifier.getOldModifier().isPresent() && !accessModifier.getNewModifier().isPresent()) {
+			if (accessModifier.getOldModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
 				return true;
 			}
 		}
@@ -58,10 +66,10 @@ public class ModifierHelper {
 
 	public static boolean hasModifierLevelDecreased(JApiHasAccessModifier hasAccessModifier) {
 		JApiModifier<AccessModifier> accessModifier = hasAccessModifier.getAccessModifier();
-		if(accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
+		if (accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
 			AccessModifier oldModifier = accessModifier.getOldModifier().get();
 			AccessModifier newModifier = accessModifier.getNewModifier().get();
-			if(newModifier.getLevel() < oldModifier.getLevel()) {
+			if (newModifier.getLevel() < oldModifier.getLevel()) {
 				return true;
 			}
 		}
@@ -87,6 +95,7 @@ public class ModifierHelper {
 
 	public interface ExtractModifierFromClassCallback<T extends JApiModifierBase> {
 		T getModifierForOld(CtClass oldClass);
+
 		T getModifierForNew(CtClass newClass);
 	}
 
@@ -118,6 +127,7 @@ public class ModifierHelper {
 
 	public interface ExtractModifierFromBehaviorCallback<T extends JApiModifierBase> {
 		T getModifierForOld(CtBehavior oldClass);
+
 		T getModifierForNew(CtBehavior newClass);
 	}
 
@@ -149,6 +159,7 @@ public class ModifierHelper {
 
 	public interface ExtractModifierFromFieldCallback<T extends JApiModifierBase> {
 		T getModifierForOld(CtField oldField);
+
 		T getModifierForNew(CtField newField);
 	}
 
@@ -226,18 +237,18 @@ public class ModifierHelper {
 
 	private static boolean hasSyntheticModifier(JApiModifier<SyntheticModifier> syntheticModifier) {
 		boolean hasSyntheticModifer = false;
-		if(syntheticModifier.getOldModifier().isPresent() && syntheticModifier.getNewModifier().isPresent()) {
+		if (syntheticModifier.getOldModifier().isPresent() && syntheticModifier.getNewModifier().isPresent()) {
 			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();
 			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();
 			if (oldModifier == SyntheticModifier.SYNTHETIC && newModifier == SyntheticModifier.SYNTHETIC) {
 				hasSyntheticModifer = true;
 			}
-		} else if(syntheticModifier.getOldModifier().isPresent()) {
+		} else if (syntheticModifier.getOldModifier().isPresent()) {
 			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();
 			if (oldModifier == SyntheticModifier.SYNTHETIC) {
 				hasSyntheticModifer = true;
 			}
-		} else if(syntheticModifier.getNewModifier().isPresent()) {
+		} else if (syntheticModifier.getNewModifier().isPresent()) {
 			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();
 			if (newModifier == SyntheticModifier.SYNTHETIC) {
 				hasSyntheticModifer = true;

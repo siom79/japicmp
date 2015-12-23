@@ -241,8 +241,7 @@ public class BinaryCompatibility {
 									}
 								}
 								if (superMethod.getStaticModifier().getNewModifier().isPresent() && method.getStaticModifier().getNewModifier().isPresent()) {
-									if (superMethod.getStaticModifier().getNewModifier().get() == StaticModifier.NON_STATIC
-										&& method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
+									if (superMethod.getStaticModifier().getNewModifier().get() == StaticModifier.NON_STATIC && method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
 										return true;
 									}
 								}
@@ -276,9 +275,7 @@ public class BinaryCompatibility {
 				}
 			}
 			// section 13.4.18 of "Java Language Specification" SE7
-			if (isNotPrivate(method)
-				&& (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC) || method.getStaticModifier().hasChangedFromTo(
-				StaticModifier.STATIC, StaticModifier.NON_STATIC))) {
+			if (isNotPrivate(method) && (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC) || method.getStaticModifier().hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC))) {
 				method.setBinaryCompatible(false);
 				changedIncompatible = true;
 			}

@@ -1,9 +1,6 @@
 package japicmp.filter;
 
-import japicmp.exception.JApiCmpException;
 import japicmp.util.AnnotationHelper;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.annotation.Annotation;
 
 import java.util.List;
 

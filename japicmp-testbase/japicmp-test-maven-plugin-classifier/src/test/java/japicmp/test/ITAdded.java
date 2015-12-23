@@ -1,6 +1,5 @@
 package japicmp.test;
 
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,9 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 

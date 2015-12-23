@@ -22,7 +22,8 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 					attributes = declaringClass.getClassFile().getAttributes();
 					hasAnnotation = hasAnnotation(attributes);
 				}
-			} catch (NotFoundException ignored) {}
+			} catch (NotFoundException ignored) {
+			}
 		}
 		return hasAnnotation;
 	}

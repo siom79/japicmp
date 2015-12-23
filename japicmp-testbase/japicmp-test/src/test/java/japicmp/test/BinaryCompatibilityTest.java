@@ -5,7 +5,13 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
 import japicmp.model.JApiMethod;
-import japicmp.test.ClassMembers.*;
+import japicmp.test.ClassMembers.ClassConstructorChangesAccessibility;
+import japicmp.test.ClassMembers.ClassFieldChangesAccessibility;
+import japicmp.test.ClassMembers.ClassLosesConstructor;
+import japicmp.test.ClassMembers.ClassLosesField;
+import japicmp.test.ClassMembers.ClassLosesMethod;
+import japicmp.test.ClassMembers.ClassMethodChangesAccessibility;
+import japicmp.test.ClassMembers.SubclassWithMethodToBeRemovedButContainedInSuperclass;
 import japicmp.test.ClassModifier.AbstractToNonAbstractClass;
 import japicmp.test.ClassModifier.FinalToNonFinalInnerClass;
 import japicmp.test.ClassModifier.NonAbstractToAbstractClass;
@@ -20,7 +26,10 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.*;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiClass;
+import static japicmp.test.util.Helper.getJApiField;
+import static japicmp.test.util.Helper.getJApiMethod;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -29,10 +38,10 @@ public class BinaryCompatibilityTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-        JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
-        jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
+		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_1() {
 		JApiClass abstractToNonAbstractClass = getJApiClass(jApiClasses, AbstractToNonAbstractClass.class.getName());
@@ -40,7 +49,7 @@ public class BinaryCompatibilityTest {
 		JApiClass nonAbstractToAbstractClass = getJApiClass(jApiClasses, NonAbstractToAbstractClass.class.getName());
 		assertThat(nonAbstractToAbstractClass.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_2() {
 		JApiClass finalToNonFinalInnerClass = getJApiClass(jApiClasses, FinalToNonFinalInnerClass.class.getName());
@@ -48,13 +57,13 @@ public class BinaryCompatibilityTest {
 		JApiClass nonFinalToFinalInnerClass = getJApiClass(jApiClasses, NonFinalToFinalInnerClass.class.getName());
 		assertThat(nonFinalToFinalInnerClass.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_3() {
 		JApiClass publicToPrivateInnerClass = getJApiClass(jApiClasses, "japicmp.test.ClassModifier$PublicToPrivateInnerClass");
 		assertThat(publicToPrivateInnerClass.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_4() {
 		JApiClass classWithInterfaceLosesMethod = getJApiClass(jApiClasses, ClassWithInterfaceLosesMethod.class.getName());
@@ -62,7 +71,7 @@ public class BinaryCompatibilityTest {
 		JApiClass subclassWithSuperclassLosesMethod = getJApiClass(jApiClasses, SubclassWithSuperclassLosesMethod.class.getName());
 		assertThat(subclassWithSuperclassLosesMethod.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_6() {
 		JApiClass classLosesField = getJApiClass(jApiClasses, ClassLosesField.class.getName());
@@ -72,7 +81,7 @@ public class BinaryCompatibilityTest {
 		JApiClass classLosesConstructor = getJApiClass(jApiClasses, ClassLosesConstructor.class.getName());
 		assertThat(classLosesConstructor.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_7() {
 		JApiClass classFieldChangesAccessibility = getJApiClass(jApiClasses, ClassFieldChangesAccessibility.class.getName());
@@ -82,13 +91,13 @@ public class BinaryCompatibilityTest {
 		JApiClass classConstructorChangesAccessibility = getJApiClass(jApiClasses, ClassConstructorChangesAccessibility.class.getName());
 		assertThat(classConstructorChangesAccessibility.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_8() {
 		JApiClass subclassExtendsSuperclassWithField = getJApiClass(jApiClasses, SubclassOverridesStaticField.class.getName());
 		assertThat(subclassExtendsSuperclassWithField.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_9() {
 		JApiClass fields = getJApiClass(jApiClasses, Fields.class.getName());
@@ -97,7 +106,7 @@ public class BinaryCompatibilityTest {
 		JApiField nonfinalToFinalField = getJApiField(fields.getFields(), "nonfinalToFinalField");
 		assertThat(nonfinalToFinalField.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_10() {
 		JApiClass fields = getJApiClass(jApiClasses, Fields.class.getName());
@@ -106,7 +115,7 @@ public class BinaryCompatibilityTest {
 		JApiField nonStaticToStaticField = getJApiField(fields.getFields(), "nonStaticToStaticField");
 		assertThat(nonStaticToStaticField.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_12() {
 		JApiClass subclassWithMethod = getJApiClass(jApiClasses, SubclassWithMethodToBeRemovedButContainedInSuperclass.class.getName());
@@ -121,7 +130,7 @@ public class BinaryCompatibilityTest {
 		jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodReturnTypeChangesFromIntToString");
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_16() {
 		JApiClass abstractModifier = getJApiClass(jApiClasses, AbstractModifier.class.getName());
@@ -130,7 +139,7 @@ public class BinaryCompatibilityTest {
 		assertThat(abstractToNonAbstract.isBinaryCompatible(), is(true));
 		assertThat(nonAbstractToAbstract.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_17() {
 		JApiClass methods = getJApiClass(jApiClasses, Methods.class.getName());
@@ -141,7 +150,7 @@ public class BinaryCompatibilityTest {
 		assertThat(nonFinalToFinalMethod.isBinaryCompatible(), is(false));
 		assertThat(staticNonFinalToStaticFinalMethod.isBinaryCompatible(), is(true));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_18() {
 		JApiClass methods = getJApiClass(jApiClasses, Methods.class.getName());
@@ -150,7 +159,7 @@ public class BinaryCompatibilityTest {
 		assertThat(staticToNonStaticMethod.isBinaryCompatible(), is(false));
 		assertThat(nonStaticToStaticMethod.isBinaryCompatible(), is(false));
 	}
-	
+
 	@Test
 	public void test_JLS_13_4_26() {
 		JApiClass abcToAbcd = getJApiClass(jApiClasses, AbcToAbcd.class.getName());

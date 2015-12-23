@@ -9,7 +9,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.*;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -103,7 +104,7 @@ public class ClassTypeTest {
 	}
 
 	@Test
-	 public void testAnnotationToClass() {
+	public void testAnnotationToClass() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, ClassType.AnnotationToClass.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));

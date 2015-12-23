@@ -1,12 +1,12 @@
 package japicmp.output.xml.model;
 
-import com.google.common.base.Optional;
-import japicmp.model.JApiClass;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.google.common.base.Optional;
+import japicmp.model.JApiClass;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;

@@ -1,10 +1,9 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
-import japicmp.util.OptionalHelper;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+import com.google.common.base.Optional;
+import japicmp.util.OptionalHelper;
 
 public class JApiAttribute<T> {
 	private final Optional<T> oldAttribute;

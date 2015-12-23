@@ -11,7 +11,10 @@ import org.junit.contrib.java.lang.system.StandardOutputStreamLog;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.*;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiClass;
+import static japicmp.test.util.Helper.hasJApiMethodWithName;
+import static japicmp.test.util.Helper.hasNoJApiMethodWithName;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -45,7 +48,7 @@ public class MethodFilterTest {
 
 	@Test
 	public void testMethodIsIncludedWithApp() {
-		JApiCmp.main(new String[]{"--include", MethodFilter.class.getName() + "#methodToInclude();" + Methods.class.getName() + "#finalToNonFinalMethod()", "-o", getArchive("japicmp-test-v1.jar").getAbsolutePath(), "-n", getArchive("japicmp-test-v2.jar").getAbsolutePath()});
+		JApiCmp.main(new String[] { "--include", MethodFilter.class.getName() + "#methodToInclude();" + Methods.class.getName() + "#finalToNonFinalMethod()", "-o", getArchive("japicmp-test-v1.jar").getAbsolutePath(), "-n", getArchive("japicmp-test-v2.jar").getAbsolutePath() });
 		String log = this.log.getLog();
 		assertThat(log, containsString(MethodFilter.class.getName()));
 		assertThat(log, containsString("methodToInclude"));

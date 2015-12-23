@@ -8,10 +8,12 @@ import japicmp.model.JApiMethod;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static japicmp.test.service.util.Helper.*;
+import static japicmp.test.service.util.Helper.createClassPath;
+import static japicmp.test.service.util.Helper.getArchive;
+import static japicmp.test.service.util.Helper.getJApiClass;
+import static japicmp.test.service.util.Helper.getJApiMethod;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertThat;
 public class AnnotationsTest {
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD})
+	@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD })
 	public @interface Include {
 
 	}

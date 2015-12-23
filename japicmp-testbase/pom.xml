@@ -24,6 +24,7 @@
 		<module>japicmp-test-maven-plugin-pom-module</module>
 		<module>japicmp-test-vx-client</module>
 		<module>japicmp-test-maven-plugin-ignoremissingartifact</module>
+		<module>japicmp-test-maven-plugin-packaging</module>
 	</modules>
 
 	<properties>

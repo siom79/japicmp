@@ -33,7 +33,11 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,7 +73,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private List<ArtifactRepository> artifactRepositories;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project}")
 	private MavenProject mavenProject;
-	@org.apache.maven.plugins.annotations.Parameter( defaultValue = "${mojoExecution}", readonly = true )
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${mojoExecution}", readonly = true)
 	private MojoExecution mojoExecution;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -83,19 +87,8 @@ public class JApiCmpMojo extends AbstractMojo {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
 			return Optional.absent();
 		}
-		if (mavenProject != null && "pom".equals(mavenProject.getPackaging())) {
-			boolean skipPomModules = true;
-			Parameter parameterParam = pluginParameters.getParameterParam();
-			if (parameterParam != null) {
-				String skipPomModulesAsString = parameterParam.getSkipPomModules();
-				if (skipPomModulesAsString != null) {
-					skipPomModules = Boolean.valueOf(skipPomModulesAsString);
-				}
-			}
-			if (skipPomModules) {
-				getLog().info("Skipping execution because packaging of this module is 'pom'.");
-				return Optional.absent();
-			}
+		if (filterModule(pluginParameters)) {
+			return Optional.absent();
 		}
 		List<File> oldArchives = new ArrayList<>();
 		List<File> newArchives = new ArrayList<>();
@@ -118,6 +111,35 @@ public class JApiCmpMojo extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
 		}
+	}
+
+	private boolean filterModule(PluginParameters pluginParameters) {
+		if (mavenProject != null) {
+			List<String> packagingSupporteds = pluginParameters.getParameterParam().getPackagingSupporteds();
+			if ((packagingSupporteds != null) && (!packagingSupporteds.isEmpty())) {
+				if (!packagingSupporteds.contains(mavenProject.getPackaging())) {
+					getLog().info("Filtered according to packagingFilter");
+					return true;
+				}
+			} else {
+				getLog().debug("No packaging support defined, no filtering");
+			}
+			if ("pom".equals(mavenProject.getPackaging())) {
+				boolean skipPomModules = true;
+				Parameter parameterParam = pluginParameters.getParameterParam();
+				if (parameterParam != null) {
+					String skipPomModulesAsString = parameterParam.getSkipPomModules();
+					if (skipPomModulesAsString != null) {
+						skipPomModules = Boolean.valueOf(skipPomModulesAsString);
+					}
+				}
+				if (skipPomModules) {
+					getLog().info("Skipping execution because packaging of this module is 'pom'.");
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private void populateArchivesListsFromParameters(PluginParameters pluginParameters, MavenParameters mavenParameters, List<File> oldArchives, List<File> newArchives) throws MojoFailureException {
@@ -333,8 +355,8 @@ public class JApiCmpMojo extends AbstractMojo {
 			if (pluginParameters.getDependenciesParam() != null) {
 				if (pluginParameters.getOldClassPathDependencies() != null || pluginParameters.getNewClassPathDependencies() != null) {
 					throw new MojoFailureException("Please specify either a <dependencies/> element or the two elements <oldClassPathDependencies/> and <newClassPathDependencies/>. " +
-							"With <dependencies/> you can specify one common classpath for both versions and with <oldClassPathDependencies/> and <newClassPathDependencies/> a " +
-							"separate classpath for the new and old version.");
+						"With <dependencies/> you can specify one common classpath for both versions and with <oldClassPathDependencies/> and <newClassPathDependencies/> a " +
+						"separate classpath for the new and old version.");
 				} else {
 					if (getLog().isDebugEnabled()) {
 						getLog().debug("Element <dependencies/> found. Using " + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
@@ -412,7 +434,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (dependencyDescriptor instanceof Dependency) {
 			Dependency dependency = (Dependency) dependencyDescriptor;
 			files = resolveDependencyToFile(parameterName, dependency, mavenParameters, false, pluginParameters);
-		} else if(dependencyDescriptor instanceof ConfigurationFile) {
+		} else if (dependencyDescriptor instanceof ConfigurationFile) {
 			ConfigurationFile configurationFile = (ConfigurationFile) dependencyDescriptor;
 			files = resolveConfigurationFileToFile(parameterName, configurationFile);
 		} else {

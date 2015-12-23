@@ -16,8 +16,7 @@ public class MavenParameters {
 	private final MavenProject mavenProject;
 	private final MojoExecution mojoExecution;
 
-	public MavenParameters(List<ArtifactRepository> artifactRepositories, ArtifactFactory artifactFactory, ArtifactRepository localRepository,
-						   ArtifactResolver artifactResolver, MavenProject mavenProject, MojoExecution mojoExecution) {
+	public MavenParameters(List<ArtifactRepository> artifactRepositories, ArtifactFactory artifactFactory, ArtifactRepository localRepository, ArtifactResolver artifactResolver, MavenProject mavenProject, MojoExecution mojoExecution) {
 		this.artifactRepositories = artifactRepositories;
 		this.artifactFactory = artifactFactory;
 		this.localRepository = localRepository;

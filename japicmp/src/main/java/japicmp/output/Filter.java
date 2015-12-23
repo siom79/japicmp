@@ -1,6 +1,13 @@
 package japicmp.output;
 
-import japicmp.model.*;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
+import japicmp.model.JApiHasAnnotations;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
 
 import java.util.Iterator;
 import java.util.List;
@@ -61,8 +68,8 @@ public class Filter {
 	private static void visitAnnotations(FilterVisitor visitor, JApiHasAnnotations jApiHasAnnotations) {
 		Iterator<JApiAnnotation> itAnnotations = jApiHasAnnotations.getAnnotations().iterator();
 		while (itAnnotations.hasNext()) {
-            JApiAnnotation jApiAnnotation = itAnnotations.next();
-            visitor.visit(itAnnotations, jApiAnnotation);
-        }
+			JApiAnnotation jApiAnnotation = itAnnotations.next();
+			visitor.visit(itAnnotations, jApiAnnotation);
+		}
 	}
 }

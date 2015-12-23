@@ -1,9 +1,8 @@
 package japicmp.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import com.google.common.base.Optional;
 import japicmp.util.OptionalHelper;
-
-import javax.xml.bind.annotation.XmlAttribute;
 
 public class JApiReturnType {
 	private final Optional<String> oldReturnTypeOptional;

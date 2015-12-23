@@ -4,7 +4,11 @@ import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
-import javassist.*;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.NotFoundException;
+import javassist.SerialVersionUID;
 
 import java.io.Externalizable;
 import java.io.Serializable;
@@ -16,8 +20,7 @@ public class JavaObjectSerializationCompatibility {
 	public static JApiSerialVersionUid extractSerialVersionUid(JarArchiveComparatorOptions options, JarArchiveComparator jarArchiveComparator, Optional<CtClass> oldClass, Optional<CtClass> newClass) {
 		SerialVersionUidResult resultOld = computeSerialVersionUid(options, oldClass, jarArchiveComparator);
 		SerialVersionUidResult resultNew = computeSerialVersionUid(options, newClass, jarArchiveComparator);
-		return new JApiSerialVersionUid(resultOld.serializable, resultNew.serializable, resultOld.serialVersionUidDefault,
-				resultNew.serialVersionUidDefault, resultOld.serialVersionUid, resultNew.serialVersionUid);
+		return new JApiSerialVersionUid(resultOld.serializable, resultNew.serializable, resultOld.serialVersionUidDefault, resultNew.serialVersionUidDefault, resultOld.serialVersionUid, resultNew.serialVersionUid);
 	}
 
 	public void evaluate(List<JApiClass> jApiClasses) {

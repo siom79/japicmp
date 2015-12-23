@@ -1,6 +1,10 @@
 package japicmp.test.serialversion;
 
-import java.io.*;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.Serializable;
 
 public class IncompatibleChanges {
 
@@ -59,7 +63,7 @@ public class IncompatibleChanges {
 	public static class ExternalizableRemoved {
 
 		public void writeExternal(ObjectOutput out) throws IOException {
-			
+
 		}
 
 		public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {

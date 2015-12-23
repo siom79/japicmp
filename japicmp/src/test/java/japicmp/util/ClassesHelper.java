@@ -13,6 +13,7 @@ public class ClassesHelper {
 
 	public interface ClassesGenerator {
 		List<CtClass> createOldClasses(ClassPool classPool) throws Exception;
+
 		List<CtClass> createNewClasses(ClassPool classPool) throws Exception;
 	}
 

@@ -2,7 +2,10 @@ package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.model.*;
+import japicmp.model.BridgeModifier;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiMethod;
+import japicmp.model.SyntheticModifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

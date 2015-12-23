@@ -1,14 +1,18 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
-import javassist.bytecode.annotation.Annotation;
-import javassist.bytecode.annotation.MemberValue;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.*;
+import com.google.common.base.Optional;
+import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.MemberValue;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final String fullyQualifiedName;
@@ -34,39 +38,34 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
 			for (String memberName : oldMemberValueMap.keySet()) {
 				Optional<MemberValue> foundOptional = newMemberValueMap.get(memberName);
 				if (foundOptional == null) {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue> absent(),
-							JApiChangeStatus.REMOVED);
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue>absent(), JApiChangeStatus.REMOVED);
 					elements.add(jApiAnnotationElement);
 				} else {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), foundOptional,
-							JApiChangeStatus.UNCHANGED);
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), foundOptional, JApiChangeStatus.UNCHANGED);
 					elements.add(jApiAnnotationElement);
 				}
 			}
 			for (String memberName : newMemberValueMap.keySet()) {
 				Optional<MemberValue> foundOptional = oldMemberValueMap.get(memberName);
 				if (foundOptional == null) {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue> absent(), newMemberValueMap.get(memberName),
-							JApiChangeStatus.NEW);
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue>absent(), newMemberValueMap.get(memberName), JApiChangeStatus.NEW);
 					elements.add(jApiAnnotationElement);
 				}
 			}
 		} else {
-			if(oldAnnotationOptional.isPresent()) {
+			if (oldAnnotationOptional.isPresent()) {
 				Annotation oldAnnotation = oldAnnotationOptional.get();
 				Map<String, Optional<MemberValue>> oldMemberValueMap = buildMemberValueMap(oldAnnotation);
 				for (String memberName : oldMemberValueMap.keySet()) {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue> absent(),
-							JApiChangeStatus.REMOVED);
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue>absent(), JApiChangeStatus.REMOVED);
 					elements.add(jApiAnnotationElement);
 				}
 			}
-			if(newAnnotationOptional.isPresent()) {
+			if (newAnnotationOptional.isPresent()) {
 				Annotation newAnnotation = newAnnotationOptional.get();
 				Map<String, Optional<MemberValue>> newMemberValueMap = buildMemberValueMap(newAnnotation);
 				for (String memberName : newMemberValueMap.keySet()) {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue> absent(), newMemberValueMap.get(memberName),
-							JApiChangeStatus.NEW);
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue>absent(), newMemberValueMap.get(memberName), JApiChangeStatus.NEW);
 					elements.add(jApiAnnotationElement);
 				}
 			}
@@ -75,13 +74,12 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
 
 	private Map<String, Optional<MemberValue>> buildMemberValueMap(Annotation annotation) {
 		Map<String, Optional<MemberValue>> map = new HashMap<>();
-		@SuppressWarnings("unchecked")
-		Set<String> memberNames = annotation.getMemberNames();
-		if(memberNames != null) {
+		@SuppressWarnings("unchecked") Set<String> memberNames = annotation.getMemberNames();
+		if (memberNames != null) {
 			for (String memberName : memberNames) {
 				MemberValue memberValue = annotation.getMemberValue(memberName);
 				if (memberValue == null) {
-					map.put(memberName, Optional.<MemberValue> absent());
+					map.put(memberName, Optional.<MemberValue>absent());
 				} else {
 					map.put(memberName, Optional.of(memberValue));
 				}
@@ -128,8 +126,8 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
 		return elements;
 	}
 
-    @Override
-    public boolean isBinaryCompatible() {
-        return true;
-    }
+	@Override
+	public boolean isBinaryCompatible() {
+		return true;
+	}
 }

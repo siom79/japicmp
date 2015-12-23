@@ -1,16 +1,20 @@
 package japicmp.test;
 
-import static japicmp.test.util.Helper.getArchive;
-import static japicmp.test.util.Helper.getJApiClass;
-import static japicmp.test.util.Helper.getJApiMethod;
-import static japicmp.test.util.Helper.getJApiField;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.SyntheticAttribute;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,11 +27,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import javassist.*;
-import javassist.Modifier;
-import org.junit.Test;
-
-import com.google.common.base.Optional;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiClass;
+import static japicmp.test.util.Helper.getJApiField;
+import static japicmp.test.util.Helper.getJApiMethod;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class SyntheticAttributeTest {
 
@@ -47,10 +52,10 @@ public class SyntheticAttributeTest {
 		assertThat(syntheticClass.getSyntheticAttribute().getNewAttribute(), is(Optional.of(SyntheticAttribute.SYNTHETIC)));
 		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getChangeStatus(), is(JApiChangeStatus.NEW));
 		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getSyntheticAttribute().getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getSyntheticAttribute().getOldAttribute(), is(Optional.<SyntheticAttribute> absent()));
+		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getSyntheticAttribute().getOldAttribute(), is(Optional.<SyntheticAttribute>absent()));
 		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getSyntheticAttribute().getNewAttribute(), is(Optional.of(SyntheticAttribute.SYNTHETIC)));
 		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getOldAttribute(), is(Optional.<SyntheticAttribute> absent()));
+		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getOldAttribute(), is(Optional.<SyntheticAttribute>absent()));
 		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getNewAttribute(), is(Optional.of(SyntheticAttribute.SYNTHETIC)));
 	}
 
