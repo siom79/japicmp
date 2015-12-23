@@ -7,12 +7,25 @@ import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiJavaObjectSerializationCompatibility;
-import japicmp.test.serialversion.*;
+import japicmp.test.serialversion.CompatibleChanges;
+import japicmp.test.serialversion.ExtendsSerializableClassModified;
+import japicmp.test.serialversion.ExtendsSerializableClassUnchanged;
+import japicmp.test.serialversion.IncompatibleChanges;
+import japicmp.test.serialversion.ModifiedAndSerialVersionUidModified;
+import japicmp.test.serialversion.ModifiedButSerialVersionUidUnchanged;
+import japicmp.test.serialversion.ModifiedFieldAddedButSerialVersionUidUnchanged;
+import japicmp.test.serialversion.NotSerializable;
+import japicmp.test.serialversion.SerialVersionUnchanged;
+import japicmp.test.serialversion.UnchangedWithSerialVersionUid;
+import japicmp.test.serialversion.UnchangedWithSerialVersionUidChange;
 import javassist.CtClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -248,7 +261,7 @@ public class JavaObjectSerializationTest {
 			Optional<CtClass> oldClassOptional = jApiClass.getOldClass();
 			if (oldClassOptional.isPresent()) {
 				CtClass ctClass = oldClassOptional.get();
-				Object oldClassInstance = ctClass.toClass(new URLClassLoader(new URL[]{}), JavaObjectSerializationTest.class.getProtectionDomain()).newInstance();
+				Object oldClassInstance = ctClass.toClass(new URLClassLoader(new URL[] {}), JavaObjectSerializationTest.class.getProtectionDomain()).newInstance();
 				ObjectOutputStream oos = new ObjectOutputStream(byteOutputStream);
 				oos.writeObject(oldClassInstance);
 				oos.flush();

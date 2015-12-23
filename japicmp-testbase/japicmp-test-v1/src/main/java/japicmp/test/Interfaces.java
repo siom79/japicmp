@@ -1,7 +1,5 @@
 package japicmp.test;
 
-import java.io.Serializable;
-
 public class Interfaces {
 
 	public interface TestInterface {

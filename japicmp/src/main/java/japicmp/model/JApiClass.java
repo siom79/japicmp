@@ -1,21 +1,35 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.exception.JApiCmpException;
-import japicmp.util.*;
-import javassist.*;
-import javassist.bytecode.AnnotationsAttribute;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.*;
+import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.exception.JApiCmpException;
+import japicmp.util.AnnotationHelper;
+import japicmp.util.Constants;
+import japicmp.util.MethodDescriptorParser;
+import japicmp.util.ModifierHelper;
+import japicmp.util.SignatureParser;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
 
-public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
-		JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
 	private final JarArchiveComparator jarArchiveComparator;
 	private final String fullyQualifiedName;
 	private final JApiClassType classType;

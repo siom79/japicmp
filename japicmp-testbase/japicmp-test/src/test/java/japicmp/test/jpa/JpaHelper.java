@@ -7,8 +7,8 @@ import java.util.List;
 public class JpaHelper {
 
 	public static JpaTable getEntityByName(List<JpaTable> entities, String name) {
-		for(JpaTable jpaTable : entities) {
-			if(jpaTable.getFullyQualifiedName().equals(name)) {
+		for (JpaTable jpaTable : entities) {
+			if (jpaTable.getFullyQualifiedName().equals(name)) {
 				return jpaTable;
 			}
 		}

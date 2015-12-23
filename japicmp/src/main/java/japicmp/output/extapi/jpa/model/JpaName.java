@@ -1,10 +1,9 @@
 package japicmp.output.extapi.jpa.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import com.google.common.base.Optional;
 import japicmp.model.JApiChangeStatus;
 import japicmp.util.OptionalHelper;
-
-import javax.xml.bind.annotation.XmlAttribute;
 
 public class JpaName {
 	private final Optional<String> newName;

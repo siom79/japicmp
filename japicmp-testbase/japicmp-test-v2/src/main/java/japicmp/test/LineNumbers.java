@@ -6,7 +6,6 @@ public class LineNumbers {
 
 	}
 
-
 	public void lineNumberChanges() {
 
 	}

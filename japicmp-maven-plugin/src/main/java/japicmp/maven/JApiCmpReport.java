@@ -51,7 +51,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 	private List<ArtifactRepository> artifactRepositories;
 	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project}")
 	private MavenProject mavenProject;
-	@org.apache.maven.plugins.annotations.Parameter( defaultValue = "${mojoExecution}", readonly = true )
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${mojoExecution}", readonly = true)
 	private MojoExecution mojoExecution;
 
 	@Override

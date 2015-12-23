@@ -9,10 +9,10 @@ public class OptionalHelper {
 
 	}
 
-    public static <T> String optionalToString(Optional<T> optional) {
-    	if(optional.isPresent()) {
-    		return optional.get().toString();
-    	}
-    	return N_A;
-    }
+	public static <T> String optionalToString(Optional<T> optional) {
+		if (optional.isPresent()) {
+			return optional.get().toString();
+		}
+		return N_A;
+	}
 }

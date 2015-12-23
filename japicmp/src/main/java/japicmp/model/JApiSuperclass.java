@@ -1,13 +1,12 @@
 package japicmp.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.util.ClassHelper;
 import japicmp.util.OptionalHelper;
 import javassist.CtClass;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
 
 public class JApiSuperclass implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final Optional<CtClass> oldSuperclassOptional;

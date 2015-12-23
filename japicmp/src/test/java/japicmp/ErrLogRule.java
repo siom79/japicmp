@@ -16,7 +16,7 @@ public class ErrLogRule extends StandardErrorStreamLog {
 			return in.replace("\r", "");
 		}
 		throw new IllegalStateException("more then one line was found, but was \"" + //
-				in.replace("\r", "") + "\"");
+			in.replace("\r", "") + "\"");
 	}
 
 	public static ImmutableList<String> linesOf(String in) {

@@ -1,6 +1,9 @@
 package japicmp.util;
 
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.Modifier;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;

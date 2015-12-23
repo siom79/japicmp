@@ -1,5 +1,16 @@
 package japicmp.output.xml;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.SchemaOutputResolver;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import japicmp.config.Options;
@@ -15,14 +26,14 @@ import japicmp.output.xml.model.JApiCmpXmlRoot;
 import japicmp.util.ListJoiner;
 import japicmp.util.Streams;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.SchemaOutputResolver;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -86,7 +97,8 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		} finally {
 			try {
 				xmlOutput.close();
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 		}
 		return filesWritten;
 	}

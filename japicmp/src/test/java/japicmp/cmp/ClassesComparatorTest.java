@@ -4,7 +4,10 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.NotFoundException;
 import org.junit.Test;
 
 import java.util.Collections;

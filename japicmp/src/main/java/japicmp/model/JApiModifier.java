@@ -1,9 +1,8 @@
 package japicmp.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import com.google.common.base.Optional;
 import japicmp.util.OptionalHelper;
-
-import javax.xml.bind.annotation.XmlAttribute;
 
 public class JApiModifier<T> {
 	private final Optional<T> oldModifier;
@@ -41,8 +40,8 @@ public class JApiModifier<T> {
 
 	public boolean hasChangedFromTo(T oldValue, T newValue) {
 		boolean hasChanged = false;
-		if(oldModifier.isPresent() && newModifier.isPresent()) {
-			if(oldModifier.get() == oldValue && newModifier.get() == newValue) {
+		if (oldModifier.isPresent() && newModifier.isPresent()) {
+			if (oldModifier.get() == oldValue && newModifier.get() == newValue) {
 				hasChanged = true;
 			}
 		}
@@ -51,12 +50,12 @@ public class JApiModifier<T> {
 
 	public boolean hasChangedFrom(T oldValue) {
 		boolean hasChanged = false;
-		if(oldModifier.isPresent() && newModifier.isPresent()) {
-			if(oldModifier.get() == oldValue && newModifier.get() != oldValue) {
+		if (oldModifier.isPresent() && newModifier.isPresent()) {
+			if (oldModifier.get() == oldValue && newModifier.get() != oldValue) {
 				hasChanged = true;
 			}
-		} else if(oldModifier.isPresent()) {
-			if(oldModifier.get() == oldValue) {
+		} else if (oldModifier.isPresent()) {
+			if (oldModifier.get() == oldValue) {
 				hasChanged = true;
 			}
 		} else {

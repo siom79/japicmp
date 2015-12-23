@@ -18,8 +18,7 @@ public class AnnotationHelper {
 		AnnotationsAttribute getAnnotationsAttribute(T t);
 	}
 
-	public static <T> void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<T> oldClassOptional, Optional<T> newClassOptional,
-													JarArchiveComparatorOptions options, AnnotationsAttributeCallback<T> annotationsAttributeCallback) {
+	public static <T> void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<T> oldClassOptional, Optional<T> newClassOptional, JarArchiveComparatorOptions options, AnnotationsAttributeCallback<T> annotationsAttributeCallback) {
 		if (!options.isNoAnnotations()) {
 			if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
 				T oldClass = oldClassOptional.get();
@@ -62,8 +61,7 @@ public class AnnotationHelper {
 					if (oldAnnotationsAttribute != null) {
 						Map<String, Annotation> oldAnnotationMap = buildAnnotationMap(oldAnnotationsAttribute.getAnnotations());
 						for (Annotation annotation : oldAnnotationMap.values()) {
-							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.<Annotation>absent(),
-								JApiChangeStatus.REMOVED);
+							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.<Annotation>absent(), JApiChangeStatus.REMOVED);
 							annotations.add(jApiAnnotation);
 						}
 					}

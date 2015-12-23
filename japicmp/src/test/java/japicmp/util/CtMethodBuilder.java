@@ -1,6 +1,9 @@
 package japicmp.util;
 
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
@@ -11,12 +14,12 @@ import java.util.List;
 
 public class CtMethodBuilder extends CtBehaviorBuilder {
 	public static final String DEFAULT_METHOD_NAME = "method";
-    protected String body = "return null;";
-    private String name = DEFAULT_METHOD_NAME;
-    private CtClass returnType;
+	protected String body = "return null;";
+	private String name = DEFAULT_METHOD_NAME;
+	private CtClass returnType;
 	private List<String> annotations = new ArrayList<>();
 
-    public CtMethodBuilder name(String name) {
+	public CtMethodBuilder name(String name) {
 		this.name = name;
 		return this;
 	}
@@ -31,35 +34,35 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return this;
 	}
 
-    public CtMethodBuilder syntheticModifier() {
+	public CtMethodBuilder syntheticModifier() {
 		this.modifier = this.modifier | ModifierHelper.ACC_SYNTHETIC;
 		return this;
 	}
 
-    public CtMethodBuilder parameters(CtClass[] parameters) {
-        return (CtMethodBuilder) super.parameters(parameters);
-    }
+	public CtMethodBuilder parameters(CtClass[] parameters) {
+		return (CtMethodBuilder) super.parameters(parameters);
+	}
 
-    public CtMethodBuilder parameter(CtClass parameter) {
-        return (CtMethodBuilder) super.parameter(parameter);
-    }
+	public CtMethodBuilder parameter(CtClass parameter) {
+		return (CtMethodBuilder) super.parameter(parameter);
+	}
 
-    public CtMethodBuilder exceptions(CtClass[] exceptions) {
-        return (CtMethodBuilder) super.exceptions(exceptions);
-    }
+	public CtMethodBuilder exceptions(CtClass[] exceptions) {
+		return (CtMethodBuilder) super.exceptions(exceptions);
+	}
 
-    public CtMethodBuilder body(String body) {
-        this.body = body;
-        return this;
-    }
+	public CtMethodBuilder body(String body) {
+		this.body = body;
+		return this;
+	}
 
-    public CtMethodBuilder publicAccess() {
-        return (CtMethodBuilder) super.publicAccess();
-    }
+	public CtMethodBuilder publicAccess() {
+		return (CtMethodBuilder) super.publicAccess();
+	}
 
-    public CtMethodBuilder privateAccess() {
-        return (CtMethodBuilder) super.privateAccess();
-    }
+	public CtMethodBuilder privateAccess() {
+		return (CtMethodBuilder) super.privateAccess();
+	}
 
 	public CtMethodBuilder withAnnotation(String annotation) {
 		this.annotations.add(annotation);
