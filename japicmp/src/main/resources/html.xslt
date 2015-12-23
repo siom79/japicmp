@@ -476,7 +476,7 @@
                 </td>
                 <td>
                     <xsl:for-each select="oldElementValues/oldElementValue">
-                        <xsl:if test="position() > 1">,</xsl:if>
+                        <xsl:if test="position() > 1">,<wbr /></xsl:if>
                         <xsl:choose>
                             <xsl:when test="@type = 'Annotation'">
                                 @<xsl:value-of select="@fullyQualifiedName"/>(<xsl:apply-templates select="values"/>)
@@ -495,7 +495,7 @@
                 </td>
                 <td>
                     <xsl:for-each select="newElementValues/newElementValue">
-                        <xsl:if test="position() > 1">,</xsl:if>
+                        <xsl:if test="position() > 1">,<wbr /></xsl:if>
                         <xsl:choose>
                             <xsl:when test="@type = 'Annotation'">
                                 @<xsl:value-of select="@fullyQualifiedName"/>(<xsl:apply-templates select="values"/>)
@@ -518,7 +518,7 @@
 
     <xsl:template match="values">
         <xsl:for-each select="value">
-            <xsl:if test="position() > 1">,</xsl:if>
+            <xsl:if test="position() > 1">,<wbr /></xsl:if>
             <xsl:choose>
                 <xsl:when test="@type = 'Annotation'">
                     @<xsl:value-of select="@fullyQualifiedName"/>(<xsl:apply-templates select="values"/>)
@@ -539,7 +539,7 @@
     <xsl:template match="parameters">
         <xsl:if test="count(parameter) > 0">
             <xsl:for-each select="parameter">
-                <xsl:if test="position() > 1">,</xsl:if>
+                <xsl:if test="position() > 1">,<wbr /></xsl:if>
                 <xsl:value-of select="@type"/>
             </xsl:for-each>
         </xsl:if>
