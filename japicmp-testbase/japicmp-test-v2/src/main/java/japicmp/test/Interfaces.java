@@ -66,4 +66,9 @@ public class Interfaces {
 	public interface MethodPulledToSuperInterfaceChild extends MethodPulledToSuperInterfaceBase {
 
 	}
+
+	public interface InterfaceWithFields {
+		String UNCHANGED = "UNCHANGED";
+		String ADDED = "ADDED";
+	}
 }

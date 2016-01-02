@@ -66,4 +66,9 @@ public class Interfaces {
 	public interface MethodPulledToSuperInterfaceChild {
 		void methodPulledUp();
 	}
+
+	public interface InterfaceWithFields {
+		String UNCHANGED = "UNCHANGED";
+		String REMOVED = "REMOVED";
+	}
 }

@@ -4,6 +4,7 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiField;
 import japicmp.model.JApiMethod;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -82,5 +83,19 @@ public class IntefacesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		methodPulledUp = getJApiMethod(jApiClass.getMethods(), "methodPulledUp");
 		assertThat(methodPulledUp.isBinaryCompatible(), is(true));
+	}
+
+	@Test
+	public void testFieldsOfInterface() {
+		JApiClass interfaceWithFields = getJApiClass(jApiClasses, "japicmp.test.Interfaces$InterfaceWithFields");
+		List<JApiField> fields = interfaceWithFields.getFields();
+		assertThat(fields.size(), is(3));
+		JApiField jApiField = getJApiField(fields, "ADDED");
+		assertThat(jApiField.getChangeStatus(), is(JApiChangeStatus.NEW));
+		jApiField = getJApiField(fields, "REMOVED");
+		assertThat(jApiField.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		jApiField = getJApiField(fields, "UNCHANGED");
+		assertThat(jApiField.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(interfaceWithFields.isBinaryCompatible(), is(false));
 	}
 }

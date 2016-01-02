@@ -341,10 +341,6 @@ public class BinaryCompatibility {
 						superclass.setBinaryCompatible(false);
 						changedIncompatible = true;
 					}
-					if (constructorsHaveChangedIncompatible(superclass, classMap)) {
-						superclass.setBinaryCompatible(false);
-						changedIncompatible = true;
-					}
 					if (fieldsHaveChangedIncompatible(superclass, classMap)) {
 						superclass.setBinaryCompatible(false);
 						changedIncompatible = true;
