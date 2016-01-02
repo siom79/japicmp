@@ -341,6 +341,10 @@ public class BinaryCompatibility {
 						superclass.setBinaryCompatible(false);
 						changedIncompatible = true;
 					}
+					if (constructorsHaveChangedIncompatible(superclass, classMap)) {
+						superclass.setBinaryCompatible(false);
+						changedIncompatible = true;
+					}
 					if (fieldsHaveChangedIncompatible(superclass, classMap)) {
 						superclass.setBinaryCompatible(false);
 						changedIncompatible = true;
@@ -375,10 +379,6 @@ public class BinaryCompatibility {
 				JApiClass foundClass = classMap.get(implementedInterface.getFullyQualifiedName());
 				if (foundClass != null) {
 					if (methodsHaveChangedIncompatible(foundClass, classMap)) {
-						implementedInterface.setBinaryCompatible(false);
-						changedIncompatible = true;
-					}
-					if (constructorsHaveChangedIncompatible(foundClass, classMap)) {
 						implementedInterface.setBinaryCompatible(false);
 						changedIncompatible = true;
 					}
