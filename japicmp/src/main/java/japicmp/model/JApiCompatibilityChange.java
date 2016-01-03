@@ -8,7 +8,7 @@ public enum JApiCompatibilityChange {
 	CLASS_TYPE_CHANGED(false, false),
 	SUPERCLASS_REMOVED(false, false),
 	SUPERCLASS_CHANGED(false, false),
-	SUPERCLASS_ADDED(false, false),
+	SUPERCLASS_ADDED(true, true),
 	SUPERCLASS_MODIFIED_INCOMPATIBLE(false, false),
 	METHOD_REMOVED(false, false),
 	METHOD_LESS_ACCESSIBLE(false, false),

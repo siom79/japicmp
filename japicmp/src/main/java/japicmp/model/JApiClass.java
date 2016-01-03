@@ -213,6 +213,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				}
 			}
 		}
+		retVal.setJApiClass(this);
 		return retVal;
 	}
 

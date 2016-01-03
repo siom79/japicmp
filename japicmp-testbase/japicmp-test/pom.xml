@@ -20,7 +20,6 @@
             <groupId>com.github.siom79.japicmp</groupId>
             <artifactId>japicmp-test-v2</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
 		<dependency>
 			<groupId>com.github.siom79.japicmp</groupId>
