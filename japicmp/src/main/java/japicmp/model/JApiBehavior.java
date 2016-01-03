@@ -344,7 +344,8 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 		return binaryCompatible;
     }
 
-	@XmlTransient
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return compatibilityChanges;
 	}

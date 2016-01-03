@@ -327,7 +327,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 		return binaryCompatible;
     }
 
-	@XmlTransient
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return compatibilityChanges;
 	}

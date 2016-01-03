@@ -7,6 +7,8 @@ import japicmp.util.OptionalHelper;
 import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,7 +114,8 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiBinaryCompatibil
 		return binaryCompatible;
 	}
 
-	@XmlTransient
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return this.compatibilityChanges;
 	}

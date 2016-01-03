@@ -145,12 +145,13 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiBinaryCom
         return values;
     }
 
-    @Override
+    @XmlAttribute
     public boolean isBinaryCompatible() {
         return true;
     }
 
-	@Override
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
 	public List getCompatibilityChanges() {
 		return Collections.EMPTY_LIST;
 	}

@@ -781,7 +781,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return changeCausedByClassElement;
 	}
 
-	@XmlTransient
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return this.compatibilityChanges;
 	}

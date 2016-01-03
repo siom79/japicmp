@@ -129,11 +129,13 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
 	}
 
     @Override
+	@XmlAttribute
     public boolean isBinaryCompatible() {
         return true;
     }
 
-	@Override
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return Collections.EMPTY_LIST;
 	}

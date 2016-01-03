@@ -3,6 +3,8 @@ package japicmp.model;
 import com.google.common.base.Optional;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,8 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinary
 		return binaryCompatible;
 	}
 
-	@Override
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return compatibilityChanges;
 	}
