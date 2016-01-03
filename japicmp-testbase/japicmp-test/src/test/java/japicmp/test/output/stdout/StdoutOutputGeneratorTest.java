@@ -34,7 +34,7 @@ public class StdoutOutputGeneratorTest {
 		assertThat(string, containsString("+++  NEW CLASS: PUBLIC(+) japicmp.test.Added"));
 		assertThat(string, containsString("---! REMOVED CLASS: PUBLIC(-) japicmp.test.Removed"));
 		assertThat(string, containsString("***! MODIFIED CLASS: PUBLIC STATIC japicmp.test.Superclasses$SuperClassChanges"));
-		assertThat(string, containsString("***! MODIFIED SUPERCLASS: japicmp.test.Superclasses$SuperclassB (<- japicmp.test.Superclasses$SuperclassA)"));
+		assertThat(string, containsString("***  MODIFIED SUPERCLASS: japicmp.test.Superclasses$SuperclassB (<- japicmp.test.Superclasses$SuperclassA)"));
 		assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.Annotations$AuthorAnnotationGetsNewValue"));
 		assertThat(string, containsString("\t***  MODIFIED ANNOTATION: japicmp.test.Annotations$Author"));
 		assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.Annotations"));

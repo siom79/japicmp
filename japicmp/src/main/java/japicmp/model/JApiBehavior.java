@@ -35,11 +35,11 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private final JApiModifier<SyntheticModifier> syntheticModifier;
     private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
     protected JApiChangeStatus changeStatus;
-    private boolean binaryCompatible = true;
 	private final Optional<Integer> oldLineNumber;
 	private final Optional<Integer> newLineNumber;
+	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
 
-    public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus, JarArchiveComparatorOptions options) {
+	public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus, JarArchiveComparatorOptions options) {
         this.name = name;
         computeAnnotationChanges(annotations, oldBehavior, newBehavior, options);
         this.accessModifier = extractAccessModifier(oldBehavior, newBehavior);
@@ -335,12 +335,19 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     @Override
     @XmlAttribute
     public boolean isBinaryCompatible() {
-        return this.binaryCompatible;
+		boolean binaryCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isBinaryCompatible()) {
+				binaryCompatible = false;
+			}
+		}
+		return binaryCompatible;
     }
 
-    void setBinaryCompatible(boolean binaryCompatible) {
-        this.binaryCompatible = binaryCompatible;
-    }
+	@XmlTransient
+	public List<JApiCompatibilityChange> getCompatibilityChanges() {
+		return compatibilityChanges;
+	}
 
     @XmlElementWrapper(name = "annotations")
     @XmlElement(name = "annotation")

@@ -35,8 +35,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final JApiModifier<AbstractModifier> abstractModifier;
 	private final JApiModifier<SyntheticModifier> syntheticModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
+	private final List<JApiCompatibilityChange> compatibilityChanges = new LinkedList<>();
 	private final JApiSerialVersionUid jApiSerialVersionUid;
-	private boolean binaryCompatible = true;
 	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
 	private boolean changeCausedByClassElement = false;
 
@@ -728,11 +728,46 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-		return this.binaryCompatible;
-	}
-
-	void setBinaryCompatible(boolean binaryCompatible) {
-		this.binaryCompatible = binaryCompatible;
+		boolean binaryCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isBinaryCompatible()) {
+				binaryCompatible = false;
+				break;
+			}
+		}
+		if (binaryCompatible) {
+			for (JApiField field : fields) {
+				if (!field.isBinaryCompatible()) {
+					binaryCompatible = false;
+					break;
+				}
+			}
+		}
+		if (binaryCompatible) {
+			for (JApiMethod method : methods) {
+				if (!method.isBinaryCompatible()) {
+					binaryCompatible = false;
+					break;
+				}
+			}
+		}
+		if (binaryCompatible) {
+			for (JApiConstructor constructor : constructors) {
+				if (!constructor.isBinaryCompatible()) {
+					binaryCompatible = false;
+					break;
+				}
+			}
+		}
+		if (binaryCompatible) {
+			for (JApiImplementedInterface implementedInterface : interfaces) {
+				if (!implementedInterface.isBinaryCompatible()) {
+					binaryCompatible = false;
+					break;
+				}
+			}
+		}
+		return binaryCompatible;
 	}
 
 	@XmlElementWrapper(name = "annotations")
@@ -744,5 +779,10 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	@XmlTransient
 	public boolean isChangeCausedByClassElement() {
 		return changeCausedByClassElement;
+	}
+
+	@XmlTransient
+	public List<JApiCompatibilityChange> getCompatibilityChanges() {
+		return this.compatibilityChanges;
 	}
 }

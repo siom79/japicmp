@@ -8,13 +8,16 @@ import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.LinkedList;
+import java.util.List;
 
 public class JApiSuperclass implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final Optional<CtClass> oldSuperclassOptional;
 	private final Optional<CtClass> newSuperclassOptional;
 	private final JApiChangeStatus changeStatus;
 	private final JarArchiveComparator jarArchiveComparator;
-	private boolean binaryCompatible = true;
+	private final List<JApiCompatibilityChange> compatibilityChanges = new LinkedList<>();
+	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
 
 	public JApiSuperclass(Optional<CtClass> oldSuperclassOptional, Optional<CtClass> newSuperclassOptional, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
 		this.oldSuperclassOptional = oldSuperclassOptional;
@@ -95,10 +98,26 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiBinaryCompatibil
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-		return this.binaryCompatible;
+		boolean binaryCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isBinaryCompatible()) {
+				binaryCompatible = false;
+			}
+		}
+		if (binaryCompatible && correspondingJApiClass.isPresent()) {
+			if (!correspondingJApiClass.get().isBinaryCompatible()) {
+				binaryCompatible = false;
+			}
+		}
+		return binaryCompatible;
 	}
 
-	void setBinaryCompatible(boolean binaryCompatible) {
-		this.binaryCompatible = binaryCompatible;
+	@XmlTransient
+	public List<JApiCompatibilityChange> getCompatibilityChanges() {
+		return this.compatibilityChanges;
+	}
+
+	void setJApiClass(JApiClass jApiClass) {
+		this.correspondingJApiClass = Optional.of(jApiClass);
 	}
 }

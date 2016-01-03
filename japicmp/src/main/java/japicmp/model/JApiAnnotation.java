@@ -132,4 +132,9 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
     public boolean isBinaryCompatible() {
         return true;
     }
+
+	@Override
+	public List<JApiCompatibilityChange> getCompatibilityChanges() {
+		return Collections.EMPTY_LIST;
+	}
 }

@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class JApiAnnotationElement implements JApiHasChangeStatus, JApiBinaryCompatibility {
@@ -148,4 +149,9 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiBinaryCom
     public boolean isBinaryCompatible() {
         return true;
     }
+
+	@Override
+	public List getCompatibilityChanges() {
+		return Collections.EMPTY_LIST;
+	}
 }
