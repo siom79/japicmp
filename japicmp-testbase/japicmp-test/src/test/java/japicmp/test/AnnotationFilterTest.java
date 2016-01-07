@@ -113,9 +113,9 @@ public class AnnotationFilterTest {
 	}
 
 	@Test
-	public void testClassExcluded() {
+	public void testClassExcludedWithInnerAnnotation() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getExcludes().add(new AnnotationClassFilter("@japicmp.test.annotation.filter.Exclude"));
+		options.getFilters().getExcludes().add(new AnnotationClassFilter("@japicmp.test.annotation.filter.InterfaceStability$Exclude"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		boolean exceptionCaught = false;
