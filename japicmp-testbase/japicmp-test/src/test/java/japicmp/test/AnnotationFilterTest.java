@@ -10,6 +10,7 @@ import japicmp.model.JApiMethod;
 import japicmp.test.annotation.filter.AnnotatedClass;
 import japicmp.test.annotation.filter.ClassWithInnerClass;
 import japicmp.test.annotation.filter.ClassWithMembersToExclude;
+import japicmp.test.annotation.filter.ExcludedClass;
 import japicmp.test.annotation.filter.exclpckg.Excluded;
 import japicmp.test.annotation.filter.inclpckg.Included;
 import org.junit.Assert;
@@ -109,5 +110,20 @@ public class AnnotationFilterTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		JApiMethod methodAdded = getJApiMethod(jApiClass.getMethods(), "methodAdded");
 		assertThat(methodAdded.getChangeStatus(), is(JApiChangeStatus.NEW));
+	}
+
+	@Test
+	public void testClassExcluded() {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.getFilters().getExcludes().add(new AnnotationClassFilter("@japicmp.test.annotation.filter.Exclude"));
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
+		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		boolean exceptionCaught = false;
+		try {
+			getJApiClass(jApiClasses, ExcludedClass.class.getName());
+		} catch (IllegalArgumentException e) {
+			exceptionCaught = true;
+		}
+		assertThat(exceptionCaught, is(true));
 	}
 }
