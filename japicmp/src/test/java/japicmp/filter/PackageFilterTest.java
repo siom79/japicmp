@@ -54,7 +54,14 @@ public class PackageFilterTest {
         assertThat(pf.matches(createCtClassForPackage("de.test.package.packageOne.test2")), is(true));
     }
 
+    @Test
+    public void testMatchAgainstDefaultPackage() {
+        JavadocLikePackageFilter pf = new JavadocLikePackageFilter("foo");
+        assertThat(pf.matches(createCtClassForPackage("")), is(false));
+    }
+
     private CtClass createCtClassForPackage(String packageName) {
-        return CtClassBuilder.create().name(packageName + ".Test").addToClassPool(new ClassPool());
+        String className = packageName + (packageName.isEmpty() ? "" : ".") + "Test";
+        return CtClassBuilder.create().name(className).addToClassPool(new ClassPool());
     }
 }

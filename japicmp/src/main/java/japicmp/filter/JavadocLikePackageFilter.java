@@ -26,6 +26,7 @@ public class JavadocLikePackageFilter implements ClassFilter {
     @Override
     public boolean matches(CtClass ctClass) {
         String name = ctClass.getPackageName();
+        name = name == null ? "" : name;
         return pattern.matcher(name).matches();
     }
 }
