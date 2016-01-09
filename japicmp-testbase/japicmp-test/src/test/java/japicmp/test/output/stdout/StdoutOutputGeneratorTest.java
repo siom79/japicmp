@@ -17,7 +17,6 @@ import java.util.List;
 
 import static japicmp.test.util.Helper.getArchive;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 

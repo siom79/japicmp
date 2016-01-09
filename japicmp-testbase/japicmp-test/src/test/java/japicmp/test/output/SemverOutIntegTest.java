@@ -1,9 +1,5 @@
 package japicmp.test.output;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-
 import com.google.common.base.Strings;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -14,6 +10,10 @@ import japicmp.model.JApiClass;
 import japicmp.output.semver.SemverOut;
 import japicmp.test.util.Helper;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
