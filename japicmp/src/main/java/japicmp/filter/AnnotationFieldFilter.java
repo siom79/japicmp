@@ -25,7 +25,8 @@ public class AnnotationFieldFilter extends AnnotationFilterBase implements Field
 					if (declaringClass != null) {
 						hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 					}
-				} catch (NotFoundException ignored) {}
+				} catch (NotFoundException ignored) {
+				}
 			}
 		}
 		return hasAnnotation;

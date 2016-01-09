@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>japicmp-testbase</artifactId>
-        <groupId>com.github.siom79.japicmp</groupId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>japicmp-testbase</artifactId>
+		<groupId>com.github.siom79.japicmp</groupId>
 		<version>0.6.3-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
-    <artifactId>japicmp-test-service-impl-base</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>japicmp-test-service-v1</module>
-        <module>japicmp-test-service-v2</module>
-        <module>japicmp-test-service-impl-v1</module>
-        <module>japicmp-test-service-impl-v2</module>
-        <module>japicmp-test-service-test</module>
-    </modules>
+	<artifactId>japicmp-test-service-impl-base</artifactId>
+	<packaging>pom</packaging>
+	<modules>
+		<module>japicmp-test-service-v1</module>
+		<module>japicmp-test-service-v2</module>
+		<module>japicmp-test-service-impl-v1</module>
+		<module>japicmp-test-service-impl-v2</module>
+		<module>japicmp-test-service-test</module>
+	</modules>
 </project>

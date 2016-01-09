@@ -1,6 +1,5 @@
 package japicmp.test;
 
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,9 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
@@ -22,6 +19,7 @@ public class ITAdded {
 	 * The japicmp plugin compares in this module the two artifacts japicmp-test-v2 with and without classifier added.
 	 * The artifact with classifier added contains only the class added, hence it should be detected as unchanged. All
 	 * other classes are removed from this artifact.
+	 *
 	 * @throws IOException
 	 */
 	@Test

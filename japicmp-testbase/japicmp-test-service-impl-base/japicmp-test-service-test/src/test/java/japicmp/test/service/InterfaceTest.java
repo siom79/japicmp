@@ -8,7 +8,6 @@ import japicmp.model.JApiMethod;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static japicmp.test.service.util.Helper.*;

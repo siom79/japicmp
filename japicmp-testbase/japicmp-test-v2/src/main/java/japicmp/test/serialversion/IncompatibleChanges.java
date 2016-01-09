@@ -59,7 +59,7 @@ public class IncompatibleChanges {
 	public static class ExternalizableRemoved {
 
 		public void writeExternal(ObjectOutput out) throws IOException {
-			
+
 		}
 
 		public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {

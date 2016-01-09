@@ -61,8 +61,8 @@ public class Filter {
 	private static void visitAnnotations(FilterVisitor visitor, JApiHasAnnotations jApiHasAnnotations) {
 		Iterator<JApiAnnotation> itAnnotations = jApiHasAnnotations.getAnnotations().iterator();
 		while (itAnnotations.hasNext()) {
-            JApiAnnotation jApiAnnotation = itAnnotations.next();
-            visitor.visit(itAnnotations, jApiAnnotation);
-        }
+			JApiAnnotation jApiAnnotation = itAnnotations.next();
+			visitor.visit(itAnnotations, jApiAnnotation);
+		}
 	}
 }

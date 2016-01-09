@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>com.github.siom79.japicmp</groupId>
-        <artifactId>japicmp-testbase</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>com.github.siom79.japicmp</groupId>
+		<artifactId>japicmp-testbase</artifactId>
 		<version>0.6.3-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
-    <artifactId>japicmp-test-maven-plugin</artifactId>
+	<artifactId>japicmp-test-maven-plugin</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.github.siom79.japicmp</groupId>
-            <artifactId>japicmp-maven-plugin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-maven-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.github.siom79.japicmp</groupId>
-                <artifactId>japicmp-maven-plugin</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.github.siom79.japicmp</groupId>
+				<artifactId>japicmp-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<executions>
+					<execution>
 						<id>single-version</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>cmp</goal>
-                        </goals>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
 						<configuration>
 							<oldVersion>
 								<dependency>
@@ -49,9 +50,11 @@
 								<onlyModified>true</onlyModified>
 								<accessModifier>public</accessModifier>
 								<breakBuildOnModifications>false</breakBuildOnModifications>
-								<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+								<breakBuildOnBinaryIncompatibleModifications>false
+								</breakBuildOnBinaryIncompatibleModifications>
 								<includeSynthetic>true</includeSynthetic>
-								<htmlStylesheet>${project.basedir}/src/main/resources/css/stylesheet.css</htmlStylesheet>
+								<htmlStylesheet>${project.basedir}/src/main/resources/css/stylesheet.css
+								</htmlStylesheet>
 								<htmlTitle>Test-Title</htmlTitle>
 							</parameter>
 							<dependencies>
@@ -62,7 +65,7 @@
 								</dependency>
 							</dependencies>
 						</configuration>
-                    </execution>
+					</execution>
 					<execution>
 						<id>multiple-versions</id>
 						<phase>pre-integration-test</phase>
@@ -98,7 +101,8 @@
 								<onlyModified>true</onlyModified>
 								<accessModifier>public</accessModifier>
 								<breakBuildOnModifications>false</breakBuildOnModifications>
-								<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+								<breakBuildOnBinaryIncompatibleModifications>false
+								</breakBuildOnBinaryIncompatibleModifications>
 								<includeSynthetic>true</includeSynthetic>
 							</parameter>
 							<dependencies>
@@ -110,22 +114,22 @@
 							</dependencies>
 						</configuration>
 					</execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.18.1</version>
-                <executions>
-                    <execution>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.18.1</version>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

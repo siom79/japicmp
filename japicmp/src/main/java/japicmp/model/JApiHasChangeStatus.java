@@ -6,7 +6,8 @@ package japicmp.model;
 public interface JApiHasChangeStatus {
 	/**
 	 * Returns the change status of this element.
+	 *
 	 * @return the change status of this element
 	 */
-    JApiChangeStatus getChangeStatus();
+	JApiChangeStatus getChangeStatus();
 }

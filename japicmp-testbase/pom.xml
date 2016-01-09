@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.github.siom79.japicmp</groupId>
-        <artifactId>japicmp-base</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.siom79.japicmp</groupId>
+		<artifactId>japicmp-base</artifactId>
 		<version>0.6.3-SNAPSHOT</version>
-    </parent>
+	</parent>
 
-    <artifactId>japicmp-testbase</artifactId>
+	<artifactId>japicmp-testbase</artifactId>
 	<packaging>pom</packaging>
 
-    <modules>
+	<modules>
 		<module>japicmp-test-v1</module>
 		<module>japicmp-test-v2</module>
 		<module>japicmp-test</module>
-        <module>japicmp-test-maven-plugin</module>
-        <module>japicmp-test-maven-plugin-guava</module>
+		<module>japicmp-test-maven-plugin</module>
+		<module>japicmp-test-maven-plugin-guava</module>
 		<module>japicmp-test-maven-plugin-japicmp</module>
-        <module>japicmp-test-service-impl-base</module>
+		<module>japicmp-test-service-impl-base</module>
 		<module>japicmp-test-maven-plugin-classifier</module>
 		<module>japicmp-test2-v1</module>
 		<module>japicmp-test2-v2</module>
@@ -40,16 +41,16 @@
 		</dependency>
 	</dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.1</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

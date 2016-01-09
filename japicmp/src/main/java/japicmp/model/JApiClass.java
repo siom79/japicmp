@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.*;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
-		JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
+	JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
 	private final JarArchiveComparator jarArchiveComparator;
 	private final String fullyQualifiedName;
 	private final JApiClassType classType;

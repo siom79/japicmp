@@ -17,7 +17,7 @@ public class JavaObjectSerializationCompatibility {
 		SerialVersionUidResult resultOld = computeSerialVersionUid(options, oldClass, jarArchiveComparator);
 		SerialVersionUidResult resultNew = computeSerialVersionUid(options, newClass, jarArchiveComparator);
 		return new JApiSerialVersionUid(resultOld.serializable, resultNew.serializable, resultOld.serialVersionUidDefault,
-				resultNew.serialVersionUidDefault, resultOld.serialVersionUid, resultNew.serialVersionUid);
+			resultNew.serialVersionUidDefault, resultOld.serialVersionUid, resultNew.serialVersionUid);
 	}
 
 	public void evaluate(List<JApiClass> jApiClasses) {
@@ -169,6 +169,7 @@ public class JavaObjectSerializationCompatibility {
 
 	/**
 	 * Checks compatibility of changes according to http://docs.oracle.com/javase/7/docs/platform/serialization/spec/version.html#5172.
+	 *
 	 * @param jApiClass the class to check
 	 * @return either SERIALIZABLE_INCOMPATIBLE or SERIALIZABLE_COMPATIBLE
 	 */

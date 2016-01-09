@@ -2,7 +2,6 @@ package japicmp.exception;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import javassist.NotFoundException;
 
 public class JApiCmpException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

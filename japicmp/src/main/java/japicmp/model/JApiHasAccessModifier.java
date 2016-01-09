@@ -6,6 +6,7 @@ package japicmp.model;
 public interface JApiHasAccessModifier {
 	/**
 	 * Returns the access modifier.
+	 *
 	 * @return the access modifier
 	 */
 	JApiModifier<AccessModifier> getAccessModifier();

@@ -9,12 +9,14 @@ import com.google.common.base.Optional;
 public interface JApiHasLineNumber {
 	/**
 	 * Returns the line number in the source file of the old element.
+	 *
 	 * @return the line number in the source file of the old element
 	 */
 	Optional<Integer> getOldLineNumber();
 
 	/**
 	 * Returns the line number in the source file of the new element.
+	 *
 	 * @return the line number in the source file of the new element
 	 */
 	Optional<Integer> geNewLineNumber();

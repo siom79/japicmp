@@ -29,6 +29,7 @@ public class JApiSerialVersionUid {
 
 	/**
 	 * Returns true if the old version of the class is serializable.
+	 *
 	 * @return if the old version of the class is serializable
 	 */
 	@XmlAttribute
@@ -38,6 +39,7 @@ public class JApiSerialVersionUid {
 
 	/**
 	 * Returns true if the new version of the class is serializable.
+	 *
 	 * @return if the new version of the class is serializable
 	 */
 	@XmlAttribute
@@ -48,6 +50,7 @@ public class JApiSerialVersionUid {
 	/**
 	 * Returns the default serialVersionUID value as defined in the Java Object Serialization Specification for the
 	 * old version of the class.
+	 *
 	 * @return the default serialVersionUID
 	 */
 	@XmlTransient
@@ -58,6 +61,7 @@ public class JApiSerialVersionUid {
 	/**
 	 * Returns the default serialVersionUID value as defined in the Java Object Serialization Specification for the
 	 * new version of the class.
+	 *
 	 * @return the default serialVersionUID
 	 */
 	@XmlTransient
@@ -67,6 +71,7 @@ public class JApiSerialVersionUid {
 
 	/**
 	 * Returns the value of the serialVersionUID field in the old class (if present).
+	 *
 	 * @return the value of the serialVersionUID field in the old class
 	 */
 	@XmlTransient
@@ -76,6 +81,7 @@ public class JApiSerialVersionUid {
 
 	/**
 	 * Returns the value of the serialVersionUID field in the new class (if present).
+	 *
 	 * @return the value of the serialVersionUID field in the new class
 	 */
 	@XmlTransient

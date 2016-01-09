@@ -1,10 +1,6 @@
 package japicmp.test.output.xml;
 
-import static japicmp.test.output.xml.XmlHelper.getDivForClass;
-import static japicmp.test.util.Helper.getArchive;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
+import com.google.common.base.Optional;
 import com.google.common.io.Files;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -13,13 +9,6 @@ import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiClass;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Paths;
-import java.util.List;
-
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,7 +16,16 @@ import org.jsoup.select.Elements;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.base.Optional;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
+import java.util.List;
+
+import static japicmp.test.output.xml.XmlHelper.getDivForClass;
+import static japicmp.test.util.Helper.getArchive;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 public class XmlOutputGeneratorTest {
 	public static final String JAPICMP_TEST_SEMVER001 = "japicmp.test.semver001";
@@ -38,18 +36,18 @@ public class XmlOutputGeneratorTest {
 	private static File htmlFile;
 
 	@BeforeClass
-    public static void beforeClass() throws IOException {
+	public static void beforeClass() throws IOException {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.getFilters().getExcludes().add(new JavadocLikePackageFilter(JAPICMP_TEST_SEMVER001));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-        jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
+		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		generateHtmlOutput("target/diff.xml", "target/diff.html", false);
 		generateHtmlOutput("target/diff_onlyModifications.xml", "target/diff_onlyModifications.html", true);
 		htmlFile = Paths.get(System.getProperty("user.dir"), "target", "diff.html").toFile();
 		File htmlFileOnlyModifications = Paths.get(System.getProperty("user.dir"), "target", "diff_onlyModifications.html").toFile();
 		document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
 		documentOnlyModifications = Jsoup.parse(htmlFileOnlyModifications, Charset.forName("UTF-8").toString());
-    }
+	}
 
 	private static void generateHtmlOutput(String xmlOutpuFile, String htmlOutputFile, boolean outputOnlyModifications) {
 		Options options = new Options();

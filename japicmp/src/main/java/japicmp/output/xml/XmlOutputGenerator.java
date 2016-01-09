@@ -86,7 +86,8 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		} finally {
 			try {
 				xmlOutput.close();
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 		}
 		return filesWritten;
 	}

@@ -8,6 +8,7 @@ import java.util.List;
 public interface JApiHasModifiers extends JApiHasChangeStatus {
 	/**
 	 * Returns a list of modifiers.
+	 *
 	 * @return a list of modifiers
 	 */
 	List<? extends JApiModifier<? extends Enum<? extends Enum<?>>>> getModifiers();

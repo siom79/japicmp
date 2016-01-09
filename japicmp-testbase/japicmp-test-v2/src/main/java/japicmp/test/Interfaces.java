@@ -51,9 +51,9 @@ public class Interfaces {
 
 	}
 
-    public class NewClassWithNewInterface implements TestInterface {
+	public class NewClassWithNewInterface implements TestInterface {
 
-    }
+	}
 
 	public static class NoInterfaceToSerializableInterface implements Serializable {
 

@@ -6,6 +6,7 @@ package japicmp.model;
 public interface JApiHasSyntheticModifier {
 	/**
 	 * Returns the synthetic modifier.
+	 *
 	 * @return the synthetic modifier
 	 */
 	JApiModifier<SyntheticModifier> getSyntheticModifier();

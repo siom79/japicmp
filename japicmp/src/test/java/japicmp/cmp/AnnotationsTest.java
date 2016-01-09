@@ -17,9 +17,7 @@ import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.List;
 
-import static japicmp.util.Helper.getJApiClass;
-import static japicmp.util.Helper.getJApiField;
-import static japicmp.util.Helper.getJApiMethod;
+import static japicmp.util.Helper.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

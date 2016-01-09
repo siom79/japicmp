@@ -6,6 +6,7 @@ package japicmp.model;
 public interface JApiHasAbstractModifier {
 	/**
 	 * Returns the abstract modifier.
+	 *
 	 * @return the abstract modifier
 	 */
 	JApiModifier<AbstractModifier> getAbstractModifier();

@@ -34,7 +34,7 @@ public class JpaTable {
 				switch (elementChangeStatus) {
 					case NEW:
 						String newName = removeQuotationMarks(element.getNewValue().get().toString());
-						if(changeStatusClass == JApiChangeStatus.NEW) {
+						if (changeStatusClass == JApiChangeStatus.NEW) {
 							return new JpaName(Optional.<String>absent(), Optional.of(newName), JApiChangeStatus.NEW);
 						}
 						if (tableName.equals(newName)) {
@@ -44,7 +44,7 @@ public class JpaTable {
 						}
 					case REMOVED:
 						String oldName = removeQuotationMarks(element.getOldValue().get().toString());
-						if(changeStatusClass == JApiChangeStatus.REMOVED) {
+						if (changeStatusClass == JApiChangeStatus.REMOVED) {
 							return new JpaName(Optional.of(oldName), Optional.<String>absent(), JApiChangeStatus.REMOVED);
 						}
 						if (tableName.equals(oldName)) {
@@ -63,10 +63,10 @@ public class JpaTable {
 			}
 			break;
 		}
-		if(changeStatusClass == JApiChangeStatus.NEW) {
+		if (changeStatusClass == JApiChangeStatus.NEW) {
 			return new JpaName(Optional.<String>absent(), Optional.of(tableName), JApiChangeStatus.NEW);
-		} else if(changeStatusClass == JApiChangeStatus.REMOVED) {
-			return new JpaName(Optional.of(tableName), Optional.<String>absent(),  JApiChangeStatus.REMOVED);
+		} else if (changeStatusClass == JApiChangeStatus.REMOVED) {
+			return new JpaName(Optional.of(tableName), Optional.<String>absent(), JApiChangeStatus.REMOVED);
 		}
 		return new JpaName(Optional.of(tableName), Optional.of(tableName), JApiChangeStatus.UNCHANGED);
 	}
@@ -91,9 +91,9 @@ public class JpaTable {
 		for (JApiField field : fields) {
 			Optional<JApiAnnotation> transientAnnotationOfFieldOptional = getTransientAnnotationOfField(field);
 			Optional<JApiAnnotation> transientAnnotationOfPropertyOptional = getTransientAnnotationOfProperty(field);
-			if(!transientAnnotationOfFieldOptional.isPresent() && !transientAnnotationOfPropertyOptional.isPresent()) {
+			if (!transientAnnotationOfFieldOptional.isPresent() && !transientAnnotationOfPropertyOptional.isPresent()) {
 				JApiChangeStatus fieldChangeStatus = field.getChangeStatus();
-				if(fieldChangeStatus == JApiChangeStatus.NEW) {
+				if (fieldChangeStatus == JApiChangeStatus.NEW) {
 					JpaAttribute jpaAttribute = new JpaAttribute(JApiChangeStatus.NEW);
 				}
 			}
@@ -114,7 +114,7 @@ public class JpaTable {
 	private Optional<JApiAnnotation> getTransientAnnotationOfProperty(JApiField field) {
 		Optional<JApiAnnotation> returnValue = Optional.absent();
 		Optional<JApiMethod> propertyMethodOptional = getPropertyMethod(field);
-		if(propertyMethodOptional.isPresent()) {
+		if (propertyMethodOptional.isPresent()) {
 			JApiMethod propertyMethod = propertyMethodOptional.get();
 			for (JApiAnnotation annotation : propertyMethod.getAnnotations()) {
 				if (JpaAnalyzer.JPA_ANNOTATION_TRANSIENT.equals(annotation.getFullyQualifiedName())) {
@@ -130,20 +130,20 @@ public class JpaTable {
 		Optional<JApiMethod> propertyMethod = Optional.absent();
 		String fieldName = field.getName();
 		String getterName = "get" + (Character.isUpperCase(fieldName.charAt(0)) ?
-				fieldName :
-				fieldName.length() > 1 ?
-						Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1) :
-						Character.toUpperCase(fieldName.charAt(0)));
-		for(JApiMethod method : jApiClass.getMethods()) {
-			if(getterName.equals(method.getName())) {
+			fieldName :
+			fieldName.length() > 1 ?
+				Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1) :
+				Character.toUpperCase(fieldName.charAt(0)));
+		for (JApiMethod method : jApiClass.getMethods()) {
+			if (getterName.equals(method.getName())) {
 				propertyMethod = Optional.of(method);
 				break;
 			}
 		}
-		if(!propertyMethod.isPresent()) {
+		if (!propertyMethod.isPresent()) {
 			String isName = "is" + getterName.substring(3);
-			for(JApiMethod method : jApiClass.getMethods()) {
-				if(isName.equals(method.getName())) {
+			for (JApiMethod method : jApiClass.getMethods()) {
+				if (isName.equals(method.getName())) {
 					propertyMethod = Optional.of(method);
 					break;
 				}

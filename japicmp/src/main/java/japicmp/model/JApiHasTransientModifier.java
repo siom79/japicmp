@@ -6,6 +6,7 @@ package japicmp.model;
 public interface JApiHasTransientModifier {
 	/**
 	 * Returns the transient modifier.
+	 *
 	 * @return the transient modifier
 	 */
 	JApiModifier<TransientModifier> getTransientModifier();

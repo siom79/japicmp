@@ -1,7 +1,8 @@
 package japicmp.filter;
 
-import javassist.*;
-import javassist.bytecode.ClassFile;
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.NotFoundException;
 
 import java.util.List;
 
@@ -24,7 +25,8 @@ public class AnnotationBehaviorFilter extends AnnotationFilterBase implements Be
 					if (declaringClass != null) {
 						hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 					}
-				} catch (NotFoundException ignored) {}
+				} catch (NotFoundException ignored) {
+				}
 			}
 		}
 		return hasAnnotation;

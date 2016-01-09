@@ -105,12 +105,14 @@ public interface JApiJavaObjectSerializationCompatibility {
 	/**
 	 * Returns if this class is serializable and if it has changed in a compatible
 	 * or incompatible way.
+	 *
 	 * @return the type of change
 	 */
 	JApiJavaObjectSerializationChangeStatus getJavaObjectSerializationCompatible();
 
 	/**
 	 * Returns the {@link japicmp.model.JApiSerialVersionUid}
+	 *
 	 * @return the serialVersionUID
 	 */
 	JApiSerialVersionUid getSerialVersionUid();

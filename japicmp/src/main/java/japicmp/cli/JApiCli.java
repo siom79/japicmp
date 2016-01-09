@@ -36,9 +36,9 @@ public class JApiCli {
 	public static class Compare implements Runnable {
 		@Inject
 		public HelpOption helpOption;
-		@Option(name = { "-o", "--old" }, description = "Provides the path to the old version(s) of the jar(s). Use ; to separate jar files.")
+		@Option(name = {"-o", "--old"}, description = "Provides the path to the old version(s) of the jar(s). Use ; to separate jar files.")
 		public String pathToOldVersionJar;
-		@Option(name = { "-n", "--new" }, description = "Provides the path to the new version(s) of the jar(s). Use ; to separate jar files.")
+		@Option(name = {"-n", "--new"}, description = "Provides the path to the new version(s) of the jar(s). Use ; to separate jar files.")
 		public String pathToNewVersionJar;
 		@Option(name = {"-m", "--only-modified"}, description = "Outputs only modified classes/methods.")
 		public boolean modifiedOnly;
@@ -185,7 +185,8 @@ public class JApiCli {
 				if (jarFile != null) {
 					try {
 						jarFile.close();
-					} catch (IOException ignored) {}
+					} catch (IOException ignored) {
+					}
 				}
 			}
 		}
@@ -205,7 +206,7 @@ public class JApiCli {
 					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
 				} catch (IllegalArgumentException e) {
 					throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option -a: %s. Possible values are: %s.",
-							accessModifierArg, AccessModifier.listOfAccessModifier()));
+						accessModifierArg, AccessModifier.listOfAccessModifier()));
 				}
 			} else {
 				return Optional.of(AccessModifier.PROTECTED);

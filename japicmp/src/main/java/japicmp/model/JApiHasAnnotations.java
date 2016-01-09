@@ -8,7 +8,8 @@ import java.util.List;
 public interface JApiHasAnnotations {
 	/**
 	 * Returns a list of annotations as {@link japicmp.model.JApiAnnotation}.
+	 *
 	 * @return a list of annotations as {@link japicmp.model.JApiAnnotation}
 	 */
-    List<JApiAnnotation> getAnnotations();
+	List<JApiAnnotation> getAnnotations();
 }
