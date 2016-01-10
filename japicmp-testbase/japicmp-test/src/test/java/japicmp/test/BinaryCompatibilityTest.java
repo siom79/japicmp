@@ -2,6 +2,7 @@ package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
 import japicmp.model.JApiMethod;
@@ -57,8 +58,16 @@ public class BinaryCompatibilityTest {
 
 	@Test
 	public void test_JLS_13_4_4() {
+		JApiClass interfaceLosesMethod = getJApiClass(jApiClasses, Interfaces.InterfaceLosesMethod.class.getName());
+		JApiMethod method = getJApiMethod(interfaceLosesMethod.getMethods(), "method");
+		assertThat(method.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		assertThat(interfaceLosesMethod.isBinaryCompatible(), is(false));
 		JApiClass classWithInterfaceLosesMethod = getJApiClass(jApiClasses, ClassWithInterfaceLosesMethod.class.getName());
 		assertThat(classWithInterfaceLosesMethod.isBinaryCompatible(), is(false));
+		JApiClass superclassLosesMethod = getJApiClass(jApiClasses, Interfaces.SuperclassLosesMethod.class.getName());
+		JApiMethod jApiMethod = getJApiMethod(superclassLosesMethod.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		assertThat(superclassLosesMethod.isBinaryCompatible(), is(false));
 		JApiClass subclassWithSuperclassLosesMethod = getJApiClass(jApiClasses, SubclassWithSuperclassLosesMethod.class.getName());
 		assertThat(subclassWithSuperclassLosesMethod.isBinaryCompatible(), is(false));
 	}

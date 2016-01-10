@@ -1,11 +1,18 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
+
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final String fullyQualifiedName;
 	private final JApiChangeStatus changeStatus;
-	private boolean binaryCompatible = true;
+	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
+	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
 
 	public JApiImplementedInterface(String fullyQualifiedName, JApiChangeStatus changeStatus) {
 		this.fullyQualifiedName = fullyQualifiedName;
@@ -25,10 +32,27 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinary
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-		return this.binaryCompatible;
+		boolean binaryCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isBinaryCompatible()) {
+				binaryCompatible = false;
+			}
+		}
+		if (binaryCompatible && correspondingJApiClass.isPresent()) {
+			if (!correspondingJApiClass.get().isBinaryCompatible()) {
+				binaryCompatible = false;
+			}
+		}
+		return binaryCompatible;
 	}
 
-	void setBinaryCompatible(boolean binaryCompatible) {
-		this.binaryCompatible = binaryCompatible;
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
+	public List<JApiCompatibilityChange> getCompatibilityChanges() {
+		return compatibilityChanges;
+	}
+
+	void setJApiClass(JApiClass jApiClass) {
+		this.correspondingJApiClass = Optional.of(jApiClass);
 	}
 }

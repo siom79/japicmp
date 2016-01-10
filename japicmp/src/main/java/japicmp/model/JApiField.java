@@ -31,8 +31,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	private final JApiModifier<TransientModifier> transientModifier;
 	private final JApiModifier<SyntheticModifier> syntheticModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
+	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
 	private final JApiType type;
-	private boolean binaryCompatible = true;
 
 	public JApiField(JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional, JarArchiveComparatorOptions options) {
 		this.oldFieldOptional = oldFieldOptional;
@@ -318,11 +318,19 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-		return this.binaryCompatible;
+		boolean binaryCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isBinaryCompatible()) {
+				binaryCompatible = false;
+			}
+		}
+		return binaryCompatible;
 	}
 
-	void setBinaryCompatible(boolean binaryCompatible) {
-		this.binaryCompatible = binaryCompatible;
+	@XmlElementWrapper(name = "compatibilityChanges")
+	@XmlElement(name = "compatibilityChange")
+	public List<JApiCompatibilityChange> getCompatibilityChanges() {
+		return compatibilityChanges;
 	}
 
 	@XmlElementWrapper(name = "annotations")
