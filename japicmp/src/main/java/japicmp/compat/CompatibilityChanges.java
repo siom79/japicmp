@@ -1,13 +1,14 @@
-package japicmp.model;
+package japicmp.compat;
 
 import com.google.common.base.Optional;
+import japicmp.model.*;
 
 import java.util.*;
 
 import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
 import static japicmp.util.ModifierHelper.isNotPrivate;
 
-public class BinaryCompatibility {
+public class CompatibilityChanges {
 
 	public void evaluate(List<JApiClass> classes) {
 		Map<String, JApiClass> classMap = buildClassMap(classes);
@@ -333,12 +334,28 @@ public class BinaryCompatibility {
 			}
 			if (superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
 				if (!superclass.getOldSuperclassName().get().equals(superclass.getNewSuperclassName().get())) {
-					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_CHANGED);
+					boolean superClassChangedToObject = false;
+					boolean superClassChangedFromObject = false;
+					if (!superclass.getOldSuperclassName().get().equals("java.lang.Object") && superclass.getNewSuperclassName().get().equals("java.lang.Object")) {
+						superClassChangedToObject = true;
+					}
+					if (superclass.getOldSuperclassName().get().equals("java.lang.Object") && !superclass.getNewSuperclassName().get().equals("java.lang.Object")) {
+						superClassChangedFromObject = true;
+					}
+					if (superClassChangedToObject) {
+						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+					} else if (superClassChangedFromObject) {
+						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+					} else {
+						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_CHANGED);
+					}
 				}
-			} else if (superclass.getOldSuperclassName().isPresent() && !superclass.getNewSuperclassName().isPresent()) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
-			} else if (!superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+			} else {
+				if (superclass.getOldSuperclassName().isPresent() && !superclass.getNewSuperclassName().isPresent()) {
+					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+				} else if (!superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
+					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+				}
 			}
 		}
 		// section 13.4.4 of "Java Language Specification" SE7

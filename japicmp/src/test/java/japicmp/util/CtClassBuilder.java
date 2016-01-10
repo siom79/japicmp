@@ -1,5 +1,6 @@
 package japicmp.util;
 
+import com.google.common.base.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.Modifier;
@@ -16,6 +17,7 @@ public class CtClassBuilder {
 	private String name = DEFAULT_CLASS_NAME;
 	private int modifier = Modifier.PUBLIC;
 	private List<String> annotations = new ArrayList<>();
+	private Optional<CtClass> superclass = Optional.absent();
 
 	public CtClassBuilder name(String name) {
 		this.name = name;
@@ -32,8 +34,35 @@ public class CtClassBuilder {
 		return this;
 	}
 
+	public CtClassBuilder abstractModifier() {
+		this.modifier = this.modifier | Modifier.ABSTRACT;
+		return this;
+	}
+
+	public CtClassBuilder finalModifier() {
+		this.modifier = this.modifier | Modifier.FINAL;
+		return this;
+	}
+
+	public CtClassBuilder privateModifier() {
+		this.modifier = this.modifier & ~Modifier.PUBLIC;
+		this.modifier = this.modifier & ~Modifier.PROTECTED;
+		this.modifier |= Modifier.PRIVATE;
+		return this;
+	}
+
+	public CtClassBuilder withSuperclass(CtClass superclass) {
+		this.superclass = Optional.of(superclass);
+		return this;
+	}
+
 	public CtClass addToClassPool(ClassPool classPool) {
-		CtClass ctClass = classPool.makeClass(name);
+		CtClass ctClass;
+		if (this.superclass.isPresent()) {
+			ctClass = classPool.makeClass(this.name, this.superclass.get());
+		} else {
+			ctClass = classPool.makeClass(this.name);
+		}
 		ctClass.setModifiers(this.modifier);
 		for (String annotation : annotations) {
 			ClassFile classFile = ctClass.getClassFile();

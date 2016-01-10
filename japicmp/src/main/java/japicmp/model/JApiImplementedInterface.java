@@ -52,7 +52,7 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinary
 		return compatibilityChanges;
 	}
 
-	void setJApiClass(JApiClass jApiClass) {
+	public void setJApiClass(JApiClass jApiClass) {
 		this.correspondingJApiClass = Optional.of(jApiClass);
 	}
 }

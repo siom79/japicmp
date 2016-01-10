@@ -25,7 +25,7 @@ import static japicmp.test.util.Helper.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class BinaryCompatibilityTest {
+public class CompatibilityChangesTest {
 	private static List<JApiClass> jApiClasses;
 
 	@BeforeClass

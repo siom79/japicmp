@@ -6,7 +6,7 @@ import japicmp.filter.AnnotationFilterBase;
 import japicmp.filter.Filter;
 import japicmp.filter.Filters;
 import japicmp.filter.JavadocLikePackageFilter;
-import japicmp.model.BinaryCompatibility;
+import japicmp.compat.CompatibilityChanges;
 import japicmp.model.JApiClass;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
@@ -146,8 +146,8 @@ public class JarArchiveComparator {
 	}
 
 	private void checkBinaryCompatibility(List<JApiClass> classList) {
-		BinaryCompatibility binaryCompatibility = new BinaryCompatibility();
-		binaryCompatibility.evaluate(classList);
+		CompatibilityChanges compatibilityChanges = new CompatibilityChanges();
+		compatibilityChanges.evaluate(classList);
 	}
 
 	private List<JApiClass> createAndCompareClassLists(List<File> oldArchives, List<File> newArchives) {
