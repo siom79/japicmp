@@ -39,4 +39,9 @@ public abstract class CtBehaviorBuilder {
 		this.modifier = this.modifier | Modifier.PRIVATE;
 		return this;
 	}
+
+	public CtBehaviorBuilder protectedAccess() {
+		this.modifier = this.modifier | Modifier.PROTECTED;
+		return this;
+	}
 }

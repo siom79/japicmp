@@ -64,6 +64,10 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return (CtMethodBuilder) super.privateAccess();
 	}
 
+	public CtMethodBuilder protectedAccess() {
+		return (CtMethodBuilder) super.protectedAccess();
+	}
+
 	public CtMethodBuilder withAnnotation(String annotation) {
 		this.annotations.add(annotation);
 		return this;
