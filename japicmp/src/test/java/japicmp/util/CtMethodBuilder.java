@@ -76,6 +76,10 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return (CtMethodBuilder) super.abstractMethod();
 	}
 
+	public CtMethodBuilder finalMethod() {
+		return (CtMethodBuilder) super.finalMethod();
+	}
+
 	public CtMethodBuilder withAnnotation(String annotation) {
 		this.annotations.add(annotation);
 		return this;

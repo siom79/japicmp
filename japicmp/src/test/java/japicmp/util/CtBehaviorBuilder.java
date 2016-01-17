@@ -54,4 +54,9 @@ public abstract class CtBehaviorBuilder {
 		this.modifier = this.modifier | Modifier.ABSTRACT;
 		return this;
 	}
+
+	public CtBehaviorBuilder finalMethod() {
+		this.modifier = this.modifier | Modifier.FINAL;
+		return this;
+	}
 }

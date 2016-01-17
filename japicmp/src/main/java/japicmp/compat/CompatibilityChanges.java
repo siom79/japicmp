@@ -89,9 +89,9 @@ public class CompatibilityChanges {
 									if (subclassFieldIsStatic) {
 										changedIncompatible = 1;
 									}
-									if (accessModifierSubclassLess) {
-										changedIncompatible = 2;
-									}
+								}
+								if (accessModifierSubclassLess) {
+									changedIncompatible = 2;
 								}
 							}
 						}

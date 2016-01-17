@@ -57,4 +57,25 @@ public class CtFieldBuilder {
 		this.annotations.add(annotation);
 		return this;
 	}
+
+	public CtFieldBuilder staticAccess() {
+		this.modifier = this.modifier | Modifier.STATIC;
+		return this;
+	}
+
+	public CtFieldBuilder privateAccess() {
+		this.modifier = this.modifier & ~Modifier.PUBLIC;
+		this.modifier = this.modifier | Modifier.PRIVATE;
+		return this;
+	}
+
+	public CtFieldBuilder packageProtectedAccess() {
+		this.modifier = this.modifier & ~Modifier.PUBLIC;
+		return this;
+	}
+
+	public CtFieldBuilder finalAccess() {
+		this.modifier = this.modifier | Modifier.FINAL;
+		return this;
+	}
 }
