@@ -44,4 +44,14 @@ public abstract class CtBehaviorBuilder {
 		this.modifier = this.modifier | Modifier.PROTECTED;
 		return this;
 	}
+
+	public CtBehaviorBuilder staticAccess() {
+		this.modifier = this.modifier | Modifier.STATIC;
+		return this;
+	}
+
+	public CtBehaviorBuilder abstractMethod() {
+		this.modifier = this.modifier | Modifier.ABSTRACT;
+		return this;
+	}
 }

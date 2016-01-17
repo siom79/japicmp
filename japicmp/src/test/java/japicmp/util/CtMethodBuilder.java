@@ -68,6 +68,14 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return (CtMethodBuilder) super.protectedAccess();
 	}
 
+	public CtMethodBuilder staticAccess() {
+		return (CtMethodBuilder) super.staticAccess();
+	}
+
+	public CtMethodBuilder abstractMethod() {
+		return (CtMethodBuilder) super.abstractMethod();
+	}
+
 	public CtMethodBuilder withAnnotation(String annotation) {
 		this.annotations.add(annotation);
 		return this;
@@ -78,6 +86,7 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 			this.returnType = declaringClass;
 		}
 		CtMethod ctMethod = CtNewMethod.make(this.modifier, this.returnType, this.name, this.parameters, this.exceptions, this.body, declaringClass);
+		ctMethod.setModifiers(this.modifier);
 		declaringClass.addMethod(ctMethod);
 		for (String annotation : annotations) {
 			ClassFile classFile = declaringClass.getClassFile();
