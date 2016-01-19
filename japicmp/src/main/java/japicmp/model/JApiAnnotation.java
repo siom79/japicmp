@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.*;
 
-public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibility {
+public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	private final String fullyQualifiedName;
 	private final Optional<Annotation> oldAnnotation;
 	private final Optional<Annotation> newAnnotation;
@@ -131,6 +131,12 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
+		return true;
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
 		return true;
 	}
 

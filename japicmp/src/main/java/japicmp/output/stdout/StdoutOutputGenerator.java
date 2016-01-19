@@ -109,8 +109,8 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 				break;
 		}
 		boolean binaryCompatible = true;
-		if (hasChangeStatus instanceof JApiBinaryCompatibility) {
-			JApiBinaryCompatibility binaryCompatibility = (JApiBinaryCompatibility) hasChangeStatus;
+		if (hasChangeStatus instanceof JApiCompatibility) {
+			JApiCompatibility binaryCompatibility = (JApiCompatibility) hasChangeStatus;
 			binaryCompatible = binaryCompatibility.isBinaryCompatible();
 		}
 		if (binaryCompatible) {

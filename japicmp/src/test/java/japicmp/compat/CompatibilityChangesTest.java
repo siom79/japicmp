@@ -758,10 +758,39 @@ public class CompatibilityChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-//		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-//		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiConstructor jApiConstructor = getJApiConstructor(jApiClass.getConstructors(), Collections.singletonList("int"));
 		assertThat(jApiConstructor.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE));
 		assertThat(jApiConstructor.isBinaryCompatible(), is(false));
+	}
+
+	@Test
+	public void testMethodAddedToInterface() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		options.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtInterfaceBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtInterfaceBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().abstractMethod().name("method").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE));
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
 }

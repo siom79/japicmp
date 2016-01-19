@@ -265,7 +265,16 @@ public class CompatibilityChanges {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NO_LONGER_STATIC);
 				}
 			}
+			if (isInterface(jApiClass)) {
+				if (method.getChangeStatus() == JApiChangeStatus.NEW) {
+					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
+				}
+			}
 		}
+	}
+
+	private boolean isInterface(JApiClass jApiClass) {
+		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.INTERFACE;
 	}
 
 	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map<String, JApiClass> classMap, final JApiMethod method, List<Integer> returnValues) {
@@ -373,7 +382,7 @@ public class CompatibilityChanges {
 		}
 	}
 
-	private void addCompatibilityChange(JApiBinaryCompatibility binaryCompatibility, JApiCompatibilityChange compatibilityChange) {
+	private void addCompatibilityChange(JApiCompatibility binaryCompatibility, JApiCompatibilityChange compatibilityChange) {
 		List<JApiCompatibilityChange> compatibilityChanges = binaryCompatibility.getCompatibilityChanges();
 		if (!compatibilityChanges.contains(compatibilityChange)) {
 			compatibilityChanges.add(compatibilityChange);

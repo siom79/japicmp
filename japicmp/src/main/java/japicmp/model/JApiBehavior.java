@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier,
-	JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiHasBridgeModifier,
+	JApiHasFinalModifier, JApiHasAbstractModifier, JApiCompatibility, JApiHasAnnotations, JApiHasBridgeModifier,
 	JApiCanBeSynthetic, JApiHasLineNumber {
 	private final String name;
 	private final List<JApiParameter> parameters = new LinkedList<>();
@@ -342,6 +342,18 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 			}
 		}
 		return binaryCompatible;
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+		boolean sourceCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isSourceCompatible()) {
+				sourceCompatible = false;
+			}
+		}
+		return sourceCompatible;
 	}
 
 	@XmlElementWrapper(name = "compatibilityChanges")

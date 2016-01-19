@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class JApiAnnotationElement implements JApiHasChangeStatus, JApiBinaryCompatibility {
+public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibility {
 	private final String name;
 	private final Optional<MemberValue> oldValue;
 	private final Optional<MemberValue> newValue;
@@ -147,6 +147,11 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiBinaryCom
 
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
+		return true;
+	}
+
+	@XmlAttribute
+	public boolean isSourceCompatible() {
 		return true;
 	}
 

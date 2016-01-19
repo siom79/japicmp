@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinaryCompatibility {
+public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompatibility {
 	private final String fullyQualifiedName;
 	private final JApiChangeStatus changeStatus;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
@@ -44,6 +44,23 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiBinary
 			}
 		}
 		return binaryCompatible;
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+		boolean sourceCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isSourceCompatible()) {
+				sourceCompatible = false;
+			}
+		}
+		if (sourceCompatible && correspondingJApiClass.isPresent()) {
+			if (!correspondingJApiClass.get().isSourceCompatible()) {
+				sourceCompatible = false;
+			}
+		}
+		return sourceCompatible;
 	}
 
 	@XmlElementWrapper(name = "compatibilityChanges")

@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.*;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
-	JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
+	JApiCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
 	private final JarArchiveComparator jarArchiveComparator;
 	private final String fullyQualifiedName;
 	private final JApiClassType classType;
@@ -769,6 +769,51 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		}
 		return binaryCompatible;
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+		boolean sourceCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isSourceCompatible()) {
+				sourceCompatible = false;
+				break;
+			}
+		}
+		if (sourceCompatible) {
+			for (JApiField field : fields) {
+				if (!field.isSourceCompatible()) {
+					sourceCompatible = false;
+					break;
+				}
+			}
+		}
+		if (sourceCompatible) {
+			for (JApiMethod method : methods) {
+				if (!method.isSourceCompatible()) {
+					sourceCompatible = false;
+					break;
+				}
+			}
+		}
+		if (sourceCompatible) {
+			for (JApiConstructor constructor : constructors) {
+				if (!constructor.isSourceCompatible()) {
+					sourceCompatible = false;
+					break;
+				}
+			}
+		}
+		if (sourceCompatible) {
+			for (JApiImplementedInterface implementedInterface : interfaces) {
+				if (!implementedInterface.isSourceCompatible()) {
+					sourceCompatible = false;
+					break;
+				}
+			}
+		}
+		return sourceCompatible;
 	}
 
 	@XmlElementWrapper(name = "annotations")

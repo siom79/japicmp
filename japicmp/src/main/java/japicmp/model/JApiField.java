@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier,
-	JApiHasFinalModifier, JApiHasTransientModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiCanBeSynthetic {
+	JApiHasFinalModifier, JApiHasTransientModifier, JApiCompatibility, JApiHasAnnotations, JApiCanBeSynthetic {
 	private final JApiChangeStatus changeStatus;
 	private final Optional<CtField> oldFieldOptional;
 	private final Optional<CtField> newFieldOptional;
@@ -325,6 +325,18 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 			}
 		}
 		return binaryCompatible;
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+		boolean sourceCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isSourceCompatible()) {
+				sourceCompatible = false;
+			}
+		}
+		return sourceCompatible;
 	}
 
 	@XmlElementWrapper(name = "compatibilityChanges")

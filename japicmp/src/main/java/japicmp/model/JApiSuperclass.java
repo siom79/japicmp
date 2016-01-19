@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JApiSuperclass implements JApiHasChangeStatus, JApiBinaryCompatibility {
+public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 	private final Optional<CtClass> oldSuperclassOptional;
 	private final Optional<CtClass> newSuperclassOptional;
 	private final JApiChangeStatus changeStatus;
@@ -113,6 +113,23 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiBinaryCompatibil
 			}
 		}
 		return binaryCompatible;
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+		boolean sourceCompatible = true;
+		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
+			if (!compatibilityChange.isSourceCompatible()) {
+				sourceCompatible = false;
+			}
+		}
+		if (sourceCompatible && correspondingJApiClass.isPresent()) {
+			if (!correspondingJApiClass.get().isSourceCompatible()) {
+				sourceCompatible = false;
+			}
+		}
+		return sourceCompatible;
 	}
 
 	@XmlElementWrapper(name = "compatibilityChanges")

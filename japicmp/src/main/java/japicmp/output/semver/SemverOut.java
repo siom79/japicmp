@@ -79,8 +79,8 @@ public class SemverOut extends OutputGenerator<String> {
 			case NEW:
 			case REMOVED:
 			case MODIFIED:
-				if (hasChangeStatus instanceof JApiBinaryCompatibility) {
-					JApiBinaryCompatibility binaryCompatibility = (JApiBinaryCompatibility) hasChangeStatus;
+				if (hasChangeStatus instanceof JApiCompatibility) {
+					JApiCompatibility binaryCompatibility = (JApiCompatibility) hasChangeStatus;
 					if (binaryCompatibility.isBinaryCompatible()) {
 						if (hasChangeStatus instanceof JApiHasAccessModifier) {
 							JApiHasAccessModifier jApiHasAccessModifier = (JApiHasAccessModifier) hasChangeStatus;
@@ -113,7 +113,7 @@ public class SemverOut extends OutputGenerator<String> {
 						}
 					}
 				} else {
-					throw new IllegalStateException("Element '" + hasChangeStatus.getClass().getCanonicalName() + " does not implement '" + JApiBinaryCompatibility.class.getCanonicalName() + "'.");
+					throw new IllegalStateException("Element '" + hasChangeStatus.getClass().getCanonicalName() + " does not implement '" + JApiCompatibility.class.getCanonicalName() + "'.");
 				}
 			default:
 				throw new IllegalStateException("The following JApiChangeStatus is not supported: " + (changeStatus == null ? "null" : changeStatus.name()));
