@@ -38,12 +38,17 @@ public class CtConstructorBuilder extends CtBehaviorBuilder {
 		return (CtConstructorBuilder) super.publicAccess();
 	}
 
+	public CtConstructorBuilder protectedAccess() {
+		return (CtConstructorBuilder) super.protectedAccess();
+	}
+
 	public CtConstructorBuilder privateAccess() {
 		return (CtConstructorBuilder) super.privateAccess();
 	}
 
 	public CtConstructor addToClass(CtClass declaringClass) throws CannotCompileException {
 		CtConstructor ctConstructor = CtNewConstructor.make(this.parameters, this.exceptions, this.body, declaringClass);
+		ctConstructor.setModifiers(this.modifier);
 		declaringClass.addConstructor(ctConstructor);
 		return ctConstructor;
 	}

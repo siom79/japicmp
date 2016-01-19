@@ -1,5 +1,6 @@
 package japicmp.util;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -39,6 +40,25 @@ public class Helper {
 			}
 		}
 		throw new IllegalArgumentException("No method found with name " + name + ".");
+	}
+
+	public static JApiConstructor getJApiConstructor(List<JApiConstructor> constructors, List<String> parameterTypes) {
+		for (JApiConstructor constructor : constructors) {
+			List<JApiParameter> parameters = constructor.getParameters();
+			if (parameterTypes.size() == parameters.size()) {
+				boolean typeMismatch = false;
+				for (int i = 0; i < parameters.size(); i++) {
+					if (!parameters.get(i).getType().equals(parameterTypes.get(i))) {
+						typeMismatch = true;
+						break;
+					}
+				}
+				if (!typeMismatch) {
+					return constructor;
+				}
+			}
+		}
+		throw new IllegalArgumentException("No constructor found with parameters " + Joiner.on(",").join(parameterTypes) + ".");
 	}
 
 	public static Matcher<JApiClass> hasJApiMethodWithName(final String methodName) {
