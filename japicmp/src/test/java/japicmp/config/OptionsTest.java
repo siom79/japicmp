@@ -13,23 +13,20 @@ public class OptionsTest {
 	public void testVerify() {
 		// GIVEN
 		Options options = Options.newDefault();
-
 		// WHEN
-		Options.verify(options);
-
+		options.verify();
 		// THEN
 		// -- no Exception
 	}
 
 	@Test
-	public void testVerify_notExistingHtmlStylesheet() {
+	public void testVerifyNotExistingHtmlStylesheet() {
 		// GIVEN
 		Options options = Options.newDefault();
 		options.setHtmlStylesheet(Optional.of("none.css"));
-
 		try {
 			// WHEN
-			Options.verify(options);
+			options.verify();
 			fail();
 		} catch (JApiCmpException e) {
 			// THEN

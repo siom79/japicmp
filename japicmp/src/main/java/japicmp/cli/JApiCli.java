@@ -70,7 +70,6 @@ public class JApiCli {
 		@Override
 		public void run() {
 			Options options = createOptionsFromCliArgs();
-			Options.verify(options);
 			JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));
 			List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
 			generateOutput(options, jApiClasses);
@@ -117,6 +116,7 @@ public class JApiCli {
 			options.setOldClassPath(Optional.fromNullable(oldClassPath));
 			options.setNewClassPath(Optional.fromNullable(newClassPath));
 			options.setNoAnnotations(noAnnotations);
+			options.verify();
 			return options;
 		}
 

@@ -41,27 +41,27 @@ public class Options {
 		return new Options();
 	}
 
-	public static void verify(Options options) {
-		for (File file : options.getOldArchives()) {
+	public void verify() {
+		for (File file : getOldArchives()) {
 			verifyExistsCanReadAndJar(file);
 		}
-		for (File file : options.getNewArchives()) {
+		for (File file : getNewArchives()) {
 			verifyExistsCanReadAndJar(file);
 		}
-		if (options.getHtmlStylesheet().isPresent()) {
-			String pathname = options.getHtmlStylesheet().get();
+		if (getHtmlStylesheet().isPresent()) {
+			String pathname = getHtmlStylesheet().get();
 			File stylesheetFile = new File(pathname);
 			if (!stylesheetFile.exists()) {
 				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "HTML stylesheet '%s' does not exist.", pathname);
 			}
 		}
-		if (options.getOldClassPath().isPresent() && options.getNewClassPath().isPresent()) {
-			options.setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+		if (getOldClassPath().isPresent() && getNewClassPath().isPresent()) {
+			setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
 		} else {
-			if (options.getOldClassPath().isPresent() || options.getNewClassPath().isPresent()) {
+			if (getOldClassPath().isPresent() || getNewClassPath().isPresent()) {
 				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Please provide both options: " + JApiCli.OLD_CLASSPATH + " and " + JApiCli.NEW_CLASSPATH);
 			} else {
-				options.setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
+				setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
 			}
 		}
 	}
