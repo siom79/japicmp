@@ -42,6 +42,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 					<accessModifier>public</accessModifier>
 					<breakBuildOnModifications>false</breakBuildOnModifications>
 					<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+					<breakBuildOnSourceIncompatibleModifications>false</breakBuildOnSourceIncompatibleModifications>
 					<onlyBinaryIncompatible>false</onlyBinaryIncompatible>
 					<includeSynthetic>false</includeSynthetic>
 					<ignoreMissingClasses>false</ignoreMissingClasses>
@@ -86,6 +87,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 * accessModifier: Sets the access modifier level (public, package, protected, private).
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
+* breakBuildOnSourceIncompatibleModifications: When set to true, the build breaks in case a source incompatible modification has been detected.
 * onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
 * includeSynthetic: When set to true, changes for synthetic classes and class members are tracked.
 * ignoreMissingClasses: When set to true, superclasses and interfaces that cannot be resolved are ignored. Pleases note that in this case the results for the affected classes may not be accurate.

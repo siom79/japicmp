@@ -195,7 +195,14 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (breakBuildOnBinaryIncompatibleModifications(parameterParam)) {
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isBinaryCompatible()) {
-					throw new MojoFailureException(String.format("Breaking the build because there is at least one modified class: %s", jApiClass.getFullyQualifiedName()));
+					throw new MojoFailureException(String.format("Breaking the build because there is at least one binary incompatible class: %s", jApiClass.getFullyQualifiedName()));
+				}
+			}
+		}
+		if (breakBuildOnSourceIncompatibleModifications(parameterParam)) {
+			for (JApiClass jApiClass : jApiClasses) {
+				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isSourceCompatible()) {
+					throw new MojoFailureException(String.format("Breaking the build because there is at least one source incompatible class: %s", jApiClass.getFullyQualifiedName()));
 				}
 			}
 		}
@@ -272,6 +279,14 @@ public class JApiCmpMojo extends AbstractMojo {
 		boolean retVal = false;
 		if (parameterParam != null) {
 			retVal = Boolean.valueOf(parameterParam.getBreakBuildOnBinaryIncompatibleModifications());
+		}
+		return retVal;
+	}
+
+	private boolean breakBuildOnSourceIncompatibleModifications(Parameter parameter) {
+		boolean retVal = false;
+		if (parameter != null) {
+			retVal = Boolean.valueOf(parameter.getBreakBuildOnSourceIncompatibleModifications());
 		}
 		return retVal;
 	}
