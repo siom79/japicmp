@@ -9,8 +9,10 @@ import japicmp.filter.*;
 import japicmp.model.AccessModifier;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.JarFile;
 
 public class Options {
 	private List<File> oldArchives = new ArrayList<>();
@@ -30,6 +32,73 @@ public class Options {
 	private Optional<String> newClassPath = Optional.absent();
 	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
 	private boolean noAnnotations = false;
+
+	Options() {
+		// intentionally left empty
+	}
+
+	public static Options newDefault() {
+		return new Options();
+	}
+
+	public static void verify(Options options) {
+		for (File file : options.getOldArchives()) {
+			verifyExistsCanReadAndJar(file);
+		}
+		for (File file : options.getNewArchives()) {
+			verifyExistsCanReadAndJar(file);
+		}
+		if (options.getHtmlStylesheet().isPresent()) {
+			String pathname = options.getHtmlStylesheet().get();
+			File stylesheetFile = new File(pathname);
+			if (!stylesheetFile.exists()) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "HTML stylesheet '%s' does not exist.", pathname);
+			}
+		}
+		if (options.getOldClassPath().isPresent() && options.getNewClassPath().isPresent()) {
+			options.setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+		} else {
+			if (options.getOldClassPath().isPresent() || options.getNewClassPath().isPresent()) {
+				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Please provide both options: " + JApiCli.OLD_CLASSPATH + " and " + JApiCli.NEW_CLASSPATH);
+			} else {
+				options.setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
+			}
+		}
+	}
+
+	private static void verifyExistsCanReadAndJar(File file) {
+		verifyExisting(file);
+		verifyCanRead(file);
+		verifyJarArchive(file);
+	}
+
+	private static void verifyExisting(File newArchive) {
+		if (!newArchive.exists()) {
+			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
+		}
+	}
+
+	private static void verifyCanRead(File file) {
+		if (!file.canRead()) {
+			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Cannot read file '%s'.", file.getAbsolutePath());
+		}
+	}
+
+	private static void verifyJarArchive(File file) {
+		JarFile jarFile = null;
+		try {
+			jarFile = new JarFile(file);
+		} catch (IOException e) {
+			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+		} finally {
+			if (jarFile != null) {
+				try {
+					jarFile.close();
+				} catch (IOException ignored) {
+				}
+			}
+		}
+	}
 
 	public List<File> getNewArchives() {
 		return newArchives;
@@ -67,12 +136,12 @@ public class Options {
 		this.accessModifier = accessModifier;
 	}
 
-	public void setAccessModifier(AccessModifier accessModifier) {
-		this.accessModifier = Optional.of(accessModifier);
-	}
-
 	public AccessModifier getAccessModifier() {
 		return accessModifier.get();
+	}
+
+	public void setAccessModifier(AccessModifier accessModifier) {
+		this.accessModifier = Optional.of(accessModifier);
 	}
 
 	public List<Filter> getIncludes() {
@@ -121,12 +190,12 @@ public class Options {
 		return filters;
 	}
 
-	public void setOutputOnlyBinaryIncompatibleModifications(boolean outputOnlyBinaryIncompatibleModifications) {
-		this.outputOnlyBinaryIncompatibleModifications = outputOnlyBinaryIncompatibleModifications;
-	}
-
 	public boolean isOutputOnlyBinaryIncompatibleModifications() {
 		return outputOnlyBinaryIncompatibleModifications;
+	}
+
+	public void setOutputOnlyBinaryIncompatibleModifications(boolean outputOnlyBinaryIncompatibleModifications) {
+		this.outputOnlyBinaryIncompatibleModifications = outputOnlyBinaryIncompatibleModifications;
 	}
 
 	public Optional<String> getHtmlOutputFile() {
@@ -137,12 +206,12 @@ public class Options {
 		this.htmlOutputFile = htmlOutputFile;
 	}
 
-	public void setIncludeSynthetic(boolean showSynthetic) {
-		this.includeSynthetic = showSynthetic;
-	}
-
 	public boolean isIncludeSynthetic() {
 		return includeSynthetic;
+	}
+
+	public void setIncludeSynthetic(boolean showSynthetic) {
+		this.includeSynthetic = showSynthetic;
 	}
 
 	public void addClassesExcludeFromArgument(Optional<String> stringOptional) {
@@ -161,51 +230,51 @@ public class Options {
 		return classesExclude;
 	}
 
-	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
-		this.ignoreMissingClasses = ignoreMissingClasses;
-	}
-
 	public boolean isIgnoreMissingClasses() {
 		return ignoreMissingClasses;
 	}
 
-	public void setHtmlStylesheet(Optional<String> htmlStylesheet) {
-		this.htmlStylesheet = htmlStylesheet;
+	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
+		this.ignoreMissingClasses = ignoreMissingClasses;
 	}
 
 	public Optional<String> getHtmlStylesheet() {
 		return htmlStylesheet;
 	}
 
-	public void setOldClassPath(Optional<String> oldClassPath) {
-		this.oldClassPath = oldClassPath;
+	public void setHtmlStylesheet(Optional<String> htmlStylesheet) {
+		this.htmlStylesheet = htmlStylesheet;
 	}
 
 	public Optional<String> getOldClassPath() {
 		return oldClassPath;
 	}
 
-	public void setNewClassPath(Optional<String> newClassPath) {
-		this.newClassPath = newClassPath;
+	public void setOldClassPath(Optional<String> oldClassPath) {
+		this.oldClassPath = oldClassPath;
 	}
 
 	public Optional<String> getNewClassPath() {
 		return newClassPath;
 	}
 
-	public void setClassPathMode(JApiCli.ClassPathMode classPathMode) {
-		this.classPathMode = classPathMode;
+	public void setNewClassPath(Optional<String> newClassPath) {
+		this.newClassPath = newClassPath;
 	}
 
 	public JApiCli.ClassPathMode getClassPathMode() {
 		return classPathMode;
 	}
 
-	public void setNoAnnotations(boolean noAnnotations) {
-		this.noAnnotations = noAnnotations;
+	public void setClassPathMode(JApiCli.ClassPathMode classPathMode) {
+		this.classPathMode = classPathMode;
 	}
 
 	public boolean isNoAnnotations() {
 		return noAnnotations;
+	}
+
+	public void setNoAnnotations(boolean noAnnotations) {
+		this.noAnnotations = noAnnotations;
 	}
 }

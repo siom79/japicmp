@@ -46,7 +46,7 @@ public class ShowSyntheticTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, CtClassBuilder.DEFAULT_CLASS_NAME);
 		assertThat(jApiClass.getMethods().size(), is(1));
 		assertThat(jApiClass.getFields().size(), is(1));
-		Options configOptions = new Options();
+		Options configOptions = Options.newDefault();
 		configOptions.setIncludeSynthetic(true);
 		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses);
 		String output = stdoutOutputGenerator.generate();
@@ -79,7 +79,7 @@ public class ShowSyntheticTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, CtClassBuilder.DEFAULT_CLASS_NAME);
 		assertThat(jApiClass.getMethods().size(), is(0));
 		assertThat(jApiClass.getFields().size(), is(0));
-		Options configOptions = new Options();
+		Options configOptions = Options.newDefault();
 		configOptions.setIncludeSynthetic(true);
 		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses);
 		String output = stdoutOutputGenerator.generate();

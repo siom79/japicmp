@@ -72,6 +72,13 @@ public class JApiCmpMojo extends AbstractMojo {
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${mojoExecution}", readonly = true)
 	private MojoExecution mojoExecution;
 
+	private static <T> T notNull(T value, String msg) throws MojoFailureException {
+		if (value == null) {
+			throw new MojoFailureException(msg);
+		}
+		return value;
+	}
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution);
 		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
@@ -195,7 +202,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private Options createOptions(Parameter parameterParam, List<File> oldVersions, List<File> newVersions) throws MojoFailureException {
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.getOldArchives().addAll(oldVersions);
 		options.getNewArchives().addAll(newVersions);
 		if (parameterParam != null) {
@@ -594,12 +601,5 @@ public class JApiCmpMojo extends AbstractMojo {
 			}
 		}
 		return ignoreNonResolvableArtifacts;
-	}
-
-	private static <T> T notNull(T value, String msg) throws MojoFailureException {
-		if (value == null) {
-			throw new MojoFailureException(msg);
-		}
-		return value;
 	}
 }

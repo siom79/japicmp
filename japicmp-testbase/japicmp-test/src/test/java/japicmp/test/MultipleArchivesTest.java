@@ -56,7 +56,7 @@ public class MultipleArchivesTest {
 
 	@Test
 	public void testStdoutputGenerator() {
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.getOldArchives().addAll(createListOfOldArchives());
 		options.getNewArchives().addAll(createListOfNewArchives());
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
@@ -71,7 +71,7 @@ public class MultipleArchivesTest {
 
 	@Test
 	public void testXmlOutputGenerator() throws UnsupportedEncodingException {
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.getOldArchives().addAll(createListOfOldArchives());
 		options.getNewArchives().addAll(createListOfNewArchives());
 		Path xmlOutputPath = Paths.get(System.getProperty("user.dir"), "target", "MultipleArchivesTest.xml");

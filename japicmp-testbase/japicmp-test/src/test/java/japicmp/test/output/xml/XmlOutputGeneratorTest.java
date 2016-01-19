@@ -50,7 +50,7 @@ public class XmlOutputGeneratorTest {
 	}
 
 	private static void generateHtmlOutput(String xmlOutpuFile, String htmlOutputFile, boolean outputOnlyModifications) {
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.setXmlOutputFile(Optional.of(xmlOutpuFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);

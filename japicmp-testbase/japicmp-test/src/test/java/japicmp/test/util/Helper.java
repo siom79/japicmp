@@ -153,7 +153,7 @@ public class Helper {
 	}
 
 	public static void generateHtmlOutput(List<JApiClass> jApiClasses, String xmlOutputFile, String htmlOutputFile, boolean outputOnlyModifications, AccessModifier accessModifier) {
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.setXmlOutputFile(Optional.of(xmlOutputFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);

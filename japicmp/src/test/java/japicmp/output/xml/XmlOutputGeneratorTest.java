@@ -30,7 +30,7 @@ public class XmlOutputGeneratorTest {
 		Path stylesheetPath = Paths.get(System.getProperty("user.dir"), "target", XmlOutputGeneratorTest.class.getSimpleName() + "_with.css");
 		Path htmlReportPath = Paths.get(System.getProperty("user.dir"), "target", XmlOutputGeneratorTest.class.getSimpleName() + "_with.html");
 		String stylesheetContent = "body {font-family: Monospace;}";
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.setHtmlStylesheet(Optional.of(stylesheetPath.toString()));
 		options.setHtmlOutputFile(Optional.of(htmlReportPath.toString()));
 		Files.write(stylesheetPath, Collections.singletonList(stylesheetContent), Charset.forName("UTF-8"));
@@ -48,7 +48,7 @@ public class XmlOutputGeneratorTest {
 	@Test
 	public void testWithoutHtmlStylesheetOption() throws IOException {
 		Path htmlReportPath = Paths.get(System.getProperty("user.dir"), "target", XmlOutputGeneratorTest.class.getSimpleName() + "_without.html");
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.setHtmlOutputFile(Optional.of(htmlReportPath.toString()));
 		generateHtmlReport(options);
 		boolean foundStyleSheet = false;
@@ -65,7 +65,7 @@ public class XmlOutputGeneratorTest {
 	public void testWithNotExistingHtmlStylesheetOption() throws IOException {
 		Path stylesheetPath = Paths.get(System.getProperty("user.dir"), "target", XmlOutputGeneratorTest.class.getSimpleName() + "_not_existing.css");
 		Path htmlReportPath = Paths.get(System.getProperty("user.dir"), "target", XmlOutputGeneratorTest.class.getSimpleName() + "_with.html");
-		Options options = new Options();
+		Options options = Options.newDefault();
 		options.setHtmlStylesheet(Optional.of(stylesheetPath.toString()));
 		options.setHtmlOutputFile(Optional.of(htmlReportPath.toString()));
 		generateHtmlReport(options);
