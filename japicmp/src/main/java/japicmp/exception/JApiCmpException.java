@@ -31,6 +31,10 @@ public class JApiCmpException extends RuntimeException {
 		return reason;
 	}
 
+	public static JApiCmpException cliError(String format, Object... args) {
+		return of(Reason.CliError, format, args);
+	}
+
 	public static JApiCmpException of(Reason reason, String format, Object... args) {
 		String msg = String.format(format, args);
 		return new JApiCmpException(reason, msg);
@@ -44,7 +48,4 @@ public class JApiCmpException extends RuntimeException {
 		return new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load '" + name + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath " + classPathAsString + " or try the option '--ignore-missing-classes'.", e);
 	}
 
-	public static JApiCmpException forClassLoading(Exception e, String name) {
-		return new JApiCmpException(JApiCmpException.Reason.ClassLoading, "Could not load '" + name + "': " + e.getMessage() + ". Please make sure that all libraries have been added to the classpath or try the option '--ignore-missing-classes'.", e);
-	}
 }

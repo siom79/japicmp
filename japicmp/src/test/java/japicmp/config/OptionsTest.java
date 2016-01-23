@@ -24,6 +24,7 @@ public class OptionsTest {
 		// GIVEN
 		Options options = Options.newDefault();
 		options.setHtmlStylesheet(Optional.of("none.css"));
+		options.setHtmlOutputFile(Optional.of("test.html"));
 		try {
 			// WHEN
 			options.verify();
@@ -31,6 +32,21 @@ public class OptionsTest {
 		} catch (JApiCmpException e) {
 			// THEN
 			assertEquals("HTML stylesheet 'none.css' does not exist.", e.getMessage());
+		}
+	}
+
+	@Test
+	public void testVerifyCssFileWithoutHtmlOutput() {
+		// GIVEN
+		Options options = Options.newDefault();
+		options.setHtmlStylesheet(Optional.of("none.css"));
+		try {
+			// WHEN
+			options.verify();
+			fail();
+		} catch (JApiCmpException e) {
+			// THEN
+			assertEquals("Define a HTML output file, if you want to apply a stylesheet.", e.getMessage());
 		}
 	}
 }

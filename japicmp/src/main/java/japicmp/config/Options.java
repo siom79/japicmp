@@ -24,7 +24,6 @@ public class Options {
 	private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PROTECTED);
 	private List<Filter> includes = new ArrayList<>();
 	private List<Filter> excludes = new ArrayList<>();
-	private List<JavaDocLikeClassFilter> classesExclude = new ArrayList<>();
 	private boolean includeSynthetic = false;
 	private boolean ignoreMissingClasses = false;
 	private Optional<String> htmlStylesheet = Optional.absent();
@@ -48,18 +47,24 @@ public class Options {
 		for (File file : getNewArchives()) {
 			verifyExistsCanReadAndJar(file);
 		}
-		if (getHtmlStylesheet().isPresent()) {
-			String pathname = getHtmlStylesheet().get();
-			File stylesheetFile = new File(pathname);
-			if (!stylesheetFile.exists()) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "HTML stylesheet '%s' does not exist.", pathname);
+		if (getHtmlOutputFile().isPresent()) {
+			if (getHtmlStylesheet().isPresent()) {
+				String pathname = getHtmlStylesheet().get();
+				File stylesheetFile = new File(pathname);
+				if (!stylesheetFile.exists()) {
+					throw JApiCmpException.cliError("HTML stylesheet '%s' does not exist.", pathname);
+				}
+			}
+		} else {
+			if (getHtmlStylesheet().isPresent()) {
+				throw JApiCmpException.cliError("Define a HTML output file, if you want to apply a stylesheet.");
 			}
 		}
 		if (getOldClassPath().isPresent() && getNewClassPath().isPresent()) {
 			setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
 		} else {
 			if (getOldClassPath().isPresent() || getNewClassPath().isPresent()) {
-				throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Please provide both options: " + JApiCli.OLD_CLASSPATH + " and " + JApiCli.NEW_CLASSPATH);
+				throw JApiCmpException.cliError("Please provide both options: " + JApiCli.OLD_CLASSPATH + " and " + JApiCli.NEW_CLASSPATH);
 			} else {
 				setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
 			}
@@ -74,13 +79,13 @@ public class Options {
 
 	private static void verifyExisting(File newArchive) {
 		if (!newArchive.exists()) {
-			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' does not exist.", newArchive.getAbsolutePath());
+			throw JApiCmpException.cliError("File '%s' does not exist.", newArchive.getAbsolutePath());
 		}
 	}
 
 	private static void verifyCanRead(File file) {
 		if (!file.canRead()) {
-			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "Cannot read file '%s'.", file.getAbsolutePath());
+			throw JApiCmpException.cliError("Cannot read file '%s'.", file.getAbsolutePath());
 		}
 	}
 
@@ -89,7 +94,7 @@ public class Options {
 		try {
 			jarFile = new JarFile(file);
 		} catch (IOException e) {
-			throw JApiCmpException.of(JApiCmpException.Reason.CliError, "File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+			throw JApiCmpException.cliError("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
 		} finally {
 			if (jarFile != null) {
 				try {
@@ -212,22 +217,6 @@ public class Options {
 
 	public void setIncludeSynthetic(boolean showSynthetic) {
 		this.includeSynthetic = showSynthetic;
-	}
-
-	public void addClassesExcludeFromArgument(Optional<String> stringOptional) {
-		Iterable<String> classesAsStrings = Splitter.on(",").trimResults().omitEmptyStrings().split(stringOptional.or(""));
-		for (String classAsString : classesAsStrings) {
-			try {
-				JavaDocLikeClassFilter classFilter = new JavaDocLikeClassFilter(classAsString);
-				this.classesExclude.add(classFilter);
-			} catch (Exception e) {
-				throw new JApiCmpException(JApiCmpException.Reason.CliError, "Wrong syntax for class exclude option '" + classAsString + "': " + e.getMessage());
-			}
-		}
-	}
-
-	public List<JavaDocLikeClassFilter> getClassesExclude() {
-		return classesExclude;
 	}
 
 	public boolean isIgnoreMissingClasses() {
