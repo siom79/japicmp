@@ -1,7 +1,14 @@
 package japicmp.compat;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.exception.JApiCmpException;
 import japicmp.model.*;
+import japicmp.util.ClassHelper;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.NotFoundException;
 
 import java.util.*;
 
@@ -9,6 +16,11 @@ import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
 import static japicmp.util.ModifierHelper.isNotPrivate;
 
 public class CompatibilityChanges {
+	private final JarArchiveComparator jarArchiveComparator;
+
+	public CompatibilityChanges(JarArchiveComparator jarArchiveComparator) {
+		this.jarArchiveComparator = jarArchiveComparator;
+	}
 
 	public void evaluate(List<JApiClass> classes) {
 		Map<String, JApiClass> classMap = buildClassMap(classes);
@@ -136,7 +148,8 @@ public class CompatibilityChanges {
 	private void forAllSuperclasses(JApiClass jApiClass, Map<String, JApiClass> classMap, List<Integer> returnValues, OnSuperclassCallback onSuperclassCallback) {
 		JApiSuperclass superclass = jApiClass.getSuperclass();
 		if (superclass.getNewSuperclassName().isPresent()) {
-			JApiClass foundClass = classMap.get(superclass.getNewSuperclassName().get());
+			String newSuperclassName = superclass.getNewSuperclassName().get();
+			JApiClass foundClass = classMap.get(newSuperclassName);
 			if (foundClass != null) {
 				int returnValue = onSuperclassCallback.callback(foundClass, classMap);
 				returnValues.add(returnValue);
@@ -145,10 +158,56 @@ public class CompatibilityChanges {
 				Optional<JApiClass> superclassJApiClassOptional = superclass.getJApiClass();
 				if (superclassJApiClassOptional.isPresent()) {
 					JApiClass superclassJApiClass = superclassJApiClassOptional.get();
-					evaluate(Arrays.asList(superclassJApiClass));
+					evaluate(Collections.singletonList(superclassJApiClass));
 					int returnValue = onSuperclassCallback.callback(superclassJApiClass, classMap);
 					returnValues.add(returnValue);
 					forAllSuperclasses(superclassJApiClass, classMap, returnValues, onSuperclassCallback);
+				} else {
+					Optional<CtClass> oldClassOptional = Optional.absent();
+					Optional<CtClass> newClassOptional = Optional.absent();
+					JarArchiveComparatorOptions.ClassPathMode classPathMode = this.jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode();
+					if (classPathMode == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
+						ClassPool classPool = this.jarArchiveComparator.getCommonClassPool();
+						try {
+							oldClassOptional = Optional.of(classPool.get(newSuperclassName));
+						} catch (NotFoundException e) {
+							throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+						}
+						try {
+							newClassOptional = Optional.of(classPool.get(newSuperclassName));
+						} catch (NotFoundException e) {
+							throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+						}
+					} else {
+						ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();
+						ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();
+						try {
+							oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
+						} catch (NotFoundException e) {
+							throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+						}
+						try {
+							newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
+						} catch (NotFoundException e) {
+							throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+						}
+					}
+					JApiClassType classType;
+					JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;
+					if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+						classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.UNCHANGED);
+					} else if (oldClassOptional.isPresent() && !newClassOptional.isPresent()) {
+						classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
+					} else if (!oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+						classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.NEW);
+					} else {
+						classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.UNCHANGED);
+					}
+					foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType, this.jarArchiveComparator.getJarArchiveComparatorOptions());
+					evaluate(Collections.singletonList(foundClass));
+					int returnValue = onSuperclassCallback.callback(foundClass, classMap);
+					returnValues.add(returnValue);
+					forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
 				}
 			}
 		}
@@ -377,6 +436,19 @@ public class CompatibilityChanges {
 					implementedInterface.setJApiClass(foundClass);
 					checkIfMethodsHaveChangedIncompatible(foundClass, classMap);
 					checkIfFieldsHaveChangedIncompatible(foundClass, classMap);
+				}
+			}
+		}
+		checkIfClassNowCheckedException(jApiClass, classMap);
+	}
+
+	private void checkIfClassNowCheckedException(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+		JApiSuperclass jApiClassSuperclass = jApiClass.getSuperclass();
+		if (jApiClassSuperclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+			if (jApiClassSuperclass.getNewSuperclassName().isPresent()) {
+				String fqn = jApiClassSuperclass.getNewSuperclassName().get();
+				if ("java.lang.Exception".equals(fqn)) {
+					addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NOW_CHECKED_EXCEPTION);
 				}
 			}
 		}

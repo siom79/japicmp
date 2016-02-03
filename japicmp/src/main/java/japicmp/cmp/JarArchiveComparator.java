@@ -146,7 +146,7 @@ public class JarArchiveComparator {
 	}
 
 	private void checkBinaryCompatibility(List<JApiClass> classList) {
-		CompatibilityChanges compatibilityChanges = new CompatibilityChanges();
+		CompatibilityChanges compatibilityChanges = new CompatibilityChanges(this);
 		compatibilityChanges.evaluate(classList);
 	}
 
@@ -285,5 +285,23 @@ public class JarArchiveComparator {
 	 */
 	public ClassPool getCommonClassPool() {
 		return commonClassPool;
+	}
+
+	/**
+	 * Returns the javassist ClassPool that is used for the old version.
+	 *
+	 * @return an instance of ClassPool
+     */
+	public ClassPool getOldClassPool() {
+		return oldClassPool;
+	}
+
+	/**
+	 * Returns the javassist ClassPool that is used for the new version.
+	 *
+	 * @return an instance of ClassPool
+	 */
+	public ClassPool getNewClassPool() {
+		return newClassPool;
 	}
 }

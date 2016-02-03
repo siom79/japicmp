@@ -793,4 +793,28 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
+
+	@Test
+	public void testClassNowCheckedException() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(classPool.get("java.lang.Exception")).addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_NOW_CHECKED_EXCEPTION));
+	}
 }
