@@ -30,9 +30,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,6 +95,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		List<File> oldArchives = new ArrayList<>();
 		List<File> newArchives = new ArrayList<>();
 		populateArchivesListsFromParameters(pluginParameters, mavenParameters, oldArchives, newArchives);
+		VersionChange versionChange = new VersionChange(oldArchives, newArchives);
 		Options options = createOptions(pluginParameters.getParameterParam(), oldArchives, newArchives);
 		List<JApiClass> jApiClasses = compareArchives(options, pluginParameters, mavenParameters);
 		try {
@@ -109,7 +109,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					getLog().info("Written file '" + file.getAbsolutePath() + "'.");
 				}
 			}
-			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam());
+			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), versionChange, options);
 			return Optional.of(xmlOutput);
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
@@ -184,7 +184,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam) throws MojoFailureException {
+	private void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, VersionChange versionChange, Options options) throws MojoFailureException {
 		if (breakBuildOnModificationsParameter(parameterParam)) {
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
@@ -204,6 +204,29 @@ public class JApiCmpMojo extends AbstractMojo {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isSourceCompatible()) {
 					throw new MojoFailureException(String.format("Breaking the build because there is at least one source incompatible class: %s", jApiClass.getFullyQualifiedName()));
 				}
+			}
+		}
+		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
+			VersionChange.ChangeType changeType = versionChange.computeChangeType();
+			SemverOut semverOut = new SemverOut(options, jApiClasses);
+			String semver = semverOut.generate();
+			if (changeType == VersionChange.ChangeType.MINOR && semver.equals("1.0.0")) {
+				throw new MojoFailureException("Versions of archives indicate a minor change but binary incompatible changes found.");
+			}
+			if (changeType == VersionChange.ChangeType.PATCH && semver.equals("1.0.0")) {
+				throw new MojoFailureException("Versions of archives indicate a patch change but binary incompatible changes found.");
+			}
+			if (changeType == VersionChange.ChangeType.PATCH && semver.equals("0.1.0")) {
+				throw new MojoFailureException("Versions of archives indicate a patch change but binary compatible changes found.");
+			}
+			if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("1.0.0")) {
+				throw new MojoFailureException("Versions of archives indicate no API changes but binary incompatible changes found.");
+			}
+			if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("0.1.0")) {
+				throw new MojoFailureException("Versions of archives indicate no API changes but binary compatible changes found.");
+			}
+			if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("0.0.1")) {
+				throw new MojoFailureException("Versions of archives indicate no API changes but found API changes.");
 			}
 		}
 	}
@@ -287,6 +310,14 @@ public class JApiCmpMojo extends AbstractMojo {
 		boolean retVal = false;
 		if (parameter != null) {
 			retVal = Boolean.valueOf(parameter.getBreakBuildOnSourceIncompatibleModifications());
+		}
+		return retVal;
+	}
+
+	private boolean breakBuildBasedOnSemanticVersioning(Parameter parameter) {
+		boolean retVal = false;
+		if (parameter != null) {
+			retVal = Boolean.valueOf(parameter.getBreakBuildBasedOnSemanticVersioning());
 		}
 		return retVal;
 	}
@@ -544,9 +575,9 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private void writeToFile(String output, File outputfile) throws MojoFailureException, IOException {
-		FileWriter fileWriter = null;
+		OutputStreamWriter fileWriter = null;
 		try {
-			fileWriter = new FileWriter(outputfile);
+			fileWriter = new OutputStreamWriter(new FileOutputStream(outputfile), Charset.forName("UTF-8"));
 			fileWriter.write(output);
 			getLog().info("Written file '" + outputfile.getAbsolutePath() + "'.");
 		} catch (Exception e) {

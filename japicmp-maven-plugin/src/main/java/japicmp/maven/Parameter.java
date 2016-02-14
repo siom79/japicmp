@@ -11,6 +11,7 @@ public class Parameter {
 	private String breakBuildOnModifications;
 	private String breakBuildOnBinaryIncompatibleModifications;
 	private String breakBuildOnSourceIncompatibleModifications;
+	private String breakBuildBasedOnSemanticVersioning;
 	private String includeSynthetic;
 	private String ignoreMissingClasses;
 	private String skipPomModules;
@@ -151,5 +152,13 @@ public class Parameter {
 
 	public void setBreakBuildOnSourceIncompatibleModifications(String breakBuildOnSourceIncompatibleModifications) {
 		this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;
+	}
+
+	public String getBreakBuildBasedOnSemanticVersioning() {
+		return breakBuildBasedOnSemanticVersioning;
+	}
+
+	public void setBreakBuildBasedOnSemanticVersioning(String breakBuildBasedOnSemanticVersioning) {
+		this.breakBuildBasedOnSemanticVersioning = breakBuildBasedOnSemanticVersioning;
 	}
 }

@@ -43,6 +43,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 					<breakBuildOnModifications>false</breakBuildOnModifications>
 					<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
 					<breakBuildOnSourceIncompatibleModifications>false</breakBuildOnSourceIncompatibleModifications>
+					<breakBuildBasedOnSemanticVersioning>false</breakBuildBasedOnSemanticVersioning>
 					<onlyBinaryIncompatible>false</onlyBinaryIncompatible>
 					<includeSynthetic>false</includeSynthetic>
 					<ignoreMissingClasses>false</ignoreMissingClasses>
@@ -88,6 +89,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 * breakBuildOnModifications: When set to true, the build breaks in case a modification has been detected.
 * breakBuildOnBinaryIncompatibleModifications: When set to true, the build breaks in case a binary incompatible modification has been detected.
 * breakBuildOnSourceIncompatibleModifications: When set to true, the build breaks in case a source incompatible modification has been detected.
+* breakBuildBasedOnSemanticVersioning: When set to true, the plugin analyzes the versions of the old and new archives and decides based on these versions if binary compatible or incompatible changes are allowed or not. This option expects versions in the form Major.Minor.Patch (e.g. 1.2.3 or 1.2.3-SNAPSHOT).
 * onlyBinaryIncompatible: When set to true, only binary incompatible changes are reported.
 * includeSynthetic: When set to true, changes for synthetic classes and class members are tracked.
 * ignoreMissingClasses: When set to true, superclasses and interfaces that cannot be resolved are ignored. Pleases note that in this case the results for the affected classes may not be accurate.
