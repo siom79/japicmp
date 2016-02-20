@@ -71,4 +71,8 @@ public class Interfaces {
 		String UNCHANGED = "UNCHANGED";
 		String ADDED = "ADDED";
 	}
+
+	public interface InterfaceAddMethod {
+		void methodAdded();
+	}
 }

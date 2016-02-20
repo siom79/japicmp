@@ -69,4 +69,8 @@ public class Interfaces {
 		String UNCHANGED = "UNCHANGED";
 		String REMOVED = "REMOVED";
 	}
+
+	public interface InterfaceAddMethod {
+
+	}
 }

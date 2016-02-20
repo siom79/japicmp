@@ -43,7 +43,7 @@ The comparison of annotations makes this approach suitable for annotation-based 
 * Per default private and package protected classes and class members are not compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to public, protected, package or private.
 * Per default all classes are tracked. If necessary, certain packages, classes, methods or fields can be excluded or explicitly included. Inclusion and exclusion is also possible based on annotations.
-* All changes between all classes/methods/fields are compared. If necessary, output can be limited to changes that are binary incompatible (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html)).
+* All changes between all classes/methods/fields are compared. japicmp differentiates between source and binary compatible changes (as described in the [Java Language Specification](http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html).
 * All changes between annotations are compared, hence japicmp can be used to track annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 * The option `--semantic-versioning` tells you which part of the version you have to increment in order to follow [semantic versioning](http://semver.org/).
@@ -63,3 +63,4 @@ The following projects have related goals:
 * [Java API Compliance Checker](http://ispras.linuxbase.org/index.php/Java_API_Compliance_Checker): A Perl script that uses javap to compare two jar archives. This approach cannot compare annotations and you need to have Perl installed.
 * [Clirr](http://clirr.sourceforge.net/): A tool written in Java that compares two libraries for binary compatibility. Tracking of API changes is implemented only partially, tracking of annotations is not supported.
 * [JDiff](http://javadiff.sourceforge.net/): A Javadoc doclet that generates an HTML report of all API changes. The source code for both versions has to be available, the differences are not distinguished between binary incompatible or not. Comparison of annotations is not supported.
+* [revapi](http://revapi.org/): An API analysis and change tracking tool that was started about the same time as japicmp. It ships with a maven plugin and an Ant task.

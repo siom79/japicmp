@@ -121,6 +121,11 @@
 				</tbody>
 			</table>
 		</div>
+		<div class="explanations">
+			<span>
+				Binary incompatible changes are marked with (!) while source incompatible changes are marked with (*).
+			</span>
+		</div>
 		<div>
 			<xsl:apply-templates select="class" mode="detail">
 				<xsl:sort select="@fullyQualifiedName"/>
@@ -639,6 +644,9 @@
 			<xsl:if test="@binaryCompatible = 'false'">
 				(!)
 			</xsl:if>
+			<xsl:if test="@binaryCompatible = 'true' and @sourceCompatible = 'false'">
+				(*)
+			</xsl:if>
 		</span>
 	</xsl:template>
 
@@ -777,6 +785,9 @@
 				</xsl:when>
 			</xsl:choose>
 			<xsl:if test="@binaryCompatible = 'false'">
+				(!)
+			</xsl:if>
+			<xsl:if test="@binaryCompatible = 'true' and @sourceCompatible = 'false'">
 				(!)
 			</xsl:if>
 		</span>

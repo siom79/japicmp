@@ -109,12 +109,18 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 				break;
 		}
 		boolean binaryCompatible = true;
+		boolean sourceCompatible = true;
 		if (hasChangeStatus instanceof JApiCompatibility) {
-			JApiCompatibility binaryCompatibility = (JApiCompatibility) hasChangeStatus;
-			binaryCompatible = binaryCompatibility.isBinaryCompatible();
+			JApiCompatibility jApiCompatibility = (JApiCompatibility) hasChangeStatus;
+			binaryCompatible = jApiCompatibility.isBinaryCompatible();
+			sourceCompatible = jApiCompatibility.isSourceCompatible();
 		}
 		if (binaryCompatible) {
-			retVal += " ";
+			if (sourceCompatible) {
+				retVal += " ";
+			} else {
+				retVal += "*";
+			}
 		} else {
 			retVal += "!";
 		}

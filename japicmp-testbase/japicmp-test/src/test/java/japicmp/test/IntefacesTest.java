@@ -98,4 +98,12 @@ public class IntefacesTest {
 		assertThat(jApiField.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(interfaceWithFields.isBinaryCompatible(), is(false));
 	}
+
+	@Test
+	public void testIntefaceMethodAdded() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.test.Interfaces$InterfaceAddMethod");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+	}
 }

@@ -2,99 +2,74 @@
 
 ##Comparing two versions of the guava library##
 
-In the following you see the beginning of the differences between the versions 16.0 and 17.0 of Google's guava library. The differences between the two Java APIs are also printed on the command line for a quick overview. Please note that binary incompatible changes are flagged with an exclamation mark.
+In the following you see some of the differences between the versions 18.0 and 19.0 of Google's guava library.
+The differences between the two Java APIs are also printed on the command line for a quick overview.
+Please note that binary incompatible changes are flagged with an exclamation mark (!) while source incompatible changes
+are marked with a trailing star (*).
 
-	***! MODIFIED CLASS: PUBLIC FINAL com.google.common.base.Stopwatch
-		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch()
-			===  UNCHANGED ANNOTATION: java.lang.Deprecated
-		***! MODIFIED CONSTRUCTOR: PACKAGE_PROTECTED (<- PUBLIC) Stopwatch(com.google.common.base.Ticker)
-			===  UNCHANGED ANNOTATION: java.lang.Deprecated
-	***! MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.util.concurrent.Service
-		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.Service$State startAndWait()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.Service$State stopAndWait()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.ListenableFuture start()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) ABSTRACT(-) com.google.common.util.concurrent.ListenableFuture stop()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-	***  MODIFIED CLASS: PUBLIC FINAL com.google.common.net.HttpHeaders
-		+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String FOLLOW_ONLY_WHEN_PRERENDER_SHOWN
-	***! MODIFIED CLASS: PUBLIC ABSTRACT com.google.common.util.concurrent.AbstractScheduledService
-		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.ListenableFuture start()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.Service$State startAndWait()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.Service$State stopAndWait()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-		---! REMOVED METHOD: PUBLIC(-) STATIC(-) FINAL(-) com.google.common.util.concurrent.ListenableFuture stop()
-			---  REMOVED ANNOTATION: java.lang.Deprecated
-	...
+```
+**** MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.collect.RangeMap  (not serializable)
+	+++* NEW METHOD: PUBLIC(+) ABSTRACT(+) java.util.Map asDescendingMapOfRanges()
+**** MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.collect.RangeSet  (not serializable)
+	+++* NEW METHOD: PUBLIC(+) ABSTRACT(+) java.util.Set asDescendingSetOfRanges()
+***! MODIFIED CLASS: com.google.common.collect.RegularImmutableBiMap  (type of field has changed)
+	***  MODIFIED FIELD: PRIVATE FINAL java.util.Map$Entry[] (<- com.google.common.collect.ImmutableMapEntry[]) entries
+	+++  NEW FIELD: STATIC(+) FINAL(+) com.google.common.collect.RegularImmutableBiMap EMPTY
+	---! REMOVED CONSTRUCTOR: RegularImmutableBiMap(java.util.Map$Entry[])
+	---! REMOVED CONSTRUCTOR: RegularImmutableBiMap(int, com.google.common.collect.ImmutableMapEntry$TerminalEntry[])
+	---! REMOVED CONSTRUCTOR: RegularImmutableBiMap(com.google.common.collect.ImmutableMapEntry$TerminalEntry[])
+	+++  NEW CONSTRUCTOR: PRIVATE(+) RegularImmutableBiMap(com.google.common.collect.ImmutableMapEntry[], com.google.common.collect.ImmutableMapEntry[], java.util.Map$Entry[], int, int)
+	+++  NEW METHOD: PRIVATE(+) STATIC(+) void checkNoConflictInValueBucket(java.lang.Object, java.util.Map$Entry, com.google.common.collect.ImmutableMapEntry)
+	---  REMOVED METHOD: PRIVATE(-) STATIC(-) com.google.common.collect.ImmutableMapEntry[] createEntryArray(int)
+	+++  NEW METHOD: STATIC(+) com.google.common.collect.RegularImmutableBiMap fromEntries(java.util.Map$Entry[])
+	+++  NEW METHOD: STATIC(+) com.google.common.collect.RegularImmutableBiMap fromEntryArray(int, java.util.Map$Entry[])
+	+++  NEW METHOD: PUBLIC(+) int hashCode()
+	+++  NEW METHOD: boolean isHashCodeFast()
+...
+```
 
-Optionally japicmp can also create an HTML report. An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.html):
+Optionally japicmp can also create an HTML report.
+An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.html):
 
 <img src="https://raw.github.com/siom79/japicmp/master/doc/japicmp_guava.png" alt="HTML Report"></img>
 
 You can also let japicmp create an XML report like the following one:
 
-	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-	<japicmp newJar="/home/siom79/dev/guava-17.0.jar" oldJar="/home/siom79/dev/guava-16.0.jar">
-		<classes>
-			<class binaryCompatible="false" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.base.Stopwatch" type="CLASS">
-				<annotations/>
-				<attributes>
-					<attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
-				</attributes>
-				<constructors>
-					<constructor binaryCompatible="false" changeStatus="MODIFIED" name="Stopwatch">
-						<annotations>
-							<annotation fullyQualifiedName="java.lang.Deprecated">
-								<elements/>
-							</annotation>
-						</annotations>
-						<attributes>
-							<attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
-						</attributes>
-						<modifiers>
-							<modifier changeStatus="UNCHANGED" newValue="NON_FINAL" oldValue="NON_FINAL"/>
-							<modifier changeStatus="UNCHANGED" newValue="NON_STATIC" oldValue="NON_STATIC"/>
-							<modifier changeStatus="MODIFIED" newValue="PACKAGE_PROTECTED" oldValue="PUBLIC"/>
-							<modifier changeStatus="UNCHANGED" newValue="NON_ABSTRACT" oldValue="NON_ABSTRACT"/>
-						</modifiers>
-						<parameters/>
-					</constructor>
-					<constructor binaryCompatible="false" changeStatus="MODIFIED" name="Stopwatch">
-						<annotations>
-							<annotation fullyQualifiedName="java.lang.Deprecated">
-								<elements/>
-							</annotation>
-						</annotations>
-						<attributes>
-							<attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
-						</attributes>
-						<modifiers>
-							<modifier changeStatus="UNCHANGED" newValue="NON_FINAL" oldValue="NON_FINAL"/>
-							<modifier changeStatus="UNCHANGED" newValue="NON_STATIC" oldValue="NON_STATIC"/>
-							<modifier changeStatus="MODIFIED" newValue="PACKAGE_PROTECTED" oldValue="PUBLIC"/>
-							<modifier changeStatus="UNCHANGED" newValue="NON_ABSTRACT" oldValue="NON_ABSTRACT"/>
-						</modifiers>
-						<parameters>
-							<parameter type="com.google.common.base.Ticker"/>
-						</parameters>
-					</constructor>
-				</constructors>
-				<fields/>
-				<interfaces/>
-				<methods/>
-				<modifiers>
-					<modifier changeStatus="UNCHANGED" newValue="FINAL" oldValue="FINAL"/>
-					<modifier changeStatus="UNCHANGED" newValue="NON_STATIC" oldValue="NON_STATIC"/>
-					<modifier changeStatus="UNCHANGED" newValue="PUBLIC" oldValue="PUBLIC"/>
-					<modifier changeStatus="UNCHANGED" newValue="NON_ABSTRACT" oldValue="NON_ABSTRACT"/>
-				</modifiers>
-				<superclass binaryCompatible="true" changeStatus="UNCHANGED" superclassNew="n.a." superclassOld="n.a."/>
-			</class>
-		...
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<japicmp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" accessModifier="PRIVATE" creationTimestamp="2016-02-19T14:36:10.066+0100" ignoreMissingClasses="false" newJar="C:\MCP-IDE\repository\com\google\guava\guava\19.0\guava-19.0.jar" oldJar="C:\MCP-IDE\repository\com\google\guava\guava\18.0\guava-18.0.jar" onlyBinaryIncompatibleModifications="false" onlyModifications="true" packagesExclude="n.a." packagesInclude="all" semanticVersioning="1.0.0" title="JApiCmp-Report" xsi:noNamespaceSchemaLocation="japicmp.xsd">
+    <classes>
+        <class binaryCompatible="false" changeStatus="MODIFIED" fullyQualifiedName="com.google.common.base.CharMatcher" javaObjectSerializationCompatible="NOT_SERIALIZABLE" javaObjectSerializationCompatibleAsString="not serializable" sourceCompatible="false">
+            <annotations/>
+            <attributes>
+                <attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
+            </attributes>
+            <classType changeStatus="UNCHANGED" newType="CLASS" oldType="CLASS"/>
+            <compatibilityChanges/>
+            <constructors>
+                <constructor binaryCompatible="false" changeStatus="REMOVED" name="CharMatcher" newLineNumber="n.a." oldLineNumber="600" sourceCompatible="false">
+                    <annotations/>
+                    <attributes>
+                        <attribute changeStatus="REMOVED" newValue="n.a." oldValue="NON_SYNTHETIC"/>
+                    </attributes>
+                    <compatibilityChanges>
+                        <compatibilityChange>CONSTRUCTOR_REMOVED</compatibilityChange>
+                    </compatibilityChanges>
+                    <modifiers>
+                        <modifier changeStatus="REMOVED" newValue="n.a." oldValue="NON_FINAL"/>
+                        <modifier changeStatus="REMOVED" newValue="n.a." oldValue="NON_STATIC"/>
+                        <modifier changeStatus="REMOVED" newValue="n.a." oldValue="PACKAGE_PROTECTED"/>
+                        <modifier changeStatus="REMOVED" newValue="n.a." oldValue="NON_ABSTRACT"/>
+                        <modifier changeStatus="REMOVED" newValue="n.a." oldValue="NON_BRIDGE"/>
+                        <modifier changeStatus="REMOVED" newValue="n.a." oldValue="NON_SYNTHETIC"/>
+                    </modifiers>
+                    <parameters>
+                        <parameter type="java.lang.String"/>
+                    </parameters>
+                </constructor>
+            </constructors>
+			...
+```
 
 ##Tracking changes of an XML document marshalled with JAXB##
 
