@@ -62,6 +62,10 @@ in less than one second and therewith can be easily integrated in each build.
 
 You can download the latest version from the [release page](https://github.com/siom79/japicmp/releases) or directly from the [maven central repository](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22japicmp%22).
 
+##Contact##
+
+The issue tracker at [github](https://github.com/siom79/japicmp/issues) can be used to submit feature requests or bugs. Beyond that contributions in form of pull requests are highly appreciated.
+
 ##Related work##
 
 The following projects have related goals:

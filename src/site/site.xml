@@ -29,6 +29,7 @@
 			<item href="CliTool.html" name="Cli-Tool" />
 			<item href="MavenPlugin.html" name="Maven Plugin" />
 			<item href="Examples.html" name="Examples" />
+			<item href="Versions.html" name="Versions" />
 		</menu>
 		<menu ref="reports" inherit="bottom" />
 	</body>
