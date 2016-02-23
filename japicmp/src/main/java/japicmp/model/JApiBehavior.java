@@ -11,15 +11,13 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ExceptionsAttribute;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier,
 	JApiHasFinalModifier, JApiHasAbstractModifier, JApiCompatibility, JApiHasAnnotations, JApiHasBridgeModifier,
@@ -34,6 +32,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	private final JApiModifier<BridgeModifier> bridgeModifier;
 	private final JApiModifier<SyntheticModifier> syntheticModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
+	private final List<JApiException> exceptions;
 	protected JApiChangeStatus changeStatus;
 	private final Optional<Integer> oldLineNumber;
 	private final Optional<Integer> newLineNumber;
@@ -49,9 +48,43 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 		this.bridgeModifier = extractBridgeModifier(oldBehavior, newBehavior);
 		this.syntheticModifier = extractSyntheticModifier(oldBehavior, newBehavior);
 		this.syntheticAttribute = extractSyntheticAttribute(oldBehavior, newBehavior);
+		this.exceptions = computeExceptionChanges(oldBehavior, newBehavior);
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 		this.oldLineNumber = getLineNumber(oldBehavior);
 		this.newLineNumber = getLineNumber(newBehavior);
+	}
+
+	private List<JApiException> computeExceptionChanges(Optional<? extends CtBehavior> oldMethodOptional, Optional<? extends CtBehavior> newMethodOptional) {
+		List<JApiException> exceptionList = new ArrayList<>();
+		if (oldMethodOptional.isPresent() && newMethodOptional.isPresent()) {
+			List<String> oldExceptions = extractExceptions(oldMethodOptional);
+			List<String> newExceptions = extractExceptions(newMethodOptional);
+			for (String oldException : oldExceptions) {
+				if (newExceptions.contains(oldException)) {
+					exceptionList.add(new JApiException(oldException, JApiChangeStatus.UNCHANGED));
+					newExceptions.remove(oldException);
+				} else {
+					exceptionList.add(new JApiException(oldException, JApiChangeStatus.REMOVED));
+				}
+			}
+			for (String newException : newExceptions) {
+				exceptionList.add(new JApiException(newException, JApiChangeStatus.NEW));
+			}
+		}
+		return exceptionList;
+	}
+
+	private List<String> extractExceptions(Optional<? extends CtBehavior> methodOptional) {
+		ExceptionsAttribute exceptionsAttribute = methodOptional.get().getMethodInfo().getExceptionsAttribute();
+		String[] exceptions;
+		if (exceptionsAttribute != null) {
+			exceptions = exceptionsAttribute.getExceptions();
+		} else {
+			exceptions = new String[0];
+		}
+		List<String> list = new ArrayList<>(exceptions.length);
+		Collections.addAll(list, exceptions);
+		return list;
 	}
 
 	private Optional<Integer> getLineNumber(Optional<? extends CtBehavior> methodOptional) {
@@ -386,5 +419,11 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	@XmlAttribute(name = "newLineNumber")
 	public String getNewLineNumberAsString() {
 		return OptionalHelper.optionalToString(this.newLineNumber);
+	}
+
+	@XmlElementWrapper(name = "exceptions")
+	@XmlElement(name = "exception")
+	public List<JApiException> getExceptions() {
+		return exceptions;
 	}
 }

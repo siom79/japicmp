@@ -4,9 +4,14 @@ import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.util.MethodDescriptorParser;
 import javassist.CtMethod;
+import javassist.bytecode.ExceptionsAttribute;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class JApiMethod extends JApiBehavior {
 	private final Optional<CtMethod> oldMethod;

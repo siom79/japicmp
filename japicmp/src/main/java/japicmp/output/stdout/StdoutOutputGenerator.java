@@ -76,6 +76,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		for (JApiConstructor jApiConstructor : constructors) {
 			appendMethod(sb, signs(jApiConstructor), jApiConstructor, "CONSTRUCTOR:");
 			processAnnotations(sb, jApiConstructor, 2);
+			processExceptions(sb, jApiConstructor, 2);
 		}
 	}
 
@@ -84,7 +85,18 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		for (JApiMethod jApiMethod : methods) {
 			appendMethod(sb, signs(jApiMethod), jApiMethod, "METHOD:");
 			processAnnotations(sb, jApiMethod, 2);
+			processExceptions(sb, jApiMethod, 2);
 		}
+	}
+
+	private void processExceptions(StringBuilder sb, JApiBehavior jApiBehavior, int indent) {
+		for (JApiException exception : jApiBehavior.getExceptions()) {
+			appendException(sb, signs(exception), exception, indent);
+		}
+	}
+
+	private void appendException(StringBuilder sb, String signs, JApiException jApiException, int indent) {
+		sb.append(tabs(indent)).append(signs).append(" ").append(jApiException.getChangeStatus()).append(" EXCEPTION: ").append(jApiException.getName()).append("\n");
 	}
 
 	private void processClass(StringBuilder sb, JApiClass jApiClass) {

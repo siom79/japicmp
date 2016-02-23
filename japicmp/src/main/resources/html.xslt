@@ -335,6 +335,7 @@
 									<td>Modifier</td>
 									<td>Type</td>
 									<td>Method</td>
+									<td>Exceptions</td>
 									<td>Line Number</td>
 								</tr>
 							</thead>
@@ -475,6 +476,31 @@
 			<td>
 				<xsl:value-of select="@name"/>(<xsl:apply-templates select="parameters"/>)
 				<xsl:call-template name="annotations"/>
+			</td>
+			<td>
+				<xsl:if test="count(exceptions/exception) > 0">
+					<table>
+						<thead>
+							<tr>
+								<td>Status:</td>
+								<td>Name:</td>
+							</tr>
+						</thead>
+						<tbody>
+							<xsl:for-each select="exceptions/exception">
+								<tr>
+									<td>
+										<xsl:call-template name="outputChangeStatus"/>
+									</td>
+									<td>
+										<xsl:value-of select="@name"/>
+									</td>
+								</tr>
+							</xsl:for-each>
+						</tbody>
+					</table>
+				</xsl:if>
+				<xsl:if test="count(exceptions/exception) = 0">n.a.</xsl:if>
 			</td>
 			<td>
 				<table>
