@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import javassist.CtConstructor;
 
@@ -10,8 +11,8 @@ public class JApiConstructor extends JApiBehavior {
 	private final Optional<CtConstructor> oldConstructor;
 	private final Optional<CtConstructor> newConstructor;
 
-	public JApiConstructor(String name, JApiChangeStatus changeStatus, Optional<CtConstructor> oldConstructor, Optional<CtConstructor> newConstructor, JarArchiveComparatorOptions options) {
-		super(name, oldConstructor, newConstructor, changeStatus, options);
+	public JApiConstructor(String name, JApiChangeStatus changeStatus, Optional<CtConstructor> oldConstructor, Optional<CtConstructor> newConstructor, JarArchiveComparator jarArchiveComparator) {
+		super(name, oldConstructor, newConstructor, changeStatus, jarArchiveComparator);
 		this.oldConstructor = oldConstructor;
 		this.newConstructor = newConstructor;
 	}

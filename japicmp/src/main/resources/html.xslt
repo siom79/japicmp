@@ -314,6 +314,7 @@
 									<td>Status</td>
 									<td>Modifier</td>
 									<td>Constructor</td>
+									<td>Exceptions</td>
 									<td>Line Number</td>
 								</tr>
 							</thead>
@@ -440,6 +441,9 @@
 				<xsl:call-template name="annotations"/>
 			</td>
 			<td>
+				<xsl:call-template name="exceptions"/>
+			</td>
+			<td>
 				<table>
 					<thead>
 						<tr>
@@ -478,29 +482,7 @@
 				<xsl:call-template name="annotations"/>
 			</td>
 			<td>
-				<xsl:if test="count(exceptions/exception) > 0">
-					<table>
-						<thead>
-							<tr>
-								<td>Status:</td>
-								<td>Name:</td>
-							</tr>
-						</thead>
-						<tbody>
-							<xsl:for-each select="exceptions/exception">
-								<tr>
-									<td>
-										<xsl:call-template name="outputChangeStatus"/>
-									</td>
-									<td>
-										<xsl:value-of select="@name"/>
-									</td>
-								</tr>
-							</xsl:for-each>
-						</tbody>
-					</table>
-				</xsl:if>
-				<xsl:if test="count(exceptions/exception) = 0">n.a.</xsl:if>
+				<xsl:call-template name="exceptions"/>
 			</td>
 			<td>
 				<table>
@@ -523,6 +505,32 @@
 				</table>
 			</td>
 		</tr>
+	</xsl:template>
+
+	<xsl:template name="exceptions">
+		<xsl:if test="count(exceptions/exception) > 0">
+			<table>
+				<thead>
+					<tr>
+						<td>Status:</td>
+						<td>Name:</td>
+					</tr>
+				</thead>
+				<tbody>
+					<xsl:for-each select="exceptions/exception">
+						<tr>
+							<td>
+								<xsl:call-template name="outputChangeStatus"/>
+							</td>
+							<td>
+								<xsl:value-of select="@name"/>
+							</td>
+						</tr>
+					</xsl:for-each>
+				</tbody>
+			</table>
+		</xsl:if>
+		<xsl:if test="count(exceptions/exception) = 0">n.a.</xsl:if>
 	</xsl:template>
 
 	<xsl:template match="annotation">

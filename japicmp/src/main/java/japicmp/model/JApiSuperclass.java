@@ -42,7 +42,7 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 			String newSuperclassName = newSuperclass.getName();
 			if (oldSuperclassName.equals(newSuperclassName)) {
 				JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.UNCHANGED);
-				JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.of(newSuperclass), JApiChangeStatus.UNCHANGED, classType, jarArchiveComparator.getJarArchiveComparatorOptions());
+				JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.of(newSuperclass), JApiChangeStatus.UNCHANGED, classType);
 				return Optional.of(jApiClass);
 			} else {
 				return Optional.absent();
@@ -51,13 +51,13 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 			CtClass oldSuperclass = oldSuperclassOptional.get();
 			String oldSuperclassName = oldSuperclass.getName();
 			JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType, jarArchiveComparator.getJarArchiveComparatorOptions());
+			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType);
 			return Optional.of(jApiClass);
 		} else if (newSuperclassOptional.isPresent()) {
 			CtClass newSuperclass = newSuperclassOptional.get();
 			String newSuperclassName = newSuperclass.getName();
 			JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.NEW);
-			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.<CtClass>absent(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType, jarArchiveComparator.getJarArchiveComparatorOptions());
+			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.<CtClass>absent(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType);
 			return Optional.of(jApiClass);
 		}
 		return Optional.absent();

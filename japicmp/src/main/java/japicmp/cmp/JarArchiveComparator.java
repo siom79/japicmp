@@ -1,5 +1,6 @@
 package japicmp.cmp;
 
+import com.google.common.base.Optional;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.filter.AnnotationFilterBase;
@@ -8,6 +9,7 @@ import japicmp.filter.Filters;
 import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.compat.CompatibilityChanges;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiException;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import japicmp.util.AnnotationHelper;
@@ -303,5 +305,52 @@ public class JarArchiveComparator {
 	 */
 	public ClassPool getNewClassPool() {
 		return newClassPool;
+	}
+
+	public enum ArchiveType {
+		OLD, NEW
+	}
+
+	/**
+	 * Loads a class either from the old, new or common classpath.
+	 * @param archiveType specify if this class should be loaded from the old or new class path
+	 * @param name the name of the class (FQN)
+	 * @return the loaded class (if options are not set to ignore missing classes)
+	 * @throws japicmp.exception.JApiCmpException if loading the class fails
+	 */
+	public Optional<CtClass> loadClass(ArchiveType archiveType, String name) {
+		Optional<CtClass> loadedClass = Optional.absent();
+		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
+			try {
+				loadedClass = Optional.of(commonClassPool.get(name));
+			} catch (NotFoundException e) {
+				if (!options.isIgnoreMissingClasses()) {
+					throw JApiCmpException.forClassLoading(e, name, this);
+				}
+			}
+		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {
+			if (archiveType == ArchiveType.OLD) {
+				try {
+					loadedClass = Optional.of(oldClassPool.get(name));
+				} catch (NotFoundException e) {
+					if (!options.isIgnoreMissingClasses()) {
+						throw JApiCmpException.forClassLoading(e, name, this);
+					}
+				}
+			} else if (archiveType == ArchiveType.NEW) {
+				try {
+					loadedClass = Optional.of(newClassPool.get(name));
+				} catch (NotFoundException e) {
+					if (!options.isIgnoreMissingClasses()) {
+						throw JApiCmpException.forClassLoading(e, name, this);
+					}
+				}
+			} else {
+				throw new JApiCmpException(Reason.IllegalState, "Unknown archive type: " + archiveType);
+			}
+		} else {
+			throw new JApiCmpException(Reason.IllegalState, "Unknown classpath mode: " + this.options.getClassPathMode());
+		}
+		return loadedClass;
 	}
 }

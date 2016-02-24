@@ -203,7 +203,7 @@ public class CompatibilityChanges {
 					} else {
 						classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.UNCHANGED);
 					}
-					foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType, this.jarArchiveComparator.getJarArchiveComparatorOptions());
+					foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType);
 					evaluate(Collections.singletonList(foundClass));
 					int returnValue = onSuperclassCallback.callback(foundClass, classMap);
 					returnValues.add(returnValue);
@@ -329,6 +329,15 @@ public class CompatibilityChanges {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
 				}
 			}
+			checkIfExceptionIsNowChecked(method);
+		}
+	}
+
+	private void checkIfExceptionIsNowChecked(JApiMethod method) {
+		for (JApiException exception : method.getExceptions()) {
+			if (exception.getChangeStatus() == JApiChangeStatus.NEW && exception.isCheckedException()) {
+				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION);
+			}
 		}
 	}
 
@@ -439,10 +448,10 @@ public class CompatibilityChanges {
 				}
 			}
 		}
-		checkIfClassNowCheckedException(jApiClass, classMap);
+		checkIfClassNowCheckedException(jApiClass);
 	}
 
-	private void checkIfClassNowCheckedException(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+	private void checkIfClassNowCheckedException(JApiClass jApiClass) {
 		JApiSuperclass jApiClassSuperclass = jApiClass.getSuperclass();
 		if (jApiClassSuperclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			if (jApiClassSuperclass.getNewSuperclassName().isPresent()) {

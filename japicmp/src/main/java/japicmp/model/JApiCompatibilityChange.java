@@ -21,6 +21,7 @@ public enum JApiCompatibilityChange {
 	METHOD_NOW_STATIC(false, false),
 	METHOD_NO_LONGER_STATIC(false, false),
 	METHOD_ADDED_TO_INTERFACE(true, false),
+	METHOD_NOW_THROWS_CHECKED_EXCEPTION(true, false),
 	FIELD_STATIC_AND_OVERRIDES_STATIC(false, false),
 	FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS(false, false),
 	FIELD_NOW_FINAL(false, false),

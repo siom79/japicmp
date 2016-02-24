@@ -1,15 +1,13 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
 import japicmp.util.OptionalHelper;
-import javassist.CtBehavior;
-import javassist.CtConstructor;
-import javassist.CtMethod;
-import javassist.Modifier;
+import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ExceptionsAttribute;
 
@@ -23,6 +21,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	JApiHasFinalModifier, JApiHasAbstractModifier, JApiCompatibility, JApiHasAnnotations, JApiHasBridgeModifier,
 	JApiCanBeSynthetic, JApiHasLineNumber {
 	private final String name;
+	private final JarArchiveComparator jarArchiveComparator;
 	private final List<JApiParameter> parameters = new LinkedList<>();
 	private final List<JApiAnnotation> annotations = new LinkedList<>();
 	private final JApiModifier<AccessModifier> accessModifier;
@@ -38,9 +37,10 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	private final Optional<Integer> newLineNumber;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
 
-	public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus, JarArchiveComparatorOptions options) {
+	public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
 		this.name = name;
-		computeAnnotationChanges(annotations, oldBehavior, newBehavior, options);
+		this.jarArchiveComparator = jarArchiveComparator;
+		computeAnnotationChanges(annotations, oldBehavior, newBehavior, jarArchiveComparator.getJarArchiveComparatorOptions());
 		this.accessModifier = extractAccessModifier(oldBehavior, newBehavior);
 		this.finalModifier = extractFinalModifier(oldBehavior, newBehavior);
 		this.staticModifier = extractStaticModifier(oldBehavior, newBehavior);
@@ -61,14 +61,14 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 			List<String> newExceptions = extractExceptions(newMethodOptional);
 			for (String oldException : oldExceptions) {
 				if (newExceptions.contains(oldException)) {
-					exceptionList.add(new JApiException(oldException, JApiChangeStatus.UNCHANGED));
+					exceptionList.add(new JApiException(jarArchiveComparator, oldException, jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, oldException), JApiChangeStatus.UNCHANGED));
 					newExceptions.remove(oldException);
 				} else {
-					exceptionList.add(new JApiException(oldException, JApiChangeStatus.REMOVED));
+					exceptionList.add(new JApiException(jarArchiveComparator, oldException, jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldException), JApiChangeStatus.REMOVED));
 				}
 			}
 			for (String newException : newExceptions) {
-				exceptionList.add(new JApiException(newException, JApiChangeStatus.NEW));
+				exceptionList.add(new JApiException(jarArchiveComparator, newException, jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newException), JApiChangeStatus.NEW));
 			}
 		}
 		return exceptionList;
@@ -152,6 +152,11 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 			}
 			if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
+			}
+			for (JApiException jApiException : exceptions) {
+				if (jApiException.getChangeStatus() == JApiChangeStatus.NEW || jApiException.getChangeStatus() == JApiChangeStatus.REMOVED) {
+					changeStatus = JApiChangeStatus.MODIFIED;
+				}
 			}
 		}
 		return changeStatus;
