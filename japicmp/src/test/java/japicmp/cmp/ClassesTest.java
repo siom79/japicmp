@@ -104,4 +104,30 @@ public class ClassesTest {
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
+
+	@Test
+	public void testAbstractMethodAddedViaNewSuperclass() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superClass);
+				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").addToClassPool(classPool);
+				return Arrays.asList(superClass, subClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superClass);
+				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
+				return Arrays.asList(superClass, subClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Subclass");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+	}
 }

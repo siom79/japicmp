@@ -2,6 +2,13 @@
 
 The following versions of japicmp are available:
 
+##0.7.1 (2016-02-21)##
+
+* Method added to new interface is no longer detected as source incompatible [#112](https://github.com/siom79/japicmp/issues/112)
+* Method that overrides in subinterface method from superinterface is no longer detected as source incompatible [#113](https://github.com/siom79/japicmp/issues/113)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.7.1%22).
+
 ##0.7.0 (2016-02-21)##
 
 * japicmp now also supports tracking of source incompatible changes. [#59](https://github.com/siom79/japicmp/issues/59)

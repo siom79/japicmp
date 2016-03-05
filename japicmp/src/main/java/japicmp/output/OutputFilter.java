@@ -21,7 +21,7 @@ public class OutputFilter extends Filter {
 				boolean remove = false;
 				if (options.isOutputOnlyModifications()) {
 					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-						if (hasOnlyUnchangedAnnotations(element)) {
+						if (hasOnlyUnchangedAnnotations(element) && element.isSourceCompatible()) {
 							remove = true;
 						}
 					}
@@ -77,7 +77,7 @@ public class OutputFilter extends Filter {
 			public void visit(Iterator<JApiImplementedInterface> iterator, JApiImplementedInterface element) {
 				boolean remove = false;
 				if (options.isOutputOnlyModifications()) {
-					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED && element.isSourceCompatible()) {
 						remove = true;
 					}
 				}
@@ -95,7 +95,7 @@ public class OutputFilter extends Filter {
 			public void visit(Iterator<JApiConstructor> iterator, JApiConstructor element) {
 				boolean remove = false;
 				if (options.isOutputOnlyModifications()) {
-					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED && element.isSourceCompatible()) {
 						if (hasOnlyUnchangedAnnotations(element)) {
 							remove = true;
 						}
@@ -118,7 +118,7 @@ public class OutputFilter extends Filter {
 			public void visit(Iterator<JApiMethod> iterator, JApiMethod element) {
 				boolean remove = false;
 				if (options.isOutputOnlyModifications()) {
-					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED && element.isSourceCompatible()) {
 						if (hasOnlyUnchangedAnnotations(element)) {
 							remove = true;
 						}
@@ -141,7 +141,7 @@ public class OutputFilter extends Filter {
 			public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
 				boolean remove = false;
 				if (options.isOutputOnlyModifications()) {
-					if (jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+					if (jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED && jApiClass.isSourceCompatible()) {
 						ImmutableList<Boolean> list = findOneChangedElement(jApiClass);
 						if (list.isEmpty()) { //filter out this class if it does not have any changed element (e.g. annotations)
 							remove = true;
