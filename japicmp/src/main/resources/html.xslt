@@ -169,6 +169,25 @@
 					</span>
 					<a href="#toc" class="toc_link">top</a>
 				</div>
+				<xsl:if test="count(compatibilityChanges/compatibilityChange) > 0">
+					<div class="class_compatibilityChanges">
+						<span class="label_class_member">Compatibility Changes:</span>
+						<table>
+							<thead>
+								<tr>
+									<td>Change</td>
+								</tr>
+							</thead>
+							<tbody>
+								<xsl:for-each select="compatibilityChanges/compatibilityChange">
+									<tr>
+										<td><xsl:value-of select="text()"/></td>
+									</tr>
+								</xsl:for-each>
+							</tbody>
+						</table>
+					</div>
+				</xsl:if>
 				<div class="class_superclass">
 					<xsl:if test="  count(superclass) > 0
                                     and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.')
@@ -183,6 +202,7 @@
 								<tr>
 									<td>Status</td>
 									<td>Superclass</td>
+									<td>Compatibility Changes:</td>
 								</tr>
 							</thead>
 							<tbody>
@@ -199,6 +219,7 @@
 								<tr>
 									<td>Status</td>
 									<td>Interface</td>
+									<td>Compatibility Changes:</td>
 								</tr>
 							</thead>
 							<tbody>
@@ -295,6 +316,7 @@
 									<td>Modifier</td>
 									<td>Type</td>
 									<td>Field</td>
+									<td>Compatibility Changes:</td>
 								</tr>
 							</thead>
 							<tbody>
@@ -315,6 +337,7 @@
 									<td>Modifier</td>
 									<td>Constructor</td>
 									<td>Exceptions</td>
+									<td>Compatibility Changes:</td>
 									<td>Line Number</td>
 								</tr>
 							</thead>
@@ -337,6 +360,7 @@
 									<td>Type</td>
 									<td>Method</td>
 									<td>Exceptions</td>
+									<td>Compatibility Changes:</td>
 									<td>Line Number</td>
 								</tr>
 							</thead>
@@ -396,6 +420,9 @@
 					</xsl:when>
 				</xsl:choose>
 			</td>
+			<td>
+				<xsl:call-template name="compatibilityChanges"/>
+			</td>
 		</tr>
 	</xsl:template>
 
@@ -406,6 +433,9 @@
 			</td>
 			<td>
 				<xsl:value-of select="@fullyQualifiedName"/>
+			</td>
+			<td>
+				<xsl:call-template name="compatibilityChanges"/>
 			</td>
 		</tr>
 	</xsl:template>
@@ -420,6 +450,9 @@
 			</td>
 			<td>
 				<xsl:call-template name="type"/>
+			</td>
+			<td>
+				<xsl:call-template name="compatibilityChanges"/>
 			</td>
 			<td>
 				<xsl:value-of select="@name"/>
@@ -442,6 +475,9 @@
 			</td>
 			<td>
 				<xsl:call-template name="exceptions"/>
+			</td>
+			<td>
+				<xsl:call-template name="compatibilityChanges"/>
 			</td>
 			<td>
 				<table>
@@ -483,6 +519,9 @@
 			</td>
 			<td>
 				<xsl:call-template name="exceptions"/>
+			</td>
+			<td>
+				<xsl:call-template name="compatibilityChanges"/>
 			</td>
 			<td>
 				<table>
@@ -778,6 +817,28 @@
 				<xsl:if test="$changeStatus != 'MODIFIED'">&#160;</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="compatibilityChanges">
+		<xsl:if test="count(compatibilityChanges/compatibilityChange) > 0">
+			<table>
+				<thead>
+					<tr>
+						<td>Change</td>
+					</tr>
+				</thead>
+				<tbody>
+					<xsl:for-each select="compatibilityChanges/compatibilityChange">
+						<tr>
+							<td><xsl:value-of select="text()"/></td>
+						</tr>
+					</xsl:for-each>
+				</tbody>
+			</table>
+		</xsl:if>
+		<xsl:if test="count(compatibilityChanges/compatibilityChange) = 0">
+			n.a.
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="type">

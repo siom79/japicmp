@@ -1,5 +1,9 @@
 package japicmp.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlEnum;
+
+@XmlEnum
 public enum JApiCompatibilityChange {
 	CLASS_REMOVED(false, false),
 	CLASS_NOW_ABSTRACT(false, false),
@@ -45,10 +49,12 @@ public enum JApiCompatibilityChange {
 		this.sourceCompatible = sourceCompatible;
 	}
 
+	@XmlAttribute(name = "binaryCompatible")
 	public boolean isBinaryCompatible() {
 		return binaryCompatible;
 	}
 
+	@XmlAttribute(name = "sourceCompatible")
 	public boolean isSourceCompatible() {
 		return sourceCompatible;
 	}

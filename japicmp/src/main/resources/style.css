@@ -48,6 +48,9 @@ table tbody tr td.matrix_layout {
     background: #ededed;
     display: inline-block;
 }
+.class_compatibilityChanges {
+	margin-top: 1em;
+}
 .class_superclass {
     margin-top: 1em;
 }

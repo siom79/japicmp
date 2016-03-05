@@ -481,7 +481,6 @@ public class CompatibilityChanges {
 		final JApiSuperclass superclass = jApiClass.getSuperclass();
 		// section 13.4.4 of "Java Language Specification" SE7
 		if (superclass.getChangeStatus() == JApiChangeStatus.REMOVED) {
-			addCompatibilityChange(superclass, JApiCompatibilityChange.CLASS_REMOVED);
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 		} else if (superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED || superclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			List<Integer> returnValues = new ArrayList<>();
