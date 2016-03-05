@@ -18,6 +18,7 @@ public class CtClassBuilder {
 	private int modifier = Modifier.PUBLIC;
 	private List<String> annotations = new ArrayList<>();
 	private Optional<CtClass> superclass = Optional.absent();
+	private List<CtClass> interfaces = new ArrayList<>();
 
 	public CtClassBuilder name(String name) {
 		this.name = name;
@@ -72,10 +73,18 @@ public class CtClassBuilder {
 			attr.setAnnotation(annot);
 			ctClass.getClassFile2().addAttribute(attr);
 		}
+		for (CtClass interfaceCtClass : interfaces) {
+			ctClass.addInterface(interfaceCtClass);
+		}
 		return ctClass;
 	}
 
 	public static CtClassBuilder create() {
 		return new CtClassBuilder();
+	}
+
+	public CtClassBuilder implementsInterface(CtClass ctClass) {
+		interfaces.add(ctClass);
+		return this;
 	}
 }

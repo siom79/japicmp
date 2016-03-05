@@ -11,8 +11,8 @@ public class JApiConstructor extends JApiBehavior {
 	private final Optional<CtConstructor> oldConstructor;
 	private final Optional<CtConstructor> newConstructor;
 
-	public JApiConstructor(String name, JApiChangeStatus changeStatus, Optional<CtConstructor> oldConstructor, Optional<CtConstructor> newConstructor, JarArchiveComparator jarArchiveComparator) {
-		super(name, oldConstructor, newConstructor, changeStatus, jarArchiveComparator);
+	public JApiConstructor(JApiClass jApiClass, String name, JApiChangeStatus changeStatus, Optional<CtConstructor> oldConstructor, Optional<CtConstructor> newConstructor, JarArchiveComparator jarArchiveComparator) {
+		super(jApiClass, name, oldConstructor, newConstructor, changeStatus, jarArchiveComparator);
 		this.oldConstructor = oldConstructor;
 		this.newConstructor = newConstructor;
 	}

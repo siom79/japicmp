@@ -20,6 +20,7 @@ import java.util.*;
 public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier,
 	JApiHasFinalModifier, JApiHasAbstractModifier, JApiCompatibility, JApiHasAnnotations, JApiHasBridgeModifier,
 	JApiCanBeSynthetic, JApiHasLineNumber {
+	private final JApiClass jApiClass;
 	private final String name;
 	private final JarArchiveComparator jarArchiveComparator;
 	private final List<JApiParameter> parameters = new LinkedList<>();
@@ -37,7 +38,8 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	private final Optional<Integer> newLineNumber;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
 
-	public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
+	public JApiBehavior(JApiClass jApiClass, String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
+		this.jApiClass = jApiClass;
 		this.name = name;
 		this.jarArchiveComparator = jarArchiveComparator;
 		computeAnnotationChanges(annotations, oldBehavior, newBehavior, jarArchiveComparator.getJarArchiveComparatorOptions());
@@ -202,20 +204,20 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	}
 
 	public boolean hasSameParameter(JApiMethod method) {
-		boolean haveSameParameter = true;
+		boolean hasSameParameter = true;
 		List<JApiParameter> parameters1 = getParameters();
 		List<JApiParameter> parameters2 = method.getParameters();
 		if (parameters1.size() != parameters2.size()) {
-			haveSameParameter = false;
+			hasSameParameter = false;
 		}
-		if (haveSameParameter) {
+		if (hasSameParameter) {
 			for (int i = 0; i < parameters1.size(); i++) {
 				if (!parameters1.get(i).getType().equals(parameters2.get(i).getType())) {
-					haveSameParameter = false;
+					hasSameParameter = false;
 				}
 			}
 		}
-		return haveSameParameter;
+		return hasSameParameter;
 	}
 
 	private JApiModifier<StaticModifier> extractStaticModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
@@ -430,5 +432,10 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	@XmlElement(name = "exception")
 	public List<JApiException> getExceptions() {
 		return exceptions;
+	}
+
+	@XmlTransient
+	public JApiClass getjApiClass() {
+		return this.jApiClass;
 	}
 }

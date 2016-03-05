@@ -64,4 +64,15 @@ public class JApiModifier<T> {
 		}
 		return hasChanged;
 	}
+
+	public boolean hasChangedTo(T value) {
+		boolean hasChangedTo = false;
+		if (newModifier.isPresent()) {
+			T newValue = newModifier.get();
+			if (value == newValue) {
+				hasChangedTo = true;
+			}
+		}
+		return hasChangedTo;
+	}
 }

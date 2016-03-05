@@ -18,6 +18,42 @@ japicmp is available in the Maven Central Repository:
 		<version>0.7.0</version>
 	</dependency>
 
+A maven plugin allows you to integrate the checks into your build:
+
+```
+<plugin>
+	<groupId>com.github.siom79.japicmp</groupId>
+	<artifactId>japicmp-maven-plugin</artifactId>
+	<version>0.7.0</version>
+	<configuration>
+		<oldVersion>
+			<dependency>
+				<groupId>japicmp</groupId>
+				<artifactId>japicmp-test-v1</artifactId>
+				<version>${oldversion}</version>
+				<type>jar</type>
+			</dependency>
+		</oldVersion>
+		<newVersion>
+			<file>
+				<path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
+			</file>
+		</newVersion>
+		<parameter>
+			<!-- see documentation -->
+		</parameter>
+	</configuration>
+	<executions>
+		<execution>
+			<phase>verify</phase>
+			<goals>
+				<goal>cmp</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
+```
+
 ##Motivation##
 
 Every time you release a new version of a library or a product, you have to tell your clients or customers what

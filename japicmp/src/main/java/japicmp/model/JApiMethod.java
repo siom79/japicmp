@@ -2,25 +2,19 @@ package japicmp.model;
 
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.util.MethodDescriptorParser;
 import javassist.CtMethod;
-import javassist.bytecode.ExceptionsAttribute;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class JApiMethod extends JApiBehavior {
 	private final Optional<CtMethod> oldMethod;
 	private final Optional<CtMethod> newMethod;
 	private final JApiReturnType returnType;
 
-	public JApiMethod(String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod, JarArchiveComparator jarArchiveComparator) {
-		super(name, oldMethod, newMethod, changeStatus, jarArchiveComparator);
+	public JApiMethod(JApiClass jApiClass, String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod, JarArchiveComparator jarArchiveComparator) {
+		super(jApiClass, name, oldMethod, newMethod, changeStatus, jarArchiveComparator);
 		this.oldMethod = oldMethod;
 		this.newMethod = newMethod;
 		this.returnType = computeReturnTypeChanges(oldMethod, newMethod);
@@ -112,6 +106,10 @@ public class JApiMethod extends JApiBehavior {
 			}
 		}
 		return haveSameReturnType;
+	}
+
+	public boolean hasSameSignature(JApiMethod jApiMethod) {
+		return hasSameReturnType(jApiMethod) && hasSameParameter(jApiMethod);
 	}
 
 	@XmlTransient

@@ -77,9 +77,9 @@ public class CompatibilityChanges {
 			// section 13.4.8 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.NEW) {
 				ArrayList<Integer> returnValues = new ArrayList<>();
-				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
+				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
 					@Override
-					public int callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap) {
 						int changedIncompatible = 0;
 						for (JApiField superclassField : superclass.getFields()) {
 							if (superclassField.getName().equals(field.getName()) && fieldTypeMatches(superclassField, field)) {
@@ -137,21 +137,21 @@ public class CompatibilityChanges {
 		}
 	}
 
-	private interface OnSuperclassCallback {
-		int callback(JApiClass superclass, Map<String, JApiClass> classMap);
+	private interface OnSuperclassCallback<T> {
+		T callback(JApiClass superclass, Map<String, JApiClass> classMap);
 	}
 
-	private interface OnImplementedInterfaceCallback {
-		int callback(JApiClass implementedInterface, Map<String, JApiClass> classMap);
+	private interface OnImplementedInterfaceCallback<T> {
+		T callback(JApiClass implementedInterface, Map<String, JApiClass> classMap);
 	}
 
-	private void forAllSuperclasses(JApiClass jApiClass, Map<String, JApiClass> classMap, List<Integer> returnValues, OnSuperclassCallback onSuperclassCallback) {
+	private <T> void forAllSuperclasses(JApiClass jApiClass, Map<String, JApiClass> classMap, List<T> returnValues, OnSuperclassCallback<T> onSuperclassCallback) {
 		JApiSuperclass superclass = jApiClass.getSuperclass();
 		if (superclass.getNewSuperclassName().isPresent()) {
 			String newSuperclassName = superclass.getNewSuperclassName().get();
 			JApiClass foundClass = classMap.get(newSuperclassName);
 			if (foundClass != null) {
-				int returnValue = onSuperclassCallback.callback(foundClass, classMap);
+				T returnValue = onSuperclassCallback.callback(foundClass, classMap);
 				returnValues.add(returnValue);
 				forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
 			} else {
@@ -159,7 +159,7 @@ public class CompatibilityChanges {
 				if (superclassJApiClassOptional.isPresent()) {
 					JApiClass superclassJApiClass = superclassJApiClassOptional.get();
 					evaluate(Collections.singletonList(superclassJApiClass));
-					int returnValue = onSuperclassCallback.callback(superclassJApiClass, classMap);
+					T returnValue = onSuperclassCallback.callback(superclassJApiClass, classMap);
 					returnValues.add(returnValue);
 					forAllSuperclasses(superclassJApiClass, classMap, returnValues, onSuperclassCallback);
 				} else {
@@ -205,7 +205,7 @@ public class CompatibilityChanges {
 					}
 					foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType);
 					evaluate(Collections.singletonList(foundClass));
-					int returnValue = onSuperclassCallback.callback(foundClass, classMap);
+					T returnValue = onSuperclassCallback.callback(foundClass, classMap);
 					returnValues.add(returnValue);
 					forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
 				}
@@ -243,9 +243,9 @@ public class CompatibilityChanges {
 			// section 13.4.6 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.REMOVED) {
 				final List<Integer> returnValues = new ArrayList<>();
-				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
+				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
 					@Override
-					public int callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap) {
 						for (JApiMethod superMethod : superclass.getMethods()) {
 							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
 								return 1;
@@ -272,9 +272,9 @@ public class CompatibilityChanges {
 			// section 13.4.12 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.NEW) {
 				List<Integer> returnValues = new ArrayList<>();
-				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
+				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
 					@Override
-					public int callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap) {
 						for (JApiMethod superMethod : superclass.getMethods()) {
 							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
 								if (superMethod.getAccessModifier().getNewModifier().isPresent() && method.getAccessModifier().getNewModifier().isPresent()) {
@@ -324,13 +324,107 @@ public class CompatibilityChanges {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NO_LONGER_STATIC);
 				}
 			}
-			if (isInterface(jApiClass)) {
-				if (method.getChangeStatus() == JApiChangeStatus.NEW) {
-					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
-				}
-			}
+			checkAbstractMethod(jApiClass, classMap, method);
 			checkIfExceptionIsNowChecked(method);
 		}
+	}
+
+	private void checkAbstractMethod(JApiClass jApiClass, Map<String, JApiClass> classMap, JApiMethod method) {
+		if (isInterface(jApiClass)) {
+			if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
+				if (method.getChangeStatus() == JApiChangeStatus.NEW) {
+					List<JApiMethod> implementedMethods = getImplementedMethods(jApiClass, classMap, method);
+					if (implementedMethods.size() == 0) {
+						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
+					} else {
+						boolean allNew = true;
+						for (JApiMethod jApiMethod : implementedMethods) {
+							if (jApiMethod.getChangeStatus() != JApiChangeStatus.NEW) {
+								allNew = false;
+							}
+						}
+						if (allNew) {
+							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
+						}
+					}
+				}
+			}
+		} else {
+			if (isAbstract(method)) {
+				if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
+					if (method.getChangeStatus() == JApiChangeStatus.NEW) {
+						List<JApiMethod> overriddenMethods = getOverriddenMethods(jApiClass, classMap, method);
+						boolean overridesAbstract = false;
+						for (JApiMethod jApiMethod : overriddenMethods) {
+							if (isAbstract(jApiMethod) && jApiMethod.getChangeStatus() != JApiChangeStatus.NEW) {
+								overridesAbstract = true;
+							}
+						}
+						List<JApiMethod> implementedMethods = getImplementedMethods(jApiClass, classMap, method);
+						if (implementedMethods.size() > 0) {
+							overridesAbstract = true;
+						}
+						if (!overridesAbstract) {
+							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_TO_CLASS);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private List<JApiMethod> getOverriddenMethods(final JApiClass jApiClass, final Map<String, JApiClass> classMap, final JApiMethod method) {
+		ArrayList<JApiMethod> jApiMethods = new ArrayList<>();
+		forAllSuperclasses(jApiClass, classMap, jApiMethods, new OnSuperclassCallback<JApiMethod>() {
+			@Override
+			public JApiMethod callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+				for (JApiMethod jApiMethod : superclass.getMethods()) {
+					if (isAbstract(jApiMethod)) {
+						if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameSignature(method)) {
+							return jApiMethod;
+						}
+					}
+				}
+				return null;
+			}
+		});
+		return removeNullValues(jApiMethods);
+	}
+
+	private List<JApiMethod> removeNullValues(ArrayList<JApiMethod> jApiMethods) {
+		ArrayList<JApiMethod> returnValues = new ArrayList<>();
+		for (JApiMethod jApiMethod : jApiMethods) {
+			if (jApiMethod != null) {
+				returnValues.add(jApiMethod);
+			}
+		}
+		return returnValues;
+	}
+
+	private List<JApiMethod> getImplementedMethods(final JApiClass jApiClass, final Map<String, JApiClass> classMap, final JApiMethod method) {
+		ArrayList<JApiMethod> jApiMethods = new ArrayList<>();
+		forAllImplementedInterfaces(jApiClass, classMap, jApiMethods, new OnImplementedInterfaceCallback<JApiMethod>() {
+			@Override
+			public JApiMethod callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
+				for (JApiMethod jApiMethod : implementedInterface.getMethods()) {
+					if (isAbstract(jApiMethod)) {
+						if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameSignature(method)) {
+							return jApiMethod;
+						}
+					}
+				}
+				return null;
+			}
+		});
+		return removeNullValues(jApiMethods);
+	}
+
+	private boolean isAbstract(JApiMethod method) {
+		boolean isAbstract = false;
+		if (method.getAbstractModifier().hasChangedTo(AbstractModifier.ABSTRACT)) {
+			isAbstract = true;
+		}
+		return isAbstract;
 	}
 
 	private void checkIfExceptionIsNowChecked(JApiMethod method) {
@@ -353,9 +447,9 @@ public class CompatibilityChanges {
 			JApiClassType.ClassType newType = newTypeOptional.get();
 			JApiClassType.ClassType oldType = oldTypeOptional.get();
 			if (newType == JApiClassType.ClassType.INTERFACE && oldType == JApiClassType.ClassType.INTERFACE) {
-				forAllImplementedInterfaces(jApiClass, classMap, returnValues, new OnImplementedInterfaceCallback() {
+				forAllImplementedInterfaces(jApiClass, classMap, returnValues, new OnImplementedInterfaceCallback<Integer>() {
 					@Override
-					public int callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
+					public Integer callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
 						for (JApiMethod superMethod : implementedInterface.getMethods()) {
 							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
 								return 1;
@@ -368,13 +462,13 @@ public class CompatibilityChanges {
 		}
 	}
 
-	private void forAllImplementedInterfaces(JApiClass jApiClass, Map<String, JApiClass> classMap, List<Integer> returnValues, OnImplementedInterfaceCallback onImplementedInterfaceCallback) {
+	private <T> void forAllImplementedInterfaces(JApiClass jApiClass, Map<String, JApiClass> classMap, List<T> returnValues, OnImplementedInterfaceCallback<T> onImplementedInterfaceCallback) {
 		List<JApiImplementedInterface> interfaces = jApiClass.getInterfaces();
 		for (JApiImplementedInterface implementedInterface : interfaces) {
 			String fullyQualifiedName = implementedInterface.getFullyQualifiedName();
 			JApiClass foundClass = classMap.get(fullyQualifiedName);
 			if (foundClass != null) {
-				int returnValue = onImplementedInterfaceCallback.callback(foundClass, classMap);
+				T returnValue = onImplementedInterfaceCallback.callback(foundClass, classMap);
 				returnValues.add(returnValue);
 				forAllImplementedInterfaces(foundClass, classMap, returnValues, onImplementedInterfaceCallback);
 			} else {
@@ -391,9 +485,9 @@ public class CompatibilityChanges {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 		} else if (superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED || superclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			List<Integer> returnValues = new ArrayList<>();
-			forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback() {
+			forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
 				@Override
-				public int callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+				public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap) {
 					int binaryCompatible = 0;
 					checkIfMethodsHaveChangedIncompatible(superclass, classMap);
 					checkIfConstructorsHaveChangedIncompatible(superclass, classMap);
@@ -428,9 +522,9 @@ public class CompatibilityChanges {
 					}
 				}
 			} else {
-				if (superclass.getOldSuperclassName().isPresent() && !superclass.getNewSuperclassName().isPresent()) {
+				if (superclass.getOldSuperclassName().isPresent()) {
 					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
-				} else if (!superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
+				} else if (superclass.getNewSuperclassName().isPresent()) {
 					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_ADDED);
 				}
 			}
@@ -438,17 +532,60 @@ public class CompatibilityChanges {
 		// section 13.4.4 of "Java Language Specification" SE7
 		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {
 			if (implementedInterface.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				addCompatibilityChange(implementedInterface, JApiCompatibilityChange.CLASS_REMOVED);
-			} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED || implementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-				JApiClass foundClass = classMap.get(implementedInterface.getFullyQualifiedName());
-				if (foundClass != null) {
-					implementedInterface.setJApiClass(foundClass);
-					checkIfMethodsHaveChangedIncompatible(foundClass, classMap);
-					checkIfFieldsHaveChangedIncompatible(foundClass, classMap);
+				addCompatibilityChange(implementedInterface, JApiCompatibilityChange.INTERFACE_REMOVED);
+			} else {
+				JApiClass interfaceClass = classMap.get(implementedInterface.getFullyQualifiedName());
+				if (implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED || implementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+					if (interfaceClass != null) {
+						implementedInterface.setJApiClass(interfaceClass);
+						checkIfMethodsHaveChangedIncompatible(interfaceClass, classMap);
+						checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
+					}
+				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
+					if (interfaceClass != null) {
+						if (interfaceClass.getMethods().size() > 0) { //no marker interface
+							addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);
+						}
+					} else {
+						addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);
+					}
 				}
 			}
 		}
 		checkIfClassNowCheckedException(jApiClass);
+		checkIfAbstractMethodAddedInSuperclass(jApiClass, classMap);
+	}
+
+	private void checkIfAbstractMethodAddedInSuperclass(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
+			final List<JApiMethod> abstractMethods = new ArrayList<>();
+			final List<JApiMethod> implementedMethods = new ArrayList<>();
+			forAllSuperclasses(jApiClass, classMap, new ArrayList<Integer>(), new OnSuperclassCallback<Integer>() {
+				@Override
+				public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+					for (JApiMethod jApiMethod : superclass.getMethods()) {
+						if (isAbstract(jApiMethod)) {
+							boolean isImplemented = false;
+							for (JApiMethod implementedMethod : implementedMethods) {
+								if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
+									isImplemented = true;
+									break;
+								}
+							}
+							if (!isImplemented) {
+								abstractMethods.add(jApiMethod);
+							}
+						} else {
+							implementedMethods.add(jApiMethod);
+						}
+					}
+					return 0;
+				}
+			});
+			if (abstractMethods.size() > 0) {
+				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_SUPERCLASS);
+			}
+		}
 	}
 
 	private void checkIfClassNowCheckedException(JApiClass jApiClass) {
