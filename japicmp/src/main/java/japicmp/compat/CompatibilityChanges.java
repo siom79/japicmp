@@ -163,47 +163,7 @@ public class CompatibilityChanges {
 					returnValues.add(returnValue);
 					forAllSuperclasses(superclassJApiClass, classMap, returnValues, onSuperclassCallback);
 				} else {
-					Optional<CtClass> oldClassOptional = Optional.absent();
-					Optional<CtClass> newClassOptional = Optional.absent();
-					JarArchiveComparatorOptions.ClassPathMode classPathMode = this.jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode();
-					if (classPathMode == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
-						ClassPool classPool = this.jarArchiveComparator.getCommonClassPool();
-						try {
-							oldClassOptional = Optional.of(classPool.get(newSuperclassName));
-						} catch (NotFoundException e) {
-							throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
-						}
-						try {
-							newClassOptional = Optional.of(classPool.get(newSuperclassName));
-						} catch (NotFoundException e) {
-							throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
-						}
-					} else {
-						ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();
-						ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();
-						try {
-							oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
-						} catch (NotFoundException e) {
-							throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
-						}
-						try {
-							newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
-						} catch (NotFoundException e) {
-							throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
-						}
-					}
-					JApiClassType classType;
-					JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;
-					if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-						classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.UNCHANGED);
-					} else if (oldClassOptional.isPresent() && !newClassOptional.isPresent()) {
-						classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-					} else if (!oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-						classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.NEW);
-					} else {
-						classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.UNCHANGED);
-					}
-					foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType);
+					foundClass = loadClass(newSuperclassName);
 					evaluate(Collections.singletonList(foundClass));
 					T returnValue = onSuperclassCallback.callback(foundClass, classMap);
 					returnValues.add(returnValue);
@@ -211,6 +171,60 @@ public class CompatibilityChanges {
 				}
 			}
 		}
+	}
+
+	private JApiClass loadClass(String newSuperclassName) {
+		JApiClass foundClass;
+		Optional<CtClass> oldClassOptional = Optional.absent();
+		Optional<CtClass> newClassOptional = Optional.absent();
+		JarArchiveComparatorOptions.ClassPathMode classPathMode = this.jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode();
+		if (classPathMode == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
+			ClassPool classPool = this.jarArchiveComparator.getCommonClassPool();
+			try {
+				oldClassOptional = Optional.of(classPool.get(newSuperclassName));
+			} catch (NotFoundException e) {
+				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreMissingClasses()) {
+					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+				}
+			}
+			try {
+				newClassOptional = Optional.of(classPool.get(newSuperclassName));
+			} catch (NotFoundException e) {
+				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreMissingClasses()) {
+					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+				}
+			}
+		} else {
+			ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();
+			ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();
+			try {
+				oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
+			} catch (NotFoundException e) {
+				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreMissingClasses()) {
+					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+				}
+			}
+			try {
+				newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
+			} catch (NotFoundException e) {
+				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreMissingClasses()) {
+					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+				}
+			}
+		}
+		JApiClassType classType;
+		JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;
+		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.UNCHANGED);
+		} else if (oldClassOptional.isPresent() && !newClassOptional.isPresent()) {
+			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
+		} else if (!oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.NEW);
+		} else {
+			classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.UNCHANGED);
+		}
+		foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType);
+		return foundClass;
 	}
 
 	private boolean fieldTypeMatches(JApiField field1, JApiField field2) {
@@ -534,19 +548,32 @@ public class CompatibilityChanges {
 				addCompatibilityChange(implementedInterface, JApiCompatibilityChange.INTERFACE_REMOVED);
 			} else {
 				JApiClass interfaceClass = classMap.get(implementedInterface.getFullyQualifiedName());
+				if (interfaceClass == null) {
+					interfaceClass = loadClass(implementedInterface.getFullyQualifiedName());
+				}
 				if (implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED || implementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-					if (interfaceClass != null) {
-						implementedInterface.setJApiClass(interfaceClass);
-						checkIfMethodsHaveChangedIncompatible(interfaceClass, classMap);
-						checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
-					}
+					implementedInterface.setJApiClass(interfaceClass);
+					checkIfMethodsHaveChangedIncompatible(interfaceClass, classMap);
+					checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
 				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
-					if (interfaceClass != null) {
-						if (interfaceClass.getMethods().size() > 0) { //no marker interface
+					if (interfaceClass.getMethods().size() > 0) { //no marker interface
+						boolean allInterfaceMethodsImplemented = true;
+						for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {
+							boolean interfaceMethodImplemented = false;
+							for (JApiMethod classMethod : jApiClass.getMethods()) {
+								if (classMethod.getName().equals(interfaceMethod.getName()) && classMethod.hasSameSignature(interfaceMethod)) {
+									interfaceMethodImplemented = true;
+									break;
+								}
+							}
+							if (!interfaceMethodImplemented) {
+								allInterfaceMethodsImplemented = false;
+								break;
+							}
+						}
+						if (!allInterfaceMethodsImplemented) {
 							addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);
 						}
-					} else {
-						addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);
 					}
 				}
 			}
