@@ -67,7 +67,7 @@ public class ClassesComparator {
 	}
 
 	private boolean includeClass(JApiClass jApiClass) {
-		return ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier()) && ModifierHelper.includeSynthetic(jApiClass, options);
+		return ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier());
 	}
 
 	private Map<String, CtClass> createClassMap(List<CtClass> oldClassesArg) {

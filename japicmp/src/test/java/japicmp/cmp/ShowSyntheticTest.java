@@ -2,6 +2,7 @@ package japicmp.cmp;
 
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
+import japicmp.output.OutputFilter;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
@@ -75,11 +76,13 @@ public class ShowSyntheticTest {
 				return Arrays.asList(ctClass, syntheticClass);
 			}
 		});
+		Options configOptions = Options.newDefault();
+		configOptions.setIncludeSynthetic(false);
+		(new OutputFilter(configOptions)).filter(jApiClasses);
 		assertThat(jApiClasses.size(), is(1));
 		JApiClass jApiClass = getJApiClass(jApiClasses, CtClassBuilder.DEFAULT_CLASS_NAME);
 		assertThat(jApiClass.getMethods().size(), is(0));
 		assertThat(jApiClass.getFields().size(), is(0));
-		Options configOptions = Options.newDefault();
 		configOptions.setIncludeSynthetic(true);
 		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses);
 		String output = stdoutOutputGenerator.generate();

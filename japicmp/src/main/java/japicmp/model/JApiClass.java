@@ -163,7 +163,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private boolean includeField(JApiField jApiField) {
-		return ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier()) && ModifierHelper.includeSynthetic(jApiField, options);
+		return ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier());
 	}
 
 	private Map<String, CtField> buildFieldMap(CtClass ctClass) {
@@ -412,7 +412,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private boolean includeMethod(JApiMethod jApiMethod) {
-		return ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier()) && ModifierHelper.includeSynthetic(jApiMethod, options);
+		return ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier());
 	}
 
 	private void sortConstructorsIntoLists(JApiClass jApiClass, Map<String, CtConstructor> oldConstructorsMap, Map<String, CtConstructor> newConstructorsMap) {
@@ -450,7 +450,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private boolean includeConstructor(JApiConstructor jApiConstructor) {
-		return ModifierHelper.matchesModifierLevel(jApiConstructor, options.getAccessModifier()) && ModifierHelper.includeSynthetic(jApiConstructor, options);
+		return ModifierHelper.matchesModifierLevel(jApiConstructor, options.getAccessModifier());
 	}
 
 	private void addParametersToMethod(MethodDescriptorParser methodDescriptorParser, JApiBehavior jApiMethod) {

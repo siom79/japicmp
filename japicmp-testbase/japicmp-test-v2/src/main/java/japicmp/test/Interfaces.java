@@ -75,4 +75,12 @@ public class Interfaces {
 	public interface InterfaceAddMethod {
 		void methodAdded();
 	}
+
+	public static class ClassImplementsComparable implements Comparable<ClassImplementsComparable> {
+
+		@Override
+		public int compareTo(ClassImplementsComparable o) {
+			return 0;
+		}
+	}
 }

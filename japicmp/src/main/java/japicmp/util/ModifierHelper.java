@@ -2,6 +2,7 @@ package japicmp.util;
 
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.config.Options;
 import japicmp.model.*;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -189,8 +190,12 @@ public class ModifierHelper {
 		return (modifier & ACC_SYNTHETIC) != 0;
 	}
 
-	public static boolean includeSynthetic(JApiCanBeSynthetic jApiClass, JarArchiveComparatorOptions options) {
-		return options.isIncludeSynthetic() || !isSynthetic(jApiClass);
+	public static boolean includeSynthetic(JApiCanBeSynthetic jApiCanBeSynthetic, JarArchiveComparatorOptions options) {
+		return options.isIncludeSynthetic() || !isSynthetic(jApiCanBeSynthetic);
+	}
+
+	public static boolean includeSynthetic(JApiCanBeSynthetic jApiCanBeSynthetic, Options options) {
+		return !isSynthetic(jApiCanBeSynthetic) || options.isIncludeSynthetic();
 	}
 
 	public static boolean isSynthetic(JApiCanBeSynthetic jApiClass) {

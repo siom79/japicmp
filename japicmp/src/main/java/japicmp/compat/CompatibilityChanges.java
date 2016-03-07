@@ -14,6 +14,7 @@ import java.util.*;
 
 import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
 import static japicmp.util.ModifierHelper.isNotPrivate;
+import static japicmp.util.ModifierHelper.isSynthetic;
 
 public class CompatibilityChanges {
 	private final JarArchiveComparator jarArchiveComparator;
@@ -346,7 +347,7 @@ public class CompatibilityChanges {
 	private void checkAbstractMethod(JApiClass jApiClass, Map<String, JApiClass> classMap, JApiMethod method) {
 		if (isInterface(jApiClass)) {
 			if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
-				if (method.getChangeStatus() == JApiChangeStatus.NEW) {
+				if (method.getChangeStatus() == JApiChangeStatus.NEW && !isSynthetic(method)) {
 					List<JApiMethod> implementedMethods = getImplementedMethods(jApiClass, classMap, method);
 					if (implementedMethods.size() == 0) {
 						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
@@ -366,7 +367,7 @@ public class CompatibilityChanges {
 		} else {
 			if (isAbstract(method)) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
-					if (method.getChangeStatus() == JApiChangeStatus.NEW) {
+					if (method.getChangeStatus() == JApiChangeStatus.NEW && !isSynthetic(method)) {
 						List<JApiMethod> overriddenMethods = getOverriddenMethods(jApiClass, classMap, method);
 						boolean overridesAbstract = false;
 						for (JApiMethod jApiMethod : overriddenMethods) {
@@ -560,6 +561,9 @@ public class CompatibilityChanges {
 						boolean allInterfaceMethodsImplemented = true;
 						for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {
 							boolean interfaceMethodImplemented = false;
+							if (isSynthetic(interfaceMethod)) {
+								continue;
+							}
 							for (JApiMethod classMethod : jApiClass.getMethods()) {
 								if (classMethod.getName().equals(interfaceMethod.getName()) && classMethod.hasSameSignature(interfaceMethod)) {
 									interfaceMethodImplemented = true;

@@ -34,6 +34,9 @@ public class OutputFilter extends Filter {
 				if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {
 					remove = true;
 				}
+				if (!ModifierHelper.includeSynthetic(element, options)) {
+					remove = true;
+				}
 				if (remove) {
 					iterator.remove();
 				}
@@ -109,6 +112,9 @@ public class OutputFilter extends Filter {
 				if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {
 					remove = true;
 				}
+				if (!ModifierHelper.includeSynthetic(element, options)) {
+					remove = true;
+				}
 				if (remove) {
 					iterator.remove();
 				}
@@ -130,6 +136,9 @@ public class OutputFilter extends Filter {
 					}
 				}
 				if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {
+					remove = true;
+				}
+				if (!ModifierHelper.includeSynthetic(element, options)) {
 					remove = true;
 				}
 				if (remove) {
@@ -157,14 +166,6 @@ public class OutputFilter extends Filter {
 					remove = true;
 				}
 				if (jApiClass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-					if (jApiClass.getMethods().size() == 0 && jApiClass.getConstructors().size() == 0 && jApiClass.getInterfaces().size() == 0 && jApiClass.getFields().size() == 0
-						&& jApiClass.getAnnotations().size() == 0 && jApiClass.getAbstractModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
-						&& jApiClass.getAccessModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
-						&& jApiClass.getFinalModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
-						&& jApiClass.getStaticModifier().getChangeStatus() == JApiChangeStatus.UNCHANGED
-						&& jApiClass.getSuperclass().getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-						remove = true;
-					}
 					if (options.getAccessModifier().getLevel() > AccessModifier.PRIVATE.getLevel() && options.isOutputOnlyModifications()) {
 						ImmutableList<Boolean> list = findOneChangedElement(jApiClass);
 						if (list.isEmpty()) { //filter out this class if it does not have any changed element at this filter level
@@ -174,6 +175,9 @@ public class OutputFilter extends Filter {
 				}
 				if (jApiClass.getJavaObjectSerializationCompatible().isIncompatible()) {
 					remove = false;
+				}
+				if (!ModifierHelper.includeSynthetic(jApiClass, options)) {
+					remove = true;
 				}
 				if (remove) {
 					iterator.remove();
