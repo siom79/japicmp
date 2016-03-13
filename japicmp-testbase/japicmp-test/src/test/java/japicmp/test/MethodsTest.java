@@ -5,6 +5,7 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiMethod;
+import japicmp.model.JApiReturnType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,22 +28,29 @@ public class MethodsTest {
 	@Test
 	public void testReturnValueStringToInt() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, Methods.class.getName());
+		boolean returnValueStringToIntFound = false;
+		boolean returnValueIntToStringFound = false;
+		boolean returnValueRemainsIntFound = false;
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
 			if (jApiMethod.getName().equals("returnValueStringToInt")) {
-				if (jApiMethod.getReturnType().equals("int")) {
-					assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
-				} else if (jApiMethod.getReturnType().equals("java.lang.String")) {
-					assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
-				}
+				JApiReturnType returnType = jApiMethod.getReturnType();
+				assertThat(returnType.getOldReturnType(), is("java.lang.String"));
+				assertThat(returnType.getNewReturnType(), is("int"));
+				returnValueStringToIntFound = true;
 			} else if (jApiMethod.getName().equals("returnValueIntToString")) {
-				if (jApiMethod.getReturnType().equals("int")) {
-					assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
-				} else if (jApiMethod.getReturnType().equals("java.lang.String")) {
-					assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
-				}
-			} else if (jApiMethod.getName().equals("returnValueRemainsInt")) {
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+				JApiReturnType returnType = jApiMethod.getReturnType();
+				assertThat(returnType.getOldReturnType(), is("int"));
+				assertThat(returnType.getNewReturnType(), is("java.lang.String"));
+				returnValueIntToStringFound = true;
+			} else if (jApiMethod.getName().equals("returnValueIntRemains")) {
+				JApiReturnType returnType = jApiMethod.getReturnType();
+				assertThat(returnType.getOldReturnType(), is("int"));
+				assertThat(returnType.getNewReturnType(), is("int"));
+				returnValueRemainsIntFound = true;
 			}
 		}
+		assertThat(returnValueStringToIntFound, is(true));
+		assertThat(returnValueIntToStringFound, is(true));
+		assertThat(returnValueRemainsIntFound, is(true));
 	}
 }
