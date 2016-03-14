@@ -6,10 +6,11 @@ The following versions of japicmp are available:
 
 * Exceptions declared in method signatures are now tracked and evaluated regarding source incompatibility. [#110](https://github.com/siom79/japicmp/issues/110)
 * HTML report now names all incompatible changes additional to the markers * and !. [#115](https://github.com/siom79/japicmp/issues/115)
+* Maven plugin has new parameter postAnalysisScript that allows execution of Groovy script after comparison phase. [#120](https://github.com/siom79/japicmp/issues/120)
 * Method added to new interface is no longer detected as source incompatible. [#112](https://github.com/siom79/japicmp/issues/112)
 * Method that overrides in subinterface method from superinterface is no longer detected as source incompatible. [#113](https://github.com/siom79/japicmp/issues/113)
 * Excluded xerces vom maven-reporting dependency in order to prevent warnings from SAXParserImpl. [#109](https://github.com/siom79/japicmp/issues/109)
-* Indirectly implemented interfaces should not be reported as removed. [#119](https://github.com/siom79/japicmp/issues/119)
+* Indirectly implemented interfaces are no longer reported as removed. [#119](https://github.com/siom79/japicmp/issues/119)
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.7.1%22).
 
