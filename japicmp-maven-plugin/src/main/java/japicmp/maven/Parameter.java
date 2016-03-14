@@ -25,6 +25,8 @@ public class Parameter {
 	private String ignoreNonResolvableArtifacts;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<String> packagingSupporteds;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String postAnalysisScript;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -160,5 +162,13 @@ public class Parameter {
 
 	public void setBreakBuildBasedOnSemanticVersioning(String breakBuildBasedOnSemanticVersioning) {
 		this.breakBuildBasedOnSemanticVersioning = breakBuildBasedOnSemanticVersioning;
+	}
+
+	public String getPostAnalysisScript() {
+		return postAnalysisScript;
+	}
+
+	public void setPostAnalysisScript(String postAnalysisScript) {
+		this.postAnalysisScript = postAnalysisScript;
 	}
 }

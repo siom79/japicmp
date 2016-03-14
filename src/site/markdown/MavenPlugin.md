@@ -1,6 +1,46 @@
 #Maven Plugin#
 
+##Basic Usage##
+
 The maven plugin can be included in the pom.xml file of your artifact in the following way (requires maven >= 3.0.3):
+
+```
+<plugin>
+	<groupId>com.github.siom79.japicmp</groupId>
+	<artifactId>japicmp-maven-plugin</artifactId>
+	<version>0.7.0</version>
+	<configuration>
+		<oldVersion>
+			<dependency>
+				<groupId>japicmp</groupId>
+				<artifactId>japicmp-test-v1</artifactId>
+				<version>${oldversion}</version>
+				<type>jar</type>
+			</dependency>
+		</oldVersion>
+		<newVersion>
+			<file>
+				<path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
+			</file>
+		</newVersion>
+		<parameter>
+			<!-- see documentation -->
+		</parameter>
+	</configuration>
+	<executions>
+		<execution>
+			<phase>verify</phase>
+			<goals>
+				<goal>cmp</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
+```
+
+##Advance Usage##
+
+An advanced configuration can utilize the following parameters:
 
 ```
 <build>
@@ -55,6 +95,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 					<packagingSupporteds>
 						<packagingSupported>jar</packagingSupported>
 					</packagingSupporteds>
+					<postAnalysisScript>${project.basedir}/src/main/groovy/postAnalysisScript.groovy</postAnalysisScript>
 				</parameter>
 				<dependencies>
 					<dependency>
@@ -100,6 +141,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 * noAnnotations: Setting this option to true disables the evaluation of annotations completely.
 * ignoreNonResolvableArtifacts: Set this to true in order to ignore artifacts that cannot be resolved, i.e. the build does not break in case a dependency cannto be resolved to a file.
 * packagingSupported: List all packaging type for which the plugin should be executed. Helpful if you define the plugin in a root pom.
+* postAnalysisScript: A [Groovy](http://www.groovy-lang.org/) script that gets invoked after analysis is completed and before the output is written. This way it can be used to filter the output or break the build on specific conditions.
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:
@@ -139,6 +181,8 @@ In case the classpath between both versions differs, you can add the dependencie
 The maven plugin produces the two files `japicmp.diff` and `japicmp.xml` within the directory `${project.build.directory}/japicmp`
 of your artifact. If you run the plugin multiple times within the same module using the &lt;executions&gt; element, the reports
 are named after the execution id.
+
+##Site report##
 
 Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
 [maven-site-plugin](https://maven.apache.org/plugins/maven-site-plugin/) and therewith to be integrated into the site report:
@@ -196,3 +240,49 @@ To create a summary report, you can also provide multiple old and new versions:
 </configuration>
 ```
 The configuration above will create one report for all the declared dependencies.
+
+##Using Groovy scripts as post analysis script##
+
+The parameter &lt;postAnalysisScript/&gt; can be used to invoke a [Groovy](http://www.groovy-lang.org/) script after the analysis but before the output is written.
+This is helpful if you want to apply some custom filtering that is not possible with the standard means of japicmp. The following script for example filters out
+all classes that reside within the package `japicmp.test.annotation` and all methods that start with `get...()` and `set...()`.
+
+```
+def it = jApiClasses.iterator()
+while (it.hasNext()) {
+	def jApiClass = it.next()
+	def fqn = jApiClass.getFullyQualifiedName()
+	if (fqn.startsWith("japicmp.test.annotation")) {
+		it.remove()
+	}
+	def methodIt = jApiClass.getMethods().iterator()
+	while (methodIt.hasNext()) {
+		def method = methodIt.next()
+		if (method.getName().startsWith("get") || method.getName().startsWith("set")) {
+			methodIt.remove()
+		}
+	}
+}
+return jApiClasses
+```
+
+Please note that the script has to return a list of `JApiClass` objects, otherwise the maven plugin will report an error.
+
+Beyond that the script can also be used to break the build on some project specific requirement. Let's assume that for the next release no classes within the package
+`japicmp.test.annotation` should be modified in any way. The following Groovy script iterates over all classes and throws an exception if a class is not `UNCHANGED`.
+
+```
+import static japicmp.model.JApiChangeStatus.*
+
+def it = jApiClasses.iterator()
+while (it.hasNext()) {
+	def jApiClass = it.next()
+	def fqn = jApiClass.getFullyQualifiedName()
+	if (fqn.startsWith("japicmp.test.annotation")) {
+		if (jApiClass.getChangeStatus() != UNCHANGED) {
+			throw new Exception("Class in package japicmp.test.annotation has been modified.")
+		}
+	}
+}
+return jApiClasses
+```

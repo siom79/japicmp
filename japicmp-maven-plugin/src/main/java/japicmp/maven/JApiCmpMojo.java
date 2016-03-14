@@ -30,8 +30,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,6 +105,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		Options options = createOptions(pluginParameters.getParameterParam(), oldArchives, newArchives);
 		List<JApiClass> jApiClasses = compareArchives(options, pluginParameters, mavenParameters);
 		try {
+			jApiClasses = applyPostAnalysisScript(parameter, jApiClasses);
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
 			String diffOutput = generateDiffOutput(jApiClasses, options);
 			createFileAndWriteTo(diffOutput, jApiCmpBuildDir, mavenParameters);
@@ -114,6 +121,44 @@ public class JApiCmpMojo extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
 		}
+	}
+
+	private List<JApiClass> applyPostAnalysisScript(Parameter parameter, List<JApiClass> jApiClasses) throws MojoFailureException {
+		List<JApiClass> filteredList = jApiClasses;
+		if (parameter != null) {
+			String postAnalysisFilterScript = parameter.getPostAnalysisScript();
+			if (postAnalysisFilterScript != null) {
+				if (Files.exists(Paths.get(postAnalysisFilterScript))) {
+					ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("groovy");
+					Bindings bindings = scriptEngine.createBindings();
+					bindings.put("jApiClasses", jApiClasses);
+					try {
+						Object returnValue = scriptEngine.eval(new FileReader(postAnalysisFilterScript), bindings);
+						if (returnValue instanceof List) {
+							List returnedList = (List) returnValue;
+							filteredList = new ArrayList<>(returnedList.size());
+							for (Object obj : returnedList) {
+								if (obj instanceof JApiClass) {
+									JApiClass jApiClass = (JApiClass) obj;
+									filteredList.add(jApiClass);
+								}
+							}
+						} else {
+							throw new MojoFailureException("Post-analysis script does not return a list.");
+						}
+					} catch (ScriptException e) {
+						throw new MojoFailureException("Execution of post-analysis script failed: " + e.getMessage(), e);
+					} catch (FileNotFoundException e) {
+						throw new MojoFailureException("Post-analysis script '" + postAnalysisFilterScript + " does not exist.");
+					}
+				} else {
+					throw new MojoFailureException("Post-analysis script '" + postAnalysisFilterScript + " does not exist.");
+				}
+			} else {
+				getLog().debug("No post-analysis script provided.");
+			}
+		}
+		return filteredList;
 	}
 
 	private boolean filterModule(PluginParameters pluginParameters) {
