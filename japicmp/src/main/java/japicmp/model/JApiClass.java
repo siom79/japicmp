@@ -234,8 +234,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
 			CtClass oldClass = oldClassOptional.get();
 			CtClass newClass = newClassOptional.get();
-			Map<String, CtClass> interfaceMapOldClass = buildInterfaceMap(oldClass);
-			Map<String, CtClass> interfaceMapNewClass = buildInterfaceMap(newClass);
+			Map<String, CtClass> interfaceMapOldClass = buildInterfaceMap(oldClass, JarArchiveComparator.ArchiveType.OLD);
+			Map<String, CtClass> interfaceMapNewClass = buildInterfaceMap(newClass, JarArchiveComparator.ArchiveType.NEW);
 			for (CtClass oldInterface : interfaceMapOldClass.values()) {
 				CtClass ctClassFound = interfaceMapNewClass.get(oldInterface.getName());
 				if (ctClassFound != null) {
@@ -255,13 +255,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} else {
 			if (oldClassOptional.isPresent()) {
-				Map<String, CtClass> interfaceMap = buildInterfaceMap(oldClassOptional.get());
+				Map<String, CtClass> interfaceMap = buildInterfaceMap(oldClassOptional.get(), JarArchiveComparator.ArchiveType.OLD);
 				for (CtClass ctClass : interfaceMap.values()) {
 					JApiImplementedInterface jApiClass = new JApiImplementedInterface(ctClass.getName(), JApiChangeStatus.REMOVED);
 					interfacesArg.add(jApiClass);
 				}
 			} else if (newClassOptional.isPresent()) {
-				Map<String, CtClass> interfaceMap = buildInterfaceMap(newClassOptional.get());
+				Map<String, CtClass> interfaceMap = buildInterfaceMap(newClassOptional.get(), JarArchiveComparator.ArchiveType.NEW);
 				for (CtClass ctClass : interfaceMap.values()) {
 					JApiImplementedInterface jApiClass = new JApiImplementedInterface(ctClass.getName(), JApiChangeStatus.NEW);
 					interfacesArg.add(jApiClass);
@@ -270,12 +270,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 	}
 
-	private Map<String, CtClass> buildInterfaceMap(CtClass ctClass) {
+	private Map<String, CtClass> buildInterfaceMap(CtClass ctClass, JarArchiveComparator.ArchiveType archiveType) {
 		Map<String, CtClass> map = new HashMap<>();
 		try {
 			CtClass[] interfaces = ctClass.getInterfaces();
 			for (CtClass ctInterface : interfaces) {
 				map.put(ctInterface.getName(), ctInterface);
+				buildInterfaceMap(archiveType, map, ctInterface);
 			}
 		} catch (NotFoundException e) {
 			if (!options.isIgnoreMissingClasses()) {
@@ -283,6 +284,18 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		}
 		return map;
+	}
+
+	private void buildInterfaceMap(JarArchiveComparator.ArchiveType archiveType, Map<String, CtClass> map, CtClass ctInterface) throws NotFoundException {
+		Optional<CtClass> loadedInterfaceOptional = this.jarArchiveComparator.loadClass(archiveType, ctInterface.getName());
+		if (loadedInterfaceOptional.isPresent()) {
+			CtClass loadedInterface = loadedInterfaceOptional.get();
+			CtClass[] loadedInterfaceInterfaces = loadedInterface.getInterfaces();
+			for (CtClass additionalInterface : loadedInterfaceInterfaces) {
+				map.put(additionalInterface.getName(), additionalInterface);
+				buildInterfaceMap(archiveType, map, additionalInterface);
+			}
+		}
 	}
 
 	private void computeMethodChanges(JApiClass jApiClass, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {

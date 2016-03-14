@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
+import static japicmp.util.Helper.getJApiImplementedInterface;
 import static japicmp.util.Helper.getJApiMethod;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -183,5 +184,33 @@ public class InterfacesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
+
+	@Test
+	public void testInterfaceHierarchyHasOneMoreLevel() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctClassInterface).addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtClass ctClassSubInterface = CtInterfaceBuilder.create().name("SubInterface").withSuperInterface(ctClassInterface).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctClassSubInterface).addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getInterfaces().size(), is(2));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "SubInterface").getChangeStatus(), is(JApiChangeStatus.NEW));
 	}
 }

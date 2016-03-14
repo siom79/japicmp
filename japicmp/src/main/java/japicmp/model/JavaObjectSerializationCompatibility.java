@@ -217,6 +217,7 @@ public class JavaObjectSerializationCompatibility {
 	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForInterfaces(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
 		boolean serializableAdded = false;
 		boolean serializableRemoved = false;
+		boolean serializableUnchanged = false;
 		boolean externalizableAdded = false;
 		boolean externalizableRemoved = false;
 		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {
@@ -225,6 +226,8 @@ public class JavaObjectSerializationCompatibility {
 					serializableAdded = true;
 				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.REMOVED) {
 					serializableRemoved = true;
+				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+					serializableUnchanged = true;
 				}
 			}
 			if (Externalizable.class.getCanonicalName().equals(implementedInterface.getFullyQualifiedName())) {
@@ -241,10 +244,10 @@ public class JavaObjectSerializationCompatibility {
 		if (externalizableRemoved) {
 			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_EXTERNALIZABLE_REMOVED;
 		}
-		if (serializableRemoved && externalizableAdded) {
+		if ((serializableRemoved || serializableUnchanged || serializableAdded) && externalizableAdded) {
 			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CHANGED_FROM_SERIALIZABLE_TO_EXTERNALIZABLE;
 		}
-		if (serializableAdded && externalizableRemoved) {
+		if ((serializableUnchanged || serializableAdded) && externalizableRemoved) {
 			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CHANGED_FROM_EXTERNALIZABLE_TO_SERIALIZABLE;
 		}
 		return state;
