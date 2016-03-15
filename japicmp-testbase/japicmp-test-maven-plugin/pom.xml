@@ -100,9 +100,76 @@
 								<onlyModified>true</onlyModified>
 								<accessModifier>public</accessModifier>
 								<breakBuildOnModifications>false</breakBuildOnModifications>
-								<breakBuildOnBinaryIncompatibleModifications>false
-								</breakBuildOnBinaryIncompatibleModifications>
+								<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
 								<includeSynthetic>true</includeSynthetic>
+							</parameter>
+							<dependencies>
+								<dependency>
+									<groupId>org.apache.commons</groupId>
+									<artifactId>commons-math3</artifactId>
+									<version>3.4</version>
+								</dependency>
+							</dependencies>
+						</configuration>
+					</execution>
+					<execution>
+						<id>no-reports</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersion>
+							<parameter>
+								<onlyModified>true</onlyModified>
+								<skipXmlReport>true</skipXmlReport>
+								<skipHtmlReport>true</skipHtmlReport>
+							</parameter>
+							<dependencies>
+								<dependency>
+									<groupId>org.apache.commons</groupId>
+									<artifactId>commons-math3</artifactId>
+									<version>3.4</version>
+								</dependency>
+							</dependencies>
+						</configuration>
+					</execution>
+					<execution>
+						<id>old-version-not-resolvable-file</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-non-existing-artifact</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersion>
+							<parameter>
+								<ignoreMissingOldVersion>true</ignoreMissingOldVersion>
 							</parameter>
 							<dependencies>
 								<dependency>

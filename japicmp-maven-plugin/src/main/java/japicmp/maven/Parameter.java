@@ -27,6 +27,14 @@ public class Parameter {
 	private List<String> packagingSupporteds;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String postAnalysisScript;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String skipHtmlReport;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String skipXmlReport;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String skipDiffReport;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String ignoreMissingOldVersion;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -170,5 +178,37 @@ public class Parameter {
 
 	public void setPostAnalysisScript(String postAnalysisScript) {
 		this.postAnalysisScript = postAnalysisScript;
+	}
+
+	public String getSkipHtmlReport() {
+		return skipHtmlReport;
+	}
+
+	public void setSkipHtmlReport(String skipHtmlReport) {
+		this.skipHtmlReport = skipHtmlReport;
+	}
+
+	public String getSkipXmlReport() {
+		return skipXmlReport;
+	}
+
+	public void setSkipXmlReport(String skipXmlReport) {
+		this.skipXmlReport = skipXmlReport;
+	}
+
+	public String getSkipDiffReport() {
+		return skipDiffReport;
+	}
+
+	public void setSkipDiffReport(String skipDiffReport) {
+		this.skipDiffReport = skipDiffReport;
+	}
+
+	public String getIgnoreMissingOldVersion() {
+		return ignoreMissingOldVersion;
+	}
+
+	public void setIgnoreMissingOldVersion(String ignoreMissingOldVersion) {
+		this.ignoreMissingOldVersion = ignoreMissingOldVersion;
 	}
 }

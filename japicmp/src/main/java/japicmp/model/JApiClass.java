@@ -272,18 +272,26 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 
 	private Map<String, CtClass> buildInterfaceMap(CtClass ctClass, JarArchiveComparator.ArchiveType archiveType) {
 		Map<String, CtClass> map = new HashMap<>();
+		buildInterfaceMap(ctClass, archiveType, map);
+		return map;
+	}
+
+	private void buildInterfaceMap(CtClass ctClass, JarArchiveComparator.ArchiveType archiveType, Map<String, CtClass> map) {
 		try {
 			CtClass[] interfaces = ctClass.getInterfaces();
 			for (CtClass ctInterface : interfaces) {
 				map.put(ctInterface.getName(), ctInterface);
 				buildInterfaceMap(archiveType, map, ctInterface);
 			}
+			Optional<CtClass> superClassOptional = getSuperclass(ctClass);
+			if (superClassOptional.isPresent()) {
+				buildInterfaceMap(superClassOptional.get(), archiveType, map);
+			}
 		} catch (NotFoundException e) {
 			if (!options.isIgnoreMissingClasses()) {
 				throw JApiCmpException.forClassLoading(e, "Class not found: " + e.getMessage(), jarArchiveComparator);
 			}
 		}
-		return map;
 	}
 
 	private void buildInterfaceMap(JarArchiveComparator.ArchiveType archiveType, Map<String, CtClass> map, CtClass ctInterface) throws NotFoundException {

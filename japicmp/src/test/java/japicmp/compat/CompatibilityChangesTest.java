@@ -856,6 +856,42 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
+	public void testInterfaceMovedToAbstractClass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		options.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtMethodBuilder.create().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(ctInterface);
+				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctInterface).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.voidType).name("method").body("int a = 42;").addToClass(ctClass);
+				return Arrays.asList(ctInterface, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtMethodBuilder.create().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(ctInterface);
+				CtClass ctAbstractClass = CtClassBuilder.create().name("AbstractTest").implementsInterface(ctInterface).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctAbstractClass).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.voidType).name("method").body("int a = 42;").addToClass(ctClass);
+				return Arrays.asList(ctInterface, ctClass, ctAbstractClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getInterfaces().size(), is(1));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiMethod.isSourceCompatible(), is(true));
+	}
+
+	@Test
 	public void testClassNowCheckedException() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setAccessModifier(AccessModifier.PRIVATE);

@@ -86,7 +86,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution);
-		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
@@ -132,8 +132,8 @@ public class JApiCmpMojo extends AbstractMojo {
 					ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("groovy");
 					Bindings bindings = scriptEngine.createBindings();
 					bindings.put("jApiClasses", jApiClasses);
-					try {
-						Object returnValue = scriptEngine.eval(new FileReader(postAnalysisFilterScript), bindings);
+					try (InputStreamReader fileReader = new InputStreamReader(new FileInputStream(postAnalysisFilterScript), Charset.forName("UTF-8"))) {
+						Object returnValue = scriptEngine.eval(fileReader, bindings);
 						if (returnValue instanceof List) {
 							List returnedList = (List) returnValue;
 							filteredList = new ArrayList<>(returnedList.size());
@@ -150,6 +150,8 @@ public class JApiCmpMojo extends AbstractMojo {
 						throw new MojoFailureException("Execution of post-analysis script failed: " + e.getMessage(), e);
 					} catch (FileNotFoundException e) {
 						throw new MojoFailureException("Post-analysis script '" + postAnalysisFilterScript + " does not exist.");
+					} catch (IOException e) {
+						throw new MojoFailureException("Failed to load post-analysis script '" + postAnalysisFilterScript + ": " + e.getMessage(), e);
 					}
 				} else {
 					throw new MojoFailureException("Post-analysis script '" + postAnalysisFilterScript + " does not exist.");
@@ -190,30 +192,35 @@ public class JApiCmpMojo extends AbstractMojo {
 		return false;
 	}
 
+
+	public static enum ConfigurationVersion {
+		OLD, NEW
+	}
+
 	private void populateArchivesListsFromParameters(PluginParameters pluginParameters, MavenParameters mavenParameters, List<File> oldArchives, List<File> newArchives) throws MojoFailureException {
 		if (pluginParameters.getOldVersionParam() != null) {
-			oldArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getOldVersionParam(), "oldVersion", mavenParameters, pluginParameters));
+			oldArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getOldVersionParam(), "oldVersion", mavenParameters, pluginParameters, ConfigurationVersion.OLD));
 		}
 		if (pluginParameters.getOldVersionsParam() != null) {
 			for (DependencyDescriptor dependencyDescriptor : pluginParameters.getOldVersionsParam()) {
 				if (dependencyDescriptor != null) {
-					oldArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "oldVersions", mavenParameters, pluginParameters));
+					oldArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "oldVersions", mavenParameters, pluginParameters, ConfigurationVersion.OLD));
 				}
 			}
 		}
 		if (pluginParameters.getNewVersionParam() != null) {
-			newArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters, pluginParameters));
+			newArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters, pluginParameters, ConfigurationVersion.NEW));
 		}
 		if (pluginParameters.getNewVersionsParam() != null) {
 			for (DependencyDescriptor dependencyDescriptor : pluginParameters.getNewVersionsParam()) {
 				if (dependencyDescriptor != null) {
-					newArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions", mavenParameters, pluginParameters));
+					newArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions", mavenParameters, pluginParameters, ConfigurationVersion.NEW));
 				}
 			}
 		}
 		if (oldArchives.size() == 0) {
 			String message = "Please provide at least one resolvable old version using one of the configuration elements <oldVersion/> or <oldVersions/>.";
-			if (ignoreNonResolvableArtifacts(pluginParameters)) {
+			if (ignoreNonResolvableArtifacts(pluginParameters) || ignoreMissingOldVersion(pluginParameters, ConfigurationVersion.OLD)) {
 				getLog().warn(message);
 			} else {
 				throw new MojoFailureException(message);
@@ -415,8 +422,12 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters, PluginParameters pluginParameters) throws IOException, MojoFailureException {
 		String filename = createFilename(mavenParameters);
-		options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
-		options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
+		if (!skipXmlReport(pluginParameters)) {
+			options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
+		}
+		if (!skipHtmlReport(pluginParameters)) {
+			options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
+		}
 		SemverOut semverOut = new SemverOut(options, jApiClasses);
 		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
 		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
@@ -426,6 +437,22 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 		return xmlGenerator.generate();
+	}
+
+	private boolean skipHtmlReport(PluginParameters pluginParameters) {
+		boolean skipReport = false;
+		if (pluginParameters.getParameterParam() != null) {
+			skipReport = Boolean.valueOf(pluginParameters.getParameterParam().getSkipHtmlReport());
+		}
+		return skipReport;
+	}
+
+	private boolean skipXmlReport(PluginParameters pluginParameters) {
+		boolean skipReport = false;
+		if (pluginParameters.getParameterParam() != null) {
+			skipReport = Boolean.valueOf(pluginParameters.getParameterParam().getSkipXmlReport());
+		}
+		return skipReport;
 	}
 
 	private String createFilename(MavenParameters mavenParameters) {
@@ -456,7 +483,7 @@ public class JApiCmpMojo extends AbstractMojo {
 						getLog().debug("Element <dependencies/> found. Using " + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
 					}
 					for (Dependency dependency : pluginParameters.getDependenciesParam()) {
-						List<File> files = resolveDependencyToFile("dependencies", dependency, mavenParameters, true, pluginParameters);
+						List<File> files = resolveDependencyToFile("dependencies", dependency, mavenParameters, true, pluginParameters, ConfigurationVersion.NEW);
 						for (File file : files) {
 							comparatorOptions.getClassPathEntries().add(file.getAbsolutePath());
 						}
@@ -470,7 +497,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					}
 					if (pluginParameters.getOldClassPathDependencies() != null) {
 						for (Dependency dependency : pluginParameters.getOldClassPathDependencies()) {
-							List<File> files = resolveDependencyToFile("oldClassPathDependencies", dependency, mavenParameters, true, pluginParameters);
+							List<File> files = resolveDependencyToFile("oldClassPathDependencies", dependency, mavenParameters, true, pluginParameters, ConfigurationVersion.OLD);
 							for (File file : files) {
 								comparatorOptions.getOldClassPath().add(file.getAbsolutePath());
 							}
@@ -478,7 +505,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					}
 					if (pluginParameters.getNewClassPathDependencies() != null) {
 						for (Dependency dependency : pluginParameters.getNewClassPathDependencies()) {
-							List<File> files = resolveDependencyToFile("newClassPathDependencies", dependency, mavenParameters, true, pluginParameters);
+							List<File> files = resolveDependencyToFile("newClassPathDependencies", dependency, mavenParameters, true, pluginParameters, ConfigurationVersion.NEW);
 							for (File file : files) {
 								comparatorOptions.getNewClassPath().add(file.getAbsolutePath());
 							}
@@ -493,17 +520,17 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 			}
 		}
-		setUpClassPathUsingMavenProject(comparatorOptions, mavenParameters, pluginParameters);
+		setUpClassPathUsingMavenProject(comparatorOptions, mavenParameters, pluginParameters, ConfigurationVersion.NEW);
 	}
 
-	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters, PluginParameters pluginParameters) throws MojoFailureException {
+	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		notNull(mavenParameters.getMavenProject(), "Maven parameter mavenProject should be provided by maven container.");
 		Set<Artifact> dependencyArtifacts = mavenParameters.getMavenProject().getArtifacts();
 		Set<String> classPathEntries = new HashSet<>();
 		for (Artifact artifact : dependencyArtifacts) {
 			String scope = artifact.getScope();
 			if (!"test".equals(scope) && !artifact.isOptional()) {
-				Set<Artifact> artifacts = resolveArtifact(artifact, mavenParameters, false, pluginParameters);
+				Set<Artifact> artifacts = resolveArtifact(artifact, mavenParameters, false, pluginParameters, configurationVersion);
 				for (Artifact resolvedArtifact : artifacts) {
 					File resolvedFile = resolvedArtifact.getFile();
 					if (resolvedFile != null) {
@@ -523,28 +550,28 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private List<File> retrieveFileFromConfiguration(DependencyDescriptor dependencyDescriptor, String parameterName, MavenParameters mavenParameters, PluginParameters pluginParameters) throws MojoFailureException {
+	private List<File> retrieveFileFromConfiguration(DependencyDescriptor dependencyDescriptor, String parameterName, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		List<File> files;
 		if (dependencyDescriptor instanceof Dependency) {
 			Dependency dependency = (Dependency) dependencyDescriptor;
-			files = resolveDependencyToFile(parameterName, dependency, mavenParameters, false, pluginParameters);
+			files = resolveDependencyToFile(parameterName, dependency, mavenParameters, false, pluginParameters, configurationVersion);
 		} else if (dependencyDescriptor instanceof ConfigurationFile) {
 			ConfigurationFile configurationFile = (ConfigurationFile) dependencyDescriptor;
-			files = resolveConfigurationFileToFile(parameterName, configurationFile);
+			files = resolveConfigurationFileToFile(parameterName, configurationFile, configurationVersion, pluginParameters);
 		} else {
 			throw new MojoFailureException("DependencyDescriptor is not of type <dependency/> nor of type <configurationFile/>.");
 		}
 		return files;
 	}
 
-	private List<File> retrieveFileFromConfiguration(Version version, String parameterName, MavenParameters mavenParameters, PluginParameters pluginParameters) throws MojoFailureException {
+	private List<File> retrieveFileFromConfiguration(Version version, String parameterName, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		if (version != null) {
 			Dependency dependency = version.getDependency();
 			if (dependency != null) {
-				return resolveDependencyToFile(parameterName, dependency, mavenParameters, false, pluginParameters);
+				return resolveDependencyToFile(parameterName, dependency, mavenParameters, false, pluginParameters, configurationVersion);
 			} else if (version.getFile() != null) {
 				ConfigurationFile configurationFile = version.getFile();
-				return resolveConfigurationFileToFile(parameterName, configurationFile);
+				return resolveConfigurationFileToFile(parameterName, configurationFile, configurationVersion, pluginParameters);
 			} else {
 				throw new MojoFailureException("Missing configuration parameter 'dependency'.");
 			}
@@ -552,22 +579,30 @@ public class JApiCmpMojo extends AbstractMojo {
 		throw new MojoFailureException(String.format("Missing configuration parameter: %s", parameterName));
 	}
 
-	private List<File> resolveConfigurationFileToFile(String parameterName, ConfigurationFile configurationFile) throws MojoFailureException {
+	private List<File> resolveConfigurationFileToFile(String parameterName, ConfigurationFile configurationFile, ConfigurationVersion configurationVersion, PluginParameters pluginParameters) throws MojoFailureException {
 		String path = configurationFile.getPath();
 		if (path == null) {
 			throw new MojoFailureException(String.format("The path element in the configuration of the plugin is missing for %s.", parameterName));
 		}
 		File file = new File(path);
 		if (!file.exists()) {
-			throw new MojoFailureException(String.format("The path '%s' does not point to an existing file.", path));
+			if (configurationVersion == ConfigurationVersion.OLD && ignoreMissingOldVersion(pluginParameters)) {
+				getLog().warn("Could not find file, but ignoreMissingOldVersion is set tot true: " + file.getAbsolutePath());
+			} else {
+				throw new MojoFailureException(String.format("The path '%s' does not point to an existing file.", path));
+			}
 		}
 		if (!file.isFile() || !file.canRead()) {
-			throw new MojoFailureException(String.format("The file given by path '%s' is either not a file or is not readable.", path));
+			if (configurationVersion == ConfigurationVersion.OLD && ignoreMissingOldVersion(pluginParameters)) {
+				getLog().warn("The file given by path '" + file.getAbsolutePath() + "' is either not a file or is not readable, but ignoreMissingOldVersion is set tot true");
+			} else {
+				throw new MojoFailureException(String.format("The file given by path '%s' is either not a file or is not readable.", path));
+			}
 		}
 		return Collections.singletonList(file);
 	}
 
-	private List<File> resolveDependencyToFile(String parameterName, Dependency dependency, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters) throws MojoFailureException {
+	private List<File> resolveDependencyToFile(String parameterName, Dependency dependency, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		List<File> files = new ArrayList<>();
 		if (getLog().isDebugEnabled()) {
 			getLog().debug("Trying to resolve dependency '" + dependency + "' to file.");
@@ -575,7 +610,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (dependency.getSystemPath() == null) {
 			String descriptor = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
 			getLog().debug(parameterName + ": " + descriptor);
-			Set<Artifact> artifacts = resolveArtifact(dependency, mavenParameters, transitively, pluginParameters);
+			Set<Artifact> artifacts = resolveArtifact(dependency, mavenParameters, transitively, pluginParameters, configurationVersion);
 			for (Artifact artifact : artifacts) {
 				File file = artifact.getFile();
 				if (file != null) {
@@ -586,7 +621,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			}
 			if (files.size() == 0) {
 				String message = String.format("Could not resolve dependency with descriptor '%s'.", descriptor);
-				if (ignoreNonResolvableArtifacts(pluginParameters)) {
+				if (ignoreNonResolvableArtifacts(pluginParameters) || ignoreMissingOldVersion(pluginParameters, configurationVersion)) {
 					getLog().warn(message);
 				} else {
 					throw new MojoFailureException(message);
@@ -608,15 +643,36 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 			}
 			File file = new File(systemPath);
+			boolean addFile = true;
 			if (!file.exists()) {
-				throw new MojoFailureException("File '" + file.getAbsolutePath() + "' does not exist.");
+				if (configurationVersion == ConfigurationVersion.OLD && ignoreMissingOldVersion(pluginParameters)) {
+					getLog().warn("Could not find file, but ignoreMissingOldVersion is set tot true: " + file.getAbsolutePath());
+				} else {
+					throw new MojoFailureException("File '" + file.getAbsolutePath() + "' does not exist.");
+				}
+				addFile = false;
 			}
 			if (!file.canRead()) {
-				throw new MojoFailureException("File '" + file.getAbsolutePath() + "' is not readable.");
+				if (configurationVersion == ConfigurationVersion.OLD && ignoreMissingOldVersion(pluginParameters)) {
+					getLog().warn("File is not readable, but ignoreMissingOldVersion is set tot true: " + file.getAbsolutePath());
+				} else {
+					throw new MojoFailureException("File '" + file.getAbsolutePath() + "' is not readable.");
+				}
+				addFile = false;
 			}
-			files.add(file);
+			if (addFile) {
+				files.add(file);
+			}
 		}
 		return files;
+	}
+
+	private boolean ignoreMissingOldVersion(PluginParameters pluginParameters) {
+		boolean ignoreMissingOldVersion = false;
+		if (pluginParameters.getParameterParam() != null) {
+			ignoreMissingOldVersion = Boolean.valueOf(pluginParameters.getParameterParam().getIgnoreMissingOldVersion());
+		}
+		return ignoreMissingOldVersion;
 	}
 
 	private void writeToFile(String output, File outputfile) throws MojoFailureException, IOException {
@@ -634,13 +690,13 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private Set<Artifact> resolveArtifact(Dependency dependency, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters) throws MojoFailureException {
+	private Set<Artifact> resolveArtifact(Dependency dependency, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		notNull(mavenParameters.getArtifactRepositories(), "Maven parameter artifactRepositories should be provided by maven container.");
 		Artifact artifact = mavenParameters.getArtifactFactory().createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getType(), dependency.getClassifier());
-		return resolveArtifact(artifact, mavenParameters, transitively, pluginParameters);
+		return resolveArtifact(artifact, mavenParameters, transitively, pluginParameters, configurationVersion);
 	}
 
-	private Set<Artifact> resolveArtifact(Artifact artifact, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters) throws MojoFailureException {
+	private Set<Artifact> resolveArtifact(Artifact artifact, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		notNull(mavenParameters.getLocalRepository(), "Maven parameter localRepository should be provided by maven container.");
 		notNull(mavenParameters.getArtifactResolver(), "Maven parameter artifactResolver should be provided by maven container.");
 		ArtifactResolutionRequest request = new ArtifactResolutionRequest();
@@ -664,7 +720,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (resolutionResult.hasExceptions()) {
 			List<Exception> exceptions = resolutionResult.getExceptions();
 			String message = "Could not resolve " + artifact;
-			if (ignoreNonResolvableArtifacts(pluginParameters)) {
+			if (ignoreNonResolvableArtifacts(pluginParameters) || ignoreMissingOldVersion(pluginParameters, configurationVersion)) {
 				getLog().warn(message);
 			} else {
 				throw new MojoFailureException(message, exceptions.get(0));
@@ -673,13 +729,17 @@ public class JApiCmpMojo extends AbstractMojo {
 		Set<Artifact> artifacts = resolutionResult.getArtifacts();
 		if (artifacts.size() == 0) {
 			String message = "Could not resolve " + artifact;
-			if (ignoreNonResolvableArtifacts(pluginParameters)) {
+			if (ignoreNonResolvableArtifacts(pluginParameters) || ignoreMissingOldVersion(pluginParameters, configurationVersion)) {
 				getLog().warn(message);
 			} else {
 				throw new MojoFailureException(message);
 			}
 		}
 		return artifacts;
+	}
+
+	private boolean ignoreMissingOldVersion(PluginParameters pluginParameters, ConfigurationVersion configurationVersion) {
+		return (configurationVersion == ConfigurationVersion.OLD && ignoreMissingOldVersion(pluginParameters));
 	}
 
 	private boolean ignoreNonResolvableArtifacts(PluginParameters pluginParameters) {
