@@ -150,6 +150,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | skipXmlReport									| true | false		| If set to true, no XML report will be generated.|
 | skipHtmlReport								| true | false		| If set to true, no HTML report will be generated.|
 | skipDiffReport								| true | false		| If set to true, no diff report will be generated.|
+| ignoreMissingOldVersion						| true | false		| If set to true, not resolvable artifacts for the old version do not break the build.|
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:
