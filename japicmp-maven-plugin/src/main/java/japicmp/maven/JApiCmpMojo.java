@@ -612,11 +612,13 @@ public class JApiCmpMojo extends AbstractMojo {
 			getLog().debug(parameterName + ": " + descriptor);
 			Set<Artifact> artifacts = resolveArtifact(dependency, mavenParameters, transitively, pluginParameters, configurationVersion);
 			for (Artifact artifact : artifacts) {
-				File file = artifact.getFile();
-				if (file != null) {
-					files.add(file);
-				} else {
-					throw new MojoFailureException(String.format("Could not resolve dependency with descriptor '%s'.", descriptor));
+				if (!artifact.isOptional()) { //skip optional artifacts because getFile() will return null
+					File file = artifact.getFile();
+					if (file != null) {
+						files.add(file);
+					} else {
+						throw new MojoFailureException(String.format("Could not resolve dependency with descriptor '%s'.", descriptor));
+					}
 				}
 			}
 			if (files.size() == 0) {
