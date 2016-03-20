@@ -5,10 +5,7 @@ import japicmp.cli.JApiCli;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.*;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -251,10 +248,6 @@ public class JApiCmpMojo extends AbstractMojo {
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isBinaryCompatible()) {
 					breakBuild = true;
-					if (sb.length() > 0) {
-						sb.append("; ");
-					}
-					sb.append(jApiClass.getFullyQualifiedName());
 					appendJApiCompatibilityChanges(sb, jApiClass);
 				}
 			}
@@ -268,10 +261,6 @@ public class JApiCmpMojo extends AbstractMojo {
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isSourceCompatible()) {
 					breakBuild = true;
-					if (sb.length() > 0) {
-						sb.append("; ");
-					}
-					sb.append(jApiClass.getFullyQualifiedName());
 					appendJApiCompatibilityChanges(sb, jApiClass);
 				}
 			}
@@ -305,20 +294,55 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private void appendJApiCompatibilityChanges(StringBuilder sb, JApiClass jApiClass) {
-		int count = 0;
 		for (JApiCompatibilityChange jApiCompatibilityChange : jApiClass.getCompatibilityChanges()) {
-            count++;
-            if (count == 1) {
-                sb.append(" [");
-            }
-            if (count > 1) {
+            if (sb.length() > 1) {
                 sb.append(',');
             }
-            sb.append(jApiCompatibilityChange.name());
+            sb.append(jApiClass.getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
         }
-		if (count > 0) {
-            sb.append("]");
-        }
+		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
+			for (JApiCompatibilityChange jApiCompatibilityChange : jApiMethod.getCompatibilityChanges()) {
+				if (sb.length() > 1) {
+					sb.append(',');
+				}
+				sb.append(jApiClass.getFullyQualifiedName()).append(".").append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod)).append(")").append(":").append(jApiCompatibilityChange.name());
+			}
+		}
+		for (JApiConstructor jApiMethod : jApiClass.getConstructors()) {
+			for (JApiCompatibilityChange jApiCompatibilityChange : jApiMethod.getCompatibilityChanges()) {
+				if (sb.length() > 1) {
+					sb.append(',');
+				}
+				sb.append(jApiClass.getFullyQualifiedName()).append(".").append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod)).append(")").append(":").append(jApiCompatibilityChange.name());
+			}
+		}
+		for (JApiField jApiField : jApiClass.getFields()) {
+			for (JApiCompatibilityChange jApiCompatibilityChange : jApiField.getCompatibilityChanges()) {
+				if (sb.length() > 1) {
+					sb.append(',');
+				}
+				sb.append(jApiClass.getFullyQualifiedName()).append(".").append(jApiField.getName()).append(":").append(jApiCompatibilityChange.name());
+			}
+		}
+		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {
+			for (JApiCompatibilityChange jApiCompatibilityChange : implementedInterface.getCompatibilityChanges()) {
+				if (sb.length() > 1) {
+					sb.append(',');
+				}
+				sb.append(jApiClass.getFullyQualifiedName()).append("[").append(implementedInterface.getFullyQualifiedName()).append("]").append(":").append(jApiCompatibilityChange.name());
+			}
+		}
+	}
+
+	private String methodParameterToList(JApiBehavior jApiMethod) {
+		StringBuilder sb = new StringBuilder();
+		for (JApiParameter jApiParameter : jApiMethod.getParameters()) {
+			if (sb.length() > 0) {
+				sb.append(',');
+			}
+			sb.append(jApiParameter.getType());
+		}
+		return sb.toString();
 	}
 
 	private Options createOptions(Parameter parameterParam, List<File> oldVersions, List<File> newVersions) throws MojoFailureException {
