@@ -8,6 +8,7 @@ import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -245,17 +246,37 @@ public class JApiCmpMojo extends AbstractMojo {
 			}
 		}
 		if (breakBuildOnBinaryIncompatibleModifications(parameterParam)) {
+			boolean breakBuild = false;
+			StringBuilder sb = new StringBuilder();
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isBinaryCompatible()) {
-					throw new MojoFailureException(String.format("Breaking the build because there is at least one binary incompatible class: %s", jApiClass.getFullyQualifiedName()));
+					breakBuild = true;
+					if (sb.length() > 0) {
+						sb.append("; ");
+					}
+					sb.append(jApiClass.getFullyQualifiedName());
+					appendJApiCompatibilityChanges(sb, jApiClass);
 				}
+			}
+			if (breakBuild) {
+				throw new MojoFailureException(String.format("Breaking the build because there is at least one binary incompatibility: %s", sb.toString()));
 			}
 		}
 		if (breakBuildOnSourceIncompatibleModifications(parameterParam)) {
+			boolean breakBuild = false;
+			StringBuilder sb = new StringBuilder();
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isSourceCompatible()) {
-					throw new MojoFailureException(String.format("Breaking the build because there is at least one source incompatible class: %s", jApiClass.getFullyQualifiedName()));
+					breakBuild = true;
+					if (sb.length() > 0) {
+						sb.append("; ");
+					}
+					sb.append(jApiClass.getFullyQualifiedName());
+					appendJApiCompatibilityChanges(sb, jApiClass);
 				}
+			}
+			if (breakBuild) {
+				throw new MojoFailureException(String.format("Breaking the build because there is at least one source incompatibility: %s", sb.toString()));
 			}
 		}
 		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
@@ -281,6 +302,23 @@ public class JApiCmpMojo extends AbstractMojo {
 				throw new MojoFailureException("Versions of archives indicate no API changes but found API changes.");
 			}
 		}
+	}
+
+	private void appendJApiCompatibilityChanges(StringBuilder sb, JApiClass jApiClass) {
+		int count = 0;
+		for (JApiCompatibilityChange jApiCompatibilityChange : jApiClass.getCompatibilityChanges()) {
+            count++;
+            if (count == 1) {
+                sb.append(" [");
+            }
+            if (count > 1) {
+                sb.append(',');
+            }
+            sb.append(jApiCompatibilityChange.name());
+        }
+		if (count > 0) {
+            sb.append("]");
+        }
 	}
 
 	private Options createOptions(Parameter parameterParam, List<File> oldVersions, List<File> newVersions) throws MojoFailureException {
