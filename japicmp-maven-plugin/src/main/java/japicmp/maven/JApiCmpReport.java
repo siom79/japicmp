@@ -3,6 +3,7 @@ package japicmp.maven;
 import com.google.common.base.Optional;
 import japicmp.output.xml.XmlOutput;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.doxia.sink.Sink;
@@ -53,12 +54,16 @@ public class JApiCmpReport extends AbstractMavenReport {
 	private MavenProject mavenProject;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${mojoExecution}", readonly = true)
 	private MojoExecution mojoExecution;
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "(,${project.version})", readonly = true)
+	private String versionRangeWithProjectVersion;
+	@Component
+	private ArtifactMetadataSource metadataSource;
 
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
 		try {
 			JApiCmpMojo mojo = new JApiCmpMojo();
-			MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution);
+			MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
 			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(pluginParameters, mavenParameters);
 			if (xmlOutputOptional.isPresent()) {

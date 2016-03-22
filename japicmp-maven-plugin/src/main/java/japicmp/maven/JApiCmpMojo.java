@@ -94,7 +94,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution);
+		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
 			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
@@ -208,7 +208,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private Artifact getComparisonArtifact(MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
 		VersionRange versionRange;
 		try {
-			versionRange = VersionRange.createFromVersionSpec(versionRangeWithProjectVersion);
+			versionRange = VersionRange.createFromVersionSpec(mavenParameters.getVersionRangeWithProjectVersion());
 		} catch (InvalidVersionSpecificationException e) {
 			throw new MojoFailureException("Invalid version versionRange: " + e.getMessage(), e);
 		}
@@ -218,17 +218,17 @@ public class JApiCmpMojo extends AbstractMojo {
 			previousArtifact = mavenParameters.getArtifactFactory().createDependencyArtifact(project.getGroupId(), project.getArtifactId(), versionRange, project.getPackaging(), null, Artifact.SCOPE_COMPILE);
 			if (!previousArtifact.getVersionRange().isSelectedVersionKnown(previousArtifact)) {
 				getLog().debug("Searching for versions in versionRange: " + previousArtifact.getVersionRange());
-				List<ArtifactVersion> availableVersions = metadataSource.retrieveAvailableVersions(previousArtifact, mavenParameters.getLocalRepository(), project.getRemoteArtifactRepositories());
+				List<ArtifactVersion> availableVersions = mavenParameters.getMetadataSource().retrieveAvailableVersions(previousArtifact, mavenParameters.getLocalRepository(), project.getRemoteArtifactRepositories());
 				filterSnapshots(availableVersions);
 				ArtifactVersion version = versionRange.matchVersion(availableVersions);
 				if (version != null) {
 					previousArtifact.selectVersion(version.toString());
 				}
 			}
-		} catch (OverConstrainedVersionException e1) {
-			throw new MojoFailureException("Invalid comparison version: " + e1.getMessage());
-		} catch (ArtifactMetadataRetrievalException e11) {
-			throw new MojoExecutionException("Error determining previous version: " + e11.getMessage(), e11);
+		} catch (OverConstrainedVersionException e) {
+			throw new MojoFailureException("Invalid comparison version: " + e.getMessage(), e);
+		} catch (ArtifactMetadataRetrievalException e) {
+			throw new MojoExecutionException("Error determining previous version: " + e.getMessage(), e);
 		}
 		if (previousArtifact.getVersion() == null) {
 			getLog().info("Unable to find a previous version of the project in the repository.");

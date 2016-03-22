@@ -1,6 +1,7 @@
 package japicmp.maven;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecution;
@@ -15,15 +16,19 @@ public class MavenParameters {
 	private final ArtifactResolver artifactResolver;
 	private final MavenProject mavenProject;
 	private final MojoExecution mojoExecution;
+	private final String versionRangeWithProjectVersion;
+	private final ArtifactMetadataSource metadataSource;
 
 	public MavenParameters(List<ArtifactRepository> artifactRepositories, ArtifactFactory artifactFactory, ArtifactRepository localRepository,
-						   ArtifactResolver artifactResolver, MavenProject mavenProject, MojoExecution mojoExecution) {
+						   ArtifactResolver artifactResolver, MavenProject mavenProject, MojoExecution mojoExecution, String versionRangeWithProjectVersion, ArtifactMetadataSource metadataSource) {
 		this.artifactRepositories = artifactRepositories;
 		this.artifactFactory = artifactFactory;
 		this.localRepository = localRepository;
 		this.artifactResolver = artifactResolver;
 		this.mavenProject = mavenProject;
 		this.mojoExecution = mojoExecution;
+		this.versionRangeWithProjectVersion = versionRangeWithProjectVersion;
+		this.metadataSource = metadataSource;
 	}
 
 	public List<ArtifactRepository> getArtifactRepositories() {
@@ -48,5 +53,13 @@ public class MavenParameters {
 
 	public MojoExecution getMojoExecution() {
 		return mojoExecution;
+	}
+
+	public String getVersionRangeWithProjectVersion() {
+		return versionRangeWithProjectVersion;
+	}
+
+	public ArtifactMetadataSource getMetadataSource() {
+		return metadataSource;
 	}
 }
