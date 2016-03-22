@@ -13,11 +13,17 @@ import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,6 +43,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,6 +81,10 @@ public class JApiCmpMojo extends AbstractMojo {
 	private MavenProject mavenProject;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${mojoExecution}", readonly = true)
 	private MojoExecution mojoExecution;
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "(,${project.version})", readonly = true)
+	private String versionRangeWithProjectVersion;
+	@Component
+	private ArtifactMetadataSource metadataSource;
 
 	private static <T> T notNull(T value, String msg) throws MojoFailureException {
 		if (value == null) {
@@ -190,9 +201,48 @@ public class JApiCmpMojo extends AbstractMojo {
 		return false;
 	}
 
-
 	public static enum ConfigurationVersion {
 		OLD, NEW
+	}
+
+	private Artifact getComparisonArtifact(MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
+		VersionRange versionRange;
+		try {
+			versionRange = VersionRange.createFromVersionSpec(versionRangeWithProjectVersion);
+		} catch (InvalidVersionSpecificationException e) {
+			throw new MojoFailureException("Invalid version versionRange: " + e.getMessage(), e);
+		}
+		Artifact previousArtifact;
+		try {
+			MavenProject project = mavenParameters.getMavenProject();
+			previousArtifact = mavenParameters.getArtifactFactory().createDependencyArtifact(project.getGroupId(), project.getArtifactId(), versionRange, project.getPackaging(), null, Artifact.SCOPE_COMPILE);
+			if (!previousArtifact.getVersionRange().isSelectedVersionKnown(previousArtifact)) {
+				getLog().debug("Searching for versions in versionRange: " + previousArtifact.getVersionRange());
+				List<ArtifactVersion> availableVersions = metadataSource.retrieveAvailableVersions(previousArtifact, mavenParameters.getLocalRepository(), project.getRemoteArtifactRepositories());
+				filterSnapshots(availableVersions);
+				ArtifactVersion version = versionRange.matchVersion(availableVersions);
+				if (version != null) {
+					previousArtifact.selectVersion(version.toString());
+				}
+			}
+		} catch (OverConstrainedVersionException e1) {
+			throw new MojoFailureException("Invalid comparison version: " + e1.getMessage());
+		} catch (ArtifactMetadataRetrievalException e11) {
+			throw new MojoExecutionException("Error determining previous version: " + e11.getMessage(), e11);
+		}
+		if (previousArtifact.getVersion() == null) {
+			getLog().info("Unable to find a previous version of the project in the repository.");
+		}
+		return previousArtifact;
+	}
+
+	private void filterSnapshots(List versions) {
+		for (Iterator versionIterator = versions.iterator(); versionIterator.hasNext(); ) {
+			ArtifactVersion version = (ArtifactVersion) versionIterator.next();
+			if ("SNAPSHOT".equals(version.getQualifier())) {
+				versionIterator.remove();
+			}
+		}
 	}
 
 	private void populateArchivesListsFromParameters(PluginParameters pluginParameters, MavenParameters mavenParameters, List<File> oldArchives, List<File> newArchives) throws MojoFailureException {
@@ -206,6 +256,26 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 			}
 		}
+		if (pluginParameters.getOldVersionParam() == null && pluginParameters.getOldVersionsParam() == null) {
+			try {
+				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters);
+				if (comparisonArtifact.getVersion() != null) {
+					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, mavenParameters, false, pluginParameters, ConfigurationVersion.OLD);
+					for (Artifact artifact : artifacts) {
+						if (!artifact.isOptional()) { //skip optional artifacts because getFile() will return null
+							File file = artifact.getFile();
+							if (file != null) {
+								oldArchives.add(file);
+							} else {
+								getLog().warn("Artifact '" + artifact + " does not have a file.");
+							}
+						}
+					}
+				}
+			} catch (MojoExecutionException e) {
+				throw new MojoFailureException("Computing and resolving comparison artifact failed: " + e.getMessage(), e);
+			}
+		}
 		if (pluginParameters.getNewVersionParam() != null) {
 			newArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters, pluginParameters, ConfigurationVersion.NEW));
 		}
@@ -213,6 +283,22 @@ public class JApiCmpMojo extends AbstractMojo {
 			for (DependencyDescriptor dependencyDescriptor : pluginParameters.getNewVersionsParam()) {
 				if (dependencyDescriptor != null) {
 					newArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions", mavenParameters, pluginParameters, ConfigurationVersion.NEW));
+				}
+			}
+		}
+		if (pluginParameters.getNewVersionParam() == null && pluginParameters.getNewVersionsParam() == null) {
+			if (mavenParameters.getMavenProject() != null && mavenParameters.getMavenProject().getArtifact() != null) {
+				Artifact artifact = mavenParameters.getMavenProject().getArtifact();
+				File file = artifact.getFile();
+				if (file != null) {
+					try (JarFile jarFile = new JarFile(file)) {
+						getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
+						newArchives.add(file);
+					} catch (IOException e) {
+						getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage());
+					}
+				} else {
+					getLog().warn("Artifact of project does not have a file. Cannot automatically set new version.");
 				}
 			}
 		}

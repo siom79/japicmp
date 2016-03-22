@@ -12,8 +12,8 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 	<configuration>
 		<oldVersion>
 			<dependency>
-				<groupId>japicmp</groupId>
-				<artifactId>japicmp-test-v1</artifactId>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>${project.artifactId}</artifactId>
 				<version>${oldversion}</version>
 				<type>jar</type>
 			</dependency>
@@ -37,6 +37,31 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 	</executions>
 </plugin>
 ```
+
+You can also leave out the &lt;oldVersion&gt; and &lt;newVersion&gt; elements:
+
+```
+<plugin>
+	<groupId>com.github.siom79.japicmp</groupId>
+	<artifactId>japicmp-maven-plugin</artifactId>
+	<version>0.7.2</version>
+	<configuration>
+		<parameter>
+			<!-- see documentation -->
+		</parameter>
+	</configuration>
+	<executions>
+		<execution>
+			<phase>verify</phase>
+			<goals>
+				<goal>cmp</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
+```
+
+This way the plugin tries to determine the artifacts output and the latest released version (no SNAPSHOT version).
 
 ##Advance Usage##
 
