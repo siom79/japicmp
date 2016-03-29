@@ -90,4 +90,50 @@ public class ExceptionsTest {
 		assertThat(method.getExceptions().size(), is(1));
 		assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.REMOVED));
 	}
+
+	@Test
+	public void testMethodRemovedThrowsExceptions() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").exceptions(new CtClass[] {classPool.get("java.lang.Exception")}).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiMethod method = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(method.getExceptions().size(), is(1));
+		assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.REMOVED));
+	}
+
+	@Test
+	public void testMethodAddedThrowsExceptions() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").exceptions(new CtClass[] {classPool.get("java.lang.Exception")}).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiMethod method = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(method.getExceptions().size(), is(1));
+		assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.NEW));
+	}
 }

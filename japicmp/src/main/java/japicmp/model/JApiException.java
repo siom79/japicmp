@@ -5,7 +5,6 @@ import japicmp.cmp.JarArchiveComparator;
 import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import java.util.List;
 
 public class JApiException implements JApiHasChangeStatus {
 	private final String name;
@@ -20,11 +19,13 @@ public class JApiException implements JApiHasChangeStatus {
 
 	private boolean isCheckedException(Optional<CtClass> ctClassOptional, JarArchiveComparator jarArchiveComparator) {
 		boolean checked = false;
-		Optional<CtClass> exceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, "java.lang.Exception");
-		if (exceptionOptional.isPresent()) {
-			CtClass ctClass = ctClassOptional.get();
-			if (ctClass.subclassOf(exceptionOptional.get())) {
-				checked = true;
+		if (ctClassOptional.isPresent()) {
+			Optional<CtClass> exceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, Exception.class.getName());
+			if (exceptionOptional.isPresent()) {
+				CtClass ctClass = ctClassOptional.get();
+				if (ctClass.subclassOf(exceptionOptional.get())) {
+					checked = true;
+				}
 			}
 		}
 		return checked;

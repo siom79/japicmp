@@ -72,21 +72,35 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 			for (String newException : newExceptions) {
 				exceptionList.add(new JApiException(jarArchiveComparator, newException, jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newException), JApiChangeStatus.NEW));
 			}
+		} else if (oldMethodOptional.isPresent()) {
+			List<String> exceptions = extractExceptions(oldMethodOptional);
+			for (String exception : exceptions) {
+				exceptionList.add(new JApiException(jarArchiveComparator, exception, jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, exception), JApiChangeStatus.REMOVED));
+			}
+		} else if (newMethodOptional.isPresent()) {
+			List<String> exceptions = extractExceptions(newMethodOptional);
+			for (String exception : exceptions) {
+				exceptionList.add(new JApiException(jarArchiveComparator, exception, jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, exception), JApiChangeStatus.NEW));
+			}
 		}
 		return exceptionList;
 	}
 
 	private List<String> extractExceptions(Optional<? extends CtBehavior> methodOptional) {
-		ExceptionsAttribute exceptionsAttribute = methodOptional.get().getMethodInfo().getExceptionsAttribute();
-		String[] exceptions;
-		if (exceptionsAttribute != null) {
-			exceptions = exceptionsAttribute.getExceptions();
+		if (methodOptional.isPresent()) {
+			ExceptionsAttribute exceptionsAttribute = methodOptional.get().getMethodInfo().getExceptionsAttribute();
+			String[] exceptions;
+			if (exceptionsAttribute != null) {
+				exceptions = exceptionsAttribute.getExceptions();
+			} else {
+				exceptions = new String[0];
+			}
+			List<String> list = new ArrayList<>(exceptions.length);
+			Collections.addAll(list, exceptions);
+			return list;
 		} else {
-			exceptions = new String[0];
+			return Collections.emptyList();
 		}
-		List<String> list = new ArrayList<>(exceptions.length);
-		Collections.addAll(list, exceptions);
-		return list;
 	}
 
 	private Optional<Integer> getLineNumber(Optional<? extends CtBehavior> methodOptional) {
