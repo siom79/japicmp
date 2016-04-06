@@ -590,6 +590,11 @@ public class CompatibilityChanges {
 		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
 			final List<JApiMethod> abstractMethods = new ArrayList<>();
 			final List<JApiMethod> implementedMethods = new ArrayList<>();
+			for (JApiMethod jApiMethod : jApiClass.getMethods()) {
+				if (!isAbstract(jApiMethod)) {
+					implementedMethods.add(jApiMethod);
+				}
+			}
 			forAllSuperclasses(jApiClass, classMap, new ArrayList<Integer>(), new OnSuperclassCallback<Integer>() {
 				@Override
 				public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap) {
