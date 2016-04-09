@@ -434,9 +434,9 @@ public class CompatibilityChanges {
 		return removeNullValues(jApiMethods);
 	}
 
-	private boolean isAbstract(JApiMethod method) {
+	private boolean isAbstract(JApiHasAbstractModifier jApiHasAbstractModifier) {
 		boolean isAbstract = false;
-		if (method.getAbstractModifier().hasChangedTo(AbstractModifier.ABSTRACT)) {
+		if (jApiHasAbstractModifier.getAbstractModifier().hasChangedTo(AbstractModifier.ABSTRACT)) {
 			isAbstract = true;
 		}
 		return isAbstract;
@@ -587,7 +587,7 @@ public class CompatibilityChanges {
 	}
 
 	private void checkIfAbstractMethodAddedInSuperclass(JApiClass jApiClass, Map<String, JApiClass> classMap) {
-		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
+		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW && !isAbstract(jApiClass)) {
 			final List<JApiMethod> abstractMethods = new ArrayList<>();
 			final List<JApiMethod> implementedMethods = new ArrayList<>();
 			for (JApiMethod jApiMethod : jApiClass.getMethods()) {
