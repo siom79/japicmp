@@ -28,6 +28,6 @@ public class AbstractClassesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, AbstractClasses.AbstractClassGetsNewSuperclass.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
 	}
 }

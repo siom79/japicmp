@@ -819,7 +819,7 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.Superclass");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "newAbstractMethod");
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_TO_CLASS));
