@@ -156,7 +156,7 @@ public class InterfacesTest {
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		jApiClass = getJApiClass(jApiClasses, "SubInterface");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
 	}
 
 	@Test

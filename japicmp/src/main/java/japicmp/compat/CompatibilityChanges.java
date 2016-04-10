@@ -584,12 +584,20 @@ public class CompatibilityChanges {
 		}
 		checkIfClassNowCheckedException(jApiClass);
 		checkIfAbstractMethodAddedInSuperclass(jApiClass, classMap);
+		checkIfAbstraceMethodAdded(jApiClass, classMap);
+	}
+
+	private void checkIfAbstraceMethodAdded(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW && !isAbstract(jApiClass)) {
+			//TODO compute hull of all methods and check if there are any abstract methods not implemented
+		}
 	}
 
 	private void checkIfAbstractMethodAddedInSuperclass(JApiClass jApiClass, Map<String, JApiClass> classMap) {
 		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW && !isAbstract(jApiClass)) {
 			final List<JApiMethod> abstractMethods = new ArrayList<>();
 			final List<JApiMethod> implementedMethods = new ArrayList<>();
+			final List<JApiImplementedInterface> implementedInterfaces = new ArrayList<>();
 			for (JApiMethod jApiMethod : jApiClass.getMethods()) {
 				if (!isAbstract(jApiMethod)) {
 					implementedMethods.add(jApiMethod);
@@ -598,6 +606,11 @@ public class CompatibilityChanges {
 			forAllSuperclasses(jApiClass, classMap, new ArrayList<Integer>(), new OnSuperclassCallback<Integer>() {
 				@Override
 				public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap) {
+					for (JApiMethod jApiMethod : superclass.getMethods()) {
+						if (!isAbstract(jApiMethod)) {
+							implementedMethods.add(jApiMethod);
+						}
+					}
 					for (JApiMethod jApiMethod : superclass.getMethods()) {
 						if (isAbstract(jApiMethod)) {
 							boolean isImplemented = false;
@@ -610,15 +623,39 @@ public class CompatibilityChanges {
 							if (!isImplemented) {
 								abstractMethods.add(jApiMethod);
 							}
-						} else {
-							implementedMethods.add(jApiMethod);
 						}
+					}
+					for (JApiImplementedInterface jApiImplementedInterface : superclass.getInterfaces()) {
+						implementedInterfaces.add(jApiImplementedInterface);
 					}
 					return 0;
 				}
 			});
 			if (abstractMethods.size() > 0) {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_SUPERCLASS);
+			}
+			abstractMethods.clear();
+			for (JApiImplementedInterface jApiImplementedInterface : implementedInterfaces) {
+				String fullyQualifiedName = jApiImplementedInterface.getFullyQualifiedName();
+				JApiClass foundClass = classMap.get(fullyQualifiedName);
+				if (foundClass == null) {
+					foundClass = loadClass(fullyQualifiedName);
+				}
+				for (JApiMethod method : foundClass.getMethods()) {
+					boolean isImplemented = false;
+					for (JApiMethod implementedMethod : implementedMethods) {
+						if (method.getName().equals(implementedMethod.getName()) && method.hasSameSignature(implementedMethod)) {
+							isImplemented = true;
+							break;
+						}
+					}
+					if (!isImplemented) {
+						abstractMethods.add(method);
+					}
+				}
+			}
+			if (abstractMethods.size() > 0) {
+				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
 		}
 	}

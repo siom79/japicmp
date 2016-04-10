@@ -826,14 +826,6 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				}
 			}
 		}
-		if (sourceCompatible) {
-			for (JApiImplementedInterface implementedInterface : interfaces) {
-				if (!implementedInterface.isSourceCompatible()) {
-					sourceCompatible = false;
-					break;
-				}
-			}
-		}
 		return sourceCompatible;
 	}
 
