@@ -35,7 +35,7 @@ public class CompatibilityChangesTest {
 
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				return Collections.EMPTY_LIST;
+				return Collections.emptyList();
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
@@ -210,7 +210,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testSuperclassModifiedIncompatible() throws Exception {
+	public void testMethodRemovedInSuperclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -231,8 +231,90 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_MODIFIED_INCOMPATIBLE));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
+	}
+
+	@Test
+	public void testMethodRemovedInSuperclassButOverriddenInSubclass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(superclass).name("getInstance").addToClass(superclass);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(superclass).name("getInstance").addToClass(ctClass);
+				return Arrays.asList(ctClass, superclass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(superclass).name("getInstance").addToClass(ctClass);
+				return Arrays.asList(ctClass, superclass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
+
+	@Test
+	public void testFieldRemovedInSuperclass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtFieldBuilder.create().type(CtClass.intType).name("field").addToClass(superclass);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
+				return Arrays.asList(ctClass, superclass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
+				return Arrays.asList(ctClass, superclass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+	}
+
+	@Test
+	public void testFieldRemovedInSuperclassButOverriddenInSubclass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtFieldBuilder.create().type(CtClass.intType).name("field").addToClass(superclass);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
+				CtFieldBuilder.create().type(CtClass.intType).name("field").addToClass(ctClass);
+				return Arrays.asList(ctClass, superclass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
+				CtFieldBuilder.create().type(CtClass.intType).name("field").addToClass(ctClass);
+				return Arrays.asList(ctClass, superclass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
 	}
 
 	@Test
@@ -889,6 +971,70 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(true));
+	}
+
+	@Test
+	public void testMethodMovedFromOneInterfaceToAnother() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		options.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface1 = CtInterfaceBuilder.create().name("Interface1").addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.intType).abstractMethod().name("method").addToClass(ctInterface1);
+				CtClass ctInterface2 = CtInterfaceBuilder.create().name("Interface2").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().abstractModifier().name("japicmp.Test").implementsInterface(ctInterface1).implementsInterface(ctInterface2).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.intType).name("method").body("return 42;").addToClass(ctClass);
+				return Arrays.asList(ctClass, ctInterface1, ctInterface2);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface1 = CtInterfaceBuilder.create().name("Interface1").addToClassPool(classPool);
+				CtClass ctInterface2 = CtInterfaceBuilder.create().name("Interface2").addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.intType).abstractMethod().name("method").addToClass(ctInterface2);
+				CtClass ctClass = CtClassBuilder.create().abstractModifier().name("japicmp.Test").implementsInterface(ctInterface1).implementsInterface(ctInterface2).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.intType).name("method").body("return 42;").addToClass(ctClass);
+				return Arrays.asList(ctClass, ctInterface1, ctInterface2);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
+
+	@Test
+	public void testMethodMovedFromOneAbstractClassToAnother() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		options.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass abstractClass1 = CtClassBuilder.create().abstractModifier().name("AbstractClass1").addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.intType).abstractMethod().name("method").addToClass(abstractClass1);
+				CtClass abstractClass2 = CtClassBuilder.create().abstractModifier().name("AbstractClass2").withSuperclass(abstractClass1).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().abstractModifier().name("japicmp.Test").withSuperclass(abstractClass2).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.intType).name("method").body("return 42;").addToClass(ctClass);
+				return Arrays.asList(ctClass, abstractClass1, abstractClass2);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass abstractClass1 = CtClassBuilder.create().abstractModifier().name("AbstractClass1").addToClassPool(classPool);
+				CtClass abstractClass2 = CtClassBuilder.create().abstractModifier().name("AbstractClass2").withSuperclass(abstractClass1).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.intType).abstractMethod().name("method").addToClass(abstractClass2);
+				CtClass ctClass = CtClassBuilder.create().abstractModifier().name("japicmp.Test").withSuperclass(abstractClass2).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.intType).name("method").body("return 42;").addToClass(ctClass);
+				return Arrays.asList(ctClass, abstractClass1, abstractClass2);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
 	}
 
 	@Test

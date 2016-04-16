@@ -492,30 +492,74 @@ public class CompatibilityChanges {
 		}
 	}
 
-	private void checkIfSuperclassesOrInterfacesChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+	private void checkIfSuperclassesOrInterfacesChangedIncompatible(final JApiClass jApiClass, Map<String, JApiClass> classMap) {
 		final JApiSuperclass superclass = jApiClass.getSuperclass();
 		// section 13.4.4 of "Java Language Specification" SE7
 		if (superclass.getChangeStatus() == JApiChangeStatus.REMOVED) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 		} else if (superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED || superclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-			List<Integer> returnValues = new ArrayList<>();
-			forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
+			final List<JApiMethod> implementedMethods = new ArrayList<>();
+			final List<JApiMethod> removedAndNotOverriddenMethods = new ArrayList<>();
+			final List<JApiField> fields = new ArrayList<>();
+			final List<JApiField> removedAndNotOverriddenFields = new ArrayList<>();
+			for (JApiMethod jApiMethod : jApiClass.getMethods()) {
+				if (!isAbstract(jApiMethod) && jApiMethod.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiMethod)) {
+					implementedMethods.add(jApiMethod);
+				}
+			}
+			for (JApiField jApiField : jApiClass.getFields()) {
+				if (jApiField.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiField)) {
+					fields.add(jApiField);
+				}
+			}
+			forAllSuperclasses(jApiClass, classMap, new ArrayList<Integer>(), new OnSuperclassCallback<Integer>() {
 				@Override
 				public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
-					int binaryCompatible = 0;
-					checkIfMethodsHaveChangedIncompatible(superclass, classMap);
-					checkIfConstructorsHaveChangedIncompatible(superclass, classMap);
-					checkIfFieldsHaveChangedIncompatible(superclass, classMap);
-					if (!superclass.isBinaryCompatible()) {
-						binaryCompatible = 1;
+					for (JApiMethod jApiMethod : superclass.getMethods()) {
+						if (!isAbstract(jApiMethod) && jApiMethod.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiMethod)) {
+							implementedMethods.add(jApiMethod);
+						}
 					}
-					return binaryCompatible;
+					for (JApiField jApiField : superclass.getFields()) {
+						if (jApiField.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiField)) {
+							fields.add(jApiField);
+						}
+					}
+					for (JApiMethod jApiMethod : superclass.getMethods()) {
+						if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED) {
+							boolean implemented = false;
+							for (JApiMethod implementedMethod : implementedMethods) {
+								if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
+									implemented = true;
+									break;
+								}
+							}
+							if (!implemented) {
+								removedAndNotOverriddenMethods.add(jApiMethod);
+							}
+						}
+					}
+					for (JApiField jApiField : superclass.getFields()) {
+						if (jApiField.getChangeStatus() == JApiChangeStatus.REMOVED) {
+							boolean overridden = false;
+							for (JApiField field : fields) {
+								if (field.getName().equals(jApiField.getName()) && hasSameType(jApiField, field)) {
+									overridden = true;
+								}
+							}
+							if (!overridden) {
+								removedAndNotOverriddenFields.add(jApiField);
+							}
+						}
+					}
+					return 0;
 				}
 			});
-			for (Integer returnValue : returnValues) {
-				if (returnValue == 1) {
-					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_MODIFIED_INCOMPATIBLE);
-				}
+			if (removedAndNotOverriddenMethods.size() > 0) {
+				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS);
+			}
+			if (removedAndNotOverriddenFields.size() > 0) {
+				addCompatibilityChange(jApiClass, JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS);
 			}
 			if (superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
 				if (!superclass.getOldSuperclassName().get().equals(superclass.getNewSuperclassName().get())) {
@@ -585,6 +629,18 @@ public class CompatibilityChanges {
 		checkIfClassNowCheckedException(jApiClass);
 		checkIfAbstractMethodAddedInSuperclass(jApiClass, classMap);
 		checkIfAbstraceMethodAdded(jApiClass, classMap);
+	}
+
+	private boolean hasSameType(JApiField field, JApiField otherField) {
+		boolean hasSameNewType = false;
+		if (field.getType().getNewTypeOptional().isPresent() && otherField.getType().getNewTypeOptional().isPresent()) {
+			hasSameNewType = field.getType().getNewTypeOptional().get().equals(otherField.getType().getNewTypeOptional().get());
+		} else if (field.getType().getOldTypeOptional().isPresent() && otherField.getType().getNewTypeOptional().isPresent()) {
+			hasSameNewType = field.getType().getOldTypeOptional().get().equals(otherField.getType().getNewTypeOptional().get());
+		} else if (field.getType().getOldTypeOptional().isPresent() && otherField.getType().getOldTypeOptional().isPresent()) {
+			hasSameNewType = field.getType().getOldTypeOptional().get().equals(otherField.getType().getOldTypeOptional().get());
+		}
+		return hasSameNewType;
 	}
 
 	private void checkIfAbstraceMethodAdded(JApiClass jApiClass, Map<String, JApiClass> classMap) {

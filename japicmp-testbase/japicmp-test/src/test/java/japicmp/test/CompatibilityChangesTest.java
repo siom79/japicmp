@@ -63,7 +63,7 @@ public class CompatibilityChangesTest {
 		assertThat(method.getChangeStatus(), is(JApiChangeStatus.REMOVED));
 		assertThat(interfaceLosesMethod.isBinaryCompatible(), is(false));
 		JApiClass classWithInterfaceLosesMethod = getJApiClass(jApiClasses, ClassWithInterfaceLosesMethod.class.getName());
-		assertThat(classWithInterfaceLosesMethod.isBinaryCompatible(), is(false));
+		assertThat(classWithInterfaceLosesMethod.isBinaryCompatible(), is(true));
 		JApiClass superclassLosesMethod = getJApiClass(jApiClasses, Interfaces.SuperclassLosesMethod.class.getName());
 		JApiMethod jApiMethod = getJApiMethod(superclassLosesMethod.getMethods(), "method");
 		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));

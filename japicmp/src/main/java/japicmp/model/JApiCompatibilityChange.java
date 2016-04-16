@@ -18,6 +18,7 @@ public enum JApiCompatibilityChange {
 	INTERFACE_ADDED(true, true),
 	INTERFACE_REMOVED(true, false),
 	METHOD_REMOVED(false, false),
+	METHOD_REMOVED_IN_SUPERCLASS(false, false),
 	METHOD_LESS_ACCESSIBLE(false, false),
 	METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS(false, false),
 	METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC(false, false),
@@ -38,6 +39,7 @@ public enum JApiCompatibilityChange {
 	FIELD_NO_LONGER_STATIC(false, false),
 	FIELD_TYPE_CHANGED(false, false),
 	FIELD_REMOVED(false, false),
+	FIELD_REMOVED_IN_SUPERCLASS(false, false),
 	FIELD_LESS_ACCESSIBLE(false, false),
 	CONSTRUCTOR_REMOVED(false, false),
 	CONSTRUCTOR_LESS_ACCESSIBLE(false, false);

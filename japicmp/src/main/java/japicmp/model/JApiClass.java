@@ -781,14 +781,6 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				}
 			}
 		}
-		if (binaryCompatible) {
-			for (JApiImplementedInterface implementedInterface : interfaces) {
-				if (!implementedInterface.isBinaryCompatible()) {
-					binaryCompatible = false;
-					break;
-				}
-			}
-		}
 		return binaryCompatible;
 	}
 
