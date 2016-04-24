@@ -61,7 +61,29 @@ You can also leave out the &lt;oldVersion&gt; and &lt;newVersion&gt; elements:
 </plugin>
 ```
 
-This way the plugin tries to determine the artifacts output and the latest released version (no SNAPSHOT version).
+This way the plugin tries to determine the artifacts output (new version) and the latest released version (no SNAPSHOT version). If you need
+to configure the latest version more precisely (e.g. only GA versions), then you can use the parameter &lt;oldVersionPattern&gt;:
+
+```
+<plugin>
+	<groupId>com.github.siom79.japicmp</groupId>
+	<artifactId>japicmp-maven-plugin</artifactId>
+	<version>0.7.2</version>
+	<configuration>
+		<parameter>
+        	<oldVersionPattern>\d+\.\d+\.\d+\.GA</oldVersionPattern>
+        </parameter>
+	</configuration>
+	<executions>
+		<execution>
+			<phase>verify</phase>
+			<goals>
+				<goal>cmp</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
+```
 
 ##Advance Usage##
 
@@ -176,6 +198,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | skipHtmlReport								| true | false		| If set to true, no HTML report will be generated.|
 | skipDiffReport								| true | false		| If set to true, no diff report will be generated.|
 | ignoreMissingOldVersion						| true | false		| If set to true, not resolvable artifacts for the old version do not break the build.|
+| oldVersionPattern								| true | n.a.		| If &lt;oldVersion&gt; is not used, the old version compared against must match this regular expression.|
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:

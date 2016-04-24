@@ -46,6 +46,7 @@ import java.util.*;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 @Mojo(name = "cmp", requiresDependencyResolution = ResolutionScope.COMPILE, defaultPhase = LifecyclePhase.VERIFY)
 public class JApiCmpMojo extends AbstractMojo {
@@ -95,7 +96,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
-			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
@@ -201,11 +202,11 @@ public class JApiCmpMojo extends AbstractMojo {
 		return false;
 	}
 
-	public static enum ConfigurationVersion {
+	private enum ConfigurationVersion {
 		OLD, NEW
 	}
 
-	private Artifact getComparisonArtifact(MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
+	private Artifact getComparisonArtifact(MavenParameters mavenParameters, PluginParameters pluginParameters) throws MojoFailureException, MojoExecutionException {
 		VersionRange versionRange;
 		try {
 			versionRange = VersionRange.createFromVersionSpec(mavenParameters.getVersionRangeWithProjectVersion());
@@ -220,6 +221,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				getLog().debug("Searching for versions in versionRange: " + previousArtifact.getVersionRange());
 				List<ArtifactVersion> availableVersions = mavenParameters.getMetadataSource().retrieveAvailableVersions(previousArtifact, mavenParameters.getLocalRepository(), project.getRemoteArtifactRepositories());
 				filterSnapshots(availableVersions);
+				filterVersionPattern(availableVersions, pluginParameters);
 				ArtifactVersion version = versionRange.matchVersion(availableVersions);
 				if (version != null) {
 					previousArtifact.selectVersion(version.toString());
@@ -234,6 +236,30 @@ public class JApiCmpMojo extends AbstractMojo {
 			getLog().info("Unable to find a previous version of the project in the repository.");
 		}
 		return previousArtifact;
+	}
+
+	private void filterVersionPattern(List<ArtifactVersion> availableVersions, PluginParameters pluginParameters) throws MojoFailureException {
+		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getOldVersionPattern() != null) {
+			String versionPattern = pluginParameters.getParameterParam().getOldVersionPattern();
+			Pattern pattern;
+			try {
+				pattern = Pattern.compile(versionPattern);
+			} catch (PatternSyntaxException e) {
+				throw new MojoFailureException("Could not compile provided versionPattern '" + versionPattern + "' as regular expression: " + e.getMessage(), e);
+			}
+			for (Iterator<ArtifactVersion> versionIterator = availableVersions.iterator(); versionIterator.hasNext(); ) {
+				ArtifactVersion version = versionIterator.next();
+				Matcher matcher = pattern.matcher(version.toString());
+				if (!matcher.matches()) {
+					versionIterator.remove();
+					if (getLog().isDebugEnabled()) {
+						getLog().debug("Filtering version '" + version.toString() + "' because it does not match configured versionPattern '" + versionPattern + "'.");
+					}
+				}
+			}
+		} else {
+			getLog().debug("Parameter <oldVersionPattern> not configured, i.e. no version filtered.");
+		}
 	}
 
 	private void filterSnapshots(List versions) {
@@ -258,7 +284,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 		if (pluginParameters.getOldVersionParam() == null && pluginParameters.getOldVersionsParam() == null) {
 			try {
-				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters);
+				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters, pluginParameters);
 				if (comparisonArtifact.getVersion() != null) {
 					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, mavenParameters, false, pluginParameters, ConfigurationVersion.OLD);
 					for (Artifact artifact : artifacts) {
@@ -381,11 +407,11 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private void appendJApiCompatibilityChanges(StringBuilder sb, JApiClass jApiClass) {
 		for (JApiCompatibilityChange jApiCompatibilityChange : jApiClass.getCompatibilityChanges()) {
-            if (sb.length() > 1) {
-                sb.append(',');
-            }
-            sb.append(jApiClass.getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
-        }
+			if (sb.length() > 1) {
+				sb.append(',');
+			}
+			sb.append(jApiClass.getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
+		}
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
 			for (JApiCompatibilityChange jApiCompatibilityChange : jApiMethod.getCompatibilityChanges()) {
 				if (sb.length() > 1) {

@@ -35,6 +35,8 @@ public class Parameter {
 	private String skipDiffReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreMissingOldVersion;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String oldVersionPattern;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -210,5 +212,13 @@ public class Parameter {
 
 	public void setIgnoreMissingOldVersion(String ignoreMissingOldVersion) {
 		this.ignoreMissingOldVersion = ignoreMissingOldVersion;
+	}
+
+	public String getOldVersionPattern() {
+		return oldVersionPattern;
+	}
+
+	public void setOldVersionPattern(String oldVersionPattern) {
+		this.oldVersionPattern = oldVersionPattern;
 	}
 }

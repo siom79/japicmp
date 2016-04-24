@@ -95,19 +95,13 @@
 				<artifactId>japicmp-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<configuration>
-					<oldVersion>
-						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp</artifactId>
-							<version>0.7.0</version>
-						</dependency>
-					</oldVersion>
 					<newVersion>
 						<file>
 							<path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
 						</file>
 					</newVersion>
 					<parameter>
+						<oldVersionPattern>\d+\.\d+\.\d+</oldVersionPattern>
 						<onlyModified>true</onlyModified>
 						<excludes>
 							<exclude>japicmp.*#__cobertura*()</exclude>
