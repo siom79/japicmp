@@ -2,6 +2,14 @@
 
 The following versions of japicmp are available:
 
+##0.8.0 (2016-xx-xx)##
+
+* Declaration of <newVersion/> and <oldVersion/> should be optional. [#129](https://github.com/siom79/japicmp/issues/129)
+* New parameter <oldVersionPattern/> allows filtering of automatically chosen old version. [#129](https://github.com/siom79/japicmp/issues/129)
+* Better error message in case exception class could not be loaded from classpath. [#130](https://github.com/siom79/japicmp/issues/130)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.8.0%22).
+
 ##0.7.2 (2016-03-20)##
 
 * maven plugin has new option to skip XML, HTML and diff report. [#121](https://github.com/siom79/japicmp/issues/121)
