@@ -114,8 +114,8 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
 ##Release##
 
 This is the release procedure:
-* Increment version in README.md.
 * Update ReleaseNotes.md.
+* Increment version in README.md.
 * Run release build (substitute passphrase with your GPG password):
 ```
 mvn release:clean release:prepare -DautoVersionSubmodules=true -Dgpg.passphrase=passphrase
@@ -125,6 +125,11 @@ mvn release:perform -Dgpg.passphrase=passphrase
 	* Download released artifact from staging repository.
 	* Close and release staging repository if sanity checks are successful.
 * Update maven site report.
+
+The second and third step can also be automated using the python script `release.py` in the root directory:
+```
+python3 release.py --gpg-passphrase <gpgpassphrase> --dry-run --new-version <new-version> --release-version <release-version> --release-tag <release-tag> --old-version <old-version>
+```
 
 ##Contributions##
 
