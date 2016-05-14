@@ -115,6 +115,7 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
 
 This is the release procedure:
 * Increment version in README.md.
+* Update ReleaseNotes.md.
 * Run release build (substitute passphrase with your GPG password):
 ```
 mvn release:clean release:prepare -DautoVersionSubmodules=true -Dgpg.passphrase=passphrase
