@@ -4,9 +4,7 @@ import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.Modifier;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
+import javassist.bytecode.*;
 import javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
@@ -18,6 +16,7 @@ public class CtFieldBuilder {
 	private String name = DEFAULT_FIELD_NAME;
 	private int modifier = Modifier.PUBLIC;
 	private List<String> annotations = new ArrayList<>();
+	private Object constantValue = null;
 
 	public CtFieldBuilder type(CtClass ctClass) {
 		this.type = ctClass;
@@ -37,7 +36,21 @@ public class CtFieldBuilder {
 	public CtField addToClass(CtClass ctClass) throws CannotCompileException {
 		CtField ctField = new CtField(this.type, this.name, ctClass);
 		ctField.setModifiers(this.modifier);
-		ctClass.addField(ctField);
+		if (constantValue != null) {
+			if (constantValue instanceof Boolean) {
+				ctClass.addField(ctField, CtField.Initializer.constant((Boolean) constantValue));
+			} else if (constantValue instanceof Integer) {
+				ctClass.addField(ctField, CtField.Initializer.constant((Integer) constantValue));
+			} else if (constantValue instanceof Long) {
+				ctClass.addField(ctField, CtField.Initializer.constant((Long) constantValue));
+			} else if (constantValue instanceof String) {
+				ctClass.addField(ctField, CtField.Initializer.constant((String) constantValue));
+			} else {
+				throw new IllegalArgumentException("Provided constant value for field is of unsupported type: " + constantValue.getClass().getName());
+			}
+		} else {
+			ctClass.addField(ctField);
+		}
 		for (String annotation : annotations) {
 			ClassFile classFile = ctClass.getClassFile();
 			ConstPool constPool = classFile.getConstPool();
@@ -76,6 +89,11 @@ public class CtFieldBuilder {
 
 	public CtFieldBuilder finalAccess() {
 		this.modifier = this.modifier | Modifier.FINAL;
+		return this;
+	}
+
+	public CtFieldBuilder withConstantValue(Object value) {
+		this.constantValue = value;
 		return this;
 	}
 }

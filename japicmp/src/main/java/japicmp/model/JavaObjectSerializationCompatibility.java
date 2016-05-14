@@ -104,9 +104,9 @@ public class JavaObjectSerializationCompatibility {
 						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_MODIFIED;
 					}
 				} else if (jApiSerialVersionUid.getSerialVersionUidInClassOld().isPresent()) {
+					Long suidOld = jApiSerialVersionUid.getSerialVersionUidInClassOld().get();
 					if (jApiClass.getChangeStatus() != JApiChangeStatus.REMOVED) {
 						if (jApiSerialVersionUid.isSerializableNew()) {
-							Long suidOld = jApiSerialVersionUid.getSerialVersionUidInClassOld().get();
 							if (jApiSerialVersionUid.getSerialVersionUidDefaultNew().isPresent()) {
 								Long suidNewDefault = jApiSerialVersionUid.getSerialVersionUidDefaultNew().get();
 								if (suidOld.equals(suidNewDefault)) {
@@ -147,24 +147,30 @@ public class JavaObjectSerializationCompatibility {
 					} else if (jApiClass.getChangeStatus() == JApiChangeStatus.REMOVED) {
 						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_REMOVED;
 					} else {
-						if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().isPresent() && jApiSerialVersionUid.getSerialVersionUidDefaultNew().isPresent()) {
-							Long defaultOld = jApiSerialVersionUid.getSerialVersionUidDefaultOld().get();
-							Long defaultNew = jApiSerialVersionUid.getSerialVersionUidDefaultNew().get();
-							if (defaultOld.equals(defaultNew)) {
-								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
+						if (!isEnum(jApiClass)) { //default serialVersionUID is ignored for enums (section 1.12 "Serialization of Enum Constants")
+							if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().isPresent() && jApiSerialVersionUid.getSerialVersionUidDefaultNew().isPresent()) {
+								Long defaultOld = jApiSerialVersionUid.getSerialVersionUidDefaultOld().get();
+								Long defaultNew = jApiSerialVersionUid.getSerialVersionUidDefaultNew().get();
+								if (defaultOld.equals(defaultNew)) {
+									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
+								} else {
+									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_DEFAULT_SERIALVERSIONUID_CHANGED;
+								}
+							} else if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().isPresent()) {
+								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALIZABLE_REMOVED;
 							} else {
-								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_DEFAULT_SERIALVERSIONUID_CHANGED;
+								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
 							}
-						} else if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().isPresent()) {
-							state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALIZABLE_REMOVED;
-						} else {
-							state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
 						}
 					}
 				}
 			}
 		}
 		jApiClass.setJavaObjectSerializationCompatible(state);
+	}
+
+	private boolean isEnum(JApiClass jApiClass) {
+		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ENUM;
 	}
 
 	/**
@@ -256,7 +262,9 @@ public class JavaObjectSerializationCompatibility {
 	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForFields(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
 		for (JApiField field : jApiClass.getFields()) {
 			if (field.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED;
+				if (!"serialVersionUID".equals(field.getName())) {
+					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED;
+				}
 			}
 			JApiModifier<StaticModifier> staticModifier = field.getStaticModifier();
 			if (staticModifier.getOldModifier().isPresent() && staticModifier.getNewModifier().isPresent()) {

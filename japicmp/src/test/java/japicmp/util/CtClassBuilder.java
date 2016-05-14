@@ -52,6 +52,11 @@ public class CtClassBuilder {
 		return this;
 	}
 
+	public CtClassBuilder enumModifier() {
+		this.modifier = this.modifier | Modifier.ENUM;
+		return this;
+	}
+
 	public CtClassBuilder withSuperclass(CtClass superclass) {
 		this.superclass = Optional.of(superclass);
 		return this;
