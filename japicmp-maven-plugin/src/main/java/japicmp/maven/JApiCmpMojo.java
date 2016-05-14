@@ -105,7 +105,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
 			return Optional.absent();
 		}
-		if (filterModule(pluginParameters)) {
+		if (filterModule(pluginParameters, mavenParameters)) {
 			return Optional.absent();
 		}
 		List<File> oldArchives = new ArrayList<>();
@@ -115,7 +115,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		Options options = createOptions(pluginParameters.getParameterParam(), oldArchives, newArchives);
 		List<JApiClass> jApiClasses = compareArchives(options, pluginParameters, mavenParameters);
 		try {
-			jApiClasses = applyPostAnalysisScript(parameter, jApiClasses);
+			jApiClasses = applyPostAnalysisScript(pluginParameters.getParameterParam(), jApiClasses);
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
 			String diffOutput = generateDiffOutput(jApiClasses, options);
 			createFileAndWriteTo(diffOutput, jApiCmpBuildDir, mavenParameters);
@@ -173,7 +173,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		return filteredList;
 	}
 
-	private boolean filterModule(PluginParameters pluginParameters) {
+	private boolean filterModule(PluginParameters pluginParameters, MavenParameters mavenParameters) {
+		MavenProject mavenProject = mavenParameters.getMavenProject();
 		if (mavenProject != null) {
 			List<String> packagingSupporteds = pluginParameters.getParameterParam().getPackagingSupporteds();
 			if ((packagingSupporteds != null) && (!packagingSupporteds.isEmpty())) {

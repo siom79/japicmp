@@ -34,7 +34,7 @@ public class JApiCmpMojoTest {
 		JApiCmpMojo mojo = new JApiCmpMojo();
 		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
 		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
-		PluginParameters pluginParameters = new PluginParameters(null, newVersion, oldVersion, null, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.<String>absent(), true, null, null, null, null);
+		PluginParameters pluginParameters = new PluginParameters(null, newVersion, oldVersion, new Parameter(), null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.<String>absent(), true, null, null, null, null);
 		ArtifactResolver artifactResolver = mock(ArtifactResolver.class);
 		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
 		Set<Artifact> artifactSet = new HashSet<>();
