@@ -8,7 +8,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.7.2</version>
+	<version>0.8.0</version>
 	<configuration>
 		<oldVersion>
 			<dependency>
@@ -44,7 +44,7 @@ You can also leave out the &lt;oldVersion&gt; and &lt;newVersion&gt; elements:
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.7.2</version>
+	<version>0.8.0</version>
 	<configuration>
 		<parameter>
 			<!-- see documentation -->
@@ -68,7 +68,7 @@ to configure the latest version more precisely (e.g. only GA versions), then you
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.7.2</version>
+	<version>0.8.0</version>
 	<configuration>
 		<parameter>
         	<oldVersionPattern>\d+\.\d+\.\d+\.GA</oldVersionPattern>
@@ -95,13 +95,13 @@ An advanced configuration can utilize the following parameters:
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.7.2</version>
+			<version>0.8.0</version>
 			<configuration>
 				<oldVersion>
 					<dependency>
 						<groupId>japicmp</groupId>
 						<artifactId>japicmp-test-v1</artifactId>
-						<version>0.7.2</version>
+						<version>0.8.0</version>
 						<type>jar</type>
 					</dependency>
 				</oldVersion>
@@ -250,7 +250,7 @@ Alternatively it can be used inside the `<reporting/>` tag in order to be invoke
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.7.2</version>
+			<version>0.8.0</version>
 			<reportSets>
 				<reportSet>
 					<reports>
@@ -298,7 +298,7 @@ To create a summary report, you can also provide multiple old and new versions:
 ```
 The configuration above will create one report for all the declared dependencies.
 
-##Using Groovy scripts as post analysis script##
+##Using Groovy scripts for post analysis##
 
 The parameter &lt;postAnalysisScript/&gt; can be used to invoke a [Groovy](http://www.groovy-lang.org/) script after the analysis but before the output is written.
 This is helpful if you want to apply some custom filtering that is not possible with the standard means of japicmp. The following script for example filters out

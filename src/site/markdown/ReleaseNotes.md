@@ -10,7 +10,7 @@ The following versions of japicmp are available:
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.8.0%22).
 
-##0.7.2 (2016-03-20)##
+##0.8.0 (2016-03-20)##
 
 * maven plugin has new option to skip XML, HTML and diff report. [#121](https://github.com/siom79/japicmp/issues/121)
 * maven-plugin has new option to ignore missing old version. [#122](https://github.com/siom79/japicmp/issues/122)
@@ -18,7 +18,7 @@ Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22c
 * When file for optional dependency could not be resolved the plugin does not break the build with 'could not resolve dependency...'. [#125](https://github.com/siom79/japicmp/issues/125)
 * Improved output if build is broken due to found incompatibilities.
 
-Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.7.2%22).
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.8.0%22).
 
 ##0.7.1 (2016-03-14)##
 
