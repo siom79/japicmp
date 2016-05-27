@@ -87,6 +87,11 @@ public class CtFieldBuilder {
 		return this;
 	}
 
+	public CtFieldBuilder protectedAccess() {
+		this.modifier = this.modifier & ~Modifier.PROTECTED;
+		return this;
+	}
+
 	public CtFieldBuilder finalAccess() {
 		this.modifier = this.modifier | Modifier.FINAL;
 		return this;

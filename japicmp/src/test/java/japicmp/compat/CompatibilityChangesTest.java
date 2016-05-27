@@ -1088,4 +1088,29 @@ public class CompatibilityChangesTest {
 		assertThat(method.isSourceCompatible(), is(false));
 		assertThat(method.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION));
 	}
+
+	@Test
+	public void testMemberVariableMovedToSuperclass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superClass).addToClassPool(classPool);
+				CtFieldBuilder.create().protectedAccess().type(CtClass.intType).name("test").addToClass(ctClass);
+				return Arrays.asList(superClass, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtFieldBuilder.create().protectedAccess().type(CtClass.intType).name("test").addToClass(superClass);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superClass).addToClassPool(classPool);
+				return Arrays.asList(superClass, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
 }

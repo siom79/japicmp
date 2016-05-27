@@ -69,7 +69,28 @@ public class CompatibilityChanges {
 		for (final JApiField field : jApiClass.getFields()) {
 			// section 13.4.6 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_REMOVED);
+				ArrayList<Integer> returnValues = new ArrayList<>();
+				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
+					@Override
+					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
+						int movedToSuperclass = 0;
+						for (JApiField superclassField : superclass.getFields()) {
+							if (superclassField.getName().equals(field.getName()) && fieldTypeMatches(superclassField, field) && isNotPrivate(superclassField)) {
+								movedToSuperclass = 1;
+							}
+						}
+						return movedToSuperclass;
+					}
+				});
+				boolean movedToSuperclass = false;
+				for (Integer returnValue : returnValues) {
+					if (returnValue == 1) {
+						movedToSuperclass = true;
+					}
+				}
+				if (!movedToSuperclass) {
+					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_REMOVED);
+				}
 			}
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(field)) {
