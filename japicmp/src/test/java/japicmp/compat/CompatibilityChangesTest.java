@@ -207,6 +207,35 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_ADDED));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		JApiSuperclass superclass = jApiClass.getSuperclass();
+		assertThat(superclass.isBinaryCompatible(), is(true));
+		assertThat(superclass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_ADDED));
+	}
+
+	@Test
+	public void testSuperclassUnchangedObject() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiClass.getCompatibilityChanges().size(), is(0));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		JApiSuperclass superclass = jApiClass.getSuperclass();
+		assertThat(superclass.isBinaryCompatible(), is(true));
+		assertThat(superclass.getCompatibilityChanges().size(), is(0));
 	}
 
 	@Test
@@ -341,6 +370,9 @@ public class CompatibilityChangesTest {
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "isRemoved");
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_REMOVED));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+		JApiSuperclass superclass = jApiClass.getSuperclass();
+		assertThat(superclass.isBinaryCompatible(), is(true));
+		assertThat(superclass.getCompatibilityChanges().size(), is(0));
 	}
 
 	@Test
@@ -1122,7 +1154,7 @@ public class CompatibilityChangesTest {
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
 				CtClass ctInterface = CtInterfaceBuilder.create().name("japicmp.Interface").addToClassPool(classPool);
 				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").implementsInterface(ctInterface).addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").implementsInterface(ctInterface).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superClass).implementsInterface(ctInterface).addToClassPool(classPool);
 				return Arrays.asList(superClass, ctClass, ctInterface);
 			}
 

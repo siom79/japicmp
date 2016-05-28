@@ -107,11 +107,6 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 				binaryCompatible = false;
 			}
 		}
-		if (binaryCompatible && correspondingJApiClass.isPresent()) {
-			if (!correspondingJApiClass.get().isBinaryCompatible()) {
-				binaryCompatible = false;
-			}
-		}
 		return binaryCompatible;
 	}
 
@@ -121,11 +116,6 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 		boolean sourceCompatible = true;
 		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
 			if (!compatibilityChange.isSourceCompatible()) {
-				sourceCompatible = false;
-			}
-		}
-		if (sourceCompatible && correspondingJApiClass.isPresent()) {
-			if (!correspondingJApiClass.get().isSourceCompatible()) {
 				sourceCompatible = false;
 			}
 		}

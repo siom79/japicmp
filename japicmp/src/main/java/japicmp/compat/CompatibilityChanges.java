@@ -594,17 +594,22 @@ public class CompatibilityChanges {
 					}
 					if (superClassChangedToObject) {
 						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 					} else if (superClassChangedFromObject) {
 						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
 					} else {
 						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_CHANGED);
+						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_CHANGED);
 					}
 				}
 			} else {
 				if (superclass.getOldSuperclassName().isPresent()) {
 					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+					addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 				} else if (superclass.getNewSuperclassName().isPresent()) {
 					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+					addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
 				}
 			}
 		}
