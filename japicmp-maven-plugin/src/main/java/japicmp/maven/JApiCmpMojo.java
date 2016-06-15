@@ -175,9 +175,9 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private boolean filterModule(PluginParameters pluginParameters, MavenParameters mavenParameters) {
 		MavenProject mavenProject = mavenParameters.getMavenProject();
-		if (mavenProject != null) {
+		if (mavenProject != null && pluginParameters.getParameterParam() !=null) {
 			List<String> packagingSupporteds = pluginParameters.getParameterParam().getPackagingSupporteds();
-			if ((packagingSupporteds != null) && (!packagingSupporteds.isEmpty())) {
+			if ((packagingSupporteds != null) && !packagingSupporteds.isEmpty()) {
 				if (!packagingSupporteds.contains(mavenProject.getPackaging())) {
 					getLog().info("Filtered according to packagingFilter");
 					return true;
