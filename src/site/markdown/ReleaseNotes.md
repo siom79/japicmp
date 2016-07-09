@@ -2,6 +2,12 @@
 
 The following versions of japicmp are available:
 
+##0.8.1 (2016-07-09)##
+
+* Variable mavenProject in maven-plugin is read from MavenParameters and not from injected field. [#128](https://github.com/siom79/japicmp/issues/128)
+* Moving protected field to superclass is no longer marked as binary incompatible. [#132](https://github.com/siom79/japicmp/issues/132)
+* Maven plugin can be run without <parameter/> section. [#134](https://github.com/siom79/japicmp/issues/134)
+
 ##0.8.0 (2016-05-14)##
 
 * Declaration of <newVersion/> and <oldVersion/> should be optional. [#129](https://github.com/siom79/japicmp/issues/129)
