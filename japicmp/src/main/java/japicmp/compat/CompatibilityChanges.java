@@ -517,7 +517,9 @@ public class CompatibilityChanges {
 		final JApiSuperclass superclass = jApiClass.getSuperclass();
 		// section 13.4.4 of "Java Language Specification" SE7
 		if (superclass.getChangeStatus() == JApiChangeStatus.REMOVED) {
-			addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+			if (jApiClass.getChangeStatus() != JApiChangeStatus.REMOVED) { //If class is removed, superclass is also removed. But this is not incompatible.
+				addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+			}
 		} else if (superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED || superclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			final List<JApiMethod> implementedMethods = new ArrayList<>();
 			final List<JApiMethod> removedAndNotOverriddenMethods = new ArrayList<>();
@@ -593,22 +595,17 @@ public class CompatibilityChanges {
 						superClassChangedFromObject = true;
 					}
 					if (superClassChangedToObject) {
-						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 					} else if (superClassChangedFromObject) {
-						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_ADDED);
 						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
 					} else {
-						addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_CHANGED);
 						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_CHANGED);
 					}
 				}
 			} else {
 				if (superclass.getOldSuperclassName().isPresent()) {
-					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 					addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
 				} else if (superclass.getNewSuperclassName().isPresent()) {
-					addCompatibilityChange(jApiClass, JApiCompatibilityChange.SUPERCLASS_ADDED);
 					addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
 				}
 			}

@@ -23,7 +23,7 @@ public class PluginParameters {
 		this.skipParam = skipParam;
 		this.newVersionParam = newVersionParam;
 		this.oldVersionParam = oldVersionParam;
-		this.parameterParam = parameterParam;
+		this.parameterParam = parameterParam == null ? new Parameter() : parameterParam;
 		this.dependenciesParam = dependenciesParam;
 		this.oldClassPathDependencies = oldClassPathDependencies;
 		this.newClassPathDependencies = newClassPathDependencies;

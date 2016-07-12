@@ -165,7 +165,7 @@ public class Options {
 		includes = createFilterList(packagesIncludeArg, includes, "Wrong syntax for include option '%s': %s");
 	}
 
-	private List<Filter> createFilterList(Optional<String> argumentString, List<Filter> filters, String errorMessage) {
+	public List<Filter> createFilterList(Optional<String> argumentString, List<Filter> filters, String errorMessage) {
 		for (String filterString : Splitter.on(";").trimResults().omitEmptyStrings().split(argumentString.or(""))) {
 			try {
 				// filter based on annotations

@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
+	private final JApiClass jApiClass;
 	private final Optional<CtClass> oldSuperclassOptional;
 	private final Optional<CtClass> newSuperclassOptional;
 	private final JApiChangeStatus changeStatus;
@@ -21,7 +22,8 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 	private final List<JApiCompatibilityChange> compatibilityChanges = new LinkedList<>();
 	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
 
-	public JApiSuperclass(Optional<CtClass> oldSuperclassOptional, Optional<CtClass> newSuperclassOptional, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
+	public JApiSuperclass(JApiClass jApiClass, Optional<CtClass> oldSuperclassOptional, Optional<CtClass> newSuperclassOptional, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
+		this.jApiClass = jApiClass;
 		this.oldSuperclassOptional = oldSuperclassOptional;
 		this.newSuperclassOptional = newSuperclassOptional;
 		this.changeStatus = changeStatus;
@@ -130,5 +132,14 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 
 	void setJApiClass(JApiClass jApiClass) {
 		this.correspondingJApiClass = Optional.of(jApiClass);
+	}
+
+	/**
+	 * Returns the {@link japicmp.model.JApiClass} this superclass belongs to.
+	 * @return the JApiClass this superclass belongs to.
+     */
+	@XmlTransient
+	public JApiClass getJApiClassOwning() {
+		return jApiClass;
 	}
 }

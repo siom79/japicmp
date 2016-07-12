@@ -37,6 +37,8 @@ public class Parameter {
 	private String ignoreMissingOldVersion;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String oldVersionPattern;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean breakBuildIfCausedByExclusion = true;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -220,5 +222,13 @@ public class Parameter {
 
 	public void setOldVersionPattern(String oldVersionPattern) {
 		this.oldVersionPattern = oldVersionPattern;
+	}
+
+	public boolean isBreakBuildIfCausedByExclusion() {
+		return breakBuildIfCausedByExclusion;
+	}
+
+	public void setBreakBuildIfCausedByExclusion(boolean breakBuildIfCausedByExclusion) {
+		this.breakBuildIfCausedByExclusion = breakBuildIfCausedByExclusion;
 	}
 }

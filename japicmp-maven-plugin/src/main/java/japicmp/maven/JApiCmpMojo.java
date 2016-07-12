@@ -5,12 +5,15 @@ import japicmp.cli.JApiCli;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
+import japicmp.filter.ClassFilter;
 import japicmp.model.*;
+import japicmp.output.Filter;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
+import javassist.CtClass;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -87,13 +90,6 @@ public class JApiCmpMojo extends AbstractMojo {
 	@Component
 	private ArtifactMetadataSource metadataSource;
 
-	private static <T> T notNull(T value, String msg) throws MojoFailureException {
-		if (value == null) {
-			throw new MojoFailureException(msg);
-		}
-		return value;
-	}
-
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
 		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
@@ -113,7 +109,10 @@ public class JApiCmpMojo extends AbstractMojo {
 		populateArchivesListsFromParameters(pluginParameters, mavenParameters, oldArchives, newArchives);
 		VersionChange versionChange = new VersionChange(oldArchives, newArchives);
 		Options options = createOptions(pluginParameters.getParameterParam(), oldArchives, newArchives);
-		List<JApiClass> jApiClasses = compareArchives(options, pluginParameters, mavenParameters);
+		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
+		setUpClassPath(comparatorOptions, pluginParameters, mavenParameters);
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
+		List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
 		try {
 			jApiClasses = applyPostAnalysisScript(pluginParameters.getParameterParam(), jApiClasses);
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
@@ -126,7 +125,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					getLog().info("Written file '" + file.getAbsolutePath() + "'.");
 				}
 			}
-			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), versionChange, options);
+			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), versionChange, options, jarArchiveComparator);
 			return Optional.of(xmlOutput);
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
@@ -347,7 +346,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, VersionChange versionChange, Options options) throws MojoFailureException {
+	private void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, VersionChange versionChange, Options options, JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
 		if (breakBuildOnModificationsParameter(parameterParam)) {
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
@@ -355,32 +354,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 			}
 		}
-		if (breakBuildOnBinaryIncompatibleModifications(parameterParam)) {
-			boolean breakBuild = false;
-			StringBuilder sb = new StringBuilder();
-			for (JApiClass jApiClass : jApiClasses) {
-				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isBinaryCompatible()) {
-					breakBuild = true;
-					appendJApiCompatibilityChanges(sb, jApiClass);
-				}
-			}
-			if (breakBuild) {
-				throw new MojoFailureException(String.format("Breaking the build because there is at least one binary incompatibility: %s", sb.toString()));
-			}
-		}
-		if (breakBuildOnSourceIncompatibleModifications(parameterParam)) {
-			boolean breakBuild = false;
-			StringBuilder sb = new StringBuilder();
-			for (JApiClass jApiClass : jApiClasses) {
-				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED && !jApiClass.isSourceCompatible()) {
-					breakBuild = true;
-					appendJApiCompatibilityChanges(sb, jApiClass);
-				}
-			}
-			if (breakBuild) {
-				throw new MojoFailureException(String.format("Breaking the build because there is at least one source incompatibility: %s", sb.toString()));
-			}
-		}
+		breakBuildIfNecessary(jApiClasses, parameterParam, options, jarArchiveComparator);
 		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
 			VersionChange.ChangeType changeType = versionChange.computeChangeType();
 			SemverOut semverOut = new SemverOut(options, jApiClasses);
@@ -406,44 +380,252 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void appendJApiCompatibilityChanges(StringBuilder sb, JApiClass jApiClass) {
-		for (JApiCompatibilityChange jApiCompatibilityChange : jApiClass.getCompatibilityChanges()) {
-			if (sb.length() > 1) {
-				sb.append(',');
-			}
-			sb.append(jApiClass.getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
+	private static class BreakBuildResult {
+		private final boolean breakBuildOnBinaryIncompatibleModifications;
+		private final boolean breakBuildOnSourceIncompatibleModifications;
+		boolean binaryIncompatibleChanges = false;
+		boolean sourceIncompatibleChanges = false;
+
+		public BreakBuildResult(boolean breakBuildOnBinaryIncompatibleModifications, boolean breakBuildOnSourceIncompatibleModifications) {
+			this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;
+			this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;
 		}
-		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
-			for (JApiCompatibilityChange jApiCompatibilityChange : jApiMethod.getCompatibilityChanges()) {
-				if (sb.length() > 1) {
-					sb.append(',');
-				}
-				sb.append(jApiClass.getFullyQualifiedName()).append(".").append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod)).append(")").append(":").append(jApiCompatibilityChange.name());
-			}
+
+		public boolean breakTheBuild() {
+			return binaryIncompatibleChanges && this.breakBuildOnBinaryIncompatibleModifications ||
+				sourceIncompatibleChanges && this.breakBuildOnSourceIncompatibleModifications;
 		}
-		for (JApiConstructor jApiMethod : jApiClass.getConstructors()) {
-			for (JApiCompatibilityChange jApiCompatibilityChange : jApiMethod.getCompatibilityChanges()) {
-				if (sb.length() > 1) {
-					sb.append(',');
+	}
+
+	void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, final Options options,
+									   final JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
+		final StringBuilder sb = new StringBuilder();
+		final BreakBuildResult breakBuildResult = new BreakBuildResult(breakBuildOnBinaryIncompatibleModifications(parameterParam),
+			breakBuildOnSourceIncompatibleModifications(parameterParam));
+		final boolean breakBuildIfCausedByExclusion = parameterParam.isBreakBuildIfCausedByExclusion();
+		Filter.filter(jApiClasses, new Filter.FilterVisitor() {
+			@Override
+			public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
+				for (JApiCompatibilityChange jApiCompatibilityChange : jApiClass.getCompatibilityChanges()) {
+					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
+						if (!jApiCompatibilityChange.isBinaryCompatible()) {
+							breakBuildResult.binaryIncompatibleChanges = true;
+						}
+						if (!jApiCompatibilityChange.isSourceCompatible()) {
+							breakBuildResult.sourceIncompatibleChanges = true;
+						}
+						if (sb.length() > 1) {
+							sb.append(',');
+						}
+						sb.append(jApiClass.getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
+					}
 				}
-				sb.append(jApiClass.getFullyQualifiedName()).append(".").append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod)).append(")").append(":").append(jApiCompatibilityChange.name());
 			}
-		}
-		for (JApiField jApiField : jApiClass.getFields()) {
-			for (JApiCompatibilityChange jApiCompatibilityChange : jApiField.getCompatibilityChanges()) {
-				if (sb.length() > 1) {
-					sb.append(',');
+
+			@Override
+			public void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod) {
+				for (JApiCompatibilityChange jApiCompatibilityChange : jApiMethod.getCompatibilityChanges()) {
+					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
+						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
+							breakBuildResult.binaryIncompatibleChanges = true;
+						}
+						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
+							breakBuildResult.sourceIncompatibleChanges = true;
+						}
+						if (sb.length() > 1) {
+							sb.append(',');
+						}
+						sb.append(jApiMethod.getjApiClass().getFullyQualifiedName()).append(".").append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod)).append(")").append(":").append(jApiCompatibilityChange.name());
+					}
 				}
-				sb.append(jApiClass.getFullyQualifiedName()).append(".").append(jApiField.getName()).append(":").append(jApiCompatibilityChange.name());
 			}
-		}
-		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {
-			for (JApiCompatibilityChange jApiCompatibilityChange : implementedInterface.getCompatibilityChanges()) {
-				if (sb.length() > 1) {
-					sb.append(',');
+
+			private boolean breakBuildIfCausedByExclusion(JApiMethod jApiMethod) {
+				if (!breakBuildIfCausedByExclusion) {
+					JApiReturnType returnType = jApiMethod.getReturnType();
+					String oldType = returnType.getOldReturnType();
+					try {
+						Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);
+						if (ctClassOptional.isPresent()) {
+							if (classExcluded(ctClassOptional.get())) {
+								return false;
+							}
+						}
+					} catch (Exception e) {
+						getLog().warn("Failed to load class " + oldType + ": " + e.getMessage(), e);
+					}
+					String newType = returnType.getNewReturnType();
+					try {
+						Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);
+						if (ctClassOptional.isPresent()) {
+							if (classExcluded(ctClassOptional.get())) {
+								return false;
+							}
+						}
+					} catch (Exception e) {
+						getLog().warn("Failed to load class " + newType + ": " + e.getMessage(), e);
+					}
 				}
-				sb.append(jApiClass.getFullyQualifiedName()).append("[").append(implementedInterface.getFullyQualifiedName()).append("]").append(":").append(jApiCompatibilityChange.name());
+				return true;
 			}
+
+			@Override
+			public void visit(Iterator<JApiConstructor> iterator, JApiConstructor jApiConstructor) {
+				for (JApiCompatibilityChange jApiCompatibilityChange : jApiConstructor.getCompatibilityChanges()) {
+					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
+						if (!jApiCompatibilityChange.isBinaryCompatible()) {
+							breakBuildResult.binaryIncompatibleChanges = true;
+						}
+						if (!jApiCompatibilityChange.isSourceCompatible()) {
+							breakBuildResult.sourceIncompatibleChanges = true;
+						}
+						if (sb.length() > 1) {
+							sb.append(',');
+						}
+						sb.append(jApiConstructor.getjApiClass().getFullyQualifiedName()).append(".").append(jApiConstructor.getName()).append("(").append(methodParameterToList(jApiConstructor)).append(")").append(":").append(jApiCompatibilityChange.name());
+					}
+				}
+			}
+
+			@Override
+			public void visit(Iterator<JApiImplementedInterface> iterator, JApiImplementedInterface jApiImplementedInterface) {
+				for (JApiCompatibilityChange jApiCompatibilityChange : jApiImplementedInterface.getCompatibilityChanges()) {
+					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
+						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiImplementedInterface)) {
+							breakBuildResult.binaryIncompatibleChanges = true;
+						}
+						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiImplementedInterface)) {
+							breakBuildResult.sourceIncompatibleChanges = true;
+						}
+						if (sb.length() > 1) {
+							sb.append(',');
+						}
+						sb.append(jApiImplementedInterface.getFullyQualifiedName()).append("[").append(jApiImplementedInterface.getFullyQualifiedName()).append("]").append(":").append(jApiCompatibilityChange.name());
+					}
+				}
+			}
+
+			private boolean breakBuildIfCausedByExclusion(JApiImplementedInterface jApiImplementedInterface) {
+				if (!breakBuildIfCausedByExclusion) {
+					CtClass ctClass = jApiImplementedInterface.getCtClass();
+					if (classExcluded(ctClass)) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+			@Override
+			public void visit(Iterator<JApiField> iterator, JApiField jApiField) {
+				for (JApiCompatibilityChange jApiCompatibilityChange : jApiField.getCompatibilityChanges()) {
+					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
+						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiField)) {
+							breakBuildResult.binaryIncompatibleChanges = true;
+						}
+						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiField)) {
+							breakBuildResult.sourceIncompatibleChanges = true;
+						}
+						if (sb.length() > 1) {
+							sb.append(',');
+						}
+						sb.append(jApiField.getjApiClass().getFullyQualifiedName()).append(".").append(jApiField.getName()).append(":").append(jApiCompatibilityChange.name());
+					}
+				}
+			}
+
+			private boolean breakBuildIfCausedByExclusion(JApiField jApiField) {
+				if (!breakBuildIfCausedByExclusion) {
+					JApiType type = jApiField.getType();
+					Optional<String> oldTypeOptional = type.getOldTypeOptional();
+					if (oldTypeOptional.isPresent()) {
+						String oldType = oldTypeOptional.get();
+						try {
+							Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);
+							if (ctClassOptional.isPresent()) {
+								if (classExcluded(ctClassOptional.get())) {
+									return false;
+								}
+							}
+						} catch (Exception e) {
+							getLog().warn("Failed to load class " + oldType + ": " + e.getMessage(), e);
+						}
+					}
+					Optional<String> newTypeOptional = type.getNewTypeOptional();
+					if (newTypeOptional.isPresent()) {
+						String newType = newTypeOptional.get();
+						try {
+							Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);
+							if (ctClassOptional.isPresent()) {
+								if (classExcluded(ctClassOptional.get())) {
+									return false;
+								}
+							}
+						} catch (Exception e) {
+							getLog().warn("Failed to load class " + newType + ": " + e.getMessage(), e);
+						}
+					}
+				}
+				return true;
+			}
+
+			@Override
+			public void visit(Iterator<JApiAnnotation> iterator, JApiAnnotation jApiAnnotation) {
+				//no incompatible changes
+			}
+
+			@Override
+			public void visit(JApiSuperclass jApiSuperclass) {
+				for (JApiCompatibilityChange jApiCompatibilityChange : jApiSuperclass.getCompatibilityChanges()) {
+					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
+						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiSuperclass)) {
+							breakBuildResult.binaryIncompatibleChanges = true;
+						}
+						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiSuperclass)) {
+							breakBuildResult.sourceIncompatibleChanges = true;
+						}
+						if (sb.length() > 1) {
+							sb.append(',');
+						}
+						sb.append(jApiSuperclass.getJApiClassOwning().getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
+					}
+				}
+			}
+
+			private boolean breakBuildIfCausedByExclusion(JApiSuperclass jApiSuperclass) {
+				if (!breakBuildIfCausedByExclusion) {
+					Optional<CtClass> oldSuperclassOptional = jApiSuperclass.getOldSuperclass();
+					if (oldSuperclassOptional.isPresent()) {
+						CtClass ctClass = oldSuperclassOptional.get();
+						if (classExcluded(ctClass)) {
+							return false;
+						}
+					}
+					Optional<CtClass> newSuperclassOptional = jApiSuperclass.getNewSuperclass();
+					if (newSuperclassOptional.isPresent()) {
+						CtClass ctClass = newSuperclassOptional.get();
+						if (classExcluded(ctClass)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+
+			private boolean classExcluded(CtClass ctClass) {
+				List<japicmp.filter.Filter> excludes = options.getExcludes();
+				for (japicmp.filter.Filter exclude : excludes) {
+					if (exclude instanceof ClassFilter) {
+						ClassFilter classFilter = (ClassFilter) exclude;
+						if (classFilter.matches(ctClass)) {
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+		});
+		if (breakBuildResult.breakTheBuild()) {
+			throw new MojoFailureException(String.format("Breaking the build because there is at least one incompatibility: %s", sb.toString()));
 		}
 	}
 
@@ -637,13 +819,6 @@ public class JApiCmpMojo extends AbstractMojo {
 			filename = executionId;
 		}
 		return filename;
-	}
-
-	private List<JApiClass> compareArchives(Options options, PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
-		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
-		setUpClassPath(comparatorOptions, pluginParameters, mavenParameters);
-		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
-		return jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
 	}
 
 	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions, PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
@@ -929,5 +1104,12 @@ public class JApiCmpMojo extends AbstractMojo {
 			}
 		}
 		return ignoreNonResolvableArtifacts;
+	}
+
+	private static <T> T notNull(T value, String msg) throws MojoFailureException {
+		if (value == null) {
+			throw new MojoFailureException(msg);
+		}
+		return value;
 	}
 }

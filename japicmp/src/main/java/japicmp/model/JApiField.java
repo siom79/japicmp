@@ -22,6 +22,7 @@ import java.util.List;
 public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier,
 	JApiHasFinalModifier, JApiHasTransientModifier, JApiCompatibility, JApiHasAnnotations, JApiCanBeSynthetic {
 	private final JApiChangeStatus changeStatus;
+	private final JApiClass jApiClass;
 	private final Optional<CtField> oldFieldOptional;
 	private final Optional<CtField> newFieldOptional;
 	private final List<JApiAnnotation> annotations = new LinkedList<>();
@@ -34,7 +35,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
 	private final JApiType type;
 
-	public JApiField(JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional, JarArchiveComparatorOptions options) {
+	public JApiField(JApiClass jApiClass, JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional, JarArchiveComparatorOptions options) {
+		this.jApiClass = jApiClass;
 		this.oldFieldOptional = oldFieldOptional;
 		this.newFieldOptional = newFieldOptional;
 		computeAnnotationChanges(this.annotations, oldFieldOptional, newFieldOptional, options);
@@ -349,5 +351,10 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	@XmlElement(name = "annotation")
 	public List<JApiAnnotation> getAnnotations() {
 		return annotations;
+	}
+
+	@XmlTransient
+	public JApiClass getjApiClass() {
+		return jApiClass;
 	}
 }

@@ -1,20 +1,24 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompatibility {
+	private final CtClass ctClass;
 	private final String fullyQualifiedName;
 	private final JApiChangeStatus changeStatus;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
 	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
 
-	public JApiImplementedInterface(String fullyQualifiedName, JApiChangeStatus changeStatus) {
+	public JApiImplementedInterface(CtClass ctClass, String fullyQualifiedName, JApiChangeStatus changeStatus) {
+		this.ctClass = ctClass;
 		this.fullyQualifiedName = fullyQualifiedName;
 		this.changeStatus = changeStatus;
 	}
@@ -71,5 +75,10 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 
 	public void setJApiClass(JApiClass jApiClass) {
 		this.correspondingJApiClass = Optional.of(jApiClass);
+	}
+
+	@XmlTransient
+	public CtClass getCtClass() {
+		return ctClass;
 	}
 }
