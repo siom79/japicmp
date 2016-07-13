@@ -324,7 +324,30 @@ public class JApiCmpMojo extends AbstractMojo {
 						getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage());
 					}
 				} else {
-					getLog().warn("Artifact of project does not have a file. Cannot automatically set new version.");
+					// maven projects with e.g. packaging type ejb don't have a file -> try to resolve artifact through
+					// ArtifactHandler
+					if (artifact.getArtifactHandler() != null) {
+						try {
+							VersionRange versionSpec = VersionRange.createFromVersionSpec(artifact.getVersion());
+							Artifact dependencyArtifact = mavenParameters.getArtifactFactory().createDependencyArtifact(artifact.getGroupId(), artifact.getArtifactId(), versionSpec, artifact.getArtifactHandler().getExtension(), null, null);
+							Set<Artifact> artifacts = resolveArtifact(dependencyArtifact, mavenParameters, false, pluginParameters, ConfigurationVersion.NEW);
+							for (Artifact a : artifacts) {
+								file = a.getFile();
+								if (file != null) {
+									try (JarFile jarFile = new JarFile(file)) {
+										getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
+										newArchives.add(file);
+									} catch (IOException e) {
+										getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage());
+									}
+								}
+							}
+						} catch (InvalidVersionSpecificationException e) {
+							getLog().error("Failed to obtain file for artifact " + artifact + ": " + e.getMessage(), e);
+						}
+					} else {
+						getLog().warn("Artifact " + artifact + " does not have an ArtifactHandler. Cannot resolve artifact automatically.");
+					}
 				}
 			}
 		}
