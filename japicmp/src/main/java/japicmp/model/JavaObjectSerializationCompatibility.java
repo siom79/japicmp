@@ -81,7 +81,7 @@ public class JavaObjectSerializationCompatibility {
 		try {
 			return clazz.subtypeOf(pool.get("java.io.Serializable"));
 		} catch (NotFoundException e) {
-			if (options.isIgnoreMissingClasses()) {
+			if (options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 				return false;
 			} else {
 				throw JApiCmpException.forClassLoading(e, clazz.getName(), jarArchiveComparator);

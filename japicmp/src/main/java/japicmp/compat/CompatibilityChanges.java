@@ -205,14 +205,14 @@ public class CompatibilityChanges {
 			try {
 				oldClassOptional = Optional.of(classPool.get(newSuperclassName));
 			} catch (NotFoundException e) {
-				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreMissingClasses()) {
+				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
 			}
 			try {
 				newClassOptional = Optional.of(classPool.get(newSuperclassName));
 			} catch (NotFoundException e) {
-				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreMissingClasses()) {
+				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
 			}
@@ -222,14 +222,14 @@ public class CompatibilityChanges {
 			try {
 				oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
 			} catch (NotFoundException e) {
-				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreMissingClasses()) {
+				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
 			}
 			try {
 				newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
 			} catch (NotFoundException e) {
-				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreMissingClasses()) {
+				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
 			}

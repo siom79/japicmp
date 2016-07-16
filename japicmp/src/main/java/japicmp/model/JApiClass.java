@@ -222,7 +222,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			CtClass superClass = ctClass.getSuperclass();
 			return Optional.fromNullable(superClass);
 		} catch (NotFoundException e) {
-			if (options.isIgnoreMissingClasses()) {
+			if (options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 				return Optional.absent();
 			} else {
 				throw JApiCmpException.forClassLoading(e, e.getMessage(), jarArchiveComparator);
@@ -288,7 +288,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				buildInterfaceMap(superClassOptional.get(), archiveType, map);
 			}
 		} catch (NotFoundException e) {
-			if (!options.isIgnoreMissingClasses()) {
+			if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 				throw JApiCmpException.forClassLoading(e, "Class not found: " + e.getMessage(), jarArchiveComparator);
 			}
 		}

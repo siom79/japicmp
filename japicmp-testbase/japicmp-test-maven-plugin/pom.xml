@@ -211,6 +211,34 @@
 							</dependencies>
 						</configuration>
 					</execution>
+					<execution>
+						<id>ignore-missing-classes-by-regex</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersion>
+							<parameter>
+								<ignoreMissingClassesByRegularExpressions>
+									<ignoreMissingClassesByRegularExpression>org.apache.commons.math3.*</ignoreMissingClassesByRegularExpression>
+								</ignoreMissingClassesByRegularExpressions>
+							</parameter>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>

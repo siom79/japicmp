@@ -709,6 +709,12 @@ public class JApiCmpMojo extends AbstractMojo {
 				Boolean ignoreMissingClasses = Boolean.valueOf(ignoreMissingClassesString);
 				options.setIgnoreMissingClasses(ignoreMissingClasses);
 			}
+			List<String> ignoreMissingClassesByRegularExpressions = parameterParam.getIgnoreMissingClassesByRegularExpressions();
+			if (ignoreMissingClassesByRegularExpressions != null) {
+				for (String ignoreMissingClassRegularExpression : ignoreMissingClassesByRegularExpressions) {
+					options.addIgnoreMissingClassRegularExpression(ignoreMissingClassRegularExpression);
+				}
+			}
 			String htmlStylesheet = parameterParam.getHtmlStylesheet();
 			if (htmlStylesheet != null) {
 				options.setHtmlStylesheet(Optional.of(htmlStylesheet));

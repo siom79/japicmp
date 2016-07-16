@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 	private static final String XSD_FILENAME = "japicmp.xsd";
@@ -217,12 +218,24 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		jApiCmpXmlRoot.setOnlyBinaryIncompatibleModifications(options.isOutputOnlyBinaryIncompatibleModifications());
 		jApiCmpXmlRoot.setPackagesInclude(filtersAsString(options.getIncludes(), true));
 		jApiCmpXmlRoot.setPackagesExclude(filtersAsString(options.getExcludes(), false));
-		jApiCmpXmlRoot.setIgnoreMissingClasses(options.isIgnoreMissingClasses());
+		jApiCmpXmlRoot.setIgnoreMissingClasses(options.getIgnoreMissingClasses().isIgnoreAllMissingClasses());
+		jApiCmpXmlRoot.setIgnoreMissingClassesByRegularExpressions(regExAsString(options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression()));
 		if (xmlOutputGeneratorOptions.getTitle().isPresent()) {
 			jApiCmpXmlRoot.setTitle(xmlOutputGeneratorOptions.getTitle().get());
 		}
 		jApiCmpXmlRoot.setSemanticVersioning(xmlOutputGeneratorOptions.getSemanticVersioningInformation());
 		return jApiCmpXmlRoot;
+	}
+
+	private String regExAsString(List<Pattern> ignoreMissingClassRegularExpression) {
+		StringBuilder sb = new StringBuilder();
+		for (Pattern pattern : ignoreMissingClassRegularExpression) {
+			if (sb.length() > 0) {
+				sb.append(";");
+			}
+			sb.append(pattern.toString());
+		}
+		return sb.toString();
 	}
 
 	private String filtersAsString(List<Filter> filters, boolean include) {

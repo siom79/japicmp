@@ -134,6 +134,9 @@ An advanced configuration can utilize the following parameters:
 					<onlyBinaryIncompatible>false</onlyBinaryIncompatible>
 					<includeSynthetic>false</includeSynthetic>
 					<ignoreMissingClasses>false</ignoreMissingClasses>
+					<ignoreMissingClassesByRegularExpressions>
+						<ignoreMissingClassesByRegularExpression>org.apache.commons.math3.*</ignoreMissingClassesByRegularExpression>
+					</ignoreMissingClassesByRegularExpressions>
 					<skipPomModules>true</skipPomModules>
 					<htmlStylesheet>path/to/stylesheet.css</htmlStylesheet>
 					<htmlTitle>Title of report</htmlTitle>
@@ -187,6 +190,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | onlyBinaryIncompatible						| true  | false		| If set to true, only binary incompatible changes are reported.|
 | includeSynthetic								| true  | false		| If set to true, changes for synthetic classes and class members are tracked.|
 | ignoreMissingClasses							| true  | false		| If set to true, superclasses and interfaces that cannot be resolved are ignored. Pleases note that in this case the results for the affected classes may not be accurate.|
+| ignoreMissingClassesByRegularExpressions		| true	| n.a.		| List of regular expressions for superclasses and interfaces that cannot be resolved and that should be ignored. In contrast to the option ignoreMissingClasses, which ignores all missing classes, this options allows a fine-grained selection.|
 | skipPomModules								| true  | true		| Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.|
 | skip											| true  | false		| Setting this parameter to true will skip execution of the plugin.|
 | htmlStylesheet								| true  | n.a.		| Path to an individual CSS stylesheet for the HTML report.|

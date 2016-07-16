@@ -1,6 +1,7 @@
 package japicmp.cmp;
 
 import com.google.common.base.Optional;
+import japicmp.config.IgnoreMissingClasses;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.filter.Filters;
@@ -19,7 +20,7 @@ public class JarArchiveComparatorOptions {
 	private AccessModifier accessModifier = AccessModifier.PROTECTED;
 	private Filters filters = new Filters();
 	private boolean includeSynthetic = false;
-	private boolean ignoreMissingClasses = false;
+	private IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();
 	private ClassPathMode classPathMode = ClassPathMode.ONE_COMMON_CLASSPATH;
 	private List<String> oldClassPath = new LinkedList<>();
 	private List<String> newClassPath = new LinkedList<>();
@@ -40,12 +41,16 @@ public class JarArchiveComparatorOptions {
 		comparatorOptions.getFilters().getIncludes().addAll(options.getIncludes());
 		comparatorOptions.setAccessModifier(options.getAccessModifier());
 		comparatorOptions.setIncludeSynthetic(options.isIncludeSynthetic());
-		comparatorOptions.setIgnoreMissingClasses(options.isIgnoreMissingClasses());
+		comparatorOptions.setIgnoreMissingClasses(options.getIgnoreMissingClasses());
 		toJarArchiveComparatorClassPathMode(options, comparatorOptions);
 		toJarArchiveComparatorClassPath(options.getOldClassPath(), comparatorOptions.getOldClassPath());
 		toJarArchiveComparatorClassPath(options.getNewClassPath(), comparatorOptions.getNewClassPath());
 		comparatorOptions.setNoAnnotations(options.isNoAnnotations());
 		return comparatorOptions;
+	}
+
+	private void setIgnoreMissingClasses(IgnoreMissingClasses ignoreMissingClasses) {
+		this.ignoreMissingClasses = ignoreMissingClasses;
 	}
 
 	private static void toJarArchiveComparatorClassPathMode(Options options, JarArchiveComparatorOptions comparatorOptions) {
@@ -92,14 +97,6 @@ public class JarArchiveComparatorOptions {
 		return includeSynthetic;
 	}
 
-	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
-		this.ignoreMissingClasses = ignoreMissingClasses;
-	}
-
-	public boolean isIgnoreMissingClasses() {
-		return ignoreMissingClasses;
-	}
-
 	public void setClassPathMode(ClassPathMode classPathMode) {
 		this.classPathMode = classPathMode;
 	}
@@ -130,5 +127,9 @@ public class JarArchiveComparatorOptions {
 
 	public boolean isNoAnnotations() {
 		return noAnnotations;
+	}
+
+	public IgnoreMissingClasses getIgnoreMissingClasses() {
+		return ignoreMissingClasses;
 	}
 }

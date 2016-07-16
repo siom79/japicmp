@@ -23,6 +23,16 @@ public class JApiCmpXmlRoot {
 	private String packagesInclude;
 	private String packagesExclude;
 	private boolean ignoreMissingClasses;
+	private String ignoreMissingClassesByRegularExpressions;
+
+	public Optional<String> getTitleOptional() {
+		return titleOptional;
+	}
+
+	public void setTitleOptional(Optional<String> titleOptional) {
+		this.titleOptional = titleOptional;
+	}
+
 	private Optional<String> titleOptional = Optional.absent();
 	private String semanticVersioning = "n.a.";
 
@@ -136,5 +146,14 @@ public class JApiCmpXmlRoot {
 
 	public void setSemanticVersioning(String semanticVersioning) {
 		this.semanticVersioning = semanticVersioning;
+	}
+
+	@XmlAttribute
+	public String getIgnoreMissingClassesByRegularExpressions() {
+		return ignoreMissingClassesByRegularExpressions;
+	}
+
+	public void setIgnoreMissingClassesByRegularExpressions(String ignoreMissingClassesByRegularExpressions) {
+		this.ignoreMissingClassesByRegularExpressions = ignoreMissingClassesByRegularExpressions;
 	}
 }

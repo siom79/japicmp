@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
+import java.util.regex.Pattern;
 
 public class Options {
 	private List<File> oldArchives = new ArrayList<>();
@@ -25,7 +26,7 @@ public class Options {
 	private List<Filter> includes = new ArrayList<>();
 	private List<Filter> excludes = new ArrayList<>();
 	private boolean includeSynthetic = false;
-	private boolean ignoreMissingClasses = false;
+	private IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();
 	private Optional<String> htmlStylesheet = Optional.absent();
 	private Optional<String> oldClassPath = Optional.absent();
 	private Optional<String> newClassPath = Optional.absent();
@@ -219,12 +220,8 @@ public class Options {
 		this.includeSynthetic = showSynthetic;
 	}
 
-	public boolean isIgnoreMissingClasses() {
-		return ignoreMissingClasses;
-	}
-
 	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
-		this.ignoreMissingClasses = ignoreMissingClasses;
+		this.ignoreMissingClasses.setIgnoreAllMissingClasses(ignoreMissingClasses);
 	}
 
 	public Optional<String> getHtmlStylesheet() {
@@ -265,5 +262,18 @@ public class Options {
 
 	public void setNoAnnotations(boolean noAnnotations) {
 		this.noAnnotations = noAnnotations;
+	}
+
+	public void addIgnoreMissingClassRegularExpression(String missingClassRegEx) {
+		try {
+			Pattern pattern = Pattern.compile(missingClassRegEx);
+			this.ignoreMissingClasses.getIgnoreMissingClassRegularExpression().add(pattern);
+		} catch (Exception e) {
+			throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, "Could not compile provided regular expression: " + e.getMessage(), e);
+		}
+	}
+
+	public IgnoreMissingClasses getIgnoreMissingClasses() {
+		return ignoreMissingClasses;
 	}
 }

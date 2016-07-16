@@ -14,6 +14,9 @@ public class Parameter {
 	private String breakBuildBasedOnSemanticVersioning;
 	private String includeSynthetic;
 	private String ignoreMissingClasses;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<String> ignoreMissingClassesByRegularExpressions;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String skipPomModules;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String htmlStylesheet;
@@ -230,5 +233,13 @@ public class Parameter {
 
 	public void setBreakBuildIfCausedByExclusion(boolean breakBuildIfCausedByExclusion) {
 		this.breakBuildIfCausedByExclusion = breakBuildIfCausedByExclusion;
+	}
+
+	public List<String> getIgnoreMissingClassesByRegularExpressions() {
+		return ignoreMissingClassesByRegularExpressions;
+	}
+
+	public void setIgnoreMissingClassesByRegularExpressions(List<String> ignoreMissingClassesByRegularExpressions) {
+		this.ignoreMissingClassesByRegularExpressions = ignoreMissingClassesByRegularExpressions;
 	}
 }

@@ -1,15 +1,14 @@
 package japicmp.cmp;
 
 import com.google.common.base.Optional;
+import japicmp.compat.CompatibilityChanges;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.filter.AnnotationFilterBase;
 import japicmp.filter.Filter;
 import japicmp.filter.Filters;
 import japicmp.filter.JavadocLikePackageFilter;
-import japicmp.compat.CompatibilityChanges;
 import japicmp.model.JApiClass;
-import japicmp.model.JApiException;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import japicmp.util.AnnotationHelper;
@@ -324,7 +323,7 @@ public class JarArchiveComparator {
 			try {
 				loadedClass = Optional.of(commonClassPool.get(name));
 			} catch (NotFoundException e) {
-				if (!options.isIgnoreMissingClasses()) {
+				if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, name, this);
 				}
 			}
@@ -333,7 +332,7 @@ public class JarArchiveComparator {
 				try {
 					loadedClass = Optional.of(oldClassPool.get(name));
 				} catch (NotFoundException e) {
-					if (!options.isIgnoreMissingClasses()) {
+					if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 						throw JApiCmpException.forClassLoading(e, name, this);
 					}
 				}
@@ -341,7 +340,7 @@ public class JarArchiveComparator {
 				try {
 					loadedClass = Optional.of(newClassPool.get(name));
 				} catch (NotFoundException e) {
-					if (!options.isIgnoreMissingClasses()) {
+					if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 						throw JApiCmpException.forClassLoading(e, name, this);
 					}
 				}

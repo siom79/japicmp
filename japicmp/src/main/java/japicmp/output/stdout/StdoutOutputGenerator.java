@@ -28,8 +28,11 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		outputFilter.filter(jApiClasses);
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("Comparing %s with %s:%n", joinFileLists(options.getOldArchives()), joinFileLists(options.getNewArchives())));
-		if (options.isIgnoreMissingClasses()) {
+		if (options.getIgnoreMissingClasses().isIgnoreAllMissingClasses()) {
 			sb.append(WARNING + ": You are using the option '" + JApiCli.IGNORE_MISSING_CLASSES + "', i.e. superclasses and interfaces that could not " +
+				"be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
+		} else if (options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression().size() > 0) {
+			sb.append(WARNING + ": You have ignored certain classes, i.e. superclasses and interfaces that could not " +
 				"be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
 		}
 		if (jApiClasses.size() > 0) {
