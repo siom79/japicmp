@@ -23,6 +23,7 @@ import java.util.List;
 
 public class JApiCli {
 	public static final String IGNORE_MISSING_CLASSES = "--ignore-missing-classes";
+	public static final String IGNORE_MISSING_CLASSES_BY_REGEX = "--ignore-missing-classes-by-regex";
 	public static final String OLD_CLASSPATH = "--old-classpath";
 	public static final String NEW_CLASSPATH = "--new-classpath";
 
@@ -56,8 +57,10 @@ public class JApiCli {
 		public boolean semanticVersioning = false;
 		@Option(name = { "--include-synthetic" }, description = "Include synthetic classes and class members that are hidden per default.")
 		public boolean includeSynthetic = false;
-		@Option(name = { IGNORE_MISSING_CLASSES }, description = "Ignores superclasses/interfaces missing on the classpath.")
+		@Option(name = { IGNORE_MISSING_CLASSES }, description = "Ignores all superclasses/interfaces missing on the classpath.")
 		public boolean ignoreMissingClasses = false;
+		@Option(name = {IGNORE_MISSING_CLASSES_BY_REGEX}, description = "Ignores only those superclasses/interface missing on the classpath that are selected by a regular expression.")
+		public List<String> ignoreMissingClassesByRegEx = new ArrayList<>();
 		@Option(name = { "--html-stylesheet" }, description = "Provides the path to your own stylesheet.")
 		public String pathToHtmlStylesheet;
 		@Option(name = { OLD_CLASSPATH }, description = "The classpath for the old version.")
@@ -116,6 +119,9 @@ public class JApiCli {
 			options.setOldClassPath(Optional.fromNullable(oldClassPath));
 			options.setNewClassPath(Optional.fromNullable(newClassPath));
 			options.setNoAnnotations(noAnnotations);
+			for (String missingClassRegEx : ignoreMissingClassesByRegEx) {
+				options.addIgnoreMissingClassRegularExpression(missingClassRegEx);
+			}
 			options.verify();
 			return options;
 		}

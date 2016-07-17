@@ -2,14 +2,23 @@ package japicmp;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import japicmp.util.CtClassBuilder;
+import japicmp.util.CtConstructorBuilder;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.Assertion;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.LogMode;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static japicmp.cli.JApiCli.IGNORE_MISSING_CLASSES_BY_REGEX;
+import static japicmp.util.JarUtil.createJarFile;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
@@ -137,5 +146,45 @@ public class JApiCmpTest {
 	static void assertListsEquals(ImmutableList<String> expected, ImmutableList<String> actual) {
 		Joiner nlJoiner = Joiner.on("\n");
 		assertEquals(nlJoiner.join(expected), nlJoiner.join(actual));
+	}
+
+	@Test
+	public void testIgnoreMissingClassesByRegExCouldNotLoad() throws IOException, CannotCompileException {
+		exit.expectSystemExitWithStatus(1);
+		exit.checkAssertionAfterwards(new Assertion() {
+			public void checkAssertion() {
+				String errLogTrimmed = errLog.getLog().trim();
+				assertThat(errLogTrimmed, containsString("E: Could not load 'NotExistingSuperclass'".trim()));
+			}
+		});
+		ClassPool cp = new ClassPool(true);
+		CtClass ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
+		CtConstructorBuilder.create().addToClass(ctClassSuperclass);
+		CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperclass).addToClassPool(cp);
+		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_old.jar");
+		createJarFile(oldPath, ctClass);
+		Path newPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_new.jar");
+		createJarFile(newPath, ctClass);
+		JApiCmp.main(new String[]{"-n", newPath.toString(), "-o", oldPath.toString()});
+	}
+
+	@Test
+	public void testIgnoreMissingClassesByRegExMissingAreIgnore() throws IOException, CannotCompileException {
+		exit.checkAssertionAfterwards(new Assertion() {
+			public void checkAssertion() {
+				String outLog = JApiCmpTest.this.outLog.getLog().trim();
+				assertThat(outLog, containsString("Comparing".trim()));
+				assertThat(outLog, containsString("WARNING: You have ignored certain classes".trim()));
+			}
+		});
+		ClassPool cp = new ClassPool(true);
+		CtClass ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
+		CtConstructorBuilder.create().addToClass(ctClassSuperclass);
+		CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperclass).addToClassPool(cp);
+		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_old.jar");
+		createJarFile(oldPath, ctClass);
+		Path newPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_new.jar");
+		createJarFile(newPath, ctClass);
+		JApiCmp.main(new String[]{"-n", newPath.toString(), "-o", oldPath.toString(), IGNORE_MISSING_CLASSES_BY_REGEX, ".*Superc.*"});
 	}
 }

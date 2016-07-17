@@ -9,6 +9,7 @@ SYNOPSIS
                 [--html-file <pathToHtmlOutputFile>]
                 [--html-stylesheet <pathToHtmlStylesheet>]
                 [(-i <includes> | --include <includes>)] [--ignore-missing-classes]
+                [--ignore-missing-classes-by-regex <ignoreMissingClassesByRegEx>...]
                 [--include-synthetic] [(-m | --only-modified)]
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
                 [--new-classpath <newClassPath>] [--no-annotations]
@@ -47,7 +48,11 @@ OPTIONS
             mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.
 
         --ignore-missing-classes
-            Ignores superclasses/interfaces missing on the classpath.
+            Ignores all superclasses/interfaces missing on the classpath.
+
+        --ignore-missing-classes-by-regex <ignoreMissingClassesByRegEx>
+            Ignores only those superclasses/interface missing on the classpath that are selected by a regular
+            expression.
 
         --include-synthetic
             Include synthetic classes and class members that are hidden per

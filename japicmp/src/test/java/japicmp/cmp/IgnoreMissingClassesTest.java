@@ -24,6 +24,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
+import static japicmp.util.JarUtil.createJarFile;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.StringContains.containsString;
@@ -105,7 +106,7 @@ public class IgnoreMissingClassesTest {
 	@Test
 	public void testClassMissingWithIgnoreByRegexThatDoesNotMatch() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getIgnoreMissingClasses().setIgnoreMissingClassRegularExpression(Arrays.asList(Pattern.compile("WrongPattern")));
+		options.getIgnoreMissingClasses().setIgnoreMissingClassRegularExpression(Collections.singletonList(Pattern.compile("WrongPattern")));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
 		CtClass ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classPool);
@@ -125,17 +126,5 @@ public class IgnoreMissingClassesTest {
 		}
 	}
 
-	private void createJarFile(Path jarFileName, CtClass... ctClasses) throws IOException, CannotCompileException {
-		Manifest manifest = new Manifest();
-		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-		try (JarOutputStream jarStream = new JarOutputStream(new FileOutputStream(jarFileName.toString()), manifest)) {
-			for (CtClass ctClass : ctClasses) {
-				JarEntry entry = new JarEntry(ctClass.getSimpleName() + ".class");
-				jarStream.putNextEntry(entry);
-				byte[] bytecode = ctClass.toBytecode();
-				jarStream.write(bytecode, 0, bytecode.length);
-				jarStream.closeEntry();
-			}
-		}
-	}
+
 }
