@@ -116,8 +116,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		try {
 			jApiClasses = applyPostAnalysisScript(pluginParameters.getParameterParam(), jApiClasses);
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
-			String diffOutput = generateDiffOutput(jApiClasses, options);
-			createFileAndWriteTo(diffOutput, jApiCmpBuildDir, mavenParameters);
+			generateDiffOutput(mavenParameters, pluginParameters, options, jApiClasses, jApiCmpBuildDir);
 			XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters);
 			if (pluginParameters.isWriteToFiles()) {
 				List<File> filesWritten = XmlOutputGenerator.writeToFiles(options, xmlOutput);
@@ -760,11 +759,6 @@ public class JApiCmpMojo extends AbstractMojo {
 		return retVal;
 	}
 
-	private void createFileAndWriteTo(String diffOutput, File jApiCmpBuildDir, MavenParameters mavenParameters) throws IOException, MojoFailureException {
-		File output = new File(jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename(mavenParameters) + ".diff");
-		writeToFile(diffOutput, output);
-	}
-
 	private File createJapiCmpBaseDir(PluginParameters pluginParameters) throws MojoFailureException {
 		if (pluginParameters.getProjectBuildDirParam().isPresent()) {
 			try {
@@ -801,9 +795,17 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private String generateDiffOutput(List<JApiClass> jApiClasses, Options options) {
-		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
-		return stdoutOutputGenerator.generate();
+	private void generateDiffOutput(MavenParameters mavenParameters, PluginParameters pluginParameters, Options options, List<JApiClass> jApiClasses, File jApiCmpBuildDir) throws IOException, MojoFailureException {
+		boolean skipDiffReport = false;
+		if (pluginParameters.getParameterParam() != null) {
+			skipDiffReport = pluginParameters.getParameterParam().isSkipDiffReport();
+		}
+		if (!skipDiffReport) {
+			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
+			String diffOutput = stdoutOutputGenerator.generate();
+			File output = new File(jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename(mavenParameters) + ".diff");
+			writeToFile(diffOutput, output);
+		}
 	}
 
 	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters, PluginParameters pluginParameters) throws IOException, MojoFailureException {

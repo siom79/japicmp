@@ -63,14 +63,16 @@ public class JApiCmpMojoTest {
 	}
 
 	@Test
-	public void testNoXmlAndNoHtmlReport() throws MojoFailureException {
+	public void testNoXmlAndNoHtmlNoDiffReport() throws MojoFailureException {
 		JApiCmpMojo mojo = new JApiCmpMojo();
 		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
 		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
 		Parameter parameter = new Parameter();
 		parameter.setSkipHtmlReport("true");
 		parameter.setSkipXmlReport("true");
-		PluginParameters pluginParameters = new PluginParameters(null, newVersion, oldVersion, parameter, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "noXmlAndNoHtmlReport").toFile()), Optional.<String>absent(), true, null, null, null, null);
+		parameter.setSkipDiffReport(true);
+		String reportDir = "noXmlAndNoHtmlNoDiffReport";
+		PluginParameters pluginParameters = new PluginParameters(null, newVersion, oldVersion, parameter, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", reportDir).toFile()), Optional.<String>absent(), true, null, null, null, null);
 		ArtifactResolver artifactResolver = mock(ArtifactResolver.class);
 		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
 		Set<Artifact> artifactSet = new HashSet<>();
@@ -83,9 +85,9 @@ public class JApiCmpMojoTest {
 		when(artifactFactory.createArtifactWithClassifier(eq("groupId"), eq("artifactId"), eq("0.1.1"), anyString(), anyString())).thenReturn(mock(Artifact.class));
 		MavenParameters mavenParameters = new MavenParameters(new ArrayList<ArtifactRepository>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mock(MavenProject.class), mock(MojoExecution.class), "0.0.1", mock(ArtifactMetadataSource.class));
 		mojo.executeWithParameters(pluginParameters, mavenParameters);
-		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "noXmlAndNoHtmlReport", "japicmp", "japicmp.diff")), is(true));
-		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "noXmlAndNoHtmlReport", "japicmp", "japicmp.xml")), is(false));
-		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "noXmlAndNoHtmlReport", "japicmp", "japicmp.html")), is(false));
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.diff")), is(false));
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.xml")), is(false));
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.html")), is(false));
 	}
 
 	private Version createVersion(String groupId, String artifactId, String version) {

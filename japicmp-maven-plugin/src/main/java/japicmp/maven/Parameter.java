@@ -35,7 +35,7 @@ public class Parameter {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String skipXmlReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private String skipDiffReport;
+	private boolean skipDiffReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreMissingOldVersion;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
@@ -203,11 +203,11 @@ public class Parameter {
 		this.skipXmlReport = skipXmlReport;
 	}
 
-	public String getSkipDiffReport() {
+	public boolean isSkipDiffReport() {
 		return skipDiffReport;
 	}
 
-	public void setSkipDiffReport(String skipDiffReport) {
+	public void setSkipDiffReport(boolean skipDiffReport) {
 		this.skipDiffReport = skipDiffReport;
 	}
 
