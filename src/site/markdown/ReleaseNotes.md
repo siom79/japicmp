@@ -2,11 +2,22 @@
 
 The following versions of japicmp are available:
 
+##0.9.0 (2016-08-xx)##
+
+* Added new option --ignore-missing-classes-by-regex for CLI-Tool. [#124](https://github.com/siom79/japicmp/issues/124)
+* Added new maven plugin option: breakBuildIfCausedByExclusion. [#126](https://github.com/siom79/japicmp/issues/126)
+* Implemented skipDiffReport. [#139](https://github.com/siom79/japicmp/issues/139)
+* Extended automatic detection for new version in case packaging is not jar. [#137](https://github.com/siom79/japicmp/issues/137)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.0%22).
+
 ##0.8.1 (2016-07-09)##
 
 * Variable mavenProject in maven-plugin is read from MavenParameters and not from injected field. [#128](https://github.com/siom79/japicmp/issues/128)
 * Moving protected field to superclass is no longer marked as binary incompatible. [#132](https://github.com/siom79/japicmp/issues/132)
 * Maven plugin can be run without <parameter/> section. [#134](https://github.com/siom79/japicmp/issues/134)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.8.1%22).
 
 ##0.8.0 (2016-05-14)##
 
