@@ -51,8 +51,8 @@ OPTIONS
             Ignores all superclasses/interfaces missing on the classpath.
 
         --ignore-missing-classes-by-regex <ignoreMissingClassesByRegEx>
-            Ignores only those superclasses/interface missing on the classpath that are selected by a regular
-            expression.
+            Ignores only those superclasses/interface missing on the classpath
+            that are selected by a regular expression.
 
         --include-synthetic
             Include synthetic classes and class members that are hidden per

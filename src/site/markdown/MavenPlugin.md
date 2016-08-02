@@ -131,6 +131,7 @@ An advanced configuration can utilize the following parameters:
 					<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
 					<breakBuildOnSourceIncompatibleModifications>false</breakBuildOnSourceIncompatibleModifications>
 					<breakBuildBasedOnSemanticVersioning>false</breakBuildBasedOnSemanticVersioning>
+					<breakBuildIfCausedByExclusion>true</breakBuildIfCausedByExclusion>
 					<onlyBinaryIncompatible>false</onlyBinaryIncompatible>
 					<includeSynthetic>false</includeSynthetic>
 					<ignoreMissingClasses>false</ignoreMissingClasses>
