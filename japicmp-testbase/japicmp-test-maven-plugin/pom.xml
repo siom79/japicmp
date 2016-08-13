@@ -9,7 +9,23 @@
 
 	<artifactId>japicmp-test-maven-plugin</artifactId>
 
+	<properties>
+		<!-- minimize standard reports -->
+		<mpir.skip>true</mpir.skip>
+	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.4</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
@@ -241,6 +257,24 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- run site plugin to build reports during 'pre-integration-test' phase
+			this allows integrations tests to verify site report generation -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>build-site-to-test</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<configuration>
+							<skip>false</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
@@ -257,4 +291,29 @@
 			</plugin>
 		</plugins>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>com.github.siom79.japicmp</groupId>
+				<artifactId>japicmp-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<oldVersion>
+						<dependency>
+							<groupId>com.github.siom79.japicmp</groupId>
+							<artifactId>japicmp-test-v1</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</oldVersion>
+					<newVersion>
+						<dependency>
+							<groupId>com.github.siom79.japicmp</groupId>
+							<artifactId>japicmp-test-v2</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</newVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>

@@ -89,6 +89,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private String versionRangeWithProjectVersion;
 	@Component
 	private ArtifactMetadataSource metadataSource;
+	private Options options;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
@@ -104,11 +105,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (filterModule(pluginParameters, mavenParameters)) {
 			return Optional.absent();
 		}
-		List<File> oldArchives = new ArrayList<>();
-		List<File> newArchives = new ArrayList<>();
-		populateArchivesListsFromParameters(pluginParameters, mavenParameters, oldArchives, newArchives);
-		VersionChange versionChange = new VersionChange(oldArchives, newArchives);
-		Options options = createOptions(pluginParameters.getParameterParam(), oldArchives, newArchives);
+		Options options = getOptions(pluginParameters, mavenParameters);
 		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
 		setUpClassPath(comparatorOptions, pluginParameters, mavenParameters);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
@@ -124,6 +121,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					getLog().info("Written file '" + file.getAbsolutePath() + "'.");
 				}
 			}
+			VersionChange versionChange = new VersionChange(options.getOldArchives(), options.getNewArchives());
 			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), versionChange, options, jarArchiveComparator);
 			return Optional.of(xmlOutput);
 		} catch (IOException e) {
@@ -662,10 +660,13 @@ public class JApiCmpMojo extends AbstractMojo {
 		return sb.toString();
 	}
 
-	private Options createOptions(Parameter parameterParam, List<File> oldVersions, List<File> newVersions) throws MojoFailureException {
-		Options options = Options.newDefault();
-		options.getOldArchives().addAll(oldVersions);
-		options.getNewArchives().addAll(newVersions);
+	Options getOptions(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
+		if (options != null) {
+			return options;
+		}
+		options = Options.newDefault();
+		populateArchivesListsFromParameters(pluginParameters, mavenParameters, options.getOldArchives(), options.getNewArchives());
+		Parameter parameterParam = pluginParameters.getParameterParam();
 		if (parameterParam != null) {
 			String accessModifierArg = parameterParam.getAccessModifier();
 			if (accessModifierArg != null) {
