@@ -133,7 +133,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 			.append(" compatibility of");
 		appendList(sb, options.getNewArchives());
 		sb.append(" against");
-		appendList(sb, options.getNewArchives());
+		appendList(sb, options.getOldArchives());
 		return sb.toString();
 	}
 
