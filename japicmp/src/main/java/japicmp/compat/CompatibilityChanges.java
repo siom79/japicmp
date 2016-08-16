@@ -476,26 +476,17 @@ public class CompatibilityChanges {
 	}
 
 	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map<String, JApiClass> classMap, final JApiMethod method, List<Integer> returnValues) {
-		JApiClassType classType = jApiClass.getClassType();
-		Optional<JApiClassType.ClassType> newTypeOptional = classType.getNewTypeOptional();
-		Optional<JApiClassType.ClassType> oldTypeOptional = classType.getOldTypeOptional();
-		if (newTypeOptional.isPresent() && oldTypeOptional.isPresent()) {
-			JApiClassType.ClassType newType = newTypeOptional.get();
-			JApiClassType.ClassType oldType = oldTypeOptional.get();
-			if (newType == JApiClassType.ClassType.INTERFACE && oldType == JApiClassType.ClassType.INTERFACE) {
-				forAllImplementedInterfaces(jApiClass, classMap, returnValues, new OnImplementedInterfaceCallback<Integer>() {
-					@Override
-					public Integer callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
-						for (JApiMethod superMethod : implementedInterface.getMethods()) {
-							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
-								return 1;
-							}
-						}
-						return 0;
+		forAllImplementedInterfaces(jApiClass, classMap, returnValues, new OnImplementedInterfaceCallback<Integer>() {
+			@Override
+			public Integer callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
+				for (JApiMethod superMethod : implementedInterface.getMethods()) {
+					if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+						return 1;
 					}
-				});
+				}
+				return 0;
 			}
-		}
+		});
 	}
 
 	private <T> void forAllImplementedInterfaces(JApiClass jApiClass, Map<String, JApiClass> classMap, List<T> returnValues, OnImplementedInterfaceCallback<T> onImplementedInterfaceCallback) {
