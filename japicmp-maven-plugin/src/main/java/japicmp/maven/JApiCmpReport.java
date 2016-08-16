@@ -1,6 +1,8 @@
 package japicmp.maven;
 
 import com.google.common.base.Optional;
+
+import japicmp.config.Options;
 import japicmp.output.xml.XmlOutput;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -8,6 +10,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -58,13 +61,14 @@ public class JApiCmpReport extends AbstractMavenReport {
 	private String versionRangeWithProjectVersion;
 	@Component
 	private ArtifactMetadataSource metadataSource;
+	private JApiCmpMojo mojo;
+	private MavenParameters mavenParameters;
+	private PluginParameters pluginParameters;
 
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
 		try {
-			JApiCmpMojo mojo = new JApiCmpMojo();
-			MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
-			PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+			JApiCmpMojo mojo = getMojo();
 			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(pluginParameters, mavenParameters);
 			if (xmlOutputOptional.isPresent()) {
 				XmlOutput xmlOutput = xmlOutputOptional.get();
@@ -90,18 +94,54 @@ public class JApiCmpReport extends AbstractMavenReport {
 		}
 	}
 
+	JApiCmpMojo getMojo() throws MojoFailureException {
+		if (mojo != null) {
+			return mojo;
+		}
+		mojo = new JApiCmpMojo();
+		mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
+		pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+		return mojo;
+	}
+
+	Options getOptions() {
+		try {
+			return getMojo().getOptions(pluginParameters, mavenParameters);
+		} catch (MojoFailureException ignore) {
+			return null;
+		}
+	}
+
 	@Override
 	public String getOutputName() {
-		return "japicmp-maven-plugin-report";
+		return "japicmp";
 	}
 
 	@Override
 	public String getName(Locale locale) {
-		return "japicmp-maven-plugin";
+		return "japicmp";
 	}
 
 	@Override
 	public String getDescription(Locale locale) {
-		return "japicmp is a maven plugin that computes the differences between two versions of a jar file/artifact.";
+		Options options = getOptions();
+		if (options == null) {
+			return "failed report";
+		}
+		StringBuilder sb = new StringBuilder()
+			.append(options.isOutputOnlyBinaryIncompatibleModifications() ?"Binary" :"Source")
+			.append(" compatibility of");
+		appendList(sb, options.getNewArchives());
+		sb.append(" against");
+		appendList(sb, options.getOldArchives());
+		return sb.toString();
+	}
+
+	private void appendList(StringBuilder sb, List<File> archives) {
+		char sep = ' ';
+		for(File archive : archives) {
+			sb.append(sep).append(archive.getName());
+			sep = ';';
+		}
 	}
 }
