@@ -2,7 +2,7 @@
 
 The following versions of japicmp are available:
 
-##0.9.0 (2016-08-xx)##
+##0.9.0 (2016-08-17)##
 
 * Added new option --ignore-missing-classes-by-regex for CLI-Tool. [#124](https://github.com/siom79/japicmp/issues/124)
 * Added new maven plugin option: breakBuildIfCausedByExclusion. [#126](https://github.com/siom79/japicmp/issues/126)
