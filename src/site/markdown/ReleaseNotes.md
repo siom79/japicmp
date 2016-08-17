@@ -7,7 +7,9 @@ The following versions of japicmp are available:
 * Added new option --ignore-missing-classes-by-regex for CLI-Tool. [#124](https://github.com/siom79/japicmp/issues/124)
 * Added new maven plugin option: breakBuildIfCausedByExclusion. [#126](https://github.com/siom79/japicmp/issues/126)
 * Implemented skipDiffReport. [#139](https://github.com/siom79/japicmp/issues/139)
+* Changed the maven site japicmp report to be more descriptive. [#141](https://github.com/siom79/japicmp/issues/141)
 * Extended automatic detection for new version in case packaging is not jar. [#137](https://github.com/siom79/japicmp/issues/137)
+* Moving abstract method to interface is binary compatible. [#140](https://github.com/siom79/japicmp/issues/140)
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.0%22).
 
