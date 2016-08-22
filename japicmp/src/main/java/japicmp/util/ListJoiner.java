@@ -29,10 +29,13 @@ public class ListJoiner<T> {
 	}
 
 	public String join(List<T> items) {
+		return join(new StringBuilder(), items).toString();
+	}
+
+	public StringBuilder join(StringBuilder sb, List<T> items) {
 		if (this.comparator != null) {
 			Collections.sort(items, this.comparator);
 		}
-		StringBuilder sb = new StringBuilder();
 		int counter = 0;
 		for (T item : items) {
 			if (item == null) {
@@ -48,6 +51,6 @@ public class ListJoiner<T> {
 			}
 			counter++;
 		}
-		return sb.toString();
+		return sb;
 	}
 }

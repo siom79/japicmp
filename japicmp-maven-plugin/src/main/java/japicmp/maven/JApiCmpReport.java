@@ -128,13 +128,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 		if (options == null) {
 			return "failed report";
 		}
-		StringBuilder sb = new StringBuilder()
-			.append(options.isOutputOnlyBinaryIncompatibleModifications() ?"Binary" :"Source")
-			.append(" compatibility of");
-		appendList(sb, options.getNewArchives());
-		sb.append(" against");
-		appendList(sb, options.getOldArchives());
-		return sb.toString();
+		return options.getDifferenceDescription();
 	}
 
 	private void appendList(StringBuilder sb, List<File> archives) {
