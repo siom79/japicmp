@@ -18,7 +18,6 @@ import static japicmp.util.ModifierHelper.isNotPrivate;
 import static japicmp.util.ModifierHelper.isSynthetic;
 
 public class CompatibilityChanges {
-	private static final Logger LOGGER = Logger.getLogger(CompatibilityChanges.class.getName());
 	private final JarArchiveComparator jarArchiveComparator;
 
 	public CompatibilityChanges(JarArchiveComparator jarArchiveComparator) {
