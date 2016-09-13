@@ -11,12 +11,14 @@ import javassist.CtClass;
 import javassist.NotFoundException;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
 import static japicmp.util.ModifierHelper.isNotPrivate;
 import static japicmp.util.ModifierHelper.isSynthetic;
 
 public class CompatibilityChanges {
+	private static final Logger LOGGER = Logger.getLogger(CompatibilityChanges.class.getName());
 	private final JarArchiveComparator jarArchiveComparator;
 
 	public CompatibilityChanges(JarArchiveComparator jarArchiveComparator) {
@@ -172,26 +174,19 @@ public class CompatibilityChanges {
 		if (superclass.getNewSuperclassName().isPresent()) {
 			String newSuperclassName = superclass.getNewSuperclassName().get();
 			JApiClass foundClass = classMap.get(newSuperclassName);
-			if (foundClass != null) {
-				T returnValue = onSuperclassCallback.callback(foundClass, classMap, superclass.getChangeStatus());
-				returnValues.add(returnValue);
-				forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
-			} else {
+			if (foundClass == null) {
 				Optional<JApiClass> superclassJApiClassOptional = superclass.getJApiClass();
 				if (superclassJApiClassOptional.isPresent()) {
-					JApiClass superclassJApiClass = superclassJApiClassOptional.get();
-					evaluate(Collections.singletonList(superclassJApiClass));
-					T returnValue = onSuperclassCallback.callback(superclassJApiClass, classMap, superclass.getChangeStatus());
-					returnValues.add(returnValue);
-					forAllSuperclasses(superclassJApiClass, classMap, returnValues, onSuperclassCallback);
+					foundClass = superclassJApiClassOptional.get();
 				} else {
 					foundClass = loadClass(newSuperclassName);
 					evaluate(Collections.singletonList(foundClass));
-					T returnValue = onSuperclassCallback.callback(foundClass, classMap, superclass.getChangeStatus());
-					returnValues.add(returnValue);
-					forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
 				}
+				classMap.put(foundClass.getFullyQualifiedName(), foundClass);
 			}
+			T returnValue = onSuperclassCallback.callback(foundClass, classMap, superclass.getChangeStatus());
+			returnValues.add(returnValue);
+			forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
 		}
 	}
 
