@@ -12,7 +12,6 @@ import japicmp.output.OutputGenerator;
 import japicmp.output.extapi.jpa.JpaAnalyzer;
 import japicmp.output.extapi.jpa.model.JpaTable;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
-import japicmp.util.ListJoiner;
 import japicmp.util.Streams;
 
 import javax.xml.bind.JAXBContext;
@@ -29,7 +28,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -198,20 +196,9 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 	}
 
 	private JApiCmpXmlRoot createRootElement(List<JApiClass> jApiClasses, Options options) {
-		ListJoiner<File> joiner = new ListJoiner<File>().on(";").sort(new Comparator<File>() {
-			@Override
-			public int compare(File o1, File o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		}).toStringBuilder(new ListJoiner.ListJoinerToString<File>() {
-			@Override
-			public String toString(File file) {
-				return file.getAbsolutePath();
-			}
-		});
 		JApiCmpXmlRoot jApiCmpXmlRoot = new JApiCmpXmlRoot();
-		jApiCmpXmlRoot.setOldJar(joiner.join(options.getOldArchives()));
-		jApiCmpXmlRoot.setNewJar(joiner.join(options.getNewArchives()));
+		jApiCmpXmlRoot.setOldJar(options.joinOldArchives());
+		jApiCmpXmlRoot.setNewJar(options.joinNewArchives());
 		jApiCmpXmlRoot.setClasses(jApiClasses);
 		jApiCmpXmlRoot.setAccessModifier(options.getAccessModifier().name());
 		jApiCmpXmlRoot.setOnlyModifications(options.isOutputOnlyModifications());

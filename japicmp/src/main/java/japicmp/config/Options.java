@@ -7,10 +7,12 @@ import japicmp.cli.JApiCli;
 import japicmp.exception.JApiCmpException;
 import japicmp.filter.*;
 import japicmp.model.AccessModifier;
+import japicmp.util.ListJoiner;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
@@ -32,6 +34,29 @@ public class Options {
 	private Optional<String> newClassPath = Optional.absent();
 	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
 	private boolean noAnnotations = false;
+	private ListJoiner<File> joiner = new ListJoiner<File>()
+			.on(";")
+			.sort(new Comparator<File>() {
+				@Override
+				public int compare(File o1, File o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			})
+			.toStringBuilder(FULL_PATH);
+
+	private static final ListJoiner.ListJoinerToString<File> FULL_PATH = new ListJoiner.ListJoinerToString<File>() {
+		@Override
+		public String toString(File file) {
+			return file.getAbsolutePath();
+		}
+	};
+
+	private static final ListJoiner.ListJoinerToString<File> FILE_NAME = new ListJoiner.ListJoinerToString<File>() {
+		@Override
+		public String toString(File file) {
+			return file.getName();
+		}
+	};
 
 	Options() {
 		// intentionally left empty
@@ -276,4 +301,26 @@ public class Options {
 	public IgnoreMissingClasses getIgnoreMissingClasses() {
 		return ignoreMissingClasses;
 	}
-}
+
+	public void setReportOnlyFilename(boolean justFile) {
+		joiner.toStringBuilder(justFile ?FILE_NAME :FULL_PATH);
+	}
+
+	public String getDifferenceDescription() {
+		StringBuilder sb = new StringBuilder()
+				.append("Comparing ")
+				.append(isOutputOnlyBinaryIncompatibleModifications() ?"binary" :"source")
+				.append(" compatibility of ");
+		joiner.join(sb, newArchives);
+		sb.append(" against ");
+		joiner.join(sb, oldArchives);
+		return sb.toString();
+	}
+
+	public String joinOldArchives() {
+		return joiner.join(oldArchives);
+	}
+
+	public String joinNewArchives() {
+		return joiner.join(newArchives);
+	}}

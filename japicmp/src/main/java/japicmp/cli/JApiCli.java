@@ -69,6 +69,8 @@ public class JApiCli {
 		public String newClassPath;
 		@Option(name = "--no-annotations", description = "Do not evaluate annotations.")
 		public boolean noAnnotations = false;
+		@Option(name = "--report-only-filename", description = "Use just filename in report description.")
+		public boolean reportOnlyFilename;
 
 		@Override
 		public void run() {
@@ -122,6 +124,7 @@ public class JApiCli {
 			for (String missingClassRegEx : ignoreMissingClassesByRegEx) {
 				options.addIgnoreMissingClassRegularExpression(missingClassRegEx);
 			}
+			options.setReportOnlyFilename(reportOnlyFilename);
 			options.verify();
 			return options;
 		}

@@ -31,7 +31,7 @@ public class ITReportTitle {
 
 		Elements description = overviewRow.select("td:eq(1)");
     String projectVersion = System.getProperty("project.version");
-		assertThat(description.text(), is("Source compatibility of japicmp-test-v2-"+projectVersion
+		assertThat(description.text(), is("Comparing source compatibility of japicmp-test-v2-"+projectVersion
 		    + ".jar against japicmp-test-v1-"+ projectVersion + ".jar"));
 	}
 }

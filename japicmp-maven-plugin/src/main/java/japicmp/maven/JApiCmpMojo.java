@@ -724,6 +724,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				Boolean noAnnotations = Boolean.valueOf(noAnnotationsString);
 				options.setNoAnnotations(noAnnotations);
 			}
+			options.setReportOnlyFilename(parameterParam.isReportOnlyFilename());
 		}
 		return options;
 	}
@@ -822,7 +823,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
 		xmlOutputGeneratorOptions.setSemanticVersioningInformation(semverOut.generate());
 		if (pluginParameters.getParameterParam() != null) {
-			xmlOutputGeneratorOptions.setTitle(pluginParameters.getParameterParam().getHtmlTitle());
+			String optionalTitle = pluginParameters.getParameterParam().getHtmlTitle();
+			xmlOutputGeneratorOptions.setTitle(optionalTitle!=null ?optionalTitle :options.getDifferenceDescription());
 		}
 		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 		return xmlGenerator.generate();

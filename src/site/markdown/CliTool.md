@@ -15,6 +15,7 @@ SYNOPSIS
                 [--new-classpath <newClassPath>] [--no-annotations]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
                 [--old-classpath <oldClassPath>] [(-s | --semantic-versioning)]
+                [--report-only-filename]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
 OPTIONS
@@ -77,6 +78,9 @@ OPTIONS
 
         --old-classpath <oldClassPath>
             The classpath for the old version.
+
+        --report-only-filename
+            Reports just filenames (not full paths) in report description.
 
         -s, --semantic-versioning
             Tells you which part of the version to increment.

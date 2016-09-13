@@ -42,6 +42,8 @@ public class Parameter {
 	private String oldVersionPattern;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean breakBuildIfCausedByExclusion = true;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean reportOnlyFilename;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -241,5 +243,13 @@ public class Parameter {
 
 	public void setIgnoreMissingClassesByRegularExpressions(List<String> ignoreMissingClassesByRegularExpressions) {
 		this.ignoreMissingClassesByRegularExpressions = ignoreMissingClassesByRegularExpressions;
+	}
+
+	public boolean isReportOnlyFilename() {
+		return reportOnlyFilename;
+	}
+
+	public void setReportOnlyFilename(boolean reportOnlyFileName) {
+		this.reportOnlyFilename = reportOnlyFileName;
 	}
 }

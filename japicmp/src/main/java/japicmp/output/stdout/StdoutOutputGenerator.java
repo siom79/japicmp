@@ -7,11 +7,8 @@ import japicmp.model.*;
 import japicmp.model.JApiAnnotationElementValue.Type;
 import japicmp.output.OutputFilter;
 import japicmp.output.OutputGenerator;
-import japicmp.util.ListJoiner;
 import javassist.bytecode.annotation.MemberValue;
 
-import java.io.File;
-import java.util.Comparator;
 import java.util.List;
 
 public class StdoutOutputGenerator extends OutputGenerator<String> {
@@ -27,7 +24,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		OutputFilter outputFilter = new OutputFilter(options);
 		outputFilter.filter(jApiClasses);
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("Comparing %s with %s:%n", joinFileLists(options.getOldArchives()), joinFileLists(options.getNewArchives())));
+		sb.append(options.getDifferenceDescription()).append('\n');
 		if (options.getIgnoreMissingClasses().isIgnoreAllMissingClasses()) {
 			sb.append(WARNING + ": You are using the option '" + JApiCli.IGNORE_MISSING_CLASSES + "', i.e. superclasses and interfaces that could not " +
 				"be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
@@ -46,21 +43,6 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 			sb.append(NO_CHANGES);
 		}
 		return sb.toString();
-	}
-
-	private String joinFileLists(List<File> files) {
-		ListJoiner<File> joiner = new ListJoiner<File>().on(";").sort(new Comparator<File>() {
-			@Override
-			public int compare(File o1, File o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		}).toStringBuilder(new ListJoiner.ListJoinerToString<File>() {
-			@Override
-			public String toString(File file) {
-				return file.getAbsolutePath();
-			}
-		});
-		return joiner.join(files);
 	}
 
 	private void processAnnotations(StringBuilder sb, JApiHasAnnotations jApiClass, int numberofTabs) {
