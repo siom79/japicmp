@@ -2,6 +2,13 @@
 
 The following versions of japicmp are available:
 
+##0.9.1 (2016-09-??)##
+
+* Added new option reportOnlyFilename. [#144](https://github.com/siom79/japicmp/pull/144)
+* Reworked CompatibilityChanges.forAllSuperclasses() such that evaluate() cannot be called recursively. [#146](https://github.com/siom79/japicmp/pull/146)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.1%22).
+
 ##0.9.0 (2016-08-17)##
 
 * Added new option --ignore-missing-classes-by-regex for CLI-Tool. [#124](https://github.com/siom79/japicmp/issues/124)
