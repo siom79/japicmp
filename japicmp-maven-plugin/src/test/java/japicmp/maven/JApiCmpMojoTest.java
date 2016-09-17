@@ -1,15 +1,14 @@
 package japicmp.maven;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.cmp.ClassesHelper;
 import japicmp.maven.util.CtClassBuilder;
 import japicmp.maven.util.CtFieldBuilder;
 import japicmp.maven.util.CtInterfaceBuilder;
 import japicmp.maven.util.CtMethodBuilder;
-import japicmp.model.JApiClass;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.apache.maven.artifact.Artifact;
@@ -25,6 +24,7 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 import org.mockito.Matchers;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -33,7 +33,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -286,5 +287,31 @@ public class JApiCmpMojoTest {
 			assertThat(msg, containsString("japicmp.Test.field:FIELD_REMOVED"));
 			assertThat(msg, containsString("japicmp.Test:SUPERCLASS_REMOVED"));
 		}
+	}
+
+	@Test
+	public void testIgnoreMissingVersions() throws MojoFailureException, IOException {
+		JApiCmpMojo mojo = new JApiCmpMojo();
+		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
+		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
+		Parameter parameterParam = new Parameter();
+		parameterParam.setIgnoreMissingNewVersion("true");
+		parameterParam.setIgnoreMissingOldVersion("true");
+		PluginParameters pluginParameters = new PluginParameters(null, newVersion, oldVersion, parameterParam, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.<String>absent(), true, null, null, null, null);
+		ArtifactResolver artifactResolver = mock(ArtifactResolver.class);
+		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
+		Set<Artifact> artifactSet = new HashSet<>();
+		when(artifactResolutionResult.getArtifacts()).thenReturn(artifactSet);
+		when(artifactResolver.resolve(Matchers.<ArtifactResolutionRequest>anyObject())).thenReturn(artifactResolutionResult);
+		ArtifactFactory artifactFactory = mock(ArtifactFactory.class);
+		when(artifactFactory.createArtifactWithClassifier(eq("groupId"), eq("artifactId"), eq("0.1.1"), anyString(), anyString())).thenReturn(mock(Artifact.class));
+		MojoExecution mojoExecution = mock(MojoExecution.class);
+		String executionId = "ignoreMissingVersions";
+		when(mojoExecution.getExecutionId()).thenReturn(executionId);
+		MavenParameters mavenParameters = new MavenParameters(new ArrayList<ArtifactRepository>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mock(MavenProject.class), mojoExecution, "0.0.1", mock(ArtifactMetadataSource.class));
+		mojo.executeWithParameters(pluginParameters, mavenParameters);
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", executionId + ".diff")), is(false));
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", executionId + ".xml")), is(false));
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", executionId + ".html")), is(false));
 	}
 }

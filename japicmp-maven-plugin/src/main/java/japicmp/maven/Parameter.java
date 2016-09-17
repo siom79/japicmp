@@ -39,6 +39,8 @@ public class Parameter {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreMissingOldVersion;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String ignoreMissingNewVersion;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String oldVersionPattern;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean breakBuildIfCausedByExclusion = true;
@@ -251,5 +253,13 @@ public class Parameter {
 
 	public void setReportOnlyFilename(boolean reportOnlyFileName) {
 		this.reportOnlyFilename = reportOnlyFileName;
+	}
+
+	public String getIgnoreMissingNewVersion() {
+		return ignoreMissingNewVersion;
+	}
+
+	public void setIgnoreMissingNewVersion(String ignoreMissingNewVersion) {
+		this.ignoreMissingNewVersion = ignoreMissingNewVersion;
 	}
 }

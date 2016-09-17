@@ -33,23 +33,27 @@ public class ListJoiner<T> {
 	}
 
 	public StringBuilder join(StringBuilder sb, List<T> items) {
-		if (this.comparator != null) {
-			Collections.sort(items, this.comparator);
-		}
-		int counter = 0;
-		for (T item : items) {
-			if (item == null) {
-				continue;
+		if (items.size() == 0) {
+			sb.append("n.a.");
+		} else {
+			if (this.comparator != null) {
+				Collections.sort(items, this.comparator);
 			}
-			if (counter > 0) {
-				sb.append(this.separator);
+			int counter = 0;
+			for (T item : items) {
+				if (item == null) {
+					continue;
+				}
+				if (counter > 0) {
+					sb.append(this.separator);
+				}
+				if (this.toStringBuilder != null) {
+					sb.append(this.toStringBuilder.toString(item));
+				} else {
+					sb.append(item.toString());
+				}
+				counter++;
 			}
-			if (this.toStringBuilder != null) {
-				sb.append(this.toStringBuilder.toString(item));
-			} else {
-				sb.append(item.toString());
-			}
-			counter++;
 		}
 		return sb;
 	}

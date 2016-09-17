@@ -18,6 +18,7 @@ import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
 public class Options {
+	static final String N_A = "n.a.";
 	private List<File> oldArchives = new ArrayList<>();
 	private List<File> newArchives = new ArrayList<>();
 	private boolean outputOnlyModifications = false;
@@ -318,9 +319,17 @@ public class Options {
 	}
 
 	public String joinOldArchives() {
-		return joiner.join(oldArchives);
+		String join = joiner.join(oldArchives);
+		if (join != null && join.trim().length() == 0) {
+			return N_A;
+		}
+		return join;
 	}
 
 	public String joinNewArchives() {
-		return joiner.join(newArchives);
+		String join = joiner.join(newArchives);
+		if (join != null && join.trim().length() == 0) {
+			return N_A;
+		}
+		return join;
 	}}

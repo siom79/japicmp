@@ -199,13 +199,14 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | htmlTitle										| true  | n.a.		| A title for the HTML report (optional).|
 | noAnnotations									| true  | false		| Setting this option to true disables the evaluation of annotations completely.|
 | ignoreNonResolvableArtifacts					| true  | false		| Set this to true in order to ignore artifacts that cannot be resolved, i.e. the build does not break in case a dependency cannot be resolved to a file.|
+| ignoreMissingOldVersion						| true  | false		| If set to true, not resolvable artifacts for the old version do not break the build.|
+| ignoreMissingNewVersion						| true  | false		| If set to true, not resolvable artifacts for the new version do not break the build.|
 | packagingSupported							| true  | n.a.		| List all packaging type for which the plugin should be executed. Helpful if you define the plugin in a root pom.|
 | postAnalysisScript							| true  | n.a.		| A [Groovy](http|//www.groovy-lang.org/) script that gets invoked after analysis is completed and before the output is written. This way it can be used to filter the output or break the build on specific conditions.|
 | skipXmlReport									| true  | false		| If set to true, no XML report will be generated.|
 | skipHtmlReport								| true  | false		| If set to true, no HTML report will be generated.|
 | skipDiffReport								| true  | false		| If set to true, no diff report will be generated.|
 | reportOnlyFilename						| true  | false		| If set to true, report will include only the artifact filename, not the complete artifact file path.|
-| ignoreMissingOldVersion						| true  | false		| If set to true, not resolvable artifacts for the old version do not break the build.|
 | oldVersionPattern								| true  | n.a.		| If &lt;oldVersion&gt; is not used, the old version compared against must match this regular expression.|
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
