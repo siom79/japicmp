@@ -2,7 +2,7 @@
 
 The following versions of japicmp are available:
 
-##0.9.1 (2016-09-??)##
+##0.9.1 (2016-09-28)##
 
 * Added new option reportOnlyFilename. [#144](https://github.com/siom79/japicmp/pull/144)
 * Added new parameter ignoreMissingNewVersion. [#148](https://github.com/siom79/japicmp/pull/148)
