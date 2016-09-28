@@ -80,7 +80,6 @@ def replaceOldVersion(oldVersion, releaseVersion, dryRun):
 		returncode = subprocess.call(args)
 		if returncode != 0:
 			print("Commit failed with error code " + str(returncode) + ".")
-			sys.exit(2)
 
 
 def releaseBuild(gpgpassphrase, dryRun, devVersion, releaseVersion, releaseTag):
