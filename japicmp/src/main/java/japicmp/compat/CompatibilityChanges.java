@@ -459,7 +459,7 @@ public class CompatibilityChanges {
 
 	private void checkIfExceptionIsNowChecked(JApiMethod method) {
 		for (JApiException exception : method.getExceptions()) {
-			if (exception.getChangeStatus() == JApiChangeStatus.NEW && exception.isCheckedException()) {
+			if (exception.getChangeStatus() == JApiChangeStatus.NEW && exception.isCheckedException() && method.getChangeStatus() != JApiChangeStatus.NEW) {
 				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION);
 			}
 		}
