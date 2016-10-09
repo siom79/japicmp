@@ -856,7 +856,13 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (executionId != null && !"default".equals(executionId)) {
 			filename = executionId;
 		}
-		return filename;
+		StringBuilder sb = new StringBuilder();
+		for (char c : filename.toCharArray()) {
+			if (c == '.' || Character.isJavaIdentifierPart(c) || c == '-') {
+				sb.append(c);
+			}
+		}
+		return sb.toString();
 	}
 
 	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions, PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
