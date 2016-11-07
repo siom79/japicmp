@@ -2,6 +2,13 @@
 
 The following versions of japicmp are available:
 
+##0.9.2 (2016-11-07)##
+
+* Illegal characters are removed from filename of diff report. [#152](https://github.com/siom79/japicmp/pull/152)
+* If method is new, new checked exception is not considered as source incompatible. [#151](https://github.com/siom79/japicmp/pull/151) 
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.2%22).
+
 ##0.9.1 (2016-09-28)##
 
 * Added new option reportOnlyFilename. [#144](https://github.com/siom79/japicmp/pull/144)
