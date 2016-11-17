@@ -17,31 +17,31 @@ public class VersionChangeTest {
 	@Test
 	public void testOneVersionNoChange() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Collections.singletonList(new File("lib-1.2.3.jar")), Collections.singletonList(new File("lib-1.2.3.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.UNCHANGED));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.UNCHANGED));
 	}
 
 	@Test
 	public void testOneVersionPatchChange() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Collections.singletonList(new File("lib-1.2.3.jar")), Collections.singletonList(new File("lib-1.2.4.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.PATCH));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.PATCH));
 	}
 
 	@Test
 	public void testOneVersionMinorChange() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Collections.singletonList(new File("lib-1.2.3.jar")), Collections.singletonList(new File("lib-1.3.0.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.MINOR));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.MINOR));
 	}
 
 	@Test
 	public void testOneVersionMajorChange() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Collections.singletonList(new File("lib-1.2.3.jar")), Collections.singletonList(new File("lib-2.0.0.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.MAJOR));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.MAJOR));
 	}
 
 	@Test
 	public void testOneVersionMajorChangeWithSnapshot() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Collections.singletonList(new File("lib-1.2.3.jar")), Collections.singletonList(new File("lib-2.0.0-SNAPSHOT.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.MAJOR));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.MAJOR));
 	}
 
 	@Test(expected = MojoFailureException.class)
@@ -53,31 +53,31 @@ public class VersionChangeTest {
 	@Test
 	public void testTwoVersionsNoChange() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Arrays.asList(new File("liba-1.2.3.jar"), new File("libb-1.2.3.jar")), Arrays.asList(new File("liba-1.2.3.jar"), new File("libb-1.2.3.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.UNCHANGED));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.UNCHANGED));
 	}
 
 	@Test
 	public void testTwoVersionsPatchChange() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Arrays.asList(new File("liba-1.2.3.jar"), new File("libb-1.2.3.jar")), Arrays.asList(new File("liba-1.2.4.jar"), new File("libb-1.2.4.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.PATCH));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.PATCH));
 	}
 
 	@Test
 	public void testTwoVersionsMinorChange() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Arrays.asList(new File("liba-1.2.3.jar"), new File("libb-1.2.3.jar")), Arrays.asList(new File("liba-1.3.0.jar"), new File("libb-1.3.0.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.MINOR));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.MINOR));
 	}
 
 	@Test
 	public void testTwoVersionsMajorChange() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Arrays.asList(new File("liba-1.2.3.jar"), new File("libb-1.2.3.jar")), Arrays.asList(new File("liba-2.0.0.jar"), new File("libb-2.0.0.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.MAJOR));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.MAJOR));
 	}
 
 	@Test
 	public void testTwoVersionsMajorChangeNotAllVersionsTheSame() throws MojoFailureException {
 		VersionChange vc = new VersionChange(Arrays.asList(new File("liba-1.2.3.jar"), new File("libb-1.2.3.jar")), Arrays.asList(new File("liba-1.2.3.jar"), new File("libb-1.3.0.jar")), new Parameter());
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.MINOR));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.MINOR));
 	}
 
 	@Test(expected = MojoFailureException.class)
@@ -92,7 +92,7 @@ public class VersionChangeTest {
 		Parameter parameter = new Parameter();
 		parameter.setIgnoreMissingOldVersion("true");
 		VersionChange vc = new VersionChange(Collections.singletonList(new File("lib-1.2.3.jar")), Collections.singletonList(new File("lib-1.2.3.jar")), parameter);
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.UNCHANGED));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.UNCHANGED));
 	}
 
 	@Test
@@ -100,7 +100,7 @@ public class VersionChangeTest {
 		Parameter parameter = new Parameter();
 		parameter.setIgnoreMissingNewVersion("true");
 		VersionChange vc = new VersionChange(Collections.singletonList(new File("lib-1.2.3.jar")), Collections.singletonList(new File("lib-1.2.3.jar")), parameter);
-		assertThat(vc.computeChangeType(), is(VersionChange.ChangeType.UNCHANGED));
+		assertThat(vc.computeChangeType().get(), is(VersionChange.ChangeType.UNCHANGED));
 	}
 
 	@Test(expected = MojoFailureException.class)

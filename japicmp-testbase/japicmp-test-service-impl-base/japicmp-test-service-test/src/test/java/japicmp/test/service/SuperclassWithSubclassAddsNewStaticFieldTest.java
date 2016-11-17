@@ -53,6 +53,6 @@ public class SuperclassWithSubclassAddsNewStaticFieldTest {
 		Optional<JApiClass> superclassJApiClass = superclass.getJApiClass();
 		assertThat(superclassJApiClass.get().getFields().size(), is(1));
 		JApiField field = getJApiField(superclassJApiClass.get().getFields(), "field");
-		assertThat(field.getChangeStatus(), is(JApiChangeStatus.NEW));
+		assertThat(field.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 	}
 }

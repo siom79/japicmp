@@ -186,6 +186,7 @@
 							</newVersion>
 							<parameter>
 								<ignoreMissingOldVersion>true</ignoreMissingOldVersion>
+								<breakBuildBasedOnSemanticVersioning>true</breakBuildBasedOnSemanticVersioning>
 							</parameter>
 							<dependencies>
 								<dependency>

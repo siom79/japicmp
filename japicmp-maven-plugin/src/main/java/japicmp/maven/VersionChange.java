@@ -1,5 +1,6 @@
 package japicmp.maven;
 
+import com.google.common.base.Optional;
 import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
@@ -62,17 +63,17 @@ public class VersionChange {
 			return major == that.major && minor == that.minor && patch == that.patch;
 		}
 
-		public ChangeType computeChangeType(SemanticVersion version) {
+		public Optional<ChangeType> computeChangeType(SemanticVersion version) {
 			if (this.major != version.major) {
-				return ChangeType.MAJOR;
+				return Optional.of(ChangeType.MAJOR);
 			}
 			if (this.minor != version.minor) {
-				return ChangeType.MINOR;
+				return Optional.of(ChangeType.MINOR);
 			}
 			if (this.patch != version.patch) {
-				return ChangeType.PATCH;
+				return Optional.of(ChangeType.PATCH);
 			}
-			return ChangeType.UNCHANGED;
+			return Optional.of(ChangeType.UNCHANGED);
 		}
 	}
 
@@ -82,19 +83,19 @@ public class VersionChange {
 		this.parameter = parameter;
 	}
 
-	public ChangeType computeChangeType() throws MojoFailureException {
+	public Optional<ChangeType> computeChangeType() throws MojoFailureException {
 		if (this.oldArchives.isEmpty()) {
 			if (!"true".equalsIgnoreCase(this.parameter != null ? this.parameter.getIgnoreMissingOldVersion() : "false")) {
 				throw new MojoFailureException("Please provide at least one old version.");
 			} else {
-				return ChangeType.UNCHANGED;
+				return Optional.absent();
 			}
 		}
 		if (this.newArchives.isEmpty()) {
 			if (!"true".equalsIgnoreCase(this.parameter != null ? this.parameter.getIgnoreMissingNewVersion() : "false")) {
 				throw new MojoFailureException("Please provide at least one new version.");
 			} else {
-				return ChangeType.UNCHANGED;
+				return Optional.absent();
 			}
 		}
 		List<SemanticVersion> oldVersions = new ArrayList<>();
@@ -117,7 +118,10 @@ public class VersionChange {
 				for (int i=0; i<oldVersions.size(); i++) {
 					SemanticVersion oldVersion = oldVersions.get(i);
 					SemanticVersion newVersion = newVersions.get(i);
-					changeTypes.add(oldVersion.computeChangeType(newVersion));
+					Optional<ChangeType> changeTypeOptional = oldVersion.computeChangeType(newVersion);
+					if (changeTypeOptional.isPresent()) {
+						changeTypes.add(changeTypeOptional.get());
+					}
 				}
 				ChangeType maxRank = ChangeType.UNCHANGED;
 				for (ChangeType changeType : changeTypes) {
@@ -125,7 +129,7 @@ public class VersionChange {
 						maxRank = changeType;
 					}
 				}
-				return maxRank;
+				return Optional.fromNullable(maxRank);
 			}
 		}
 	}

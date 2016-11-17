@@ -380,26 +380,29 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 		breakBuildIfNecessary(jApiClasses, parameterParam, options, jarArchiveComparator);
 		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
-			VersionChange.ChangeType changeType = versionChange.computeChangeType();
-			SemverOut semverOut = new SemverOut(options, jApiClasses);
-			String semver = semverOut.generate();
-			if (changeType == VersionChange.ChangeType.MINOR && semver.equals("1.0.0")) {
-				throw new MojoFailureException("Versions of archives indicate a minor change but binary incompatible changes found.");
-			}
-			if (changeType == VersionChange.ChangeType.PATCH && semver.equals("1.0.0")) {
-				throw new MojoFailureException("Versions of archives indicate a patch change but binary incompatible changes found.");
-			}
-			if (changeType == VersionChange.ChangeType.PATCH && semver.equals("0.1.0")) {
-				throw new MojoFailureException("Versions of archives indicate a patch change but binary compatible changes found.");
-			}
-			if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("1.0.0")) {
-				throw new MojoFailureException("Versions of archives indicate no API changes but binary incompatible changes found.");
-			}
-			if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("0.1.0")) {
-				throw new MojoFailureException("Versions of archives indicate no API changes but binary compatible changes found.");
-			}
-			if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("0.0.1")) {
-				throw new MojoFailureException("Versions of archives indicate no API changes but found API changes.");
+			Optional<VersionChange.ChangeType> changeTypeOptional = versionChange.computeChangeType();
+			if (changeTypeOptional.isPresent()) {
+				VersionChange.ChangeType changeType = changeTypeOptional.get();
+				SemverOut semverOut = new SemverOut(options, jApiClasses);
+				String semver = semverOut.generate();
+				if (changeType == VersionChange.ChangeType.MINOR && semver.equals("1.0.0")) {
+					throw new MojoFailureException("Versions of archives indicate a minor change but binary incompatible changes found.");
+				}
+				if (changeType == VersionChange.ChangeType.PATCH && semver.equals("1.0.0")) {
+					throw new MojoFailureException("Versions of archives indicate a patch change but binary incompatible changes found.");
+				}
+				if (changeType == VersionChange.ChangeType.PATCH && semver.equals("0.1.0")) {
+					throw new MojoFailureException("Versions of archives indicate a patch change but binary compatible changes found.");
+				}
+				if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("1.0.0")) {
+					throw new MojoFailureException("Versions of archives indicate no API changes but binary incompatible changes found.");
+				}
+				if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("0.1.0")) {
+					throw new MojoFailureException("Versions of archives indicate no API changes but binary compatible changes found.");
+				}
+				if (changeType == VersionChange.ChangeType.UNCHANGED && semver.equals("0.0.1")) {
+					throw new MojoFailureException("Versions of archives indicate no API changes but found API changes.");
+				}
 			}
 		}
 	}
