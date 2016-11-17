@@ -117,7 +117,7 @@ An advanced configuration can utilize the following parameters:
 						<include>package.ClassToInclude</include>
 						<include>package.Class#methodToInclude(long,int)</include>
 						<include>package.Class#fieldToInclude</include>
-						<inclue>@my.AnnotationToInclude</include>
+						<include>@my.AnnotationToInclude</include>
 					</includes>
 					<excludes>
 						<exclude>package.to.exclude</exclude>
