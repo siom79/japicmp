@@ -125,7 +125,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					getLog().info("Written file '" + file.getAbsolutePath() + "'.");
 				}
 			}
-			VersionChange versionChange = new VersionChange(options.getOldArchives(), options.getNewArchives());
+			VersionChange versionChange = new VersionChange(options.getOldArchives(), options.getNewArchives(), parameter);
 			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), versionChange, options, jarArchiveComparator);
 			return Optional.of(xmlOutput);
 		} catch (IOException e) {

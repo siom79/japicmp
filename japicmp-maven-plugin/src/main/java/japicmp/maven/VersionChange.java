@@ -12,6 +12,7 @@ public class VersionChange {
 	private static final Pattern versionPattern = Pattern.compile(".*([0-9]+)\\.([0-9]+)\\.([0-9]+).*");
 	private final List<File> oldArchives;
 	private final List<File> newArchives;
+	private final Parameter parameter;
 
 	public enum ChangeType {
 		MAJOR(3),
@@ -75,17 +76,26 @@ public class VersionChange {
 		}
 	}
 
-	public VersionChange(List<File> oldArchives, List<File> newArchives) {
+	public VersionChange(List<File> oldArchives, List<File> newArchives, Parameter parameter) {
 		this.oldArchives = oldArchives;
 		this.newArchives = newArchives;
+		this.parameter = parameter;
 	}
 
 	public ChangeType computeChangeType() throws MojoFailureException {
 		if (this.oldArchives.isEmpty()) {
-			throw new MojoFailureException("Please provide at least one old version.");
+			if (!"true".equalsIgnoreCase(this.parameter != null ? this.parameter.getIgnoreMissingOldVersion() : "false")) {
+				throw new MojoFailureException("Please provide at least one old version.");
+			} else {
+				return ChangeType.UNCHANGED;
+			}
 		}
 		if (this.newArchives.isEmpty()) {
-			throw new MojoFailureException("Please provide at least one old version.");
+			if (!"true".equalsIgnoreCase(this.parameter != null ? this.parameter.getIgnoreMissingNewVersion() : "false")) {
+				throw new MojoFailureException("Please provide at least one new version.");
+			} else {
+				return ChangeType.UNCHANGED;
+			}
 		}
 		List<SemanticVersion> oldVersions = new ArrayList<>();
 		List<SemanticVersion> newVersions = new ArrayList<>();
