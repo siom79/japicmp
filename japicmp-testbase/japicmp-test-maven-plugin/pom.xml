@@ -256,6 +256,37 @@
 							</parameter>
 						</configuration>
 					</execution>
+					<execution>
+						<id>ignore-module</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersion>
+							<parameter>
+								<includeModules>
+									<includeModule>.*incl.*</includeModule>
+								</includeModules>
+								<excludeModules>
+									<excludeModule>.*test.*</excludeModule>
+								</excludeModules>
+							</parameter>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<!-- run site plugin to build reports during 'pre-integration-test' phase

@@ -46,6 +46,10 @@ public class Parameter {
 	private boolean breakBuildIfCausedByExclusion = true;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean reportOnlyFilename;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<String> includeModules;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<String> excludeModules;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -261,5 +265,21 @@ public class Parameter {
 
 	public void setIgnoreMissingNewVersion(String ignoreMissingNewVersion) {
 		this.ignoreMissingNewVersion = ignoreMissingNewVersion;
+	}
+
+	public List<String> getIncludeModules() {
+		return includeModules;
+	}
+
+	public void setIncludeModules(List<String> includeModules) {
+		this.includeModules = includeModules;
+	}
+
+	public List<String> getExcludeModules() {
+		return excludeModules;
+	}
+
+	public void setExcludeModules(List<String> excludeModules) {
+		this.excludeModules = excludeModules;
 	}
 }

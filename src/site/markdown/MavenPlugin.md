@@ -151,6 +151,12 @@ An advanced configuration can utilize the following parameters:
 					<skipXmlReport>false</skipXmlReport>
 					<skipHtmlReport>false</skipHtmlReport>
 					<skipDiffReport>false</skipDiffReport>
+					<includeModules>
+						<includeModule>.*incl.*</includeModule>
+					</includeModules>
+					<excludeModules>
+						<excludeModule>.*incl.*</excludeModule>
+					</excludeModules>
 				</parameter>
 				<dependencies>
 					<dependency>
@@ -206,8 +212,10 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | skipXmlReport									| true  | false		| If set to true, no XML report will be generated.|
 | skipHtmlReport								| true  | false		| If set to true, no HTML report will be generated.|
 | skipDiffReport								| true  | false		| If set to true, no diff report will be generated.|
-| reportOnlyFilename						| true  | false		| If set to true, report will include only the artifact filename, not the complete artifact file path.|
+| reportOnlyFilename							| true  | false		| If set to true, report will include only the artifact filename, not the complete artifact file path.|
 | oldVersionPattern								| true  | n.a.		| If &lt;oldVersion&gt; is not used, the old version compared against must match this regular expression.|
+| includeModlues								| true  | n.a.		| List of regular expression that specify if an artifact should be excluded based on its artifact id.|
+| excludeModlues								| true  | n.a.		| List of regular expression that specify if an artifact should be included based on its artifact id.|
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:

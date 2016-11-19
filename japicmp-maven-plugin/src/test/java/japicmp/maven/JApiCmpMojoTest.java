@@ -91,7 +91,7 @@ public class JApiCmpMojoTest {
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.html")), is(false));
 	}
 
-	private Version createVersion(String groupId, String artifactId, String version) {
+	public static Version createVersion(String groupId, String artifactId, String version) {
 		Version versionInstance = new Version();
 		Dependency dependency = new Dependency();
 		dependency.setGroupId(groupId);

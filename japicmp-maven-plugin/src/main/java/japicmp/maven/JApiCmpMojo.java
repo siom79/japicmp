@@ -102,7 +102,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
 			return Optional.absent();
 		}
-		if (filterModule(pluginParameters, mavenParameters)) {
+		if (skipModule(pluginParameters, mavenParameters)) {
 			return Optional.absent();
 		}
 		Options options = getOptions(pluginParameters, mavenParameters);
@@ -173,34 +173,9 @@ public class JApiCmpMojo extends AbstractMojo {
 		return filteredList;
 	}
 
-	private boolean filterModule(PluginParameters pluginParameters, MavenParameters mavenParameters) {
-		MavenProject mavenProject = mavenParameters.getMavenProject();
-		if (mavenProject != null && pluginParameters.getParameterParam() !=null) {
-			List<String> packagingSupporteds = pluginParameters.getParameterParam().getPackagingSupporteds();
-			if ((packagingSupporteds != null) && !packagingSupporteds.isEmpty()) {
-				if (!packagingSupporteds.contains(mavenProject.getPackaging())) {
-					getLog().info("Filtered according to packagingFilter");
-					return true;
-				}
-			} else {
-				getLog().debug("No packaging support defined, no filtering");
-			}
-			if ("pom".equals(mavenProject.getPackaging())) {
-				boolean skipPomModules = true;
-				Parameter parameterParam = pluginParameters.getParameterParam();
-				if (parameterParam != null) {
-					String skipPomModulesAsString = parameterParam.getSkipPomModules();
-					if (skipPomModulesAsString != null) {
-						skipPomModules = Boolean.valueOf(skipPomModulesAsString);
-					}
-				}
-				if (skipPomModules) {
-					getLog().info("Skipping execution because packaging of this module is 'pom'.");
-					return true;
-				}
-			}
-		}
-		return false;
+	private boolean skipModule(PluginParameters pluginParameters, MavenParameters mavenParameters) {
+		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, getLog());
+		return skipModuleStrategy.skip();
 	}
 
 	private enum ConfigurationVersion {
