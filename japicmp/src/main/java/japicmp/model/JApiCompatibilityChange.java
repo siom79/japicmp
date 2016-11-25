@@ -16,7 +16,7 @@ public enum JApiCompatibilityChange {
 	SUPERCLASS_ADDED(true, true),
 	SUPERCLASS_MODIFIED_INCOMPATIBLE(false, false),
 	INTERFACE_ADDED(true, true),
-	INTERFACE_REMOVED(true, false),
+	INTERFACE_REMOVED(false, false),
 	METHOD_REMOVED(false, false),
 	METHOD_REMOVED_IN_SUPERCLASS(false, false),
 	METHOD_LESS_ACCESSIBLE(false, false),
