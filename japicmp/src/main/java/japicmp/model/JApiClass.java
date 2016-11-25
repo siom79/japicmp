@@ -786,6 +786,21 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				binaryCompatible = false;
 			}
 		}
+		if (binaryCompatible) {
+			for (JApiImplementedInterface anInterface : interfaces) {
+				// don't use JApiImplementedInterface.isBinaryCompatible(), since that checks the corresponding source
+				// without checking if this class still provides the equivalent methods from some other source
+				for (JApiCompatibilityChange change : anInterface.getCompatibilityChanges()) {
+					if (!change.isBinaryCompatible()) {
+						binaryCompatible = false;
+						break;
+					}
+				}
+				if (!binaryCompatible) {
+					break;
+				}
+			}
+		}
 		return binaryCompatible;
 	}
 
@@ -826,6 +841,21 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		if (sourceCompatible) {
 			if (!superclass.isSourceCompatible()) {
 				sourceCompatible = false;
+			}
+		}
+		if (sourceCompatible) {
+			for (JApiImplementedInterface anInterface : interfaces) {
+				// don't use JApiImplementedInterface.isSourceCompatible(), since that checks the corresponding source
+				// without checking if this class still provides the equivalent methods from some other source
+				for (JApiCompatibilityChange change : anInterface.getCompatibilityChanges()) {
+					if (!change.isSourceCompatible()) {
+						sourceCompatible = false;
+						break;
+					}
+				}
+				if (!sourceCompatible) {
+					break;
+				}
 			}
 		}
 		return sourceCompatible;

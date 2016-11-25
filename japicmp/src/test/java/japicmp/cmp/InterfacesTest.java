@@ -1,8 +1,11 @@
 package japicmp.cmp;
 
-import japicmp.config.Options;
-import japicmp.model.*;
-import japicmp.output.stdout.StdoutOutputGenerator;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
@@ -187,6 +190,34 @@ public class InterfacesTest {
 	}
 
 	@Test
+	public void testClassNoLongerImplementsInterface() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.voidType).publicAccess().abstractMethod().name("method").addToClass(ctClassInterface);
+				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctClassInterface).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.voidType).publicAccess().name("method").addToClass(ctClass);
+				return Arrays.asList(ctClassInterface, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.voidType).publicAccess().abstractMethod().name("method").addToClass(ctClassInterface);
+				CtClass ctClass = CtClassBuilder.create().name("Test").addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.REMOVED));
+	}
+
+	@Test
 	public void testInterfaceHierarchyHasOneMoreLevel() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
@@ -203,7 +234,7 @@ public class InterfacesTest {
 				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
 				CtClass ctClassSubInterface = CtInterfaceBuilder.create().name("SubInterface").withSuperInterface(ctClassInterface).addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctClassSubInterface).addToClassPool(classPool);
-				return Arrays.asList(ctClassInterface, ctClass);
+				return Arrays.asList(ctClassInterface, ctClassSubInterface, ctClass);
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
@@ -212,5 +243,98 @@ public class InterfacesTest {
 		assertThat(jApiClass.getInterfaces().size(), is(2));
 		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "SubInterface").getChangeStatus(), is(JApiChangeStatus.NEW));
+	}
+
+	@Test
+	public void testInterfaceHierarchyHasOneLessLevel() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtClass ctClassSubInterface = CtInterfaceBuilder.create().name("SubInterface").withSuperInterface(ctClassInterface).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctClassSubInterface).addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClassSubInterface, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctClassInterface).addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(jApiClass.getInterfaces().size(), is(2));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "SubInterface").getChangeStatus(), is(JApiChangeStatus.REMOVED));
+	}
+
+	@Test
+	public void testInterfaceMovedToSuperclass() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtClass ctClassSuperClass = CtClassBuilder.create().name("SuperClass").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctClassInterface).withSuperclass(ctClassSuperClass).addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClassSuperClass, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtClass ctClassSuperClass = CtClassBuilder.create().name("SuperClass").implementsInterface(ctClassInterface).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperClass).addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClassSuperClass, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getInterfaces().size(), is(1));
+		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiSuperclass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+	}
+
+	@Test
+	public void testInterfaceMovedToSubclass() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtClass ctClassSuperClass = CtClassBuilder.create().name("SuperClass").implementsInterface(ctClassInterface).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperClass).addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClassSuperClass, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
+				CtClass ctClassSuperClass = CtClassBuilder.create().name("SuperClass").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(ctClassInterface).withSuperclass(ctClassSuperClass).addToClassPool(classPool);
+				return Arrays.asList(ctClassInterface, ctClassSuperClass, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getInterfaces().size(), is(1));
+		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.NEW));
+		assertThat(jApiSuperclass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		jApiClass = getJApiClass(jApiClasses, "SuperClass");
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(jApiClass.getInterfaces().size(), is(1));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.REMOVED));
 	}
 }
