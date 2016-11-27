@@ -2,6 +2,14 @@
 
 The following versions of japicmp are available:
 
+##0.9.3 (2016-11-27)##
+
+* Do not break build if breakBuildBasedOnSemanticVersioning=true and ignoreMissingOldVersion=true and old version missing. [#153](https://github.com/siom79/japicmp/pull/153)
+* FIELD_STATIC_AND_OVERRIDES_STATIC and FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS should not be reported in case field in superclass is also new. [#154](https://github.com/siom79/japicmp/pull/154)
+* Cover more edit operations on class and interface inheritance hierarchies. [#155](https://github.com/siom79/japicmp/pull/155)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.3%22).
+
 ##0.9.2 (2016-11-07)##
 
 * Illegal characters are removed from filename of diff report. [#152](https://github.com/siom79/japicmp/pull/152)
