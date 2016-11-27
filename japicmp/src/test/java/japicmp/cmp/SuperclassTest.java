@@ -3,6 +3,7 @@ package japicmp.cmp;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import javassist.ClassPool;
@@ -15,7 +16,9 @@ import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
 import static japicmp.util.Helper.getJApiImplementedInterface;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 public class SuperclassTest {
@@ -116,6 +119,7 @@ public class SuperclassTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.SUPERCLASS_REMOVED)));
 		assertThat(jApiClass.getSuperclass().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		jApiClass = getJApiClass(jApiClasses, "Intermediate");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.NEW));
@@ -173,6 +177,7 @@ public class SuperclassTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_REMOVED));
 		assertThat(jApiClass.getSuperclass().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		jApiClass = getJApiClass(jApiClasses, "Intermediate");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.REMOVED));
