@@ -4,6 +4,7 @@ The following versions of japicmp are available:
 
 ##0.9.3 (2016-11-27)##
 
+* Added new parameters includeModules and excludeModules to maven plugin. [#154](https://github.com/siom79/japicmp/pull/154)
 * Do not break build if breakBuildBasedOnSemanticVersioning=true and ignoreMissingOldVersion=true and old version missing. [#153](https://github.com/siom79/japicmp/pull/153)
 * FIELD_STATIC_AND_OVERRIDES_STATIC and FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS should not be reported in case field in superclass is also new. [#154](https://github.com/siom79/japicmp/pull/154)
 * Cover more edit operations on class and interface inheritance hierarchies. [#155](https://github.com/siom79/japicmp/pull/155)
