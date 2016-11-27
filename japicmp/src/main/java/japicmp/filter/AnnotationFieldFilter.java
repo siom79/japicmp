@@ -5,8 +5,11 @@ import javassist.CtField;
 import javassist.NotFoundException;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AnnotationFieldFilter extends AnnotationFilterBase implements FieldFilter {
+	private static final Logger LOGGER = Logger.getLogger(AnnotationBehaviorFilter.class.getName());
 
 	public AnnotationFieldFilter(String filterString) {
 		super(filterString.substring(1));
@@ -25,7 +28,8 @@ public class AnnotationFieldFilter extends AnnotationFilterBase implements Field
 					if (declaringClass != null) {
 						hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 					}
-				} catch (NotFoundException ignored) {
+				} catch (NotFoundException e) {
+					LOGGER.log(Level.FINE, "Failed to load class '" + declaringClass.getName() + "': " + e.getLocalizedMessage(), e);
 				}
 			}
 		}

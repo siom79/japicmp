@@ -1,5 +1,5 @@
 package japicmp.test.service;
 
 public class SuperclassWithSubclassAddsNewStaticField {
-	public static int field = 42;
+	public static final int field = 42;
 }

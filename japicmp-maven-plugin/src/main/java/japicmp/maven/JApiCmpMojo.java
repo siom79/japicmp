@@ -159,7 +159,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					} catch (ScriptException e) {
 						throw new MojoFailureException("Execution of post-analysis script failed: " + e.getMessage(), e);
 					} catch (FileNotFoundException e) {
-						throw new MojoFailureException("Post-analysis script '" + postAnalysisFilterScript + " does not exist.");
+						throw new MojoFailureException("Post-analysis script '" + postAnalysisFilterScript + " does not exist.", e);
 					} catch (IOException e) {
 						throw new MojoFailureException("Failed to load post-analysis script '" + postAnalysisFilterScript + ": " + e.getMessage(), e);
 					}
@@ -297,7 +297,7 @@ public class JApiCmpMojo extends AbstractMojo {
 						getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
 						newArchives.add(file);
 					} catch (IOException e) {
-						getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage());
+						getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage(), e);
 					}
 				} else {
 					// maven projects with e.g. packaging type ejb don't have a file -> try to resolve artifact through
@@ -314,7 +314,7 @@ public class JApiCmpMojo extends AbstractMojo {
 										getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
 										newArchives.add(file);
 									} catch (IOException e) {
-										getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage());
+										getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage(), e);
 									}
 								}
 							}
@@ -656,7 +656,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
 					options.setAccessModifier(accessModifier);
 				} catch (IllegalArgumentException e) {
-					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()));
+					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()), e);
 				}
 			}
 			String onlyBinaryIncompatible = parameterParam.getOnlyBinaryIncompatible();

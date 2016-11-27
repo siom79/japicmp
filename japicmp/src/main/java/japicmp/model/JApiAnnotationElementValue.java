@@ -112,6 +112,15 @@ public class JApiAnnotationElementValue {
 		return true;
 	}
 
+	@Override
+	public int hashCode() {
+		int result = fullyQualifiedName != null ? fullyQualifiedName.hashCode() : 0;
+		result = 31 * result + (type != null ? type.hashCode() : 0);
+		result = 31 * result + (value != null ? value.hashCode() : 0);
+		result = 31 * result + (name != null ? name.hashCode() : 0);
+		return result;
+	}
+
 	@XmlAttribute(name = "fullyQualifiedName")
 	public String getFullyQualifiedName() {
 		return fullyQualifiedName;

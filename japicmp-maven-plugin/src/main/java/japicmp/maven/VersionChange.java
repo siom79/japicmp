@@ -75,6 +75,14 @@ public class VersionChange {
 			}
 			return Optional.of(ChangeType.UNCHANGED);
 		}
+
+		@Override
+		public int hashCode() {
+			int result = major;
+			result = 31 * result + minor;
+			result = 31 * result + patch;
+			return result;
+		}
 	}
 
 	public VersionChange(List<File> oldArchives, List<File> newArchives, Parameter parameter) {

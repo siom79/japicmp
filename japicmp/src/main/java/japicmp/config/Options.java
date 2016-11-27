@@ -15,9 +15,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class Options {
+	private static final Logger LOGGER = Logger.getLogger(Options.class.getName());
 	static final String N_A = "n.a.";
 	private List<File> oldArchives = new ArrayList<>();
 	private List<File> newArchives = new ArrayList<>();
@@ -121,12 +124,13 @@ public class Options {
 		try {
 			jarFile = new JarFile(file);
 		} catch (IOException e) {
-			throw JApiCmpException.cliError("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage());
+			throw JApiCmpException.cliError("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage(), e);
 		} finally {
 			if (jarFile != null) {
 				try {
 					jarFile.close();
-				} catch (IOException ignored) {
+				} catch (IOException e) {
+					LOGGER.log(Level.FINE, "Failed to close file: " + e.getLocalizedMessage(), e);
 				}
 			}
 		}
@@ -216,7 +220,7 @@ public class Options {
 					filters.add(packageFilter);
 				}
 			} catch (Exception e) {
-				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(errorMessage, filterString, e.getMessage()));
+				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(errorMessage, filterString, e.getMessage()), e);
 			}
 		}
 		return filters;

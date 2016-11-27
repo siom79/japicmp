@@ -9,8 +9,11 @@ import javassist.*;
 import java.io.Externalizable;
 import java.io.Serializable;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class JavaObjectSerializationCompatibility {
+	private static final Logger LOGGER = Logger.getLogger(JavaObjectSerializationCompatibility.class.getName());
 	public static final String SERIAL_VERSION_UID = "serialVersionUID";
 
 	public static JApiSerialVersionUid extractSerialVersionUid(JarArchiveComparatorOptions options, JarArchiveComparator jarArchiveComparator, Optional<CtClass> oldClass, Optional<CtClass> newClass) {
@@ -45,6 +48,7 @@ public class JavaObjectSerializationCompatibility {
 						result.serialVersionUid = Optional.of((Long) constantValue);
 					}
 				} catch (Exception e) {
+					LOGGER.log(Level.FINE, "Failed to get serialVersionUid from class " + ctClass.getName() + ": " + e.getLocalizedMessage(), e);
 					try {
 						SerialVersionUID.setSerialVersionUID(ctClass);
 						CtField declaredField = ctClass.getDeclaredField(SERIAL_VERSION_UID);
@@ -53,7 +57,8 @@ public class JavaObjectSerializationCompatibility {
 							result.serialVersionUidDefault = Optional.of((Long) constantValue);
 						}
 						ctClass.removeField(declaredField);
-					} catch (Exception ignored) {
+					} catch (Exception ex) {
+						LOGGER.log(Level.FINE, "Failed to compute default serialVersionUid for class " + ctClass.getName() + ": " + ex.getLocalizedMessage(), ex);
 					}
 				}
 				if (!result.serialVersionUidDefault.isPresent()) {
@@ -68,7 +73,8 @@ public class JavaObjectSerializationCompatibility {
 						}
 						ctClass.removeField(declaredField);
 						ctClass.addField(declaredFieldOriginal);
-					} catch (Exception ignored) {
+					} catch (Exception ex) {
+						LOGGER.log(Level.FINE, "Failed to compute default serialVersionUid for class " + ctClass.getName() + ": " + ex.getLocalizedMessage(), ex);
 					}
 				}
 			}

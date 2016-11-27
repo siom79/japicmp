@@ -154,7 +154,7 @@ public class JApiCli {
 					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
 				} catch (IllegalArgumentException e) {
 					throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option -a: %s. Possible values are: %s.",
-						accessModifierArg, AccessModifier.listOfAccessModifier()));
+						accessModifierArg, AccessModifier.listOfAccessModifier()), e);
 				}
 			} else {
 				return Optional.of(AccessModifier.PROTECTED);

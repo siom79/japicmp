@@ -4,8 +4,11 @@ import javassist.CtClass;
 import javassist.NotFoundException;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AnnotationClassFilter extends AnnotationFilterBase implements ClassFilter {
+	private static final Logger LOGGER = Logger.getLogger(AnnotationBehaviorFilter.class.getName());
 
 	public AnnotationClassFilter(String filterString) {
 		super(filterString.substring(1));
@@ -22,7 +25,8 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 					attributes = declaringClass.getClassFile().getAttributes();
 					hasAnnotation = hasAnnotation(attributes);
 				}
-			} catch (NotFoundException ignored) {
+			} catch (NotFoundException e) {
+				LOGGER.log(Level.FINE, "Failed to load class '" + ctClass.getName() + "': " + e.getLocalizedMessage(), e);
 			}
 		}
 		return hasAnnotation;

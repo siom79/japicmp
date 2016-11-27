@@ -107,7 +107,8 @@ public class JApiCmpReport extends AbstractMavenReport {
 	private Options getOptions() {
 		try {
 			return getMojo().getOptions(pluginParameters, mavenParameters);
-		} catch (MojoFailureException ignore) {
+		} catch (MojoFailureException e) {
+			getLog().debug("Failed to retrieve options: " + e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
