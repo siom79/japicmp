@@ -501,11 +501,9 @@ public class CompatibilityChanges {
 	private void checkIfSuperclassesOrInterfacesChangedIncompatible(final JApiClass jApiClass, Map<String, JApiClass> classMap) {
 		final JApiSuperclass superclass = jApiClass.getSuperclass();
 		// section 13.4.4 of "Java Language Specification" SE7
-		if (superclass.getChangeStatus() == JApiChangeStatus.REMOVED) {
-			if (jApiClass.getChangeStatus() != JApiChangeStatus.REMOVED) { //If class is removed, superclass is also removed. But this is not incompatible.
-				addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
-			}
-		} else if (superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED || superclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+		if (superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED
+			|| superclass.getChangeStatus() == JApiChangeStatus.MODIFIED
+			|| superclass.getChangeStatus() == JApiChangeStatus.REMOVED) {
 			final List<JApiMethod> implementedMethods = new ArrayList<>();
 			final List<JApiMethod> removedAndNotOverriddenMethods = new ArrayList<>();
 			final List<JApiField> fields = new ArrayList<>();
@@ -584,7 +582,25 @@ public class CompatibilityChanges {
 					} else if (superClassChangedFromObject) {
 						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
 					} else {
-						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_CHANGED);
+						// check if the old superclass is still an ancestor of the new superclass
+						List<JApiSuperclass> ancestors = new ArrayList<>();
+						final List<JApiSuperclass> matchingAncestors = new ArrayList<>();
+						forAllSuperclasses(jApiClass, classMap, ancestors, new OnSuperclassCallback<JApiSuperclass>() {
+							@Override
+							public JApiSuperclass callback(JApiClass clazz, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
+								JApiSuperclass ancestor = clazz.getSuperclass();
+								if (ancestor.getNewSuperclassName().isPresent() && ancestor.getNewSuperclassName().get().equals(superclass.getOldSuperclassName().get())) {
+									matchingAncestors.add(ancestor);
+								}
+								return ancestor;
+							}
+						});
+						if (matchingAncestors.isEmpty()) {
+							addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+						} else {
+							// really, superclass(es) inserted - but the old superclass is still an ancestor
+							addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+						}
 					}
 				}
 			} else {

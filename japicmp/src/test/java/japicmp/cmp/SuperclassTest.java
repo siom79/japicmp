@@ -1,8 +1,11 @@
 package japicmp.cmp;
 
+import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
 import japicmp.util.CtClassBuilder;
+import japicmp.util.CtInterfaceBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.junit.Test;
@@ -12,7 +15,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
+import static japicmp.util.Helper.getJApiImplementedInterface;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 public class SuperclassTest {
@@ -88,5 +94,92 @@ public class SuperclassTest {
 		assertThat(jApiClass.getSuperclass().getOldSuperclass().isPresent(), is(true));
 		assertThat(jApiClass.getSuperclass().getNewSuperclass().isPresent(), is(false));
 		assertThat(jApiClass.getSuperclass().getOldSuperclass().get().getName(), is("japicmp.Super"));
+	}
+
+	@Test
+	public void testClassHierarchyHasOneMoreLevel() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classPool);
+				return Arrays.asList(ctClassBase, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classPool);
+				CtClass ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classPool);
+				return Arrays.asList(ctClassBase, ctClassIntermediate, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.SUPERCLASS_REMOVED)));
+		assertThat(jApiClass.getSuperclass().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		jApiClass = getJApiClass(jApiClasses, "Intermediate");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.NEW));
+	}
+
+	@Test
+	public void testClassHierarchyHasOneMoreLevelWithExistingClasses() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classPool);
+				CtClass ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classPool);
+				return Arrays.asList(ctClassBase, ctClassIntermediate, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classPool);
+				CtClass ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classPool);
+				return Arrays.asList(ctClassBase, ctClassIntermediate, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getSuperclass().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		jApiClass = getJApiClass(jApiClasses, "Intermediate");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+	}
+
+	@Test
+	public void testClassHierarchyHasOneLessLevel() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classPool);
+				CtClass ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classPool);
+				return Arrays.asList(ctClassBase, ctClassIntermediate, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classPool);
+				return Arrays.asList(ctClassBase, ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_REMOVED));
+		assertThat(jApiClass.getSuperclass().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		jApiClass = getJApiClass(jApiClasses, "Intermediate");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.REMOVED));
 	}
 }
