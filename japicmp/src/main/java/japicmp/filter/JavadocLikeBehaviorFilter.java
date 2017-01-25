@@ -20,6 +20,7 @@ public class JavadocLikeBehaviorFilter implements BehaviorFilter {
 		this.filterString = filterString;
 		String regEx = filterString.replace(".", "\\.");
 		regEx = regEx.replace("*", ".*");
+		regEx = regEx.replace("$", "\\$");
 		String[] parts = regEx.split("#");
 		if (parts.length != 2) {
 			throw new JApiCmpException(JApiCmpException.Reason.CliError, "Filter option '" + filterString + "' should not contain more than one '#'.");

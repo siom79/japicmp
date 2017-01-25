@@ -95,4 +95,14 @@ public class BehaviorFilterTest {
 		CtMethod ctMethod = CtMethodBuilder.create().name("__cobertura_classmap").addToClass(ctClass);
 		assertThat(filter.matches(ctMethod), is(true));
 	}
+
+	@Test
+	public void testMethodOfInnerClass() throws CannotCompileException, NotFoundException {
+		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test$InnerClass#method()");
+		ClassPool classPool = new ClassPool();
+		classPool.appendSystemPath();
+		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test$InnerClass").addToClassPool(classPool);
+		CtMethod ctMethod = CtMethodBuilder.create().name("method").addToClass(ctClass);
+		assertThat(filter.matches(ctMethod), is(true));
+	}
 }

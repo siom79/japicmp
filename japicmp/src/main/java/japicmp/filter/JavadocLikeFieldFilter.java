@@ -15,6 +15,7 @@ public class JavadocLikeFieldFilter implements FieldFilter {
 		this.filterString = filterString;
 		String regEx = filterString.replace(".", "\\.");
 		regEx = regEx.replace("*", ".*");
+		regEx = regEx.replace("$", "\\$");
 		String[] parts = regEx.split("#");
 		if (parts.length != 2) {
 			throw new JApiCmpException(JApiCmpException.Reason.CliError, "Filter option '" + filterString + "' contains more than one '#'.");

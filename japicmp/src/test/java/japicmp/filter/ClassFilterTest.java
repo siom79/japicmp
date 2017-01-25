@@ -30,4 +30,11 @@ public class ClassFilterTest {
 		CtClass ctClass = CtClassBuilder.create().name("japicmp.Homer$InnerHomer").addToClassPool(new ClassPool());
 		assertThat(classFilter.matches(ctClass), is(true));
 	}
+
+	@Test
+	public void testInnerClassAsFilter() {
+		JavaDocLikeClassFilter classFilter = new JavaDocLikeClassFilter("japicmp.MyClass$InnerClass");
+		CtClass ctClass = CtClassBuilder.create().name("japicmp.MyClass$InnerClass").addToClassPool(new ClassPool());
+		assertThat(classFilter.matches(ctClass), is(true));
+	}
 }

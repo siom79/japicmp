@@ -37,4 +37,11 @@ public class FieldFilterTest {
 		CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
 		assertThat(fieldFilter.matches(ctField), is(false));
 	}
+
+	public void testFieldOfInnerClass() throws CannotCompileException {
+		JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter("japicmp.Test$InnerClass#field");
+		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test$InnerClass").addToClassPool(new ClassPool());
+		CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
+		assertThat(fieldFilter.matches(ctField), is(false));
+	}
 }

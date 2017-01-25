@@ -16,6 +16,7 @@ public class JavaDocLikeClassFilter implements ClassFilter {
 		this.className = className;
 		String regEx = className.replace(".", "\\.");
 		regEx = regEx.replace("*", ".*");
+		regEx = regEx.replace("$", "\\$");
 		regEx += "(\\$.*)?";
 		pattern = Pattern.compile(regEx);
 	}
