@@ -214,8 +214,8 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | skipDiffReport								| true  | false		| If set to true, no diff report will be generated.|
 | reportOnlyFilename							| true  | false		| If set to true, report will include only the artifact filename, not the complete artifact file path.|
 | oldVersionPattern								| true  | n.a.		| If &lt;oldVersion&gt; is not used, the old version compared against must match this regular expression.|
-| includeModlues								| true  | n.a.		| List of regular expression that specify if an artifact should be excluded based on its artifact id.|
-| excludeModlues								| true  | n.a.		| List of regular expression that specify if an artifact should be included based on its artifact id.|
+| includeModules								| true  | n.a.		| List of regular expression that specify if an artifact should be excluded based on its artifact id.|
+| excludeModules								| true  | n.a.		| List of regular expression that specify if an artifact should be included based on its artifact id.|
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:
