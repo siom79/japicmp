@@ -2,26 +2,34 @@
 
 The following versions of japicmp are available:
 
+##0.9.4 (2017-02-16)##
+
+* exclude option now also works for inner classes and methods/fields of inner classes. [#157](https://github.com/siom79/japicmp/issues/157)
+* Added threadSafe=true to @Mojo annotation to suppress @threadSafe warning in parallel builds. [#158](https://github.com/siom79/japicmp/issues/158)
+* The automatic detection of old version does no longer only compares the qualifier with SNAPSHOT but checks if it ends with SNAPSHOT. [#160](https://github.com/siom79/japicmp/issues/160)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.4%22).
+
 ##0.9.3 (2016-11-27)##
 
-* Added new parameters includeModules and excludeModules to maven plugin. [#154](https://github.com/siom79/japicmp/pull/154)
-* Do not break build if breakBuildBasedOnSemanticVersioning=true and ignoreMissingOldVersion=true and old version missing. [#153](https://github.com/siom79/japicmp/pull/153)
-* FIELD_STATIC_AND_OVERRIDES_STATIC and FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS should not be reported in case field in superclass is also new. [#154](https://github.com/siom79/japicmp/pull/154)
-* Cover more edit operations on class and interface inheritance hierarchies. [#155](https://github.com/siom79/japicmp/pull/155)
+* Added new parameters includeModules and excludeModules to maven plugin. [#154](https://github.com/siom79/japicmp/issues/154)
+* Do not break build if breakBuildBasedOnSemanticVersioning=true and ignoreMissingOldVersion=true and old version missing. [#153](https://github.com/siom79/japicmp/issues/153)
+* FIELD_STATIC_AND_OVERRIDES_STATIC and FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS should not be reported in case field in superclass is also new. [#154](https://github.com/siom79/japicmp/issues/154)
+* Cover more edit operations on class and interface inheritance hierarchies. [#155](https://github.com/siom79/japicmp/issues/155)
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.3%22).
 
 ##0.9.2 (2016-11-07)##
 
-* Illegal characters are removed from filename of diff report. [#152](https://github.com/siom79/japicmp/pull/152)
-* If method is new, new checked exception is not considered as source incompatible. [#151](https://github.com/siom79/japicmp/pull/151) 
+* Illegal characters are removed from filename of diff report. [#152](https://github.com/siom79/japicmp/issues/152)
+* If method is new, new checked exception is not considered as source incompatible. [#151](https://github.com/siom79/japicmp/issues/151) 
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.2%22).
 
 ##0.9.1 (2016-09-28)##
 
-* Added new option reportOnlyFilename. [#144](https://github.com/siom79/japicmp/pull/144)
-* Added new parameter ignoreMissingNewVersion. [#148](https://github.com/siom79/japicmp/pull/148)
+* Added new option reportOnlyFilename. [#144](https://github.com/siom79/japicmp/issues/144)
+* Added new parameter ignoreMissingNewVersion. [#148](https://github.com/siom79/japicmp/issues/148)
 * Reworked CompatibilityChanges.forAllSuperclasses() such that evaluate() cannot be called recursively. [#146](https://github.com/siom79/japicmp/pull/146)
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.1%22).
