@@ -241,7 +241,8 @@ public class JApiCmpMojo extends AbstractMojo {
 	private void filterSnapshots(List versions) {
 		for (Iterator versionIterator = versions.iterator(); versionIterator.hasNext(); ) {
 			ArtifactVersion version = (ArtifactVersion) versionIterator.next();
-			if ("SNAPSHOT".equals(version.getQualifier())) {
+			String qualifier = version.getQualifier();
+			if (qualifier != null && qualifier.endsWith("SNAPSHOT")) {
 				versionIterator.remove();
 			}
 		}
