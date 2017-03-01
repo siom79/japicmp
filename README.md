@@ -56,6 +56,8 @@ A maven plugin allows you to integrate the checks into your build:
 </plugin>
 ```
 
+A Sonar Qube plugin integrates the results from the japicmp analysis into your code quality report: [sonar-japicmp-plugin](https://github.com/siom79/sonar-japicmp-plugin).
+
 ##Motivation##
 
 Every time you release a new version of a library or a product, you have to tell your clients or customers what
