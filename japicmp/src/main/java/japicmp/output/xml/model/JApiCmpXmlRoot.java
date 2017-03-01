@@ -3,10 +3,7 @@ package japicmp.output.xml.model;
 import com.google.common.base.Optional;
 import japicmp.model.JApiClass;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -24,15 +21,6 @@ public class JApiCmpXmlRoot {
 	private String packagesExclude;
 	private boolean ignoreMissingClasses;
 	private String ignoreMissingClassesByRegularExpressions;
-
-	public Optional<String> getTitleOptional() {
-		return titleOptional;
-	}
-
-	public void setTitleOptional(Optional<String> titleOptional) {
-		this.titleOptional = titleOptional;
-	}
-
 	private Optional<String> titleOptional = Optional.absent();
 	private String semanticVersioning = "n.a.";
 
@@ -155,5 +143,14 @@ public class JApiCmpXmlRoot {
 
 	public void setIgnoreMissingClassesByRegularExpressions(String ignoreMissingClassesByRegularExpressions) {
 		this.ignoreMissingClassesByRegularExpressions = ignoreMissingClassesByRegularExpressions;
+	}
+
+	@XmlTransient
+	public Optional<String> getTitleOptional() {
+		return titleOptional;
+	}
+
+	public void setTitleOptional(Optional<String> titleOptional) {
+		this.titleOptional = titleOptional;
 	}
 }
