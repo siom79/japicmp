@@ -64,8 +64,10 @@ public class SemverOut extends OutputGenerator<String> {
 			return "1.0.0";
 		} else if (build.contains(SemverStatus.CHANGED_BINARY_COMPATIBLE)) {
 			return "0.1.0";
-		} else if (build.isEmpty() || build.contains(SemverStatus.UNCHANGED)) {
+		} else if (build.contains(SemverStatus.UNCHANGED)) {
 			return "0.0.1";
+		} else if (build.isEmpty()) {
+			return "0.0.0";
 		} else {
 			return "N/A";
 		}
