@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import io.airlift.airline.Command;
 import io.airlift.airline.HelpOption;
 import io.airlift.airline.Option;
+import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -129,14 +130,15 @@ public class JApiCli {
 			return options;
 		}
 
-		private List<File> createFileList(String option) {
+		private List<JApiCmpArchive> createFileList(String option) {
 			String[] parts = option.split(";");
-			List<File> files = new ArrayList<>(parts.length);
+			List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>(parts.length);
 			for (String part : parts) {
 				File file = new File(part);
-				files.add(file);
+				JApiCmpArchive jApiCmpArchive = new JApiCmpArchive(file, "n.a.");
+				jApiCmpArchives.add(jApiCmpArchive);
 			}
-			return files;
+			return jApiCmpArchives;
 		}
 
 		private <T> T checkNonNull(T in, String errorMessage) {

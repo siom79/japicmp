@@ -1,6 +1,7 @@
 package japicmp.test;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -38,11 +39,11 @@ public class MultipleArchivesTest {
 		jApiClasses = jarArchiveComparator.compare(createListOfOldArchives(), createListOfNewArchives());
 	}
 
-	private static List<File> createListOfOldArchives() {
+	private static List<JApiCmpArchive> createListOfOldArchives() {
 		return Arrays.asList(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test2-v1.jar"));
 	}
 
-	private static List<File> createListOfNewArchives() {
+	private static List<JApiCmpArchive> createListOfNewArchives() {
 		return Arrays.asList(getArchive("japicmp-test-v2.jar"), getArchive("japicmp-test2-v2.jar"));
 	}
 

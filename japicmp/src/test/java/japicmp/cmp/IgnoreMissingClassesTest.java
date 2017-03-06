@@ -24,6 +24,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
+import static japicmp.util.Helper.toJApiCmpArchive;
 import static japicmp.util.JarUtil.createJarFile;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -59,7 +60,7 @@ public class IgnoreMissingClassesTest {
 		createJarFile(newPath, ctClass);
 		jarArchiveComparator = new JarArchiveComparator(options);
 		try {
-			jarArchiveComparator.compare(oldPath.toFile(), newPath.toFile());
+			jarArchiveComparator.compare(toJApiCmpArchive(oldPath.toFile()), toJApiCmpArchive(newPath.toFile()));
 			fail("No exception thrown");
 		} catch (Exception e) {
 			JApiCmpException jApiCmpException = (JApiCmpException) e;
@@ -81,7 +82,7 @@ public class IgnoreMissingClassesTest {
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_new.jar");
 		createJarFile(newPath, ctClass);
 		jarArchiveComparator = new JarArchiveComparator(options);
-		List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldPath.toFile(), newPath.toFile());
+		List<JApiClass> jApiClasses = jarArchiveComparator.compare(toJApiCmpArchive(oldPath.toFile()), toJApiCmpArchive(newPath.toFile()));
 		assertThat(jApiClasses.size(), is(1));
 	}
 
@@ -99,7 +100,7 @@ public class IgnoreMissingClassesTest {
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_new.jar");
 		createJarFile(newPath, ctClass);
 		jarArchiveComparator = new JarArchiveComparator(options);
-		List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldPath.toFile(), newPath.toFile());
+		List<JApiClass> jApiClasses = jarArchiveComparator.compare(toJApiCmpArchive(oldPath.toFile()), toJApiCmpArchive(newPath.toFile()));
 		assertThat(jApiClasses.size(), is(1));
 	}
 
@@ -118,7 +119,7 @@ public class IgnoreMissingClassesTest {
 		createJarFile(newPath, ctClass);
 		jarArchiveComparator = new JarArchiveComparator(options);
 		try {
-			jarArchiveComparator.compare(oldPath.toFile(), newPath.toFile());
+			jarArchiveComparator.compare(toJApiCmpArchive(oldPath.toFile()), toJApiCmpArchive(newPath.toFile()));
 			fail("No exception thrown");
 		} catch (Exception e) {
 			JApiCmpException jApiCmpException = (JApiCmpException) e;

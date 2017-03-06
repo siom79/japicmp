@@ -201,6 +201,8 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		JApiCmpXmlRoot jApiCmpXmlRoot = new JApiCmpXmlRoot();
 		jApiCmpXmlRoot.setOldJar(options.joinOldArchives());
 		jApiCmpXmlRoot.setNewJar(options.joinNewArchives());
+		jApiCmpXmlRoot.setOldVersion(options.joinOldVersions());
+		jApiCmpXmlRoot.setNewVersion(options.joinNewVersions());
 		jApiCmpXmlRoot.setClasses(jApiClasses);
 		jApiCmpXmlRoot.setAccessModifier(options.getAccessModifier().name());
 		jApiCmpXmlRoot.setOnlyModifications(options.isOutputOnlyModifications());

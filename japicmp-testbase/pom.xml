@@ -29,6 +29,7 @@
 
 	<properties>
 		<maven.site.plugin.skip>true</maven.site.plugin.skip>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
 	<dependencies>

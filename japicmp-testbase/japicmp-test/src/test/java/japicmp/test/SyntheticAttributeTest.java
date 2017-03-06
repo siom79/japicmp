@@ -1,6 +1,7 @@
 package japicmp.test;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
@@ -32,9 +33,9 @@ public class SyntheticAttributeTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		File archiveV1 = getArchive("japicmp-test-v1.jar");
-		File archiveV2 = getArchive("japicmp-test-v2.jar");
-		File instrumentedArchiveV2 = instrumentClass(archiveV2);
+		JApiCmpArchive archiveV1 = getArchive("japicmp-test-v1.jar");
+		JApiCmpArchive archiveV2 = getArchive("japicmp-test-v2.jar");
+		JApiCmpArchive instrumentedArchiveV2 = instrumentClass(archiveV2);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(archiveV1, instrumentedArchiveV2);
 		JApiClass syntheticClass = getJApiClass(jApiClasses, Synthetic.class.getName());
 		assertThat(syntheticClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
@@ -50,10 +51,10 @@ public class SyntheticAttributeTest {
 		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getNewAttribute(), is(Optional.of(SyntheticAttribute.SYNTHETIC)));
 	}
 
-	private File instrumentClass(File archive) throws IOException, CannotCompileException, NotFoundException {
+	private JApiCmpArchive instrumentClass(JApiCmpArchive archive) throws IOException, CannotCompileException, NotFoundException {
 		ClassPool classPool = ClassPool.getDefault();
 		String path = Paths.get(System.getProperty("user.dir"), "target", "japicmp-test-v2-instrumented.jar").toString();
-		try (ZipFile zipFile = new ZipFile(archive); ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path))) {
+		try (ZipFile zipFile = new ZipFile(archive.getFile()); ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path))) {
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry zipEntry = entries.nextElement();
@@ -86,6 +87,6 @@ public class SyntheticAttributeTest {
 				}
 			}
 		}
-		return new File(path);
+		return new JApiCmpArchive(new File(path), "n.a.");
 	}
 }

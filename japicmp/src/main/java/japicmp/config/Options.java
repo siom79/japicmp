@@ -1,18 +1,18 @@
 package japicmp.config;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import japicmp.cli.JApiCli;
+import japicmp.cmp.JApiCmpArchive;
 import japicmp.exception.JApiCmpException;
 import japicmp.filter.*;
 import japicmp.model.AccessModifier;
-import japicmp.util.ListJoiner;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
 public class Options {
 	private static final Logger LOGGER = Logger.getLogger(Options.class.getName());
 	static final String N_A = "n.a.";
-	private List<File> oldArchives = new ArrayList<>();
-	private List<File> newArchives = new ArrayList<>();
+	private List<JApiCmpArchive> oldArchives = new ArrayList<>();
+	private List<JApiCmpArchive> newArchives = new ArrayList<>();
 	private boolean outputOnlyModifications = false;
 	private boolean outputOnlyBinaryIncompatibleModifications = false;
 	private Optional<String> xmlOutputFile = Optional.absent();
@@ -38,29 +38,7 @@ public class Options {
 	private Optional<String> newClassPath = Optional.absent();
 	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
 	private boolean noAnnotations = false;
-	private ListJoiner<File> joiner = new ListJoiner<File>()
-			.on(";")
-			.sort(new Comparator<File>() {
-				@Override
-				public int compare(File o1, File o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
-			})
-			.toStringBuilder(FULL_PATH);
-
-	private static final ListJoiner.ListJoinerToString<File> FULL_PATH = new ListJoiner.ListJoinerToString<File>() {
-		@Override
-		public String toString(File file) {
-			return file.getAbsolutePath();
-		}
-	};
-
-	private static final ListJoiner.ListJoinerToString<File> FILE_NAME = new ListJoiner.ListJoinerToString<File>() {
-		@Override
-		public String toString(File file) {
-			return file.getName();
-		}
-	};
+	private boolean reportOnlyFilename;
 
 	Options() {
 		// intentionally left empty
@@ -71,11 +49,11 @@ public class Options {
 	}
 
 	public void verify() {
-		for (File file : getOldArchives()) {
-			verifyExistsCanReadAndJar(file);
+		for (JApiCmpArchive archive : getOldArchives()) {
+			verifyExistsCanReadAndJar(archive);
 		}
-		for (File file : getNewArchives()) {
-			verifyExistsCanReadAndJar(file);
+		for (JApiCmpArchive archive : getNewArchives()) {
+			verifyExistsCanReadAndJar(archive);
 		}
 		if (getHtmlOutputFile().isPresent()) {
 			if (getHtmlStylesheet().isPresent()) {
@@ -101,30 +79,30 @@ public class Options {
 		}
 	}
 
-	private static void verifyExistsCanReadAndJar(File file) {
-		verifyExisting(file);
-		verifyCanRead(file);
-		verifyJarArchive(file);
+	private static void verifyExistsCanReadAndJar(JApiCmpArchive jApiCmpArchive) {
+		verifyExisting(jApiCmpArchive);
+		verifyCanRead(jApiCmpArchive);
+		verifyJarArchive(jApiCmpArchive);
 	}
 
-	private static void verifyExisting(File newArchive) {
-		if (!newArchive.exists()) {
-			throw JApiCmpException.cliError("File '%s' does not exist.", newArchive.getAbsolutePath());
+	private static void verifyExisting(JApiCmpArchive jApiCmpArchive) {
+		if (!jApiCmpArchive.getFile().exists()) {
+			throw JApiCmpException.cliError("File '%s' does not exist.", jApiCmpArchive.getFile().getAbsolutePath());
 		}
 	}
 
-	private static void verifyCanRead(File file) {
-		if (!file.canRead()) {
-			throw JApiCmpException.cliError("Cannot read file '%s'.", file.getAbsolutePath());
+	private static void verifyCanRead(JApiCmpArchive jApiCmpArchive) {
+		if (!jApiCmpArchive.getFile().canRead()) {
+			throw JApiCmpException.cliError("Cannot read file '%s'.", jApiCmpArchive.getFile().getAbsolutePath());
 		}
 	}
 
-	private static void verifyJarArchive(File file) {
+	private static void verifyJarArchive(JApiCmpArchive jApiCmpArchive) {
 		JarFile jarFile = null;
 		try {
-			jarFile = new JarFile(file);
+			jarFile = new JarFile(jApiCmpArchive.getFile());
 		} catch (IOException e) {
-			throw JApiCmpException.cliError("File '%s' could not be opened as a jar file: %s", file.getAbsolutePath(), e.getMessage(), e);
+			throw JApiCmpException.cliError("File '%s' could not be opened as a jar file: %s", jApiCmpArchive.getFile().getAbsolutePath(), e.getMessage(), e);
 		} finally {
 			if (jarFile != null) {
 				try {
@@ -136,19 +114,19 @@ public class Options {
 		}
 	}
 
-	public List<File> getNewArchives() {
+	public List<JApiCmpArchive> getNewArchives() {
 		return newArchives;
 	}
 
-	public void setNewArchives(List<File> newArchives) {
+	public void setNewArchives(List<JApiCmpArchive> newArchives) {
 		this.newArchives = newArchives;
 	}
 
-	public List<File> getOldArchives() {
+	public List<JApiCmpArchive> getOldArchives() {
 		return oldArchives;
 	}
 
-	public void setOldArchives(List<File> oldArchives) {
+	public void setOldArchives(List<JApiCmpArchive> oldArchives) {
 		this.oldArchives = oldArchives;
 	}
 
@@ -307,33 +285,78 @@ public class Options {
 		return ignoreMissingClasses;
 	}
 
-	public void setReportOnlyFilename(boolean justFile) {
-		joiner.toStringBuilder(justFile ?FILE_NAME :FULL_PATH);
+	public void setReportOnlyFilename(boolean reportOnlyFilename) {
+		this.reportOnlyFilename = reportOnlyFilename;
 	}
 
 	public String getDifferenceDescription() {
+		Joiner joiner = Joiner.on(";");
 		StringBuilder sb = new StringBuilder()
 				.append("Comparing ")
-				.append(isOutputOnlyBinaryIncompatibleModifications() ?"binary" :"source")
+				.append(isOutputOnlyBinaryIncompatibleModifications() ? "binary" :"source")
 				.append(" compatibility of ");
-		joiner.join(sb, newArchives);
+		sb.append(joiner.join(toPathList(newArchives)));
 		sb.append(" against ");
-		joiner.join(sb, oldArchives);
+		sb.append(joiner.join(toPathList(oldArchives)));
 		return sb.toString();
 	}
 
+	private List<String> toPathList(List<JApiCmpArchive> archives) {
+		List<String> paths = new ArrayList<>(archives.size());
+		for (JApiCmpArchive archive : archives) {
+			if (this.reportOnlyFilename) {
+				paths.add(archive.getFile().getName());
+			} else {
+				paths.add(archive.getFile().getAbsolutePath());
+			}
+		}
+		return paths;
+	}
+
+	private List<String> toVersionList(List<JApiCmpArchive> archives) {
+		List<String> versions = new ArrayList<>(archives.size());
+		for (JApiCmpArchive archive : archives) {
+			String stringVersion = archive.getVersion().getStringVersion();
+			if (stringVersion != null) {
+				versions.add(stringVersion);
+			}
+		}
+		return versions;
+	}
+
 	public String joinOldArchives() {
-		String join = joiner.join(oldArchives);
-		if (join != null && join.trim().length() == 0) {
+		Joiner joiner = Joiner.on(";");
+		String join = joiner.join(toPathList(oldArchives));
+		if (join.trim().length() == 0) {
 			return N_A;
 		}
 		return join;
 	}
 
 	public String joinNewArchives() {
-		String join = joiner.join(newArchives);
-		if (join != null && join.trim().length() == 0) {
+		Joiner joiner = Joiner.on(";");
+		String join = joiner.join(toPathList(newArchives));
+		if (join.trim().length() == 0) {
 			return N_A;
 		}
 		return join;
-	}}
+	}
+
+	public String joinOldVersions() {
+		Joiner joiner = Joiner.on(";");
+		String join = joiner.join(toVersionList(oldArchives));
+		if (join.trim().length() == 0) {
+			return N_A;
+		}
+		return join;
+	}
+
+	public String joinNewVersions() {
+		Joiner joiner = Joiner.on(";");
+		String join = joiner.join(toVersionList(newArchives));
+		if (join.trim().length() == 0) {
+			return N_A;
+		}
+		return join;
+	}
+}

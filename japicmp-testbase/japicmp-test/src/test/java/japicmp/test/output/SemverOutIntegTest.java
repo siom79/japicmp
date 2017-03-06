@@ -1,6 +1,7 @@
 package japicmp.test.output;
 
 import com.google.common.base.Strings;
+import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -90,18 +91,18 @@ public class SemverOutIntegTest {
 	}
 
 	private String getSemverDiff(String lastPackage) {
-		File oldFile = Helper.getArchive("japicmp-test-v1.jar");
-		File newFile = Helper.getArchive("japicmp-test-v2.jar");
+		JApiCmpArchive oldFile = Helper.getArchive("japicmp-test-v1.jar");
+		JApiCmpArchive newFile = Helper.getArchive("japicmp-test-v2.jar");
 		return getSemverDiff(lastPackage, oldFile, newFile);
 	}
 
-	private String getSemverDiff(String lastPackage, File oldFile, File newFile) {
+	private String getSemverDiff(String lastPackage, JApiCmpArchive oldArchive, JApiCmpArchive newArchive) {
 		AccessModifier accessModifier = AccessModifier.PRIVATE;
 		JarArchiveComparator jarArchiveComparator = newComparator(lastPackage, accessModifier);
-		List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldFile, newFile);
+		List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchive, newArchive);
 		Options options = Options.newDefault();
-		options.setNewArchives(Collections.singletonList(newFile));
-		options.setOldArchives(Collections.singletonList(oldFile));
+		options.setNewArchives(Collections.singletonList(newArchive));
+		options.setOldArchives(Collections.singletonList(oldArchive));
 		options.setAccessModifier(accessModifier);
 		options.setOutputOnlyModifications(false);
 		return new SemverOut(options, jApiClasses).generate();

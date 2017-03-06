@@ -24,6 +24,8 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static japicmp.util.FileHelper.toFileList;
+
 /**
  * This class provides the basic methods to compare the classes within to jar archives.
  */
@@ -48,27 +50,27 @@ public class JarArchiveComparator {
 	}
 
 	/**
-	 * Compares the two given jar archives.
+	 * Compares the two given archives.
 	 *
 	 * @param oldArchive the old version of the archive
 	 * @param newArchive the new version of the archive
 	 * @return a list which contains one instance of {@link japicmp.model.JApiClass} for each class found in one of the two archives
 	 * @throws JApiCmpException if the comparison fails
 	 */
-	public List<JApiClass> compare(File oldArchive, File newArchive) {
+	public List<JApiClass> compare(JApiCmpArchive oldArchive, JApiCmpArchive newArchive) {
 		return compare(Collections.singletonList(oldArchive), Collections.singletonList(newArchive));
 	}
 
 	/**
-	 * Compares the two given list of jar archives.
+	 * Compares the two given lists of archives.
 	 *
 	 * @param oldArchives the old versions of the archives
 	 * @param newArchives the new versions of the archives
 	 * @return a list which contains one instance of {@link japicmp.model.JApiClass} for each class found in one of the archives
 	 * @throws JApiCmpException if the comparison fails
 	 */
-	public List<JApiClass> compare(List<File> oldArchives, List<File> newArchives) {
-		return createAndCompareClassLists(oldArchives, newArchives);
+	public List<JApiClass> compare(List<JApiCmpArchive> oldArchives, List<JApiCmpArchive> newArchives) {
+		return createAndCompareClassLists(toFileList(oldArchives), toFileList(newArchives));
 	}
 
 	private void checkJavaObjectSerializationCompatibility(List<JApiClass> jApiClasses) {

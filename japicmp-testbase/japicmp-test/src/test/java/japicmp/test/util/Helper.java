@@ -1,6 +1,7 @@
 package japicmp.test.util;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -19,8 +20,14 @@ import java.util.List;
 
 public class Helper {
 
-	public static File getArchive(String filename) {
-		return new File("target" + File.separator + filename);
+	public static JApiCmpArchive getArchive(String filename) {
+		File file = new File("target" + File.separator + filename);
+		return toJApiCmpArchive(file);
+	}
+
+	public static JApiCmpArchive toJApiCmpArchive(File file) {
+		JApiCmpArchive jApiCmpArchive = new JApiCmpArchive(file, "n.a.");
+		return jApiCmpArchive;
 	}
 
 	public static JApiClass getJApiClass(List<JApiClass> jApiClasses, String fqn) {

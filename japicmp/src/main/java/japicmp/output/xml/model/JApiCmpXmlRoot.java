@@ -13,6 +13,8 @@ import java.util.List;
 public class JApiCmpXmlRoot {
 	private String oldJar = "";
 	private String newJar = "";
+	private String oldVersion = "";
+	private String newVersion = "";
 	private String accessModifier = "";
 	private List<JApiClass> classes = new LinkedList<>();
 	private boolean onlyModifications;
@@ -152,5 +154,23 @@ public class JApiCmpXmlRoot {
 
 	public void setTitleOptional(Optional<String> titleOptional) {
 		this.titleOptional = titleOptional;
+	}
+
+	@XmlAttribute
+	public String getOldVersion() {
+		return oldVersion;
+	}
+
+	public void setOldVersion(String oldVersion) {
+		this.oldVersion = oldVersion;
+	}
+
+	@XmlAttribute
+	public String getNewVersion() {
+		return newVersion;
+	}
+
+	public void setNewVersion(String newVersion) {
+		this.newVersion = newVersion;
 	}
 }
