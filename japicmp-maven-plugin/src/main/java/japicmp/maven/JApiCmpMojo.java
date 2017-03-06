@@ -69,7 +69,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private List<Dependency> oldClassPathDependencies;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<Dependency> newClassPathDependencies;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skip", required = false)
 	private String skip;
 	@org.apache.maven.plugins.annotations.Parameter(property = "project.build.directory", required = true)
 	private File projectBuildDir;
