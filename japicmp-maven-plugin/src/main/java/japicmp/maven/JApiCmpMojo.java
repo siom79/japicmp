@@ -15,6 +15,7 @@ import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import japicmp.versioning.SemanticVersion;
+import japicmp.versioning.VersionChange;
 import javassist.CtClass;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -127,8 +128,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					getLog().info("Written file '" + file.getAbsolutePath() + "'.");
 				}
 			}
-			VersionChange versionChange = new VersionChange(options.getOldArchives(), options.getNewArchives(), parameter);
-			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), versionChange, options, jarArchiveComparator);
+			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), options, jarArchiveComparator);
 			return Optional.of(xmlOutput);
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
@@ -348,7 +348,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, VersionChange versionChange, Options options, JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
+	private void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, Options options, JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
 		if (breakBuildOnModificationsParameter(parameterParam)) {
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
@@ -356,8 +356,25 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 			}
 		}
-		breakBuildIfNecessary(jApiClasses, parameterParam, options, jarArchiveComparator);
+		breakBuildIfNecessaryByApplyingFilter(jApiClasses, parameterParam, options, jarArchiveComparator);
 		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
+			boolean ignoreMissingOldVersion = "true".equalsIgnoreCase(parameter.getIgnoreMissingOldVersion() == null ? "false" : parameter.getIgnoreMissingOldVersion());
+			boolean ignoreMissingNewVersion = "true".equalsIgnoreCase(parameter.getIgnoreMissingNewVersion() == null ? "false" : parameter.getIgnoreMissingNewVersion());
+			List<SemanticVersion> oldVersions = new ArrayList<>();
+			List<SemanticVersion> newVersions = new ArrayList<>();
+			for (JApiCmpArchive file : options.getOldArchives()) {
+				Optional<SemanticVersion> semanticVersion = file.getVersion().getSemanticVersion();
+				if (semanticVersion.isPresent()) {
+					oldVersions.add(semanticVersion.get());
+				}
+			}
+			for (JApiCmpArchive file : options.getNewArchives()) {
+				Optional<SemanticVersion> semanticVersion = file.getVersion().getSemanticVersion();
+				if (semanticVersion.isPresent()) {
+					newVersions.add(semanticVersion.get());
+				}
+			}
+			VersionChange versionChange = new VersionChange(oldVersions, newVersions, ignoreMissingOldVersion, ignoreMissingNewVersion);
 			Optional<SemanticVersion.ChangeType> changeTypeOptional = versionChange.computeChangeType();
 			if (changeTypeOptional.isPresent()) {
 				SemanticVersion.ChangeType changeType = changeTypeOptional.get();
@@ -402,7 +419,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, final Options options,
+	void breakBuildIfNecessaryByApplyingFilter(List<JApiClass> jApiClasses, Parameter parameterParam, final Options options,
 									   final JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
 		final StringBuilder sb = new StringBuilder();
 		final BreakBuildResult breakBuildResult = new BreakBuildResult(breakBuildOnBinaryIncompatibleModifications(parameterParam),
