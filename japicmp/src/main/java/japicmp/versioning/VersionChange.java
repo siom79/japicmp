@@ -65,6 +65,18 @@ public class VersionChange {
 		}
 	}
 
+	public boolean isAllMajorVersionsZero() {
+		boolean allMajorVersionsZero = true;
+		for (SemanticVersion semanticVersion : newVersions) {
+			int major = semanticVersion.getMajor();
+			if (major > 0) {
+				allMajorVersionsZero = false;
+				break;
+			}
+		}
+		return allMajorVersionsZero;
+	}
+
 	private boolean allVersionsTheSame(List<SemanticVersion> versions) {
 		boolean allVersionsTheSame = true;
 		if (versions.size() > 1) {

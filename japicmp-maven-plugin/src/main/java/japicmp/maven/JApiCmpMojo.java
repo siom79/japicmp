@@ -1,5 +1,6 @@
 package japicmp.maven;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
@@ -375,29 +376,38 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 			}
 			VersionChange versionChange = new VersionChange(oldVersions, newVersions, ignoreMissingOldVersion, ignoreMissingNewVersion);
-			Optional<SemanticVersion.ChangeType> changeTypeOptional = versionChange.computeChangeType();
-			if (changeTypeOptional.isPresent()) {
-				SemanticVersion.ChangeType changeType = changeTypeOptional.get();
-				SemverOut semverOut = new SemverOut(options, jApiClasses);
-				String semver = semverOut.generate();
-				if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals("1.0.0")) {
-					throw new MojoFailureException("Versions of archives indicate a minor change but binary incompatible changes found.");
+			if (!versionChange.isAllMajorVersionsZero()) {
+				Optional<SemanticVersion.ChangeType> changeTypeOptional = versionChange.computeChangeType();
+				if (changeTypeOptional.isPresent()) {
+					SemanticVersion.ChangeType changeType = changeTypeOptional.get();
+					SemverOut semverOut = new SemverOut(options, jApiClasses);
+					String semver = semverOut.generate();
+					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals("1.0.0")) {
+						throw new MojoFailureException("Versions of archives indicate a minor change but binary incompatible changes found.");
+					}
+					if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals("1.0.0")) {
+						throw new MojoFailureException("Versions of archives indicate a patch change but binary incompatible changes found.");
+					}
+					if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals("0.1.0")) {
+						throw new MojoFailureException("Versions of archives indicate a patch change but binary compatible changes found.");
+					}
+					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("1.0.0")) {
+						throw new MojoFailureException("Versions of archives indicate no API changes but binary incompatible changes found.");
+					}
+					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("0.1.0")) {
+						throw new MojoFailureException("Versions of archives indicate no API changes but binary compatible changes found.");
+					}
+					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("0.0.1")) {
+						throw new MojoFailureException("Versions of archives indicate no API changes but found API changes.");
+					}
+				} else {
+					if (getLog().isDebugEnabled()) {
+						Joiner joiner = Joiner.on(';');
+						getLog().debug("No change type available for old version(s) " + joiner.join(oldVersions) + " and new version(s) " + joiner.join(newVersions) + ".");
+					}
 				}
-				if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals("1.0.0")) {
-					throw new MojoFailureException("Versions of archives indicate a patch change but binary incompatible changes found.");
-				}
-				if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals("0.1.0")) {
-					throw new MojoFailureException("Versions of archives indicate a patch change but binary compatible changes found.");
-				}
-				if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("1.0.0")) {
-					throw new MojoFailureException("Versions of archives indicate no API changes but binary incompatible changes found.");
-				}
-				if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("0.1.0")) {
-					throw new MojoFailureException("Versions of archives indicate no API changes but binary compatible changes found.");
-				}
-				if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("0.0.1")) {
-					throw new MojoFailureException("Versions of archives indicate no API changes but found API changes.");
-				}
+			} else {
+				getLog().info("Skipping semantic version check because all major versions are zero (see http://semver.org/#semantic-versioning-specification-semver, section 4).");
 			}
 		}
 	}
