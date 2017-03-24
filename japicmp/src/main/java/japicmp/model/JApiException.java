@@ -17,18 +17,27 @@ public class JApiException implements JApiHasChangeStatus {
 		this.checkedException = isCheckedException(ctClassOptional, jarArchiveComparator);
 	}
 
-	private boolean isCheckedException(Optional<CtClass> ctClassOptional, JarArchiveComparator jarArchiveComparator) {
-		boolean checked = false;
+	private boolean isCheckedException(Optional<CtClass> ctClassOptional, JarArchiveComparator jarArchiveComparator) throws OutOfMemoryError {
+		boolean checkedException = false;
 		if (ctClassOptional.isPresent()) {
+			boolean subClassOfException = false;
+			CtClass ctClass = ctClassOptional.get();
 			Optional<CtClass> exceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, Exception.class.getName());
 			if (exceptionOptional.isPresent()) {
-				CtClass ctClass = ctClassOptional.get();
 				if (ctClass.subclassOf(exceptionOptional.get())) {
-					checked = true;
+					subClassOfException = true;
+				}
+			}
+			if (subClassOfException) {
+				Optional<CtClass> runtimeExceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, RuntimeException.class.getName());
+				if (runtimeExceptionOptional.isPresent()) {
+					if (!ctClass.subclassOf(runtimeExceptionOptional.get())) {
+						checkedException = true;
+					}
 				}
 			}
 		}
-		return checked;
+		return checkedException;
 	}
 
 	@XmlAttribute(name = "name")

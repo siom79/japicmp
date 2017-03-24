@@ -98,11 +98,12 @@ public class JarArchiveComparator {
 	}
 
 	private String appendSystemClassPath(ClassPool classPool, String classPathAsString) {
+		String retVal = classPathAsString;
 		classPool.appendSystemPath();
-		if (classPathAsString.length() > 0 && !classPathAsString.endsWith(File.pathSeparator)) {
-			classPathAsString += File.pathSeparator;
+		if (retVal.length() > 0 && !retVal.endsWith(File.pathSeparator)) {
+			retVal += File.pathSeparator;
 		}
-		return classPathAsString;
+		return retVal;
 	}
 
 	private String appendUserDefinedClassPathEntries(ClassPool classPool, List<String> classPathEntries) {
