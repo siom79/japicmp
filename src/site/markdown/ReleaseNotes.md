@@ -2,6 +2,18 @@
 
 The following versions of japicmp are available:
 
+##0.10.0 (2017-04-02)##
+
+* The maven plugin relaxes the semantic versioning check for 0.x.x versions, it can be enabled with the option breakBuildBasedOnSemanticVersioningForMajorVersionZero. [#165](https://github.com/siom79/japicmp/issues/165)
+* The XML report contains now the old and new version of the two archives compared. [#164](https://github.com/siom79/japicmp/issues/164)
+* The maven plugin execution can be skipped using a CLI property (-Djapicmp.skip=true).
+* Removed unnecessary XML element titleOptional from report. [#161](https://github.com/siom79/japicmp/issues/161)
+* SemverOut now returns 0.0.0 in case no JApiClass(es) are there. [#162](https://github.com/siom79/japicmp/issues/162)
+* Method throwing in new version RuntimeException is no longer reported to be source incompatible. [#167](https://github.com/siom79/japicmp/issues/167)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.10.0%22).
+
+
 ##0.9.4 (2017-02-16)##
 
 * exclude option now also works for inner classes and methods/fields of inner classes. [#157](https://github.com/siom79/japicmp/issues/157)
