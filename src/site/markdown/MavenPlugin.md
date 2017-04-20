@@ -288,7 +288,7 @@ To create a summary report, you can also provide multiple old and new versions:
 
 ```
 <configuration>
-	<oldVersions>
+	<oldVersion>
 		<dependency>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-test-v1</artifactId>
@@ -299,8 +299,8 @@ To create a summary report, you can also provide multiple old and new versions:
 			<artifactId>japicmp-test2-v1</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	</oldVersions>
-	<newVersions>
+	</oldVersion>
+	<newVersion>
 		<dependency>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-test-v2</artifactId>
@@ -311,7 +311,7 @@ To create a summary report, you can also provide multiple old and new versions:
 			<artifactId>japicmp-test2-v2</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	</newVersions>
+	</newVersion>
 	...
 </configuration>
 ```
