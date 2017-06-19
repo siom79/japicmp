@@ -166,15 +166,15 @@ public class Options {
 		return ImmutableList.copyOf(excludes);
 	}
 
-	public void addExcludeFromArgument(Optional<String> packagesExcludeArg) {
-		excludes = createFilterList(packagesExcludeArg, excludes, "Wrong syntax for exclude option '%s': %s");
+	public void addExcludeFromArgument(Optional<String> packagesExcludeArg, boolean excludeExclusively) {
+		excludes = createFilterList(packagesExcludeArg, excludes, "Wrong syntax for exclude option '%s': %s", excludeExclusively);
 	}
 
-	public void addIncludeFromArgument(Optional<String> packagesIncludeArg) {
-		includes = createFilterList(packagesIncludeArg, includes, "Wrong syntax for include option '%s': %s");
+	public void addIncludeFromArgument(Optional<String> packagesIncludeArg, boolean includeExclusively) {
+		includes = createFilterList(packagesIncludeArg, includes, "Wrong syntax for include option '%s': %s", includeExclusively);
 	}
 
-	public List<Filter> createFilterList(Optional<String> argumentString, List<Filter> filters, String errorMessage) {
+	public List<Filter> createFilterList(Optional<String> argumentString, List<Filter> filters, String errorMessage, boolean exclusive) {
 		for (String filterString : Splitter.on(";").trimResults().omitEmptyStrings().split(argumentString.or(""))) {
 			try {
 				// filter based on annotations
@@ -194,7 +194,7 @@ public class Options {
 				} else {
 					JavaDocLikeClassFilter classFilter = new JavaDocLikeClassFilter(filterString);
 					filters.add(classFilter);
-					JavadocLikePackageFilter packageFilter = new JavadocLikePackageFilter(filterString);
+					JavadocLikePackageFilter packageFilter = new JavadocLikePackageFilter(filterString, exclusive);
 					filters.add(packageFilter);
 				}
 			} catch (Exception e) {

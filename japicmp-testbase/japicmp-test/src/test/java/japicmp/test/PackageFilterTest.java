@@ -21,7 +21,7 @@ public class PackageFilterTest {
 	@Test
 	public void onlyIncludeOnePackage() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.packageOne"));
+		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.packageOne", false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		getJApiClass(jApiClasses, PackageOne.class.getName());
@@ -31,8 +31,8 @@ public class PackageFilterTest {
 	@Test
 	public void onlyIncludeTwoPackages() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.packageOne"));
-		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.packageTwo"));
+		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.packageOne", false));
+		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.packageTwo", false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		getJApiClass(jApiClasses, PackageOne.class.getName());
@@ -43,7 +43,7 @@ public class PackageFilterTest {
 	@Test
 	public void onlyExcludeOnePackage() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("japicmp.test.packageOne"));
+		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("japicmp.test.packageOne", false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		assertThatExceptionIsThrown(new Callback() {
@@ -56,7 +56,7 @@ public class PackageFilterTest {
 	@Test
 	public void excludePackageJapicmpTest() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("japicmp.test"));
+		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("japicmp.test", false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		assertThat(jApiClasses.size(), is(0));
@@ -65,7 +65,7 @@ public class PackageFilterTest {
 	@Test
 	public void includePackageJapicmpTest() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test"));
+		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test", false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		assertThat(getJApiClass(jApiClasses, PackageOne.class.getName()), is(notNullValue()));
@@ -74,7 +74,7 @@ public class PackageFilterTest {
 	@Test
 	public void includePackageOneWithWildcard() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.*.packageOne"));
+		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.*.packageOne", false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		assertThat(getJApiClass(jApiClasses, PackageOne.class.getName()), is(notNullValue()));

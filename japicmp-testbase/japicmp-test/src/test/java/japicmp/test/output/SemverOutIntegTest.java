@@ -113,7 +113,7 @@ public class SemverOutIntegTest {
 		options.setAccessModifier(accessModifier);
 		if (!Strings.isNullOrEmpty(lastPackage)) {
 			String packageName = "japicmp.test." + lastPackage;
-			options.getFilters().getIncludes().add(new JavadocLikePackageFilter(packageName));
+			options.getFilters().getIncludes().add(new JavadocLikePackageFilter(packageName, false));
 		}
 		return new JarArchiveComparator(options);
 	}

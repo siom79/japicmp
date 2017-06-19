@@ -8,11 +8,11 @@ public class JavadocLikePackageFilter implements ClassFilter {
 	private final Pattern pattern;
 	private final String packageName;
 
-	public JavadocLikePackageFilter(String packageName) {
+	public JavadocLikePackageFilter(String packageName, boolean exclusive) {
 		this.packageName = packageName;
 		String regEx = packageName.replace(".", "\\.");
 		regEx = regEx.replace("*", ".*");
-		regEx = regEx + "(\\.[^\\.]+)*";
+		regEx += exclusive ? "" : "(\\.[^\\.]+)*";
 		pattern = Pattern.compile(regEx);
 	}
 

@@ -20,7 +20,7 @@ public class PackageFilterTest {
 
 	@Test
 	public void testWithoutWildcard() {
-		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("de.test.package");
+		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("de.test.package", false);
 		assertThat(pf.matches(createCtClassForPackage("de.test.package")), is(true));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.packageOne")), is(true));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.")), is(false));
@@ -30,7 +30,7 @@ public class PackageFilterTest {
 
 	@Test
 	public void testWithWildcardAfterDot() {
-		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("de.test.package.*");
+		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("de.test.package.*", false);
 		assertThat(pf.matches(createCtClassForPackage("de.test.package")), is(false));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.packageOne")), is(true));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.packageOne.p2")), is(true));
@@ -38,7 +38,7 @@ public class PackageFilterTest {
 
 	@Test
 	public void testWithWildcardWithoutDot() {
-		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("de.test.package*");
+		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("de.test.package*", false);
 		assertThat(pf.matches(createCtClassForPackage("de.test.package")), is(true));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.packageOne")), is(true));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.packageOne.p2")), is(true));
@@ -46,7 +46,7 @@ public class PackageFilterTest {
 
 	@Test
 	public void testWithWildcardAndFollowingPackagename() {
-		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("de.test.package.*.test");
+		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("de.test.package.*.test", false);
 		assertThat(pf.matches(createCtClassForPackage("de.test.package")), is(false));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.p.test")), is(true));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.packageOne.test")), is(true));
@@ -55,7 +55,7 @@ public class PackageFilterTest {
 
 	@Test
 	public void testWithOnlyWildcard() {
-		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("*");
+		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("*", false);
 		assertThat(pf.matches(createCtClassForPackage("de.test.package")), is(true));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.p.test")), is(true));
 		assertThat(pf.matches(createCtClassForPackage("de.test.package.packageOne.test")), is(true));
@@ -64,7 +64,7 @@ public class PackageFilterTest {
 
 	@Test
 	public void testMatchAgainstDefaultPackage() {
-		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("foo");
+		JavadocLikePackageFilter pf = new JavadocLikePackageFilter("foo", false);
 		assertThat(pf.matches(createCtClassForPackage("")), is(false));
 	}
 
@@ -76,8 +76,8 @@ public class PackageFilterTest {
 	@Test
 	public void testExcludeInnerPackageWhenOuterPackageIsIncluded() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("include"));
-		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("include.exclude"));
+		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("include", false));
+		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("include.exclude", false));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
