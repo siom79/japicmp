@@ -18,7 +18,7 @@ public class JApiAnnotationElementValue {
 	private final String fullyQualifiedName;
 	private final Type type;
 	private final Object value;
-	private Optional<String> name = Optional.<String>absent();
+	private Optional<String> name = Optional.absent();
 
 	public enum Type {
 		Double, Char, Long, Integer, Float, Byte, Enum, Annotation, Class, Short, Boolean, UnsupportedType, Array, String

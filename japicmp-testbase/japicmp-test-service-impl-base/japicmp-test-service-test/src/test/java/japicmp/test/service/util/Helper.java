@@ -5,7 +5,13 @@ import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.model.*;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiAnnotationElement;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiField;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
@@ -27,8 +33,7 @@ public class Helper {
 	}
 
 	public static JApiCmpArchive toJApiCmpArchive(File file) {
-		JApiCmpArchive jApiCmpArchive = new JApiCmpArchive(file, "n.a.");
-		return jApiCmpArchive;
+		return new JApiCmpArchive(file, "n.a.");
 	}
 
 	public static JApiClass getJApiClass(List<JApiClass> jApiClasses, String fqn) {

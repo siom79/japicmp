@@ -71,7 +71,7 @@ public class ClassesComparator {
 	}
 
 	private Map<String, CtClass> createClassMap(List<CtClass> oldClassesArg) {
-		Map<String, CtClass> oldClassesMap = new HashMap<String, CtClass>();
+		Map<String, CtClass> oldClassesMap = new HashMap<>();
 		for (CtClass ctClass : oldClassesArg) {
 			oldClassesMap.put(ctClass.getName(), ctClass);
 		}

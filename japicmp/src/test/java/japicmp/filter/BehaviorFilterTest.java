@@ -4,7 +4,13 @@ import japicmp.exception.JApiCmpException;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
 import japicmp.util.CtMethodBuilder;
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtMethod;
+import javassist.NotFoundException;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;

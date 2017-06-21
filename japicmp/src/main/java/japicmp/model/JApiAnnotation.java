@@ -8,7 +8,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	private final String fullyQualifiedName;
@@ -143,6 +148,6 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	@XmlElementWrapper(name = "compatibilityChanges")
 	@XmlElement(name = "compatibilityChange")
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 }

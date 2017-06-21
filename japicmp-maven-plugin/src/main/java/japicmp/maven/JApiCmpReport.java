@@ -94,7 +94,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 		}
 	}
 
-	private JApiCmpMojo getMojo() throws MojoFailureException {
+	private JApiCmpMojo getMojo() {
 		if (mojo != null) {
 			return mojo;
 		}

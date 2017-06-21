@@ -60,7 +60,6 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<finalName>${project.artifactId}-${project.version}</finalName>
 					<appendAssemblyId>true</appendAssemblyId>
 				</configuration>
 				<executions>

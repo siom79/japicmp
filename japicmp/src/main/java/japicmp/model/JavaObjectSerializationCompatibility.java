@@ -4,7 +4,11 @@ import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
-import javassist.*;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.NotFoundException;
+import javassist.SerialVersionUID;
 
 import java.io.Externalizable;
 import java.io.Serializable;
@@ -118,7 +122,7 @@ public class JavaObjectSerializationCompatibility {
 								if (suidOld.equals(suidNewDefault)) {
 									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
 								} else {
-									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MACHTES_NEW_DEFAULT;
+									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MATCHES_NEW_DEFAULT;
 								}
 							} else {
 								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_REMOVED;
@@ -138,7 +142,7 @@ public class JavaObjectSerializationCompatibility {
 								if (suidNew.equals(suidOldDefault)) {
 									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
 								} else {
-									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MACHTES_NEW_DEFAULT;
+									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MATCHES_NEW_DEFAULT;
 								}
 							} else {
 								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;

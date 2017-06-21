@@ -4,7 +4,9 @@ import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.Modifier;
-import javassist.bytecode.*;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;

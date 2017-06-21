@@ -12,10 +12,7 @@ public class AnnotationFilterBase {
 	}
 
 	protected boolean hasAnnotation(List attributes) {
-		if (AnnotationHelper.hasAnnotation(attributes, annotationClassName)) {
-			return true;
-		}
-		return false;
+		return AnnotationHelper.hasAnnotation(attributes, annotationClassName);
 	}
 
 	public String getClassName() {

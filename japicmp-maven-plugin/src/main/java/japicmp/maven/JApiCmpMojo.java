@@ -8,7 +8,20 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.filter.ClassFilter;
-import japicmp.model.*;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiBehavior;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiParameter;
+import japicmp.model.JApiReturnType;
+import japicmp.model.JApiSuperclass;
+import japicmp.model.JApiType;
 import japicmp.output.Filter;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
@@ -45,11 +58,22 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -822,7 +846,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters, PluginParameters pluginParameters) throws IOException, MojoFailureException {
+	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters, PluginParameters pluginParameters) throws IOException {
 		String filename = createFilename(mavenParameters);
 		if (!skipXmlReport(pluginParameters)) {
 			options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));

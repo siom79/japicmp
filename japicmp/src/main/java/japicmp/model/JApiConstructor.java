@@ -2,7 +2,6 @@ package japicmp.model;
 
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
 import javassist.CtConstructor;
 
 import javax.xml.bind.annotation.XmlTransient;

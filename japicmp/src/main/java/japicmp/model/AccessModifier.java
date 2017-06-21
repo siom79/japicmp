@@ -22,7 +22,7 @@ public enum AccessModifier implements JApiModifierBase {
 	public static String listOfAccessModifier() {
 		StringBuilder sb = new StringBuilder();
 		int i = 0;
-		for (AccessModifier am : AccessModifier.values()) {
+		for (AccessModifier am : values()) {
 			if (i > 0) {
 				sb.append(",");
 			}

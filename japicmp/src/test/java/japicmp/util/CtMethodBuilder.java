@@ -104,7 +104,6 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 	}
 
 	public static CtMethodBuilder create() {
-		CtMethodBuilder ctMethodBuilder = new CtMethodBuilder();
-		return ctMethodBuilder;
+		return new CtMethodBuilder();
 	}
 }

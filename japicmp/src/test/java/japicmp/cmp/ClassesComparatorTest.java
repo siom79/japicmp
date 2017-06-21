@@ -7,7 +7,6 @@ import japicmp.util.CtMethodBuilder;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.NotFoundException;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -42,7 +41,7 @@ public class ClassesComparatorTest {
 		return new CtClassBuilder().name("japicmp.Test").addToClassPool(classPool);
 	}
 
-	private CtClass createClassWithMethod(ClassPool classPool) throws NotFoundException, CannotCompileException {
+	private CtClass createClassWithMethod(ClassPool classPool) throws CannotCompileException {
 		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 		CtMethodBuilder.create().publicAccess().returnType(CtClass.intType).name("method").body("return 42;").addToClass(ctClass);
 		return ctClass;

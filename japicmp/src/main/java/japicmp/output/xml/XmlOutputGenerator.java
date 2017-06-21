@@ -18,16 +18,27 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.SchemaOutputResolver;
-import javax.xml.transform.*;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -184,7 +195,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		xsltAsString = xsltAsString.replace("<style type=\"text/css\"></style>", "<style type=\"text/css\">\n" + styleSheetAsString + "\n</style>");
 		if (System.getProperty("japicmp.dump.xslt") != null) {
 			try {
-				Files.write(Paths.get(System.getProperty("japicmp.dump.xslt")), Arrays.asList(xsltAsString), Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+				Files.write(Paths.get(System.getProperty("japicmp.dump.xslt")), Collections.singletonList(xsltAsString), Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 			} catch (IOException e) {
 				LOGGER.log(Level.WARNING, "Could not dump XSLT file: " + e.getMessage(), e);
 			}

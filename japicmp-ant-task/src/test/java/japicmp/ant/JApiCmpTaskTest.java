@@ -2,6 +2,7 @@ package japicmp.ant;
 
 import org.apache.tools.ant.BuildFileRule;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -16,7 +17,8 @@ public class JApiCmpTaskTest {
 		rule.configureProject(System.getProperty("user.dir") + "/src/test/resources/japicmp/japicmptask.xml");
 	}
 
-	//@Test
+	@Ignore
+	@Test
 	public void testTask() {
 		rule.executeTarget("compare");
 		String logContents = rule.getLog();

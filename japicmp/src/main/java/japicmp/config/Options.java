@@ -7,7 +7,14 @@ import com.google.common.collect.ImmutableList;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.exception.JApiCmpException;
-import japicmp.filter.*;
+import japicmp.filter.AnnotationBehaviorFilter;
+import japicmp.filter.AnnotationClassFilter;
+import japicmp.filter.AnnotationFieldFilter;
+import japicmp.filter.Filter;
+import japicmp.filter.JavaDocLikeClassFilter;
+import japicmp.filter.JavadocLikeBehaviorFilter;
+import japicmp.filter.JavadocLikeFieldFilter;
+import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.AccessModifier;
 
 import java.io.File;

@@ -4,7 +4,14 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
-import japicmp.test.ClassModifier.*;
+import japicmp.test.ClassModifier.FinalStaysFinalInnerClass;
+import japicmp.test.ClassModifier.FinalToNonFinalInnerClass;
+import japicmp.test.ClassModifier.NonFinalStaysNonFinalInnerClass;
+import japicmp.test.ClassModifier.NonFinalToFinalInnerClass;
+import japicmp.test.ClassModifier.NonStaticStaysNonStaticInnerClass;
+import japicmp.test.ClassModifier.NonStaticToStaticInnerClass;
+import japicmp.test.ClassModifier.StaticStaysStaticInnerClass;
+import japicmp.test.ClassModifier.StaticToNonStaticInnerClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

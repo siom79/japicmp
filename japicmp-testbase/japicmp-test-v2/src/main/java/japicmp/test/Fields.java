@@ -3,7 +3,7 @@ package japicmp.test;
 public class Fields {
 	public int privateToPublicField;
 	protected int privateToProtectedField;
-	int privateToPackageProctedField;
+	int privateToPackageProtectedField;
 	private int privateRemainsPrivateField;
 	private int publicToPrivateField;
 	protected int publicToProtectedField;
