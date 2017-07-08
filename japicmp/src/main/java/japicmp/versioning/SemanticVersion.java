@@ -1,6 +1,8 @@
 package japicmp.versioning;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -49,11 +51,11 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
 		int patchEndPos = -1;
 		int idListEndPos = -1;
 		
-		this.major = Integer.valueOf(versionDescription.substring(0, firstDotPos - 1));
-		this.minor = Integer.valueOf(versionDescription.substring(firstDotPos + 1, secondDotPos - 1));
+		this.major = Integer.valueOf(versionDescription.substring(0, firstDotPos));
+		this.minor = Integer.valueOf(versionDescription.substring(firstDotPos + 1, secondDotPos));
 		
 		if (hyphenPos != -1) {
-			patchEndPos = hyphenPos - 1;
+			patchEndPos = hyphenPos;
 			plusSignPos = versionDescription.indexOf('+', hyphenPos + 1);
 		}
 		else {
@@ -62,41 +64,24 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
 		
 		if (plusSignPos != -1) {
 			if (hyphenPos != -1) {
-				idListEndPos = plusSignPos - 1;
+				idListEndPos = plusSignPos;
 			}
 			else {
-				patchEndPos = plusSignPos - 1;
+				patchEndPos = plusSignPos;
 			}
 		}
 		else {
 			if (hyphenPos != -1) {
-				idListEndPos = versionDescription.length() - 1;
+				idListEndPos = versionDescription.length();
 			}
 			else {
-				patchEndPos = versionDescription.length() - 1;
+				patchEndPos = versionDescription.length();
 			}
 		}
 		
 		this.patch = Integer.valueOf(versionDescription.substring(secondDotPos + 1, patchEndPos));
-		this.preReleaseIdentifiers = (hyphenPos == -1) ? new ArrayList<String>() : parseIdentifierList(versionDescription.substring(hyphenPos + 1, idListEndPos));
+		this.preReleaseIdentifiers = (hyphenPos == -1) ? new ArrayList<String>() : Splitter.on('.').splitToList(versionDescription.substring(hyphenPos + 1, idListEndPos));
 		this.buildMetadata = (plusSignPos == -1) ? null : versionDescription.substring(plusSignPos + 1);
-	}
-	
-	private List<String> parseIdentifierList(String idListString) {
-		List<String> idList = new ArrayList<String>();
-
-		int currentDotPos = -1;
-		int nextDotPos = idListString.indexOf('.');
-		
-		while (nextDotPos != -1) {
-			idList.add(idListString.substring(currentDotPos + 1, nextDotPos - 1));
-			
-			currentDotPos = nextDotPos;
-			nextDotPos = idListString.indexOf('.', nextDotPos + 1);
-		}
-		idList.add(idListString.substring(currentDotPos + 1));
-		
-		return idList;
 	}
 
 	public int getMajor() {
@@ -142,7 +127,9 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
 
 	@Override
 	public String toString() {
-		return major + "." + minor + "." + patch;
+		return major + "." + minor + "." + patch + 
+			(preReleaseIdentifiers.size() > 0 ? "-" + Joiner.on('.').join(preReleaseIdentifiers) : "") + 
+			(buildMetadata != null ? "+" + buildMetadata : "");
 	}
 	
 	private boolean isInteger(String str) {
@@ -186,13 +173,13 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
 							}
 							else {
 								// "Numeric identifiers always have lower precedence than non-numeric identifiers" as per spec.
-								return 1;
+								return -1;
 							}
 						}
 						else {
 							if (isInteger(otherId)) {
 								// Same as above : int greater than string.
-								return -1;
+								return 1;
 							}
 							else {
 								// Compare strings in lexicographic order.
@@ -205,7 +192,7 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
 					}
 					
 					// "A larger set of pre-release fields has a higher precedence than a smaller set, if all of the preceding identifiers are equal", as per spec.
-					return other.preReleaseIdentifiers.size() - this.preReleaseIdentifiers.size();
+					return this.preReleaseIdentifiers.size() - other.preReleaseIdentifiers.size();
 				}
 				else {
 					return this.patch - other.patch;
