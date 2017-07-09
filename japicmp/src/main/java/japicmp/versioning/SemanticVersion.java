@@ -95,6 +95,10 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
 	public int getPatch() {
 		return patch;
 	}
+	
+	public String getPreReleaseIdentifier() {
+		return Joiner.on('.').join(preReleaseIdentifiers);
+	}
 
 	@Override
 	public boolean equals(Object o) {
