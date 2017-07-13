@@ -71,7 +71,8 @@
 		</contributor>
 		<contributor>
 			<name>Chas Honton</name>
-			<url>chas@honton.org</url>
+			<email>chas@honton.org</email>
+			<url>https://github.com/chonton</url>
 		</contributor>
 		<contributor>
 			<name>Richard Atkins</name>
@@ -80,6 +81,11 @@
 		<contributor>
 			<name>io7m</name>
 			<url>https://github.com/io7m</url>
+		</contributor>
+		<contributor>
+			<name>zhostasa</name>
+			<url>https://github.com/zhostasa</url>
+			<email>zhostasa@redhat.com</email>
 		</contributor>
 	</contributors>
 
