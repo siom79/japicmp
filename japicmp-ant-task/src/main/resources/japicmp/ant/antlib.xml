@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<antlib>
+	<taskdef name="japicmp" classname="japicmp.ant.JApiCmpTask"/>
+</antlib>

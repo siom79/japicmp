@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<project default="compare" name="JApiCmpTask test file">
+  <property name="japicmp.current.jar" value="${basedir}/../japicmp/target/japicmp-${japicmp.current.version}.jar"/>
+  <property name="japicmp.version" value="0.9.4"/>
+  <property name="japicmp.jar" value="japicmp-${japicmp.version}.jar"/>
+  <property name="javassist.version" value="3.20.0-GA"/>
+  <property name="javassist.jar" value="${user.home}/.m2/repository/org/javassist/javassist/${javassist.version}/javassist-${javassist.version}.jar"/>
+  <property name="guava.version" value="18.0"/>
+  <property name="guava.jar" value="${user.home}/.m2/repository/com/google/guava/guava/${guava.version}/guava-${guava.version}.jar"/>
+
+  <target name="init">
+    <fail message="Dependencies not found in Maven cache">
+      <condition>
+	<or>
+	  <not><available file="${javassist.jar}"/></not>
+	  <not><available file="${guava.jar}"/></not>
+	</or>
+      </condition>
+    </fail>
+    <path id="dependency.classpath">
+      <fileset file="${javassist.jar}"/>
+      <fileset file="${guava.jar}"/>
+    </path>
+    <path id="compare.classpath">
+      <path refid="dependency.classpath"/>
+      <fileset file="${ant.core.lib}"/>
+    </path>
+    <path id="task.classpath">
+      <path refid="dependency.classpath"/>
+      <fileset file="${japicmp.current.jar}"/>
+    </path>
+
+    <get src="http://central.maven.org/maven2/com/github/siom79/japicmp/japicmp/${japicmp.version}/${japicmp.jar}"
+	 dest="target/${japicmp.jar}" usetimestamp="true"
+	 skipexisting="true"/>
+  </target>
+
+  <target name="compare" depends="init">
+    <taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
+    <japicmp oldjar="target/${japicmp.jar}" newjar="${japicmp.current.jar}" classpathref="compare.classpath" onlybinaryincompatiblemodifications="true"/>
+  </target>
+</project>
