@@ -5,17 +5,17 @@ The command line tool has the following options:
 ```
 SYNOPSIS
         java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
-                [(-e <excludes> | --exclude <excludes>)] [(-h | --help)]
-                [--html-file <pathToHtmlOutputFile>]
+                [(-e <excludes> | --exclude <excludes>)] [--exclude-exclusively]
+                [(-h | --help)] [--html-file <pathToHtmlOutputFile>]
                 [--html-stylesheet <pathToHtmlStylesheet>]
                 [(-i <includes> | --include <includes>)] [--ignore-missing-classes]
                 [--ignore-missing-classes-by-regex <ignoreMissingClassesByRegEx>...]
-                [--include-synthetic] [(-m | --only-modified)]
+                [--include-exclusively] [--include-synthetic] [(-m | --only-modified)]
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
                 [--new-classpath <newClassPath>] [--no-annotations]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
-                [--old-classpath <oldClassPath>] [(-s | --semantic-versioning)]
-                [--report-only-filename]
+                [--old-classpath <oldClassPath>] [--report-only-filename]
+                [(-s | --semantic-versioning)]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
 
 OPTIONS
@@ -32,6 +32,10 @@ OPTIONS
             package.Class#classMember, * can be used as wildcard. Annotations
             are given as FQN starting with @. Examples:
             mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.
+
+        --exclude-exclusively
+            Exclude only packages specified in the "exclude" option, include
+            their sub-packages
 
         -h, --help
             Display help information
@@ -54,6 +58,10 @@ OPTIONS
         --ignore-missing-classes-by-regex <ignoreMissingClassesByRegEx>
             Ignores only those superclasses/interface missing on the classpath
             that are selected by a regular expression.
+
+        --include-exclusively
+            Include only packages specified in the "include" option, exclude
+            their sub-packages
 
         --include-synthetic
             Include synthetic classes and class members that are hidden per
