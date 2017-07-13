@@ -97,6 +97,7 @@
         <module>japicmp</module>
         <module>japicmp-testbase</module>
         <module>japicmp-maven-plugin</module>
+		<module>japicmp-ant-task</module>
     </modules>
 
     <dependencies>
