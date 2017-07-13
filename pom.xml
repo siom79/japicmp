@@ -81,6 +81,10 @@
 			<name>io7m</name>
 			<url>https://github.com/io7m</url>
 		</contributor>
+		<contributor>
+			<name>twogee</name>
+			<url>https://github.com/twogee</url>
+		</contributor>
 	</contributors>
 
     <properties>
