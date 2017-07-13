@@ -38,7 +38,7 @@ public class XmlOutputGeneratorTest {
 	@BeforeClass
 	public static void beforeClass() throws IOException {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getExcludes().add(new JavadocLikePackageFilter(JAPICMP_TEST_SEMVER001));
+		options.getFilters().getExcludes().add(new JavadocLikePackageFilter(JAPICMP_TEST_SEMVER001, false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		generateHtmlOutput("target/diff.xml", "target/diff.html", false);

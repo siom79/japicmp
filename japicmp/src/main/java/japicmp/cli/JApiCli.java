@@ -72,6 +72,10 @@ public class JApiCli {
 		public boolean noAnnotations = false;
 		@Option(name = "--report-only-filename", description = "Use just filename in report description.")
 		public boolean reportOnlyFilename;
+	        @Option(name = "--include-exclusively", description = "Include only packages specified in the \"include\" option, exclude their sub-packages")
+	        public boolean includeExclusively = false;
+	        @Option(name = "--exclude-exclusively", description = "Exclude only packages specified in the \"exclude\" option, include their sub-packages")
+	        public boolean excludeExclusively = false;
 
 		@Override
 		public void run() {
@@ -113,8 +117,8 @@ public class JApiCli {
 			options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
 			options.setOutputOnlyModifications(modifiedOnly);
 			options.setAccessModifier(toModifier(accessModifier));
-			options.addIncludeFromArgument(Optional.fromNullable(includes));
-			options.addExcludeFromArgument(Optional.fromNullable(excludes));
+			options.addIncludeFromArgument(Optional.fromNullable(includes), includeExclusively);
+			options.addExcludeFromArgument(Optional.fromNullable(excludes), excludeExclusively);
 			options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
 			options.setIncludeSynthetic(includeSynthetic);
 			options.setIgnoreMissingClasses(ignoreMissingClasses);

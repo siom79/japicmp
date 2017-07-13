@@ -136,7 +136,7 @@ public class FilterTest {
 	public void testTwoClassesIncludePackageButExcludeClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.getFilters().getExcludes().add(new JavaDocLikeClassFilter("japicmp.Test1"));
-		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp"));
+		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp", false));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
@@ -159,7 +159,7 @@ public class FilterTest {
 	public void testTwoClassesExcludePackageAndClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.getFilters().getExcludes().add(new JavaDocLikeClassFilter("japicmp.Test1"));
-		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("japicmp"));
+		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("japicmp", false));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
@@ -293,7 +293,7 @@ public class FilterTest {
 	@Test
 	public void testPackageExcludedMethodIncluded() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("simpsons"));
+		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("simpsons", false));
 		options.getFilters().getIncludes().add(new JavadocLikeBehaviorFilter("big.bang.theory.Sheldon#study()"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -328,7 +328,7 @@ public class FilterTest {
 	@Test
 	public void testPackageIncludedMethodExcluded() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("big.bang.theory"));
+		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("big.bang.theory", false));
 		options.getFilters().getExcludes().add(new JavadocLikeBehaviorFilter("big.bang.theory.Sheldon#study()"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override

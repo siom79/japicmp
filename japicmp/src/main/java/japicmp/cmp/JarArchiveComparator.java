@@ -250,7 +250,7 @@ public class JarArchiveComparator {
 			if (filter instanceof AnnotationFilterBase) {
 				String className = ((AnnotationFilterBase) filter).getClassName();
 				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {
-					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName()));
+					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName(), false));
 				}
 			}
 		}
@@ -262,7 +262,7 @@ public class JarArchiveComparator {
 			if (filter instanceof AnnotationFilterBase) {
 				String className = ((AnnotationFilterBase) filter).getClassName();
 				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {
-					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName()));
+					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName(), false));
 				}
 			}
 		}
