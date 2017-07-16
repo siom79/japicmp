@@ -130,17 +130,6 @@ public class JApiCli {
 			return options;
 		}
 
-		private List<JApiCmpArchive> createFileList(String option) {
-			String[] parts = option.split(";");
-			List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>(parts.length);
-			for (String part : parts) {
-				File file = new File(part);
-				JApiCmpArchive jApiCmpArchive = new JApiCmpArchive(file, "n.a.");
-				jApiCmpArchives.add(jApiCmpArchive);
-			}
-			return jApiCmpArchives;
-		}
-
 		private <T> T checkNonNull(T in, String errorMessage) {
 			if (in == null) {
 				throw new JApiCmpException(JApiCmpException.Reason.CliError, errorMessage);
@@ -162,5 +151,16 @@ public class JApiCli {
 				return Optional.of(AccessModifier.PROTECTED);
 			}
 		}
+	}
+
+	public static List<JApiCmpArchive> createFileList(String option) {
+		String[] parts = option.split(";");
+		List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>(parts.length);
+		for (String part : parts) {
+			File file = new File(part);
+			JApiCmpArchive jApiCmpArchive = new JApiCmpArchive(file, "n.a.");
+			jApiCmpArchives.add(jApiCmpArchive);
+		}
+		return jApiCmpArchives;
 	}
 }

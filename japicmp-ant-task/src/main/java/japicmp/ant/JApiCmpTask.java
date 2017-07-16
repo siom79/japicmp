@@ -1,6 +1,7 @@
 package japicmp.ant;
 
 import com.google.common.base.Optional;
+import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -25,44 +26,44 @@ import java.util.Arrays;
 import java.util.List;
 
 public class JApiCmpTask extends Task {
-	private boolean onlyBinaryIncompatibleModifications = false;
+	private boolean onlyBinaryIncompatible = false;
 	private boolean onlyModified = false;
 	private boolean includeSynthetic = false;
 	private boolean noAnnotations = false;
 	private boolean semanticVersioning = false;
 	private boolean reportOnlyFilename = false;
 	private boolean ignoreMissingClasses = false;
-	private List<String> ignoreMissingClassesByRegEx = new ArrayList<>();
+	private List<String> ignoreMissingClassesByRegularExpressions = new ArrayList<>();
 	private String accessModifier = "protected";
 	private String semanticVersionProperty;
-	private File oldVersionJar;
-	private File newVersionJar;
+	private String oldJar;
+	private String newJar;
 	private Path oldClassPath;
 	private Path newClassPath;
 	private String includes;
 	private String excludes;
-	private String pathToXmlOutputFile;
-	private String pathToHtmlOutputFile;
-	private String pathToHtmlStylesheet;
+	private String xmlOutputFile;
+	private String htmlOutputFile;
+	private String htmlStylesheet;
 
-	public void setOnlyBinaryIncompatibleModifications(String biModified) {
-		onlyBinaryIncompatibleModifications = Project.toBoolean(biModified);
+	public void setOnlyBinaryIncompatible(String onlyBinaryIncompatible) {
+		this.onlyBinaryIncompatible = Project.toBoolean(onlyBinaryIncompatible);
 	}
 
-	public void setOnlyModifications(String modified) {
-		onlyModified = Project.toBoolean(modified);
+	public void setOnlyModified(String onlyModified) {
+		this.onlyModified = Project.toBoolean(onlyModified);
 	}
 
-	public void setIncludeSynthetic(String synthetic) {
-		includeSynthetic = Project.toBoolean(synthetic);
+	public void setIncludeSynthetic(String includeSynthetic) {
+		this.includeSynthetic = Project.toBoolean(includeSynthetic);
 	}
 
-	public void setExcludeAnnotations(String annotations) {
-		noAnnotations = Project.toBoolean(annotations);
+	public void setNoAnnotations(String noAnnotations) {
+		this.noAnnotations = Project.toBoolean(noAnnotations);
 	}
 
-	public void setSemanticVersion(String semver) {
-		semanticVersioning = Project.toBoolean(semver);
+	public void setSemanticVersioning(String semanticVersioning) {
+		this.semanticVersioning = Project.toBoolean(semanticVersioning);
 	}
 
 	public void setSemVerProperty(String semverProperty) {
@@ -70,28 +71,28 @@ public class JApiCmpTask extends Task {
 		semanticVersionProperty = semverProperty;
 	}
 
-	public void setReportOnlyFilename(String onlyFilename) {
-		reportOnlyFilename = Project.toBoolean(onlyFilename);
+	public void setReportOnlyFilename(String reportOnlyFilename) {
+		this.reportOnlyFilename = Project.toBoolean(reportOnlyFilename);
 	}
 
-	public void setIgnoreMissingClasses(String missingClasses) {
-		ignoreMissingClasses = Project.toBoolean(missingClasses);
+	public void setIgnoreMissingClasses(String ignoreMissingClasses) {
+		this.ignoreMissingClasses = Project.toBoolean(ignoreMissingClasses);
 	}
 
-	public void setIgnoreMissingClassesRegEx(String regexList) {
-		ignoreMissingClassesByRegEx.addAll(Arrays.asList(regexList.split("[,\\s]+")));
+	public void setIgnoreMissingClassesRegEx(String ignoreMissingClassesByRegularExpressions) {
+		this.ignoreMissingClassesByRegularExpressions.addAll(Arrays.asList(ignoreMissingClassesByRegularExpressions.split("[,\\s]+")));
 	}
 
-	public void setAccessModifier(String modifier) {
-		accessModifier = modifier;
+	public void setAccessModifier(String accessModifier) {
+		this.accessModifier = accessModifier;
 	}
 
-	public void setOldJar(File oldJar) {
-		oldVersionJar = oldJar;
+	public void setOldJar(String oldJar) {
+		this.oldJar = oldJar;
 	}
 
-	public void setNewJar(File newJar) {
-		newVersionJar = newJar;
+	public void setNewJar(String newJar) {
+		this.newJar = newJar;
 	}
 
 	public Path getOldClassPath() {
@@ -108,51 +109,46 @@ public class JApiCmpTask extends Task {
 		return newClassPath;
 	}
 
-	public void setOldClassPathRef(Reference oldClassPathRef) {
+	public void setOldClassPath(Reference oldClassPathRef) {
 		getOldClassPath().setRefid(oldClassPathRef);
 	}
 
-	public void setNewClassPathRef(Reference newClassPathRef) {
+	public void setNewClassPath(Reference newClassPathRef) {
 		getNewClassPath().setRefid(newClassPathRef);
 	}
 
-	public void setClassPathRef(Reference classPathRef) {
+	public void setClassPath(Reference classPathRef) {
 		getOldClassPath().setRefid(classPathRef);
 		getNewClassPath().setRefid(classPathRef);
 	}
 
-	public void setIncludeFilter(String includeFilter) {
-		includes = includeFilter;
+	public void setIncludes(String includes) {
+		this.includes = includes;
 	}
 
-	public void setExcludeFilter(String excludeFilter) {
-		excludes = excludeFilter;
+	public void setExcludes(String excludes) {
+		this.excludes = excludes;
 	}
 
 	public void setXmlOutputFile(String xmlOutputFile) {
-		pathToXmlOutputFile = xmlOutputFile;
+		this.xmlOutputFile = xmlOutputFile;
 	}
 
 	public void setHtmlOutputFile(String htmlOutputFile) {
-		pathToHtmlOutputFile = htmlOutputFile;
+		this.htmlOutputFile = htmlOutputFile;
 	}
 
 	public void setHtmlStylesheet(String htmlStylesheet) {
-		pathToHtmlStylesheet = htmlStylesheet;
+		this.htmlStylesheet = htmlStylesheet;
 	}
 
 	@Override
 	public void execute() {
-		if (oldVersionJar == null) {
+		if (oldJar == null) {
 			throw new BuildException("Path to old jar must be specified using the oldjar attribute.");
 		}
-
-		if (newVersionJar == null) {
+		if (newJar == null) {
 			throw new BuildException("Path to new jar must be specified using the newjar attribute.");
-		}
-
-		if (oldClassPath != null) {
-
 		}
 		Options options = createOptionsFromAntAttrs();
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));
@@ -162,22 +158,22 @@ public class JApiCmpTask extends Task {
 
 	private Options createOptionsFromAntAttrs() {
 		Options options = Options.newDefault();
-		options.getOldArchives().add(new JApiCmpArchive(oldVersionJar, "n.a."));
-		options.getNewArchives().add(new JApiCmpArchive(newVersionJar, "n.a."));
-		options.setXmlOutputFile(Optional.fromNullable(pathToXmlOutputFile));
-		options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
-		options.setHtmlStylesheet(Optional.fromNullable(pathToHtmlStylesheet));
+		options.getOldArchives().addAll(JApiCli.createFileList(this.oldJar));
+		options.getNewArchives().addAll(JApiCli.createFileList(this.newJar));
+		options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
+		options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
+		options.setHtmlStylesheet(Optional.fromNullable(htmlStylesheet));
 		options.setOutputOnlyModifications(onlyModified);
 		options.setAccessModifier(toModifier(accessModifier));
 		options.addIncludeFromArgument(Optional.fromNullable(includes));
 		options.addExcludeFromArgument(Optional.fromNullable(excludes));
-		options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatibleModifications);
+		options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatible);
 		options.setIncludeSynthetic(includeSynthetic);
 		options.setIgnoreMissingClasses(ignoreMissingClasses);
 		options.setOldClassPath(Optional.fromNullable(getOldClassPath().size() > 0 ? getOldClassPath().toString() : null));
 		options.setNewClassPath(Optional.fromNullable(getNewClassPath().size() > 0 ? getNewClassPath().toString() : null));
 		options.setNoAnnotations(noAnnotations);
-		for (String missingClassRegEx : ignoreMissingClassesByRegEx) {
+		for (String missingClassRegEx : ignoreMissingClassesByRegularExpressions) {
 			options.addIgnoreMissingClassRegularExpression(missingClassRegEx);
 		}
 		options.setReportOnlyFilename(reportOnlyFilename);
