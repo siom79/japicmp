@@ -25,6 +25,7 @@ public class JarArchiveComparatorOptions {
 	private List<String> oldClassPath = new LinkedList<>();
 	private List<String> newClassPath = new LinkedList<>();
 	private boolean noAnnotations = false;
+	private boolean includeClassFileFormatVersion = false;
 
 	/**
 	 * When both versions of the archives under comparison use the exact same classpath
@@ -131,5 +132,9 @@ public class JarArchiveComparatorOptions {
 
 	public IgnoreMissingClasses getIgnoreMissingClasses() {
 		return ignoreMissingClasses;
+	}
+
+	public boolean isIncludeClassFileFormatVersion() {
+		return includeClassFileFormatVersion;
 	}
 }

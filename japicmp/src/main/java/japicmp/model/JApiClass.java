@@ -7,6 +7,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.util.*;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -37,8 +38,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new LinkedList<>();
 	private final JApiSerialVersionUid jApiSerialVersionUid;
-	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
+	private final JApiClassFileFormatVersion classFileFormatVersion;
 	private boolean changeCausedByClassElement = false;
+	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
 
 	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
 		this.jarArchiveComparator = jarArchiveComparator;
@@ -59,7 +61,30 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		this.syntheticModifier = extractSyntheticModifier(oldClass, newClass);
 		this.syntheticAttribute = extractSyntheticAttribute(oldClass, newClass);
 		this.jApiSerialVersionUid = JavaObjectSerializationCompatibility.extractSerialVersionUid(options, jarArchiveComparator, oldClass, newClass);
+		this.classFileFormatVersion = extractClassFileFormatVersion(oldClass, newClass);
 		this.changeStatus = evaluateChangeStatus(changeStatus);
+	}
+
+	private JApiClassFileFormatVersion extractClassFileFormatVersion(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
+			CtClass oldClass = oldClassOptional.get();
+			CtClass newClass = newClassOptional.get();
+			ClassFile classFileOld = oldClass.getClassFile();
+			ClassFile classFileNew = newClass.getClassFile();
+			return new JApiClassFileFormatVersion(classFileOld.getMajorVersion(), classFileOld.getMinorVersion(), classFileNew.getMajorVersion(), classFileNew.getMinorVersion());
+		} else {
+			if (oldClassOptional.isPresent()) {
+				CtClass oldClass = oldClassOptional.get();
+				ClassFile classFileOld = oldClass.getClassFile();
+				return new JApiClassFileFormatVersion(classFileOld.getMajorVersion(), classFileOld.getMinorVersion(), -1, -1);
+			}
+			if (newClassOptional.isPresent()) {
+				CtClass newClass = newClassOptional.get();
+				ClassFile classFileNew = newClass.getClassFile();
+				return new JApiClassFileFormatVersion(-1, -1, classFileNew.getMajorVersion(), classFileNew.getMinorVersion());
+			}
+			return new JApiClassFileFormatVersion(-1, -1, -1, -1);
+		}
 	}
 
 	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -876,5 +901,10 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	@XmlElement(name = "compatibilityChange")
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return this.compatibilityChanges;
+	}
+
+	@XmlElement(name = "classFileFormatVersion")
+	public JApiClassFileFormatVersion getClassFileFormatVersion() {
+		return classFileFormatVersion;
 	}
 }

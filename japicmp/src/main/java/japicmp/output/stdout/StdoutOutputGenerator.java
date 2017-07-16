@@ -231,9 +231,22 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
 		sb.append(signs + " " + jApiClass.getChangeStatus() + " " + processClassType(jApiClass) + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
 			+ staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + syntheticModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + " " + javaObjectSerializationStatus(jApiClass) + "\n");
+		processClassFileFormatVersionChanges(sb, jApiClass);
 		processInterfaceChanges(sb, jApiClass);
 		processSuperclassChanges(sb, jApiClass);
 		processFieldChanges(sb, jApiClass);
+	}
+
+	private void processClassFileFormatVersionChanges(StringBuilder sb, JApiClass jApiClass) {
+		JApiClassFileFormatVersion classFileFormatVersion = jApiClass.getClassFileFormatVersion();
+		sb.append(tabs(1))
+			.append(signs(classFileFormatVersion))
+			.append(" CLASS FILE FORMAT VERSION: ")
+			.append(classFileFormatVersion.getMajorVersionNew()).append(".").append(classFileFormatVersion.getMinorVersionNew())
+			.append(" <- ")
+			.append(classFileFormatVersion.getMajorVersionOld()).append(".").append(classFileFormatVersion.getMinorVersionOld())
+			.append("\n")
+		;
 	}
 
 	private String processClassType(JApiClass jApiClass) {

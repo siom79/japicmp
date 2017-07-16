@@ -188,6 +188,23 @@
 						</table>
 					</div>
 				</xsl:if>
+				<xsl:if test="classFileFormatVersion/@changeStatus = 'MODIFIED'">
+					<div class="class_fileFormatVersion">
+						<span class="label_class_member">class File Format Version:</span>
+						<table>
+							<thead>
+								<tr>
+									<td>Status</td>
+									<td>Old Version</td>
+									<td>New Version</td>
+								</tr>
+							</thead>
+							<tbody>
+								<xsl:apply-templates select="classFileFormatVersion"/>
+							</tbody>
+						</table>
+					</div>
+				</xsl:if>
 				<div class="class_superclass">
 					<xsl:if test="  count(superclass) > 0
                                     and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.')
@@ -397,6 +414,24 @@
 				</table>
 			</div>
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="classFileFormatVersion">
+		<tr>
+			<td><xsl:call-template name="outputChangeStatus"/></td>
+			<xsl:if test="@majorVersionOld != '-1' and @minorVersionOld != '-1'">
+				<td><xsl:value-of select="@majorVersionOld"/>.<xsl:value-of select="@minorVersionOld"/></td>
+			</xsl:if>
+			<xsl:if test="@majorVersionOld = '-1' or @minorVersionOld = '-1'">
+				<td>n.a.</td>
+			</xsl:if>
+			<xsl:if test="@majorVersionNew != '-1' and @minorVersionNew != '-1'">
+				<td><xsl:value-of select="@majorVersionNew"/>.<xsl:value-of select="@minorVersionNew"/></td>
+			</xsl:if>
+			<xsl:if test="@majorVersionNew = '-1' or @minorVersionNew = '-1'">
+				<td>n.a.</td>
+			</xsl:if>
+		</tr>
 	</xsl:template>
 
 	<xsl:template match="superclass">

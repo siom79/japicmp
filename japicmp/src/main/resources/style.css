@@ -51,6 +51,10 @@ table tbody tr td.matrix_layout {
 .class_compatibilityChanges {
 	margin-top: 1em;
 }
+
+.class_fileFormatVersion {
+	margin-top: 1em;
+}
 .class_superclass {
     margin-top: 1em;
 }

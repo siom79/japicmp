@@ -287,6 +287,29 @@
 							</parameter>
 						</configuration>
 					</execution>
+					<execution>
+						<id>class-file-format-version</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.google.guava</groupId>
+									<artifactId>guava</artifactId>
+									<version>18.0</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.google.guava</groupId>
+									<artifactId>guava</artifactId>
+									<version>22.0</version>
+								</dependency>
+							</newVersion>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<!-- run site plugin to build reports during 'pre-integration-test' phase
