@@ -12,6 +12,7 @@
 	<properties>
 		<!-- minimize standard reports -->
 		<mpir.skip>true</mpir.skip>
+		<japicmp.skip-jdk7>false</japicmp.skip-jdk7>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -294,6 +295,7 @@
 							<goal>cmp</goal>
 						</goals>
 						<configuration>
+							<skip>${japicmp.skip-jdk7}</skip>
 							<oldVersion>
 								<dependency>
 									<groupId>com.google.guava</groupId>
@@ -379,4 +381,16 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<profiles>
+		<profile>
+			<id>java7-disabled</id>
+			<activation>
+				<jdk>(,1.7]</jdk>
+			</activation>
+			<properties>
+				<japicmp.skip-jdk7>true</japicmp.skip-jdk7>
+			</properties>
+		</profile>
+	</profiles>
 </project>
