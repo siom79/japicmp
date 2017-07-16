@@ -1,5 +1,9 @@
 #Ant Task#
 
+## Download ##
+
+You can download the Ant task from the Central Maven Repository: http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20a%3A%22japicmp-ant-task%22.
+
 ##Basic Usage##
 
 The Ant task can be included in the build file of a project like shown in the following (requires Ant >= 1.9.5):

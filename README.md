@@ -58,6 +58,21 @@ A maven plugin allows you to integrate the checks into your build:
 
 A Sonar Qube plugin integrates the results from the japicmp analysis into your code quality report: [sonar-japicmp-plugin](https://github.com/siom79/sonar-japicmp-plugin).
 
+By using the available Ant task, you can also integrate japicmp into your Ant build files:
+
+```
+<taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
+<japicmp oldjar="${project.build.directory}/guava-18.0.jar"
+	 newjar="${project.build.directory}/guava-19.0.jar"
+	 oldclasspathref="old.classpath"
+	 newclasspathref="new.classpath"
+	 onlybinaryincompatiblemodifications="false"
+	 onlyModifications="true"
+	 />
+```
+
+[melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
+
 ## Motivation
 
 Every time you release a new version of a library or a product, you have to tell your clients or customers what
@@ -96,8 +111,6 @@ in less than one second and therewith can be easily integrated in each build.
 * If a class is serializable, changes are evaluated regarding the [Java Object Serialization Specification](http://docs.oracle.com/javase/7/docs/platform/serialization/spec/serialTOC.html).
 * Per default synthetic classes and class members (e.g. [bridge methods](https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html)) are hidden. They can be listed by using the option `--include-synthetic`.
 * The maven plugin allows project-specific filtering and reports using a custom [Groovy](groovy-lang.org) script.
-
-[melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
 ## Downloads
 
