@@ -74,21 +74,36 @@ public class VersionChangeTest {
 		fail();
 	}
 
-	@Test
+	@Test(expected = JApiCmpException.class)
 	public void testMissingOldVersion() {
-		VersionChange vc = new VersionChange(Collections.singletonList(new SemanticVersion(1, 2, 3)), Collections.singletonList(new SemanticVersion(1, 2, 3)), true, false);
-		assertThat(vc.computeChangeType().get(), is(SemanticVersion.ChangeType.UNCHANGED));
+		VersionChange vc = new VersionChange(Collections.<SemanticVersion>emptyList(), Collections.singletonList(new SemanticVersion(1, 2, 3)), false, false);
+		vc.computeChangeType();
+		fail();
 	}
 
 	@Test
-	public void testMissingNewVersion() {
-		VersionChange vc = new VersionChange(Collections.singletonList(new SemanticVersion(1, 2, 3)), Collections.singletonList(new SemanticVersion(1, 2, 3)), false, true);
-		assertThat(vc.computeChangeType().get(), is(SemanticVersion.ChangeType.UNCHANGED));
-	}
-
-	@Test
-	public void testNoParameter() {
-		VersionChange vc = new VersionChange(new ArrayList<SemanticVersion>(), new ArrayList<SemanticVersion>(), false, false);
+	public void testIgnoreMissingOldVersion() {
+		VersionChange vc = new VersionChange(Collections.<SemanticVersion>emptyList(), Collections.singletonList(new SemanticVersion(1, 2, 3)), true, false);
 		assertThat(vc.computeChangeType().isPresent(), is(false));
+	}
+
+	@Test(expected = JApiCmpException.class)
+	public void testMissingNewVersion() {
+		VersionChange vc = new VersionChange(Collections.singletonList(new SemanticVersion(1, 2, 3)), Collections.<SemanticVersion>emptyList(), false, false);
+		vc.computeChangeType();
+		fail();
+	}
+
+	@Test
+	public void testIgnoreMissingNewVersion() {
+		VersionChange vc = new VersionChange(Collections.singletonList(new SemanticVersion(1, 2, 3)), Collections.<SemanticVersion>emptyList(), false, true);
+		assertThat(vc.computeChangeType().isPresent(), is(false));
+	}
+
+	@Test(expected = JApiCmpException.class)
+	public void testNoParameter() {
+		VersionChange vc = new VersionChange(Collections.<SemanticVersion>emptyList(), Collections.<SemanticVersion>emptyList(), false, false);
+		vc.computeChangeType();
+		fail();
 	}
 }

@@ -22,7 +22,7 @@ public class VersionChange {
 
 	public Optional<SemanticVersion.ChangeType> computeChangeType() throws JApiCmpException {
 		if (this.oldVersions.isEmpty()) {
-			if (ignoreMissingOldVersion) {
+			if (!ignoreMissingOldVersion) {
 				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, "Could not extract semantic version for at least one old version. Please " +
 					"follow the rules for semantic versioning.");
 			} else {
@@ -30,7 +30,7 @@ public class VersionChange {
 			}
 		}
 		if (this.newVersions.isEmpty()) {
-			if (ignoreMissingNewVersion) {
+			if (!ignoreMissingNewVersion) {
 				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, "Could not extract semantic version for at least one new version. Please " +
 					"follow the rules for semantic versioning.");
 			} else {
