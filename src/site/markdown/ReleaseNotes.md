@@ -34,7 +34,7 @@ Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22c
 ##0.9.2 (2016-11-07)##
 
 * Illegal characters are removed from filename of diff report. [#152](https://github.com/siom79/japicmp/issues/152)
-* If method is new, new checked exception is not considered as source incompatible. [#151](https://github.com/siom79/japicmp/issues/151) 
+* If method is new, new checked exception is not considered as source incompatible. [#151](https://github.com/siom79/japicmp/issues/151)
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.9.2%22).
 
@@ -101,7 +101,7 @@ Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22c
 * japicmp now also supports tracking of source incompatible changes. [#59](https://github.com/siom79/japicmp/issues/59)
 * The XML report now also outputs the reason for each change for better traceability. [#105](https://github.com/siom79/japicmp/issues/105)
 * The maven plugin comes now with the new option `breakBuildBasedOnSemanticVersioning` that breaks the build based on the version numbers of the old and new archive(s) assuming they are using semantic versioning. [#108](https://github.com/siom79/japicmp/issues/108)
-* The maven plugin now has a new option `packagingSupported` that lets you define for which packaging types the plugin shoule be invoked. This is useful when the plugin is defined in the root pom and should be executed for all submodules, but you want to exclude some of these submodules by packaging type. [#100](https://github.com/siom79/japicmp/pull/100)
+* The maven plugin now has a new option `packagingSupported` that lets you define for which packaging types the plugin should be invoked. This is useful when the plugin is defined in the root pom and should be executed for all submodules, but you want to exclude some of these submodules by packaging type. [#100](https://github.com/siom79/japicmp/pull/100)
 * Fixed NPE in JavadocLikePackageFilter when matching against classes in the default (empty) package. [#106](https://github.com/siom79/japicmp/pull/106)
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.7.0%22).
@@ -165,7 +165,7 @@ Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22c
 
 ##0.5.0 (2015-05-26)##
 
-* The parameters `--exclude` and `--include` have been extended such that next to packages now also classes, methods and fields can be excluded or only included. The syntax is similiar to the one used for javadoc references: `package.to.include;package.ClassToInclude;package.Class#methodToInclude();package.Class#fieldToInclude`. Please note that the separator char has changed from `,` to `;`. This was necessary as the `,` is now used to separate the arguments for a method in `package.Class#methodWithParams(long,int)` ([#51](https://github.com/siom79/japicmp/issues/51)).
+* The parameters `--exclude` and `--include` have been extended such that next to packages now also classes, methods and fields can be excluded or only included. The syntax is similar to the one used for javadoc references: `package.to.include;package.ClassToInclude;package.Class#methodToInclude();package.Class#fieldToInclude`. Please note that the separator char has changed from `,` to `;`. This was necessary as the `,` is now used to separate the arguments for a method in `package.Class#methodWithParams(long,int)` ([#51](https://github.com/siom79/japicmp/issues/51)).
 * Parameters classes for methods with the same name but different signatures are no longer resolved through the classpath ([#55](https://github.com/siom79/japicmp/issues/55)).
 
 Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.5.0%22).

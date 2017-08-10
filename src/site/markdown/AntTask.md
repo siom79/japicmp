@@ -24,39 +24,42 @@ The Ant task can be included in the build file of a project like shown in the fo
 	 newjar="${project.build.directory}/guava-19.0.jar"
 	 oldclasspathref="old.classpath"
 	 newclasspathref="new.classpath"
-	 onlybinaryincompatiblemodifications="false"
-	 onlyModifications="true"
+	 onlybinaryincompatible="false"
+	 onlymodifications="true"
 	 />
 ```
 
 First the new task japicmp is defined using the taskdef command. After this definition the japicmp task can be
 invoked like any other Ant task. The attribute `oldjar` specifies the old version of the jar archive while `newjar`
 defines the new one. `classpathref` lets you reference the classpath used by japicmp. If you only want to output
-binary incompatible changes, you cah set the attribute `onlybinaryincompatiblemodifications` to true.
+binary incompatible changes, you can set the attribute `onlybinaryincompatible` to true.
 
-##Advance Usage##
+##Advanced Usage##
 
 The following table gives an overview of all available parameters of the Ant task.
 
 | Parameter | Optional | Default | Description |
 |-----------|----------|---------|-------------|
-| oldjar 									| false | n.a.  | Provides the path to the old version(s) of the jar(s). Use ; to separate jar files. |
-| newjar 									| false | n.a.  | Provides the path to the new version(s) of the jar(s). Use ; to separate jar files. |
-| classpath 								| true  | n.a.  | Defines the classpath used to compare old and new version. |
-| onlyBinaryIncompatible 					| true  | false | If set to true, only binary incompatible changes are included. |
-| onlyModified 								| true  | false | Outputs only modified classes/methods. If not set to true, all classes and methods are printed.|
-| includeSynthetic 							| true  | false | If set to true, changes for synthetic classes and class members are tracked.|
-| noAnnotations 							| true  | false | Setting this option to true disables the evaluation of annotations completely.|
-| semanticVersioning 						| true  | false | Tells you which part of the version to increment. |
-| reportOnlyFilename 						| true  | false | Reports just filenames (not full paths) in report description. |
-| ignoreMissingClasses 						| true  | n.a.  | Ignores all superclasses/interfaces missing on the classpath. |
-| ignoreMissingClassesByRegularExpressions 	| true  | n.a.  | Ignores only those superclasses/interface missing on the classpath that are selected by a regular expression. |
-| accessModifier 							| true  | protected |  Sets the access modifier level (public, package, protected, private), which should be used.|      
-| oldClassPath 								| true  | n.a.  | The classpath for the old version. |
-| newClassPath 								| true  | n.a.  | The classpath for the new version. |
-| includes 									| true  | n.a.  | Semicolon separated list of elements to include in the form package.Class#classMember, * can be used as wildcard. Annotations are given as FQN starting with @. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.|
-| excludes 									| true  | n.a.  | Semicolon separated list of elements to exclude in the form package.Class#classMember, * can be used as wildcard. Annotations are given as FQN starting with @. Examples: mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.|    
-| xmlOutputFile 							| true  | n.a.  | Provides the path to the xml output file. |     
-| htmlOutputFile 							| true  | n.a.  | Provides the path to the html output file. |
-| htmlStylesheet 							| true  | n.a.  | Provides the path to your own stylesheet. |
+| oldjar 									| false | n.a.  | Path to the old version(s) of the jar(s). Use `;` as list separator. |
+| newjar 									| false | n.a.  | Path to the new version(s) of the jar(s). Use `;` as list separator. |
+| classpath 								| true  | n.a.  | Classpath for the dependencies used to compare old and new versions. |
+| classpathref 								| true  | n.a.  | Classpath reference for the dependencies used to compare old and new versions. |
+| onlyBinaryIncompatible 					| true  | false | If true, output only binary incompatible changes. |
+| onlyModified 								| true  | false | If true, output only modified classes/methods, else print all classes and methods.|
+| includeSynthetic 							| true  | false | If true, track changes for synthetic classes and class members.|
+| noAnnotations 							| true  | false | If true, disable the evaluation of annotations completely.|
+| semanticVersioning 						| true  | false | Indicate which part of the version to increment according to semantic versioning rules. |
+| reportOnlyFilename 						| true  | false | If true, report only filenames (not full paths). |
+| ignoreMissingClasses 						| true  | n.a.  | Ignore all superclasses/interfaces missing on the classpath. |
+| ignoreMissingClassesbyRegularExpressions	| true  | n.a.  | Ignore only those superclasses/interface missing on the classpath that are selected by a regular expression. |
+| accessModifier 							| true  | protected | Ignore changes below the access modifier level (public, package, protected, private).|
+| oldClassPath 								| true  | n.a.  | Classpath for the dependencies of the old version. |
+| newClassPath 								| true  | n.a.  | Classpath for the dependencies of the new version. |
+| oldClassPathRef 							| true  | n.a.  | Classpath reference for the dependencies of the old version. |
+| newClassPathRef 							| true  | n.a.  | Classpath reference for the dependencies of the new version. |
+| includes 									| true  | n.a.  | Semicolon separated list of elements to include in the form `package.Class#classMember`, `*` can be used as wildcard. Annotations are given as FQN starting with `@`. Examples: `mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation`.|
+| excludes 									| true  | n.a.  | Semicolon separated list of elements to exclude in the form `package.Class#classMember`, `*` can be used as wildcard. Annotations are given as FQN starting with `@`. Examples: `mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation`.|
+| xmlOutputFile 							| true  | n.a.  | Path to the xml output file. |
+| htmlOutputFile 							| true  | n.a.  | Path to the html output file. |
+| htmlStylesheet 							| true  | n.a.  | Path to your own stylesheet. |
 

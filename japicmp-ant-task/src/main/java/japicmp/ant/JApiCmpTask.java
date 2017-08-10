@@ -2,12 +2,9 @@ package japicmp.ant;
 
 import com.google.common.base.Optional;
 import japicmp.cli.JApiCli;
-import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.exception.JApiCmpException;
-import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
@@ -20,10 +17,11 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static japicmp.model.AccessModifier.toModifier;
 
 public class JApiCmpTask extends Task {
 	private boolean onlyBinaryIncompatible = false;
@@ -79,7 +77,7 @@ public class JApiCmpTask extends Task {
 		this.ignoreMissingClasses = Project.toBoolean(ignoreMissingClasses);
 	}
 
-	public void setIgnoreMissingClassesRegEx(String ignoreMissingClassesByRegularExpressions) {
+	public void setIgnoreMissingClassesByRegularExpressions(String ignoreMissingClassesByRegularExpressions) {
 		this.ignoreMissingClassesByRegularExpressions.addAll(Arrays.asList(ignoreMissingClassesByRegularExpressions.split("[,\\s]+")));
 	}
 
@@ -93,6 +91,19 @@ public class JApiCmpTask extends Task {
 
 	public void setNewJar(String newJar) {
 		this.newJar = newJar;
+	}
+
+	public void setOldClassPath(Path oldClassPath) {
+		this.oldClassPath = oldClassPath;
+	}
+
+	public void setNewClassPath(Path newClassPath) {
+		this.newClassPath = newClassPath;
+	}
+
+	public void setClassPath(Path classPath) {
+		oldClassPath = classPath;
+		newClassPath = classPath;
 	}
 
 	public Path getOldClassPath() {
@@ -109,15 +120,15 @@ public class JApiCmpTask extends Task {
 		return newClassPath;
 	}
 
-	public void setOldClassPath(Reference oldClassPathRef) {
+	public void setOldClassPathRef(Reference oldClassPathRef) {
 		getOldClassPath().setRefid(oldClassPathRef);
 	}
 
-	public void setNewClassPath(Reference newClassPathRef) {
+	public void setNewClassPathRef(Reference newClassPathRef) {
 		getNewClassPath().setRefid(newClassPathRef);
 	}
 
-	public void setClassPath(Reference classPathRef) {
+	public void setClassPathRef(Reference classPathRef) {
 		getOldClassPath().setRefid(classPathRef);
 		getNewClassPath().setRefid(classPathRef);
 	}
@@ -208,19 +219,5 @@ public class JApiCmpTask extends Task {
         } catch (Exception e) {
             throw new BuildException("Could not close output streams: " + e.getMessage(), e);
         }
-	}
-
-	private Optional<AccessModifier> toModifier(String accessModifierArg) {
-		Optional<String> stringOptional = Optional.fromNullable(accessModifierArg);
-		if (stringOptional.isPresent()) {
-			try {
-				return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
-			} catch (IllegalArgumentException e) {
-				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option accessModifier: %s. Possible values are: %s.",
-					accessModifierArg, AccessModifier.listOfAccessModifier()), e);
-			}
-		} else {
-			return Optional.of(AccessModifier.PROTECTED);
-		}
 	}
 }

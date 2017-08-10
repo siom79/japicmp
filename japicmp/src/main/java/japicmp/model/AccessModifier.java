@@ -1,5 +1,8 @@
 package japicmp.model;
 
+import com.google.common.base.Optional;
+import japicmp.exception.JApiCmpException;
+
 /**
  * Represents the access modifiers as defined in the Java Language Specification.
  */
@@ -27,5 +30,19 @@ public enum AccessModifier implements JApiModifierBase {
 			i++;
 		}
 		return sb.toString();
+	}
+
+	public static Optional<AccessModifier> toModifier(String accessModifierArg) {
+		Optional<String> stringOptional = Optional.fromNullable(accessModifierArg);
+		if (stringOptional.isPresent()) {
+			try {
+				return Optional.of(valueOf(stringOptional.get().toUpperCase()));
+			} catch (IllegalArgumentException e) {
+				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option accessModifier: %s. Possible values are: %s.",
+					accessModifierArg, listOfAccessModifier()), e);
+			}
+		} else {
+			return Optional.of(PROTECTED);
+		}
 	}
 }
