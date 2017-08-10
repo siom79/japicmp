@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>com.github.siom79.japicmp</groupId>
+		<artifactId>japicmp-testbase</artifactId>
+		<version>0.10.1-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>japicmp-test-ant-task</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-ant-task</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<classifier>jar-with-dependencies</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>japicmp-jar-with-dependencies.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-ant-task</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>japicmp-ant-task.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.guava</groupId>
+									<artifactId>guava</artifactId>
+									<version>18.0</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>guava-18.0.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.guava</groupId>
+									<artifactId>guava</artifactId>
+									<version>19.0</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>guava-19.0.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<phase>test </phase>
+						<configuration>
+							<target>
+
+								<path id="task.classpath">
+									<fileset file="${project.build.directory}/japicmp-jar-with-dependencies.jar"/>
+									<fileset file="${project.build.directory}/japicmp-ant-task.jar"/>
+								</path>
+								<path id="old.classpath">
+									<fileset file="${project.build.directory}/guava-18.0.jar"/>
+								</path>
+								<path id="new.classpath">
+									<fileset file="${project.build.directory}/guava-19.0.jar"/>
+								</path>
+
+								<taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
+								<japicmp oldjar="${project.build.directory}/guava-18.0.jar"
+										 newjar="${project.build.directory}/guava-19.0.jar"
+										 oldclasspath="old.classpath"
+										 newclasspath="new.classpath"
+										 onlyBinaryIncompatible="false"
+										 onlyModified="true"
+										 />
+
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -28,6 +28,7 @@
 			<item href="index.html" name="Introduction"/>
 			<item href="CliTool.html" name="Cli-Tool" />
 			<item href="MavenPlugin.html" name="Maven Plugin" />
+			<item href="AntTask.html" name="Ant Task" />
 			<item href="Examples.html" name="Examples" />
 			<item href="ReleaseNotes.html" name="Release Notes" />
 		</menu>

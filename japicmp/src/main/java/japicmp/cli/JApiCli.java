@@ -9,7 +9,6 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
-import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
@@ -21,6 +20,8 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static japicmp.model.AccessModifier.toModifier;
 
 public class JApiCli {
 	public static final String IGNORE_MISSING_CLASSES = "--ignore-missing-classes";
@@ -134,17 +135,6 @@ public class JApiCli {
 			return options;
 		}
 
-		private List<JApiCmpArchive> createFileList(String option) {
-			String[] parts = option.split(";");
-			List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>(parts.length);
-			for (String part : parts) {
-				File file = new File(part);
-				JApiCmpArchive jApiCmpArchive = new JApiCmpArchive(file, "n.a.");
-				jApiCmpArchives.add(jApiCmpArchive);
-			}
-			return jApiCmpArchives;
-		}
-
 		private <T> T checkNonNull(T in, String errorMessage) {
 			if (in == null) {
 				throw new JApiCmpException(JApiCmpException.Reason.CliError, errorMessage);
@@ -152,19 +142,16 @@ public class JApiCli {
 				return in;
 			}
 		}
+	}
 
-		private Optional<AccessModifier> toModifier(String accessModifierArg) {
-			Optional<String> stringOptional = Optional.fromNullable(accessModifierArg);
-			if (stringOptional.isPresent()) {
-				try {
-					return Optional.of(AccessModifier.valueOf(stringOptional.get().toUpperCase()));
-				} catch (IllegalArgumentException e) {
-					throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option -a: %s. Possible values are: %s.",
-						accessModifierArg, AccessModifier.listOfAccessModifier()), e);
-				}
-			} else {
-				return Optional.of(AccessModifier.PROTECTED);
-			}
+	public static List<JApiCmpArchive> createFileList(String option) {
+		String[] parts = option.split(";");
+		List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>(parts.length);
+		for (String part : parts) {
+			File file = new File(part);
+			JApiCmpArchive jApiCmpArchive = new JApiCmpArchive(file, "n.a.");
+			jApiCmpArchives.add(jApiCmpArchive);
 		}
+		return jApiCmpArchives;
 	}
 }

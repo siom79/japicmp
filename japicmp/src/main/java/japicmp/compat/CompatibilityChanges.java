@@ -178,7 +178,7 @@ public class CompatibilityChanges {
 				if (superclassJApiClassOptional.isPresent()) {
 					foundClass = superclassJApiClassOptional.get();
 				} else {
-					foundClass = loadClass(newSuperclassName);
+					foundClass = loadClass(newSuperclassName, EnumSet.of(Classpath.NEW_CLASSPATH));
 					evaluate(Collections.singletonList(foundClass));
 				}
 				classMap.put(foundClass.getFullyQualifiedName(), foundClass);
@@ -189,7 +189,12 @@ public class CompatibilityChanges {
 		}
 	}
 
-	private JApiClass loadClass(String newSuperclassName) {
+	private enum Classpath {
+		OLD_CLASSPATH,
+		NEW_CLASSPATH
+	}
+
+	private JApiClass loadClass(String newSuperclassName, EnumSet<Classpath> classpaths) {
 		JApiClass foundClass;
 		Optional<CtClass> oldClassOptional = Optional.absent();
 		Optional<CtClass> newClassOptional = Optional.absent();
@@ -211,20 +216,24 @@ public class CompatibilityChanges {
 				}
 			}
 		} else {
-			ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();
-			ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();
-			try {
-				oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
-			} catch (NotFoundException e) {
-				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
-					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+			if (classpaths.contains(Classpath.OLD_CLASSPATH)) {
+				ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();
+				try {
+					oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
+				} catch (NotFoundException e) {
+					if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
+						throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+					}
 				}
 			}
-			try {
-				newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
-			} catch (NotFoundException e) {
-				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
-					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+			if (classpaths.contains(Classpath.NEW_CLASSPATH)) {
+				ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();
+				try {
+					newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
+				} catch (NotFoundException e) {
+					if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
+						throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
+					}
 				}
 			}
 		}
@@ -618,7 +627,7 @@ public class CompatibilityChanges {
 			} else {
 				JApiClass interfaceClass = classMap.get(implementedInterface.getFullyQualifiedName());
 				if (interfaceClass == null) {
-					interfaceClass = loadClass(implementedInterface.getFullyQualifiedName());
+					interfaceClass = loadClass(implementedInterface.getFullyQualifiedName(), EnumSet.allOf(Classpath.class));
 				}
 				if (implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED || implementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 					implementedInterface.setJApiClass(interfaceClass);
@@ -721,7 +730,7 @@ public class CompatibilityChanges {
 				String fullyQualifiedName = jApiImplementedInterface.getFullyQualifiedName();
 				JApiClass foundClass = classMap.get(fullyQualifiedName);
 				if (foundClass == null) {
-					foundClass = loadClass(fullyQualifiedName);
+					foundClass = loadClass(fullyQualifiedName, EnumSet.allOf(Classpath.class));
 				}
 				for (JApiMethod method : foundClass.getMethods()) {
 					boolean isImplemented = false;
