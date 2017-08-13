@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 public class JApiCmpTaskTest {
 	@Rule
-	public BuildFileRule rule = new BuildFileRule();
+	public final BuildFileRule rule = new BuildFileRule();
 
 	@Before
 	public void setUp() {

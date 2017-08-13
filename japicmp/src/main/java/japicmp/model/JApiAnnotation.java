@@ -20,7 +20,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	private final Optional<Annotation> oldAnnotation;
 	private final Optional<Annotation> newAnnotation;
 	private final List<JApiAnnotationElement> elements = new LinkedList<>();
-	private JApiChangeStatus changeStatus;
+	private final JApiChangeStatus changeStatus;
 
 	public JApiAnnotation(String fullyQualifiedName, Optional<Annotation> oldAnnotation, Optional<Annotation> newAnnotation, JApiChangeStatus changeStatus) {
 		this.fullyQualifiedName = fullyQualifiedName;

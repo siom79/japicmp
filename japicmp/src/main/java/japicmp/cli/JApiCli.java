@@ -62,7 +62,7 @@ public class JApiCli {
 		@Option(name = { IGNORE_MISSING_CLASSES }, description = "Ignores all superclasses/interfaces missing on the classpath.")
 		public boolean ignoreMissingClasses = false;
 		@Option(name = {IGNORE_MISSING_CLASSES_BY_REGEX}, description = "Ignores only those superclasses/interface missing on the classpath that are selected by a regular expression.")
-		public List<String> ignoreMissingClassesByRegEx = new ArrayList<>();
+		public final List<String> ignoreMissingClassesByRegEx = new ArrayList<>();
 		@Option(name = { "--html-stylesheet" }, description = "Provides the path to your own stylesheet.")
 		public String pathToHtmlStylesheet;
 		@Option(name = { OLD_CLASSPATH }, description = "The classpath for the old version.")

@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class ClassesComparator {
 	private List<JApiClass> classes = new LinkedList<>();
-	private JarArchiveComparator jarArchiveComparator;
+	private final JarArchiveComparator jarArchiveComparator;
 	private final JarArchiveComparatorOptions options;
 
 	public ClassesComparator(JarArchiveComparator jarArchiveComparator, JarArchiveComparatorOptions options) {

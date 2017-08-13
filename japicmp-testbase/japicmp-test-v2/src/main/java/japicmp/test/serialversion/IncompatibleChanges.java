@@ -48,7 +48,7 @@ public class IncompatibleChanges {
 		}
 	}
 
-	public static enum NonEnumToEnum implements Serializable {
+	public enum NonEnumToEnum implements Serializable {
 
 	}
 

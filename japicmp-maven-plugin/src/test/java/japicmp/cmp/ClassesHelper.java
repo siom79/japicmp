@@ -17,8 +17,8 @@ public class ClassesHelper {
 	}
 
 	public static class CompareClassesResult {
-		List<JApiClass> jApiClasses;
-		JarArchiveComparator jarArchiveComparator;
+		final List<JApiClass> jApiClasses;
+		final JarArchiveComparator jarArchiveComparator;
 
 		public CompareClassesResult(List<JApiClass> jApiClasses, JarArchiveComparator jarArchiveComparator) {
 			this.jApiClasses = jApiClasses;

@@ -164,7 +164,7 @@ public class Annotations {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.TYPE})
-	public static @interface InnerInnerAnnotation {
+	public @interface InnerInnerAnnotation {
 		int[] innerInner();
 
 		int number();
@@ -172,13 +172,13 @@ public class Annotations {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.TYPE})
-	public static @interface InnerAnnotation2 {
+	public @interface InnerAnnotation2 {
 		InnerInnerAnnotation[] inner();
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.TYPE})
-	public static @interface OuterAnnotation2 {
+	public @interface OuterAnnotation2 {
 		InnerAnnotation2[] outer();
 	}
 

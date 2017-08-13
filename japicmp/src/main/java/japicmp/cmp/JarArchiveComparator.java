@@ -41,7 +41,7 @@ public class JarArchiveComparator {
 	private String commonClassPathAsString = "";
 	private String oldClassPathAsString = "";
 	private String newClassPathAsString = "";
-	private JarArchiveComparatorOptions options;
+	private final JarArchiveComparatorOptions options;
 
 	/**
 	 * Constructs an instance of this class and performs a setup of the classpath

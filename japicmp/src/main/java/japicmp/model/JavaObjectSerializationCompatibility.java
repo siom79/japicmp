@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 
 public class JavaObjectSerializationCompatibility {
 	private static final Logger LOGGER = Logger.getLogger(JavaObjectSerializationCompatibility.class.getName());
-	public static final String SERIAL_VERSION_UID = "serialVersionUID";
+	private static final String SERIAL_VERSION_UID = "serialVersionUID";
 
 	public static JApiSerialVersionUid extractSerialVersionUid(JarArchiveComparatorOptions options, JarArchiveComparator jarArchiveComparator, Optional<CtClass> oldClass, Optional<CtClass> newClass) {
 		SerialVersionUidResult resultOld = computeSerialVersionUid(options, oldClass, jarArchiveComparator);

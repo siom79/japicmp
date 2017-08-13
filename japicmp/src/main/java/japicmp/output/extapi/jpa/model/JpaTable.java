@@ -19,7 +19,7 @@ public class JpaTable {
 	private final List<JpaAttribute> attributes = new LinkedList<>();
 	private final JApiClass jApiClass;
 	private final JpaName jpaName;
-	private JApiChangeStatus changeStatus;
+	private final JApiChangeStatus changeStatus;
 
 	public JpaTable(JApiClass jApiClass, JApiAnnotation entityAnnotation) {
 		this.jApiClass = jApiClass;

@@ -7,7 +7,7 @@ import javassist.CtClass;
 
 public class CtInterfaceBuilder {
 	private String name = "japicmp.Test";
-	protected Optional<CtClass> superInterfaceOptional = Optional.absent();
+	private Optional<CtClass> superInterfaceOptional = Optional.absent();
 
 	public CtInterfaceBuilder name(String name) {
 		this.name = name;

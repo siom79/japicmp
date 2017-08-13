@@ -39,7 +39,7 @@ public class Options {
 	private List<Filter> includes = new ArrayList<>();
 	private List<Filter> excludes = new ArrayList<>();
 	private boolean includeSynthetic = false;
-	private IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();
+	private final IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();
 	private Optional<String> htmlStylesheet = Optional.absent();
 	private Optional<String> oldClassPath = Optional.absent();
 	private Optional<String> newClassPath = Optional.absent();
