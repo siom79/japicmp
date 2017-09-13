@@ -189,6 +189,9 @@ public class JApiCmpMojo extends AbstractMojo {
 		VersionRange versionRange;
 		try {
 			versionRange = VersionRange.createFromVersionSpec(mavenParameters.getVersionRangeWithProjectVersion());
+			if (pluginParameters.getParameterParam().isUseSemanticVersioningOrderingToResolvePreviousVersion()) {
+				versionRange = SemanticVersionRange.getFromExistingVersionRange(versionRange);
+			}
 		} catch (InvalidVersionSpecificationException e) {
 			throw new MojoFailureException("Invalid version versionRange: " + e.getMessage(), e);
 		}
