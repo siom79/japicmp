@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CtMethodBuilder extends CtBehaviorBuilder {
-	public static final String DEFAULT_METHOD_NAME = "method";
-	protected String body = "return null;";
+	private static final String DEFAULT_METHOD_NAME = "method";
+	private String body = "return null;";
 	private String name = DEFAULT_METHOD_NAME;
 	private CtClass returnType;
-	private List<String> annotations = new ArrayList<>();
+	private final List<String> annotations = new ArrayList<>();
 
 	public CtMethodBuilder name(String name) {
 		this.name = name;
@@ -104,7 +104,6 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 	}
 
 	public static CtMethodBuilder create() {
-		CtMethodBuilder ctMethodBuilder = new CtMethodBuilder();
-		return ctMethodBuilder;
+		return new CtMethodBuilder();
 	}
 }

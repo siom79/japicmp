@@ -2,10 +2,22 @@ package japicmp.output;
 
 import com.google.common.collect.ImmutableList;
 import japicmp.config.Options;
-import japicmp.model.*;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
+import japicmp.model.JApiHasAnnotations;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
 import japicmp.util.ModifierHelper;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 public class OutputFilter extends Filter {
 	private final Options options;
@@ -186,7 +198,7 @@ public class OutputFilter extends Filter {
 
 			private ImmutableList<Boolean> findOneChangedElement(JApiClass jApiClass) {
 				final ImmutableList.Builder<Boolean> builder = ImmutableList.builder();
-				Filter.filter(Arrays.asList(jApiClass), new FilterVisitor() {
+				Filter.filter(Collections.singletonList(jApiClass), new FilterVisitor() {
 					@Override
 					public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
 						evaluateAnnotations(jApiClass);

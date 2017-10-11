@@ -1,6 +1,11 @@
 package japicmp.cmp;
 
-import japicmp.filter.*;
+import japicmp.filter.AnnotationBehaviorFilter;
+import japicmp.filter.AnnotationClassFilter;
+import japicmp.filter.AnnotationFieldFilter;
+import japicmp.filter.JavaDocLikeClassFilter;
+import japicmp.filter.JavadocLikeBehaviorFilter;
+import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
@@ -20,7 +25,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static japicmp.util.Helper.*;
+import static japicmp.util.Helper.getJApiClass;
+import static japicmp.util.Helper.getJApiField;
+import static japicmp.util.Helper.getJApiMethod;
+import static japicmp.util.Helper.hasJApiFieldWithName;
+import static japicmp.util.Helper.hasJApiMethodWithName;
+import static japicmp.util.Helper.hasNoJApiFieldWithName;
+import static japicmp.util.Helper.hasNoJApiMethodWithName;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;

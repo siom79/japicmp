@@ -12,7 +12,9 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.*;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiClass;
+import static japicmp.test.util.Helper.getJApiField;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -46,12 +48,12 @@ public class FieldsTest {
 	}
 
 	@Test
-	public void testPrivateToPackageProctedField() {
+	public void testPrivateToPackageProtectedField() {
 		JApiClass fieldsClass = getJApiClass(jApiClasses, Fields.class.getName());
 		assertThat(fieldsClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProctedField").getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProctedField").getAccessModifier().getOldModifier(), is(Optional.of(AccessModifier.PRIVATE)));
-		assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProctedField").getAccessModifier().getNewModifier(), is(Optional.of(AccessModifier.PACKAGE_PROTECTED)));
+		assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProtectedField").getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProtectedField").getAccessModifier().getOldModifier(), is(Optional.of(AccessModifier.PRIVATE)));
+		assertThat(getJApiField(fieldsClass.getFields(), "privateToPackageProtectedField").getAccessModifier().getNewModifier(), is(Optional.of(AccessModifier.PACKAGE_PROTECTED)));
 	}
 
 	@Test

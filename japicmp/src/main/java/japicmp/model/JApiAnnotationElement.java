@@ -116,10 +116,7 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibi
 		if (this.oldValue.isPresent()) {
 			JApiAnnotationElementValue memberValue = getMemberValue(this.oldValue.get());
 			if (memberValue.getType() == JApiAnnotationElementValue.Type.Array) {
-				List<JApiAnnotationElementValue> multiValues = memberValue.getValues();
-				for (JApiAnnotationElementValue multiValue : multiValues) {
-					values.add(multiValue);
-				}
+				values.addAll(memberValue.getValues());
 			} else {
 				values.add(memberValue);
 			}
@@ -134,10 +131,7 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibi
 		if (this.newValue.isPresent()) {
 			JApiAnnotationElementValue memberValue = getMemberValue(this.newValue.get());
 			if (memberValue.getType() == JApiAnnotationElementValue.Type.Array) {
-				List<JApiAnnotationElementValue> multiValues = memberValue.getValues();
-				for (JApiAnnotationElementValue multiValue : multiValues) {
-					values.add(multiValue);
-				}
+				values.addAll(memberValue.getValues());
 			} else {
 				values.add(memberValue);
 			}
@@ -157,7 +151,7 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibi
 
 	@XmlElementWrapper(name = "compatibilityChanges")
 	@XmlElement(name = "compatibilityChange")
-	public List getCompatibilityChanges() {
-		return Collections.EMPTY_LIST;
+	public List<JApiCompatibilityChange> getCompatibilityChanges() {
+		return Collections.emptyList();
 	}
 }

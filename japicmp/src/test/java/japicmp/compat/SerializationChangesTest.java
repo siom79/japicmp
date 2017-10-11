@@ -2,7 +2,10 @@ package japicmp.compat;
 
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.model.*;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiClassType;
+import japicmp.model.JApiJavaObjectSerializationCompatibility;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
@@ -11,13 +14,10 @@ import javassist.CtClass;
 import org.junit.Test;
 
 import java.io.Serializable;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -236,6 +236,6 @@ public class SerializationChangesTest {
 		assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
 		assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
 		assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MACHTES_NEW_DEFAULT));
+		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MATCHES_NEW_DEFAULT));
 	}
 }

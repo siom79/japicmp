@@ -31,7 +31,7 @@ public class JApiCmpTask extends Task {
 	private boolean semanticVersioning = false;
 	private boolean reportOnlyFilename = false;
 	private boolean ignoreMissingClasses = false;
-	private List<String> ignoreMissingClassesByRegularExpressions = new ArrayList<>();
+	private final List<String> ignoreMissingClassesByRegularExpressions = new ArrayList<>();
 	private String accessModifier = "protected";
 	private String semanticVersionProperty;
 	private String oldJar;

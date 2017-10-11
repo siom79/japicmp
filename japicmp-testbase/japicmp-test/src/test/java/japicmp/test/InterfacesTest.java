@@ -12,11 +12,16 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.util.List;
 
-import static japicmp.test.util.Helper.*;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiClass;
+import static japicmp.test.util.Helper.getJApiField;
+import static japicmp.test.util.Helper.getJApiImplementedInterface;
+import static japicmp.test.util.Helper.getJApiMethod;
+import static japicmp.test.util.Helper.replaceLastDotWith$;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class IntefacesTest {
+public class InterfacesTest {
 	private static List<JApiClass> jApiClasses;
 
 	@BeforeClass
@@ -100,7 +105,7 @@ public class IntefacesTest {
 	}
 
 	@Test
-	public void testIntefaceMethodAdded() {
+	public void testInterfaceMethodAdded() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.test.Interfaces$InterfaceAddMethod");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));

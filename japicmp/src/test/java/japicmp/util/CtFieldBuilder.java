@@ -4,7 +4,9 @@ import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.Modifier;
-import javassist.bytecode.*;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ public class CtFieldBuilder {
 	private CtClass type = CtClass.intType;
 	private String name = DEFAULT_FIELD_NAME;
 	private int modifier = Modifier.PUBLIC;
-	private List<String> annotations = new ArrayList<>();
+	private final List<String> annotations = new ArrayList<>();
 	private Object constantValue = null;
 
 	public CtFieldBuilder type(CtClass ctClass) {

@@ -16,7 +16,6 @@ import japicmp.output.xml.model.JApiCmpXmlRoot;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
