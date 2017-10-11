@@ -2,12 +2,21 @@ package japicmp.compat;
 
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.model.*;
-import japicmp.util.*;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
+import japicmp.util.CtClassBuilder;
+import japicmp.util.CtConstructorBuilder;
+import japicmp.util.CtFieldBuilder;
+import japicmp.util.CtInterfaceBuilder;
+import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.Modifier;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -15,7 +24,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static japicmp.util.Helper.*;
+import static japicmp.util.Helper.getJApiClass;
+import static japicmp.util.Helper.getJApiConstructor;
+import static japicmp.util.Helper.getJApiField;
+import static japicmp.util.Helper.getJApiMethod;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

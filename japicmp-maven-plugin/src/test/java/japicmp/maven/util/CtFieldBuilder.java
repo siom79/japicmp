@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CtFieldBuilder {
-	public static final String DEFAULT_FIELD_NAME = "field";
+	private static final String DEFAULT_FIELD_NAME = "field";
 	private CtClass type = CtClass.intType;
 	private String name = DEFAULT_FIELD_NAME;
 	private int modifier = Modifier.PUBLIC;
-	private List<String> annotations = new ArrayList<>();
+	private final List<String> annotations = new ArrayList<>();
 	private Object constantValue = null;
 
 	public CtFieldBuilder type(CtClass ctClass) {

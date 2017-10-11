@@ -12,7 +12,6 @@ import japicmp.output.semver.SemverOut;
 import japicmp.test.util.Helper;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 

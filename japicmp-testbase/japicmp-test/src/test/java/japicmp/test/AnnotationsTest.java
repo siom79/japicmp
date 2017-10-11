@@ -2,13 +2,21 @@ package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.model.*;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiAnnotationElement;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiField;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.*;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiAnnotation;
+import static japicmp.test.util.Helper.getJApiAnnotationElement;
+import static japicmp.test.util.Helper.getJApiClass;
+import static japicmp.test.util.Helper.getJApiField;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 

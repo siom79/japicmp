@@ -2,7 +2,17 @@ package japicmp.output.semver;
 
 import com.google.common.collect.ImmutableSet;
 import japicmp.config.Options;
-import japicmp.model.*;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibility;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
+import japicmp.model.JApiHasAccessModifier;
+import japicmp.model.JApiHasChangeStatus;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
 import japicmp.output.Filter;
 import japicmp.output.OutputGenerator;
 
@@ -13,7 +23,7 @@ import static japicmp.util.ModifierHelper.isNotPrivate;
 
 public class SemverOut extends OutputGenerator<String> {
 	private enum SemverStatus {
-		UNCHANGED, CHANGED_BINARY_COMPATIBLE, CHANGED_BINARY_INCOMPATIBLE;
+		UNCHANGED, CHANGED_BINARY_COMPATIBLE, CHANGED_BINARY_INCOMPATIBLE
 	}
 
 	public SemverOut(Options options, List<JApiClass> jApiClasses) {

@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
-import static japicmp.util.Helper.getJApiImplementedInterface;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -51,7 +50,7 @@ public class SuperclassTest {
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				return Collections.EMPTY_LIST;
+				return Collections.emptyList();
 			}
 
 			@Override
@@ -85,7 +84,7 @@ public class SuperclassTest {
 
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				return Collections.EMPTY_LIST;
+				return Collections.emptyList();
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");

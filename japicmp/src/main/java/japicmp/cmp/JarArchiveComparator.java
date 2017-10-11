@@ -18,7 +18,11 @@ import javassist.NotFoundException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -37,7 +41,7 @@ public class JarArchiveComparator {
 	private String commonClassPathAsString = "";
 	private String oldClassPathAsString = "";
 	private String newClassPathAsString = "";
-	private JarArchiveComparatorOptions options;
+	private final JarArchiveComparatorOptions options;
 
 	/**
 	 * Constructs an instance of this class and performs a setup of the classpath
@@ -107,19 +111,19 @@ public class JarArchiveComparator {
 	}
 
 	private String appendUserDefinedClassPathEntries(ClassPool classPool, List<String> classPathEntries) {
-		String classPathAsString = "";
+		StringBuilder classPathAsString = new StringBuilder();
 		for (String classPathEntry : classPathEntries) {
 			try {
 				classPool.appendClassPath(classPathEntry);
-				if (!classPathAsString.endsWith(File.pathSeparator)) {
-					classPathAsString += File.pathSeparator;
+				if (!classPathAsString.toString().endsWith(File.pathSeparator)) {
+					classPathAsString.append(File.pathSeparator);
 				}
-				classPathAsString += classPathEntry;
+				classPathAsString.append(classPathEntry);
 			} catch (NotFoundException e) {
 				throw JApiCmpException.forClassLoading(e, classPathEntry, this);
 			}
 		}
-		return classPathAsString;
+		return classPathAsString.toString();
 	}
 
 	/**

@@ -4,8 +4,40 @@ import japicmp.util.Optional;
 import japicmp.cli.CliParser;
 import japicmp.cli.JApiCli;
 import japicmp.config.Options;
-import japicmp.model.*;
+import japicmp.model.AbstractModifier;
+import japicmp.model.AccessModifier;
+import japicmp.model.BridgeModifier;
+import japicmp.model.FinalModifier;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiAnnotationElement;
+import japicmp.model.JApiAnnotationElementValue;
 import japicmp.model.JApiAnnotationElementValue.Type;
+import japicmp.model.JApiBehavior;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiClassFileFormatVersion;
+import japicmp.model.JApiClassType;
+import japicmp.model.JApiCompatibility;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiException;
+import japicmp.model.JApiField;
+import japicmp.model.JApiHasAbstractModifier;
+import japicmp.model.JApiHasAccessModifier;
+import japicmp.model.JApiHasAnnotations;
+import japicmp.model.JApiHasBridgeModifier;
+import japicmp.model.JApiHasChangeStatus;
+import japicmp.model.JApiHasFinalModifier;
+import japicmp.model.JApiHasStaticModifier;
+import japicmp.model.JApiHasSyntheticModifier;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiModifier;
+import japicmp.model.JApiParameter;
+import japicmp.model.JApiReturnType;
+import japicmp.model.JApiSuperclass;
+import japicmp.model.JApiType;
+import japicmp.model.StaticModifier;
+import japicmp.model.SyntheticModifier;
 import japicmp.output.OutputFilter;
 import japicmp.output.OutputGenerator;
 import javassist.bytecode.annotation.MemberValue;
@@ -27,11 +59,12 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		StringBuilder sb = new StringBuilder();
 		sb.append(options.getDifferenceDescription()).append('\n');
 		if (options.getIgnoreMissingClasses().isIgnoreAllMissingClasses()) {
-			sb.append(WARNING + ": You are using the option '" + CliParser.IGNORE_MISSING_CLASSES + "', i.e. superclasses and interfaces that could not " +
-				"be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
+			sb.append(WARNING).append(": You are using the option '").append(JApiCli.IGNORE_MISSING_CLASSES)
+				.append("', i.e. superclasses and interfaces that could not be found on the classpath are ignored.")
+				.append(" Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
 		} else if (options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression().size() > 0) {
-			sb.append(WARNING + ": You have ignored certain classes, i.e. superclasses and interfaces that could not " +
-				"be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
+			sb.append(WARNING).append(": You have ignored certain classes, i.e. superclasses and interfaces that could not ")
+				.append("be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
 		}
 		if (jApiClasses.size() > 0) {
 			for (JApiClass jApiClass : jApiClasses) {
@@ -160,27 +193,27 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	}
 
 	private void appendAnnotation(StringBuilder sb, String signs, JApiAnnotation jApiAnnotation, int numberOfTabs) {
-		sb.append(tabs(numberOfTabs) + signs + " " + jApiAnnotation.getChangeStatus() + " ANNOTATION: " + jApiAnnotation.getFullyQualifiedName() + "\n");
+		sb.append(String.format("%s%s %s ANNOTATION: %s\n", tabs(numberOfTabs), signs, jApiAnnotation.getChangeStatus(), jApiAnnotation.getFullyQualifiedName()));
 	}
 
 	private void appendAnnotationElement(StringBuilder sb, String signs, JApiAnnotationElement jApiAnnotationElement, int numberOfTabs) {
-		sb.append(tabs(numberOfTabs) + signs + " " + jApiAnnotationElement.getChangeStatus() + " ELEMENT: " + jApiAnnotationElement.getName() + "=");
+		sb.append(String.format("%s%s %s ELEMENT: %s=", tabs(numberOfTabs), signs, jApiAnnotationElement.getChangeStatus(), jApiAnnotationElement.getName()));
 		Optional<MemberValue> oldValue = jApiAnnotationElement.getOldValue();
 		Optional<MemberValue> newValue = jApiAnnotationElement.getNewValue();
 		if (oldValue.isPresent() && newValue.isPresent()) {
 			if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 				sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()));
 			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				sb.append(elementValueList2String(jApiAnnotationElement.getOldElementValues()) + " (-)");
+				sb.append(String.format("%s (-)", elementValueList2String(jApiAnnotationElement.getOldElementValues())));
 			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.NEW) {
-				sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()) + " (+)");
+				sb.append(String.format("%s (+)", elementValueList2String(jApiAnnotationElement.getNewElementValues())));
 			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()) + " (<- " + elementValueList2String(jApiAnnotationElement.getOldElementValues()) + ")");
+				sb.append(String.format("%s (<- %s)", elementValueList2String(jApiAnnotationElement.getNewElementValues()), elementValueList2String(jApiAnnotationElement.getOldElementValues())));
 			}
 		} else if (!oldValue.isPresent() && newValue.isPresent()) {
-			sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()) + " (+)");
+			sb.append(String.format("%s (+)", elementValueList2String(jApiAnnotationElement.getNewElementValues())));
 		} else if (oldValue.isPresent() && !newValue.isPresent()) {
-			sb.append(elementValueList2String(jApiAnnotationElement.getOldElementValues()) + " (-)");
+			sb.append(String.format("%s (-)", elementValueList2String(jApiAnnotationElement.getOldElementValues())));
 		} else {
 			sb.append(" n.a.");
 		}
@@ -194,19 +227,19 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 				sb.append(",");
 			}
 			if (value.getName().isPresent()) {
-				sb.append(value.getName().get() + "=");
+				sb.append(value.getName().get()).append("=");
 			}
 			if (value.getType() != Type.Array && value.getType() != Type.Annotation) {
 				if (value.getType() == Type.Enum) {
-					sb.append(value.getFullyQualifiedName() + "." + value.getValueString());
+					sb.append(value.getFullyQualifiedName()).append(".").append(value.getValueString());
 				} else {
 					sb.append(value.getValueString());
 				}
 			} else {
 				if (value.getType() == Type.Array) {
-					sb.append("{" + elementValueList2String(value.getValues()) + "}");
+					sb.append("{").append(elementValueList2String(value.getValues())).append("}");
 				} else if (value.getType() == Type.Annotation) {
-					sb.append("@" + value.getFullyQualifiedName() + "(" + elementValueList2String(value.getValues()) + ")");
+					sb.append("@").append(value.getFullyQualifiedName()).append("(").append(elementValueList2String(value.getValues())).append(")");
 				}
 			}
 		}
@@ -230,8 +263,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	}
 
 	private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
-		sb.append(signs + " " + jApiClass.getChangeStatus() + " " + processClassType(jApiClass) + ": " + accessModifierAsString(jApiClass) + abstractModifierAsString(jApiClass)
-			+ staticModifierAsString(jApiClass) + finalModifierAsString(jApiClass) + syntheticModifierAsString(jApiClass) + jApiClass.getFullyQualifiedName() + " " + javaObjectSerializationStatus(jApiClass) + "\n");
+		sb.append(signs).append(" ").append(jApiClass.getChangeStatus()).append(" ").append(processClassType(jApiClass)).append(": ").append(accessModifierAsString(jApiClass)).append(abstractModifierAsString(jApiClass)).append(staticModifierAsString(jApiClass)).append(finalModifierAsString(jApiClass)).append(syntheticModifierAsString(jApiClass)).append(jApiClass.getFullyQualifiedName()).append(" ").append(javaObjectSerializationStatus(jApiClass)).append("\n");
 		processClassFileFormatVersionChanges(sb, jApiClass);
 		processInterfaceChanges(sb, jApiClass);
 		processSuperclassChanges(sb, jApiClass);
@@ -362,7 +394,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
 		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
 		if (options.isOutputOnlyModifications() && jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-			sb.append(tabs(1) + signs(jApiSuperclass) + " " + jApiSuperclass.getChangeStatus() + " SUPERCLASS: " + superclassChangeAsString(jApiSuperclass) + "\n");
+			sb.append(tabs(1)).append(signs(jApiSuperclass)).append(" ").append(jApiSuperclass.getChangeStatus()).append(" SUPERCLASS: ").append(superclassChangeAsString(jApiSuperclass)).append("\n");
 		}
 	}
 
@@ -380,7 +412,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	private void processInterfaceChanges(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiImplementedInterface> interfaces = jApiClass.getInterfaces();
 		for (JApiImplementedInterface implementedInterface : interfaces) {
-			sb.append(tabs(1) + signs(implementedInterface) + " " + implementedInterface.getChangeStatus() + " INTERFACE: " + implementedInterface.getFullyQualifiedName() + "\n");
+			sb.append(tabs(1)).append(signs(implementedInterface)).append(" ").append(implementedInterface.getChangeStatus()).append(" INTERFACE: ").append(implementedInterface.getFullyQualifiedName()).append("\n");
 		}
 	}
 }

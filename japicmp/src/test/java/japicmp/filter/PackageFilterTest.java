@@ -4,7 +4,6 @@ import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
-import japicmp.util.CtFieldBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.junit.Test;

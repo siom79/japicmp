@@ -16,9 +16,9 @@ public class CtClassBuilder {
 	public static final String DEFAULT_CLASS_NAME = "japicmp.Test";
 	private String name = DEFAULT_CLASS_NAME;
 	private int modifier = Modifier.PUBLIC;
-	private List<String> annotations = new ArrayList<>();
+	private final List<String> annotations = new ArrayList<>();
 	private Optional<CtClass> superclass = Optional.absent();
-	private List<CtClass> interfaces = new ArrayList<>();
+	private final List<CtClass> interfaces = new ArrayList<>();
 
 	public CtClassBuilder name(String name) {
 		this.name = name;

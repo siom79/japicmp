@@ -1,6 +1,10 @@
 package japicmp.cmp;
 
-import japicmp.model.*;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiReturnType;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;

@@ -1,7 +1,6 @@
 package japicmp.maven;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-import japicmp.util.Optional;
+import com.google.common.base.Optional;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -13,6 +12,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -25,7 +25,7 @@ public class SkipModuleStrategyTest {
 		PluginParameters pluginParameters = createPluginParameters();
 		MavenParameters mavenParameters = createMavenParameters();
 		mavenParameters.getMavenProject().setArtifactId("name-to-exclude");
-		pluginParameters.getParameterParam().setExcludeModules(Arrays.asList(new String[]{".*excl.*"}));
+		pluginParameters.getParameterParam().setExcludeModules(Collections.singletonList(".*excl.*"));
 		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
 		assertThat(skipModuleStrategy.skip(), is(true));
 	}
@@ -35,7 +35,7 @@ public class SkipModuleStrategyTest {
 		PluginParameters pluginParameters = createPluginParameters();
 		MavenParameters mavenParameters = createMavenParameters();
 		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		pluginParameters.getParameterParam().setIncludeModules(Arrays.asList(new String[]{".*incl.*"}));
+		pluginParameters.getParameterParam().setIncludeModules(Collections.singletonList(".*incl.*"));
 		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
 		assertThat(skipModuleStrategy.skip(), is(false));
 	}
@@ -45,7 +45,7 @@ public class SkipModuleStrategyTest {
 		PluginParameters pluginParameters = createPluginParameters();
 		MavenParameters mavenParameters = createMavenParameters();
 		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		pluginParameters.getParameterParam().setExcludeModules(Arrays.asList(new String[]{".*excl.*"}));
+		pluginParameters.getParameterParam().setExcludeModules(Collections.singletonList(".*excl.*"));
 		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
 		assertThat(skipModuleStrategy.skip(), is(false));
 	}
@@ -55,8 +55,8 @@ public class SkipModuleStrategyTest {
 		PluginParameters pluginParameters = createPluginParameters();
 		MavenParameters mavenParameters = createMavenParameters();
 		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		pluginParameters.getParameterParam().setExcludeModules(Arrays.asList(new String[]{".*incl.*"}));
-		pluginParameters.getParameterParam().setIncludeModules(Arrays.asList(new String[]{".*incl.*"}));
+		pluginParameters.getParameterParam().setExcludeModules(Collections.singletonList(".*incl.*"));
+		pluginParameters.getParameterParam().setIncludeModules(Collections.singletonList(".*incl.*"));
 		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
 		assertThat(skipModuleStrategy.skip(), is(true));
 	}
@@ -75,7 +75,7 @@ public class SkipModuleStrategyTest {
 		PluginParameters pluginParameters = createPluginParameters();
 		MavenParameters mavenParameters = createMavenParameters();
 		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		pluginParameters.getParameterParam().setIncludeModules(Arrays.asList(new String[]{".*test.*"}));
+		pluginParameters.getParameterParam().setIncludeModules(Collections.singletonList(".*test.*"));
 		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
 		assertThat(skipModuleStrategy.skip(), is(true));
 	}

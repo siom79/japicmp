@@ -93,10 +93,7 @@ public class AnnotationHelper {
 
 	public static boolean hasAnnotation(ClassFile classFile, String annotationClassName) {
 		List attributes = classFile.getAttributes();
-		if (hasAnnotation(attributes, annotationClassName)) {
-			return true;
-		}
-		return false;
+		return hasAnnotation(attributes, annotationClassName);
 	}
 
 	public static boolean hasAnnotation(List attributes, String annotationClassName) {

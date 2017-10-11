@@ -6,12 +6,17 @@ import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiMethod;
+import japicmp.test.util.Helper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.*;
+import static japicmp.test.util.Helper.assertThatExceptionIsThrown;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiClass;
+import static japicmp.test.util.Helper.getJApiField;
+import static japicmp.test.util.Helper.getJApiMethod;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -65,7 +70,7 @@ public class AccessModifierLevelTest {
 		assertThat(getJApiField(jApiClass.getFields(), "fieldRemainsPackageProtected").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiField(jApiClass.getFields(), "fieldRemainsProtected").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiField(jApiClass.getFields(), "fieldRemainsPublic").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThatExceptionIsThrown(new SimpleExceptionVerifier() {
+		assertThatExceptionIsThrown(new Helper.SimpleExceptionVerifier() {
 			@Override
 			public void execute() {
 				getJApiField(jApiClass.getFields(), "fieldRemainsPrivate");
@@ -83,13 +88,13 @@ public class AccessModifierLevelTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiField(jApiClass.getFields(), "fieldRemainsProtected").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiField(jApiClass.getFields(), "fieldRemainsPublic").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThatExceptionIsThrown(new SimpleExceptionVerifier() {
+		assertThatExceptionIsThrown(new Helper.SimpleExceptionVerifier() {
 			@Override
 			public void execute() {
 				getJApiField(jApiClass.getFields(), "fieldRemainsPrivate");
 			}
 		}, IllegalArgumentException.class);
-		assertThatExceptionIsThrown(new SimpleExceptionVerifier() {
+		assertThatExceptionIsThrown(new Helper.SimpleExceptionVerifier() {
 			@Override
 			public void execute() {
 				getJApiField(jApiClass.getFields(), "fieldRemainsPackageProtected");
@@ -106,19 +111,19 @@ public class AccessModifierLevelTest {
 		final JApiClass jApiClass = getJApiClass(jApiClasses, AccessModifierLevel.AccessModifierNotChangesForPrivate.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiField(jApiClass.getFields(), "fieldRemainsPublic").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThatExceptionIsThrown(new SimpleExceptionVerifier() {
+		assertThatExceptionIsThrown(new Helper.SimpleExceptionVerifier() {
 			@Override
 			public void execute() {
 				getJApiField(jApiClass.getFields(), "fieldRemainsPrivate");
 			}
 		}, IllegalArgumentException.class);
-		assertThatExceptionIsThrown(new SimpleExceptionVerifier() {
+		assertThatExceptionIsThrown(new Helper.SimpleExceptionVerifier() {
 			@Override
 			public void execute() {
 				getJApiField(jApiClass.getFields(), "fieldRemainsProtected");
 			}
 		}, IllegalArgumentException.class);
-		assertThatExceptionIsThrown(new SimpleExceptionVerifier() {
+		assertThatExceptionIsThrown(new Helper.SimpleExceptionVerifier() {
 			@Override
 			public void execute() {
 				getJApiField(jApiClass.getFields(), "fieldRemainsPackageProtected");
