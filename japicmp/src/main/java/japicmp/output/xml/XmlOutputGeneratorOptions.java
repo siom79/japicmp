@@ -1,6 +1,6 @@
 package japicmp.output.xml;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 
 public class XmlOutputGeneratorOptions {
 	private boolean createSchemaFile = false;

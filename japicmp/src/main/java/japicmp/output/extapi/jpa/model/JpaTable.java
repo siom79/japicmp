@@ -1,6 +1,6 @@
 package japicmp.output.extapi.jpa.model;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import japicmp.model.*;
 import japicmp.output.extapi.jpa.JpaAnalyzer;
 

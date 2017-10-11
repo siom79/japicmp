@@ -1,7 +1,5 @@
 package japicmp.ant;
 
-import com.google.common.base.Optional;
-import japicmp.cli.JApiCli;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -11,6 +9,7 @@ import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
+import japicmp.util.Optional;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -22,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static japicmp.model.AccessModifier.toModifier;
+import static japicmp.util.FileHelper.createFileList;
 
 public class JApiCmpTask extends Task {
 	private boolean onlyBinaryIncompatible = false;
@@ -169,8 +169,8 @@ public class JApiCmpTask extends Task {
 
 	private Options createOptionsFromAntAttrs() {
 		Options options = Options.newDefault();
-		options.getOldArchives().addAll(JApiCli.createFileList(this.oldJar));
-		options.getNewArchives().addAll(JApiCli.createFileList(this.newJar));
+		options.getOldArchives().addAll(createFileList(this.oldJar));
+		options.getNewArchives().addAll(createFileList(this.newJar));
 		options.setXmlOutputFile(Optional.fromNullable(xmlOutputFile));
 		options.setHtmlOutputFile(Optional.fromNullable(htmlOutputFile));
 		options.setHtmlStylesheet(Optional.fromNullable(htmlStylesheet));

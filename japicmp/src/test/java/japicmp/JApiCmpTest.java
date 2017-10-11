@@ -2,6 +2,7 @@ package japicmp;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import japicmp.cli.CliParser;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
 import javassist.CannotCompileException;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static japicmp.cli.JApiCli.IGNORE_MISSING_CLASSES_BY_REGEX;
 import static japicmp.util.JarUtil.createJarFile;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
@@ -49,7 +49,6 @@ public class JApiCmpTest {
 	}
 
 	private void assertThatHelpIsPrinted() {
-		assertThat(outLog.getLog(), containsString("NAME"));
 		assertThat(outLog.getLog(), containsString("SYNOPSIS"));
 		assertThat(outLog.getLog(), containsString("OPTIONS"));
 	}
@@ -78,10 +77,10 @@ public class JApiCmpTest {
 
 	@Test
 	public void testWithNewArchiveOptionButWithoutArgument() {
-		exit.expectSystemExitWithStatus(128);
+		exit.expectSystemExitWithStatus(1);
 		exit.checkAssertionAfterwards(new Assertion() {
 			public void checkAssertion() {
-				assertThat(errLog.getLog().trim(), containsString("E: Required values for option 'pathToNewVersionJar' not provided".trim()));
+				assertThat(errLog.getLog().trim(), containsString("E: Missing argument for option '-n, --new'.".trim()));
 				assertThatUseHelpOptionIsPrinted();
 			}
 		});
@@ -90,10 +89,10 @@ public class JApiCmpTest {
 
 	@Test
 	public void testWithOldArchiveOptionButWithoutArgument() {
-		exit.expectSystemExitWithStatus(128);
+		exit.expectSystemExitWithStatus(1);
 		exit.checkAssertionAfterwards(new Assertion() {
 			public void checkAssertion() {
-				assertThat(errLog.getLog().trim(), containsString("E: Required values for option 'pathToOldVersionJar' not provided".trim()));
+				assertThat(errLog.getLog().trim(), containsString("E: Missing argument for option '-o, --old'.".trim()));
 				assertThatUseHelpOptionIsPrinted();
 			}
 		});
@@ -185,6 +184,6 @@ public class JApiCmpTest {
 		createJarFile(oldPath, ctClass);
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_new.jar");
 		createJarFile(newPath, ctClass);
-		JApiCmp.main(new String[]{"-n", newPath.toString(), "-o", oldPath.toString(), IGNORE_MISSING_CLASSES_BY_REGEX, ".*Superc.*"});
+		JApiCmp.main(new String[]{"-n", newPath.toString(), "-o", oldPath.toString(), CliParser.IGNORE_MISSING_CLASSES_BY_REGEX, ".*Superc.*"});
 	}
 }

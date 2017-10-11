@@ -1,6 +1,6 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import com.google.common.xml.XmlEscapers;
 import japicmp.util.OptionalHelper;
 import javassist.bytecode.annotation.Annotation;

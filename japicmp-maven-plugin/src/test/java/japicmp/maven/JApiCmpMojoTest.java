@@ -1,6 +1,5 @@
 package japicmp.maven;
 
-import com.google.common.base.Optional;
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -9,6 +8,7 @@ import japicmp.maven.util.CtClassBuilder;
 import japicmp.maven.util.CtFieldBuilder;
 import japicmp.maven.util.CtInterfaceBuilder;
 import japicmp.maven.util.CtMethodBuilder;
+import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.apache.maven.artifact.Artifact;

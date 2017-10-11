@@ -1,6 +1,6 @@
 package japicmp.test;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;

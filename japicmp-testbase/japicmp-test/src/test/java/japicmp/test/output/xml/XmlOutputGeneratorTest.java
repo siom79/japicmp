@@ -1,6 +1,5 @@
 package japicmp.test.output.xml;
 
-import com.google.common.base.Optional;
 import com.google.common.io.Files;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -10,6 +9,7 @@ import japicmp.model.JApiClass;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
+import japicmp.util.Optional;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;

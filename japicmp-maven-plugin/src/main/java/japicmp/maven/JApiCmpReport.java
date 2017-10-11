@@ -1,9 +1,8 @@
 package japicmp.maven;
 
-import com.google.common.base.Optional;
-
 import japicmp.config.Options;
 import japicmp.output.xml.XmlOutput;
+import japicmp.util.Optional;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;

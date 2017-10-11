@@ -1,6 +1,6 @@
 package japicmp.versioning;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import japicmp.exception.JApiCmpException;
 
 import java.util.ArrayList;

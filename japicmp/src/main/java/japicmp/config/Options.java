@@ -1,9 +1,10 @@
 package japicmp.config;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import japicmp.cli.CliParser;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.exception.JApiCmpException;
@@ -39,6 +40,8 @@ public class Options {
 	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
 	private boolean noAnnotations = false;
 	private boolean reportOnlyFilename;
+	private boolean semanticVersioning;
+	private boolean helpRequested;
 
 	Options() {
 		// intentionally left empty
@@ -49,6 +52,12 @@ public class Options {
 	}
 
 	public void verify() {
+		if (oldArchives.isEmpty()) {
+			throw new JApiCmpException(JApiCmpException.Reason.CliError, "Required option -o, --old is missing.");
+		}
+		if (newArchives.isEmpty()) {
+			throw new JApiCmpException(JApiCmpException.Reason.CliError, "Required option -n, --new is missing.");
+		}
 		for (JApiCmpArchive archive : getOldArchives()) {
 			verifyExistsCanReadAndJar(archive);
 		}
@@ -72,7 +81,7 @@ public class Options {
 			setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
 		} else {
 			if (getOldClassPath().isPresent() || getNewClassPath().isPresent()) {
-				throw JApiCmpException.cliError("Please provide both options: " + JApiCli.OLD_CLASSPATH + " and " + JApiCli.NEW_CLASSPATH);
+				throw JApiCmpException.cliError("Please provide both options: " + CliParser.OLD_CLASSPATH + " and " + CliParser.NEW_CLASSPATH);
 			} else {
 				setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
 			}
@@ -358,5 +367,21 @@ public class Options {
 			return N_A;
 		}
 		return join;
+	}
+
+	public void setSemanticVersioning(boolean semanticVersioning) {
+		this.semanticVersioning = semanticVersioning;
+	}
+
+	public boolean isSemanticVersioning() {
+		return semanticVersioning;
+	}
+
+	public boolean isHelpRequested() {
+		return helpRequested;
+	}
+
+	public void setHelpRequested(boolean helpRequested) {
+		this.helpRequested = helpRequested;
 	}
 }

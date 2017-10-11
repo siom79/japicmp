@@ -1,5 +1,6 @@
 package japicmp.output.stdout;
 
+import japicmp.cli.CliParser;
 import japicmp.cli.JApiCli;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
@@ -27,6 +28,6 @@ public class StdoutOutputGeneratorTest {
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0));
 		String generated = generator.generate();
 		assertThat(generated, containsString(StdoutOutputGenerator.WARNING));
-		assertThat(generated, containsString(JApiCli.IGNORE_MISSING_CLASSES));
+		assertThat(generated, containsString(CliParser.IGNORE_MISSING_CLASSES));
 	}
 }

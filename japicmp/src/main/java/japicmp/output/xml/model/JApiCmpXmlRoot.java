@@ -1,6 +1,6 @@
 package japicmp.output.xml.model;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import japicmp.model.JApiClass;
 
 import javax.xml.bind.annotation.*;

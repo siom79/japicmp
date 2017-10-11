@@ -1,6 +1,7 @@
 package japicmp.output.stdout;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
+import japicmp.cli.CliParser;
 import japicmp.cli.JApiCli;
 import japicmp.config.Options;
 import japicmp.model.*;
@@ -26,7 +27,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		StringBuilder sb = new StringBuilder();
 		sb.append(options.getDifferenceDescription()).append('\n');
 		if (options.getIgnoreMissingClasses().isIgnoreAllMissingClasses()) {
-			sb.append(WARNING + ": You are using the option '" + JApiCli.IGNORE_MISSING_CLASSES + "', i.e. superclasses and interfaces that could not " +
+			sb.append(WARNING + ": You are using the option '" + CliParser.IGNORE_MISSING_CLASSES + "', i.e. superclasses and interfaces that could not " +
 				"be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
 		} else if (options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression().size() > 0) {
 			sb.append(WARNING + ": You have ignored certain classes, i.e. superclasses and interfaces that could not " +

@@ -1,7 +1,5 @@
 package japicmp;
 
-import io.airlift.airline.ParseException;
-import io.airlift.airline.SingleCommand;
 import japicmp.cli.JApiCli;
 import japicmp.exception.JApiCmpException;
 
@@ -18,17 +16,9 @@ public class JApiCmp {
 	}
 
 	public static void main(String[] args) {
-		SingleCommand<JApiCli.Compare> singleCommand = SingleCommand.singleCommand(JApiCli.Compare.class);
 		try {
-			JApiCli.Compare cmd = singleCommand.parse(args);
-			if (!cmd.helpOption.showHelpIfRequested()) {
-				cmd.run();
-			}
-		} catch (ParseException e) {
-			LOGGER.log(Level.FINE, CAUGHT_EXCEPTION + e.getLocalizedMessage(), e);
-			System.err.println("E: " + e.getMessage());
-			System.out.println(USE_HELP_OR_H_FOR_MORE_INFORMATION);
-			System.exit(128);
+			JApiCli jApiCli = new JApiCli();
+			jApiCli.run(args);
 		} catch (JApiCmpException e) {
 			LOGGER.log(Level.FINE, CAUGHT_EXCEPTION + e.getLocalizedMessage(), e);
 			if (e.getReason() != JApiCmpException.Reason.NormalTermination) {

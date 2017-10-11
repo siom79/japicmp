@@ -1,6 +1,6 @@
 package japicmp.util;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 
 public class OptionalHelper {
 	public static final String N_A = "n.a.";

@@ -1,6 +1,6 @@
 package japicmp.cmp;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import japicmp.compat.CompatibilityChanges;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;

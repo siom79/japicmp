@@ -1,6 +1,5 @@
 package japicmp.output.xml;
 
-import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -8,6 +7,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiClassType;
+import japicmp.util.Optional;
 import javassist.CtClass;
 import org.junit.Test;
 
