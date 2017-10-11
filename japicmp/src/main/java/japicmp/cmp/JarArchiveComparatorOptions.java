@@ -16,9 +16,9 @@ import java.util.List;
  * This class represents all options for the comparison.
  */
 public class JarArchiveComparatorOptions {
-	private List<String> classPathEntries = new LinkedList<>();
+	private final List<String> classPathEntries = new LinkedList<>();
 	private AccessModifier accessModifier = AccessModifier.PROTECTED;
-	private Filters filters = new Filters();
+	private final Filters filters = new Filters();
 	private boolean includeSynthetic = false;
 	private IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();
 	private ClassPathMode classPathMode = ClassPathMode.ONE_COMMON_CLASSPATH;

@@ -1,7 +1,11 @@
 package japicmp.cmp;
 
-import japicmp.compat.CompatibilityChanges;
-import japicmp.model.*;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;

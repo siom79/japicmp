@@ -1,8 +1,8 @@
 package japicmp.output.extapi.jpa.model;
 
-import japicmp.util.Optional;
 import japicmp.model.*;
 import japicmp.output.extapi.jpa.JpaAnalyzer;
+import japicmp.util.Optional;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -14,7 +14,7 @@ public class JpaTable {
 	private final List<JpaAttribute> attributes = new LinkedList<>();
 	private final JApiClass jApiClass;
 	private final JpaName jpaName;
-	private JApiChangeStatus changeStatus;
+	private final JApiChangeStatus changeStatus;
 
 	public JpaTable(JApiClass jApiClass, JApiAnnotation entityAnnotation) {
 		this.jApiClass = jApiClass;
@@ -26,10 +26,8 @@ public class JpaTable {
 	private JpaName extractName(JApiAnnotation entityAnnotation, JApiClass jApiClass) {
 		JApiChangeStatus changeStatusClass = jApiClass.getChangeStatus();
 		String tableName = computeTablename();
-		List<JApiAnnotationElement> elements = entityAnnotation.getElements();
-		for (JApiAnnotationElement element : elements) {
-			String name = element.getName();
-			if ("name".equals(name)) {
+		for (JApiAnnotationElement element : entityAnnotation.getElements()) {
+			if ("name".equals(element.getName())) {
 				JApiChangeStatus elementChangeStatus = element.getChangeStatus();
 				switch (elementChangeStatus) {
 					case NEW:

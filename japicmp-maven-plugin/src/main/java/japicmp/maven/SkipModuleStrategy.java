@@ -62,7 +62,7 @@ public class SkipModuleStrategy {
 							includeCount++;
 							if (artifactId.matches(includeModule)) {
 								if (this.log.isDebugEnabled()) {
-									this.log.debug("Including module because it is explicitely included: " + includeModule);
+									this.log.debug("Including module because it is explicitly included: " + includeModule);
 								}
 								return false;
 							}

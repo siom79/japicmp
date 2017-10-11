@@ -2,7 +2,6 @@ package japicmp.model;
 
 import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
 import javassist.CtConstructor;
 
 import javax.xml.bind.annotation.XmlTransient;

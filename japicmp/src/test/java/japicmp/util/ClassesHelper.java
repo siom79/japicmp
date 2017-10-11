@@ -12,9 +12,9 @@ import java.util.List;
 public class ClassesHelper {
 
 	public interface ClassesGenerator {
-		List<CtClass> createOldClasses(ClassPool classPool) throws Exception;
+		List<CtClass> createOldClasses(ClassPool classPool);
 
-		List<CtClass> createNewClasses(ClassPool classPool) throws Exception;
+		List<CtClass> createNewClasses(ClassPool classPool);
 	}
 
 	public static List<JApiClass> compareClasses(JarArchiveComparatorOptions options, ClassesGenerator classesGenerator) throws Exception {

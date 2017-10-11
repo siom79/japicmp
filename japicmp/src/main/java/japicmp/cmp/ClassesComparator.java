@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class ClassesComparator {
 	private List<JApiClass> classes = new LinkedList<>();
-	private JarArchiveComparator jarArchiveComparator;
+	private final JarArchiveComparator jarArchiveComparator;
 	private final JarArchiveComparatorOptions options;
 
 	public ClassesComparator(JarArchiveComparator jarArchiveComparator, JarArchiveComparatorOptions options) {
@@ -71,7 +71,7 @@ public class ClassesComparator {
 	}
 
 	private Map<String, CtClass> createClassMap(List<CtClass> oldClassesArg) {
-		Map<String, CtClass> oldClassesMap = new HashMap<String, CtClass>();
+		Map<String, CtClass> oldClassesMap = new HashMap<>();
 		for (CtClass ctClass : oldClassesArg) {
 			oldClassesMap.put(ctClass.getName(), ctClass);
 		}

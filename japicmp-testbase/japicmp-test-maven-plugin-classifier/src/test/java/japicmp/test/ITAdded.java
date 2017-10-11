@@ -20,7 +20,7 @@ public class ITAdded {
 	 * The artifact with classifier added contains only the class added, hence it should be detected as unchanged. All
 	 * other classes are removed from this artifact.
 	 *
-	 * @throws IOException
+	 * @throws IOException if HTML file cannot be read
 	 */
 	@Test
 	public void testStylesheetIsUsed() throws IOException {

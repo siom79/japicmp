@@ -8,7 +8,7 @@ package japicmp.model;
  */
 public interface JApiJavaObjectSerializationCompatibility {
 
-	public enum JApiJavaObjectSerializationChangeStatus {
+	enum JApiJavaObjectSerializationChangeStatus {
 		/**
 		 * The class is not serializable.
 		 */
@@ -25,7 +25,7 @@ public interface JApiJavaObjectSerializationCompatibility {
 		 * The serialVersionUID has been removed from this class but the new default serialVersionUID does not match
 		 * the old one.
 		 */
-		SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MACHTES_NEW_DEFAULT("serialVersionUID removed but not matches new default serialVersionUID"),
+		SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MATCHES_NEW_DEFAULT("serialVersionUID removed but not matches new default serialVersionUID"),
 		/**
 		 * The serialVersionUID has been added but does not match the old default serialVersionUID.
 		 */
@@ -91,10 +91,7 @@ public interface JApiJavaObjectSerializationCompatibility {
 		}
 
 		public boolean isIncompatible() {
-			if (this == NOT_SERIALIZABLE || this == SERIALIZABLE_COMPATIBLE) {
-				return false;
-			}
-			return true;
+			return !(this == NOT_SERIALIZABLE || this == SERIALIZABLE_COMPATIBLE);
 		}
 
 		public String getDescription() {

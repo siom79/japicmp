@@ -28,7 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class XmlOutputGeneratorTest {
-	public static final String JAPICMP_TEST_SEMVER001 = "japicmp.test.semver001";
+	private static final String JAPICMP_TEST_SEMVER001 = "japicmp.test.semver001";
 	private static final String TITLE = "Title with Ümläüte";
 	private static List<JApiClass> jApiClasses;
 	private static Document document;

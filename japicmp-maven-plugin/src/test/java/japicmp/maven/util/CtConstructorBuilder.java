@@ -6,7 +6,7 @@ import javassist.CtConstructor;
 import javassist.CtNewConstructor;
 
 public class CtConstructorBuilder extends CtBehaviorBuilder {
-	protected String body = "System.out.println(\"a\");";
+	private String body = "System.out.println(\"a\");";
 
 	public static CtConstructorBuilder create() {
 		return new CtConstructorBuilder();

@@ -18,7 +18,7 @@ public class MethodReturnType {
 	}
 
 	public List<MethodReturnType> methodReturnTypeChangesFromListToMap() {
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	public void methodReturnTypeChangesFromVoidToInt() {

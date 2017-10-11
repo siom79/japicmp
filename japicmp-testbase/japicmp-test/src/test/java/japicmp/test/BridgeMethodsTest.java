@@ -28,7 +28,7 @@ public class BridgeMethodsTest {
 	}
 
 	@Test
-	public void testBridgeModiferSet() {
+	public void testBridgeModifierSet() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, BridgeMethods.MyNode.class.getName());
 		boolean setDataWithObjectArgFound = false;
 		boolean setDataWithIntegerArgFound = false;

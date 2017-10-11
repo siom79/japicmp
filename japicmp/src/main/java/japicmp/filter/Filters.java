@@ -1,6 +1,10 @@
 package japicmp.filter;
 
-import javassist.*;
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
+import javassist.CtMethod;
 
 import java.util.ArrayList;
 import java.util.List;

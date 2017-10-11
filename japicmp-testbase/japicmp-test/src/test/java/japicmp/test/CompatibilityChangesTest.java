@@ -6,7 +6,13 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
 import japicmp.model.JApiMethod;
-import japicmp.test.ClassMembers.*;
+import japicmp.test.ClassMembers.ClassConstructorChangesAccessibility;
+import japicmp.test.ClassMembers.ClassFieldChangesAccessibility;
+import japicmp.test.ClassMembers.ClassLosesConstructor;
+import japicmp.test.ClassMembers.ClassLosesField;
+import japicmp.test.ClassMembers.ClassLosesMethod;
+import japicmp.test.ClassMembers.ClassMethodChangesAccessibility;
+import japicmp.test.ClassMembers.SubclassWithMethodToBeRemovedButContainedInSuperclass;
 import japicmp.test.ClassModifier.AbstractToNonAbstractClass;
 import japicmp.test.ClassModifier.FinalToNonFinalInnerClass;
 import japicmp.test.ClassModifier.NonAbstractToAbstractClass;
@@ -21,7 +27,10 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.*;
+import static japicmp.test.util.Helper.getArchive;
+import static japicmp.test.util.Helper.getJApiClass;
+import static japicmp.test.util.Helper.getJApiField;
+import static japicmp.test.util.Helper.getJApiMethod;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 

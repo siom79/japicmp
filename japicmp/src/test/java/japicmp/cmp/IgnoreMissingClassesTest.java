@@ -5,28 +5,19 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
-import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 import org.junit.Test;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
 import static japicmp.util.Helper.toJApiCmpArchive;
 import static japicmp.util.JarUtil.createJarFile;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
@@ -89,7 +80,7 @@ public class IgnoreMissingClassesTest {
 	@Test
 	public void testClassMissingWithIgnoreClassByRegex() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.getIgnoreMissingClasses().setIgnoreMissingClassRegularExpression(Arrays.asList(Pattern.compile(".*NotExisting")));
+		options.getIgnoreMissingClasses().setIgnoreMissingClassRegularExpression(Collections.singletonList(Pattern.compile(".*NotExisting")));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
 		CtClass ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classPool);

@@ -12,7 +12,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.Assertion;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.LogMode;
+import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -28,9 +29,9 @@ public class JApiCmpTest {
 	@Rule
 	public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 	@Rule
-	public final ErrLogRule errLog = new ErrLogRule(LogMode.LOG_ONLY);
+	public final SystemErrRule errLog = new SystemErrRule().mute().enableLog();
 	@Rule
-	public final OutLogRule outLog = new OutLogRule(LogMode.LOG_ONLY);
+	public final SystemOutRule outLog = new SystemOutRule().mute().enableLog();
 
 	@Test
 	public void testWithoutArguments() {

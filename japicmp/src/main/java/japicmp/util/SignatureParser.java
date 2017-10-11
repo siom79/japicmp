@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SignatureParser {
-	private List<String> parameters = new LinkedList<String>();
+	private final List<String> parameters = new LinkedList<>();
 	private String returnType = "void";
 
 	public void parse(String signature) {
@@ -38,7 +38,7 @@ public class SignatureParser {
 	}
 
 	public List<String> parseTypes(String paramPart) {
-		List<String> types = new LinkedList<String>();
+		List<String> types = new LinkedList<>();
 		boolean arrayNotation = false;
 		for (int i = 0; i < paramPart.length(); i++) {
 			char c = paramPart.charAt(i);

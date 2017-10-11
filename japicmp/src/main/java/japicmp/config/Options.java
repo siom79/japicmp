@@ -8,7 +8,14 @@ import japicmp.cli.CliParser;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.exception.JApiCmpException;
-import japicmp.filter.*;
+import japicmp.filter.AnnotationBehaviorFilter;
+import japicmp.filter.AnnotationClassFilter;
+import japicmp.filter.AnnotationFieldFilter;
+import japicmp.filter.Filter;
+import japicmp.filter.JavaDocLikeClassFilter;
+import japicmp.filter.JavadocLikeBehaviorFilter;
+import japicmp.filter.JavadocLikeFieldFilter;
+import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.AccessModifier;
 
 import java.io.File;
@@ -33,7 +40,7 @@ public class Options {
 	private List<Filter> includes = new ArrayList<>();
 	private List<Filter> excludes = new ArrayList<>();
 	private boolean includeSynthetic = false;
-	private IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();
+	private final IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();
 	private Optional<String> htmlStylesheet = Optional.absent();
 	private Optional<String> oldClassPath = Optional.absent();
 	private Optional<String> newClassPath = Optional.absent();

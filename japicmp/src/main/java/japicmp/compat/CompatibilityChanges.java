@@ -4,14 +4,34 @@ import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
-import japicmp.model.*;
+import japicmp.model.AbstractModifier;
+import japicmp.model.AccessModifier;
+import japicmp.model.FinalModifier;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiClassType;
+import japicmp.model.JApiCompatibility;
+import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiException;
+import japicmp.model.JApiField;
+import japicmp.model.JApiHasAbstractModifier;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
+import japicmp.model.JApiType;
+import japicmp.model.StaticModifier;
 import japicmp.util.ClassHelper;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
-import java.util.*;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
 import static japicmp.util.ModifierHelper.isNotPrivate;
@@ -661,7 +681,7 @@ public class CompatibilityChanges {
 		}
 		checkIfClassNowCheckedException(jApiClass);
 		checkIfAbstractMethodAddedInSuperclass(jApiClass, classMap);
-		checkIfAbstraceMethodAdded(jApiClass, classMap);
+		checkIfAbstractMethodAdded(jApiClass, classMap);
 	}
 
 	private boolean hasSameType(JApiField field, JApiField otherField) {
@@ -676,7 +696,7 @@ public class CompatibilityChanges {
 		return hasSameNewType;
 	}
 
-	private void checkIfAbstraceMethodAdded(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+	private void checkIfAbstractMethodAdded(JApiClass jApiClass, Map<String, JApiClass> classMap) {
 		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW && !isAbstract(jApiClass)) {
 			//TODO compute hull of all methods and check if there are any abstract methods not implemented
 		}
@@ -716,9 +736,7 @@ public class CompatibilityChanges {
 							}
 						}
 					}
-					for (JApiImplementedInterface jApiImplementedInterface : superclass.getInterfaces()) {
-						implementedInterfaces.add(jApiImplementedInterface);
-					}
+					implementedInterfaces.addAll(superclass.getInterfaces());
 					return 0;
 				}
 			});
