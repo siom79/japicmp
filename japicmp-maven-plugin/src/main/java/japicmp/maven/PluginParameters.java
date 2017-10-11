@@ -1,6 +1,6 @@
 package japicmp.maven;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 
 import java.io.File;
 import java.util.List;

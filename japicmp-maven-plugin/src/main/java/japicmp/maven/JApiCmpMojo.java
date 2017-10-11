@@ -1,7 +1,6 @@
 package japicmp.maven;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
@@ -28,6 +27,7 @@ import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
+import japicmp.util.Optional;
 import japicmp.versioning.SemanticVersion;
 import japicmp.versioning.VersionChange;
 import javassist.CtClass;

@@ -1,6 +1,7 @@
 package japicmp.output.stdout;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
+import japicmp.cli.CliParser;
 import japicmp.cli.JApiCli;
 import japicmp.config.Options;
 import japicmp.model.AbstractModifier;

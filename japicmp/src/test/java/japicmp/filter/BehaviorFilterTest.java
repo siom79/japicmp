@@ -111,4 +111,14 @@ public class BehaviorFilterTest {
 		CtMethod ctMethod = CtMethodBuilder.create().name("method").addToClass(ctClass);
 		assertThat(filter.matches(ctMethod), is(true));
 	}
+
+	@Test
+	public void testMethodWithDollarSignInName() throws CannotCompileException, NotFoundException {
+		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("org.apache.flink.streaming.api.scala.DataStream#iterate$default$3[R]()");
+		ClassPool classPool = new ClassPool();
+		classPool.appendSystemPath();
+		CtClass ctClass = CtClassBuilder.create().name("org.apache.flink.streaming.api.scala.DataStream").addToClassPool(classPool);
+		CtMethod ctMethod = CtMethodBuilder.create().name("iterate$default$3[R]").addToClass(ctClass);
+		assertThat(filter.matches(ctMethod), is(true));
+	}
 }

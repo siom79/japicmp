@@ -1,12 +1,12 @@
 package japicmp.test.service;
 
-import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
 import japicmp.model.JApiSuperclass;
+import japicmp.util.Optional;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

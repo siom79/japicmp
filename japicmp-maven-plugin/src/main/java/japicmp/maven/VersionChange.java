@@ -1,7 +1,7 @@
 package japicmp.maven;
 
-import com.google.common.base.Optional;
 import japicmp.cmp.JApiCmpArchive;
+import japicmp.util.Optional;
 import japicmp.versioning.SemanticVersion;
 import org.apache.maven.plugin.MojoFailureException;
 

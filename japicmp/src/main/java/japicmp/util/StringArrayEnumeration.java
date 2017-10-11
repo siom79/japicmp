@@ -23,4 +23,12 @@ public class StringArrayEnumeration implements Enumeration<String> {
 			throw new NoSuchElementException();
 		}
 	}
+
+	public String inspectNextElement() {
+		if (hasMoreElements()) {
+			return array[pos];
+		} else {
+			throw new NoSuchElementException();
+		}
+	}
 }

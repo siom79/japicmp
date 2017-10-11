@@ -1,6 +1,6 @@
 package japicmp.model;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;

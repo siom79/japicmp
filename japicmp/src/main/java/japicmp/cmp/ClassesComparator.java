@@ -1,6 +1,6 @@
 package japicmp.cmp;
 
-import com.google.common.base.Optional;
+import japicmp.util.Optional;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiClassType;
