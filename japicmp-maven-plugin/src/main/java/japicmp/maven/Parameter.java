@@ -52,6 +52,10 @@ public class Parameter {
 	private List<String> excludeModules;
 	@org.apache.maven.plugins.annotations.Parameter(required = false, defaultValue = "false")
 	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
+	@org.apache.maven.plugins.annotations.Parameter(required = false, defaultValue = "false")
+	private boolean includeExclusively;
+	@org.apache.maven.plugins.annotations.Parameter(required = false, defaultValue = "false")
+	private boolean excludeExclusively;
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -291,5 +295,21 @@ public class Parameter {
 
 	public void setBreakBuildBasedOnSemanticVersioningForMajorVersionZero(boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero) {
 		this.breakBuildBasedOnSemanticVersioningForMajorVersionZero = breakBuildBasedOnSemanticVersioningForMajorVersionZero;
+	}
+
+	public boolean isIncludeExlusively() {
+		return includeExclusively;
+	}
+
+	public void setIncludeExclusively(boolean includeExclusively) {
+		this.includeExclusively = includeExclusively;
+	}
+
+	public boolean isExcludeExclusively() {
+		return excludeExclusively;
+	}
+
+	public void setExcludeExclusively(boolean excludeExclusively) {
+		this.excludeExclusively = excludeExclusively;
 	}
 }

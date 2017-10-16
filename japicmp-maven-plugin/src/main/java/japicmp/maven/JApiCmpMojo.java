@@ -726,13 +726,13 @@ public class JApiCmpMojo extends AbstractMojo {
 			List<String> excludes = parameterParam.getExcludes();
 			if (excludes != null) {
 				for (String exclude : excludes) {
-					options.addExcludeFromArgument(Optional.fromNullable(exclude), false);
+					options.addExcludeFromArgument(Optional.fromNullable(exclude), parameterParam.isExcludeExclusively());
 				}
 			}
 			List<String> includes = parameterParam.getIncludes();
 			if (includes != null) {
 				for (String include : includes) {
-					options.addIncludeFromArgument(Optional.fromNullable(include), false);
+					options.addIncludeFromArgument(Optional.fromNullable(include), parameterParam.isIncludeExlusively());
 				}
 			}
 			String includeSyntheticString = parameterParam.getIncludeSynthetic();

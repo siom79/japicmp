@@ -44,11 +44,11 @@ The following table gives an overview of all available parameters of the Ant tas
 | newjar 									| false | n.a.  | Path to the new version(s) of the jar(s). Use `;` as list separator. |
 | classpath 								| true  | n.a.  | Classpath for the dependencies used to compare old and new versions. |
 | classpathref 								| true  | n.a.  | Classpath reference for the dependencies used to compare old and new versions. |
+| semanticVersioning 						| true  | false | Indicate which part of the version to increment according to semantic versioning rules. |
 | onlyBinaryIncompatible 					| true  | false | If true, output only binary incompatible changes. |
 | onlyModified 								| true  | false | If true, output only modified classes/methods, else print all classes and methods.|
 | includeSynthetic 							| true  | false | If true, track changes for synthetic classes and class members.|
 | noAnnotations 							| true  | false | If true, disable the evaluation of annotations completely.|
-| semanticVersioning 						| true  | false | Indicate which part of the version to increment according to semantic versioning rules. |
 | reportOnlyFilename 						| true  | false | If true, report only filenames (not full paths). |
 | ignoreMissingClasses 						| true  | n.a.  | Ignore all superclasses/interfaces missing on the classpath. |
 | ignoreMissingClassesbyRegularExpressions	| true  | n.a.  | Ignore only those superclasses/interface missing on the classpath that are selected by a regular expression. |
@@ -59,6 +59,8 @@ The following table gives an overview of all available parameters of the Ant tas
 | newClassPathRef 							| true  | n.a.  | Classpath reference for the dependencies of the new version. |
 | includes 									| true  | n.a.  | Semicolon separated list of elements to include in the form `package.Class#classMember`, `*` can be used as wildcard. Annotations are given as FQN starting with `@`. Examples: `mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation`.|
 | excludes 									| true  | n.a.  | Semicolon separated list of elements to exclude in the form `package.Class#classMember`, `*` can be used as wildcard. Annotations are given as FQN starting with `@`. Examples: `mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation`.|
+| includeExclusively						| true  | false	| Include only packages specified in the "includes" parameter, exclude their sub-packages.|
+| excludeExclusively						| true  | false	| Exclude only packages specified in the "excludes" parameter, include their sub-packages.|
 | xmlOutputFile 							| true  | n.a.  | Path to the xml output file. |
 | htmlOutputFile 							| true  | n.a.  | Path to the html output file. |
 | htmlStylesheet 							| true  | n.a.  | Path to your own stylesheet. |
