@@ -31,6 +31,8 @@ public class JApiCmpTask extends Task {
 	private boolean semanticVersioning = false;
 	private boolean reportOnlyFilename = false;
 	private boolean ignoreMissingClasses = false;
+	private boolean includeExclusively = false;
+	private boolean excludeExclusively = false;
 	private final List<String> ignoreMissingClassesByRegularExpressions = new ArrayList<>();
 	private String accessModifier = "protected";
 	private String semanticVersionProperty;
@@ -79,6 +81,14 @@ public class JApiCmpTask extends Task {
 
 	public void setIgnoreMissingClassesByRegularExpressions(String ignoreMissingClassesByRegularExpressions) {
 		this.ignoreMissingClassesByRegularExpressions.addAll(Arrays.asList(ignoreMissingClassesByRegularExpressions.split("[,\\s]+")));
+	}
+
+	public void setIncludeExclusively(String includeExclusively) {
+		this.includeExclusively = Project.toBoolean(includeExclusively);
+	}
+
+	public void setExcludeExclusively(String excludeExclusively) {
+		this.excludeExclusively = Project.toBoolean(excludeExclusively);
 	}
 
 	public void setAccessModifier(String accessModifier) {
@@ -176,8 +186,8 @@ public class JApiCmpTask extends Task {
 		options.setHtmlStylesheet(Optional.fromNullable(htmlStylesheet));
 		options.setOutputOnlyModifications(onlyModified);
 		options.setAccessModifier(toModifier(accessModifier));
-		options.addIncludeFromArgument(Optional.fromNullable(includes), false);
-		options.addExcludeFromArgument(Optional.fromNullable(excludes), false);
+		options.addIncludeFromArgument(Optional.fromNullable(includes), includeExclusively);
+		options.addExcludeFromArgument(Optional.fromNullable(excludes), excludeExclusively);
 		options.setOutputOnlyBinaryIncompatibleModifications(onlyBinaryIncompatible);
 		options.setIncludeSynthetic(includeSynthetic);
 		options.setIgnoreMissingClasses(ignoreMissingClasses);

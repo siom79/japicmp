@@ -126,6 +126,8 @@ An advanced configuration can utilize the following parameters:
 						<exclude>package.Class#fieldToExclude</exclude>
 						<exclude>@my.AnnotationToExcluce</exclude>
 					</excludes>
+					<includeExclusively>false</includeExclusively>
+					<excludeExclusively>false</excludeExclusively>
 					<accessModifier>public</accessModifier>
 					<breakBuildOnModifications>false</breakBuildOnModifications>
 					<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
@@ -187,10 +189,6 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 
 | Parameter | Optional | Default | Description |
 |-----------|----------|---------|-------------|
-| onlyModified									         | true  | false 	    | Outputs only modified classes/methods. If not set to true, all classes and methods are printed.|
-| includes										         | true  | n.a.  	    | List of package, classes, methods and field that should be included. The syntax is similar to the one used for javadoc references. Annotations can also be used for filtering, just let the fully qualified name start with @.|
-| excludes										         | true  | n.a.		    | List of package, classes, methods and field that should be excluded. The syntax is similar to the one used for javadoc references. Annotations can also be used for filtering, just let the fully qualified name start with @.|
-| accessModifier								         | true  | protected	| Sets the access modifier level (public, package, protected, private).|
 | breakBuildOnModifications						         | true  | false		| If set to true, the build breaks in case a modification has been detected.|
 | breakBuildOnBinaryIncompatibleModifications	         | true  | false		| If set to true, the build breaks in case a binary incompatible modification has been detected.|
 | breakBuildOnSourceIncompatibleModifications	         | true  | false		| If set to true, the build breaks in case a source incompatible modification has been detected.|
@@ -198,14 +196,21 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | breakBuildBasedOnSemanticVersioningForMajorVersionZero | true  | false        | If set to true, the plugin will apply the option breakBuildBasedOnSemanticVersioning also for projects with major version zero (which is not required by the Semantic Versioning Specification).|
 | breakBuildIfCausedByExclusion					         | true  | true		    | If set to false, the plugin won't break the build if the incompatible change was caused by an excluded class (e.g. excluded interface removed from not excluded class).|
 | onlyBinaryIncompatible						         | true  | false		| If set to true, only binary incompatible changes are reported.|
+| onlyModified									         | true  | false 	    | Outputs only modified classes/methods. If not set to true, all classes and methods are printed.|
 | includeSynthetic								         | true  | false		| If set to true, changes for synthetic classes and class members are tracked.|
+| noAnnotations									         | true  | false		| Setting this option to true disables the evaluation of annotations completely.|
+| reportOnlyFilename							         | true  | false		| If set to true, report will include only the artifact filename, not the complete artifact file path.|
 | ignoreMissingClasses							         | true  | false		| If set to true, superclasses and interfaces that cannot be resolved are ignored. Pleases note that in this case the results for the affected classes may not be accurate.|
 | ignoreMissingClassesByRegularExpressions		         | true	 | n.a.		    | List of regular expressions for superclasses and interfaces that cannot be resolved and that should be ignored. In contrast to the option ignoreMissingClasses, which ignores all missing classes, this options allows a fine-grained selection.|
-| skipPomModules								         | true  | true		    | Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.|
-| skip											         | true  | false		| Setting this parameter to true will skip execution of the plugin.|
+| accessModifier								         | true  | protected	| Sets the access modifier level (public, package, protected, private).|
+| includes										         | true  | n.a.  	    | List of package, classes, methods and field that should be included. The syntax is similar to the one used for javadoc references. Annotations can also be used for filtering, just let the fully qualified name start with @.|
+| excludes										         | true  | n.a.		    | List of package, classes, methods and field that should be excluded. The syntax is similar to the one used for javadoc references. Annotations can also be used for filtering, just let the fully qualified name start with @.|
+| includeExclusively								     | true  | false		| Include only packages specified in the "includes" parameter, exclude their sub-packages.|
+| excludeExclusively								     | true  | false		| Exclude only packages specified in the "excludes" parameter, include their sub-packages.|
 | htmlStylesheet								         | true  | n.a.		    | Path to an individual CSS stylesheet for the HTML report.|
 | htmlTitle										         | true  | n.a.		    | A title for the HTML report (optional).|
-| noAnnotations									         | true  | false		| Setting this option to true disables the evaluation of annotations completely.|
+| skipPomModules								         | true  | true		    | Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.|
+| skip											         | true  | false		| Setting this parameter to true will skip execution of the plugin.|
 | ignoreNonResolvableArtifacts					         | true  | false		| Set this to true in order to ignore artifacts that cannot be resolved, i.e. the build does not break in case a dependency cannot be resolved to a file.|
 | ignoreMissingOldVersion						         | true  | false		| If set to true, not resolvable artifacts for the old version do not break the build.|
 | ignoreMissingNewVersion						         | true  | false		| If set to true, not resolvable artifacts for the new version do not break the build.|
@@ -214,7 +219,6 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | skipXmlReport									         | true  | false		| If set to true, no XML report will be generated.|
 | skipHtmlReport								         | true  | false		| If set to true, no HTML report will be generated.|
 | skipDiffReport								         | true  | false		| If set to true, no diff report will be generated.|
-| reportOnlyFilename							         | true  | false		| If set to true, report will include only the artifact filename, not the complete artifact file path.|
 | oldVersionPattern								         | true  | n.a.			| If &lt;oldVersion&gt; is not used, the old version compared against must match this regular expression.|
 | includeModules								         | true  | n.a.			| List of regular expression that specify if an artifact should be excluded based on its artifact id.|
 | excludeModules								         | true  | n.a.			| List of regular expression that specify if an artifact should be included based on its artifact id.|
