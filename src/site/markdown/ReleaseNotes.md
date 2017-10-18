@@ -2,6 +2,14 @@
 
 The following versions of japicmp are available:
 
+##0.11.0 (2017-10-18)##
+
+* japicmp has now an Ant task. [#171](https://github.com/siom79/japicmp/issues/171)
+* Two new options includeExclusively and excludeExclusively allow to exclude or include sub-packages. [#170](https://github.com/siom79/japicmp/issues/170)
+* Changed class file format version is reported. [#168](https://github.com/siom79/japicmp/issues/168)
+* Square brackets are escaped in regular expressions for behavior matching. [#176](https://github.com/siom79/japicmp/issues/176)
+* japicmp can be build and run under JDK 1.9. [#182](https://github.com/siom79/japicmp/issues/182)
+
 ##0.10.0 (2017-04-02)##
 
 * The maven plugin relaxes the semantic versioning check for 0.x.x versions, it can be enabled with the option breakBuildBasedOnSemanticVersioningForMajorVersionZero. [#165](https://github.com/siom79/japicmp/issues/165)
