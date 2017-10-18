@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp-testbase</artifactId>
-		<version>0.10.1-SNAPSHOT</version>
+		<version>0.11.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -84,24 +84,18 @@
 							<target>
 
 								<path id="task.classpath">
-									<fileset file="${project.build.directory}/japicmp-jar-with-dependencies.jar"/>
-									<fileset file="${project.build.directory}/japicmp-ant-task.jar"/>
+									<fileset file="${project.build.directory}/japicmp-jar-with-dependencies.jar" />
+									<fileset file="${project.build.directory}/japicmp-ant-task.jar" />
 								</path>
 								<path id="old.classpath">
-									<fileset file="${project.build.directory}/guava-18.0.jar"/>
+									<fileset file="${project.build.directory}/guava-18.0.jar" />
 								</path>
 								<path id="new.classpath">
-									<fileset file="${project.build.directory}/guava-19.0.jar"/>
+									<fileset file="${project.build.directory}/guava-19.0.jar" />
 								</path>
 
-								<taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
-								<japicmp oldjar="${project.build.directory}/guava-18.0.jar"
-										 newjar="${project.build.directory}/guava-19.0.jar"
-										 oldclasspath="old.classpath"
-										 newclasspath="new.classpath"
-										 onlyBinaryIncompatible="false"
-										 onlyModified="true"
-										 />
+								<taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath" />
+								<japicmp oldjar="${project.build.directory}/guava-18.0.jar" newjar="${project.build.directory}/guava-19.0.jar" oldclasspath="old.classpath" newclasspath="new.classpath" onlyBinaryIncompatible="false" onlyModified="true" />
 
 							</target>
 						</configuration>
