@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -27,8 +28,10 @@ public class XmlOutputGeneratorClassTypeTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
+		Path diffPublicXmlPath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.xml");
+		Path diffPublicHtmlPath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html");
 		List<JApiClass> jApiClasses = Helper.compareTestV1WithTestV2(AccessModifier.PUBLIC);
-		Helper.generateHtmlOutput(jApiClasses, "target/diff_public.xml", "target/diff_public.html", false, AccessModifier.PUBLIC);
+		Helper.generateHtmlOutput(jApiClasses, diffPublicXmlPath.toString(), diffPublicHtmlPath.toString(), false, AccessModifier.PUBLIC);
 		File htmlFilePublic = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html").toFile();
 		documentPublic = Jsoup.parse(htmlFilePublic, Charset.forName("UTF-8").toString());
 	}

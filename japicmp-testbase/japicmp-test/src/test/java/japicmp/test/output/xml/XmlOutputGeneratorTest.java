@@ -19,6 +19,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -37,16 +38,19 @@ public class XmlOutputGeneratorTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
+		Path diffXmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff.xml");
+		Path diffHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff.html");
+		Path diffOnlyModificationsXmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_onlyModifications.xml");
+		Path diffOnlyModificationsHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_onlyModifications.html");
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.getFilters().getExcludes().add(new JavadocLikePackageFilter(JAPICMP_TEST_SEMVER001, false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-		generateHtmlOutput("target/diff.xml", "target/diff.html", false);
-		generateHtmlOutput("target/diff_onlyModifications.xml", "target/diff_onlyModifications.html", true);
+		generateHtmlOutput(diffXmlFilePath.toString(), diffHtmlFilePath.toString(), false);
+		generateHtmlOutput(diffOnlyModificationsXmlFilePath.toString(), diffOnlyModificationsHtmlFilePath.toString(), true);
 		htmlFile = Paths.get(System.getProperty("user.dir"), "target", "diff.html").toFile();
-		File htmlFileOnlyModifications = Paths.get(System.getProperty("user.dir"), "target", "diff_onlyModifications.html").toFile();
 		document = Jsoup.parse(htmlFile, Charset.forName("UTF-8").toString());
-		documentOnlyModifications = Jsoup.parse(htmlFileOnlyModifications, Charset.forName("UTF-8").toString());
+		documentOnlyModifications = Jsoup.parse(diffOnlyModificationsHtmlFilePath.toFile(), Charset.forName("UTF-8").toString());
 	}
 
 	private static void generateHtmlOutput(String xmlOutpuFile, String htmlOutputFile, boolean outputOnlyModifications) {

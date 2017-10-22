@@ -27,7 +27,7 @@ import java.util.List;
 public class Helper {
 
 	public static JApiCmpArchive getArchive(String filename) {
-		File file = new File("target" + File.separator + filename);
+		File file = new File(System.getProperty("user.dir") + File.separator + "target" + File.separator + filename);
 		return toJApiCmpArchive(file);
 	}
 

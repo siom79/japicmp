@@ -22,14 +22,14 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Helper {
 
 	public static JApiCmpArchive getArchive(String filename) {
-		File file = new File("target" + File.separator + filename);
-		return toJApiCmpArchive(file);
+		return toJApiCmpArchive(Paths.get(System.getProperty("user.dir"), "target", filename).toFile());
 	}
 
 	public static JApiCmpArchive toJApiCmpArchive(File file) {

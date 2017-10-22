@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -26,12 +27,16 @@ public class XmlOutputGeneratorAccessModifierTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
+		Path diffPublicXmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.xml");
+		Path diffPublicHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html");
+		Path diffPrivateXmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_private.xml");
+		Path diffPrivateHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_private.html");
 		List<JApiClass> jApiClasses = Helper.compareTestV1WithTestV2(AccessModifier.PUBLIC);
-		Helper.generateHtmlOutput(jApiClasses, "target/diff_public.xml", "target/diff_public.html", true, AccessModifier.PUBLIC);
+		Helper.generateHtmlOutput(jApiClasses, diffPublicXmlFilePath.toString(), diffPublicHtmlFilePath.toString(), true, AccessModifier.PUBLIC);
 		jApiClasses = Helper.compareTestV1WithTestV2(AccessModifier.PRIVATE);
-		Helper.generateHtmlOutput(jApiClasses, "target/diff_private.xml", "target/diff_private.html", true, AccessModifier.PRIVATE);
-		File htmlFilePublic = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html").toFile();
-		File htmlFilePrivate = Paths.get(System.getProperty("user.dir"), "target", "diff_private.html").toFile();
+		Helper.generateHtmlOutput(jApiClasses, diffPrivateXmlFilePath.toString(), diffPrivateHtmlFilePath.toString(), true, AccessModifier.PRIVATE);
+		File htmlFilePublic = diffPublicHtmlFilePath.toFile();
+		File htmlFilePrivate = diffPrivateHtmlFilePath.toFile();
 		documentPublic = Jsoup.parse(htmlFilePublic, Charset.forName("UTF-8").toString());
 		documentPrivate = Jsoup.parse(htmlFilePrivate, Charset.forName("UTF-8").toString());
 	}

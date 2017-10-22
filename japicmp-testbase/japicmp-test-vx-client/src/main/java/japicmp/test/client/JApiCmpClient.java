@@ -21,14 +21,16 @@ public class JApiCmpClient {
 		StringBuilder sb = new StringBuilder();
 		sb.append(JApiCmpClient.class.getSimpleName()).append(" has the following classpath:\n");
 		ClassLoader cl = JApiCmpClient.class.getClassLoader();
-		URL[] urls = ((URLClassLoader) cl).getURLs();
-		int count = 0;
-		for (URL url : urls) {
-			if (count > 0) {
-				sb.append("\n");
+		if (cl instanceof  URLClassLoader) {
+			URL[] urls = ((URLClassLoader) cl).getURLs();
+			int count = 0;
+			for (URL url : urls) {
+				if (count > 0) {
+					sb.append("\n");
+				}
+				sb.append(url.getFile());
+				count++;
 			}
-			sb.append(url.getFile());
-			count++;
 		}
 		System.out.println(sb.toString());
 	}
