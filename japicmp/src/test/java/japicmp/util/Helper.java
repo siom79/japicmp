@@ -33,8 +33,17 @@ public class Helper {
 		return toJApiCmpArchive(file);
 	}
 
+	public static JApiCmpArchive getArchive(String filename, String version) {
+		File file = new File("target" + File.separator + filename);
+		return toJApiCmpArchive(file, version);
+	}
+
 	public static JApiCmpArchive toJApiCmpArchive(File file) {
 		return new JApiCmpArchive(file, "n.a.");
+	}
+
+	public static JApiCmpArchive toJApiCmpArchive(File file, String version) {
+		return new JApiCmpArchive(file, version);
 	}
 
 	public static JApiClass getJApiClass(List<JApiClass> jApiClasses, String fqn) {
