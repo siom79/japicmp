@@ -50,7 +50,7 @@ public class Options {
 	private boolean semanticVersioning;
 	private boolean errorOnBinaryIncompatibility;
 	private boolean errorOnSourceIncompatibility;
-	private boolean errorOnExclusionIncompatibility;
+	private boolean errorOnExclusionIncompatibility = true;
 	private boolean errorOnModifications;
 	private boolean errorOnSemanticIncompatibility;
 	private boolean ignoreMissingOldVersion;
