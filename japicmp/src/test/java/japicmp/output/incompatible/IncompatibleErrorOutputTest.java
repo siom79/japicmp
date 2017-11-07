@@ -18,6 +18,7 @@
 package japicmp.output.incompatible;
 
 import japicmp.cmp.ClassesHelper;
+import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
@@ -25,12 +26,14 @@ import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
+import japicmp.util.Helper;
 import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class IncompatibleErrorOutputTest {
@@ -179,5 +182,64 @@ public class IncompatibleErrorOutputTest {
 		new IncompatibleErrorOutput(options, result.getjApiClasses(), result.getJarArchiveComparator()).generate();
 	}
 
-	// TODO Test with missing versions
+	@Test(expected = JApiCmpException.class)
+	public void testSemVerMinorChangeMissingOldVersion() throws Exception {
+		testMissingVersions("1.0.0", true, "1.1.0", false);
+	}
+
+	@Test
+	public void testSemVerMajjorChangeMissingOldVersion() throws Exception {
+		testMissingVersions("1.0.0", true, "2.0.0", false);
+	}
+
+	@Test(expected = JApiCmpException.class)
+	public void testSemVerMinorChangeMissingNewVersion() throws Exception {
+		testMissingVersions("1.0.0", true, "1.1.0",false);
+	}
+
+	@Test
+	public void testSemVerMajorChangeMissingNewVersion() throws Exception {
+		testMissingVersions("1.0.0", true, "2.0.0",false);
+	}
+
+	@Test(expected = JApiCmpException.class)
+	public void testSemVerMinorChange() throws Exception {
+		testMissingVersions("1.0.0", false, "1.1.0", false);
+	}
+
+	@Test
+	public void testSemVerMajorChange() throws Exception {
+		testMissingVersions("1.0.0", false, "2.0.0", false);
+	}
+
+	private void testMissingVersions(String oldVersion, boolean missingOld, String newVersion, boolean missingNew) throws Exception {
+		Options options = Options.newDefault();
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
+		ClassesHelper.CompareClassesResult result = ClassesHelper.compareClassesWithResult(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classPool);
+				return Arrays.asList(typeCtClass, ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(classPool.get("java.lang.String")).addToClassPool(classPool);
+				return Arrays.asList(typeCtClass, ctClass);
+			}
+		});
+		options.addExcludeFromArgument(Optional.of("japicmp.SuperType"), false); // exclude japicmp.SuperType
+
+		options.setErrorOnSemanticIncompatibility(true);
+		options.setIgnoreMissingNewVersion(missingNew);
+		options.setIgnoreMissingOldVersion(missingOld);
+
+		JApiCmpArchive oldFile = Helper.getArchive("japicmp-test-v"+oldVersion+".jar", oldVersion);
+		options.setOldArchives(Collections.singletonList(oldFile));
+		JApiCmpArchive newFile = Helper.getArchive("japicmp-test-v"+newVersion+".jar", newVersion);
+		options.setNewArchives(Collections.singletonList(newFile));
+		new IncompatibleErrorOutput(options, result.getjApiClasses(), result.getJarArchiveComparator()).generate();
+	}
 }
