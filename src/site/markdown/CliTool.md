@@ -17,6 +17,12 @@ SYNOPSIS
                 [--old-classpath <oldClassPath>] [--report-only-filename]
                 [(-s | --semantic-versioning)]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
+                [--error-on-binary-incompatibility]
+                [--error-on-source-incompatibility]
+                [--error-on-modifications]
+                [--no-error-on-exclusion-incompatibility]
+                [--error-on-semantic-incompatibility]
+                [--ignore-missing-old-version] [--ignore-missing-new-version]
 
 OPTIONS
         -a <accessModifier>
@@ -95,6 +101,35 @@ OPTIONS
 
         -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
             Provides the path to the xml output file.
+
+        --error-on-binary-incompatibility
+            Exit with an error if a binary incompatibility is detected.
+
+        --error-on-source-incompatibility
+            Exit with an error if a source incompatibility is detected.
+
+        --error-on-modifications
+            Exit with an error if any change between versions is detected.
+
+        --no-error-on-exclusion-incompatibility
+            Ignore incompatible changes caused by an excluded class
+            (e.g. excluded interface removed from not excluded class) when
+            deciding whether to exit with an error.
+
+        --error-on-semantic-incompatibility
+            Exit with an error if the binary compatibility changes are
+            inconsistent with Semantic Versioning. This expects versions of
+            the form Major.Minor.Patch (e.g. 1.2.3 or 1.2.3-SNAPSHOT).
+            See http://semver.org/spec/v2.0.0.html for more information about
+            Semantic Versioning.
+
+        --ignore-missing-old-version
+            When --error-on-semantic-incompatibility is passed, ignore
+            non-resolvable artifacts for the old version.
+
+        --ignore-missing-new-version
+            When --error-on-semantic-incompatibility is passed, ignore
+            non-resolvable artifacts for the new version.
 
 ```
 
