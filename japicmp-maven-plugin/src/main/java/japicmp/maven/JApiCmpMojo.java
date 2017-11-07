@@ -371,8 +371,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (breakBuildOnModificationsParameter(parameterParam)) {
 			options.setErrorOnModifications(true);
 		}
-		if (parameterParam.isBreakBuildIfCausedByExclusion()) {
-			options.setErrorOnExclusionIncompatibility(true);
+		if (!parameterParam.isBreakBuildIfCausedByExclusion()) {
+			options.setErrorOnExclusionIncompatibility(false);
 		}
 		if (parameter != null && "true".equalsIgnoreCase(parameter.getIgnoreMissingOldVersion() == null ? "false" : parameter.getIgnoreMissingOldVersion())) {
 			options.setIgnoreMissingOldVersion(true);
