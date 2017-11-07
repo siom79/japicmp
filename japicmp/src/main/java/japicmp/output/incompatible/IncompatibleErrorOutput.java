@@ -83,7 +83,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 		if (options.isErrorOnModifications()) {
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-					throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format("Breaking the build because there is at least one modified class: %s", jApiClass.getFullyQualifiedName()));
+					throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format("There is at least one modified class: %s", jApiClass.getFullyQualifiedName()));
 				}
 			}
 		}
@@ -400,7 +400,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 			}
 		});
 		if (breakBuildResult.breakTheBuild()) {
-			throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format("Breaking the build because there is at least one incompatibility: %s", sb.toString()));
+			throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format("There is at least one incompatibility: %s", sb.toString()));
 		}
 	}
 }
