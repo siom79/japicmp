@@ -91,7 +91,7 @@ public class CliParser {
 				options.setErrorOnBinaryIncompatibility(true);
 			} else if ("--error-on-source-incompatibility".equals(arg)) {
 				options.setErrorOnSourceIncompatibility(true);
-			} else if ("--error-on-binary-incompatibility".equals(arg)) {
+			} else if ("--error-on-exclusion-incompatibility".equals(arg)) {
 				options.setErrorOnExclusionIncompatibility(true);
 			} else if ("--error-on-modifications".equals(arg)) {
 				options.setErrorOnModifications(true);
