@@ -5,6 +5,7 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
+import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -28,10 +29,10 @@ public class JApiCli {
 		}
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
-		generateOutput(options, jApiClasses);
+		generateOutput(options, jApiClasses, jarArchiveComparator);
 	}
 
-	private void generateOutput(Options options, List<JApiClass> jApiClasses) {
+	private void generateOutput(Options options, List<JApiClass> jApiClasses, JarArchiveComparator jarArchiveComparator) {
 		if (options.isSemanticVersioning()) {
 			SemverOut semverOut = new SemverOut(options, jApiClasses);
 			String output = semverOut.generate();
@@ -53,5 +54,12 @@ public class JApiCli {
 		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
 		String output = stdoutOutputGenerator.generate();
 		System.out.println(output);
+
+		if (options.isErrorOnBinaryIncompatibility()
+			|| options.isErrorOnSourceIncompatibility()
+			|| options.isErrorOnExclusionIncompatibility()) {
+			IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses, jarArchiveComparator);
+			errorOutput.generate();
+		}
 	}
 }

@@ -19,6 +19,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
@@ -46,7 +47,7 @@ import static org.mockito.Mockito.when;
 public class JApiCmpMojoTest {
 
 	@Test
-	public void testSimple() throws MojoFailureException {
+	public void testSimple() throws MojoFailureException, MojoExecutionException {
 		JApiCmpMojo mojo = new JApiCmpMojo();
 		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
 		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
@@ -69,7 +70,7 @@ public class JApiCmpMojoTest {
 	}
 
 	@Test
-	public void testNoXmlAndNoHtmlNoDiffReport() throws MojoFailureException {
+	public void testNoXmlAndNoHtmlNoDiffReport() throws MojoFailureException, MojoExecutionException {
 		JApiCmpMojo mojo = new JApiCmpMojo();
 		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
 		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
@@ -140,7 +141,7 @@ public class JApiCmpMojoTest {
 		parameterParam.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion); //do not break the build if cause is excluded
 		parameterParam.setBreakBuildOnBinaryIncompatibleModifications("true");
 		parameterParam.setBreakBuildOnSourceIncompatibleModifications("true");
-		mojo.breakBuildIfNecessaryByApplyingFilter(compareClassesResult.getjApiClasses(), parameterParam, options, new JarArchiveComparator(jarArchiveComparatorOptions));
+		mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, new JarArchiveComparator(jarArchiveComparatorOptions));
 	}
 
 	@Test
@@ -179,7 +180,7 @@ public class JApiCmpMojoTest {
 		parameterParam.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion); //do not break the build if cause is excluded
 		parameterParam.setBreakBuildOnBinaryIncompatibleModifications("true");
 		parameterParam.setBreakBuildOnSourceIncompatibleModifications("true");
-		mojo.breakBuildIfNecessaryByApplyingFilter(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
+		mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
 	}
 
 	@Test
@@ -218,7 +219,7 @@ public class JApiCmpMojoTest {
 		parameterParam.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion); //do not break the build if cause is excluded
 		parameterParam.setBreakBuildOnBinaryIncompatibleModifications("true");
 		parameterParam.setBreakBuildOnSourceIncompatibleModifications("true");
-		mojo.breakBuildIfNecessaryByApplyingFilter(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
+		mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
 	}
 
 	@Test
@@ -255,7 +256,7 @@ public class JApiCmpMojoTest {
 		parameterParam.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion); //do not break the build if cause is excluded
 		parameterParam.setBreakBuildOnBinaryIncompatibleModifications("true");
 		parameterParam.setBreakBuildOnSourceIncompatibleModifications("true");
-		mojo.breakBuildIfNecessaryByApplyingFilter(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
+		mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
 	}
 
 	@Test
@@ -283,7 +284,7 @@ public class JApiCmpMojoTest {
 		parameterParam.setBreakBuildOnBinaryIncompatibleModifications("true");
 		parameterParam.setBreakBuildOnSourceIncompatibleModifications("true");
 		try {
-			mojo.breakBuildIfNecessaryByApplyingFilter(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
+			mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
 			fail("No exception thrown.");
 		} catch (MojoFailureException e) {
 			String msg = e.getMessage();
@@ -295,7 +296,7 @@ public class JApiCmpMojoTest {
 	}
 
 	@Test
-	public void testIgnoreMissingVersions() throws MojoFailureException, IOException {
+	public void testIgnoreMissingVersions() throws MojoFailureException, IOException, MojoExecutionException {
 		JApiCmpMojo mojo = new JApiCmpMojo();
 		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
 		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");

@@ -1,27 +1,14 @@
 package japicmp.maven;
 
-import com.google.common.base.Joiner;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.filter.ClassFilter;
+import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
-import japicmp.model.JApiAnnotation;
-import japicmp.model.JApiBehavior;
-import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.model.JApiConstructor;
-import japicmp.model.JApiField;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiParameter;
-import japicmp.model.JApiReturnType;
-import japicmp.model.JApiSuperclass;
-import japicmp.model.JApiType;
-import japicmp.output.Filter;
+import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -29,8 +16,6 @@ import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import japicmp.util.Optional;
 import japicmp.versioning.SemanticVersion;
-import japicmp.versioning.VersionChange;
-import javassist.CtClass;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -125,7 +110,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
-	Optional<XmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
+	Optional<XmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
 		if (Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getSkipParam())) {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
 			return Optional.absent();
@@ -373,327 +358,44 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, Options options, JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
-		if (breakBuildOnModificationsParameter(parameterParam)) {
-			for (JApiClass jApiClass : jApiClasses) {
-				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-					throw new MojoFailureException(String.format("Breaking the build because there is at least one modified class: %s", jApiClass.getFullyQualifiedName()));
-				}
-			}
-		}
-		breakBuildIfNecessaryByApplyingFilter(jApiClasses, parameterParam, options, jarArchiveComparator);
+	void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, Options options, JarArchiveComparator jarArchiveComparator) throws MojoFailureException, MojoExecutionException {
 		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
-			boolean ignoreMissingOldVersion = "true".equalsIgnoreCase(parameter.getIgnoreMissingOldVersion() == null ? "false" : parameter.getIgnoreMissingOldVersion());
-			boolean ignoreMissingNewVersion = "true".equalsIgnoreCase(parameter.getIgnoreMissingNewVersion() == null ? "false" : parameter.getIgnoreMissingNewVersion());
-			List<SemanticVersion> oldVersions = new ArrayList<>();
-			List<SemanticVersion> newVersions = new ArrayList<>();
-			for (JApiCmpArchive file : options.getOldArchives()) {
-				Optional<SemanticVersion> semanticVersion = file.getVersion().getSemanticVersion();
-				if (semanticVersion.isPresent()) {
-					oldVersions.add(semanticVersion.get());
-				}
+			options.setErrorOnSemanticIncompatibility(true);
+		}
+		if (breakBuildOnBinaryIncompatibleModifications(parameterParam)) {
+			options.setErrorOnBinaryIncompatibility(true);
+		}
+		if (breakBuildOnSourceIncompatibleModifications(parameterParam)) {
+			options.setErrorOnSourceIncompatibility(true);
+		}
+		if (breakBuildOnModificationsParameter(parameterParam)) {
+			options.setErrorOnModifications(true);
+		}
+		if (parameterParam.isBreakBuildIfCausedByExclusion()) {
+			options.setErrorOnExclusionIncompatibility(true);
+		}
+		if (parameter != null && "true".equalsIgnoreCase(parameter.getIgnoreMissingOldVersion() == null ? "false" : parameter.getIgnoreMissingOldVersion())) {
+			options.setIgnoreMissingOldVersion(true);
+		}
+		if (parameter != null && "true".equalsIgnoreCase(parameter.getIgnoreMissingNewVersion() == null ? "false" : parameter.getIgnoreMissingNewVersion())) {
+			options.setIgnoreMissingNewVersion(true);
+		}
+
+		IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses, jarArchiveComparator) {
+			@Override
+			protected void warn(String msg, Throwable error) {
+				getLog().warn(msg, error);
 			}
-			for (JApiCmpArchive file : options.getNewArchives()) {
-				Optional<SemanticVersion> semanticVersion = file.getVersion().getSemanticVersion();
-				if (semanticVersion.isPresent()) {
-					newVersions.add(semanticVersion.get());
-				}
-			}
-			VersionChange versionChange = new VersionChange(oldVersions, newVersions, ignoreMissingOldVersion, ignoreMissingNewVersion);
-			if (!versionChange.isAllMajorVersionsZero()) {
-				Optional<SemanticVersion.ChangeType> changeTypeOptional = versionChange.computeChangeType();
-				if (changeTypeOptional.isPresent()) {
-					SemanticVersion.ChangeType changeType = changeTypeOptional.get();
-					SemverOut semverOut = new SemverOut(options, jApiClasses);
-					String semver = semverOut.generate();
-					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals("1.0.0")) {
-						throw new MojoFailureException("Versions of archives indicate a minor change but binary incompatible changes found.");
-					}
-					if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals("1.0.0")) {
-						throw new MojoFailureException("Versions of archives indicate a patch change but binary incompatible changes found.");
-					}
-					if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals("0.1.0")) {
-						throw new MojoFailureException("Versions of archives indicate a patch change but binary compatible changes found.");
-					}
-					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("1.0.0")) {
-						throw new MojoFailureException("Versions of archives indicate no API changes but binary incompatible changes found.");
-					}
-					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("0.1.0")) {
-						throw new MojoFailureException("Versions of archives indicate no API changes but binary compatible changes found.");
-					}
-					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("0.0.1")) {
-						throw new MojoFailureException("Versions of archives indicate no API changes but found API changes.");
-					}
-				} else {
-					if (getLog().isDebugEnabled()) {
-						Joiner joiner = Joiner.on(';');
-						getLog().debug("No change type available for old version(s) " + joiner.join(oldVersions) + " and new version(s) " + joiner.join(newVersions) + ".");
-					}
-				}
+		};
+		try {
+			errorOutput.generate();
+		} catch (JApiCmpException e) {
+			if (e.getReason() == JApiCmpException.Reason.IncompatibleChange) {
+				throw new MojoFailureException(e.getMessage());
 			} else {
-				getLog().info("Skipping semantic version check because all major versions are zero (see http://semver.org/#semantic-versioning-specification-semver, section 4).");
+				throw new MojoExecutionException("Error while checking for incompatible changes", e);
 			}
 		}
-	}
-
-	private static class BreakBuildResult {
-		private final boolean breakBuildOnBinaryIncompatibleModifications;
-		private final boolean breakBuildOnSourceIncompatibleModifications;
-		boolean binaryIncompatibleChanges = false;
-		boolean sourceIncompatibleChanges = false;
-
-		public BreakBuildResult(boolean breakBuildOnBinaryIncompatibleModifications, boolean breakBuildOnSourceIncompatibleModifications) {
-			this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;
-			this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;
-		}
-
-		public boolean breakTheBuild() {
-			return binaryIncompatibleChanges && this.breakBuildOnBinaryIncompatibleModifications ||
-				sourceIncompatibleChanges && this.breakBuildOnSourceIncompatibleModifications;
-		}
-	}
-
-	void breakBuildIfNecessaryByApplyingFilter(List<JApiClass> jApiClasses, Parameter parameterParam, final Options options,
-									   final JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
-		final StringBuilder sb = new StringBuilder();
-		final BreakBuildResult breakBuildResult = new BreakBuildResult(breakBuildOnBinaryIncompatibleModifications(parameterParam),
-			breakBuildOnSourceIncompatibleModifications(parameterParam));
-		final boolean breakBuildIfCausedByExclusion = parameterParam.isBreakBuildIfCausedByExclusion();
-		Filter.filter(jApiClasses, new Filter.FilterVisitor() {
-			@Override
-			public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiClass.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible()) {
-							breakBuildResult.binaryIncompatibleChanges = true;
-						}
-						if (!jApiCompatibilityChange.isSourceCompatible()) {
-							breakBuildResult.sourceIncompatibleChanges = true;
-						}
-						if (sb.length() > 1) {
-							sb.append(',');
-						}
-						sb.append(jApiClass.getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
-					}
-				}
-			}
-
-			@Override
-			public void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiMethod.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
-							breakBuildResult.binaryIncompatibleChanges = true;
-						}
-						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
-							breakBuildResult.sourceIncompatibleChanges = true;
-						}
-						if (sb.length() > 1) {
-							sb.append(',');
-						}
-						sb.append(jApiMethod.getjApiClass().getFullyQualifiedName()).append(".").append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod)).append(")").append(":").append(jApiCompatibilityChange.name());
-					}
-				}
-			}
-
-			private boolean breakBuildIfCausedByExclusion(JApiMethod jApiMethod) {
-				if (!breakBuildIfCausedByExclusion) {
-					JApiReturnType returnType = jApiMethod.getReturnType();
-					String oldType = returnType.getOldReturnType();
-					try {
-						Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);
-						if (ctClassOptional.isPresent()) {
-							if (classExcluded(ctClassOptional.get())) {
-								return false;
-							}
-						}
-					} catch (Exception e) {
-						getLog().warn("Failed to load class " + oldType + ": " + e.getMessage(), e);
-					}
-					String newType = returnType.getNewReturnType();
-					try {
-						Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);
-						if (ctClassOptional.isPresent()) {
-							if (classExcluded(ctClassOptional.get())) {
-								return false;
-							}
-						}
-					} catch (Exception e) {
-						getLog().warn("Failed to load class " + newType + ": " + e.getMessage(), e);
-					}
-				}
-				return true;
-			}
-
-			@Override
-			public void visit(Iterator<JApiConstructor> iterator, JApiConstructor jApiConstructor) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiConstructor.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible()) {
-							breakBuildResult.binaryIncompatibleChanges = true;
-						}
-						if (!jApiCompatibilityChange.isSourceCompatible()) {
-							breakBuildResult.sourceIncompatibleChanges = true;
-						}
-						if (sb.length() > 1) {
-							sb.append(',');
-						}
-						sb.append(jApiConstructor.getjApiClass().getFullyQualifiedName()).append(".").append(jApiConstructor.getName()).append("(").append(methodParameterToList(jApiConstructor)).append(")").append(":").append(jApiCompatibilityChange.name());
-					}
-				}
-			}
-
-			@Override
-			public void visit(Iterator<JApiImplementedInterface> iterator, JApiImplementedInterface jApiImplementedInterface) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiImplementedInterface.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiImplementedInterface)) {
-							breakBuildResult.binaryIncompatibleChanges = true;
-						}
-						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiImplementedInterface)) {
-							breakBuildResult.sourceIncompatibleChanges = true;
-						}
-						if (sb.length() > 1) {
-							sb.append(',');
-						}
-						sb.append(jApiImplementedInterface.getFullyQualifiedName()).append("[").append(jApiImplementedInterface.getFullyQualifiedName()).append("]").append(":").append(jApiCompatibilityChange.name());
-					}
-				}
-			}
-
-			private boolean breakBuildIfCausedByExclusion(JApiImplementedInterface jApiImplementedInterface) {
-				if (!breakBuildIfCausedByExclusion) {
-					CtClass ctClass = jApiImplementedInterface.getCtClass();
-					if (classExcluded(ctClass)) {
-						return false;
-					}
-				}
-				return true;
-			}
-
-			@Override
-			public void visit(Iterator<JApiField> iterator, JApiField jApiField) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiField.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiField)) {
-							breakBuildResult.binaryIncompatibleChanges = true;
-						}
-						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiField)) {
-							breakBuildResult.sourceIncompatibleChanges = true;
-						}
-						if (sb.length() > 1) {
-							sb.append(',');
-						}
-						sb.append(jApiField.getjApiClass().getFullyQualifiedName()).append(".").append(jApiField.getName()).append(":").append(jApiCompatibilityChange.name());
-					}
-				}
-			}
-
-			private boolean breakBuildIfCausedByExclusion(JApiField jApiField) {
-				if (!breakBuildIfCausedByExclusion) {
-					JApiType type = jApiField.getType();
-					Optional<String> oldTypeOptional = type.getOldTypeOptional();
-					if (oldTypeOptional.isPresent()) {
-						String oldType = oldTypeOptional.get();
-						try {
-							Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);
-							if (ctClassOptional.isPresent()) {
-								if (classExcluded(ctClassOptional.get())) {
-									return false;
-								}
-							}
-						} catch (Exception e) {
-							getLog().warn("Failed to load class " + oldType + ": " + e.getMessage(), e);
-						}
-					}
-					Optional<String> newTypeOptional = type.getNewTypeOptional();
-					if (newTypeOptional.isPresent()) {
-						String newType = newTypeOptional.get();
-						try {
-							Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);
-							if (ctClassOptional.isPresent()) {
-								if (classExcluded(ctClassOptional.get())) {
-									return false;
-								}
-							}
-						} catch (Exception e) {
-							getLog().warn("Failed to load class " + newType + ": " + e.getMessage(), e);
-						}
-					}
-				}
-				return true;
-			}
-
-			@Override
-			public void visit(Iterator<JApiAnnotation> iterator, JApiAnnotation jApiAnnotation) {
-				//no incompatible changes
-			}
-
-			@Override
-			public void visit(JApiSuperclass jApiSuperclass) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiSuperclass.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiSuperclass)) {
-							breakBuildResult.binaryIncompatibleChanges = true;
-						}
-						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiSuperclass)) {
-							breakBuildResult.sourceIncompatibleChanges = true;
-						}
-						if (sb.length() > 1) {
-							sb.append(',');
-						}
-						sb.append(jApiSuperclass.getJApiClassOwning().getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
-					}
-				}
-			}
-
-			private boolean breakBuildIfCausedByExclusion(JApiSuperclass jApiSuperclass) {
-				if (!breakBuildIfCausedByExclusion) {
-					Optional<CtClass> oldSuperclassOptional = jApiSuperclass.getOldSuperclass();
-					if (oldSuperclassOptional.isPresent()) {
-						CtClass ctClass = oldSuperclassOptional.get();
-						if (classExcluded(ctClass)) {
-							return false;
-						}
-					}
-					Optional<CtClass> newSuperclassOptional = jApiSuperclass.getNewSuperclass();
-					if (newSuperclassOptional.isPresent()) {
-						CtClass ctClass = newSuperclassOptional.get();
-						if (classExcluded(ctClass)) {
-							return false;
-						}
-					}
-				}
-				return true;
-			}
-
-			private boolean classExcluded(CtClass ctClass) {
-				List<japicmp.filter.Filter> excludes = options.getExcludes();
-				for (japicmp.filter.Filter exclude : excludes) {
-					if (exclude instanceof ClassFilter) {
-						ClassFilter classFilter = (ClassFilter) exclude;
-						if (classFilter.matches(ctClass)) {
-							return true;
-						}
-					}
-				}
-				return false;
-			}
-		});
-		if (breakBuildResult.breakTheBuild()) {
-			throw new MojoFailureException(String.format("Breaking the build because there is at least one incompatibility: %s", sb.toString()));
-		}
-	}
-
-	private String methodParameterToList(JApiBehavior jApiMethod) {
-		StringBuilder sb = new StringBuilder();
-		for (JApiParameter jApiParameter : jApiMethod.getParameters()) {
-			if (sb.length() > 0) {
-				sb.append(',');
-			}
-			sb.append(jApiParameter.getType());
-		}
-		return sb.toString();
 	}
 
 	Options getOptions(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
