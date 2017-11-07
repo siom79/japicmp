@@ -89,6 +89,20 @@ public class CliParser {
 				options.setNoAnnotations(true);
 			} else if ("--report-only-filename".equals(arg)) {
 				options.setReportOnlyFilename(true);
+			} else if ("--error-on-binary-incompatibility".equals(arg)) {
+				options.setErrorOnBinaryIncompatibility(true);
+			} else if ("--error-on-source-incompatibility".equals(arg)) {
+				options.setErrorOnSourceIncompatibility(true);
+			} else if ("--error-on-binary-incompatibility".equals(arg)) {
+				options.setErrorOnExclusionIncompatibility(true);
+			} else if ("--error-on-modifications".equals(arg)) {
+				options.setErrorOnModifications(true);
+			} else if ("--error-on-semantic-incompatibility".equals(arg)) {
+				options.setErrorOnSemanticIncompatibility(true);
+			} else if ("--ignore-missing-old-version".equals(arg)) {
+				options.setIgnoreMissingOldVersion(true);
+			} else if ("--ignore-missing-new-version".equals(arg)) {
+				options.setIgnoreMissingNewVersion(true);
 			} else {
 				throw new JApiCmpException(JApiCmpException.Reason.CliError, "Unknown argument: " + arg);
 			}
