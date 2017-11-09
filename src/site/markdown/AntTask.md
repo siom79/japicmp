@@ -64,4 +64,11 @@ The following table gives an overview of all available parameters of the Ant tas
 | xmlOutputFile 							| true  | n.a.  | Path to the xml output file. |
 | htmlOutputFile 							| true  | n.a.  | Path to the html output file. |
 | htmlStylesheet 							| true  | n.a.  | Path to your own stylesheet. |
+| errorOnBinaryIncompatibility				| true	| false | Exit with an error if a binary incompatibility is detected. |
+| errorOnSourceIncompatibility				| true	| false | Exit with an error if a source incompatibility is detected. |
+| errorOnModifications						| true	| false | Exit with an error if any change between versions is detected. |
+| errorOnExclusionIncompatibility			| true	| false | Ignore incompatible changes caused by an excluded class. |
+| errorOnSemanticIncompatibility 			| true	| false | Exit with an error if the binary compatibility changes are inconsistent with Semantic Versioning. This expects versions of the form Major.Minor.Patch (e.g. 1.2.3 or 1.2.3-SNAPSHOT). |
+| ignoreMissingOldVersion					| true	| false | When errorOnSemanticIncompatibility is true, ignore non-resolvable artifacts for the old version. |
+| ignoreMissingNewVersion					| true	| false | When errorOnSemanticIncompatibility is true, ignore non-resolvable artifacts for the new version. |
 
