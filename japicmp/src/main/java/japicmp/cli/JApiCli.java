@@ -57,7 +57,9 @@ public class JApiCli {
 
 		if (options.isErrorOnBinaryIncompatibility()
 			|| options.isErrorOnSourceIncompatibility()
-			|| options.isErrorOnExclusionIncompatibility()) {
+			|| options.isErrorOnExclusionIncompatibility()
+			|| options.isErrorOnModifications()
+			|| options.isErrorOnSemanticIncompatibility()) {
 			IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses, jarArchiveComparator);
 			errorOutput.generate();
 		}
