@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class Version {
 	private static final Logger LOGGER = Logger.getLogger(Version.class.getName());
-	private static final Pattern VERSION_PATTERN_THREE_DIGITS = Pattern.compile(".*([0-9]+)\\.([0-9]+)\\.([0-9]+).*");
+	private static final Pattern VERSION_PATTERN_THREE_DIGITS = Pattern.compile(".*?([0-9]+)\\.([0-9]+)\\.([0-9]+).*");
 	private final String version;
 
 	public Version(String version) {
