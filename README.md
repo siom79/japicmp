@@ -1,25 +1,25 @@
 The website is located at [https://siom79.github.io/japicmp](https://siom79.github.io/japicmp/).
 
 # japicmp
-
 japicmp is a tool to compare two versions of a jar archive:
-
-	java -jar japicmp-0.11.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
-
+```
+java -jar japicmp-0.11.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+```
 It can also be used as a library:
-
-	JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
-	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
-	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchives);
-
+```java
+JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
+JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
+List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchives);
+```
 japicmp is available in the Maven Central Repository:
-
-	<dependency>
-		<groupId>com.github.siom79.japicmp</groupId>
-		<artifactId>japicmp</artifactId>
-		<version>0.11.0</version>
-	</dependency>
-
+[![mvnrepository](https://img.shields.io/maven-central/v/com.github.siom79.japicmp/japicmp.svg)](https://mvnrepository.com/artifact/com.github.siom79.japicmp/japicmp)
+```
+<dependency>
+	<groupId>com.github.siom79.japicmp</groupId>
+	<artifactId>japicmp</artifactId>
+	<version>0.11.0</version>
+</dependency>
+```
 A maven plugin allows you to integrate the checks into your build:
 
 ```
