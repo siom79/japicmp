@@ -1,7 +1,10 @@
 language: java
-script: mvn integration-test
 jdk:
+    - oraclejdk9
     - oraclejdk8
-    - oraclejdk7
     - openjdk7
 sudo: false
+install: true
+before_script: |
+    if [ `java -version 2>&1 | grep -c " 9\."` -ne 0 ]; then export MAVEN_OPTS="--add-modules=java.xml.bind"; fi
+script: mvn integration-test
