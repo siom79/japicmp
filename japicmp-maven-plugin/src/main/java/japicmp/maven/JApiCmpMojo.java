@@ -338,6 +338,10 @@ public class JApiCmpMojo extends AbstractMojo {
 							for (Artifact a : artifacts) {
 								file = a.getFile();
 								if (file != null) {
+									if (!file.isFile()) {
+										getLog().info("No new version specified and artifact is not a file (" + file.getAbsolutePath() + ").");
+										continue;
+									}
 									try (JarFile jarFile = new JarFile(file)) {
 										getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
 										newArchives.add(new JApiCmpArchive(file, guessVersion(file)));
