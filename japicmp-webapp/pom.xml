@@ -9,6 +9,11 @@
 	<artifactId>japicmp-webapp</artifactId>
 	<packaging>war</packaging>
 
+	<properties>
+		<maven.site.plugin.skip>true</maven.site.plugin.skip>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
