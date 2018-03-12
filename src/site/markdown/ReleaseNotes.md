@@ -2,6 +2,15 @@
 
 The following versions of japicmp are available:
 
+##0.11.1 (2018-03-12)##
+* Reduced extraneous whitespace in the generated HTML report. [#197](https://github.com/siom79/japicmp/issues/197)
+* Addition of a default method to an interface or making a previously abstract method to a default method is marked as incompatible. [#201](https://github.com/siom79/japicmp/issues/201)
+* japicmp can be build under Oracle JDK 9.0.1 [#182(https://github.com/siom79/japicmp/issues/182)
+* If maven artifact is a directory, no stacktrace is printed to stdout. [#196](https://github.com/siom79/japicmp/issues/196)
+* If interface/class has been removed/added, the class file format version is printed as 'n.a.'. [#194](https://github.com/siom79/japicmp/issues/194)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.11.1%22).
+
 ##0.11.0 (2017-10-18)##
 
 * japicmp has now an Ant task. [#171](https://github.com/siom79/japicmp/issues/171)
@@ -9,6 +18,8 @@ The following versions of japicmp are available:
 * Changed class file format version is reported. [#168](https://github.com/siom79/japicmp/issues/168)
 * Square brackets are escaped in regular expressions for behavior matching. [#176](https://github.com/siom79/japicmp/issues/176)
 * japicmp can be build and run under JDK 1.9. [#182](https://github.com/siom79/japicmp/issues/182)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.11.0%22).
 
 ##0.10.0 (2017-04-02)##
 
