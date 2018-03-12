@@ -57,7 +57,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private boolean changeCausedByClassElement = false;
 	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
 
-	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
+	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass,
+					 Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
 		this.jarArchiveComparator = jarArchiveComparator;
 		this.options = this.jarArchiveComparator.getJarArchiveComparatorOptions();
 		this.fullyQualifiedName = fullyQualifiedName;

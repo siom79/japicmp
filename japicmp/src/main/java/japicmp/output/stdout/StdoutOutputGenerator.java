@@ -241,12 +241,19 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		JApiClassFileFormatVersion classFileFormatVersion = jApiClass.getClassFileFormatVersion();
 		sb.append(tabs(1))
 			.append(signs(classFileFormatVersion))
-			.append(" CLASS FILE FORMAT VERSION: ")
-			.append(classFileFormatVersion.getMajorVersionNew()).append(".").append(classFileFormatVersion.getMinorVersionNew())
-			.append(" <- ")
-			.append(classFileFormatVersion.getMajorVersionOld()).append(".").append(classFileFormatVersion.getMinorVersionOld())
-			.append("\n")
-		;
+			.append(" CLASS FILE FORMAT VERSION: ");
+		if (classFileFormatVersion.getMajorVersionNew() != -1 && classFileFormatVersion.getMinorVersionNew() != -1) {
+			sb.append(classFileFormatVersion.getMajorVersionNew()).append(".").append(classFileFormatVersion.getMinorVersionNew());
+		} else {
+			sb.append("n.a.");
+		}
+		sb.append(" <- ");
+		if (classFileFormatVersion.getMajorVersionOld() != -1 && classFileFormatVersion.getMinorVersionOld() != -1) {
+			sb.append(classFileFormatVersion.getMajorVersionOld()).append(".").append(classFileFormatVersion.getMinorVersionOld());
+		} else {
+			sb.append("n.a.");
+		}
+		sb.append("\n");
 	}
 
 	private String processClassType(JApiClass jApiClass) {
