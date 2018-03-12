@@ -84,9 +84,8 @@
 						<div class="warnings">
 							<span>
 								WARNING: You are using the option '--ignore-missing-classes', i.e. superclasses and
-								interfaces that could not
-								be found on the classpath are ignored. Hence changes caused by these superclasses and
-								interfaces are not reflected in the output.
+								interfaces that could not be found on the classpath are ignored. Hence changes
+								caused by these superclasses and interfaces are not reflected in the output.
 							</span>
 						</div>
 					</xsl:if>
@@ -104,8 +103,7 @@
 	</xsl:template>
 
 	<xsl:template match="classes">
-		<div class="toc">
-			<a name="toc"/>
+		<div class="toc" id="toc">
 			<span class="label">Classes:</span>
 			<table>
 				<thead>
@@ -122,9 +120,7 @@
 			</table>
 		</div>
 		<div class="explanations">
-			<span>
-				Binary incompatible changes are marked with (!) while source incompatible changes are marked with (*).
-			</span>
+			<span>Binary incompatible changes are marked with (!) while source incompatible changes are marked with (*).</span>
 		</div>
 		<div>
 			<xsl:apply-templates select="class" mode="detail">
@@ -140,8 +136,7 @@
 			</td>
 			<td>
 				<a>
-					<xsl:attribute name="href">#<xsl:value-of select="@fullyQualifiedName"/>
-					</xsl:attribute>
+					<xsl:attribute name="href">#<xsl:value-of select="@fullyQualifiedName"/></xsl:attribute>
 					<xsl:value-of select="@fullyQualifiedName"/>
 				</a>
 			</td>
@@ -151,21 +146,16 @@
 	<xsl:template match="class" mode="detail">
 		<div>
 			<div class="class">
-				<xsl:attribute name="id">
-					<xsl:value-of select="@fullyQualifiedName"/>
-				</xsl:attribute>
+				<xsl:attribute name="id"><xsl:value-of select="@fullyQualifiedName"/></xsl:attribute>
 				<div class="class_header">
 					<span class="label">
 						<a>
-							<xsl:attribute name="name">
-								<xsl:value-of select="@fullyQualifiedName"/>
-							</xsl:attribute>
+							<xsl:attribute name="name"><xsl:value-of select="@fullyQualifiedName"/></xsl:attribute>
 						</a>
 						<xsl:call-template name="outputChangeStatus"/>
 						<xsl:call-template name="javaObjectSerializationCompatible"/>
 						<xsl:call-template name="modifiers"/>
-						<xsl:call-template name="classType"/>&#160;
-						<xsl:value-of select="@fullyQualifiedName"/>
+						<xsl:call-template name="classType"/>&#160;<xsl:value-of select="@fullyQualifiedName"/>
 					</span>
 					<a href="#toc" class="toc_link">top</a>
 				</div>
@@ -262,29 +252,20 @@
 								<tr>
 									<td class="matrix_layout">Old</td>
 									<td>
-										<xsl:if
-											test="serialVersionUid/@serializableOld != serialVersionUid/@serializableNew">
-											<xsl:attribute name="class">
-												modified
-											</xsl:attribute>
+										<xsl:if test="serialVersionUid/@serializableOld != serialVersionUid/@serializableNew">
+											<xsl:attribute name="class">modified</xsl:attribute>
 										</xsl:if>
 										<xsl:value-of select="serialVersionUid/@serializableOld"/>
 									</td>
 									<td>
-										<xsl:if
-											test="serialVersionUid/@serialVersionUidDefaultOld != serialVersionUid/@serialVersionUidDefaultNew">
-											<xsl:attribute name="class">
-												modified
-											</xsl:attribute>
+										<xsl:if test="serialVersionUid/@serialVersionUidDefaultOld != serialVersionUid/@serialVersionUidDefaultNew">
+											<xsl:attribute name="class">modified</xsl:attribute>
 										</xsl:if>
 										<xsl:value-of select="serialVersionUid/@serialVersionUidDefaultOld"/>
 									</td>
 									<td>
-										<xsl:if
-											test="serialVersionUid/@serialVersionUidInClassOld != serialVersionUid/@serialVersionUidInClassNew">
-											<xsl:attribute name="class">
-												modified
-											</xsl:attribute>
+										<xsl:if test="serialVersionUid/@serialVersionUidInClassOld != serialVersionUid/@serialVersionUidInClassNew">
+											<xsl:attribute name="class">modified</xsl:attribute>
 										</xsl:if>
 										<xsl:value-of select="serialVersionUid/@serialVersionUidInClassOld"/>
 									</td>
@@ -292,29 +273,20 @@
 								<tr>
 									<td class="matrix_layout">New</td>
 									<td>
-										<xsl:if
-											test="serialVersionUid/@serializableOld != serialVersionUid/@serializableNew">
-											<xsl:attribute name="class">
-												modified
-											</xsl:attribute>
+										<xsl:if test="serialVersionUid/@serializableOld != serialVersionUid/@serializableNew">
+											<xsl:attribute name="class">modified</xsl:attribute>
 										</xsl:if>
 										<xsl:value-of select="serialVersionUid/@serializableNew"/>
 									</td>
 									<td>
-										<xsl:if
-											test="serialVersionUid/@serialVersionUidDefaultOld != serialVersionUid/@serialVersionUidDefaultNew">
-											<xsl:attribute name="class">
-												modified
-											</xsl:attribute>
+										<xsl:if test="serialVersionUid/@serialVersionUidDefaultOld != serialVersionUid/@serialVersionUidDefaultNew">
+											<xsl:attribute name="class">modified</xsl:attribute>
 										</xsl:if>
 										<xsl:value-of select="serialVersionUid/@serialVersionUidDefaultNew"/>
 									</td>
 									<td>
-										<xsl:if
-											test="serialVersionUid/@serialVersionUidInClassOld != serialVersionUid/@serialVersionUidInClassNew">
-											<xsl:attribute name="class">
-												modified
-											</xsl:attribute>
+										<xsl:if test="serialVersionUid/@serialVersionUidInClassOld != serialVersionUid/@serialVersionUidInClassNew">
+											<xsl:attribute name="class">modified</xsl:attribute>
 										</xsl:if>
 										<xsl:value-of select="serialVersionUid/@serialVersionUidInClassNew"/>
 									</td>
@@ -490,8 +462,7 @@
 				<xsl:call-template name="compatibilityChanges"/>
 			</td>
 			<td>
-				<xsl:value-of select="@name"/>
-				<xsl:call-template name="annotations"/>
+				<xsl:value-of select="@name"/><xsl:call-template name="annotations"/>
 			</td>
 		</tr>
 	</xsl:template>
@@ -505,8 +476,7 @@
 				<xsl:call-template name="modifiers"/>
 			</td>
 			<td>
-				<xsl:value-of select="@name"/>(<xsl:apply-templates select="parameters"/>)
-				<xsl:call-template name="annotations"/>
+				<xsl:value-of select="@name"/>(<xsl:apply-templates select="parameters"/>)<xsl:call-template name="annotations"/>
 			</td>
 			<td>
 				<xsl:call-template name="exceptions"/>
@@ -549,8 +519,7 @@
 				<xsl:apply-templates select="returnType"/>
 			</td>
 			<td>
-				<xsl:value-of select="@name"/>(<xsl:apply-templates select="parameters"/>)
-				<xsl:call-template name="annotations"/>
+				<xsl:value-of select="@name"/>(<xsl:apply-templates select="parameters"/>)<xsl:call-template name="annotations"/>
 			</td>
 			<td>
 				<xsl:call-template name="exceptions"/>
@@ -647,9 +616,7 @@
 				</td>
 				<td>
 					<xsl:for-each select="oldElementValues/oldElementValue">
-						<xsl:if test="position() > 1">,
-							<wbr/>
-						</xsl:if>
+						<xsl:if test="position() > 1">,<wbr/></xsl:if>
 						<xsl:choose>
 							<xsl:when test="@type = 'Annotation'">
 								@<xsl:value-of select="@fullyQualifiedName"/>(<xsl:apply-templates select="values"/>)
@@ -668,9 +635,7 @@
 				</td>
 				<td>
 					<xsl:for-each select="newElementValues/newElementValue">
-						<xsl:if test="position() > 1">,
-							<wbr/>
-						</xsl:if>
+						<xsl:if test="position() > 1">,<wbr/></xsl:if>
 						<xsl:choose>
 							<xsl:when test="@type = 'Annotation'">
 								@<xsl:value-of select="@fullyQualifiedName"/>(<xsl:apply-templates select="values"/>)
@@ -693,9 +658,7 @@
 
 	<xsl:template match="values">
 		<xsl:for-each select="value">
-			<xsl:if test="position() > 1">,
-				<wbr/>
-			</xsl:if>
+			<xsl:if test="position() > 1">,<wbr/></xsl:if>
 			<xsl:choose>
 				<xsl:when test="@type = 'Annotation'">
 					@<xsl:value-of select="@fullyQualifiedName"/>(<xsl:apply-templates select="values"/>)
@@ -716,9 +679,7 @@
 	<xsl:template match="parameters">
 		<xsl:if test="count(parameter) > 0">
 			<xsl:for-each select="parameter">
-				<xsl:if test="position() > 1">,
-					<wbr/>
-				</xsl:if>
+				<xsl:if test="position() > 1">,<wbr/></xsl:if>
 				<xsl:value-of select="@type"/>
 			</xsl:for-each>
 		</xsl:if>
@@ -728,33 +689,21 @@
 		<span>
 			<xsl:choose>
 				<xsl:when test="@changeStatus = 'MODIFIED'">
-					<xsl:attribute name="class">
-						modified
-					</xsl:attribute>
+					<xsl:attribute name="class">modified</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'UNCHANGED'">
-					<xsl:attribute name="class">
-						unchanged
-					</xsl:attribute>
+					<xsl:attribute name="class">unchanged</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'NEW'">
-					<xsl:attribute name="class">
-						new
-					</xsl:attribute>
+					<xsl:attribute name="class">new</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'REMOVED'">
-					<xsl:attribute name="class">
-						removed
-					</xsl:attribute>
+					<xsl:attribute name="class">removed</xsl:attribute>
 				</xsl:when>
 			</xsl:choose>
 			<xsl:value-of select="@changeStatus"/>
-			<xsl:if test="@binaryCompatible = 'false'">
-				(!)
-			</xsl:if>
-			<xsl:if test="@binaryCompatible = 'true' and @sourceCompatible = 'false'">
-				(*)
-			</xsl:if>
+			<xsl:if test="@binaryCompatible = 'false'">&#160;(!)</xsl:if>
+			<xsl:if test="@binaryCompatible = 'true' and @sourceCompatible = 'false'">&#160;(*)</xsl:if>
 		</span>
 	</xsl:template>
 
@@ -763,60 +712,47 @@
 			<span>
 				<xsl:choose>
 					<xsl:when test="@changeStatus = 'MODIFIED'">
-						<xsl:attribute name="class">
-							modified modifier
-						</xsl:attribute>
+						<xsl:attribute name="class">modified modifier</xsl:attribute>
 					</xsl:when>
 					<xsl:when test="@changeStatus = 'UNCHANGED'">
-						<xsl:attribute name="class">
-							unchanged modifier
-						</xsl:attribute>
+						<xsl:attribute name="class">unchanged modifier</xsl:attribute>
 					</xsl:when>
 					<xsl:when test="@changeStatus = 'NEW'">
-						<xsl:attribute name="class">
-							new modifier
-						</xsl:attribute>
+						<xsl:attribute name="class">new modifier</xsl:attribute>
 					</xsl:when>
 					<xsl:when test="@changeStatus = 'REMOVED'">
-						<xsl:attribute name="class">
-							removed modifier
-						</xsl:attribute>
+						<xsl:attribute name="class">removed modifier</xsl:attribute>
 					</xsl:when>
 				</xsl:choose>
 				<xsl:choose>
 					<xsl:when test="@changeStatus = 'MODIFIED'">
 						<xsl:call-template name="modifier">
 							<xsl:with-param name="modifier" select="@newValue"/>
-							<xsl:with-param
-								name="changeStatus" select="@changeStatus"/>
+							<xsl:with-param name="changeStatus" select="@changeStatus"/>
 						</xsl:call-template>
 						&#160;(&lt;-&#160;
 						<xsl:call-template name="modifier">
 							<xsl:with-param name="modifier" select="@oldValue"/>
-							<xsl:with-param
-								name="changeStatus" select="@changeStatus"/>
+							<xsl:with-param name="changeStatus" select="@changeStatus"/>
 						</xsl:call-template>
 						)&#160;
 					</xsl:when>
 					<xsl:when test="@changeStatus = 'UNCHANGED'">
 						<xsl:call-template name="modifier">
 							<xsl:with-param name="modifier" select="@newValue"/>
-							<xsl:with-param
-								name="changeStatus" select="@changeStatus"/>
+							<xsl:with-param name="changeStatus" select="@changeStatus"/>
 						</xsl:call-template>
 					</xsl:when>
 					<xsl:when test="@changeStatus = 'NEW'">
 						<xsl:call-template name="modifier">
 							<xsl:with-param name="modifier" select="@newValue"/>
-							<xsl:with-param
-								name="changeStatus" select="@changeStatus"/>
+							<xsl:with-param name="changeStatus" select="@changeStatus"/>
 						</xsl:call-template>
 					</xsl:when>
 					<xsl:when test="@changeStatus = 'REMOVED'">
 						<xsl:call-template name="modifier">
 							<xsl:with-param name="modifier" select="@oldValue"/>
-							<xsl:with-param
-								name="changeStatus" select="@changeStatus"/>
+							<xsl:with-param name="changeStatus" select="@changeStatus"/>
 						</xsl:call-template>
 					</xsl:when>
 				</xsl:choose>
@@ -847,8 +783,7 @@
 				<xsl:if test="$changeStatus = 'MODIFIED'">package_protected</xsl:if>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of
-					select="translate($modifier, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+				<xsl:value-of select="translate($modifier, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
 				<xsl:if test="$changeStatus != 'MODIFIED'">&#160;</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -871,33 +806,23 @@
 				</tbody>
 			</table>
 		</xsl:if>
-		<xsl:if test="count(compatibilityChanges/compatibilityChange) = 0">
-			n.a.
-		</xsl:if>
+		<xsl:if test="count(compatibilityChanges/compatibilityChange) = 0">n.a.</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="type">
 		<span>
 			<xsl:choose>
 				<xsl:when test="@changeStatus = 'MODIFIED'">
-					<xsl:attribute name="class">
-						modified modifier
-					</xsl:attribute>
+					<xsl:attribute name="class">modified modifier</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'UNCHANGED'">
-					<xsl:attribute name="class">
-						unchanged modifier
-					</xsl:attribute>
+					<xsl:attribute name="class">unchanged modifier</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'NEW'">
-					<xsl:attribute name="class">
-						new modifier
-					</xsl:attribute>
+					<xsl:attribute name="class">new modifier</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'REMOVED'">
-					<xsl:attribute name="class">
-						removed modifier
-					</xsl:attribute>
+					<xsl:attribute name="class">removed modifier</xsl:attribute>
 				</xsl:when>
 			</xsl:choose>
 			<xsl:choose>
@@ -927,24 +852,16 @@
 		<span>
 			<xsl:choose>
 				<xsl:when test="@changeStatus = 'MODIFIED'">
-					<xsl:attribute name="class">
-						modified method_return_type
-					</xsl:attribute>
+					<xsl:attribute name="class">modified method_return_type</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'UNCHANGED'">
-					<xsl:attribute name="class">
-						unchanged method_return_type
-					</xsl:attribute>
+					<xsl:attribute name="class">unchanged method_return_type</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'NEW'">
-					<xsl:attribute name="class">
-						new method_return_type
-					</xsl:attribute>
+					<xsl:attribute name="class">new method_return_type</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'REMOVED'">
-					<xsl:attribute name="class">
-						removed method_return_type
-					</xsl:attribute>
+					<xsl:attribute name="class">removed method_return_type</xsl:attribute>
 				</xsl:when>
 			</xsl:choose>
 			<xsl:choose>
@@ -968,43 +885,31 @@
 		<span>
 			<xsl:choose>
 				<xsl:when test="classType/@changeStatus = 'MODIFIED'">
-					<xsl:attribute name="class">
-						modified
-					</xsl:attribute>
+					<xsl:attribute name="class">modified</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="classType/@changeStatus = 'UNCHANGED'">
-					<xsl:attribute name="class">
-						unchanged
-					</xsl:attribute>
+					<xsl:attribute name="class">unchanged</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="classType/@changeStatus = 'NEW'">
-					<xsl:attribute name="class">
-						new
-					</xsl:attribute>
+					<xsl:attribute name="class">new</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="classType/@changeStatus = 'REMOVED'">
-					<xsl:attribute name="class">
-						removed
-					</xsl:attribute>
+					<xsl:attribute name="class">removed</xsl:attribute>
 				</xsl:when>
 			</xsl:choose>
 			<xsl:choose>
 				<xsl:when test="classType/@changeStatus = 'MODIFIED'">
-					<xsl:value-of
-						select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>&#160;(&lt;-&#160;<xsl:value-of
+					<xsl:value-of select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>&#160;(&lt;-&#160;<xsl:value-of
 					select="translate(classType/@oldType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>)
 				</xsl:when>
 				<xsl:when test="classType/@changeStatus = 'UNCHANGED'">
-					<xsl:value-of
-						select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+					<xsl:value-of select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
 				</xsl:when>
 				<xsl:when test="classType/@changeStatus = 'NEW'">
-					<xsl:value-of
-						select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+					<xsl:value-of select="translate(classType/@newType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
 				</xsl:when>
 				<xsl:when test="classType/@changeStatus = 'REMOVED'">
-					<xsl:value-of
-						select="translate(classType/@oldType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+					<xsl:value-of select="translate(classType/@oldType, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
 				</xsl:when>
 			</xsl:choose>
 		</span>
@@ -1013,23 +918,9 @@
 	<xsl:template name="javaObjectSerializationCompatible">
 		<span>
 			<xsl:choose>
-				<xsl:when test="@javaObjectSerializationCompatible = 'NOT_SERIALIZABLE'">
-					<xsl:attribute name="class">
-					</xsl:attribute>
-					&#160;
-				</xsl:when>
-				<xsl:when test="@javaObjectSerializationCompatible = 'SERIALIZABLE_COMPATIBLE'">
-					<xsl:attribute name="class">
-						new
-					</xsl:attribute>
-					(Serializable compatible)&#160;
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:attribute name="class">
-						removed
-					</xsl:attribute>
-					(Serializable incompatible(!): <xsl:value-of select="@javaObjectSerializationCompatibleAsString"/>)&#160;
-				</xsl:otherwise>
+				<xsl:when test="@javaObjectSerializationCompatible = 'NOT_SERIALIZABLE'"><xsl:attribute name="class"></xsl:attribute>&#160;</xsl:when>
+				<xsl:when test="@javaObjectSerializationCompatible = 'SERIALIZABLE_COMPATIBLE'"><xsl:attribute name="class">new</xsl:attribute>&#160;(Serializable compatible)&#160;</xsl:when>
+				<xsl:otherwise><xsl:attribute name="class">removed</xsl:attribute>&#160;(Serializable incompatible(!): <xsl:value-of select="@javaObjectSerializationCompatibleAsString"/>)&#160;</xsl:otherwise>
 			</xsl:choose>
 		</span>
 	</xsl:template>
