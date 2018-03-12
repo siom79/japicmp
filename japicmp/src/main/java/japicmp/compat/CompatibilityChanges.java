@@ -1,26 +1,10 @@
 package japicmp.compat;
 
+import japicmp.model.*;
 import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
-import japicmp.model.AbstractModifier;
-import japicmp.model.AccessModifier;
-import japicmp.model.FinalModifier;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiClassType;
-import japicmp.model.JApiCompatibility;
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.model.JApiConstructor;
-import japicmp.model.JApiException;
-import japicmp.model.JApiField;
-import japicmp.model.JApiHasAbstractModifier;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiSuperclass;
-import japicmp.model.JApiType;
-import japicmp.model.StaticModifier;
 import japicmp.util.ClassHelper;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -381,6 +365,22 @@ public class CompatibilityChanges {
 				}
 				if (method.getStaticModifier().hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NO_LONGER_STATIC);
+				}
+			}
+			// section 13.5.6 of "Java Language Specification" SE7
+			if (isInterface(jApiClass)) {
+				if (method.getChangeStatus() == JApiChangeStatus.NEW) {
+					// new default method in interface
+					if (method.getAbstractModifier().hasChangedTo(AbstractModifier.NON_ABSTRACT)) {
+						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_DEFAULT);
+					}
+				} else if (method.getChangeStatus() == JApiChangeStatus.MODIFIED || method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+					JApiModifier<AbstractModifier> abstractModifier = method.getAbstractModifier();
+					// method changed from abstract to default
+					if (abstractModifier.getOldModifier().isPresent() && abstractModifier.getOldModifier().get() == AbstractModifier.ABSTRACT &&
+						abstractModifier.getNewModifier().isPresent() && abstractModifier.getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
+						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT);
+					}
 				}
 			}
 			checkAbstractMethod(jApiClass, classMap, method);
