@@ -21,10 +21,6 @@ public class ITReportTitle {
 		assertThat(Files.exists(htmlPath), is(true));
 		Document document = Jsoup.parse(htmlPath.toFile(), "UTF-8");
 
-		Elements leftNav = document.select("#leftColumn [href=\"japicmp.html\"]");
-		assertThat(leftNav.attr("title"), is("japicmp"));
-		assertThat(leftNav.text(), is("japicmp"));
-
 		Elements overviewRow = document.select("#bodyColumn tr:has([href=\"japicmp.html\"])");
 		Elements link = overviewRow.select("[href=\"japicmp.html\"]");
 		assertThat(link.text(), is("japicmp"));

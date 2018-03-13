@@ -32,6 +32,6 @@
 			<item href="Examples.html" name="Examples" />
 			<item href="ReleaseNotes.html" name="Release Notes" />
 		</menu>
-		<menu ref="reports" inherit="bottom" />
+		<menu ref="modules" inherit="bottom" />
 	</body>
 </project>
