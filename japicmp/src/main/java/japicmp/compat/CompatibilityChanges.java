@@ -207,38 +207,27 @@ public class CompatibilityChanges {
 			ClassPool classPool = this.jarArchiveComparator.getCommonClassPool();
 			try {
 				oldClassOptional = Optional.of(classPool.get(newSuperclassName));
-			} catch (NotFoundException e) {
-				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
-					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
-				}
-			}
+			} catch (NotFoundException ignored) {}
 			try {
 				newClassOptional = Optional.of(classPool.get(newSuperclassName));
-			} catch (NotFoundException e) {
-				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
-					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
-				}
-			}
+			} catch (NotFoundException ignored) {}
 		} else {
 			if (classpaths.contains(Classpath.OLD_CLASSPATH)) {
 				ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();
 				try {
 					oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
-				} catch (NotFoundException e) {
-					if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
-						throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
-					}
-				}
+				} catch (NotFoundException ignored) {}
 			}
 			if (classpaths.contains(Classpath.NEW_CLASSPATH)) {
 				ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();
 				try {
 					newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
-				} catch (NotFoundException e) {
-					if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
-						throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
-					}
-				}
+				} catch (NotFoundException ignored) {}
+			}
+		}
+		if (!oldClassOptional.isPresent() && !newClassOptional.isPresent()) {
+			if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(newSuperclassName)) {
+				throw JApiCmpException.forClassLoading(newSuperclassName, this.jarArchiveComparator);
 			}
 		}
 		JApiClassType classType;
