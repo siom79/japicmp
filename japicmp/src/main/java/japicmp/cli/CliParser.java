@@ -35,7 +35,9 @@ public class CliParser {
 		sae = new StringArrayEnumeration(args);
 		while (sae.hasMoreElements()) {
 			String arg = sae.nextElement();
-			if ("-n".equals(arg) || "--new".equals(arg)) {
+			if ("--include-exclusively".equals(arg) || "--exclude-exclusively".equals(arg)){
+                // Do nothing
+			} else if ("-n".equals(arg) || "--new".equals(arg)) {
 				String newArchive = getOptionWithArgument("-n, --new", sae);
 				options.getNewArchives().addAll(createFileList(checkNonNull(newArchive, "Required option -n is missing.")));
 			} else if ("-o".equals(arg) || "--old".equals(arg)) {
