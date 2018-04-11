@@ -48,6 +48,13 @@ public class Options {
 	private boolean noAnnotations = false;
 	private boolean reportOnlyFilename;
 	private boolean semanticVersioning;
+	private boolean errorOnBinaryIncompatibility;
+	private boolean errorOnSourceIncompatibility;
+	private boolean errorOnExclusionIncompatibility = true;
+	private boolean errorOnModifications;
+	private boolean errorOnSemanticIncompatibility;
+	private boolean ignoreMissingOldVersion;
+	private boolean ignoreMissingNewVersion;
 	private boolean helpRequested;
 
 	Options() {
@@ -382,6 +389,62 @@ public class Options {
 
 	public boolean isSemanticVersioning() {
 		return semanticVersioning;
+	}
+
+	public boolean isErrorOnBinaryIncompatibility() {
+		return errorOnBinaryIncompatibility;
+	}
+
+	public void setErrorOnBinaryIncompatibility(boolean errorOnBinaryIncompatibility) {
+		this.errorOnBinaryIncompatibility = errorOnBinaryIncompatibility;
+	}
+
+	public boolean isErrorOnSourceIncompatibility() {
+		return errorOnSourceIncompatibility;
+	}
+
+	public void setErrorOnSourceIncompatibility(boolean errorOnSourceIncompatibility) {
+		this.errorOnSourceIncompatibility = errorOnSourceIncompatibility;
+	}
+
+	public boolean isErrorOnExclusionIncompatibility() {
+		return errorOnExclusionIncompatibility;
+	}
+
+	public void setErrorOnExclusionIncompatibility(boolean errorOnExclusionIncompatibility) {
+		this.errorOnExclusionIncompatibility = errorOnExclusionIncompatibility;
+	}
+
+	public boolean isErrorOnModifications() {
+		return errorOnModifications;
+	}
+
+	public void setErrorOnModifications(boolean errorOnModifications) {
+		this.errorOnModifications = errorOnModifications;
+	}
+
+	public boolean isErrorOnSemanticIncompatibility() {
+		return errorOnSemanticIncompatibility;
+	}
+
+	public void setErrorOnSemanticIncompatibility(boolean errorOnSemanticIncompatibility) {
+		this.errorOnSemanticIncompatibility = errorOnSemanticIncompatibility;
+	}
+
+	public boolean isIgnoreMissingOldVersion() {
+		return ignoreMissingOldVersion;
+	}
+
+	public void setIgnoreMissingOldVersion(boolean ignoreMissingOldVersion) {
+		this.ignoreMissingOldVersion = ignoreMissingOldVersion;
+	}
+
+	public boolean isIgnoreMissingNewVersion() {
+		return ignoreMissingNewVersion;
+	}
+
+	public void setIgnoreMissingNewVersion(boolean ignoreMissingNewVersion) {
+		this.ignoreMissingNewVersion = ignoreMissingNewVersion;
 	}
 
 	public boolean isHelpRequested() {

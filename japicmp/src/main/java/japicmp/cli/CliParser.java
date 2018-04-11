@@ -87,6 +87,20 @@ public class CliParser {
 				options.setNoAnnotations(true);
 			} else if ("--report-only-filename".equals(arg)) {
 				options.setReportOnlyFilename(true);
+			} else if ("--error-on-binary-incompatibility".equals(arg)) {
+				options.setErrorOnBinaryIncompatibility(true);
+			} else if ("--error-on-source-incompatibility".equals(arg)) {
+				options.setErrorOnSourceIncompatibility(true);
+			} else if ("--no-error-on-exclusion-incompatibility".equals(arg)) {
+				options.setErrorOnExclusionIncompatibility(false);
+			} else if ("--error-on-modifications".equals(arg)) {
+				options.setErrorOnModifications(true);
+			} else if ("--error-on-semantic-incompatibility".equals(arg)) {
+				options.setErrorOnSemanticIncompatibility(true);
+			} else if ("--ignore-missing-old-version".equals(arg)) {
+				options.setIgnoreMissingOldVersion(true);
+			} else if ("--ignore-missing-new-version".equals(arg)) {
+				options.setIgnoreMissingNewVersion(true);
 			} else {
 				throw new JApiCmpException(JApiCmpException.Reason.CliError, "Unknown argument: " + arg);
 			}
@@ -110,6 +124,12 @@ public class CliParser {
 			"                [--old-classpath <oldClassPath>] [--report-only-filename]\n" +
 			"                [(-s | --semantic-versioning)]\n" +
 			"                [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]\n" +
+			"                [--error-on-binary-incompatibility]\n" +
+			"                [--error-on-source-incompatibility]\n" +
+			"                [--error-on-modifications]\n" +
+			"                [--no-error-on-exclusion-incompatibility]\n" +
+			"                [--error-on-semantic-incompatibility]\n" +
+			"                [--ignore-missing-old-version] [--ignore-missing-new-version]\n" +
 			"\n" +
 			"OPTIONS\n" +
 			"        -a <accessModifier>\n" +
@@ -187,7 +207,36 @@ public class CliParser {
 			"            Tells you which part of the version to increment.\n" +
 			"\n" +
 			"        -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>\n" +
-			"            Provides the path to the xml output file.");
+			"            Provides the path to the xml output file.\n" +
+			"\n" +
+			"        --error-on-binary-incompatibility\n" +
+			"            Exit with an error if a binary incompatibility is detected.\n" +
+			"\n" +
+			"        --error-on-source-incompatibility\n" +
+			"            Exit with an error if a source incompatibility is detected.\n" +
+			"\n" +
+			"        --error-on-modifications\n" +
+			"            Exit with an error if any change between versions is detected.\n" +
+			"\n" +
+			"        --no-error-on-exclusion-incompatibility\n" +
+			"            Ignore incompatible changes caused by an excluded class\n" +
+			"            (e.g. excluded interface removed from not excluded class) when\n" +
+			"            deciding whether to exit with an error.\n" +
+			"\n" +
+			"        --error-on-semantic-incompatibility\n" +
+			"            Exit with an error if the binary compatibility changes are\n" +
+			"            inconsistent with Semantic Versioning. This expects versions of\n" +
+			"            the form Major.Minor.Patch (e.g. 1.2.3 or 1.2.3-SNAPSHOT).\n" +
+			"            See http://semver.org/spec/v2.0.0.html for more information about\n" +
+			"            Semantic Versioning.\n" +
+			"\n" +
+			"        --ignore-missing-old-version\n" +
+			"            When --error-on-semantic-incompatibility is passed, ignore\n" +
+			"            non-resolvable artifacts for the old version.\n" +
+			"\n" +
+			"        --ignore-missing-new-version\n" +
+			"            When --error-on-semantic-incompatibility is passed, ignore\n" +
+			"            non-resolvable artifacts for the new version.\n");
 	}
 
 	private String getOptionWithArgument(String option, StringArrayEnumeration sae) {
