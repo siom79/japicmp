@@ -68,6 +68,10 @@ public class JApiCmpReport extends AbstractMavenReport {
 	protected void executeReport(Locale locale) throws MavenReportException {
 		try {
 			JApiCmpMojo mojo = getMojo();
+			if ("true".equalsIgnoreCase(skip) || isPomModuleNeedingSkip()) {
+				getLog().info("japicmp module set to skip");
+				return;
+			}
 			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(pluginParameters, mavenParameters);
 			if (xmlOutputOptional.isPresent()) {
 				XmlOutput xmlOutput = xmlOutputOptional.get();
@@ -124,11 +128,19 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	@Override
 	public String getDescription(Locale locale) {
+		if (Boolean.TRUE.toString().equalsIgnoreCase(skip) || isPomModuleNeedingSkip()) {
+			return "skipping report";
+		}
 		Options options = getOptions();
 		if (options == null) {
 			return "failed report";
 		}
 		return options.getDifferenceDescription();
+	}
+
+	private boolean isPomModuleNeedingSkip() {
+		return Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getParameterParam().getSkipPomModules())
+			&& "pom".equalsIgnoreCase(mavenProject.getArtifact().getType());
 	}
 
 	private void appendList(StringBuilder sb, List<File> archives) {
