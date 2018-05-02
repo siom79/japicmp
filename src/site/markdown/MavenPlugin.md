@@ -8,7 +8,7 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.11.1</version>
+	<version>0.12.0</version>
 	<configuration>
 		<oldVersion>
 			<dependency>
@@ -44,7 +44,7 @@ You can also leave out the &lt;oldVersion&gt; and &lt;newVersion&gt; elements:
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.11.1</version>
+	<version>0.12.0</version>
 	<configuration>
 		<parameter>
 			<!-- see documentation -->
@@ -68,7 +68,7 @@ to configure the latest version more precisely (e.g. only GA versions), then you
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.11.1</version>
+	<version>0.12.0</version>
 	<configuration>
 		<parameter>
         	<oldVersionPattern>\d+\.\d+\.\d+\.GA</oldVersionPattern>
@@ -95,13 +95,13 @@ An advanced configuration can utilize the following parameters:
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.11.1</version>
+			<version>0.12.0</version>
 			<configuration>
 				<oldVersion>
 					<dependency>
 						<groupId>japicmp</groupId>
 						<artifactId>japicmp-test-v1</artifactId>
-						<version>0.11.1</version>
+						<version>0.12.0</version>
 						<type>jar</type>
 					</dependency>
 				</oldVersion>
@@ -326,7 +326,7 @@ Alternatively it can be used inside the `<reporting/>` tag in order to be invoke
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.11.1</version>
+			<version>0.12.0</version>
 			<reportSets>
 				<reportSet>
 					<reports>
