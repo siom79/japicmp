@@ -127,7 +127,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	Optional<XmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
 		if (Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getSkipParam())
-			|| isPomModuleNeedingSkip()) {
+			|| isPomModuleNeedingSkip(pluginParameters)) {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
 			return Optional.absent();
 		}
@@ -1217,8 +1217,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		return artifacts;
 	}
 
-	private boolean isPomModuleNeedingSkip() {
-		return Boolean.TRUE.toString().equalsIgnoreCase(parameter.getSkipPomModules())
+	private boolean isPomModuleNeedingSkip(PluginParameters pluginParameters) {
+		return Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getParameterParam().getSkipPomModules())
 			&& "pom".equalsIgnoreCase(mavenProject.getArtifact().getType());
 	}
 
