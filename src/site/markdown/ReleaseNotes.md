@@ -2,6 +2,14 @@
 
 The following versions of japicmp are available:
 
+##0.12.0 (2018-05-02)##
+* If a change is evaluated as binary or source incompatible can be configured. [#209](https://github.com/siom79/japicmp/issues/209)
+* Proper error message in case class could not loaded from old and new classpath if specified separately. [#200](https://github.com/siom79/japicmp/issues/200)
+* Skip pom modules in site report. [#207](https://github.com/siom79/japicmp/issues/207)
+* The parameters for exclusive filters are checked in CLI tool. [#202](https://github.com/siom79/japicmp/issues/202)
+
+Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.12.0%22).
+
 ##0.11.1 (2018-03-12)##
 * Reduced extraneous whitespace in the generated HTML report. [#197](https://github.com/siom79/japicmp/issues/197)
 * Addition of a default method to an interface or making a previously abstract method to a default method is marked as incompatible. [#201](https://github.com/siom79/japicmp/issues/201)
