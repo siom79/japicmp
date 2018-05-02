@@ -91,6 +91,16 @@
 			<name>twogee</name>
 			<url>https://github.com/twogee</url>
 		</contributor>
+		<contributor>
+			<name>Rob Tompkins</name>
+			<url>https://github.com/chtompki</url>
+			<email>chtompki@gmail.com</email>
+		</contributor>
+		<contributor>
+			<name>zhostasa</name>
+			<url>https://github.com/zhostasa</url>
+			<email>zhostasa@redhat.com</email>
+		</contributor>
 	</contributors>
 
     <properties>
