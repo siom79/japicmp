@@ -135,6 +135,13 @@ An advanced configuration can utilize the following parameters:
 					<breakBuildBasedOnSemanticVersioning>false</breakBuildBasedOnSemanticVersioning>
 					<breakBuildBasedOnSemanticVersioningForMajorVersionZero>false</breakBuildBasedOnSemanticVersioningForMajorVersionZero>
 					<breakBuildIfCausedByExclusion>true</breakBuildIfCausedByExclusion>
+					<overrideCompatibilityChangeParameters>
+						<overrideCompatibilityChangeParameter>
+							<compatibilityChange>CLASS_REMOVED</compatibilityChange>
+							<binaryCompatible>true</binaryCompatible>
+							<sourceCompatible>true</sourceCompatible>
+						</overrideCompatibilityChangeParameter>
+					</overrideCompatibilityChangeParameters>
 					<onlyBinaryIncompatible>false</onlyBinaryIncompatible>
 					<includeSynthetic>false</includeSynthetic>
 					<ignoreMissingClasses>false</ignoreMissingClasses>
@@ -195,6 +202,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | breakBuildBasedOnSemanticVersioning			         | true  | false		| If set to true, the plugin analyzes the versions of the old and new archives and decides based on these versions if binary compatible or incompatible changes are allowed or not. This option expects versions in the form Major.Minor.Patch (e.g. 1.2.3 or 1.2.3-SNAPSHOT).|
 | breakBuildBasedOnSemanticVersioningForMajorVersionZero | true  | false        | If set to true, the plugin will apply the option breakBuildBasedOnSemanticVersioning also for projects with major version zero (which is not required by the Semantic Versioning Specification).|
 | breakBuildIfCausedByExclusion					         | true  | true		    | If set to false, the plugin won't break the build if the incompatible change was caused by an excluded class (e.g. excluded interface removed from not excluded class).|
+| overrideCompatibilityChangeParameters                  | true  | n.a.         | Can be used to override default values for binary and source compatibility checks.|
 | onlyBinaryIncompatible						         | true  | false		| If set to true, only binary incompatible changes are reported.|
 | onlyModified									         | true  | false 	    | Outputs only modified classes/methods. If not set to true, all classes and methods are printed.|
 | includeSynthetic								         | true  | false		| If set to true, changes for synthetic classes and class members are tracked.|
@@ -222,6 +230,51 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | oldVersionPattern								         | true  | n.a.			| If &lt;oldVersion&gt; is not used, the old version compared against must match this regular expression.|
 | includeModules								         | true  | n.a.			| List of regular expression that specify if an artifact should be excluded based on its artifact id.|
 | excludeModules								         | true  | n.a.			| List of regular expression that specify if an artifact should be included based on its artifact id.|
+
+The parameter overrideCompatibilityChangeParameters allows you to override the default values for binary and source compatibility
+for each check. This allows you to customize the following verifications:
+
+| Check | Default binary compatible | Default source compatible |
+|-------|-------------|
+| CLASS_REMOVED | false | false |
+| CLASS_NOW_ABSTRACT | false | false |
+| CLASS_NOW_FINAL | false | false |
+| CLASS_NO_LONGER_PUBLIC | false | false |
+| CLASS_TYPE_CHANGED | false | false |
+| CLASS_NOW_CHECKED_EXCEPTION | true | false |
+| SUPERCLASS_REMOVED | false | false |
+| SUPERCLASS_ADDED | true | true |
+| SUPERCLASS_MODIFIED_INCOMPATIBLE | false | false |
+| INTERFACE_ADDED | true | true |
+| INTERFACE_REMOVED | false | false |
+| METHOD_REMOVED | false | false |
+| METHOD_REMOVED_IN_SUPERCLASS | false | false |
+| METHOD_LESS_ACCESSIBLE | false | false |
+| METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS | false | false |
+| METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC | false | false |
+| METHOD_RETURN_TYPE_CHANGED | false | false |
+| METHOD_NOW_ABSTRACT | false | false |
+| METHOD_NOW_FINAL | false | false |
+| METHOD_NOW_STATIC | false | false |
+| METHOD_NO_LONGER_STATIC | false | false |
+| METHOD_ADDED_TO_INTERFACE | true | false |
+| METHOD_NOW_THROWS_CHECKED_EXCEPTION | true | false |
+| METHOD_ABSTRACT_ADDED_TO_CLASS | true | false |
+| METHOD_ABSTRACT_ADDED_IN_SUPERCLASS | true | false |
+| METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE | true | false |
+| METHOD_NEW_DEFAULT | false | false |
+| METHOD_ABSTRACT_NOW_DEFAULT | false | false |
+| FIELD_STATIC_AND_OVERRIDES_STATIC | false | false |
+| FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS | false | false |
+| FIELD_NOW_FINAL | false | false |
+| FIELD_NOW_STATIC | false | false |
+| FIELD_NO_LONGER_STATIC | false | false |
+| FIELD_TYPE_CHANGED | false | false |
+| FIELD_REMOVED | false | false |
+| FIELD_REMOVED_IN_SUPERCLASS | false | false |
+| FIELD_LESS_ACCESSIBLE | false | false |
+| CONSTRUCTOR_REMOVED | false | false |
+| CONSTRUCTOR_LESS_ACCESSIBLE | false | false |
 
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:

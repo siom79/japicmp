@@ -136,6 +136,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		Options options = getOptions(pluginParameters, mavenParameters);
 		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
 		setUpClassPath(comparatorOptions, pluginParameters, mavenParameters);
+		setUpOverrideCompatibilityChanges(comparatorOptions, pluginParameters);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 		if (options.getNewArchives().isEmpty()) {
 			getLog().warn("Skipping execution because no new version could be resolved/found.");
@@ -157,6 +158,26 @@ public class JApiCmpMojo extends AbstractMojo {
 			return Optional.of(xmlOutput);
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
+		}
+	}
+
+	private void setUpOverrideCompatibilityChanges(JarArchiveComparatorOptions comparatorOptions, PluginParameters pluginParameters) throws MojoFailureException {
+		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getOverrideCompatibilityChangeParameters() != null) {
+			List<Parameter.OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters = pluginParameters.getParameterParam().getOverrideCompatibilityChangeParameters();
+			for (Parameter.OverrideCompatibilityChangeParameter configChange : overrideCompatibilityChangeParameters) {
+				String compatibilityChange = configChange.getCompatibilityChange();
+				JApiCompatibilityChange foundChange = null;
+				for (JApiCompatibilityChange change : JApiCompatibilityChange.values()) {
+					if (change.name().equalsIgnoreCase(compatibilityChange)) {
+						foundChange = change;
+						break;
+					}
+				}
+				if (foundChange == null) {
+					throw new MojoFailureException("Unknown compatibility change '" + compatibilityChange + "'. Supported values: " + Joiner.on(',').join(JApiCompatibilityChange.values()));
+				}
+				comparatorOptions.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(foundChange, configChange.isBinaryCompatible(), configChange.isSourceCompatible()));
+			}
 		}
 	}
 

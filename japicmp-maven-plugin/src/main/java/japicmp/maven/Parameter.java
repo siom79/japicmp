@@ -1,5 +1,7 @@
 package japicmp.maven;
 
+import japicmp.cmp.JarArchiveComparatorOptions;
+
 import java.util.List;
 
 public class Parameter {
@@ -56,6 +58,41 @@ public class Parameter {
 	private boolean includeExclusively;
 	@org.apache.maven.plugins.annotations.Parameter(required = false, defaultValue = "false")
 	private boolean excludeExclusively;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters;
+
+	public static class OverrideCompatibilityChangeParameter {
+		@org.apache.maven.plugins.annotations.Parameter(required = true)
+		private String compatibilityChange;
+		@org.apache.maven.plugins.annotations.Parameter(required = true)
+		private boolean binaryCompatible;
+		@org.apache.maven.plugins.annotations.Parameter(required = true)
+		private boolean sourceCompatible;
+
+		public String getCompatibilityChange() {
+			return compatibilityChange;
+		}
+
+		public void setCompatibilityChange(String compatibilityChange) {
+			this.compatibilityChange = compatibilityChange;
+		}
+
+		public boolean isBinaryCompatible() {
+			return binaryCompatible;
+		}
+
+		public void setBinaryCompatible(boolean binaryCompatible) {
+			this.binaryCompatible = binaryCompatible;
+		}
+
+		public boolean isSourceCompatible() {
+			return sourceCompatible;
+		}
+
+		public void setSourceCompatible(boolean sourceCompatible) {
+			this.sourceCompatible = sourceCompatible;
+		}
+	}
 
 	public String getNoAnnotations() {
 		return noAnnotations;
@@ -311,5 +348,17 @@ public class Parameter {
 
 	public void setExcludeExclusively(boolean excludeExclusively) {
 		this.excludeExclusively = excludeExclusively;
+	}
+
+	public boolean isIncludeExclusively() {
+		return includeExclusively;
+	}
+
+	public List<OverrideCompatibilityChangeParameter> getOverrideCompatibilityChangeParameters() {
+		return overrideCompatibilityChangeParameters;
+	}
+
+	public void setOverrideCompatibilityChangeParameters(List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters) {
+		this.overrideCompatibilityChangeParameters = overrideCompatibilityChangeParameters;
 	}
 }

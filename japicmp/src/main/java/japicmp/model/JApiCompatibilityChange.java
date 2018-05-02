@@ -45,8 +45,10 @@ public enum JApiCompatibilityChange {
 	CONSTRUCTOR_REMOVED(false, false),
 	CONSTRUCTOR_LESS_ACCESSIBLE(false, false);
 
-	private final boolean binaryCompatible;
-	private final boolean sourceCompatible;
+	private boolean binaryCompatible;
+	private boolean sourceCompatible;
+	private Boolean binaryCompatibleOverridden = null;
+	private Boolean sourceCompatibleOverridden = null;
 
 	JApiCompatibilityChange(boolean binaryCompatible, boolean sourceCompatible) {
 		this.binaryCompatible = binaryCompatible;
@@ -55,11 +57,30 @@ public enum JApiCompatibilityChange {
 
 	@XmlAttribute(name = "binaryCompatible")
 	public boolean isBinaryCompatible() {
+		if (binaryCompatibleOverridden != null) {
+			return binaryCompatibleOverridden;
+		}
 		return binaryCompatible;
 	}
 
 	@XmlAttribute(name = "sourceCompatible")
 	public boolean isSourceCompatible() {
+		if (sourceCompatibleOverridden != null) {
+			return sourceCompatibleOverridden;
+		}
 		return sourceCompatible;
+	}
+
+	public void setBinaryCompatible(boolean binaryCompatible) {
+		this.binaryCompatibleOverridden = binaryCompatible;
+	}
+
+	public void setSourceCompatible(boolean sourceCompatible) {
+		this.sourceCompatibleOverridden = sourceCompatible;
+	}
+
+	public void resetOverrides() {
+		this.binaryCompatibleOverridden = null;
+		this.sourceCompatibleOverridden = null;
 	}
 }

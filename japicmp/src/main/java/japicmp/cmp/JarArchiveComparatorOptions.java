@@ -1,5 +1,6 @@
 package japicmp.cmp;
 
+import japicmp.model.JApiCompatibilityChange;
 import japicmp.util.Optional;
 import japicmp.config.IgnoreMissingClasses;
 import japicmp.config.Options;
@@ -8,6 +9,7 @@ import japicmp.filter.Filters;
 import japicmp.model.AccessModifier;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +28,31 @@ public class JarArchiveComparatorOptions {
 	private List<String> newClassPath = new LinkedList<>();
 	private boolean noAnnotations = false;
 	private boolean includeClassFileFormatVersion = false;
+	private List<OverrideCompatibilityChange> overrideCompatibilityChanges = new ArrayList<>();
+
+	public static class OverrideCompatibilityChange {
+		private JApiCompatibilityChange compatibilityChange;
+		private boolean binaryCompatible;
+		private boolean sourceCompatible;
+
+		public OverrideCompatibilityChange(JApiCompatibilityChange compatibilityChange, boolean binaryCompatible, boolean sourceCompatible) {
+			this.compatibilityChange = compatibilityChange;
+			this.binaryCompatible = binaryCompatible;
+			this.sourceCompatible = sourceCompatible;
+		}
+
+		public JApiCompatibilityChange getCompatibilityChange() {
+			return compatibilityChange;
+		}
+
+		public boolean isBinaryCompatible() {
+			return binaryCompatible;
+		}
+
+		public boolean isSourceCompatible() {
+			return sourceCompatible;
+		}
+	}
 
 	/**
 	 * When both versions of the archives under comparison use the exact same classpath
@@ -136,5 +163,13 @@ public class JarArchiveComparatorOptions {
 
 	public boolean isIncludeClassFileFormatVersion() {
 		return includeClassFileFormatVersion;
+	}
+
+	public void addOverrideCompatibilityChange(OverrideCompatibilityChange overrideCompatibilityChange) {
+		this.overrideCompatibilityChanges.add(overrideCompatibilityChange);
+	}
+
+	public List<OverrideCompatibilityChange> getOverrideCompatibilityChanges() {
+		return overrideCompatibilityChanges;
 	}
 }

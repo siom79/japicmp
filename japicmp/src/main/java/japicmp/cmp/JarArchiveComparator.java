@@ -1,5 +1,7 @@
 package japicmp.cmp;
 
+import japicmp.model.JApiCompatibility;
+import japicmp.model.JApiCompatibilityChange;
 import japicmp.util.Optional;
 import japicmp.compat.CompatibilityChanges;
 import japicmp.exception.JApiCmpException;
@@ -51,6 +53,22 @@ public class JarArchiveComparator {
 	public JarArchiveComparator(JarArchiveComparatorOptions options) {
 		this.options = options;
 		setupClasspaths();
+		setupCompatibilityChanges(options);
+	}
+
+	private void setupCompatibilityChanges(JarArchiveComparatorOptions options) {
+		for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {
+			jApiCompatibility.resetOverrides();
+		}
+		for (JarArchiveComparatorOptions.OverrideCompatibilityChange change : options.getOverrideCompatibilityChanges()) {
+			JApiCompatibilityChange compatibilityChange = change.getCompatibilityChange();
+			for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {
+				if (jApiCompatibility == compatibilityChange) {
+					jApiCompatibility.setBinaryCompatible(change.isBinaryCompatible());
+					jApiCompatibility.setSourceCompatible(change.isSourceCompatible());
+				}
+			}
+		}
 	}
 
 	/**
