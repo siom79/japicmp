@@ -2,7 +2,7 @@ The website is located at [https://siom79.github.io/japicmp](https://siom79.gith
 
 # japicmp
 japicmp is a tool to compare two versions of a jar archive:
-```
+``` bash
 java -jar japicmp-0.11.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 ```
 It can also be used as a library:
@@ -13,7 +13,7 @@ List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchi
 ```
 japicmp is available in the Maven Central Repository:
 [![mvnrepository](https://img.shields.io/maven-central/v/com.github.siom79.japicmp/japicmp.svg)](https://mvnrepository.com/artifact/com.github.siom79.japicmp/japicmp)
-```
+``` xml
 <dependency>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp</artifactId>
@@ -22,7 +22,7 @@ japicmp is available in the Maven Central Repository:
 ```
 A maven plugin allows you to integrate the checks into your build:
 
-```
+``` xml
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
@@ -60,7 +60,7 @@ A Sonar Qube plugin integrates the results from the japicmp analysis into your c
 
 By using the available Ant task, you can also integrate japicmp into your Ant build files:
 
-```
+``` xml
 <taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
 <japicmp oldjar="${project.build.directory}/guava-18.0.jar"
 	 newjar="${project.build.directory}/guava-19.0.jar"
@@ -75,11 +75,11 @@ By using the available Ant task, you can also integrate japicmp into your Ant bu
 
 To build and run japicmp under Java 1.9, you must add the following module: `java.xml.bind`. This can be done for the maven plugin for example
 by:
-```
+``` bash
 export MAVEN_OPTS="--add-modules java.xml.bind"
 ```
 For the CLI tool the following invocation of `java` is required:
-```
+``` bash
 java --add-modules java.xml.bind
 ```
 
@@ -144,7 +144,7 @@ This is the release procedure:
 * Update ReleaseNotes.md.
 * Increment version in README.md.
 * Run release build (substitute passphrase with your GPG password):
-```
+``` bash
 mvn release:clean release:prepare -DautoVersionSubmodules=true -Dgpg.passphrase=passphrase
 mvn release:perform -Dgpg.passphrase=passphrase
 ```
@@ -154,7 +154,7 @@ mvn release:perform -Dgpg.passphrase=passphrase
 * Update maven site report.
 
 The second and third step can also be automated using the python script `release.py` in the root directory:
-```
+``` bash
 python3 release.py --gpg-passphrase <gpgpassphrase> --dry-run --new-version <new-version> --release-version <release-version> --release-tag <release-tag> --old-version <old-version>
 ```
 
