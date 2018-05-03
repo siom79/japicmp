@@ -1,0 +1,82 @@
+diff --git a/japicmp/src/main/java/japicmp/compat/CompatibilityChanges.java b/japicmp/src/main/java/japicmp/compat/CompatibilityChanges.java
+index 235de07..fc5f1ee 100644
+--- a/japicmp/src/main/java/japicmp/compat/CompatibilityChanges.java
++++ b/japicmp/src/main/java/japicmp/compat/CompatibilityChanges.java
+@@ -356,22 +356,6 @@ public class CompatibilityChanges {
+ 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NO_LONGER_STATIC);
+ 				}
+ 			}
+-			// section 13.5.6 of "Java Language Specification" SE7
+-			if (isInterface(jApiClass)) {
+-				if (method.getChangeStatus() == JApiChangeStatus.NEW) {
+-					// new default method in interface
+-					if (method.getAbstractModifier().hasChangedTo(AbstractModifier.NON_ABSTRACT)) {
+-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_DEFAULT);
+-					}
+-				} else if (method.getChangeStatus() == JApiChangeStatus.MODIFIED || method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+-					JApiModifier<AbstractModifier> abstractModifier = method.getAbstractModifier();
+-					// method changed from abstract to default
+-					if (abstractModifier.getOldModifier().isPresent() && abstractModifier.getOldModifier().get() == AbstractModifier.ABSTRACT &&
+-						abstractModifier.getNewModifier().isPresent() && abstractModifier.getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
+-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT);
+-					}
+-				}
+-			}
+ 			checkAbstractMethod(jApiClass, classMap, method);
+ 			checkIfExceptionIsNowChecked(method);
+ 		}
+@@ -383,7 +367,12 @@ public class CompatibilityChanges {
+ 				if (method.getChangeStatus() == JApiChangeStatus.NEW && !isSynthetic(method)) {
+ 					List<JApiMethod> implementedMethods = getImplementedMethods(jApiClass, classMap, method);
+ 					if (implementedMethods.size() == 0) {
+-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
++						// new default method in interface
++						if (method.getAbstractModifier().hasChangedTo(AbstractModifier.NON_ABSTRACT)) {
++							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_DEFAULT);
++						} else {
++							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
++						}
+ 					} else {
+ 						boolean allNew = true;
+ 						for (JApiMethod jApiMethod : implementedMethods) {
+@@ -395,6 +384,13 @@ public class CompatibilityChanges {
+ 							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
+ 						}
+ 					}
++				} else if (method.getChangeStatus() == JApiChangeStatus.MODIFIED || method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
++					JApiModifier<AbstractModifier> abstractModifier = method.getAbstractModifier();
++					// method changed from abstract to default
++					if (abstractModifier.getOldModifier().isPresent() && abstractModifier.getOldModifier().get() == AbstractModifier.ABSTRACT &&
++						abstractModifier.getNewModifier().isPresent() && abstractModifier.getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
++						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT);
++					}
+ 				}
+ 			}
+ 		} else {
+diff --git a/japicmp/src/test/java/japicmp/compat/CompatibilityChangesTest.java b/japicmp/src/test/java/japicmp/compat/CompatibilityChangesTest.java
+index 1118478..5b4539d 100644
+--- a/japicmp/src/test/java/japicmp/compat/CompatibilityChangesTest.java
++++ b/japicmp/src/test/java/japicmp/compat/CompatibilityChangesTest.java
+@@ -28,6 +28,7 @@ import java.util.List;
+ import static japicmp.util.Helper.*;
+ import static org.hamcrest.CoreMatchers.hasItem;
+ import static org.hamcrest.CoreMatchers.is;
++import static org.hamcrest.core.IsNot.not;
+ import static org.junit.Assert.assertThat;
+ 
+ public class CompatibilityChangesTest {
+@@ -1297,6 +1298,7 @@ public class CompatibilityChangesTest {
+ 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+ 		assertThat(jApiMethod.isSourceCompatible(), is(false));
+ 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NEW_DEFAULT));
++		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
+ 	}
+ 
+ 	@Test
+@@ -1329,5 +1331,6 @@ public class CompatibilityChangesTest {
+ 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+ 		assertThat(jApiMethod.isSourceCompatible(), is(false));
+ 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT));
++		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
+ 	}
+ }

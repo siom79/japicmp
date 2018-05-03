@@ -28,6 +28,7 @@ import java.util.List;
 import static japicmp.util.Helper.*;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 public class CompatibilityChangesTest {
@@ -1297,6 +1298,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NEW_DEFAULT));
+		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
 	}
 
 	@Test
@@ -1329,5 +1331,6 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT));
+		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
 	}
 }
