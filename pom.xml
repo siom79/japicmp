@@ -114,6 +114,7 @@
 		<javassist.version>3.22.0-GA</javassist.version>
 		<guava.version>18.0</guava.version>
 		<jaxb.version>2.2.7</jaxb.version>
+		<javax-activation.version>1.1</javax-activation.version>
     </properties>
 
     <modules>
@@ -171,6 +172,11 @@
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
 				<version>${jaxb.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.activation</groupId>
+				<artifactId>activation</artifactId>
+				<version>${javax-activation.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -370,7 +376,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>2.20.1</version>
+						<version>2.21.0</version>
 						<configuration>
 							<argLine>
 								--add-modules=java.xml.bind

@@ -1,0 +1,40 @@
+diff --git a/japicmp/pom.xml b/japicmp/pom.xml
+index fad7e90..b0cd919 100644
+--- a/japicmp/pom.xml
++++ b/japicmp/pom.xml
+@@ -44,6 +44,11 @@
+ 			<groupId>com.sun.xml.bind</groupId>
+ 			<artifactId>jaxb-impl</artifactId>
+ 		</dependency>
++		<dependency>
++			<groupId>javax.activation</groupId>
++			<artifactId>activation</artifactId>
++			<version>1.1</version>
++		</dependency>
+ 	</dependencies>
+ 
+ 	<build>
+diff --git a/pom.xml b/pom.xml
+index 8dad462..dec9280 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -114,6 +114,7 @@
+ 		<javassist.version>3.22.0-GA</javassist.version>
+ 		<guava.version>18.0</guava.version>
+ 		<jaxb.version>2.2.7</jaxb.version>
++		<javax-activation.version>1.1</javax-activation.version>
+     </properties>
+ 
+     <modules>
+@@ -172,6 +173,11 @@
+ 				<artifactId>jaxb-impl</artifactId>
+ 				<version>${jaxb.version}</version>
+ 			</dependency>
++			<dependency>
++				<groupId>javax.activation</groupId>
++				<artifactId>activation</artifactId>
++				<version>${javax-activation.version}</version>
++			</dependency>
+ 		</dependencies>
+ 	</dependencyManagement>
+ 
