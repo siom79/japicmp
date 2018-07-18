@@ -68,6 +68,8 @@ public class Parameter {
 		private boolean binaryCompatible;
 		@org.apache.maven.plugins.annotations.Parameter(required = true)
 		private boolean sourceCompatible;
+		@org.apache.maven.plugins.annotations.Parameter(required = true)
+		private String semanticVersionLevel;
 
 		public String getCompatibilityChange() {
 			return compatibilityChange;
@@ -91,6 +93,14 @@ public class Parameter {
 
 		public void setSourceCompatible(boolean sourceCompatible) {
 			this.sourceCompatible = sourceCompatible;
+		}
+
+		public String getSemanticVersionLevel() {
+			return semanticVersionLevel;
+		}
+
+		public void setSemanticVersionLevel(String semanticVersionLevel) {
+			this.semanticVersionLevel = semanticVersionLevel;
 		}
 	}
 

@@ -68,6 +68,10 @@ public class CompatibilityChanges {
 		if (jApiClass.getClassType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_TYPE_CHANGED);
 		}
+		checkIfAnnotationDeprectedAdded(jApiClass);
+		if (hasModifierLevelDecreased(jApiClass)) {
+			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_LESS_ACCESSIBLE);
+		}
 	}
 
 	private void checkIfFieldsHaveChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
@@ -161,6 +165,7 @@ public class CompatibilityChanges {
 			if (isNotPrivate(field) && field.getType().hasChanged()) {
 				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_TYPE_CHANGED);
 			}
+			checkIfAnnotationDeprectedAdded(field);
 		}
 	}
 
@@ -267,6 +272,7 @@ public class CompatibilityChanges {
 			if (hasModifierLevelDecreased(constructor)) {
 				addCompatibilityChange(constructor, JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE);
 			}
+			checkIfAnnotationDeprectedAdded(constructor);
 		}
 	}
 
@@ -358,6 +364,15 @@ public class CompatibilityChanges {
 			}
 			checkAbstractMethod(jApiClass, classMap, method);
 			checkIfExceptionIsNowChecked(method);
+			checkIfAnnotationDeprectedAdded(method);
+		}
+	}
+
+	private void checkIfAnnotationDeprectedAdded(JApiHasAnnotations jApiHasAnnotations) {
+		for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {
+			if (annotation.getFullyQualifiedName().equals(Deprecated.class.getName())) {
+				addCompatibilityChange((JApiCompatibility) jApiHasAnnotations, JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED);
+			}
 		}
 	}
 

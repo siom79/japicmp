@@ -1,6 +1,7 @@
 package japicmp.cmp;
 
 import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiSemanticVersionLevel;
 import japicmp.util.Optional;
 import japicmp.config.IgnoreMissingClasses;
 import japicmp.config.Options;
@@ -34,11 +35,14 @@ public class JarArchiveComparatorOptions {
 		private JApiCompatibilityChange compatibilityChange;
 		private boolean binaryCompatible;
 		private boolean sourceCompatible;
+		private JApiSemanticVersionLevel semanticVersionLevel;
 
-		public OverrideCompatibilityChange(JApiCompatibilityChange compatibilityChange, boolean binaryCompatible, boolean sourceCompatible) {
+		public OverrideCompatibilityChange(JApiCompatibilityChange compatibilityChange, boolean binaryCompatible,
+										   boolean sourceCompatible, JApiSemanticVersionLevel semanticVersionLevel) {
 			this.compatibilityChange = compatibilityChange;
 			this.binaryCompatible = binaryCompatible;
 			this.sourceCompatible = sourceCompatible;
+			this.semanticVersionLevel = semanticVersionLevel;
 		}
 
 		public JApiCompatibilityChange getCompatibilityChange() {
@@ -51,6 +55,10 @@ public class JarArchiveComparatorOptions {
 
 		public boolean isSourceCompatible() {
 			return sourceCompatible;
+		}
+
+		public JApiSemanticVersionLevel getSemanticVersionLevel() {
+			return semanticVersionLevel;
 		}
 	}
 

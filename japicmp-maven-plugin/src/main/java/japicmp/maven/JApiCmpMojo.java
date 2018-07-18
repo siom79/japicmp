@@ -7,20 +7,7 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.filter.ClassFilter;
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiAnnotation;
-import japicmp.model.JApiBehavior;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.model.JApiConstructor;
-import japicmp.model.JApiField;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiParameter;
-import japicmp.model.JApiReturnType;
-import japicmp.model.JApiSuperclass;
-import japicmp.model.JApiType;
+import japicmp.model.*;
 import japicmp.output.Filter;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
@@ -166,6 +153,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getOverrideCompatibilityChangeParameters() != null) {
 			List<Parameter.OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters = pluginParameters.getParameterParam().getOverrideCompatibilityChangeParameters();
 			for (Parameter.OverrideCompatibilityChangeParameter configChange : overrideCompatibilityChangeParameters) {
+
 				String compatibilityChange = configChange.getCompatibilityChange();
 				JApiCompatibilityChange foundChange = null;
 				for (JApiCompatibilityChange change : JApiCompatibilityChange.values()) {
@@ -177,7 +165,20 @@ public class JApiCmpMojo extends AbstractMojo {
 				if (foundChange == null) {
 					throw new MojoFailureException("Unknown compatibility change '" + compatibilityChange + "'. Supported values: " + Joiner.on(',').join(JApiCompatibilityChange.values()));
 				}
-				comparatorOptions.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(foundChange, configChange.isBinaryCompatible(), configChange.isSourceCompatible()));
+
+				JApiSemanticVersionLevel foundSemanticVersionLevel = null;
+				String semanticVersionLevel = configChange.getSemanticVersionLevel();
+				for (JApiSemanticVersionLevel level : JApiSemanticVersionLevel.values()) {
+					if (level.name().equalsIgnoreCase(semanticVersionLevel)) {
+						foundSemanticVersionLevel = level;
+						break;
+					}
+				}
+				if (foundSemanticVersionLevel == null) {
+					throw new MojoFailureException("Unknown semantic version level '" + semanticVersionLevel + "'. Supported values: " + Joiner.on(',').join(JApiSemanticVersionLevel.values()));
+				}
+
+				comparatorOptions.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(foundChange, configChange.isBinaryCompatible(), configChange.isSourceCompatible(), foundSemanticVersionLevel));
 			}
 		}
 	}

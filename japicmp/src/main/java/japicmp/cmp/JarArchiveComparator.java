@@ -66,6 +66,7 @@ public class JarArchiveComparator {
 				if (jApiCompatibility == compatibilityChange) {
 					jApiCompatibility.setBinaryCompatible(change.isBinaryCompatible());
 					jApiCompatibility.setSourceCompatible(change.isSourceCompatible());
+					jApiCompatibility.setSemanticVersionLevel(change.getSemanticVersionLevel());
 				}
 			}
 		}

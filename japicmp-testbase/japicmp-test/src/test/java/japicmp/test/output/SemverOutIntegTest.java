@@ -10,6 +10,7 @@ import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.semver.SemverOut;
 import japicmp.test.util.Helper;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -29,13 +30,6 @@ public class SemverOutIntegTest {
 	@Test
 	public void testSemver010_added_deprecated_annotation() {
 		String lastPackage = "semver010.a";
-		String string = getSemverDiff(lastPackage);
-		assertEquals("0.1.0", string);
-	}
-
-	@Test
-	public void testSemver010_increase_visibility_of_class_from_default_to_public() {
-		String lastPackage = "semver010.b";
 		String string = getSemverDiff(lastPackage);
 		assertEquals("0.1.0", string);
 	}

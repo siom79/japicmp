@@ -74,8 +74,8 @@
 							</td>
 						</tr>
 						<tr>
-							<td>Semantic Versioning:</td>
-							<td>
+							<td id="semver-label">Semantic Versioning:</td>
+							<td id="semver-version">
 								<xsl:value-of select="@semanticVersioning"/>
 							</td>
 						</tr>
