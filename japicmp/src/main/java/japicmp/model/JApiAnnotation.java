@@ -30,6 +30,23 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 	}
 
+
+	public String toString()
+	{
+		return "JApiAnnotation [fullyQualifiedName="
+			+ fullyQualifiedName
+			+ ", oldAnnotation="
+			+ oldAnnotation
+			+ ", newAnnotation="
+			+ newAnnotation
+			+ ", changeStatus="
+			+ changeStatus
+			+ ", compatibilityChanges="
+			+ getCompatibilityChanges()
+			+ "]";
+	}
+
+
 	private void computeElements(List<JApiAnnotationElement> elements, Optional<Annotation> oldAnnotationOptional, Optional<Annotation> newAnnotationOptional) {
 		if (oldAnnotationOptional.isPresent() && newAnnotationOptional.isPresent()) {
 			Annotation oldAnnotation = oldAnnotationOptional.get();

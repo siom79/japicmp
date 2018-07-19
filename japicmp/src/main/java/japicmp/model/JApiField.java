@@ -357,4 +357,36 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	public JApiClass getjApiClass() {
 		return jApiClass;
 	}
+
+	public String toString()
+	{
+		return "JApiField [changeStatus="
+			+ changeStatus
+			+ ", jApiClass="
+			+ jApiClass
+			+ ", oldFieldOptional="
+			+ oldFieldOptional
+			+ ", newFieldOptional="
+			+ newFieldOptional
+			+ ", annotations="
+			+ annotations
+			+ ", accessModifier="
+			+ accessModifier
+			+ ", staticModifier="
+			+ staticModifier
+			+ ", finalModifier="
+			+ finalModifier
+			+ ", transientModifier="
+			+ transientModifier
+			+ ", syntheticModifier="
+			+ syntheticModifier
+			+ ", syntheticAttribute="
+			+ syntheticAttribute
+			+ ", compatibilityChanges="
+			+ compatibilityChanges
+			+ ", type="
+			+ type
+			+ "]";
+	}
+
 }

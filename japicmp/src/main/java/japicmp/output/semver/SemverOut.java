@@ -1,21 +1,42 @@
 package japicmp.output.semver;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.common.collect.ImmutableSet;
+
 import japicmp.config.Options;
-import japicmp.model.*;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibility;
+import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
+import japicmp.model.JApiHasAccessModifier;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSemanticVersionLevel;
+import japicmp.model.JApiSuperclass;
 import japicmp.output.Filter;
 import japicmp.output.OutputGenerator;
 import japicmp.util.ModifierHelper;
 
-import java.util.Iterator;
-import java.util.List;
-
-import static japicmp.util.ModifierHelper.isNotPrivate;
-
 public class SemverOut extends OutputGenerator<String> {
 
+	private Listener m_Listener = Listener.NULL;
+
 	public SemverOut(Options options, List<JApiClass> jApiClasses) {
+		this(options, jApiClasses, Listener.NULL);
+	}
+
+	public SemverOut(Options options, List<JApiClass> jApiClasses, Listener listener) {
 		super(options, jApiClasses);
+		m_Listener = listener == null ? Listener.NULL: listener;
 	}
 
 	@Override
@@ -72,6 +93,12 @@ public class SemverOut extends OutputGenerator<String> {
 	}
 
 	private JApiSemanticVersionLevel signs(JApiCompatibility jApiCompatibility) {
+		JApiSemanticVersionLevel ret = signsPriv(jApiCompatibility);
+		m_Listener.onChange(jApiCompatibility, ret);
+		return ret;
+	}
+
+	private JApiSemanticVersionLevel signsPriv(JApiCompatibility jApiCompatibility) {
 		JApiSemanticVersionLevel semanticVersionLevel = JApiSemanticVersionLevel.PATCH;
 		List<JApiCompatibilityChange> compatibilityChanges = jApiCompatibility.getCompatibilityChanges();
 		for (JApiCompatibilityChange change : compatibilityChanges) {
@@ -79,6 +106,8 @@ public class SemverOut extends OutputGenerator<String> {
 				semanticVersionLevel = change.getSemanticVersionLevel();
 			}
 		}
+
+
 		if (jApiCompatibility instanceof JApiHasAccessModifier) {
 			JApiHasAccessModifier jApiHasAccessModifier = (JApiHasAccessModifier) jApiCompatibility;
 			if (ModifierHelper.matchesModifierLevel(jApiHasAccessModifier, AccessModifier.PUBLIC)
@@ -91,4 +120,17 @@ public class SemverOut extends OutputGenerator<String> {
 			return semanticVersionLevel;
 		}
 	}
+
+	public interface Listener {
+
+		void onChange(JApiCompatibility change, JApiSemanticVersionLevel semanticVersionLevel);
+
+		Listener NULL = new Listener() {
+			public void onChange(JApiCompatibility change, JApiSemanticVersionLevel semanticVersionLevel)
+			{
+				// Empty
+			}
+		};
+	}
+
 }
