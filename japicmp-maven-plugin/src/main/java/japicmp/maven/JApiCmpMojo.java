@@ -441,17 +441,17 @@ public class JApiCmpMojo extends AbstractMojo {
 							switch(semanticVersionLevel) {
 								case MAJOR:
 									if (changeType.ordinal() > ChangeType.MAJOR.ordinal()) {
-										getLog().error("Incompatiblity detected: " + semanticVersionLevel + ": " + change );
+										getLog().error("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change );
 									}
 									break;
 								case MINOR:
 									if (changeType.ordinal() > ChangeType.MINOR.ordinal()) {
-										getLog().error("Incompatiblity detected: " + semanticVersionLevel + ": " + change );
+										getLog().error("Incompatibility detected: Requires semantic version level  " + semanticVersionLevel + ": " + change );
 									}
 									break;
 								case PATCH:
 									if (changeType.ordinal() > ChangeType.PATCH.ordinal()) {
-										getLog().error("Incompatiblity detected: " + semanticVersionLevel + ": " + change );
+										getLog().error("Incompatibility detected: Requires semantic version level  " + semanticVersionLevel + ": " + change );
 									}
 									break;
 							    default:
