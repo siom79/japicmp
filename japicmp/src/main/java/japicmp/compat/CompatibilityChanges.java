@@ -370,8 +370,10 @@ public class CompatibilityChanges {
 
 	private void checkIfAnnotationDeprectedAdded(JApiHasAnnotations jApiHasAnnotations) {
 		for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {
-			if (annotation.getFullyQualifiedName().equals(Deprecated.class.getName())) {
-				addCompatibilityChange((JApiCompatibility) jApiHasAnnotations, JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED);
+			if (annotation.getChangeStatus() == JApiChangeStatus.NEW || annotation.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+				if (annotation.getFullyQualifiedName().equals(Deprecated.class.getName())) {
+					addCompatibilityChange((JApiCompatibility) jApiHasAnnotations, JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED);
+				}
 			}
 		}
 	}
