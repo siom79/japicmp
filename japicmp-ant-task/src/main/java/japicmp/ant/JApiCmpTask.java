@@ -172,32 +172,32 @@ public class JApiCmpTask extends Task {
 		this.htmlStylesheet = htmlStylesheet;
 	}
 
-	public boolean isErrorOnSemanticIncompatibility() {
-		return errorOnSemanticIncompatibility;
+	public void setErrorOnSemanticIncompatibility(boolean errorOnSemanticIncompatibility) {
+		this.errorOnSemanticIncompatibility = errorOnSemanticIncompatibility;
 	}
 
-	public boolean isErrorOnExclusionIncompatibility() {
-		return errorOnExclusionIncompatibility;
+	public void setErrorOnExclusionIncompatibility(boolean errorOnExclusionIncompatibility) {
+		this.errorOnExclusionIncompatibility = errorOnExclusionIncompatibility;
 	}
 
-	public boolean isErrorOnSourceIncompatibility() {
-		return errorOnSourceIncompatibility;
+	public void setErrorOnSourceIncompatibility(boolean errorOnSourceIncompatibility) {
+		this.errorOnSourceIncompatibility = errorOnSourceIncompatibility;
 	}
 
-	public boolean isErrorOnBinaryIncompatibility() {
-		return errorOnBinaryIncompatibility;
+	public void setErrorOnBinaryIncompatibility(boolean errorOnBinaryIncompatibility) {
+		this.errorOnBinaryIncompatibility = errorOnBinaryIncompatibility;
 	}
 
-	public boolean isErrorOnModifications() {
-		return errorOnModifications;
+	public void setErrorOnModifications(boolean errorOnModifications) {
+		this.errorOnModifications = errorOnModifications;
 	}
 
-	public boolean isIgnoreMissingOldVersion() {
-		return ignoreMissingOldVersion;
+	public void setIgnoreMissingOldVersion(boolean ignoreMissingOldVersion) {
+		this.ignoreMissingOldVersion = ignoreMissingOldVersion;
 	}
 
-	public boolean isIgnoreMissingNewVersion() {
-		return ignoreMissingNewVersion;
+	public void setIgnoreMissingNewVersion(boolean ignoreMissingNewVersion) {
+		this.ignoreMissingNewVersion = ignoreMissingNewVersion;
 	}
 
 	@Override
@@ -247,6 +247,22 @@ public class JApiCmpTask extends Task {
 	}
 
 	private void generateOutput(Options options, List<JApiClass> jApiClasses, JarArchiveComparator jarArchiveComparator) {
+		if (options.isErrorOnBinaryIncompatibility()
+			|| options.isErrorOnSourceIncompatibility()
+			|| options.isErrorOnExclusionIncompatibility()
+			|| options.isErrorOnModifications()
+			|| options.isErrorOnSemanticIncompatibility()) {
+			IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses, jarArchiveComparator);
+			try {
+				errorOutput.generate();
+			} catch (JApiCmpException e) {
+				if (e.getReason() == JApiCmpException.Reason.IncompatibleChange) {
+					throw new BuildException(e.getMessage());
+				}
+				throw e;
+			}
+		}
+
 		if (semanticVersioning) {
 			SemverOut semverOut = new SemverOut(options, jApiClasses);
 			String semver = semverOut.generate();
@@ -273,21 +289,5 @@ public class JApiCmpTask extends Task {
         } catch (Exception e) {
             throw new BuildException("Could not close output streams: " + e.getMessage(), e);
         }
-
-		if (options.isErrorOnBinaryIncompatibility()
-			|| options.isErrorOnSourceIncompatibility()
-			|| options.isErrorOnExclusionIncompatibility()
-			|| options.isErrorOnModifications()
-			|| options.isErrorOnSemanticIncompatibility()) {
-			IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses, jarArchiveComparator);
-			try {
-				errorOutput.generate();
-			} catch (JApiCmpException e) {
-				if (e.getReason() == JApiCmpException.Reason.IncompatibleChange) {
-					throw new BuildException(e.getMessage());
-				}
-				throw e;
-			}
-		}
 	}
 }

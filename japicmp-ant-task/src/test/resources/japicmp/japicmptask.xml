@@ -1,9 +1,17 @@
 <?xml version="1.0"?>
 <project default="compare" name="JApiCmpTask test file">
-  <property name="japicmp.current.jar" value="${basedir}/../japicmp/target/japicmp-${japicmp.current.version}.jar"/>
+  <basename file="${basedir}" property="task.cwd"/>
+  <condition property="task.base" value="${basedir}/../../../.." else="${basedir}">
+    <equals arg1="${task.cwd}" arg2="japicmp"/>
+  </condition>
+  <!-- current -->
+  <property name="japicmp.current.jar" value="${task.base}/../japicmp/target/japicmp-${japicmp.current.version}.jar"/>
+  <!-- reference -->
   <property name="japicmp.version" value="0.9.4"/>
   <property name="japicmp.jar" value="japicmp-${japicmp.version}.jar"/>
-  <property name="javassist.version" value="3.20.0-GA"/>
+  <property name="japicmp.reference.jar" value="${task.base}/target/${japicmp.jar}"/>
+  <!-- dependencies -->
+  <property name="javassist.version" value="3.22.0-GA"/>
   <property name="javassist.jar" value="${user.home}/.m2/repository/org/javassist/javassist/${javassist.version}/javassist-${javassist.version}.jar"/>
   <property name="guava.version" value="18.0"/>
   <property name="guava.jar" value="${user.home}/.m2/repository/com/google/guava/guava/${guava.version}/guava-${guava.version}.jar"/>
@@ -11,10 +19,10 @@
   <target name="init">
     <fail message="Dependencies not found in Maven cache">
       <condition>
-	<or>
-	  <not><available file="${javassist.jar}"/></not>
-	  <not><available file="${guava.jar}"/></not>
-	</or>
+        <or>
+          <not><available file="${javassist.jar}"/></not>
+          <not><available file="${guava.jar}"/></not>
+        </or>
       </condition>
     </fail>
     <path id="dependency.classpath">
@@ -31,12 +39,38 @@
     </path>
 
     <get src="http://central.maven.org/maven2/com/github/siom79/japicmp/japicmp/${japicmp.version}/${japicmp.jar}"
-	 dest="target/${japicmp.jar}" usetimestamp="true"
-	 skipexisting="true"/>
+         dest="${japicmp.reference.jar}" usetimestamp="true" skipexisting="true"/>
+
+    <taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
   </target>
 
   <target name="compare" depends="init">
-    <taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
-    <japicmp oldjar="target/${japicmp.jar}" newjar="${japicmp.current.jar}" classpathref="compare.classpath" onlybinaryincompatiblemodifications="true"/>
+    <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}"
+			 classpathref="compare.classpath" onlybinaryincompatible="true"/>
+  </target>
+
+  <target name="binary" depends="init">
+    <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
+			 classpathref="compare.classpath" erroronbinaryincompatibility="true"/>
+  </target>
+
+  <target name="source" depends="init">
+    <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
+			 classpathref="compare.classpath" erroronsourceincompatibility="true"/>
+  </target>
+
+  <target name="exclusion" depends="init">
+    <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
+			 classpathref="compare.classpath" erroronexclusionincompatibility="true"/>
+  </target>
+
+  <target name="semantic" depends="init">
+    <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
+			 classpathref="compare.classpath" erroronsemanticincompatibility="true"/>
+  </target>
+
+  <target name="modifications" depends="init">
+    <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
+			 classpathref="compare.classpath" erroronmodifications="true"/>
   </target>
 </project>
