@@ -81,4 +81,17 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 	public CtClass getCtClass() {
 		return ctClass;
 	}
+
+	public String toString()
+	{
+		return "JApiImplementedInterface [fullyQualifiedName="
+			+ fullyQualifiedName
+			+ ", changeStatus="
+			+ changeStatus
+			+ ", compatibilityChanges="
+			+ compatibilityChanges
+			+ "]";
+	}
+
+
 }

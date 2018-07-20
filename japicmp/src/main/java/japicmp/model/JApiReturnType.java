@@ -30,4 +30,18 @@ public class JApiReturnType {
 	public String getNewReturnType() {
 		return OptionalHelper.optionalToString(newReturnTypeOptional);
 	}
+
+	public String toString()
+	{
+		return "JApiReturnType [oldReturnTypeOptional="
+			+ oldReturnTypeOptional
+			+ ", newReturnTypeOptional="
+			+ newReturnTypeOptional
+			+ ", changeStatus="
+			+ changeStatus
+			+ "]";
+	}
+
+
+
 }

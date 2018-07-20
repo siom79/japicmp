@@ -16,6 +16,7 @@ import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import japicmp.util.Optional;
 import japicmp.versioning.SemanticVersion;
+import japicmp.versioning.SemanticVersion.ChangeType;
 import japicmp.versioning.VersionChange;
 import javassist.CtClass;
 import org.apache.maven.artifact.Artifact;
@@ -400,7 +401,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, Options options, JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
+	void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, Options options, JarArchiveComparator jarArchiveComparator) throws MojoFailureException {
 		if (breakBuildOnModificationsParameter(parameterParam)) {
 			for (JApiClass jApiClass : jApiClasses) {
 				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
@@ -410,8 +411,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 		breakBuildIfNecessaryByApplyingFilter(jApiClasses, parameterParam, options, jarArchiveComparator);
 		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
-			boolean ignoreMissingOldVersion = "true".equalsIgnoreCase(parameter.getIgnoreMissingOldVersion() == null ? "false" : parameter.getIgnoreMissingOldVersion());
-			boolean ignoreMissingNewVersion = "true".equalsIgnoreCase(parameter.getIgnoreMissingNewVersion() == null ? "false" : parameter.getIgnoreMissingNewVersion());
+			boolean ignoreMissingOldVersion = "true".equalsIgnoreCase(parameterParam.getIgnoreMissingOldVersion() == null ? "false" : parameterParam.getIgnoreMissingOldVersion());
+			boolean ignoreMissingNewVersion = "true".equalsIgnoreCase(parameterParam.getIgnoreMissingNewVersion() == null ? "false" : parameterParam.getIgnoreMissingNewVersion());
 			List<SemanticVersion> oldVersions = new ArrayList<>();
 			List<SemanticVersion> newVersions = new ArrayList<>();
 			for (JApiCmpArchive file : options.getOldArchives()) {
@@ -430,8 +431,38 @@ public class JApiCmpMojo extends AbstractMojo {
 			if (!versionChange.isAllMajorVersionsZero()) {
 				Optional<SemanticVersion.ChangeType> changeTypeOptional = versionChange.computeChangeType();
 				if (changeTypeOptional.isPresent()) {
-					SemanticVersion.ChangeType changeType = changeTypeOptional.get();
-					SemverOut semverOut = new SemverOut(options, jApiClasses);
+					final SemanticVersion.ChangeType changeType = changeTypeOptional.get();
+
+
+					SemverOut semverOut = new SemverOut(options, jApiClasses, new SemverOut.Listener() {
+
+						public void onChange(JApiCompatibility change, JApiSemanticVersionLevel semanticVersionLevel)
+						{
+							switch(semanticVersionLevel) {
+								case MAJOR:
+									if (changeType.ordinal() > ChangeType.MAJOR.ordinal()) {
+										getLog().error("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change );
+									}
+									break;
+								case MINOR:
+									if (changeType.ordinal() > ChangeType.MINOR.ordinal()) {
+										getLog().error("Incompatibility detected: Requires semantic version level  " + semanticVersionLevel + ": " + change );
+									}
+									break;
+								case PATCH:
+									if (changeType.ordinal() > ChangeType.PATCH.ordinal()) {
+										getLog().error("Incompatibility detected: Requires semantic version level  " + semanticVersionLevel + ": " + change );
+									}
+									break;
+							    default:
+							    	// Ignore
+							}
+						}
+
+					});
+
+
+
 					String semver = semverOut.generate();
 					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals("1.0.0")) {
 						throw new MojoFailureException("Versions of archives indicate a minor change but binary incompatible changes found.");

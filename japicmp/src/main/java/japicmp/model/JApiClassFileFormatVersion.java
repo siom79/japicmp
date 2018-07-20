@@ -84,4 +84,23 @@ public class JApiClassFileFormatVersion implements JApiHasChangeStatus, JApiComp
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return this.compatibilityChanges;
 	}
+
+	public String toString()
+	{
+		return "JApiClassFileFormatVersion [majorVersionOld="
+			+ majorVersionOld
+			+ ", minorVersionOld="
+			+ minorVersionOld
+			+ ", majorVersionNew="
+			+ majorVersionNew
+			+ ", minorVersionNew="
+			+ minorVersionNew
+			+ ", changeStatus="
+			+ changeStatus
+			+ ", compatibilityChanges="
+			+ compatibilityChanges
+			+ "]";
+	}
+
+
 }

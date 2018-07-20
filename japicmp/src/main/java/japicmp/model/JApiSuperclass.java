@@ -142,4 +142,30 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 	public JApiClass getJApiClassOwning() {
 		return jApiClass;
 	}
+
+	public String toString()
+	{
+		String oldSuperClass = "n.a.";
+		if(oldSuperclassOptional.isPresent()) {
+			oldSuperClass = oldSuperclassOptional.get().getName();
+		}
+		String newSuperClass = "n.a.";
+		if(newSuperclassOptional.isPresent()) {
+			newSuperClass = newSuperclassOptional.get().getName();
+		}
+
+		return "JApiSuperclass [jApiClass="
+			+ jApiClass
+			+ ", oldSuperclass="
+			+ oldSuperClass
+			+ ", newSuperclass="
+			+ newSuperClass
+			+ ", changeStatus="
+			+ changeStatus
+			+ ", compatibilityChanges="
+			+ compatibilityChanges
+			+ "]";
+	}
+
+
 }

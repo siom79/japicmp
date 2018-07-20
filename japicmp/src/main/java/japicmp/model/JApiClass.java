@@ -923,4 +923,18 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	public JApiClassFileFormatVersion getClassFileFormatVersion() {
 		return classFileFormatVersion;
 	}
+
+	public String toString()
+	{
+		return "JApiClass [fullyQualifiedName="
+			+ fullyQualifiedName
+			+ ", changeStatus="
+			+ changeStatus
+			+ ", compatibilityChanges="
+			+ compatibilityChanges
+			+ "]";
+	}
+
+
+
 }

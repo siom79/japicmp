@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import japicmp.util.Optional;
+import japicmp.util.OptionalHelper;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.util.MethodDescriptorParser;
 import javassist.CtMethod;
@@ -126,4 +127,29 @@ public class JApiMethod extends JApiBehavior {
 	public JApiReturnType getReturnType() {
 		return returnType;
 	}
+
+	public String toString()
+	{
+		return "JApiMethod [oldMethod="
+			+ toString(oldMethod)
+			+ ", newMethod="
+			+ toString(newMethod)
+			+ ", returnType="
+			+ returnType
+			+ ", getCompatibilityChanges()="
+			+ getCompatibilityChanges()
+			+ "]";
+	}
+
+	public static String toString(Optional<CtMethod> method) {
+		if(method == null ) {
+			return OptionalHelper.N_A;
+		}
+		if(method.isPresent()) {
+			return method.get().getLongName();
+		}
+		return OptionalHelper.N_A;
+	}
+
+
 }

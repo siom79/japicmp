@@ -25,4 +25,21 @@ public class JApiConstructor extends JApiBehavior {
 	public Optional<CtConstructor> getOldConstructor() {
 		return oldConstructor;
 	}
+
+	public String toString()
+	{
+		return "JApiConstructor [oldConstructor="
+			+ oldConstructor
+			+ ", newConstructor="
+			+ newConstructor
+			+ ", getNewConstructor()="
+			+ getNewConstructor()
+			+ ", getOldConstructor()="
+			+ getOldConstructor()
+			+ ", getCompatibilityChanges()="
+			+ getCompatibilityChanges()
+			+ "]";
+	}
+
+
 }
