@@ -1,6 +1,5 @@
 package japicmp.cmp;
 
-import japicmp.model.JApiCompatibility;
 import japicmp.model.JApiCompatibilityChange;
 import japicmp.util.Optional;
 import japicmp.compat.CompatibilityChanges;

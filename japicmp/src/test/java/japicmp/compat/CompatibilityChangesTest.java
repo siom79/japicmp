@@ -17,7 +17,6 @@ import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtMethod;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -25,7 +24,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static japicmp.util.Helper.*;
+import static japicmp.util.Helper.getJApiClass;
+import static japicmp.util.Helper.getJApiConstructor;
+import static japicmp.util.Helper.getJApiField;
+import static japicmp.util.Helper.getJApiMethod;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNot.not;

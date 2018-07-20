@@ -3,7 +3,6 @@ package japicmp.versioning;
 import japicmp.exception.JApiCmpException;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 

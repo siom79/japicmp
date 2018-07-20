@@ -14,7 +14,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.jar.JarFile;
 
 import static japicmp.util.JarUtil.createJarFile;
 import static org.junit.Assert.assertEquals;

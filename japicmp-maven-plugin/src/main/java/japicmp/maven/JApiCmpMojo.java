@@ -895,17 +895,11 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private void writeToFile(String output, File outputfile) throws MojoFailureException, IOException {
-		OutputStreamWriter fileWriter = null;
-		try {
-			fileWriter = new OutputStreamWriter(new FileOutputStream(outputfile), Charset.forName("UTF-8"));
+		try (OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(outputfile), Charset.forName("UTF-8"))) {
 			fileWriter.write(output);
 			getLog().info("Written file '" + outputfile.getAbsolutePath() + "'.");
 		} catch (Exception e) {
 			throw new MojoFailureException(String.format("Failed to write diff file: %s", e.getMessage()), e);
-		} finally {
-			if (fileWriter != null) {
-				fileWriter.close();
-			}
 		}
 	}
 
