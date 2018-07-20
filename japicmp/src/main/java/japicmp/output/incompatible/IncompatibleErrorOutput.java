@@ -28,6 +28,7 @@ import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiBehavior;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibility;
 import japicmp.model.JApiCompatibilityChange;
 import japicmp.model.JApiConstructor;
 import japicmp.model.JApiField;
@@ -35,6 +36,7 @@ import japicmp.model.JApiImplementedInterface;
 import japicmp.model.JApiMethod;
 import japicmp.model.JApiParameter;
 import japicmp.model.JApiReturnType;
+import japicmp.model.JApiSemanticVersionLevel;
 import japicmp.model.JApiSuperclass;
 import japicmp.model.JApiType;
 import japicmp.output.Filter;
@@ -64,6 +66,10 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 
 	protected void warn(String msg, Throwable exception) {
 		LOGGER.log(Level.WARNING, msg, exception);
+	}
+
+	protected void warn(String msg) {
+		LOGGER.log(Level.WARNING, msg);
 	}
 
 	protected void info(String msg) {
@@ -109,8 +115,32 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 			if (!versionChange.isAllMajorVersionsZero()) {
 				Optional<SemanticVersion.ChangeType> changeTypeOptional = versionChange.computeChangeType();
 				if (changeTypeOptional.isPresent()) {
-					SemanticVersion.ChangeType changeType = changeTypeOptional.get();
-					SemverOut semverOut = new SemverOut(options, jApiClasses);
+					final SemanticVersion.ChangeType changeType = changeTypeOptional.get();
+
+					SemverOut semverOut = new SemverOut(options, jApiClasses, new SemverOut.Listener() {
+							public void onChange(JApiCompatibility change, JApiSemanticVersionLevel semanticVersionLevel) {
+								switch(semanticVersionLevel) {
+								case MAJOR:
+									if (changeType.ordinal() > SemanticVersion.ChangeType.MAJOR.ordinal()) {
+										warn("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change);
+									}
+									break;
+								case MINOR:
+									if (changeType.ordinal() > SemanticVersion.ChangeType.MINOR.ordinal()) {
+										warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
+									}
+									break;
+								case PATCH:
+									if (changeType.ordinal() > SemanticVersion.ChangeType.PATCH.ordinal()) {
+										warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
+									}
+									break;
+								default:
+									// Ignore
+								}
+							}
+						});
+
 					String semver = semverOut.generate();
 					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals("1.0.0")) {
 						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, "Versions of archives indicate a minor change but binary incompatible changes found.");
