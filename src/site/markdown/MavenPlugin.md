@@ -140,6 +140,7 @@ An advanced configuration can utilize the following parameters:
 							<compatibilityChange>CLASS_REMOVED</compatibilityChange>
 							<binaryCompatible>true</binaryCompatible>
 							<sourceCompatible>true</sourceCompatible>
+							<semanticVersionLevel>PATCH</semanticVersionLevel>
 						</overrideCompatibilityChangeParameter>
 					</overrideCompatibilityChangeParameters>
 					<onlyBinaryIncompatible>false</onlyBinaryIncompatible>
