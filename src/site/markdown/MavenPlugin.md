@@ -85,7 +85,7 @@ to configure the latest version more precisely (e.g. only GA versions), then you
 </plugin>
 ```
 
-##Advance Usage##
+##Advanced Usage##
 
 An advanced configuration can utilize the following parameters:
 

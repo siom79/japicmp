@@ -1,26 +1,20 @@
 package japicmp.output.stdout;
 
 import japicmp.cli.CliParser;
-import japicmp.cli.JApiCli;
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.util.CtInterfaceBuilder;
-import japicmp.util.CtMethodBuilder;
-import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.junit.Test;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static japicmp.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;

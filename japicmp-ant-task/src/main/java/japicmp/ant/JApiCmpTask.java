@@ -3,7 +3,9 @@ package japicmp.ant;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
+import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -45,6 +47,13 @@ public class JApiCmpTask extends Task {
 	private String xmlOutputFile;
 	private String htmlOutputFile;
 	private String htmlStylesheet;
+	private boolean errorOnSemanticIncompatibility = false;
+	private boolean errorOnExclusionIncompatibility = false;
+	private boolean errorOnSourceIncompatibility = false;
+	private boolean errorOnBinaryIncompatibility = false;
+	private boolean errorOnModifications = false;
+	private boolean ignoreMissingOldVersion = false;
+	private boolean ignoreMissingNewVersion = false;
 
 	public void setOnlyBinaryIncompatible(String onlyBinaryIncompatible) {
 		this.onlyBinaryIncompatible = Project.toBoolean(onlyBinaryIncompatible);
@@ -163,6 +172,34 @@ public class JApiCmpTask extends Task {
 		this.htmlStylesheet = htmlStylesheet;
 	}
 
+	public void setErrorOnSemanticIncompatibility(boolean errorOnSemanticIncompatibility) {
+		this.errorOnSemanticIncompatibility = errorOnSemanticIncompatibility;
+	}
+
+	public void setErrorOnExclusionIncompatibility(boolean errorOnExclusionIncompatibility) {
+		this.errorOnExclusionIncompatibility = errorOnExclusionIncompatibility;
+	}
+
+	public void setErrorOnSourceIncompatibility(boolean errorOnSourceIncompatibility) {
+		this.errorOnSourceIncompatibility = errorOnSourceIncompatibility;
+	}
+
+	public void setErrorOnBinaryIncompatibility(boolean errorOnBinaryIncompatibility) {
+		this.errorOnBinaryIncompatibility = errorOnBinaryIncompatibility;
+	}
+
+	public void setErrorOnModifications(boolean errorOnModifications) {
+		this.errorOnModifications = errorOnModifications;
+	}
+
+	public void setIgnoreMissingOldVersion(boolean ignoreMissingOldVersion) {
+		this.ignoreMissingOldVersion = ignoreMissingOldVersion;
+	}
+
+	public void setIgnoreMissingNewVersion(boolean ignoreMissingNewVersion) {
+		this.ignoreMissingNewVersion = ignoreMissingNewVersion;
+	}
+
 	@Override
 	public void execute() {
 		if (oldJar == null) {
@@ -174,7 +211,7 @@ public class JApiCmpTask extends Task {
 		Options options = createOptionsFromAntAttrs();
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
-		generateOutput(options, jApiClasses);
+		generateOutput(options, jApiClasses, jarArchiveComparator);
 	}
 
 	private Options createOptionsFromAntAttrs() {
@@ -198,11 +235,34 @@ public class JApiCmpTask extends Task {
 			options.addIgnoreMissingClassRegularExpression(missingClassRegEx);
 		}
 		options.setReportOnlyFilename(reportOnlyFilename);
+		options.setErrorOnSemanticIncompatibility(errorOnSemanticIncompatibility);
+		options.setErrorOnExclusionIncompatibility(errorOnExclusionIncompatibility);
+		options.setErrorOnSourceIncompatibility(errorOnSourceIncompatibility);
+		options.setErrorOnBinaryIncompatibility(errorOnBinaryIncompatibility);
+		options.setErrorOnModifications(errorOnModifications);
+		options.setIgnoreMissingOldVersion(ignoreMissingOldVersion);
+		options.setIgnoreMissingNewVersion(ignoreMissingNewVersion);
 		options.verify();
 		return options;
 	}
 
-	private void generateOutput(Options options, List<JApiClass> jApiClasses) {
+	private void generateOutput(Options options, List<JApiClass> jApiClasses, JarArchiveComparator jarArchiveComparator) {
+		if (options.isErrorOnBinaryIncompatibility()
+			|| options.isErrorOnSourceIncompatibility()
+			|| options.isErrorOnExclusionIncompatibility()
+			|| options.isErrorOnModifications()
+			|| options.isErrorOnSemanticIncompatibility()) {
+			IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses, jarArchiveComparator);
+			try {
+				errorOutput.generate();
+			} catch (JApiCmpException e) {
+				if (e.getReason() == JApiCmpException.Reason.IncompatibleChange) {
+					throw new BuildException(e.getMessage());
+				}
+				throw e;
+			}
+		}
+
 		if (semanticVersioning) {
 			SemverOut semverOut = new SemverOut(options, jApiClasses);
 			String semver = semverOut.generate();

@@ -1,7 +1,5 @@
 package japicmp.maven;
 
-import japicmp.cmp.JarArchiveComparatorOptions;
-
 import java.util.List;
 
 public class Parameter {

@@ -100,14 +100,14 @@ public abstract class Optional<T> {
 		if (reference == null) {
 			throw new IllegalArgumentException("reference should not be null.");
 		}
-		return new Present<T>(reference);
+		return new Present<>(reference);
 	}
 
 	public static <T> Optional<T> fromNullable(T reference) {
 		if (reference == null) {
 			return new Absent<>();
 		}
-		return new Present<T>(reference);
+		return new Present<>(reference);
 	}
 
 	@SuppressWarnings("unchecked")
