@@ -50,11 +50,15 @@
 			<url>https://github.com/mike-duigou</url>
 		</contributor>
 		<contributor>
+			<name>Chetan Narsude</name>
+			<url>https://github.com/243826</url>
+		</contributor>
+		<contributor>
 			<name>Guy Rooms</name>
 			<url>https://github.com/roomsg</url>
 		</contributor>
 		<contributor>
-			<name>earcam</name>
+			<name>Caspar MacRae</name>
 			<url>https://github.com/earcam</url>
 		</contributor>
 		<contributor>
@@ -71,15 +75,15 @@
 		</contributor>
 		<contributor>
 			<name>Chas Honton</name>
-			<email>chas@honton.org</email>
 			<url>https://github.com/chonton</url>
+			<email>chas@honton.org</email>
 		</contributor>
 		<contributor>
 			<name>Richard Atkins</name>
 			<url>https://github.com/rjatkins</url>
 		</contributor>
 		<contributor>
-			<name>io7m</name>
+			<name>Mark Raynsford</name>
 			<url>https://github.com/io7m</url>
 		</contributor>
 		<contributor>
@@ -92,14 +96,39 @@
 			<url>https://github.com/twogee</url>
 		</contributor>
 		<contributor>
+			<name>Arnaud Vié</name>
+			<url>https://github.com/UnasZole</url>
+		</contributor>
+		<contributor>
+			<name>Buddhi Kulatunga</name>
+			<url>https://github.com/bkulatun</url>
+		</contributor>
+		<contributor>
+			<name>Rostislav Svoboda</name>
+			<url>https://github.com/rsvoboda</url>
+			<email>rsvoboda@redhat.com</email>
+		</contributor>
+		<contributor>
 			<name>Rob Tompkins</name>
 			<url>https://github.com/chtompki</url>
 			<email>chtompki@gmail.com</email>
 		</contributor>
 		<contributor>
-			<name>zhostasa</name>
-			<url>https://github.com/zhostasa</url>
-			<email>zhostasa@redhat.com</email>
+			<name>Tobias Preuss</name>
+			<url>https://github.com/johnjohndoe</url>
+		</contributor>
+		<contributor>
+			<name>Tom Bentley</name>
+			<url>https://github.com/tombentley</url>
+		</contributor>
+		<contributor>
+			<name>Richard Hierlmeier</name>
+			<url>https://github.com/rhierlmeier</url>
+		</contributor>
+		<contributor>
+			<name>Matt Benson</name>
+			<url>https://github.com/mbenson</url>
+			<email>gudnabrsam@gmail.com</email>
 		</contributor>
 	</contributors>
 
