@@ -11,7 +11,7 @@
   <property name="japicmp.jar" value="japicmp-${japicmp.version}.jar"/>
   <property name="japicmp.reference.jar" value="${task.base}/target/${japicmp.jar}"/>
   <!-- dependencies -->
-  <property name="javassist.version" value="3.22.0-GA"/>
+  <property name="javassist.version" value="3.23.1-GA"/>
   <property name="javassist.jar" value="${user.home}/.m2/repository/org/javassist/javassist/${javassist.version}/javassist-${javassist.version}.jar"/>
   <property name="guava.version" value="18.0"/>
   <property name="guava.jar" value="${user.home}/.m2/repository/com/google/guava/guava/${guava.version}/guava-${guava.version}.jar"/>
@@ -46,31 +46,31 @@
 
   <target name="compare" depends="init">
     <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}"
-			 classpathref="compare.classpath" onlybinaryincompatible="true"/>
+             classpathref="compare.classpath" onlybinaryincompatible="true"/>
   </target>
 
   <target name="binary" depends="init">
     <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
-			 classpathref="compare.classpath" erroronbinaryincompatibility="true"/>
+             classpathref="compare.classpath" erroronbinaryincompatibility="true"/>
   </target>
 
   <target name="source" depends="init">
     <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
-			 classpathref="compare.classpath" erroronsourceincompatibility="true"/>
+             classpathref="compare.classpath" erroronsourceincompatibility="true"/>
   </target>
 
   <target name="exclusion" depends="init">
     <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
-			 classpathref="compare.classpath" erroronexclusionincompatibility="true"/>
+             classpathref="compare.classpath" erroronexclusionincompatibility="true"/>
   </target>
 
   <target name="semantic" depends="init">
     <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
-			 classpathref="compare.classpath" erroronsemanticincompatibility="true"/>
+             classpathref="compare.classpath" erroronsemanticincompatibility="true"/>
   </target>
 
   <target name="modifications" depends="init">
     <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
-			 classpathref="compare.classpath" erroronmodifications="true"/>
+             classpathref="compare.classpath" erroronmodifications="true"/>
   </target>
 </project>
