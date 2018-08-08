@@ -167,7 +167,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					throw new MojoFailureException("Unknown compatibility change '" + compatibilityChange + "'. Supported values: " + Joiner.on(',').join(JApiCompatibilityChange.values()));
 				}
 
-				JApiSemanticVersionLevel foundSemanticVersionLevel = null;
+				JApiSemanticVersionLevel foundSemanticVersionLevel = foundChange.getSemanticVersionLevel();
 				String semanticVersionLevel = configChange.getSemanticVersionLevel();
 				for (JApiSemanticVersionLevel level : JApiSemanticVersionLevel.values()) {
 					if (level.name().equalsIgnoreCase(semanticVersionLevel)) {
