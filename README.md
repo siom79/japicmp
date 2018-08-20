@@ -73,16 +73,6 @@ By using the available Ant task, you can also integrate japicmp into your Ant bu
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
-To build and run japicmp under Java 1.9, you must add the following module: `java.xml.bind`. This can be done for the maven plugin for example
-by:
-``` bash
-export MAVEN_OPTS="--add-modules java.xml.bind"
-```
-For the CLI tool the following invocation of `java` is required:
-``` bash
-java --add-modules java.xml.bind
-```
-
 ## Motivation
 
 Every time you release a new version of a library or a product, you have to tell your clients or customers what

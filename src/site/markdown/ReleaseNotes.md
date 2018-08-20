@@ -2,13 +2,25 @@
 
 The following versions of japicmp are available:
 
+##0.13.0 (2018-08-20)##
+* Use javassist 3.23.1-GA.
+* Added configuration option <semanticVersionLevel/> to <overrideCompatibilityChangeParameter/>. [#213](https://github.com/siom79/japicmp/issues/213)
+* CLI support to error on incompatibilities. [#216](https://github.com/siom79/japicmp/issues/216)
+* japicmp-maven-plugin writes now errors to the console if an incompatible change is detected. [#215](https://github.com/siom79/japicmp/issues/215)
+* Use MavenParameters to obtain mavenProject in isPomModuleNeedingSkip(). [#210](https://github.com/siom79/japicmp/issues/210)
+* CompatibilityChanges only detects ANNOTATION_DEPRECATED_ADDED if the annoation has change status NEW or MODIFIED. [#213](https://github.com/siom79/japicmp/issues/213)
+* The two compatibility changes METHOD_NEW_DEFAULT and METHOD_ADDED_TO_INTERFACE are not set simultaneously. [#201](https://github.com/siom79/japicmp/issues/201)
+* Added maven dependency on javax.activation. [#177](https://github.com/siom79/japicmp/issues/177)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.13.0).
+
 ##0.12.0 (2018-05-02)##
 * If a change is evaluated as binary or source incompatible can be configured. [#209](https://github.com/siom79/japicmp/issues/209)
 * Proper error message in case class could not loaded from old and new classpath if specified separately. [#200](https://github.com/siom79/japicmp/issues/200)
 * Skip pom modules in site report. [#207](https://github.com/siom79/japicmp/issues/207)
 * The parameters for exclusive filters are checked in CLI tool. [#202](https://github.com/siom79/japicmp/issues/202)
 
-Available at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20v%3A%220.12.0%22).
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.12.0).
 
 ##0.11.1 (2018-03-12)##
 * Reduced extraneous whitespace in the generated HTML report. [#197](https://github.com/siom79/japicmp/issues/197)
