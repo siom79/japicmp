@@ -265,7 +265,7 @@ for each check. This allows you to customize the following verifications:
 | METHOD_ABSTRACT_ADDED_TO_CLASS | true | false | MINOR |
 | METHOD_ABSTRACT_ADDED_IN_SUPERCLASS | true | false | MINOR |
 | METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE | true | false | MINOR |
-| METHOD_NEW_DEFAULT | false | false | MAJOR |
+| METHOD_NEW_DEFAULT | true | false | MAJOR |
 | METHOD_ABSTRACT_NOW_DEFAULT | false | false | MAJOR |
 | FIELD_STATIC_AND_OVERRIDES_STATIC | false | false | MAJOR |
 | FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS | false | false | MAJOR |
