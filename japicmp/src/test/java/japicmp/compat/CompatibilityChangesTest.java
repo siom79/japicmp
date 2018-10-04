@@ -1436,7 +1436,7 @@ public class CompatibilityChangesTest {
                 CtClass bClass = CtClassBuilder.create().name("japicmp.B").withSuperclass(aClass).addToClassPool(classPool);
                 CtClass cClass = CtClassBuilder.create().name("japicmp.C").withSuperclass(bClass).addToClassPool(classPool);
 
-                CtMethodBuilder.create().name("foo").publicAccess().addToClass(bClass);
+                CtMethodBuilder.create().name("foo").returnType(aClass).publicAccess().addToClass(bClass);
 
                 return Arrays.asList(aClass, bClass, cClass);
             }
@@ -1447,7 +1447,7 @@ public class CompatibilityChangesTest {
                 CtClass bClass = CtClassBuilder.create().name("japicmp.B").withSuperclass(aClass).addToClassPool(classPool);
                 CtClass cClass = CtClassBuilder.create().name("japicmp.C").withSuperclass(bClass).addToClassPool(classPool);
 
-                CtMethodBuilder.create().name("foo").publicAccess().addToClass(aClass);
+                CtMethodBuilder.create().name("foo").returnType(aClass).publicAccess().addToClass(aClass);
                 return Arrays.asList(aClass, bClass, cClass);
             }
         });

@@ -535,16 +535,16 @@ public class CompatibilityChanges {
 	 * @return <code>true</code> if it is implemented in a super class
 	 */
 	private boolean isImplemented(JApiMethod jApiMethod) {
-
         JApiClass aClass = jApiMethod.getjApiClass();
 	    while(aClass != null) {
             for (JApiMethod method : aClass.getMethods()) {
-                if (!isAbstract(method) && method.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(method)) {
+                if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameParameter(method) &&
+                    !isAbstract(method) && method.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(method)) {
                     return true;
                 }
             }
 
-            if(aClass.getSuperclass() != null) {
+            if(aClass.getSuperclass() != null && aClass.getSuperclass().getJApiClass().isPresent()) {
                 aClass = aClass.getSuperclass().getJApiClass().get();
             } else {
                 aClass = null;
