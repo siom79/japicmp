@@ -546,6 +546,8 @@ public class CompatibilityChanges {
 
             if(aClass.getSuperclass() != null) {
                 aClass = aClass.getSuperclass().getJApiClass().get();
+            } else {
+                aClass = null;
             }
 	    }
 	    return false;
