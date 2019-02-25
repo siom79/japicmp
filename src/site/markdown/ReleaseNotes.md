@@ -2,6 +2,12 @@
 
 The following versions of japicmp are available:
 
+##0.13.1 (2019-02-25)##
+* Do not report METHOD_REMOVED_IN_SUPERCLASS if method is pulled up. [#222](https://github.com/siom79/japicmp/issues/222)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.13.1).
+
+
 ##0.13.0 (2018-08-20)##
 * Use javassist 3.23.1-GA.
 * Added configuration option <semanticVersionLevel/> to <overrideCompatibilityChangeParameter/>. [#213](https://github.com/siom79/japicmp/issues/213)
