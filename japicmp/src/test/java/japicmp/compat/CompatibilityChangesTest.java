@@ -1421,4 +1421,38 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED)));
 	}
+
+	/**
+	 * Tests that no regression of issue #222 occurs
+	 * @throws Exception
+	 */
+	@Test
+	public void testMethodMovedToSuperClass() throws Exception {
+        JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+        List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+            @Override
+            public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+                CtClass aClass = CtClassBuilder.create().name("japicmp.A").addToClassPool(classPool);
+                CtClass bClass = CtClassBuilder.create().name("japicmp.B").withSuperclass(aClass).addToClassPool(classPool);
+                CtClass cClass = CtClassBuilder.create().name("japicmp.C").withSuperclass(bClass).addToClassPool(classPool);
+
+                CtMethodBuilder.create().name("foo").returnType(aClass).publicAccess().addToClass(bClass);
+
+                return Arrays.asList(aClass, bClass, cClass);
+            }
+
+            @Override
+            public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+                CtClass aClass = CtClassBuilder.create().name("japicmp.A").addToClassPool(classPool);
+                CtClass bClass = CtClassBuilder.create().name("japicmp.B").withSuperclass(aClass).addToClassPool(classPool);
+                CtClass cClass = CtClassBuilder.create().name("japicmp.C").withSuperclass(bClass).addToClassPool(classPool);
+
+                CtMethodBuilder.create().name("foo").returnType(aClass).publicAccess().addToClass(aClass);
+                return Arrays.asList(aClass, bClass, cClass);
+            }
+        });
+        JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.C");
+        assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS)));
+
+	}
 }

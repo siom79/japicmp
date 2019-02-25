@@ -529,6 +529,30 @@ public class CompatibilityChanges {
 		}
 	}
 
+	/**
+	 * Is a method implemented in a super class
+	 * @param jApiMethod the method
+	 * @return <code>true</code> if it is implemented in a super class
+	 */
+	private boolean isImplemented(JApiMethod jApiMethod) {
+        JApiClass aClass = jApiMethod.getjApiClass();
+	    while(aClass != null) {
+            for (JApiMethod method : aClass.getMethods()) {
+                if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameParameter(method) &&
+                    !isAbstract(method) && method.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(method)) {
+                    return true;
+                }
+            }
+
+            if(aClass.getSuperclass() != null && aClass.getSuperclass().getJApiClass().isPresent()) {
+                aClass = aClass.getSuperclass().getJApiClass().get();
+            } else {
+                aClass = null;
+            }
+	    }
+	    return false;
+	}
+
 	private void checkIfSuperclassesOrInterfacesChangedIncompatible(final JApiClass jApiClass, Map<String, JApiClass> classMap) {
 		final JApiSuperclass superclass = jApiClass.getSuperclass();
 		// section 13.4.4 of "Java Language Specification" SE7
@@ -563,7 +587,7 @@ public class CompatibilityChanges {
 						}
 					}
 					for (JApiMethod jApiMethod : superclass.getMethods()) {
-						if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED) {
+						if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED && !isImplemented(jApiMethod)) {
 							boolean implemented = false;
 							for (JApiMethod implementedMethod : implementedMethods) {
 								if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
@@ -572,7 +596,7 @@ public class CompatibilityChanges {
 								}
 							}
 							if (!implemented) {
-								removedAndNotOverriddenMethods.add(jApiMethod);
+						        removedAndNotOverriddenMethods.add(jApiMethod);
 							}
 						}
 					}
