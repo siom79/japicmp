@@ -375,11 +375,9 @@
                  <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <configuration>
-                       <additionalJOption>
-						   -Xdoclint:none
-					   </additionalJOption>
-                    </configuration>
+					 <configuration>
+						 <source>8</source>
+					 </configuration>
                  </plugin>
               </plugins>
            </build>
@@ -397,7 +395,6 @@
 						<version>2.22.0</version>
 						<configuration>
 							<argLine>
-								--add-modules=java.xml.bind
 								--illegal-access=warn
 							</argLine>
 						</configuration>
@@ -408,7 +405,6 @@
 						<version>2.22.0</version>
 						<configuration>
 							<argLine>
-								--add-modules=java.xml.bind
 								--illegal-access=warn
 							</argLine>
 						</configuration>
@@ -418,7 +414,6 @@
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<configuration>
 							<additionalJOption>
-								--add-modules=java.xml.bind
 							</additionalJOption>
 						</configuration>
 					</plugin>
