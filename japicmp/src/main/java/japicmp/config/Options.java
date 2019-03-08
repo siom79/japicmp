@@ -56,6 +56,7 @@ public class Options {
 	private boolean ignoreMissingOldVersion;
 	private boolean ignoreMissingNewVersion;
 	private boolean helpRequested;
+	private boolean errorOnSemanticIncompatibilityForMajorVersionZero;
 
 	Options() {
 		// intentionally left empty
@@ -453,5 +454,13 @@ public class Options {
 
 	public void setHelpRequested(boolean helpRequested) {
 		this.helpRequested = helpRequested;
+	}
+
+	public boolean isErrorOnSemanticIncompatibilityForMajorVersionZero() {
+		return errorOnSemanticIncompatibilityForMajorVersionZero;
+	}
+
+	public void setErrorOnSemanticIncompatibilityForMajorVersionZero(boolean errorOnSemanticIncompatibilityForMajorVersionZero) {
+		this.errorOnSemanticIncompatibilityForMajorVersionZero = errorOnSemanticIncompatibilityForMajorVersionZero;
 	}
 }
