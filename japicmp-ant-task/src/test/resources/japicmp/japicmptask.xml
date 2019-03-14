@@ -12,9 +12,9 @@
   <property name="japicmp.reference.jar" value="${task.base}/target/${japicmp.jar}"/>
   <!-- dependencies -->
   <property name="javassist.version" value="3.23.1-GA"/>
-  <property name="javassist.jar" value="${user.home}/.m2/repository/org/javassist/javassist/${javassist.version}/javassist-${javassist.version}.jar"/>
+  <property name="javassist.jar" value="${localRepository}/org/javassist/javassist/${javassist.version}/javassist-${javassist.version}.jar"/>
   <property name="guava.version" value="18.0"/>
-  <property name="guava.jar" value="${user.home}/.m2/repository/com/google/guava/guava/${guava.version}/guava-${guava.version}.jar"/>
+  <property name="guava.jar" value="${localRepository}/com/google/guava/guava/${guava.version}/guava-${guava.version}.jar"/>
 
   <target name="init">
     <fail message="Dependencies not found in Maven cache">

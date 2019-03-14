@@ -73,11 +73,11 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 	}
 
 	protected void info(String msg) {
-		LOGGER.log(Level.INFO, "Skipping semantic version check because all major versions are zero (see http://semver.org/#semantic-versioning-specification-semver, section 4).");
+		LOGGER.log(Level.INFO, msg);
 	}
 
 	protected void debug(String msg) {
-		LOGGER.log(Level.FINE, "Skipping semantic version check because all major versions are zero (see http://semver.org/#semantic-versioning-specification-semver, section 4).");
+		LOGGER.log(Level.FINE, msg);
 	}
 
 	protected boolean isDebugEnabled() {
@@ -112,7 +112,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 				}
 			}
 			VersionChange versionChange = new VersionChange(oldVersions, newVersions, ignoreMissingOldVersion, ignoreMissingNewVersion);
-			if (!versionChange.isAllMajorVersionsZero()) {
+			if (!versionChange.isAllMajorVersionsZero() || options.isErrorOnSemanticIncompatibilityForMajorVersionZero()) {
 				Optional<SemanticVersion.ChangeType> changeTypeOptional = versionChange.computeChangeType();
 				if (changeTypeOptional.isPresent()) {
 					final SemanticVersion.ChangeType changeType = changeTypeOptional.get();
