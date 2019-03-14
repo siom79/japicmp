@@ -66,6 +66,7 @@
 						<include>**/ant/**</include>
 					</includes>
 					<systemPropertyVariables>
+						<localRepository>${settings.localRepository}</localRepository>
 						<japicmp.current.version>${project.version}</japicmp.current.version>
 					</systemPropertyVariables>
 				</configuration>
