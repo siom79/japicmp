@@ -349,7 +349,8 @@ public class CompatibilityChanges {
 			}
 			// section 13.4.17 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
-				if (!(method.getStaticModifier().getOldModifier().isPresent() && method.getStaticModifier().getOldModifier().get() == StaticModifier.STATIC)) {
+				if ((jApiClass.getFinalModifier().getOldModifier().isPresent() && jApiClass.getFinalModifier().getOldModifier().get() != FinalModifier.FINAL) &&
+					!(method.getStaticModifier().getOldModifier().isPresent() && method.getStaticModifier().getOldModifier().get() == StaticModifier.STATIC)) {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);
 				}
 			}

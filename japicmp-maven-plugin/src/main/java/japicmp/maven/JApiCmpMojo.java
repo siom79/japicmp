@@ -405,6 +405,9 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
 			options.setErrorOnSemanticIncompatibility(true);
 		}
+		if (breakBuildBasedOnSemanticVersioningForMajorVersionZero(parameterParam)) {
+			options.setErrorOnSemanticIncompatibilityForMajorVersionZero(true);
+		}
 		if (breakBuildOnBinaryIncompatibleModifications(parameterParam)) {
 			options.setErrorOnBinaryIncompatibility(true);
 		}
@@ -439,6 +442,14 @@ public class JApiCmpMojo extends AbstractMojo {
 				throw new MojoExecutionException("Error while checking for incompatible changes", e);
 			}
 		}
+	}
+
+	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero(Parameter parameterParam) {
+		boolean retVal = false;
+		if (parameter != null) {
+			retVal = Boolean.valueOf(parameter.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero());
+		}
+		return retVal;
 	}
 
 	Options getOptions(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
