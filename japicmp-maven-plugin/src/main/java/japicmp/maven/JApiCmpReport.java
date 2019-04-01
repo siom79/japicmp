@@ -128,6 +128,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	@Override
 	public String getDescription(Locale locale) {
+		getMojo();
 		if (Boolean.TRUE.toString().equalsIgnoreCase(skip) || isPomModuleNeedingSkip()) {
 			return "skipping report";
 		}

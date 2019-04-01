@@ -635,24 +635,59 @@
 				<artifactId>japicmp-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<configuration>
-					<oldVersion>
-						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-v1</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</oldVersion>
-					<newVersion>
-						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-v2</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</newVersion>
 					<parameter>
+						<ignoreMissingClasses>true</ignoreMissingClasses>
+						<ignoreNonResolvableArtifacts>true</ignoreNonResolvableArtifacts>
+						<onlyModified>true</onlyModified>
 						<reportOnlyFilename>true</reportOnlyFilename>
 					</parameter>
 				</configuration>
+				<reportSets>
+					<reportSet>
+						<id>2.6.0-to-current</id>
+						<reports>
+							<report>cmp-report</report>
+						</reports>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersion>
+						</configuration>
+					</reportSet>
+					<reportSet>
+						<id>2.5.4-to-2.6.0</id>
+						<reports>
+							<report>cmp-report</report>
+						</reports>
+						<configuration>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersion>
+						</configuration>
+					</reportSet>
+				</reportSets>
 			</plugin>
 		</plugins>
 	</reporting>
