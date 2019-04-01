@@ -154,6 +154,7 @@ An advanced configuration can utilize the following parameters:
 					<htmlTitle>Title of report</htmlTitle>
 					<noAnnotations>false</noAnnotations>
 					<ignoreNonResolvableArtifacts>false</ignoreNonResolvableArtifacts>
+					<ignoreMissingOptionalDependency>false</ignoreMissingOptionalDependency>
 					<packagingSupporteds>
 						<packagingSupported>jar</packagingSupported>
 					</packagingSupporteds>
@@ -221,6 +222,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | skipPomModules								         | true  | true		    | Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.|
 | skip											         | true  | false		| Setting this parameter to true will skip execution of the plugin.|
 | ignoreNonResolvableArtifacts					         | true  | false		| Set this to true in order to ignore artifacts that cannot be resolved, i.e. the build does not break in case a dependency cannot be resolved to a file.|
+| ignoreMissingOptionalDependency                        | true  | false        | Ignore missing optional dependencies.|
 | ignoreMissingOldVersion						         | true  | false		| If set to true, not resolvable artifacts for the old version do not break the build.|
 | ignoreMissingNewVersion						         | true  | false		| If set to true, not resolvable artifacts for the new version do not break the build.|
 | packagingSupported							         | true  | n.a.			| List all packaging type for which the plugin should be executed. Helpful if you define the plugin in a root pom.|

@@ -316,13 +316,11 @@ public class JApiCmpMojo extends AbstractMojo {
 				if (comparisonArtifact.getVersion() != null) {
 					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, mavenParameters, false, pluginParameters, ConfigurationVersion.OLD);
 					for (Artifact artifact : artifacts) {
-						if (!artifact.isOptional()) { //skip optional artifacts because getFile() will return null
-							File file = artifact.getFile();
-							if (file != null) {
-								oldArchives.add(new JApiCmpArchive(file, guessVersion(file)));
-							} else {
-								getLog().warn("Artifact '" + artifact + " does not have a file.");
-							}
+						File file = artifact.getFile();
+						if (file != null) {
+							oldArchives.add(new JApiCmpArchive(file, guessVersion(file)));
+						} else {
+							handleMissingArtifactFile(pluginParameters, artifact);
 						}
 					}
 				}
@@ -711,7 +709,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		Set<String> classPathEntries = new HashSet<>();
 		for (Artifact artifact : dependencyArtifacts) {
 			String scope = artifact.getScope();
-			if (!"test".equals(scope) && !artifact.isOptional()) {
+			if (!"test".equals(scope)) {
 				Set<Artifact> artifacts = resolveArtifact(artifact, mavenParameters, false, pluginParameters, configurationVersion);
 				for (Artifact resolvedArtifact : artifacts) {
 					File resolvedFile = resolvedArtifact.getFile();
@@ -723,6 +721,8 @@ public class JApiCmpMojo extends AbstractMojo {
 							}
 							classPathEntries.add(absolutePath);
 						}
+					} else {
+						handleMissingArtifactFile(pluginParameters, artifact);
 					}
 				}
 			}
@@ -730,6 +730,22 @@ public class JApiCmpMojo extends AbstractMojo {
 		for (String classPathEntry : classPathEntries) {
 			comparatorOptions.getClassPathEntries().add(classPathEntry);
 		}
+	}
+
+	private void handleMissingArtifactFile(PluginParameters pluginParameters, Artifact artifact) {
+		if (artifact.isOptional()) {
+			if (pluginParameters.getParameterParam().isIgnoreMissingOptionalDependency()) {
+				getLog().info("Ignoring missing optional dependency: " + toDescriptor(artifact));
+			} else {
+				getLog().warn("Could not resolve optional artifact: " + toDescriptor(artifact));
+			}
+		} else {
+			getLog().warn("Could not resolve artifact: " + toDescriptor(artifact));
+		}
+	}
+
+	private String toDescriptor(Artifact artifact) {
+		return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
 	}
 
 	private List<JApiCmpArchive> retrieveFileFromConfiguration(DependencyDescriptor dependencyDescriptor, String parameterName, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
@@ -795,13 +811,11 @@ public class JApiCmpMojo extends AbstractMojo {
 			getLog().debug(parameterName + ": " + descriptor);
 			Set<Artifact> artifacts = resolveArtifact(dependency, mavenParameters, transitively, pluginParameters, configurationVersion);
 			for (Artifact artifact : artifacts) {
-				if (!artifact.isOptional()) { //skip optional artifacts because getFile() will return null
-					File file = artifact.getFile();
-					if (file != null) {
-						jApiCmpArchives.add(new JApiCmpArchive(file, artifact.getVersion()));
-					} else {
-						throw new MojoFailureException(String.format("Could not resolve dependency with descriptor '%s'.", descriptor));
-					}
+				File file = artifact.getFile();
+				if (file != null) {
+					jApiCmpArchives.add(new JApiCmpArchive(file, artifact.getVersion()));
+				} else {
+					handleMissingArtifactFile(pluginParameters, artifact);
 				}
 			}
 			if (jApiCmpArchives.size() == 0) {
@@ -931,7 +945,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			@Override
 			public boolean include(Artifact artifact) {
 				boolean include = true;
-				if (artifact != null && artifact.isOptional()) {
+				if (artifact != null) {
 					include = false;
 				}
 				return include;

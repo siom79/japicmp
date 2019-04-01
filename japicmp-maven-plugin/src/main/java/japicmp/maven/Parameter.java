@@ -58,6 +58,8 @@ public class Parameter {
 	private boolean excludeExclusively;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean ignoreMissingOptionalDependency;
 
 	public static class OverrideCompatibilityChangeParameter {
 		@org.apache.maven.plugins.annotations.Parameter(required = true)
@@ -368,5 +370,13 @@ public class Parameter {
 
 	public void setOverrideCompatibilityChangeParameters(List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters) {
 		this.overrideCompatibilityChangeParameters = overrideCompatibilityChangeParameters;
+	}
+
+	public boolean isIgnoreMissingOptionalDependency() {
+		return ignoreMissingOptionalDependency;
+	}
+
+	public void setIgnoreMissingOptionalDependency(boolean ignoreMissingOptionalDependency) {
+		this.ignoreMissingOptionalDependency = ignoreMissingOptionalDependency;
 	}
 }
