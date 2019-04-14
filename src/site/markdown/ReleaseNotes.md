@@ -2,6 +2,16 @@
 
 The following versions of japicmp are available:
 
+##0.14.0 (2019-04-14)##
+* Invocations from different reportSets supported. [#232](https://github.com/siom79/japicmp/issues/232)
+* Optional dependencies are included, but can be excluded using the new option ignoreMissingOptionalDependency. [#230](https://github.com/siom79/japicmp/issues/230)
+* Update to javassist 3.24.0-GA (no longer support for Java 1.7).
+* Fixed ErrorOnSemanticIncompatibilityForMajorVersionZero. [#227](https://github.com/siom79/japicmp/issues/227)
+* Support 'effective final'. [#229](https://github.com/siom79/japicmp/issues/229)
+* Changed link to javassist site. [#233](https://github.com/siom79/japicmp/issues/233)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.14.0).
+
 ##0.13.1 (2019-02-25)##
 * Do not report METHOD_REMOVED_IN_SUPERCLASS if method is pulled up. [#222](https://github.com/siom79/japicmp/issues/222)
 
