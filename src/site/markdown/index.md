@@ -81,7 +81,7 @@ jar archives.
 This library does not use the Java Reflection API to compute the differences, as the usage of the Reflection API makes
 it necessary to include all classes the jar archive under investigation depends on are available on the classpath.
 To prevent the inclusion of all dependencies, which can be a lot of work for bigger applications, this library makes
-use of the [javassist](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/) library to inspect the class files.
+use of the [javassist](https://www.javassist.org/) library to inspect the class files.
 This way you only have to provide the two jar archives on the command line (and eventually libraries that contain
 classes/interfaces you have extended/implemented).
 
