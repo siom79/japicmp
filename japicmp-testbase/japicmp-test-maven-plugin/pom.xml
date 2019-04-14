@@ -674,7 +674,7 @@
 							<oldVersion>
 								<dependency>
 									<groupId>com.github.siom79.japicmp</groupId>
-									<artifactId>japicmp-test-v1</artifactId>
+									<artifactId>japicmp-test-v2</artifactId>
 									<version>${project.version}</version>
 								</dependency>
 							</oldVersion>

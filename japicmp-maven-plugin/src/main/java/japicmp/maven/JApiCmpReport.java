@@ -19,6 +19,7 @@ import org.apache.maven.reporting.MavenReportException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -118,12 +119,40 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	@Override
 	public String getOutputName() {
-		return "japicmp";
+		StringBuilder sb = new StringBuilder();
+		generateReportName(sb);
+		sb.append("_output");
+		return sb.toString();
+	}
+
+	private void generateReportName(StringBuilder sb) {
+		if (this.oldVersion != null) {
+			Dependency dependency = this.oldVersion.getDependency();
+			if (dependency != null) {
+				sb.append(dependency.getGroupId()).append('_')
+					.append(dependency.getArtifactId()).append('_').append(dependency.getVersion());
+			}
+			if (this.oldVersion.getFile() != null) {
+				sb.append(this.oldVersion.getFile().getPath());
+			}
+		}
+		if (this.newVersion != null) {
+			Dependency dependency = this.newVersion.getDependency();
+			if (dependency != null) {
+				sb.append(dependency.getGroupId()).append('_')
+					.append(dependency.getArtifactId()).append('_').append(dependency.getVersion());
+			}
+			if (this.newVersion.getFile() != null) {
+				sb.append(this.newVersion.getFile().getPath());
+			}
+		}
 	}
 
 	@Override
 	public String getName(Locale locale) {
-		return "japicmp";
+		StringBuilder sb = new StringBuilder();
+		generateReportName(sb);
+		return sb.toString();
 	}
 
 	@Override
@@ -142,13 +171,5 @@ public class JApiCmpReport extends AbstractMavenReport {
 	private boolean isPomModuleNeedingSkip() {
 		return Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getParameterParam().getSkipPomModules())
 			&& "pom".equalsIgnoreCase(mavenProject.getArtifact().getType());
-	}
-
-	private void appendList(StringBuilder sb, List<File> archives) {
-		char sep = ' ';
-		for(File archive : archives) {
-			sb.append(sep).append(archive.getName());
-			sep = ';';
-		}
 	}
 }
