@@ -2,6 +2,11 @@
 
 The following versions of japicmp are available:
 
+##0.14.1 (2019-05-01)##
+* New option reportLinkName that allows to define a name for the report link in site reports when using report sets. [#236](https://github.com/siom79/japicmp/issues/236)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.14.1).
+
 ##0.14.0 (2019-04-14)##
 * Invocations from different reportSets supported. [#232](https://github.com/siom79/japicmp/issues/232)
 * Optional dependencies are included, but can be excluded using the new option ignoreMissingOptionalDependency. [#230](https://github.com/siom79/japicmp/issues/230)
