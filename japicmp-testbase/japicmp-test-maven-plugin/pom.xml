@@ -37,6 +37,40 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>japicmp-test-v2.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.guava</groupId>
+									<artifactId>guava</artifactId>
+									<version>18.0</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>guava-18.0.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>com.github.siom79.japicmp</groupId>
 				<artifactId>japicmp-maven-plugin</artifactId>
 				<version>${project.version}</version>
@@ -657,12 +691,13 @@
 								</dependency>
 							</oldVersion>
 							<newVersion>
-								<dependency>
-									<groupId>com.github.siom79.japicmp</groupId>
-									<artifactId>japicmp-test-v2</artifactId>
-									<version>${project.version}</version>
-								</dependency>
+								<file>
+									<path>${project.build.directory}/japicmp-test-v2.jar</path>
+								</file>
 							</newVersion>
+							<parameter>
+								<reportLinkName>japicmp-test-v1_japicmp-test-v2</reportLinkName>
+							</parameter>
 						</configuration>
 					</reportSet>
 					<reportSet>
@@ -685,6 +720,9 @@
 									<version>${project.version}</version>
 								</dependency>
 							</newVersion>
+							<parameter>
+								<reportLinkName>japicmp-test-v2_japicmp-test-v2</reportLinkName>
+							</parameter>
 						</configuration>
 					</reportSet>
 				</reportSets>

@@ -60,6 +60,8 @@ public class Parameter {
 	private List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean ignoreMissingOptionalDependency;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String reportLinkName;
 
 	public static class OverrideCompatibilityChangeParameter {
 		@org.apache.maven.plugins.annotations.Parameter(required = true)
@@ -378,5 +380,13 @@ public class Parameter {
 
 	public void setIgnoreMissingOptionalDependency(boolean ignoreMissingOptionalDependency) {
 		this.ignoreMissingOptionalDependency = ignoreMissingOptionalDependency;
+	}
+
+	public String getReportLinkName() {
+		return reportLinkName;
+	}
+
+	public void setReportLinkName(String reportLinkName) {
+		this.reportLinkName = reportLinkName;
 	}
 }

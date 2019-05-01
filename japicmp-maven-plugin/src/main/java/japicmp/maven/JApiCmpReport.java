@@ -119,40 +119,18 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	@Override
 	public String getOutputName() {
-		StringBuilder sb = new StringBuilder();
-		generateReportName(sb);
-		sb.append("_output");
-		return sb.toString();
-	}
-
-	private void generateReportName(StringBuilder sb) {
-		if (this.oldVersion != null) {
-			Dependency dependency = this.oldVersion.getDependency();
-			if (dependency != null) {
-				sb.append(dependency.getGroupId()).append('_')
-					.append(dependency.getArtifactId()).append('_').append(dependency.getVersion());
-			}
-			if (this.oldVersion.getFile() != null) {
-				sb.append(this.oldVersion.getFile().getPath());
-			}
+		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
+			return this.parameter.getReportLinkName();
 		}
-		if (this.newVersion != null) {
-			Dependency dependency = this.newVersion.getDependency();
-			if (dependency != null) {
-				sb.append(dependency.getGroupId()).append('_')
-					.append(dependency.getArtifactId()).append('_').append(dependency.getVersion());
-			}
-			if (this.newVersion.getFile() != null) {
-				sb.append(this.newVersion.getFile().getPath());
-			}
-		}
+		return "japicmp";
 	}
 
 	@Override
 	public String getName(Locale locale) {
-		StringBuilder sb = new StringBuilder();
-		generateReportName(sb);
-		return sb.toString();
+		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
+			return this.parameter.getReportLinkName();
+		}
+		return "japicmp";
 	}
 
 	@Override

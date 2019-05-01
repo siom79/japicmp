@@ -23,12 +23,11 @@ public class ITReportTitle {
 
 		String projectVersion = System.getProperty("project.version");
 
-		Elements overviewRow = document.select("#bodyColumn tr:has([href=\"com.github.siom79.japicmp_japicmp-test-v1_" + projectVersion + "com.github.siom79.japicmp_japicmp-test-v2_" + projectVersion + "_output.html\"])");
-		Elements link = overviewRow.select("[href=\"com.github.siom79.japicmp_japicmp-test-v1_" + projectVersion + "com.github.siom79.japicmp_japicmp-test-v2_" + projectVersion + "_output.html\"]");
-		assertThat(link.text(), is("com.github.siom79.japicmp_japicmp-test-v1_" + projectVersion + "com.github.siom79.japicmp_japicmp-test-v2_" + projectVersion));
+		Elements overviewRow = document.select("#bodyColumn tr:has([href=\"japicmp-test-v1_japicmp-test-v2.html\"])");
+		Elements link = overviewRow.select("[href=\"japicmp-test-v1_japicmp-test-v2.html\"]");
+		assertThat(link.text(), is("japicmp-test-v1_japicmp-test-v2"));
 
 		Elements description = overviewRow.select("td:eq(1)");
-		assertThat(description.text(), is("Comparing source compatibility of japicmp-test-v2-"+projectVersion
-		    + ".jar against japicmp-test-v1-"+ projectVersion + ".jar"));
+		assertThat(description.text(), is("Comparing source compatibility of japicmp-test-v2.jar against japicmp-test-v1-"+ projectVersion + ".jar"));
 	}
 }
