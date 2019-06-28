@@ -87,6 +87,20 @@ public class JApiCmpMojo extends AbstractMojo {
 	private List<Dependency> newClassPathDependencies;
 	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skip", required = false)
 	private String skip;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipXmlReport", required = false)
+	private boolean skipXmlReport;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipHtmlReport", required = false)
+	private boolean skipHtmlReport;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnModifications", required = false)
+	private boolean breakBuildOnModifications;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnBinaryIncompatibleModifications", required = false)
+	private boolean breakBuildOnBinaryIncompatibleModifications;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnSourceIncompatibleModifications", required = false)
+	private boolean breakBuildOnSourceIncompatibleModifications;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioning", required = false)
+	private boolean breakBuildBasedOnSemanticVersioning;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero", required = false)
+	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 	@org.apache.maven.plugins.annotations.Parameter(property = "project.build.directory", required = true)
 	private File projectBuildDir;
 	@Component
@@ -445,9 +459,9 @@ public class JApiCmpMojo extends AbstractMojo {
 	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero(Parameter parameterParam) {
 		boolean retVal = false;
 		if (parameter != null) {
-			retVal = Boolean.valueOf(parameter.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero());
+			retVal = parameter.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero();
 		}
-		return retVal;
+		return retVal || breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 	}
 
 	Options getOptions(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
@@ -524,7 +538,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (parameterParam != null) {
 			retVal = Boolean.valueOf(parameterParam.getBreakBuildOnModifications());
 		}
-		return retVal;
+		return retVal || breakBuildOnModifications;
 	}
 
 	private boolean breakBuildOnBinaryIncompatibleModifications(Parameter parameterParam) {
@@ -532,7 +546,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (parameterParam != null) {
 			retVal = Boolean.valueOf(parameterParam.getBreakBuildOnBinaryIncompatibleModifications());
 		}
-		return retVal;
+		return retVal || breakBuildOnBinaryIncompatibleModifications;
 	}
 
 	private boolean breakBuildOnSourceIncompatibleModifications(Parameter parameter) {
@@ -540,7 +554,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (parameter != null) {
 			retVal = Boolean.valueOf(parameter.getBreakBuildOnSourceIncompatibleModifications());
 		}
-		return retVal;
+		return retVal || breakBuildOnSourceIncompatibleModifications;
 	}
 
 	private boolean breakBuildBasedOnSemanticVersioning(Parameter parameter) {
@@ -548,7 +562,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (parameter != null) {
 			retVal = Boolean.valueOf(parameter.getBreakBuildBasedOnSemanticVersioning());
 		}
-		return retVal;
+		return retVal || breakBuildBasedOnSemanticVersioning;
 	}
 
 	private File createJapiCmpBaseDir(PluginParameters pluginParameters) throws MojoFailureException {
@@ -625,7 +639,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (pluginParameters.getParameterParam() != null) {
 			skipReport = Boolean.valueOf(pluginParameters.getParameterParam().getSkipHtmlReport());
 		}
-		return skipReport;
+		return skipReport || skipHtmlReport;
 	}
 
 	private boolean skipXmlReport(PluginParameters pluginParameters) {
@@ -633,7 +647,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (pluginParameters.getParameterParam() != null) {
 			skipReport = Boolean.valueOf(pluginParameters.getParameterParam().getSkipXmlReport());
 		}
-		return skipReport;
+		return skipReport || skipXmlReport;
 	}
 
 	private String createFilename(MavenParameters mavenParameters) {
