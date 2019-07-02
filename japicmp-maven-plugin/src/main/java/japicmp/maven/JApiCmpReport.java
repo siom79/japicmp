@@ -42,7 +42,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<Dependency> newClassPathDependencies;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private String skip;
+	private boolean skip;
 	@org.apache.maven.plugins.annotations.Parameter(required = true, readonly = true, property = "project.reporting.outputDirectory")
 	private String outputDirectory;
 	@Component
@@ -69,7 +69,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 	protected void executeReport(Locale locale) throws MavenReportException {
 		try {
 			JApiCmpMojo mojo = getMojo();
-			if ("true".equalsIgnoreCase(skip) || isPomModuleNeedingSkip()) {
+			if (skip || isPomModuleNeedingSkip()) {
 				getLog().info("japicmp module set to skip");
 				return;
 			}
@@ -136,7 +136,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 	@Override
 	public String getDescription(Locale locale) {
 		getMojo();
-		if (Boolean.TRUE.toString().equalsIgnoreCase(skip) || isPomModuleNeedingSkip()) {
+		if (skip || isPomModuleNeedingSkip()) {
 			return "skipping report";
 		}
 		Options options = getOptions();
@@ -147,7 +147,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 	}
 
 	private boolean isPomModuleNeedingSkip() {
-		return Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getParameterParam().getSkipPomModules())
+		return pluginParameters.getParameterParam().getSkipPomModules()
 			&& "pom".equalsIgnoreCase(mavenProject.getArtifact().getType());
 	}
 }

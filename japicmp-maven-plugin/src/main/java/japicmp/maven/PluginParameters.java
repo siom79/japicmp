@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.List;
 
 public class PluginParameters {
-	private final String skipParam;
+	private final boolean skipParam;
 	private final Version oldVersionParam;
 	private final List<DependencyDescriptor> oldVersionsParam;
 	private final Version newVersionParam;
@@ -19,7 +19,7 @@ public class PluginParameters {
 	private final Optional<String> outputDirectory;
 	private final boolean writeToFiles;
 
-	public PluginParameters(String skipParam, Version newVersionParam, Version oldVersionParam, Parameter parameterParam, List<Dependency> dependenciesParam, Optional<File> projectBuildDirParam, Optional<String> outputDirectory, boolean writeToFiles, List<DependencyDescriptor> oldVersionsParam, List<DependencyDescriptor> newVersionsParam, List<Dependency> oldClassPathDependencies, List<Dependency> newClassPathDependencies) {
+	public PluginParameters(boolean skipParam, Version newVersionParam, Version oldVersionParam, Parameter parameterParam, List<Dependency> dependenciesParam, Optional<File> projectBuildDirParam, Optional<String> outputDirectory, boolean writeToFiles, List<DependencyDescriptor> oldVersionsParam, List<DependencyDescriptor> newVersionsParam, List<Dependency> oldClassPathDependencies, List<Dependency> newClassPathDependencies) {
 		this.skipParam = skipParam;
 		this.newVersionParam = newVersionParam;
 		this.oldVersionParam = oldVersionParam;
@@ -34,7 +34,7 @@ public class PluginParameters {
 		this.newVersionsParam = newVersionsParam;
 	}
 
-	public String getSkipParam() {
+	public boolean getSkipParam() {
 		return skipParam;
 	}
 

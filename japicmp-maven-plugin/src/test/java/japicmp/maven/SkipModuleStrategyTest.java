@@ -98,7 +98,7 @@ public class SkipModuleStrategyTest {
 		Version oldVersion = JApiCmpMojoTest.createVersion("groupId", "artifactId", "0.1.0");
 		Version newVersion = JApiCmpMojoTest.createVersion("groupId", "artifactId", "0.1.1");
 		Parameter parameter = new Parameter();
-		return new PluginParameters("false", newVersion, oldVersion, parameter, new ArrayList<Dependency>(),
+		return new PluginParameters(false, newVersion, oldVersion, parameter, new ArrayList<Dependency>(),
 			Optional.<File>absent(), Optional.<String>absent(), false, new ArrayList<DependencyDescriptor>(),
 			new ArrayList<DependencyDescriptor>(), new ArrayList<Dependency>(), new ArrayList<Dependency>());
 	}

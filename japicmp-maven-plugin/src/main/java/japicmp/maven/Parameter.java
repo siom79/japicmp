@@ -6,24 +6,24 @@ public class Parameter {
 	private String accessModifier;
 	private List<String> includes;
 	private List<String> excludes;
-	private String onlyBinaryIncompatible;
-	private String onlyModified;
-	private String breakBuildOnModifications;
-	private String breakBuildOnBinaryIncompatibleModifications;
-	private String breakBuildOnSourceIncompatibleModifications;
-	private String breakBuildBasedOnSemanticVersioning;
-	private String includeSynthetic;
-	private String ignoreMissingClasses;
+	private boolean onlyBinaryIncompatible;
+	private boolean onlyModified;
+	private boolean breakBuildOnModifications;
+	private boolean breakBuildOnBinaryIncompatibleModifications;
+	private boolean breakBuildOnSourceIncompatibleModifications;
+	private boolean breakBuildBasedOnSemanticVersioning;
+	private boolean includeSynthetic;
+	private boolean ignoreMissingClasses;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<String> ignoreMissingClassesByRegularExpressions;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private String skipPomModules;
+	private boolean skipPomModules = true;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String htmlStylesheet;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String htmlTitle;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private String noAnnotations;
+	private boolean noAnnotations;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreNonResolvableArtifacts;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
@@ -31,15 +31,15 @@ public class Parameter {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String postAnalysisScript;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private String skipHtmlReport;
+	private boolean skipHtmlReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private String skipXmlReport;
+	private boolean skipXmlReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean skipDiffReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private String ignoreMissingOldVersion;
+	private boolean ignoreMissingOldVersion;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private String ignoreMissingNewVersion;
+	private boolean ignoreMissingNewVersion;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String oldVersionPattern;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
@@ -106,11 +106,11 @@ public class Parameter {
 		}
 	}
 
-	public String getNoAnnotations() {
+	public boolean getNoAnnotations() {
 		return noAnnotations;
 	}
 
-	public void setNoAnnotations(String noAnnotations) {
+	public void setNoAnnotations(boolean noAnnotations) {
 		this.noAnnotations = noAnnotations;
 	}
 
@@ -122,43 +122,43 @@ public class Parameter {
 		this.accessModifier = accessModifier;
 	}
 
-	public String getOnlyModified() {
+	public boolean getOnlyModified() {
 		return onlyModified;
 	}
 
-	public void setOnlyModified(String onlyModified) {
+	public void setOnlyModified(boolean onlyModified) {
 		this.onlyModified = onlyModified;
 	}
 
-	public String getOnlyBinaryIncompatible() {
+	public boolean getOnlyBinaryIncompatible() {
 		return onlyBinaryIncompatible;
 	}
 
-	public void setOnlyBinaryIncompatible(String onlyBinaryIncompatible) {
+	public void setOnlyBinaryIncompatible(boolean onlyBinaryIncompatible) {
 		this.onlyBinaryIncompatible = onlyBinaryIncompatible;
 	}
 
-	public String getBreakBuildOnModifications() {
+	public boolean getBreakBuildOnModifications() {
 		return breakBuildOnModifications;
 	}
 
-	public void setBreakBuildOnModifications(String breakBuildOnModifications) {
+	public void setBreakBuildOnModifications(boolean breakBuildOnModifications) {
 		this.breakBuildOnModifications = breakBuildOnModifications;
 	}
 
-	public String getBreakBuildOnBinaryIncompatibleModifications() {
+	public boolean getBreakBuildOnBinaryIncompatibleModifications() {
 		return breakBuildOnBinaryIncompatibleModifications;
 	}
 
-	public void setBreakBuildOnBinaryIncompatibleModifications(String breakBuildOnBinaryIncompatibleModifications) {
+	public void setBreakBuildOnBinaryIncompatibleModifications(boolean breakBuildOnBinaryIncompatibleModifications) {
 		this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;
 	}
 
-	public String getIncludeSynthetic() {
+	public boolean getIncludeSynthetic() {
 		return includeSynthetic;
 	}
 
-	public void setIncludeSynthetic(String includeSynthetic) {
+	public void setIncludeSynthetic(boolean includeSynthetic) {
 		this.includeSynthetic = includeSynthetic;
 	}
 
@@ -178,19 +178,19 @@ public class Parameter {
 		this.excludes = excludes;
 	}
 
-	public String getIgnoreMissingClasses() {
+	public boolean getIgnoreMissingClasses() {
 		return ignoreMissingClasses;
 	}
 
-	public void setIgnoreMissingClasses(String ignoreMissingClasses) {
+	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
 		this.ignoreMissingClasses = ignoreMissingClasses;
 	}
 
-	public String getSkipPomModules() {
+	public boolean getSkipPomModules() {
 		return skipPomModules;
 	}
 
-	public void setSkipPomModules(String skipPomModules) {
+	public void setSkipPomModules(boolean skipPomModules) {
 		this.skipPomModules = skipPomModules;
 	}
 
@@ -226,19 +226,19 @@ public class Parameter {
 		this.packagingSupporteds = packagingSupporteds;
 	}
 
-	public String getBreakBuildOnSourceIncompatibleModifications() {
+	public boolean getBreakBuildOnSourceIncompatibleModifications() {
 		return breakBuildOnSourceIncompatibleModifications;
 	}
 
-	public void setBreakBuildOnSourceIncompatibleModifications(String breakBuildOnSourceIncompatibleModifications) {
+	public void setBreakBuildOnSourceIncompatibleModifications(boolean breakBuildOnSourceIncompatibleModifications) {
 		this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;
 	}
 
-	public String getBreakBuildBasedOnSemanticVersioning() {
+	public boolean getBreakBuildBasedOnSemanticVersioning() {
 		return breakBuildBasedOnSemanticVersioning;
 	}
 
-	public void setBreakBuildBasedOnSemanticVersioning(String breakBuildBasedOnSemanticVersioning) {
+	public void setBreakBuildBasedOnSemanticVersioning(boolean breakBuildBasedOnSemanticVersioning) {
 		this.breakBuildBasedOnSemanticVersioning = breakBuildBasedOnSemanticVersioning;
 	}
 
@@ -250,19 +250,19 @@ public class Parameter {
 		this.postAnalysisScript = postAnalysisScript;
 	}
 
-	public String getSkipHtmlReport() {
+	public boolean getSkipHtmlReport() {
 		return skipHtmlReport;
 	}
 
-	public void setSkipHtmlReport(String skipHtmlReport) {
+	public void setSkipHtmlReport(boolean skipHtmlReport) {
 		this.skipHtmlReport = skipHtmlReport;
 	}
 
-	public String getSkipXmlReport() {
+	public boolean getSkipXmlReport() {
 		return skipXmlReport;
 	}
 
-	public void setSkipXmlReport(String skipXmlReport) {
+	public void setSkipXmlReport(boolean skipXmlReport) {
 		this.skipXmlReport = skipXmlReport;
 	}
 
@@ -274,11 +274,11 @@ public class Parameter {
 		this.skipDiffReport = skipDiffReport;
 	}
 
-	public String getIgnoreMissingOldVersion() {
+	public boolean getIgnoreMissingOldVersion() {
 		return ignoreMissingOldVersion;
 	}
 
-	public void setIgnoreMissingOldVersion(String ignoreMissingOldVersion) {
+	public void setIgnoreMissingOldVersion(boolean ignoreMissingOldVersion) {
 		this.ignoreMissingOldVersion = ignoreMissingOldVersion;
 	}
 
@@ -314,11 +314,11 @@ public class Parameter {
 		this.reportOnlyFilename = reportOnlyFileName;
 	}
 
-	public String getIgnoreMissingNewVersion() {
+	public boolean getIgnoreMissingNewVersion() {
 		return ignoreMissingNewVersion;
 	}
 
-	public void setIgnoreMissingNewVersion(String ignoreMissingNewVersion) {
+	public void setIgnoreMissingNewVersion(boolean ignoreMissingNewVersion) {
 		this.ignoreMissingNewVersion = ignoreMissingNewVersion;
 	}
 

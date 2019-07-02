@@ -25,14 +25,14 @@ public class VersionChange {
 
 	public Optional<SemanticVersion.ChangeType> computeChangeType() throws MojoFailureException {
 		if (this.oldArchives.isEmpty()) {
-			if (!"true".equalsIgnoreCase(this.parameter != null ? this.parameter.getIgnoreMissingOldVersion() : "false")) {
+			if (!(parameter != null && parameter.getIgnoreMissingOldVersion())) {
 				throw new MojoFailureException("Please provide at least one old version.");
 			} else {
 				return Optional.absent();
 			}
 		}
 		if (this.newArchives.isEmpty()) {
-			if (!"true".equalsIgnoreCase(this.parameter != null ? this.parameter.getIgnoreMissingNewVersion() : "false")) {
+			if (!(parameter != null && parameter.getIgnoreMissingNewVersion())) {
 				throw new MojoFailureException("Please provide at least one new version.");
 			} else {
 				return Optional.absent();
