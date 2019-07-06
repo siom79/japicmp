@@ -92,7 +92,7 @@ public class VersionChangeTest {
 	@Test
 	public void testMissingOldVersion() throws MojoFailureException {
 		Parameter parameter = new Parameter();
-		parameter.setIgnoreMissingOldVersion("true");
+		parameter.setIgnoreMissingOldVersion(true);
 		VersionChange vc = new VersionChange(Collections.singletonList(new JApiCmpArchive(new File("lib-1.2.3.jar"), "1.2.3")), Collections.singletonList(new JApiCmpArchive(new File("lib-1.2.3.jar"), "1.2.3")), parameter);
 		assertThat(vc.computeChangeType().get(), is(SemanticVersion.ChangeType.UNCHANGED));
 	}
@@ -100,7 +100,7 @@ public class VersionChangeTest {
 	@Test
 	public void testMissingNewVersion() throws MojoFailureException {
 		Parameter parameter = new Parameter();
-		parameter.setIgnoreMissingNewVersion("true");
+		parameter.setIgnoreMissingNewVersion(true);
 		VersionChange vc = new VersionChange(Collections.singletonList(new JApiCmpArchive(new File("lib-1.2.3.jar"), "1.2.3")), Collections.singletonList(new JApiCmpArchive(new File("lib-1.2.3.jar"), "1.2.3")), parameter);
 		assertThat(vc.computeChangeType().get(), is(SemanticVersion.ChangeType.UNCHANGED));
 	}

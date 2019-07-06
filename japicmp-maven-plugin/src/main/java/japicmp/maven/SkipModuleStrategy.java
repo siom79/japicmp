@@ -20,7 +20,7 @@ public class SkipModuleStrategy {
 	public boolean skip() {
 		MavenProject mavenProject = mavenParameters.getMavenProject();
 		Parameter parameterParam = pluginParameters.getParameterParam();
-		if (mavenProject != null && parameterParam !=null) {
+		if (mavenProject != null && parameterParam != null) {
 			List<String> packagingSupporteds = parameterParam.getPackagingSupporteds();
 			if ((packagingSupporteds != null) && !packagingSupporteds.isEmpty()) {
 				if (!packagingSupporteds.contains(mavenProject.getPackaging())) {
@@ -31,11 +31,7 @@ public class SkipModuleStrategy {
 				this.log.debug("No packaging support defined, no filtering");
 			}
 			if ("pom".equals(mavenProject.getPackaging())) {
-				boolean skipPomModules = true;
-				String skipPomModulesAsString = parameterParam.getSkipPomModules();
-				if (skipPomModulesAsString != null) {
-					skipPomModules = Boolean.valueOf(skipPomModulesAsString);
-				}
+				boolean skipPomModules = parameterParam.getSkipPomModules();
 				if (skipPomModules) {
 					this.log.info("Skipping execution because packaging of this module is 'pom'.");
 					return true;

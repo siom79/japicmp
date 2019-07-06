@@ -86,7 +86,21 @@ public class JApiCmpMojo extends AbstractMojo {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<Dependency> newClassPathDependencies;
 	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skip", required = false)
-	private String skip;
+	private boolean skip;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipXmlReport", required = false)
+	private boolean skipXmlReport;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipHtmlReport", required = false)
+	private boolean skipHtmlReport;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnModifications", required = false)
+	private boolean breakBuildOnModifications;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnBinaryIncompatibleModifications", required = false)
+	private boolean breakBuildOnBinaryIncompatibleModifications;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnSourceIncompatibleModifications", required = false)
+	private boolean breakBuildOnSourceIncompatibleModifications;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioning", required = false)
+	private boolean breakBuildBasedOnSemanticVersioning;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero", required = false)
+	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 	@org.apache.maven.plugins.annotations.Parameter(property = "project.build.directory", required = true)
 	private File projectBuildDir;
 	@Component
@@ -114,7 +128,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	Optional<XmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
-		if (Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getSkipParam())
+		if (pluginParameters.getSkipParam()
 			|| isPomModuleNeedingSkip(pluginParameters, mavenParameters)) {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
 			return Optional.absent();
@@ -418,10 +432,10 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (!parameterParam.isBreakBuildIfCausedByExclusion()) {
 			options.setErrorOnExclusionIncompatibility(false);
 		}
-		if (parameter != null && "true".equalsIgnoreCase(parameter.getIgnoreMissingOldVersion() == null ? "false" : parameter.getIgnoreMissingOldVersion())) {
+		if (parameter != null && parameter.getIgnoreMissingOldVersion()) {
 			options.setIgnoreMissingOldVersion(true);
 		}
-		if (parameter != null && "true".equalsIgnoreCase(parameter.getIgnoreMissingNewVersion() == null ? "false" : parameter.getIgnoreMissingNewVersion())) {
+		if (parameter != null && parameter.getIgnoreMissingNewVersion()) {
 			options.setIgnoreMissingNewVersion(true);
 		}
 
@@ -445,9 +459,9 @@ public class JApiCmpMojo extends AbstractMojo {
 	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero(Parameter parameterParam) {
 		boolean retVal = false;
 		if (parameter != null) {
-			retVal = Boolean.valueOf(parameter.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero());
+			retVal = parameter.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero();
 		}
-		return retVal;
+		return retVal || breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 	}
 
 	Options getOptions(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
@@ -467,16 +481,9 @@ public class JApiCmpMojo extends AbstractMojo {
 					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()), e);
 				}
 			}
-			String onlyBinaryIncompatible = parameterParam.getOnlyBinaryIncompatible();
-			if (onlyBinaryIncompatible != null) {
-				Boolean booleanOnlyBinaryIncompatible = Boolean.valueOf(onlyBinaryIncompatible);
-				options.setOutputOnlyBinaryIncompatibleModifications(booleanOnlyBinaryIncompatible);
-			}
-			String onlyModified = parameterParam.getOnlyModified();
-			if (onlyModified != null) {
-				Boolean booleanOnlyModified = Boolean.valueOf(onlyModified);
-				options.setOutputOnlyModifications(booleanOnlyModified);
-			}
+			options.setOutputOnlyBinaryIncompatibleModifications(parameterParam.getOnlyBinaryIncompatible());
+			options.setOutputOnlyModifications(parameterParam.getOnlyModified());
+
 			List<String> excludes = parameterParam.getExcludes();
 			if (excludes != null) {
 				for (String exclude : excludes) {
@@ -489,16 +496,10 @@ public class JApiCmpMojo extends AbstractMojo {
 					options.addIncludeFromArgument(Optional.fromNullable(include), parameterParam.isIncludeExlusively());
 				}
 			}
-			String includeSyntheticString = parameterParam.getIncludeSynthetic();
-			if (includeSyntheticString != null) {
-				Boolean includeSynthetic = Boolean.valueOf(includeSyntheticString);
-				options.setIncludeSynthetic(includeSynthetic);
-			}
-			String ignoreMissingClassesString = parameterParam.getIgnoreMissingClasses();
-			if (ignoreMissingClassesString != null) {
-				Boolean ignoreMissingClasses = Boolean.valueOf(ignoreMissingClassesString);
-				options.setIgnoreMissingClasses(ignoreMissingClasses);
-			}
+
+			options.setIncludeSynthetic(parameterParam.getIncludeSynthetic());
+			options.setIgnoreMissingClasses(parameterParam.getIgnoreMissingClasses());
+
 			List<String> ignoreMissingClassesByRegularExpressions = parameterParam.getIgnoreMissingClassesByRegularExpressions();
 			if (ignoreMissingClassesByRegularExpressions != null) {
 				for (String ignoreMissingClassRegularExpression : ignoreMissingClassesByRegularExpressions) {
@@ -509,11 +510,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			if (htmlStylesheet != null) {
 				options.setHtmlStylesheet(Optional.of(htmlStylesheet));
 			}
-			String noAnnotationsString = parameterParam.getNoAnnotations();
-			if (noAnnotationsString != null) {
-				Boolean noAnnotations = Boolean.valueOf(noAnnotationsString);
-				options.setNoAnnotations(noAnnotations);
-			}
+			options.setNoAnnotations(parameterParam.getNoAnnotations());
 			options.setReportOnlyFilename(parameterParam.isReportOnlyFilename());
 		}
 		return options;
@@ -522,33 +519,33 @@ public class JApiCmpMojo extends AbstractMojo {
 	private boolean breakBuildOnModificationsParameter(Parameter parameterParam) {
 		boolean retVal = false;
 		if (parameterParam != null) {
-			retVal = Boolean.valueOf(parameterParam.getBreakBuildOnModifications());
+			retVal = parameterParam.getBreakBuildOnModifications();
 		}
-		return retVal;
+		return retVal || breakBuildOnModifications;
 	}
 
 	private boolean breakBuildOnBinaryIncompatibleModifications(Parameter parameterParam) {
 		boolean retVal = false;
 		if (parameterParam != null) {
-			retVal = Boolean.valueOf(parameterParam.getBreakBuildOnBinaryIncompatibleModifications());
+			retVal = parameterParam.getBreakBuildOnBinaryIncompatibleModifications();
 		}
-		return retVal;
+		return retVal || breakBuildOnBinaryIncompatibleModifications;
 	}
 
 	private boolean breakBuildOnSourceIncompatibleModifications(Parameter parameter) {
 		boolean retVal = false;
 		if (parameter != null) {
-			retVal = Boolean.valueOf(parameter.getBreakBuildOnSourceIncompatibleModifications());
+			retVal = parameter.getBreakBuildOnSourceIncompatibleModifications();
 		}
-		return retVal;
+		return retVal || breakBuildOnSourceIncompatibleModifications;
 	}
 
 	private boolean breakBuildBasedOnSemanticVersioning(Parameter parameter) {
 		boolean retVal = false;
 		if (parameter != null) {
-			retVal = Boolean.valueOf(parameter.getBreakBuildBasedOnSemanticVersioning());
+			retVal = parameter.getBreakBuildBasedOnSemanticVersioning();
 		}
-		return retVal;
+		return retVal || breakBuildBasedOnSemanticVersioning;
 	}
 
 	private File createJapiCmpBaseDir(PluginParameters pluginParameters) throws MojoFailureException {
@@ -623,17 +620,17 @@ public class JApiCmpMojo extends AbstractMojo {
 	private boolean skipHtmlReport(PluginParameters pluginParameters) {
 		boolean skipReport = false;
 		if (pluginParameters.getParameterParam() != null) {
-			skipReport = Boolean.valueOf(pluginParameters.getParameterParam().getSkipHtmlReport());
+			skipReport = pluginParameters.getParameterParam().getSkipHtmlReport();
 		}
-		return skipReport;
+		return skipReport || skipHtmlReport;
 	}
 
 	private boolean skipXmlReport(PluginParameters pluginParameters) {
 		boolean skipReport = false;
 		if (pluginParameters.getParameterParam() != null) {
-			skipReport = Boolean.valueOf(pluginParameters.getParameterParam().getSkipXmlReport());
+			skipReport = pluginParameters.getParameterParam().getSkipXmlReport();
 		}
-		return skipReport;
+		return skipReport || skipXmlReport;
 	}
 
 	private String createFilename(MavenParameters mavenParameters) {
@@ -906,7 +903,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private boolean ignoreMissingOldVersion(PluginParameters pluginParameters) {
 		boolean ignoreMissingOldVersion = false;
 		if (pluginParameters.getParameterParam() != null) {
-			ignoreMissingOldVersion = Boolean.valueOf(pluginParameters.getParameterParam().getIgnoreMissingOldVersion());
+			ignoreMissingOldVersion = pluginParameters.getParameterParam().getIgnoreMissingOldVersion();
 		}
 		return ignoreMissingOldVersion;
 	}
@@ -914,7 +911,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private boolean ignoreMissingNewVersion(PluginParameters pluginParameters) {
 		boolean ignoreMissingNewVersion = false;
 		if (pluginParameters.getParameterParam() != null) {
-			ignoreMissingNewVersion = Boolean.valueOf(pluginParameters.getParameterParam().getIgnoreMissingNewVersion());
+			ignoreMissingNewVersion = pluginParameters.getParameterParam().getIgnoreMissingNewVersion();
 		}
 		return ignoreMissingNewVersion;
 	}
@@ -977,7 +974,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private boolean isPomModuleNeedingSkip(PluginParameters pluginParameters, MavenParameters mavenParameters) {
-		return Boolean.TRUE.toString().equalsIgnoreCase(pluginParameters.getParameterParam().getSkipPomModules())
+		return pluginParameters.getParameterParam().getSkipPomModules()
 			&& "pom".equalsIgnoreCase(mavenParameters.getMavenProject().getArtifact().getType());
 	}
 
