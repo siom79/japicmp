@@ -177,14 +177,6 @@ public class OutputFilter extends Filter {
 				if (!ModifierHelper.matchesModifierLevel(jApiClass, OutputFilter.this.options.getAccessModifier())) {
 					remove = true;
 				}
-				if (jApiClass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-					if (options.getAccessModifier().getLevel() > AccessModifier.PRIVATE.getLevel() && options.isOutputOnlyModifications()) {
-						ImmutableList<Boolean> list = findOneChangedElement(jApiClass);
-						if (list.isEmpty()) { //filter out this class if it does not have any changed element at this filter level
-							remove = true;
-						}
-					}
-				}
 				if (jApiClass.getJavaObjectSerializationCompatible().isIncompatible()) {
 					remove = false;
 				}
