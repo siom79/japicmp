@@ -469,6 +469,33 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
+	public void testMethodMoreAccessibleProtectedToPublic() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().protectedAccess().returnType(CtClass.booleanType).name("isMoreVisible").body("return true;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.booleanType).name("isMoreVisible").body("return true;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "isMoreVisible");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_MORE_ACCESSIBLE));
+		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+	}
+	
+	@Test
 	public void testMethodStaticOverridesNonStatic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
@@ -888,6 +915,34 @@ public class CompatibilityChangesTest {
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
+	@Test
+	public void testFieldMoreAccessibleProtectedToPublic() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		options.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtFieldBuilder.create().packageProtectedAccess().type(CtClass.intType).name("field").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtFieldBuilder.create().protectedAccess().type(CtClass.intType).name("field").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_MORE_ACCESSIBLE));
+		assertThat(jApiField.isBinaryCompatible(), is(false));
+	}
+	
 	@Test
 	public void testConstructorRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
+import static japicmp.util.ModifierHelper.hasModifierLevelIncreased;
 import static japicmp.util.ModifierHelper.isNotPrivate;
 import static japicmp.util.ModifierHelper.isSynthetic;
 
@@ -101,10 +102,17 @@ public class CompatibilityChanges {
 					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_REMOVED);
 				}
 			}
+			
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(field)) {
 				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_LESS_ACCESSIBLE);
 			}
+			
+			// section 13.4.8 of "Java Language Specification" SE7
+			if (hasModifierLevelIncreased(field)) {
+				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_MORE_ACCESSIBLE);
+			}
+			
 			// section 13.4.8 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.NEW) {
 				ArrayList<Integer> returnValues = new ArrayList<>();
@@ -303,10 +311,17 @@ public class CompatibilityChanges {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_REMOVED);
 				}
 			}
+			
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(method)) {
 				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_LESS_ACCESSIBLE);
 			}
+			
+			// section 13.4.12 of "Java Language Specification" SE7
+			if (hasModifierLevelIncreased(method)) {
+				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_MORE_ACCESSIBLE);
+			}
+			
 			// section 13.4.12 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.NEW) {
 				List<Integer> returnValues = new ArrayList<>();
