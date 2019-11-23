@@ -85,6 +85,22 @@ to configure the latest version more precisely (e.g. only GA versions), then you
 </plugin>
 ```
 
+##Properties##
+
+The following properties can be set:
+
+| Property | Description |
+|----------|-------------|
+| japicmp.skip | Skip the execution of this plugin. |
+| japicmp.skipXmlReport | Skip the generation of the XML report. |
+| japicmp.skipHtmlReport | Skip the generation of the HTML report. |
+| japicmp.breakBuildOnModifications | Break the build in case of any modifications. |
+| japicmp.breakBuildOnBinaryIncompatibleModifications | Break the build in case of any binary incompatible modifications. |
+| japicmp.breakBuildOnSourceIncompatibleModifications | Break the build in case of any source incompatible modifications. |
+| japicmp.breakBuildBasedOnSemanticVersioning | Break the build in case the semantic versioning is violated. |
+| japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero | Break the build in case of semantic versioning used with zero as major version number is violated. |
+
+
 ##Advanced Usage##
 
 An advanced configuration can utilize the following parameters:

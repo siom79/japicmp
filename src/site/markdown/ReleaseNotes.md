@@ -2,6 +2,12 @@
 
 The following versions of japicmp are available:
 
+##0.14.2 (2019-11-23)##
+* New properties: japicmp.skip, japicmp.skipXmlReport, japicmp.skipHtmlReport, japicmp.breakBuildOnModifications, japicmp.breakBuildOnBinaryIncompatibleModifications, japicmp.breakBuildOnSourceIncompatibleModifications, japicmp.breakBuildBasedOnSemanticVersioning, japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero. [#240](https://github.com/siom79/japicmp/issues/240)
+* Do not filer modified classes when outputOnlyModifications is set and all members are unchanged. [#247](https://github.com/siom79/japicmp/issues/247)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.14.2).
+
 ##0.14.1 (2019-05-01)##
 * New option reportLinkName that allows to define a name for the report link in site reports when using report sets. [#236](https://github.com/siom79/japicmp/issues/236)
 
