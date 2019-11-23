@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp-base</artifactId>
-		<version>0.14.2</version>
+		<version>0.14.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>japicmp</artifactId>
