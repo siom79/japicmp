@@ -4,6 +4,12 @@
   <condition property="task.base" value="${basedir}/../../../.." else="${basedir}">
     <equals arg1="${task.cwd}" arg2="japicmp"/>
   </condition>
+  <condition property="maven.cache" value="${maven.repo.local}">
+    <isset property="maven.repo.local"/>
+  </condition>
+  <condition property="maven.cache" value="${localRepository}" else="${user.home}/.m2">
+    <isset property="localRepository"/>
+  </condition>
   <!-- current -->
   <property name="japicmp.current.jar" value="${task.base}/../japicmp/target/japicmp-${japicmp.current.version}.jar"/>
   <!-- reference -->
@@ -12,9 +18,9 @@
   <property name="japicmp.reference.jar" value="${task.base}/target/${japicmp.jar}"/>
   <!-- dependencies -->
   <property name="javassist.version" value="3.23.1-GA"/>
-  <property name="javassist.jar" value="${localRepository}/org/javassist/javassist/${javassist.version}/javassist-${javassist.version}.jar"/>
+  <property name="javassist.jar" value="${maven.cache}/org/javassist/javassist/${javassist.version}/javassist-${javassist.version}.jar"/>
   <property name="guava.version" value="18.0"/>
-  <property name="guava.jar" value="${localRepository}/com/google/guava/guava/${guava.version}/guava-${guava.version}.jar"/>
+  <property name="guava.jar" value="${maven.cache}/com/google/guava/guava/${guava.version}/guava-${guava.version}.jar"/>
 
   <target name="init">
     <fail message="Dependencies not found in Maven cache">
