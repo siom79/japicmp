@@ -571,7 +571,7 @@ public class CompatibilityChanges {
 					fields.add(jApiField);
 				}
 			}
-			forAllSuperclasses(jApiClass, classMap, new ArrayList<Integer>(), new OnSuperclassCallback<Integer>() {
+			forAllSuperclasses(jApiClass, classMap, new ArrayList<>(), new OnSuperclassCallback<Integer>() {
 				@Override
 				public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
 					for (JApiMethod jApiMethod : superclass.getMethods()) {
@@ -752,7 +752,7 @@ public class CompatibilityChanges {
 					implementedMethods.add(jApiMethod);
 				}
 			}
-			forAllSuperclasses(jApiClass, classMap, new ArrayList<Integer>(), new OnSuperclassCallback<Integer>() {
+			forAllSuperclasses(jApiClass, classMap, new ArrayList<>(), new OnSuperclassCallback<Integer>() {
 				@Override
 				public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
 					for (JApiMethod jApiMethod : superclass.getMethods()) {

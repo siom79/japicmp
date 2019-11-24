@@ -15,7 +15,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecution;
@@ -25,7 +24,6 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -59,13 +57,12 @@ public class JApiCmpMojoTest {
 		artifactSet.add(resolvedArtifact);
 		when(resolvedArtifact.getFile()).thenReturn(Paths.get(System.getProperty("user.dir"), "target", "guava-18.0.jar").toFile());
 		when(artifactResolutionResult.getArtifacts()).thenReturn(artifactSet);
-		when(artifactResolver.resolve(Matchers.<ArtifactResolutionRequest>anyObject())).thenReturn(artifactResolutionResult);
+		when(artifactResolver.resolve(Matchers.anyObject())).thenReturn(artifactResolutionResult);
 		ArtifactFactory artifactFactory = mock(ArtifactFactory.class);
 		when(artifactFactory.createArtifactWithClassifier(eq("groupId"), eq("artifactId"), eq("0.1.1"), anyString(), anyString())).thenReturn(mock(Artifact.class));
 		MavenProject mavenProject = mock(MavenProject.class);
 		when(mavenProject.getArtifact()).thenReturn(mock(Artifact.class));
-		MavenParameters mavenParameters = new MavenParameters(new ArrayList<ArtifactRepository>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mock(MojoExecution.class), "0.0.1", mock(ArtifactMetadataSource.class));
-
+		MavenParameters mavenParameters = new MavenParameters(new ArrayList<>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mock(MojoExecution.class), "0.0.1", mock(ArtifactMetadataSource.class));
 		mojo.executeWithParameters(pluginParameters, mavenParameters);
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", "japicmp.diff")), is(true));
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", "japicmp.xml")), is(true));
@@ -90,12 +87,12 @@ public class JApiCmpMojoTest {
 		artifactSet.add(resolvedArtifact);
 		when(resolvedArtifact.getFile()).thenReturn(Paths.get(System.getProperty("user.dir"), "target", "guava-18.0.jar").toFile());
 		when(artifactResolutionResult.getArtifacts()).thenReturn(artifactSet);
-		when(artifactResolver.resolve(Matchers.<ArtifactResolutionRequest>anyObject())).thenReturn(artifactResolutionResult);
+		when(artifactResolver.resolve(Matchers.anyObject())).thenReturn(artifactResolutionResult);
 		ArtifactFactory artifactFactory = mock(ArtifactFactory.class);
 		when(artifactFactory.createArtifactWithClassifier(eq("groupId"), eq("artifactId"), eq("0.1.1"), anyString(), anyString())).thenReturn(mock(Artifact.class));
 		MavenProject mavenProject = mock(MavenProject.class);
 		when(mavenProject.getArtifact()).thenReturn(mock(Artifact.class));
-		MavenParameters mavenParameters = new MavenParameters(new ArrayList<ArtifactRepository>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mock(MojoExecution.class), "0.0.1", mock(ArtifactMetadataSource.class));
+		MavenParameters mavenParameters = new MavenParameters(new ArrayList<>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mock(MojoExecution.class), "0.0.1", mock(ArtifactMetadataSource.class));
 		mojo.executeWithParameters(pluginParameters, mavenParameters);
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.diff")), is(false));
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.xml")), is(false));
@@ -301,7 +298,7 @@ public class JApiCmpMojoTest {
 	}
 
 	@Test
-	public void testIgnoreMissingVersions() throws MojoFailureException, IOException, MojoExecutionException {
+	public void testIgnoreMissingVersions() throws MojoFailureException, MojoExecutionException {
 		JApiCmpMojo mojo = new JApiCmpMojo();
 		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
 		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
@@ -313,7 +310,7 @@ public class JApiCmpMojoTest {
 		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
 		Set<Artifact> artifactSet = new HashSet<>();
 		when(artifactResolutionResult.getArtifacts()).thenReturn(artifactSet);
-		when(artifactResolver.resolve(Matchers.<ArtifactResolutionRequest>anyObject())).thenReturn(artifactResolutionResult);
+		when(artifactResolver.resolve(Matchers.anyObject())).thenReturn(artifactResolutionResult);
 		ArtifactFactory artifactFactory = mock(ArtifactFactory.class);
 		when(artifactFactory.createArtifactWithClassifier(eq("groupId"), eq("artifactId"), eq("0.1.1"), anyString(), anyString())).thenReturn(mock(Artifact.class));
 		MojoExecution mojoExecution = mock(MojoExecution.class);
@@ -321,7 +318,7 @@ public class JApiCmpMojoTest {
 		when(mojoExecution.getExecutionId()).thenReturn(executionId);
 		MavenProject mavenProject = mock(MavenProject.class);
 		when(mavenProject.getArtifact()).thenReturn(mock(Artifact.class));
-		MavenParameters mavenParameters = new MavenParameters(new ArrayList<ArtifactRepository>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mojoExecution, "0.0.1", mock(ArtifactMetadataSource.class));
+		MavenParameters mavenParameters = new MavenParameters(new ArrayList<>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mojoExecution, "0.0.1", mock(ArtifactMetadataSource.class));
 		mojo.executeWithParameters(pluginParameters, mavenParameters);
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", executionId + ".diff")), is(false));
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", executionId + ".xml")), is(false));

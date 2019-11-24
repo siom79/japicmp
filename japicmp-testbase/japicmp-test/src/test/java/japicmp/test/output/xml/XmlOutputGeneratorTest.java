@@ -66,7 +66,7 @@ public class XmlOutputGeneratorTest {
 	}
 
 	@Test
-	public void testMetaInformationTable() throws IOException {
+	public void testMetaInformationTable() {
 		assertThat(document.select("div.meta-information > table").isEmpty(), is(false));
 		assertThat(document.select("div.meta-information > table > tbody > tr").size(), is(10));
 	}
@@ -85,13 +85,13 @@ public class XmlOutputGeneratorTest {
 	}
 
 	@Test
-	public void superclassAllChangesAddedWithSuperclass() throws IOException {
+	public void superclassAllChangesAddedWithSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
-	public void superclassOnlyModificationsAddedWithSuperclass() throws IOException {
+	public void superclassOnlyModificationsAddedWithSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$AddedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
@@ -104,49 +104,49 @@ public class XmlOutputGeneratorTest {
 	}
 
 	@Test
-	public void superclassAllChangesAdded() throws IOException {
+	public void superclassAllChangesAdded() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Added");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
-	public void superclassOnlyModificationsAdded() throws IOException {
+	public void superclassOnlyModificationsAdded() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Added");
 		assertThat(divSuperClass.select("table").isEmpty(), is(true));
 	}
 
 	@Test
-	public void superclassAddedWithSuperclass() throws IOException {
+	public void superclassAddedWithSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
-	public void superclassAddedWithSuperclassOnlyModifications() throws IOException {
+	public void superclassAddedWithSuperclassOnlyModifications() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$AddedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
-	public void superclassRemovedWithSuperclass() throws IOException {
+	public void superclassRemovedWithSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$RemovedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
-	public void superclassRemovedWithSuperclassOnlyModifications() throws IOException {
+	public void superclassRemovedWithSuperclassOnlyModifications() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$RemovedWithSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
-	public void superclassNoSuperclassToSuperclass() throws IOException {
+	public void superclassNoSuperclassToSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$NoSuperclassToSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}
 
 	@Test
-	public void superclassNoSuperclassToSuperclassOnlyModifications() throws IOException {
+	public void superclassNoSuperclassToSuperclassOnlyModifications() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$NoSuperclassToSuperclass");
 		assertThat(divSuperClass.select("table").isEmpty(), is(false));
 	}

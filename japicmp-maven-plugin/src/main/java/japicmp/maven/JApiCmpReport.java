@@ -19,7 +19,6 @@ import org.apache.maven.reporting.MavenReportException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 

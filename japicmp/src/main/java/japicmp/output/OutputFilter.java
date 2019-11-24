@@ -2,7 +2,6 @@ package japicmp.output;
 
 import com.google.common.collect.ImmutableList;
 import japicmp.config.Options;
-import japicmp.model.AccessModifier;
 import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;

@@ -1,14 +1,6 @@
 package japicmp.output.semver;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.google.common.collect.ImmutableSet;
-
 import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiAnnotation;
@@ -25,6 +17,9 @@ import japicmp.model.JApiSuperclass;
 import japicmp.output.Filter;
 import japicmp.output.OutputGenerator;
 import japicmp.util.ModifierHelper;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class SemverOut extends OutputGenerator<String> {
 

@@ -107,7 +107,7 @@ public class VersionChangeTest {
 
 	@Test(expected = MojoFailureException.class)
 	public void testNoParameter() throws MojoFailureException {
-		VersionChange vc = new VersionChange(new ArrayList<JApiCmpArchive>(), new ArrayList<JApiCmpArchive>(), null);
+		VersionChange vc = new VersionChange(new ArrayList<>(), new ArrayList<>(), null);
 		vc.computeChangeType();
 	}
 }

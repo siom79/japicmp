@@ -46,7 +46,7 @@ public class VersionChange {
 				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, "Cannot compare versions because the number of old versions is different than the number of new versions.");
 			} else {
 				List<SemanticVersion.ChangeType> changeTypes = new ArrayList<>();
-				for (int i=0; i<oldVersions.size(); i++) {
+				for (int i = 0; i<oldVersions.size(); i++) {
 					SemanticVersion oldVersion = oldVersions.get(i);
 					SemanticVersion newVersion = newVersions.get(i);
 					Optional<SemanticVersion.ChangeType> changeTypeOptional = oldVersion.computeChangeType(newVersion);

@@ -24,7 +24,7 @@ public class StdoutOutputGeneratorTest {
 	@Test
 	public void testNoChanges() {
 		Options options = Options.newDefault();
-		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0));
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<>(0));
 		String generated = generator.generate();
 		assertThat(generated, containsString(StdoutOutputGenerator.NO_CHANGES));
 	}
@@ -33,7 +33,7 @@ public class StdoutOutputGeneratorTest {
 	public void testWarningWhenIgnoreMissingClasses() {
 		Options options = Options.newDefault();
 		options.setIgnoreMissingClasses(true);
-		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0));
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<>(0));
 		String generated = generator.generate();
 		assertThat(generated, containsString(StdoutOutputGenerator.WARNING));
 		assertThat(generated, containsString(CliParser.IGNORE_MISSING_CLASSES));

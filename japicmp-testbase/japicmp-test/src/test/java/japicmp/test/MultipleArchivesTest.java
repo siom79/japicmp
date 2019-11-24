@@ -16,7 +16,6 @@ import japicmp.output.xml.model.JApiCmpXmlRoot;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -70,7 +69,7 @@ public class MultipleArchivesTest {
 	}
 
 	@Test
-	public void testXmlOutputGenerator() throws UnsupportedEncodingException {
+	public void testXmlOutputGenerator() {
 		Options options = Options.newDefault();
 		options.getOldArchives().addAll(createListOfOldArchives());
 		options.getNewArchives().addAll(createListOfNewArchives());

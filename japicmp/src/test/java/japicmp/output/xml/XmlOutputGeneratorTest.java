@@ -62,7 +62,7 @@ public class XmlOutputGeneratorTest {
 	}
 
 	@Test(expected = JApiCmpException.class)
-	public void testWithNotExistingHtmlStylesheetOption() throws IOException {
+	public void testWithNotExistingHtmlStylesheetOption() {
 		Path stylesheetPath = Paths.get(System.getProperty("user.dir"), "target", XmlOutputGeneratorTest.class.getSimpleName() + "_not_existing.css");
 		Path htmlReportPath = Paths.get(System.getProperty("user.dir"), "target", XmlOutputGeneratorTest.class.getSimpleName() + "_with.html");
 		Options options = Options.newDefault();

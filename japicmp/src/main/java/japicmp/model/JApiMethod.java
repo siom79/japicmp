@@ -128,8 +128,7 @@ public class JApiMethod extends JApiBehavior {
 		return returnType;
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		return "JApiMethod [oldMethod="
 			+ toString(oldMethod)
 			+ ", newMethod="
@@ -142,10 +141,10 @@ public class JApiMethod extends JApiBehavior {
 	}
 
 	public static String toString(Optional<CtMethod> method) {
-		if(method == null ) {
+		if (method == null) {
 			return OptionalHelper.N_A;
 		}
-		if(method.isPresent()) {
+		if (method.isPresent()) {
 			return method.get().getLongName();
 		}
 		return OptionalHelper.N_A;

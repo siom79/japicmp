@@ -93,7 +93,7 @@ public class BehaviorFilterTest {
 	}
 
 	@Test
-	public void testCoberturaMethodWithWildcards() throws CannotCompileException, NotFoundException {
+	public void testCoberturaMethodWithWildcards() throws CannotCompileException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.*#__cobertura*()");
 		ClassPool classPool = new ClassPool();
 		classPool.appendSystemPath();
@@ -103,7 +103,7 @@ public class BehaviorFilterTest {
 	}
 
 	@Test
-	public void testMethodOfInnerClass() throws CannotCompileException, NotFoundException {
+	public void testMethodOfInnerClass() throws CannotCompileException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test$InnerClass#method()");
 		ClassPool classPool = new ClassPool();
 		classPool.appendSystemPath();
@@ -113,7 +113,7 @@ public class BehaviorFilterTest {
 	}
 
 	@Test
-	public void testMethodWithDollarSignInName() throws CannotCompileException, NotFoundException {
+	public void testMethodWithDollarSignInName() throws CannotCompileException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("org.apache.flink.streaming.api.scala.DataStream#iterate$default$3[R]()");
 		ClassPool classPool = new ClassPool();
 		classPool.appendSystemPath();

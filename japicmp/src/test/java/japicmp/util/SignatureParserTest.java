@@ -11,7 +11,7 @@ public class SignatureParserTest {
 	private SignatureParser subject;
 
 	@Before
-	public void before() throws Exception {
+	public void before() {
 		subject = new SignatureParser();
 	}
 

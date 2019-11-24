@@ -68,7 +68,6 @@ public class JApiAnnotationElementValue {
 		} else if (type == Type.Annotation) {
 			if (value instanceof Annotation) {
 				Annotation annotation = (Annotation) value;
-				@SuppressWarnings("unchecked")
 				Set<String> memberNames = annotation.getMemberNames();
 				if (memberNames != null) {
 					for (String memberName : memberNames) {

@@ -4,15 +4,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
-
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -22,6 +21,8 @@ import static org.junit.Assert.assertThat;
 
 public class ITOverrideCompatibilityChanges {
 
+	@Ignore
+	@Test
 	public void testSemanticVersion() throws IOException {
 		Path htmlPath = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "override-compatibility-changes.html");
  		assertThat(Files.exists(htmlPath), is(true));
