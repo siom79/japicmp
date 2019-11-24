@@ -281,6 +281,7 @@ for each check. This allows you to customize the following verifications:
 | METHOD_NOW_STATIC | false | false | MAJOR |
 | METHOD_NO_LONGER_STATIC | false | false | MAJOR |
 | METHOD_ADDED_TO_INTERFACE | true | false | MINOR |
+| METHOD_ADDED_TO_PUBLIC_CLASS | true | true | PATCH |
 | METHOD_NOW_THROWS_CHECKED_EXCEPTION | true | false | MINOR |
 | METHOD_ABSTRACT_ADDED_TO_CLASS | true | false | MINOR |
 | METHOD_ABSTRACT_ADDED_IN_SUPERCLASS | true | false | MINOR |

@@ -79,17 +79,14 @@ public class CompatibilityChanges {
 			// section 13.4.6 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.REMOVED) {
 				ArrayList<Integer> returnValues = new ArrayList<>();
-				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
-					@Override
-					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
-						int movedToSuperclass = 0;
-						for (JApiField superclassField : superclass.getFields()) {
-							if (superclassField.getName().equals(field.getName()) && fieldTypeMatches(superclassField, field) && isNotPrivate(superclassField)) {
-								movedToSuperclass = 1;
-							}
+				forAllSuperclasses(jApiClass, classMap, returnValues, (superclass, classMap1, changeStatusOfSuperclass) -> {
+					int movedToSuperclass = 0;
+					for (JApiField superclassField : superclass.getFields()) {
+						if (superclassField.getName().equals(field.getName()) && fieldTypeMatches(superclassField, field) && isNotPrivate(superclassField)) {
+							movedToSuperclass = 1;
 						}
-						return movedToSuperclass;
 					}
+					return movedToSuperclass;
 				});
 				boolean movedToSuperclass = false;
 				for (Integer returnValue : returnValues) {
@@ -303,6 +300,11 @@ public class CompatibilityChanges {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_REMOVED);
 				}
 			}
+
+			if (!isInterface(jApiClass) && method.getChangeStatus() == JApiChangeStatus.NEW && method.getAccessModifier().getNewModifier().get().getLevel() == AccessModifier.PUBLIC.getLevel()) {
+				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_PUBLIC_CLASS);
+			}
+
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(method)) {
 				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_LESS_ACCESSIBLE);
