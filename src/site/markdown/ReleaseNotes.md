@@ -2,6 +2,12 @@
 
 The following versions of japicmp are available:
 
+##0.14.3 (2019-12-24)##
+* METHOD_REMOVED_IN_SUPERCLASS is no longer reported if method is moved from superclass to superclass of superclass. [#253](https://github.com/siom79/japicmp/issues/253)
+* Added METHOD_ADDED_TO_PUBLIC_CLASS as a new compatibility check. [#241](https://github.com/siom79/japicmp/issues/241)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.14.3).
+
 ##0.14.2 (2019-11-23)##
 * New properties: japicmp.skip, japicmp.skipXmlReport, japicmp.skipHtmlReport, japicmp.breakBuildOnModifications, japicmp.breakBuildOnBinaryIncompatibleModifications, japicmp.breakBuildOnSourceIncompatibleModifications, japicmp.breakBuildBasedOnSemanticVersioning, japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero. [#240](https://github.com/siom79/japicmp/issues/240)
 * Do not filer modified classes when outputOnlyModifications is set and all members are unchanged. [#247](https://github.com/siom79/japicmp/issues/247)
@@ -27,7 +33,6 @@ Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom
 * Do not report METHOD_REMOVED_IN_SUPERCLASS if method is pulled up. [#222](https://github.com/siom79/japicmp/issues/222)
 
 Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.13.1).
-
 
 ##0.13.0 (2018-08-20)##
 * Use javassist 3.23.1-GA.
