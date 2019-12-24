@@ -10,12 +10,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
 import static japicmp.util.ModifierHelper.isNotPrivate;
@@ -583,10 +578,24 @@ public class CompatibilityChanges {
 						if (!isAbstract(jApiMethod) && jApiMethod.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiMethod)) {
 							implementedMethods.add(jApiMethod);
 						}
+						Iterator<JApiMethod> iterator = removedAndNotOverriddenMethods.iterator();
+						while (iterator.hasNext()) {
+							JApiMethod removedAndNotOverriddenMethod = iterator.next();
+							if (jApiMethod.getName().equals(removedAndNotOverriddenMethod.getName()) && jApiMethod.hasSameSignature(removedAndNotOverriddenMethod)) {
+								iterator.remove();
+							}
+						}
 					}
 					for (JApiField jApiField : superclass.getFields()) {
 						if (jApiField.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiField)) {
 							fields.add(jApiField);
+						}
+						Iterator<JApiField> iterator = removedAndNotOverriddenFields.iterator();
+						while (iterator.hasNext()) {
+							JApiField removedAndNotOverriddenField = iterator.next();
+							if (jApiField.getName().equals(removedAndNotOverriddenField.getName()) && hasSameType(jApiField, removedAndNotOverriddenField)) {
+								iterator.remove();
+							}
 						}
 					}
 					for (JApiMethod jApiMethod : superclass.getMethods()) {
@@ -721,6 +730,8 @@ public class CompatibilityChanges {
 			hasSameNewType = field.getType().getOldTypeOptional().get().equals(otherField.getType().getNewTypeOptional().get());
 		} else if (field.getType().getOldTypeOptional().isPresent() && otherField.getType().getOldTypeOptional().isPresent()) {
 			hasSameNewType = field.getType().getOldTypeOptional().get().equals(otherField.getType().getOldTypeOptional().get());
+		} else if (field.getType().getNewTypeOptional().isPresent() && otherField.getType().getOldTypeOptional().isPresent()) {
+			hasSameNewType = field.getType().getNewTypeOptional().get().equals(otherField.getType().getOldTypeOptional().get());
 		}
 		return hasSameNewType;
 	}
