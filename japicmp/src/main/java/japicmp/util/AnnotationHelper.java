@@ -5,6 +5,7 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiChangeStatus;
 import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.annotation.Annotation;
 
@@ -44,14 +45,14 @@ public class AnnotationHelper {
 						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.of(foundAnnotation), JApiChangeStatus.UNCHANGED);
 						annotations.add(jApiAnnotation);
 					} else {
-						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.<Annotation>absent(), JApiChangeStatus.REMOVED);
+						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.absent(), JApiChangeStatus.REMOVED);
 						annotations.add(jApiAnnotation);
 					}
 				}
 				for (Annotation annotation : newAnnotationMap.values()) {
 					Annotation foundAnnotation = oldAnnotationMap.get(annotation.getTypeName());
 					if (foundAnnotation == null) {
-						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.<Annotation>absent(), Optional.of(annotation), JApiChangeStatus.NEW);
+						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.absent(), Optional.of(annotation), JApiChangeStatus.NEW);
 						annotations.add(jApiAnnotation);
 					}
 				}
@@ -62,7 +63,7 @@ public class AnnotationHelper {
 					if (oldAnnotationsAttribute != null) {
 						Map<String, Annotation> oldAnnotationMap = buildAnnotationMap(oldAnnotationsAttribute.getAnnotations());
 						for (Annotation annotation : oldAnnotationMap.values()) {
-							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.<Annotation>absent(),
+							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.absent(),
 								JApiChangeStatus.REMOVED);
 							annotations.add(jApiAnnotation);
 						}
@@ -74,7 +75,7 @@ public class AnnotationHelper {
 					if (newAnnotationsAttribute != null) {
 						Map<String, Annotation> newAnnotationMap = buildAnnotationMap(newAnnotationsAttribute.getAnnotations());
 						for (Annotation annotation : newAnnotationMap.values()) {
-							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.<Annotation>absent(), Optional.of(annotation), JApiChangeStatus.NEW);
+							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.absent(), Optional.of(annotation), JApiChangeStatus.NEW);
 							annotations.add(jApiAnnotation);
 						}
 					}
@@ -92,12 +93,12 @@ public class AnnotationHelper {
 	}
 
 	public static boolean hasAnnotation(ClassFile classFile, String annotationClassName) {
-		List attributes = classFile.getAttributes();
+		List<AttributeInfo> attributes = classFile.getAttributes();
 		return hasAnnotation(attributes, annotationClassName);
 	}
 
-	public static boolean hasAnnotation(List attributes, String annotationClassName) {
-		for (Object obj : attributes) {
+	public static boolean hasAnnotation(List<? extends AttributeInfo> attributes, String annotationClassName) {
+		for (AttributeInfo obj : attributes) {
 			if (obj instanceof AnnotationsAttribute) {
 				AnnotationsAttribute annotationsAttribute = (AnnotationsAttribute) obj;
 				Annotation[] annotations = annotationsAttribute.getAnnotations();

@@ -34,8 +34,8 @@ public class ClassesComparator {
 		for (CtClass oldCtClass : oldClassesMap.values()) {
 			CtClass newCtClass = newClassesMap.get(oldCtClass.getName());
 			if (newCtClass == null) {
-				JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldCtClass)), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType);
+				JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldCtClass)), Optional.absent(), JApiChangeStatus.REMOVED);
+				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.absent(), JApiChangeStatus.REMOVED, classType);
 				if (includeClass(jApiClass)) {
 					classes.add(jApiClass);
 				}
@@ -57,8 +57,8 @@ public class ClassesComparator {
 			CtClass oldCtClass = oldClassesMap.get(newCtClass.getName());
 			if (oldCtClass == null) {
 				JApiClassType.ClassType newType = ClassHelper.getType(newCtClass);
-				JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(newType), JApiChangeStatus.NEW);
-				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, newCtClass.getName(), Optional.<CtClass>absent(), Optional.of(newCtClass), JApiChangeStatus.NEW, classType);
+				JApiClassType classType = new JApiClassType(Optional.absent(), Optional.of(newType), JApiChangeStatus.NEW);
+				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, newCtClass.getName(), Optional.absent(), Optional.of(newCtClass), JApiChangeStatus.NEW, classType);
 				if (includeClass(jApiClass)) {
 					classes.add(jApiClass);
 				}

@@ -18,7 +18,6 @@ import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
@@ -103,7 +102,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 		}
 		mojo = new JApiCmpMojo();
 		mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
-		pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+		pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.absent(), Optional.of(outputDirectory), false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 		return mojo;
 	}
 

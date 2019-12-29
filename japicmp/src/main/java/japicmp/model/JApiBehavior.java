@@ -211,18 +211,18 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 				CtBehavior ctBehavior = oldBehaviorOptional.get();
 				byte[] attribute = ctBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 				if (attribute != null) {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>absent());
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.absent());
 				} else {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>absent());
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.absent());
 				}
 			}
 			if (newBehaviorOptional.isPresent()) {
 				CtBehavior ctBehavior = newBehaviorOptional.get();
 				byte[] attribute = ctBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 				if (attribute != null) {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
 				} else {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
 				}
 			}
 		}

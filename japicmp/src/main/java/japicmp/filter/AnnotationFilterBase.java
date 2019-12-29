@@ -1,6 +1,7 @@
 package japicmp.filter;
 
 import japicmp.util.AnnotationHelper;
+import javassist.bytecode.AttributeInfo;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class AnnotationFilterBase {
 		this.annotationClassName = annotationClassName;
 	}
 
-	protected boolean hasAnnotation(List attributes) {
+	protected boolean hasAnnotation(List<? extends AttributeInfo> attributes) {
 		return AnnotationHelper.hasAnnotation(attributes, annotationClassName);
 	}
 

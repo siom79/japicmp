@@ -3,6 +3,7 @@ package japicmp.filter;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import javassist.bytecode.AttributeInfo;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -17,7 +18,7 @@ public class AnnotationBehaviorFilter extends AnnotationFilterBase implements Be
 
 	@Override
 	public boolean matches(CtBehavior ctBehavior) {
-		List attributes = ctBehavior.getMethodInfo().getAttributes();
+		List<AttributeInfo> attributes = ctBehavior.getMethodInfo().getAttributes();
 		boolean hasAnnotation = hasAnnotation(attributes);
 		if (!hasAnnotation) {
 			CtClass declaringClass = ctBehavior.getDeclaringClass();

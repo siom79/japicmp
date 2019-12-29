@@ -52,14 +52,14 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 		} else if (oldSuperclassOptional.isPresent()) {
 			CtClass oldSuperclass = oldSuperclassOptional.get();
 			String oldSuperclassName = oldSuperclass.getName();
-			JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType);
+			JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.absent(), JApiChangeStatus.REMOVED);
+			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.absent(), JApiChangeStatus.REMOVED, classType);
 			return Optional.of(jApiClass);
 		} else if (newSuperclassOptional.isPresent()) {
 			CtClass newSuperclass = newSuperclassOptional.get();
 			String newSuperclassName = newSuperclass.getName();
-			JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.NEW);
-			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.<CtClass>absent(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType);
+			JApiClassType classType = new JApiClassType(Optional.absent(), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.NEW);
+			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.absent(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType);
 			return Optional.of(jApiClass);
 		}
 		return Optional.absent();
@@ -77,12 +77,12 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 
 	@XmlTransient
 	public Optional<String> getOldSuperclassName() {
-		return oldSuperclassOptional.isPresent() ? Optional.of(oldSuperclassOptional.get().getName()) : Optional.<String>absent();
+		return oldSuperclassOptional.isPresent() ? Optional.of(oldSuperclassOptional.get().getName()) : Optional.absent();
 	}
 
 	@XmlTransient
 	public Optional<String> getNewSuperclassName() {
-		return newSuperclassOptional.isPresent() ? Optional.of(newSuperclassOptional.get().getName()) : Optional.<String>absent();
+		return newSuperclassOptional.isPresent() ? Optional.of(newSuperclassOptional.get().getName()) : Optional.absent();
 	}
 
 	@XmlAttribute(name = "changeStatus")

@@ -123,7 +123,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
-		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
@@ -210,7 +210,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					try (InputStreamReader fileReader = new InputStreamReader(new FileInputStream(postAnalysisFilterScript), Charset.forName("UTF-8"))) {
 						Object returnValue = scriptEngine.eval(fileReader, bindings);
 						if (returnValue instanceof List) {
-							List returnedList = (List) returnValue;
+							List<?> returnedList = (List<?>) returnValue;
 							filteredList = new ArrayList<>(returnedList.size());
 							for (Object obj : returnedList) {
 								if (obj instanceof JApiClass) {
@@ -303,9 +303,9 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void filterSnapshots(List versions) {
-		for (Iterator versionIterator = versions.iterator(); versionIterator.hasNext(); ) {
-			ArtifactVersion version = (ArtifactVersion) versionIterator.next();
+	private void filterSnapshots(List<ArtifactVersion> versions) {
+		for (Iterator<ArtifactVersion> versionIterator = versions.iterator(); versionIterator.hasNext(); ) {
+			ArtifactVersion version = versionIterator.next();
 			String qualifier = version.getQualifier();
 			if (qualifier != null && qualifier.endsWith("SNAPSHOT")) {
 				versionIterator.remove();

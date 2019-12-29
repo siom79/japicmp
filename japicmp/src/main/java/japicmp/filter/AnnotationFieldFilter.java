@@ -3,6 +3,7 @@ package japicmp.filter;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.NotFoundException;
+import javassist.bytecode.AttributeInfo;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -17,7 +18,7 @@ public class AnnotationFieldFilter extends AnnotationFilterBase implements Field
 
 	@Override
 	public boolean matches(CtField ctField) {
-		List attributes = ctField.getFieldInfo().getAttributes();
+		List<AttributeInfo> attributes = ctField.getFieldInfo().getAttributes();
 		boolean hasAnnotation = hasAnnotation(attributes);
 		if (!hasAnnotation) {
 			CtClass declaringClass = ctField.getDeclaringClass();

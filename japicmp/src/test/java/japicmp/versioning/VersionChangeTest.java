@@ -75,33 +75,33 @@ public class VersionChangeTest {
 
 	@Test(expected = JApiCmpException.class)
 	public void testMissingOldVersion() {
-		VersionChange vc = new VersionChange(Collections.<SemanticVersion>emptyList(), Collections.singletonList(new SemanticVersion(1, 2, 3)), false, false);
+		VersionChange vc = new VersionChange(Collections.emptyList(), Collections.singletonList(new SemanticVersion(1, 2, 3)), false, false);
 		vc.computeChangeType();
 		fail();
 	}
 
 	@Test
 	public void testIgnoreMissingOldVersion() {
-		VersionChange vc = new VersionChange(Collections.<SemanticVersion>emptyList(), Collections.singletonList(new SemanticVersion(1, 2, 3)), true, false);
+		VersionChange vc = new VersionChange(Collections.emptyList(), Collections.singletonList(new SemanticVersion(1, 2, 3)), true, false);
 		assertThat(vc.computeChangeType().isPresent(), is(false));
 	}
 
 	@Test(expected = JApiCmpException.class)
 	public void testMissingNewVersion() {
-		VersionChange vc = new VersionChange(Collections.singletonList(new SemanticVersion(1, 2, 3)), Collections.<SemanticVersion>emptyList(), false, false);
+		VersionChange vc = new VersionChange(Collections.singletonList(new SemanticVersion(1, 2, 3)), Collections.emptyList(), false, false);
 		vc.computeChangeType();
 		fail();
 	}
 
 	@Test
 	public void testIgnoreMissingNewVersion() {
-		VersionChange vc = new VersionChange(Collections.singletonList(new SemanticVersion(1, 2, 3)), Collections.<SemanticVersion>emptyList(), false, true);
+		VersionChange vc = new VersionChange(Collections.singletonList(new SemanticVersion(1, 2, 3)), Collections.emptyList(), false, true);
 		assertThat(vc.computeChangeType().isPresent(), is(false));
 	}
 
 	@Test(expected = JApiCmpException.class)
 	public void testNoParameter() {
-		VersionChange vc = new VersionChange(Collections.<SemanticVersion>emptyList(), Collections.<SemanticVersion>emptyList(), false, false);
+		VersionChange vc = new VersionChange(Collections.emptyList(), Collections.emptyList(), false, false);
 		vc.computeChangeType();
 		fail();
 	}

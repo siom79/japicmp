@@ -47,7 +47,7 @@ public abstract class Optional<T> {
 
 		@Override
 		public boolean equals(Object object) {
-			return object instanceof Present && this.reference.equals(((Present) object).reference);
+			return object instanceof Present && this.reference.equals(((Present<T>) object).reference);
 		}
 
 		@Override

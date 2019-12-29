@@ -33,7 +33,7 @@ public class JpaTable {
 					case NEW:
 						String newName = removeQuotationMarks(element.getNewValue().get().toString());
 						if (changeStatusClass == JApiChangeStatus.NEW) {
-							return new JpaName(Optional.<String>absent(), Optional.of(newName), JApiChangeStatus.NEW);
+							return new JpaName(Optional.absent(), Optional.of(newName), JApiChangeStatus.NEW);
 						}
 						if (tableName.equals(newName)) {
 							return new JpaName(Optional.of(newName), Optional.of(newName), JApiChangeStatus.UNCHANGED);
@@ -43,7 +43,7 @@ public class JpaTable {
 					case REMOVED:
 						String oldName = removeQuotationMarks(element.getOldValue().get().toString());
 						if (changeStatusClass == JApiChangeStatus.REMOVED) {
-							return new JpaName(Optional.of(oldName), Optional.<String>absent(), JApiChangeStatus.REMOVED);
+							return new JpaName(Optional.of(oldName), Optional.absent(), JApiChangeStatus.REMOVED);
 						}
 						if (tableName.equals(oldName)) {
 							return new JpaName(Optional.of(oldName), Optional.of(oldName), JApiChangeStatus.UNCHANGED);
@@ -62,9 +62,9 @@ public class JpaTable {
 			break;
 		}
 		if (changeStatusClass == JApiChangeStatus.NEW) {
-			return new JpaName(Optional.<String>absent(), Optional.of(tableName), JApiChangeStatus.NEW);
+			return new JpaName(Optional.absent(), Optional.of(tableName), JApiChangeStatus.NEW);
 		} else if (changeStatusClass == JApiChangeStatus.REMOVED) {
-			return new JpaName(Optional.of(tableName), Optional.<String>absent(), JApiChangeStatus.REMOVED);
+			return new JpaName(Optional.of(tableName), Optional.absent(), JApiChangeStatus.REMOVED);
 		}
 		return new JpaName(Optional.of(tableName), Optional.of(tableName), JApiChangeStatus.UNCHANGED);
 	}

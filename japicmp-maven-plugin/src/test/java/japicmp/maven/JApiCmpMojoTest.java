@@ -49,7 +49,7 @@ public class JApiCmpMojoTest {
 		JApiCmpMojo mojo = new JApiCmpMojo();
 		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
 		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
-		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, new Parameter(), null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.<String>absent(), true, null, null, null, null);
+		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, new Parameter(), null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.absent(), true, null, null, null, null);
 		ArtifactResolver artifactResolver = mock(ArtifactResolver.class);
 		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
 		Set<Artifact> artifactSet = new HashSet<>();
@@ -79,7 +79,7 @@ public class JApiCmpMojoTest {
 		parameter.setSkipXmlReport(true);
 		parameter.setSkipDiffReport(true);
 		String reportDir = "noXmlAndNoHtmlNoDiffReport";
-		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, parameter, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", reportDir).toFile()), Optional.<String>absent(), true, null, null, null, null);
+		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, parameter, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", reportDir).toFile()), Optional.absent(), true, null, null, null, null);
 		ArtifactResolver artifactResolver = mock(ArtifactResolver.class);
 		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
 		Set<Artifact> artifactSet = new HashSet<>();
@@ -305,7 +305,7 @@ public class JApiCmpMojoTest {
 		Parameter parameterParam = new Parameter();
 		parameterParam.setIgnoreMissingNewVersion(true);
 		parameterParam.setIgnoreMissingOldVersion(true);
-		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, parameterParam, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.<String>absent(), true, null, null, null, null);
+		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, parameterParam, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.absent(), true, null, null, null, null);
 		ArtifactResolver artifactResolver = mock(ArtifactResolver.class);
 		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
 		Set<Artifact> artifactSet = new HashSet<>();

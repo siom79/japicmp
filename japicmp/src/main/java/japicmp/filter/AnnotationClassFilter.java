@@ -2,6 +2,7 @@ package japicmp.filter;
 
 import javassist.CtClass;
 import javassist.NotFoundException;
+import javassist.bytecode.AttributeInfo;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -16,7 +17,7 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 
 	@Override
 	public boolean matches(CtClass ctClass) {
-		List attributes = ctClass.getClassFile().getAttributes();
+		List<AttributeInfo> attributes = ctClass.getClassFile().getAttributes();
 		boolean hasAnnotation = hasAnnotation(attributes);
 		if (!hasAnnotation) {
 			try {

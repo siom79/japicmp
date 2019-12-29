@@ -8,7 +8,6 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiClassType;
 import japicmp.util.Optional;
-import javassist.CtClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -74,8 +73,8 @@ public class XmlOutputGeneratorTest {
 	private void generateHtmlReport(Options options) {
 		List<JApiClass> jApiClasses = new ArrayList<>();
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
-		JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-		jApiClasses.add(new JApiClass(new JarArchiveComparator(jarArchiveComparatorOptions), "japicmp.Test", Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.NEW, classType));
+		JApiClassType classType = new JApiClassType(Optional.absent(), Optional.absent(), JApiChangeStatus.REMOVED);
+		jApiClasses.add(new JApiClass(new JarArchiveComparator(jarArchiveComparatorOptions), "japicmp.Test", Optional.absent(), Optional.absent(), JApiChangeStatus.NEW, classType));
 		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
 		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
 		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);

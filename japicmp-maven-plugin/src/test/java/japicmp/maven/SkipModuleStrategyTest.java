@@ -10,7 +10,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -99,7 +98,7 @@ public class SkipModuleStrategyTest {
 		Version newVersion = JApiCmpMojoTest.createVersion("groupId", "artifactId", "0.1.1");
 		Parameter parameter = new Parameter();
 		return new PluginParameters(false, newVersion, oldVersion, parameter, new ArrayList<>(),
-			Optional.<File>absent(), Optional.<String>absent(), false, new ArrayList<>(),
+			Optional.absent(), Optional.absent(), false, new ArrayList<>(),
 			new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 	}
 }

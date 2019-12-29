@@ -232,11 +232,11 @@ public class CompatibilityChanges {
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
 			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.UNCHANGED);
 		} else if (oldClassOptional.isPresent() && !newClassOptional.isPresent()) {
-			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
+			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.absent(), JApiChangeStatus.REMOVED);
 		} else if (!oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.NEW);
+			classType = new JApiClassType(Optional.absent(), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.NEW);
 		} else {
-			classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.UNCHANGED);
+			classType = new JApiClassType(Optional.absent(), Optional.absent(), JApiChangeStatus.UNCHANGED);
 		}
 		foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType);
 		return foundClass;

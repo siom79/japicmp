@@ -115,15 +115,15 @@ public class ModifierHelper {
 			if (oldClassOptional.isPresent()) {
 				CtClass oldClass = oldClassOptional.get();
 				T oldClassModifier = callback.getModifierForOld(oldClass);
-				return new JApiModifier<>(Optional.of(oldClassModifier), Optional.<T>absent(), JApiChangeStatus.REMOVED);
+				return new JApiModifier<>(Optional.of(oldClassModifier), Optional.absent(), JApiChangeStatus.REMOVED);
 			}
 			if (newClassOptional.isPresent()) {
 				CtClass newClass = newClassOptional.get();
 				T newClassModifier = callback.getModifierForNew(newClass);
-				return new JApiModifier<>(Optional.<T>absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);
+				return new JApiModifier<>(Optional.absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);
 			}
 		}
-		return new JApiModifier<>(Optional.<T>absent(), Optional.<T>absent(), JApiChangeStatus.UNCHANGED);
+		return new JApiModifier<>(Optional.absent(), Optional.absent(), JApiChangeStatus.UNCHANGED);
 	}
 
 	public interface ExtractModifierFromBehaviorCallback<T extends JApiModifierBase> {
@@ -147,15 +147,15 @@ public class ModifierHelper {
 			if (oldClassOptional.isPresent()) {
 				CtBehavior oldClass = oldClassOptional.get();
 				T oldClassModifier = callback.getModifierForOld(oldClass);
-				return new JApiModifier<>(Optional.of(oldClassModifier), Optional.<T>absent(), JApiChangeStatus.REMOVED);
+				return new JApiModifier<>(Optional.of(oldClassModifier), Optional.absent(), JApiChangeStatus.REMOVED);
 			}
 			if (newClassOptional.isPresent()) {
 				CtBehavior newClass = newClassOptional.get();
 				T newClassModifier = callback.getModifierForNew(newClass);
-				return new JApiModifier<>(Optional.<T>absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);
+				return new JApiModifier<>(Optional.absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);
 			}
 		}
-		return new JApiModifier<>(Optional.<T>absent(), Optional.<T>absent(), JApiChangeStatus.UNCHANGED);
+		return new JApiModifier<>(Optional.absent(), Optional.absent(), JApiChangeStatus.UNCHANGED);
 	}
 
 	public interface ExtractModifierFromFieldCallback<T extends JApiModifierBase> {
@@ -179,15 +179,15 @@ public class ModifierHelper {
 			if (oldFieldOptional.isPresent()) {
 				CtField oldField = oldFieldOptional.get();
 				T oldFieldModifier = callback.getModifierForOld(oldField);
-				return new JApiModifier<>(Optional.of(oldFieldModifier), Optional.<T>absent(), JApiChangeStatus.REMOVED);
+				return new JApiModifier<>(Optional.of(oldFieldModifier), Optional.absent(), JApiChangeStatus.REMOVED);
 			}
 			if (newFieldOptional.isPresent()) {
 				CtField newField = newFieldOptional.get();
 				T newFieldModifier = callback.getModifierForNew(newField);
-				return new JApiModifier<>(Optional.<T>absent(), Optional.of(newFieldModifier), JApiChangeStatus.NEW);
+				return new JApiModifier<>(Optional.absent(), Optional.of(newFieldModifier), JApiChangeStatus.NEW);
 			}
 		}
-		return new JApiModifier<>(Optional.<T>absent(), Optional.<T>absent(), JApiChangeStatus.UNCHANGED);
+		return new JApiModifier<>(Optional.absent(), Optional.absent(), JApiChangeStatus.UNCHANGED);
 	}
 
 	public static boolean isBridge(int modifier) {

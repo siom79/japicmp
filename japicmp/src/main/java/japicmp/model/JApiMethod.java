@@ -32,7 +32,7 @@ public class JApiMethod extends JApiBehavior {
 	}
 
 	private JApiReturnType computeReturnTypeChanges(Optional<CtMethod> oldMethodOptional, Optional<CtMethod> newMethodOptional) {
-		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.<String>absent(), Optional.<String>absent());
+		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.absent(), Optional.absent());
 		if (oldMethodOptional.isPresent() && newMethodOptional.isPresent()) {
 			String oldReturnType = computeReturnType(oldMethodOptional.get());
 			String newReturnType = computeReturnType(newMethodOptional.get());
@@ -44,11 +44,11 @@ public class JApiMethod extends JApiBehavior {
 		} else {
 			if (oldMethodOptional.isPresent()) {
 				String oldReturnType = computeReturnType(oldMethodOptional.get());
-				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType), Optional.<String>absent());
+				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType), Optional.absent());
 			}
 			if (newMethodOptional.isPresent()) {
 				String newReturnType = computeReturnType(newMethodOptional.get());
-				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.<String>absent(), Optional.of(newReturnType));
+				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.absent(), Optional.of(newReturnType));
 			}
 		}
 		return jApiReturnType;
