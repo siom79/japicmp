@@ -141,7 +141,6 @@
         <java.target>1.8</java.target>
 		<maven.site.plugin.skip>false</maven.site.plugin.skip>
 		<javassist.version>3.24.0-GA</javassist.version>
-		<guava.version>18.0</guava.version>
 		<jaxb.version>2.2.7</jaxb.version>
 		<javax-activation.version>1.1</javax-activation.version>
     </properties>
@@ -181,11 +180,6 @@
 				<groupId>org.javassist</groupId>
 				<artifactId>javassist</artifactId>
 				<version>${javassist.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>${guava.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.xml.bind</groupId>

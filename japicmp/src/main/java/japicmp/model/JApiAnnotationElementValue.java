@@ -1,7 +1,6 @@
 package japicmp.model;
 
 import japicmp.util.Optional;
-import com.google.common.xml.XmlEscapers;
 import japicmp.util.OptionalHelper;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
@@ -48,9 +47,23 @@ public class JApiAnnotationElementValue {
 	@XmlAttribute(name = "value")
 	public String getValueString() {
 		if (type != Type.Array && type != Type.Annotation) {
-			return XmlEscapers.xmlAttributeEscaper().escape(value.toString());
+			return xmlEscape(value.toString());
 		}
 		return "n.a.";
+	}
+
+	private String xmlEscape(String xmlAttribute) {
+		return xmlAttribute.replaceAll("&", "&amp;")
+				.replaceAll("<", "&lt;")
+				.replaceAll(">", "&gt;")
+				.replaceAll("'", "&apos;")
+				.replaceAll("\"", "&quot;")
+				.replaceAll("\t", "&#x9;")
+				.replaceAll("\n", "&#xA;")
+				.replaceAll("\r", "&#xD;")
+				.replaceAll("[\000-\037]", "\uFFFD")
+				.replaceAll("\uFFFE", "\uFFFD")
+				.replaceAll("\uFFFF", "\uFFFD");
 	}
 
 	@XmlElementWrapper(name = "values")

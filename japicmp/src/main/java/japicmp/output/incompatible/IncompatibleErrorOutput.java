@@ -17,7 +17,6 @@
 
 package japicmp.output.incompatible;
 
-import com.google.common.base.Joiner;
 import japicmp.JApiCmp;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
@@ -52,6 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 
@@ -162,8 +162,8 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 					}
 				} else {
 					if (isDebugEnabled()) {
-						Joiner joiner = Joiner.on(';');
-						debug("No change type available for old version(s) " + joiner.join(oldVersions) + " and new version(s) " + joiner.join(newVersions) + ".");
+						debug("No change type available for old version(s) " + oldVersions.stream().map(SemanticVersion::toString).collect(Collectors.joining(";"))
+								+ " and new version(s) " + newVersions.stream().map(SemanticVersion::toString).collect(Collectors.joining(";")) + ".");
 					}
 				}
 			} else {

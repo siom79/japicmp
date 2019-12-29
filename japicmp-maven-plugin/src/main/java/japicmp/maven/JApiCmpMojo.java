@@ -1,6 +1,5 @@
 package japicmp.maven;
 
-import com.google.common.base.Joiner;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
@@ -66,6 +65,8 @@ import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Mojo(name = "cmp", requiresDependencyResolution = ResolutionScope.COMPILE, defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
 public class JApiCmpMojo extends AbstractMojo {
@@ -178,7 +179,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					}
 				}
 				if (foundChange == null) {
-					throw new MojoFailureException("Unknown compatibility change '" + compatibilityChange + "'. Supported values: " + Joiner.on(',').join(JApiCompatibilityChange.values()));
+					throw new MojoFailureException("Unknown compatibility change '" + compatibilityChange + "'. Supported values: " + Stream.of(JApiCompatibilityChange.values()).map(Enum::name).collect(Collectors.joining(",")));
 				}
 
 				JApiSemanticVersionLevel foundSemanticVersionLevel = foundChange.getSemanticVersionLevel();
@@ -190,7 +191,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					}
 				}
 				if (foundSemanticVersionLevel == null) {
-					throw new MojoFailureException("Unknown semantic version level '" + semanticVersionLevel + "'. Supported values: " + Joiner.on(',').join(JApiSemanticVersionLevel.values()));
+					throw new MojoFailureException("Unknown semantic version level '" + semanticVersionLevel + "'. Supported values: " + Stream.of(JApiSemanticVersionLevel.values()).map(Enum::name).collect(Collectors.joining(",")));
 				}
 
 				comparatorOptions.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(foundChange, configChange.isBinaryCompatible(), configChange.isSourceCompatible(), foundSemanticVersionLevel));

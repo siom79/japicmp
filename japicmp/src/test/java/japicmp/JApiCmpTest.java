@@ -1,7 +1,5 @@
 package japicmp;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import japicmp.cli.CliParser;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
@@ -18,6 +16,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static japicmp.util.JarUtil.createJarFile;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -143,9 +142,8 @@ public class JApiCmpTest {
 		return Paths.get(System.getProperty("user.dir"), "src", "test", "resources", jarFileName).toString();
 	}
 
-	static void assertListsEquals(ImmutableList<String> expected, ImmutableList<String> actual) {
-		Joiner nlJoiner = Joiner.on("\n");
-		assertEquals(nlJoiner.join(expected), nlJoiner.join(actual));
+	static void assertListsEquals(List<String> expected, List<String> actual) {
+		assertEquals(String.join("\n", expected), String.join("\n", actual));
 	}
 
 	@Test

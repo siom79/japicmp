@@ -1,7 +1,5 @@
 package japicmp.output.xml;
 
-import com.google.common.base.Joiner;
-import japicmp.util.Optional;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
@@ -12,6 +10,7 @@ import japicmp.output.OutputGenerator;
 import japicmp.output.extapi.jpa.JpaAnalyzer;
 import japicmp.output.extapi.jpa.model.JpaTable;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
+import japicmp.util.Optional;
 import japicmp.util.Streams;
 
 import javax.xml.bind.JAXBContext;
@@ -40,9 +39,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 	private static final String XSD_FILENAME = "japicmp.xsd";
@@ -249,7 +250,8 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 				join = "n.a.";
 			}
 		} else {
-			join = Joiner.on(";").skipNulls().join(filters);
+			join = filters.stream().filter(Objects::nonNull).map(Filter::toString)
+					.collect(Collectors.joining(";"));
 		}
 		return join;
 	}

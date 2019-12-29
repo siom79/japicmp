@@ -1,10 +1,5 @@
 package japicmp.test.output.stdout;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.base.Splitter;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -14,6 +9,8 @@ import japicmp.output.stdout.StdoutOutputGenerator;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static japicmp.test.util.Helper.getArchive;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -43,13 +40,7 @@ public class StdoutOutputGeneratorTest {
 	}
 
 	private void assertNoToStringModel(String string) {
-		ImmutableList<String> toString = FluentIterable.from(Splitter.on("\n").split(string)).filter(new Predicate<String>() {
-			@Override
-			public boolean apply(String input) {
-				return input.contains("japicmp.model.");
-			}
-		}).toList();
-		assertEquals("", Joiner.on("\n").join(toString));
+		assertEquals("", Stream.of(string.split("\n")).filter(input -> input.contains("japicmp.model.")).collect(Collectors.joining("\n")));
 	}
 
 	@Test

@@ -1,6 +1,5 @@
 package japicmp.test.output.xml;
 
-import com.google.common.io.Files;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
@@ -19,6 +18,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -73,15 +74,8 @@ public class XmlOutputGeneratorTest {
 
 	@Test
 	public void htmlFileNotContainsPackageSemver001() throws IOException {
-		List<String> lines = Files.readLines(htmlFile, Charset.forName("UTF-8"));
-		boolean containsPackageName = false;
-		for (String line : lines) {
-			if (line.contains(JAPICMP_TEST_SEMVER001)) {
-				containsPackageName = true;
-				break;
-			}
-		}
-		assertThat(containsPackageName, is(false));
+		assertThat(Files.lines(htmlFile.toPath(), StandardCharsets.UTF_8)
+				.anyMatch(line -> line.contains(JAPICMP_TEST_SEMVER001)), is(false));
 	}
 
 	@Test

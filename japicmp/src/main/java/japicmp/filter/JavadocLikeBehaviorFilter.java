@@ -1,6 +1,5 @@
 package japicmp.filter;
 
-import com.google.common.base.Splitter;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.SignatureParser;
 import javassist.CtBehavior;
@@ -9,6 +8,8 @@ import javassist.CtClass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JavadocLikeBehaviorFilter implements BehaviorFilter {
 	private final String filterString;
@@ -47,7 +48,7 @@ public class JavadocLikeBehaviorFilter implements BehaviorFilter {
 		methodPattern = Pattern.compile(methodName);
 		String paramList = methodPart.substring(indexOpeningBracket + 1, indexClosingBracket);
 		if (paramList.length() > 0) {
-			for (String param : Splitter.on(",").trimResults().omitEmptyStrings().split(paramList)) {
+			for (String param : Stream.of(paramList.split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList())) {
 				param = param.replaceAll("\\s+", "");
 				parameterPatterns.add(Pattern.compile(param));
 			}

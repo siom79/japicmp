@@ -34,7 +34,7 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 	 * Returns the {@link japicmp.model.JApiClass} representation of this superclass.
 	 * The return value is Optional.absent() in case the superclass for the old and new version is absent.
 	 *
-	 * @return the {@link japicmp.model.JApiClass} representation of this superclass as {@link com.google.common.base.Optional}
+	 * @return the {@link japicmp.model.JApiClass} representation of this superclass as {@link japicmp.util.Optional}
 	 */
 	public Optional<JApiClass> getJApiClass() {
 		if (oldSuperclassOptional.isPresent() && newSuperclassOptional.isPresent()) {

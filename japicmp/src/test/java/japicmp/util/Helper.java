@@ -1,6 +1,5 @@
 package japicmp.util;
 
-import com.google.common.base.Joiner;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -80,7 +79,8 @@ public class Helper {
 				}
 			}
 		}
-		throw new IllegalArgumentException("No constructor found with parameters " + Joiner.on(",").join(parameterTypes) + ".");
+		throw new IllegalArgumentException("No constructor found with parameters "
+				+ String.join(",", parameterTypes) + ".");
 	}
 
 	public static Matcher<JApiClass> hasJApiMethodWithName(final String methodName) {

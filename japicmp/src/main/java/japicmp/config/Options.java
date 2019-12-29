@@ -1,9 +1,5 @@
 package japicmp.config;
 
-import com.google.common.base.Joiner;
-import japicmp.util.Optional;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
 import japicmp.cli.CliParser;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
@@ -17,15 +13,19 @@ import japicmp.filter.JavadocLikeBehaviorFilter;
 import japicmp.filter.JavadocLikeFieldFilter;
 import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.AccessModifier;
+import japicmp.util.Optional;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Options {
 	private static final Logger LOGGER = Logger.getLogger(Options.class.getName());
@@ -183,11 +183,11 @@ public class Options {
 	}
 
 	public List<Filter> getIncludes() {
-		return ImmutableList.copyOf(includes);
+		return Collections.unmodifiableList(includes);
 	}
 
 	public List<Filter> getExcludes() {
-		return ImmutableList.copyOf(excludes);
+		return Collections.unmodifiableList(excludes);
 	}
 
 	public void addExcludeFromArgument(Optional<String> packagesExcludeArg, boolean excludeExclusively) {
@@ -199,7 +199,7 @@ public class Options {
 	}
 
 	public List<Filter> createFilterList(Optional<String> argumentString, List<Filter> filters, String errorMessage, boolean exclusive) {
-		for (String filterString : Splitter.on(";").trimResults().omitEmptyStrings().split(argumentString.or(""))) {
+		for (String filterString : Stream.of(argumentString.or("").split(";")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList())) {
 			try {
 				// filter based on annotations
 				if (filterString.startsWith("@")) {
@@ -314,18 +314,17 @@ public class Options {
 	}
 
 	public String getDifferenceDescription() {
-		Joiner joiner = Joiner.on(";");
 		StringBuilder sb = new StringBuilder()
 				.append("Comparing ")
 				.append(isOutputOnlyBinaryIncompatibleModifications() ? "binary" :"source")
 				.append(" compatibility of ");
-		sb.append(joiner.join(toPathList(newArchives)));
+		sb.append(joinPaths(newArchives));
 		sb.append(" against ");
-		sb.append(joiner.join(toPathList(oldArchives)));
+		sb.append(joinPaths(oldArchives));
 		return sb.toString();
 	}
 
-	private List<String> toPathList(List<JApiCmpArchive> archives) {
+	private String joinPaths(List<JApiCmpArchive> archives) {
 		List<String> paths = new ArrayList<>(archives.size());
 		for (JApiCmpArchive archive : archives) {
 			if (this.reportOnlyFilename) {
@@ -334,10 +333,10 @@ public class Options {
 				paths.add(archive.getFile().getAbsolutePath());
 			}
 		}
-		return paths;
+		return String.join(";", paths);
 	}
 
-	private List<String> toVersionList(List<JApiCmpArchive> archives) {
+	private String joinVersions(List<JApiCmpArchive> archives) {
 		List<String> versions = new ArrayList<>(archives.size());
 		for (JApiCmpArchive archive : archives) {
 			String stringVersion = archive.getVersion().getStringVersion();
@@ -345,12 +344,11 @@ public class Options {
 				versions.add(stringVersion);
 			}
 		}
-		return versions;
+		return String.join(";", versions);
 	}
 
 	public String joinOldArchives() {
-		Joiner joiner = Joiner.on(";");
-		String join = joiner.join(toPathList(oldArchives));
+		String join = joinPaths(oldArchives);
 		if (join.trim().length() == 0) {
 			return N_A;
 		}
@@ -358,8 +356,7 @@ public class Options {
 	}
 
 	public String joinNewArchives() {
-		Joiner joiner = Joiner.on(";");
-		String join = joiner.join(toPathList(newArchives));
+		String join = joinPaths(newArchives);
 		if (join.trim().length() == 0) {
 			return N_A;
 		}
@@ -367,8 +364,7 @@ public class Options {
 	}
 
 	public String joinOldVersions() {
-		Joiner joiner = Joiner.on(";");
-		String join = joiner.join(toVersionList(oldArchives));
+		String join = joinVersions(oldArchives);
 		if (join.trim().length() == 0) {
 			return N_A;
 		}
@@ -376,8 +372,7 @@ public class Options {
 	}
 
 	public String joinNewVersions() {
-		Joiner joiner = Joiner.on(";");
-		String join = joiner.join(toVersionList(newArchives));
+		String join = joinVersions(newArchives);
 		if (join.trim().length() == 0) {
 			return N_A;
 		}

@@ -1,6 +1,5 @@
 package japicmp.output;
 
-import com.google.common.collect.ImmutableList;
 import japicmp.config.Options;
 import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiChangeStatus;
@@ -13,6 +12,7 @@ import japicmp.model.JApiMethod;
 import japicmp.model.JApiSuperclass;
 import japicmp.util.ModifierHelper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -162,7 +162,7 @@ public class OutputFilter extends Filter {
 				boolean remove = false;
 				if (options.isOutputOnlyModifications()) {
 					if (jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED && jApiClass.isSourceCompatible()) {
-						ImmutableList<Boolean> list = findOneChangedElement(jApiClass);
+						List<Boolean> list = findOneChangedElement(jApiClass);
 						if (list.isEmpty()) { //filter out this class if it does not have any changed element (e.g. annotations)
 							remove = true;
 						}
@@ -187,8 +187,8 @@ public class OutputFilter extends Filter {
 				}
 			}
 
-			private ImmutableList<Boolean> findOneChangedElement(JApiClass jApiClass) {
-				final ImmutableList.Builder<Boolean> builder = ImmutableList.builder();
+			private List<Boolean> findOneChangedElement(JApiClass jApiClass) {
+				final List<Boolean> builder = new ArrayList<>();
 				Filter.filter(Collections.singletonList(jApiClass), new FilterVisitor() {
 					@Override
 					public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
@@ -251,7 +251,7 @@ public class OutputFilter extends Filter {
 						}
 					}
 				});
-				return builder.build();
+				return Collections.unmodifiableList(builder);
 			}
 		});
 	}

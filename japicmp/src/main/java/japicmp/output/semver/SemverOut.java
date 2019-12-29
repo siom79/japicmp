@@ -1,6 +1,5 @@
 package japicmp.output.semver;
 
-import com.google.common.collect.ImmutableSet;
 import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiAnnotation;
@@ -18,6 +17,8 @@ import japicmp.output.Filter;
 import japicmp.output.OutputGenerator;
 import japicmp.util.ModifierHelper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class SemverOut extends OutputGenerator<String> {
 
 	@Override
 	public String generate() {
-		final ImmutableSet.Builder<JApiSemanticVersionLevel> builder = ImmutableSet.builder();
+		final List<JApiSemanticVersionLevel> builder = new ArrayList<>();
 		Filter.filter(jApiClasses, new Filter.FilterVisitor() {
 			@Override
 			public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
@@ -73,7 +74,7 @@ public class SemverOut extends OutputGenerator<String> {
 				builder.add(signs(jApiSuperclass));
 			}
 		});
-		ImmutableSet<JApiSemanticVersionLevel> build = builder.build();
+		List<JApiSemanticVersionLevel> build = Collections.unmodifiableList(builder);
 		if (build.contains(JApiSemanticVersionLevel.MAJOR)) {
 			return "1.0.0";
 		} else if (build.contains(JApiSemanticVersionLevel.MINOR)) {

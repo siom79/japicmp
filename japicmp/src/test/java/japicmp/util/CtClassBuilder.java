@@ -1,6 +1,5 @@
 package japicmp.util;
 
-import com.google.common.base.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.Modifier;
@@ -11,13 +10,14 @@ import javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CtClassBuilder {
 	public static final String DEFAULT_CLASS_NAME = "japicmp.Test";
 	private String name = DEFAULT_CLASS_NAME;
 	private int modifier = Modifier.PUBLIC;
 	private final List<String> annotations = new ArrayList<>();
-	private Optional<CtClass> superclass = Optional.absent();
+	private Optional<CtClass> superclass = Optional.empty();
 	private final List<CtClass> interfaces = new ArrayList<>();
 
 	public CtClassBuilder name(String name) {
