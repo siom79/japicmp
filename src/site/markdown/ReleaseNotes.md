@@ -2,6 +2,13 @@
 
 The following versions of japicmp are available:
 
+##0.14.4 (2020-10-17)##
+* New compatibility change METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION. [#263](https://github.com/siom79/japicmp/issues/263)
+* More detailed output message when skipping the build. [#273](https://github.com/siom79/japicmp/issues/273)
+* StdoutOutputGenerator prints modified superclasses if outputOnlyModifications=false. [#272](https://github.com/siom79/japicmp/issues/272)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.14.4).
+
 ##0.14.3 (2019-12-24)##
 * METHOD_REMOVED_IN_SUPERCLASS is no longer reported if method is moved from superclass to superclass of superclass. [#253](https://github.com/siom79/japicmp/issues/253)
 * Added METHOD_ADDED_TO_PUBLIC_CLASS as a new compatibility check. [#241](https://github.com/siom79/japicmp/issues/241)
