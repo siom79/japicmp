@@ -367,8 +367,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
 		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
-		if (!options.isOutputOnlyModifications() || (jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED
-				|| jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED)) {
+		if (!options.isOutputOnlyModifications() || jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 			sb.append(tabs(1)).append(signs(jApiSuperclass)).append(" ").append(jApiSuperclass.getChangeStatus()).append(" SUPERCLASS: ").append(superclassChangeAsString(jApiSuperclass)).append("\n");
 		}
 	}
