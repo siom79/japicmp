@@ -128,9 +128,12 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	Optional<XmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
-		if (pluginParameters.getSkipParam()
-			|| isPomModuleNeedingSkip(pluginParameters, mavenParameters)) {
+		if (pluginParameters.getSkipParam()) {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
+			return Optional.absent();
+		}
+		if (isPomModuleNeedingSkip(pluginParameters, mavenParameters)) {
+			getLog().info("Skipping execution because parameter 'skipPomModules' was set to true and this is artifact is of type pom.");
 			return Optional.absent();
 		}
 		if (skipModule(pluginParameters, mavenParameters)) {
