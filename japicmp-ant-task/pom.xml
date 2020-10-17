@@ -24,7 +24,7 @@
 	</licenses>
 
 	<properties>
-		<ant.version>1.9.5</ant.version>
+		<ant.version>1.9.15</ant.version>
 	</properties>
 
 	<dependencies>
