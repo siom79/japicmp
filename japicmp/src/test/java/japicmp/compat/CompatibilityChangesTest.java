@@ -1245,6 +1245,34 @@ public class CompatibilityChangesTest {
 		assertThat(method.isSourceCompatible(), is(false));
 		assertThat(method.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION));
 	}
+	
+	@Test
+	public void testMethodNoLongerThrowsNewCheckedException() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").exceptions(new CtClass[] {classPool.get("java.lang.Exception")}).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+			
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiMethod method = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(method.getExceptions().size(), Is.is(1));
+		assertThat(method.getExceptions().get(0).getChangeStatus(), Is.is(JApiChangeStatus.REMOVED));
+		assertThat(method.getExceptions().get(0).isCheckedException(), Is.is(true));
+		assertThat(method.isBinaryCompatible(), is(true));
+		assertThat(method.isSourceCompatible(), is(false));
+		assertThat(method.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION));
+	}
 
 	@Test
 	public void testMethodThrowsNewRuntimeException() throws Exception {

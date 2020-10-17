@@ -491,6 +491,9 @@ public class CompatibilityChanges {
 			if (exception.getChangeStatus() == JApiChangeStatus.NEW && exception.isCheckedException() && method.getChangeStatus() != JApiChangeStatus.NEW) {
 				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION);
 			}
+			if (exception.getChangeStatus() == JApiChangeStatus.REMOVED && exception.isCheckedException() && method.getChangeStatus() != JApiChangeStatus.REMOVED) {
+				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION);
+			}
 		}
 	}
 

@@ -283,6 +283,7 @@ for each check. This allows you to customize the following verifications:
 | METHOD_ADDED_TO_INTERFACE | true | false | MINOR |
 | METHOD_ADDED_TO_PUBLIC_CLASS | true | true | PATCH |
 | METHOD_NOW_THROWS_CHECKED_EXCEPTION | true | false | MINOR |
+| METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION | true | false | MINOR |
 | METHOD_ABSTRACT_ADDED_TO_CLASS | true | false | MINOR |
 | METHOD_ABSTRACT_ADDED_IN_SUPERCLASS | true | false | MINOR |
 | METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE | true | false | MINOR |

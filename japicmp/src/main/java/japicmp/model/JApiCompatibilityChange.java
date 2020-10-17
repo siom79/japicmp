@@ -31,6 +31,7 @@ public enum JApiCompatibilityChange {
 	METHOD_ADDED_TO_INTERFACE(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_ADDED_TO_PUBLIC_CLASS(true, true, JApiSemanticVersionLevel.PATCH),
 	METHOD_NOW_THROWS_CHECKED_EXCEPTION(true, false, JApiSemanticVersionLevel.MINOR),
+	METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_ABSTRACT_ADDED_TO_CLASS(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_ABSTRACT_ADDED_IN_SUPERCLASS(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE(true, false, JApiSemanticVersionLevel.MINOR),
