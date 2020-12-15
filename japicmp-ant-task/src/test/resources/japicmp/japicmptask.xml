@@ -44,7 +44,7 @@
       <fileset file="${japicmp.current.jar}"/>
     </path>
 
-    <get src="http://central.maven.org/maven2/com/github/siom79/japicmp/japicmp/${japicmp.version}/${japicmp.jar}"
+    <get src="https://repo1.maven.org/maven2/com/github/siom79/japicmp/japicmp/${japicmp.version}/${japicmp.jar}"
          dest="${japicmp.reference.jar}" usetimestamp="true" skipexisting="true"/>
 
     <taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
