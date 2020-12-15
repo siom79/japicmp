@@ -31,7 +31,7 @@ import static japicmp.util.Helper.getJApiMethod;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CompatibilityChangesTest {
 
@@ -1650,5 +1650,55 @@ public class CompatibilityChangesTest {
 		jApiClass = getJApiClass(jApiClasses, "japicmp.C");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS)));
+	}
+	
+	@Test
+	public void testAddDefaultMethodToInterface() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass aInterface = CtInterfaceBuilder.create().name("japicmp.I").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.C").implementsInterface(aInterface).addToClassPool(classPool);
+				return Arrays.asList(aInterface, aClass);
+			}
+			
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass aInterface = CtInterfaceBuilder.create().name("japicmp.I").addToClassPool(classPool);
+				CtMethodBuilder.create().name("defaultMethod").returnType(CtClass.booleanType).body("return true;").addToClass(aInterface);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.C").implementsInterface(aInterface).addToClassPool(classPool);
+				return Arrays.asList(aInterface, aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.C");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE));
+	}
+	
+	@Test
+	public void testAddAbstractMethodToInterface() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass aInterface = CtInterfaceBuilder.create().name("japicmp.I").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.C").implementsInterface(aInterface).addToClassPool(classPool);
+				return Arrays.asList(aInterface, aClass);
+			}
+			
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass aInterface = CtInterfaceBuilder.create().name("japicmp.I").addToClassPool(classPool);
+				CtMethodBuilder.create().abstractMethod().name("defaultMethod").returnType(CtClass.booleanType).addToClass(aInterface);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.C").implementsInterface(aInterface).addToClassPool(classPool);
+				return Arrays.asList(aInterface, aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.C");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE));
 	}
 }

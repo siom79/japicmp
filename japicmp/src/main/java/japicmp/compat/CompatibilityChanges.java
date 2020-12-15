@@ -748,6 +748,7 @@ public class CompatibilityChanges {
 	private void checkIfAbstractMethodAddedInSuperclass(final JApiClass jApiClass, Map<String, JApiClass> classMap) {
 		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
 			final List<JApiMethod> abstractMethods = new ArrayList<>();
+			final List<JApiMethod> defaultMethods = new ArrayList<>();
 			final List<JApiMethod> implementedMethods = new ArrayList<>();
 			final List<JApiImplementedInterface> implementedInterfaces = new ArrayList<>();
 			for (JApiMethod jApiMethod : jApiClass.getMethods()) {
@@ -774,7 +775,14 @@ public class CompatibilityChanges {
 							}
 							if (!isImplemented) {
 								if (jApiMethod.getChangeStatus() == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.MODIFIED) {
-									abstractMethods.add(jApiMethod);
+									if (jApiMethod.getAbstractModifier().getNewModifier().isPresent()) {
+										AbstractModifier abstractModifier = jApiMethod.getAbstractModifier().getNewModifier().get();
+										if (abstractModifier == AbstractModifier.ABSTRACT) {
+											abstractMethods.add(jApiMethod);
+										} else {
+											defaultMethods.add(jApiMethod);
+										}
+									}
 								}
 							}
 						}
@@ -783,6 +791,7 @@ public class CompatibilityChanges {
 					return 0;
 				}
 			});
+			implementedInterfaces.addAll(jApiClass.getInterfaces());
 			if (abstractMethods.size() > 0) {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_SUPERCLASS);
 			}
@@ -803,13 +812,23 @@ public class CompatibilityChanges {
 					}
 					if (!isImplemented) {
 						if (method.getChangeStatus() == JApiChangeStatus.NEW || jApiImplementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
-							abstractMethods.add(method);
+							if (method.getAbstractModifier().getNewModifier().isPresent()) {
+								AbstractModifier abstractModifier = method.getAbstractModifier().getNewModifier().get();
+								if (abstractModifier == AbstractModifier.ABSTRACT) {
+									abstractMethods.add(method);
+								} else {
+									defaultMethods.add(method);
+								}
+							}
 						}
 					}
 				}
 			}
-			if (abstractMethods.size() > 0) {
+			if (!abstractMethods.isEmpty()) {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
+			}
+			if (!defaultMethods.isEmpty()) {
+				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
 		}
 	}
