@@ -19,19 +19,9 @@ import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import japicmp.util.Optional;
 import japicmp.versioning.SemanticVersion;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -41,27 +31,26 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+//https://cwiki.apache.org/confluence/display/MAVEN/Migrating+from+org.sonatype.aether+to+Apache+Maven+Resolver
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.*;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,7 +95,11 @@ public class JApiCmpMojo extends AbstractMojo {
 	@Component
 	private ArtifactFactory artifactFactory;
 	@Component
-	private ArtifactResolver artifactResolver;
+	private RepositorySystem repoSystem;
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+	private RepositorySystemSession repoSession;
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+	private List<RemoteRepository> remoteRepos;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${localRepository}")
 	private ArtifactRepository localRepository;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteArtifactRepositories}")
@@ -122,8 +115,12 @@ public class JApiCmpMojo extends AbstractMojo {
 	private Options options;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		MavenParameters mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
-		PluginParameters pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.of(projectBuildDir), Optional.<String>absent(), true, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
+		MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories, this.artifactFactory, this.localRepository,
+				this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.metadataSource, this.repoSystem, this.repoSession,
+				this.remoteRepos);
+		PluginParameters pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.of(
+				this.projectBuildDir), Optional.<String>absent(), true, this.oldVersions, this.newVersions, this.oldClassPathDependencies,
+				this.newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
@@ -250,39 +247,36 @@ public class JApiCmpMojo extends AbstractMojo {
 		OLD, NEW
 	}
 
-	private Artifact getComparisonArtifact(MavenParameters mavenParameters, PluginParameters pluginParameters) throws MojoFailureException, MojoExecutionException {
-		VersionRange versionRange;
+	private Artifact getComparisonArtifact(final MavenParameters mavenParameters, final PluginParameters pluginParameters) throws MojoFailureException, MojoExecutionException {
+		MavenProject mavenProject = mavenParameters.getMavenProject();
+		DefaultArtifact artifactVersionRange = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), null, mavenParameters.getVersionRangeWithProjectVersion());
+		VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifactVersionRange, mavenParameters.getRemoteRepos(), null);
 		try {
-			versionRange = VersionRange.createFromVersionSpec(mavenParameters.getVersionRangeWithProjectVersion());
-		} catch (InvalidVersionSpecificationException e) {
-			throw new MojoFailureException("Invalid version versionRange: " + e.getMessage(), e);
-		}
-		Artifact previousArtifact;
-		try {
-			MavenProject project = mavenParameters.getMavenProject();
-			previousArtifact = mavenParameters.getArtifactFactory().createDependencyArtifact(project.getGroupId(), project.getArtifactId(), versionRange, project.getPackaging(), null, Artifact.SCOPE_COMPILE);
-			if (!previousArtifact.getVersionRange().isSelectedVersionKnown(previousArtifact)) {
-				getLog().debug("Searching for versions in versionRange: " + previousArtifact.getVersionRange());
-				List<ArtifactVersion> availableVersions = mavenParameters.getMetadataSource().retrieveAvailableVersions(previousArtifact, mavenParameters.getLocalRepository(), project.getRemoteArtifactRepositories());
-				filterSnapshots(availableVersions);
-				filterVersionPattern(availableVersions, pluginParameters);
-				ArtifactVersion version = versionRange.matchVersion(availableVersions);
-				if (version != null) {
-					previousArtifact.selectVersion(version.toString());
+			VersionRangeResult versionRangeResult = mavenParameters.getRepoSystem()
+					.resolveVersionRange(mavenParameters.getRepoSession(), versionRangeRequest);
+			List<org.eclipse.aether.version.Version> versions = versionRangeResult.getVersions();
+			filterSnapshots(versions);
+			filterVersionPattern(versions, pluginParameters);
+			if (!versions.isEmpty()) {
+				DefaultArtifact artifactVersion = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), null,
+						versions.get(versions.size()-1).toString());
+				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
+				ArtifactResult artifactResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), artifactRequest);
+				if (artifactResult.isMissing() || (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty())){
+					throw new MojoFailureException("Could not resolve artifact: " + artifactVersion);
 				}
+				return artifactResult.getArtifact();
+			} else {
+				throw new MojoFailureException("Could not find previous version for artifact: " + artifactVersionRange.getGroupId() + ":"
+						+ artifactVersionRange.getArtifactId());
 			}
-		} catch (OverConstrainedVersionException e) {
-			throw new MojoFailureException("Invalid comparison version: " + e.getMessage(), e);
-		} catch (ArtifactMetadataRetrievalException e) {
-			throw new MojoExecutionException("Error determining previous version: " + e.getMessage(), e);
+		} catch (final VersionRangeResolutionException | ArtifactResolutionException e) {
+			getLog().error("Failed to retrieve comparison artifact: " + e.getMessage(), e);
+			throw new MojoFailureException(e.getMessage(), e);
 		}
-		if (previousArtifact.getVersion() == null) {
-			getLog().info("Unable to find a previous version of the project in the repository.");
-		}
-		return previousArtifact;
 	}
 
-	private void filterVersionPattern(List<ArtifactVersion> availableVersions, PluginParameters pluginParameters) throws MojoFailureException {
+	private void filterVersionPattern(List<org.eclipse.aether.version.Version> availableVersions, PluginParameters pluginParameters) throws MojoFailureException {
 		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getOldVersionPattern() != null) {
 			String versionPattern = pluginParameters.getParameterParam().getOldVersionPattern();
 			Pattern pattern;
@@ -291,8 +285,8 @@ public class JApiCmpMojo extends AbstractMojo {
 			} catch (PatternSyntaxException e) {
 				throw new MojoFailureException("Could not compile provided versionPattern '" + versionPattern + "' as regular expression: " + e.getMessage(), e);
 			}
-			for (Iterator<ArtifactVersion> versionIterator = availableVersions.iterator(); versionIterator.hasNext(); ) {
-				ArtifactVersion version = versionIterator.next();
+			for (Iterator<org.eclipse.aether.version.Version> versionIterator = availableVersions.iterator(); versionIterator.hasNext(); ) {
+				org.eclipse.aether.version.Version version = versionIterator.next();
 				Matcher matcher = pattern.matcher(version.toString());
 				if (!matcher.matches()) {
 					versionIterator.remove();
@@ -306,14 +300,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void filterSnapshots(List versions) {
-		for (Iterator versionIterator = versions.iterator(); versionIterator.hasNext(); ) {
-			ArtifactVersion version = (ArtifactVersion) versionIterator.next();
-			String qualifier = version.getQualifier();
-			if (qualifier != null && qualifier.endsWith("SNAPSHOT")) {
-				versionIterator.remove();
-			}
-		}
+	private void filterSnapshots(List<org.eclipse.aether.version.Version> versions) {
+		versions.removeIf(version -> version.toString() != null && version.toString().endsWith("SNAPSHOT"));
 	}
 
 	private void populateArchivesListsFromParameters(PluginParameters pluginParameters, MavenParameters mavenParameters, List<JApiCmpArchive> oldArchives, List<JApiCmpArchive> newArchives) throws MojoFailureException {
@@ -331,7 +319,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			try {
 				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters, pluginParameters);
 				if (comparisonArtifact.getVersion() != null) {
-					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, mavenParameters, false, pluginParameters, ConfigurationVersion.OLD);
+					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, mavenParameters, pluginParameters, ConfigurationVersion.OLD);
 					for (Artifact artifact : artifacts) {
 						File file = artifact.getFile();
 						if (file != null) {
@@ -356,49 +344,26 @@ public class JApiCmpMojo extends AbstractMojo {
 			}
 		}
 		if (pluginParameters.getNewVersionParam() == null && pluginParameters.getNewVersionsParam() == null) {
-			if (mavenParameters.getMavenProject() != null && mavenParameters.getMavenProject().getArtifact() != null) {
-				Artifact artifact = mavenParameters.getMavenProject().getArtifact();
-				File file = artifact.getFile();
-				if (file != null) {
-					try (JarFile jarFile = new JarFile(file)) {
-						getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
-						newArchives.add(new JApiCmpArchive(file, guessVersion(file)));
-					} catch (IOException e) {
-						getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage(), e);
-					}
-				} else {
-					// maven projects with e.g. packaging type ejb don't have a file -> try to resolve artifact through
-					// ArtifactHandler
-					if (artifact.getArtifactHandler() != null) {
-						try {
-							VersionRange versionSpec = VersionRange.createFromVersionSpec(artifact.getVersion());
-							Artifact dependencyArtifact = mavenParameters.getArtifactFactory().createDependencyArtifact(artifact.getGroupId(), artifact.getArtifactId(), versionSpec, artifact.getArtifactHandler().getExtension(), null, null);
-							Set<Artifact> artifacts = resolveArtifact(dependencyArtifact, mavenParameters, false, pluginParameters, ConfigurationVersion.NEW);
-							for (Artifact a : artifacts) {
-								file = a.getFile();
-								if (file != null) {
-									if (!file.isFile()) {
-										getLog().info("No new version specified and artifact is not a file (" + file.getAbsolutePath() + ").");
-										continue;
-									}
-									try (JarFile jarFile = new JarFile(file)) {
-										getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
-										newArchives.add(new JApiCmpArchive(file, guessVersion(file)));
-									} catch (IOException e) {
-										getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage(), e);
-									}
-								}
-							}
-						} catch (InvalidVersionSpecificationException e) {
-							getLog().error("Failed to obtain file for artifact " + artifact + ": " + e.getMessage(), e);
+			MavenProject mavenProject = mavenParameters.getMavenProject();
+			if (mavenProject != null && mavenProject.getArtifact() != null) {
+				DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), null, mavenProject.getVersion());
+				Set<Artifact> artifacts = resolveArtifact(defaultArtifact, mavenParameters, pluginParameters, ConfigurationVersion.NEW);
+				for (Artifact artifact : artifacts) {
+					File file = artifact.getFile();
+					if (file != null) {
+						try (JarFile jarFile = new JarFile(file)) {
+							getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
+							newArchives.add(new JApiCmpArchive(file, guessVersion(file)));
+						} catch (IOException e) {
+							getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage(), e);
 						}
 					} else {
-						getLog().warn("Artifact " + artifact + " does not have an ArtifactHandler. Cannot resolve artifact automatically.");
+						getLog().warn("Artifact " + artifact + " does not have a file. Cannot resolve artifact automatically.");
 					}
 				}
 			}
 		}
-		if (oldArchives.size() == 0) {
+		if (oldArchives.isEmpty()) {
 			String message = "Please provide at least one resolvable old version using one of the configuration elements <oldVersion/> or <oldVersions/>.";
 			if (ignoreMissingArtifact(pluginParameters, ConfigurationVersion.OLD)) {
 				getLog().warn(message);
@@ -406,7 +371,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				throw new MojoFailureException(message);
 			}
 		}
-		if (newArchives.size() == 0) {
+		if (newArchives.isEmpty()) {
 			String message = "Please provide at least one resolvable new version using one of the configuration elements <newVersion/> or <newVersions/>.";
 			if (ignoreMissingArtifact(pluginParameters, ConfigurationVersion.NEW)) {
 				getLog().warn(message);
@@ -435,10 +400,10 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (!parameterParam.isBreakBuildIfCausedByExclusion()) {
 			options.setErrorOnExclusionIncompatibility(false);
 		}
-		if (parameter != null && parameter.getIgnoreMissingOldVersion()) {
+		if (this.parameter != null && this.parameter.getIgnoreMissingOldVersion()) {
 			options.setIgnoreMissingOldVersion(true);
 		}
-		if (parameter != null && parameter.getIgnoreMissingNewVersion()) {
+		if (this.parameter != null && this.parameter.getIgnoreMissingNewVersion()) {
 			options.setIgnoreMissingNewVersion(true);
 		}
 
@@ -461,62 +426,62 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero(Parameter parameterParam) {
 		boolean retVal = false;
-		if (parameter != null) {
-			retVal = parameter.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero();
+		if (this.parameter != null) {
+			retVal = this.parameter.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero();
 		}
-		return retVal || breakBuildBasedOnSemanticVersioningForMajorVersionZero;
+		return retVal || this.breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 	}
 
 	Options getOptions(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
-		if (options != null) {
-			return options;
+		if (this.options != null) {
+			return this.options;
 		}
-		options = Options.newDefault();
-		populateArchivesListsFromParameters(pluginParameters, mavenParameters, options.getOldArchives(), options.getNewArchives());
+		this.options = Options.newDefault();
+		populateArchivesListsFromParameters(pluginParameters, mavenParameters, this.options.getOldArchives(), this.options.getNewArchives());
 		Parameter parameterParam = pluginParameters.getParameterParam();
 		if (parameterParam != null) {
 			String accessModifierArg = parameterParam.getAccessModifier();
 			if (accessModifierArg != null) {
 				try {
 					AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
-					options.setAccessModifier(accessModifier);
+					this.options.setAccessModifier(accessModifier);
 				} catch (IllegalArgumentException e) {
 					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()), e);
 				}
 			}
-			options.setOutputOnlyBinaryIncompatibleModifications(parameterParam.getOnlyBinaryIncompatible());
-			options.setOutputOnlyModifications(parameterParam.getOnlyModified());
+			this.options.setOutputOnlyBinaryIncompatibleModifications(parameterParam.getOnlyBinaryIncompatible());
+			this.options.setOutputOnlyModifications(parameterParam.getOnlyModified());
 
 			List<String> excludes = parameterParam.getExcludes();
 			if (excludes != null) {
 				for (String exclude : excludes) {
-					options.addExcludeFromArgument(Optional.fromNullable(exclude), parameterParam.isExcludeExclusively());
+					this.options.addExcludeFromArgument(Optional.fromNullable(exclude), parameterParam.isExcludeExclusively());
 				}
 			}
 			List<String> includes = parameterParam.getIncludes();
 			if (includes != null) {
 				for (String include : includes) {
-					options.addIncludeFromArgument(Optional.fromNullable(include), parameterParam.isIncludeExlusively());
+					this.options.addIncludeFromArgument(Optional.fromNullable(include), parameterParam.isIncludeExlusively());
 				}
 			}
-
-			options.setIncludeSynthetic(parameterParam.getIncludeSynthetic());
-			options.setIgnoreMissingClasses(parameterParam.getIgnoreMissingClasses());
+			
+			this.options.setIncludeSynthetic(parameterParam.getIncludeSynthetic());
+			this.options.setIgnoreMissingClasses(parameterParam.getIgnoreMissingClasses());
 
 			List<String> ignoreMissingClassesByRegularExpressions = parameterParam.getIgnoreMissingClassesByRegularExpressions();
 			if (ignoreMissingClassesByRegularExpressions != null) {
 				for (String ignoreMissingClassRegularExpression : ignoreMissingClassesByRegularExpressions) {
-					options.addIgnoreMissingClassRegularExpression(ignoreMissingClassRegularExpression);
+					this.options.addIgnoreMissingClassRegularExpression(ignoreMissingClassRegularExpression);
 				}
 			}
 			String htmlStylesheet = parameterParam.getHtmlStylesheet();
 			if (htmlStylesheet != null) {
-				options.setHtmlStylesheet(Optional.of(htmlStylesheet));
+				this.options.setHtmlStylesheet(Optional.of(htmlStylesheet));
 			}
-			options.setNoAnnotations(parameterParam.getNoAnnotations());
-			options.setReportOnlyFilename(parameterParam.isReportOnlyFilename());
+			this.options.setNoAnnotations(parameterParam.getNoAnnotations());
+			this.options.setReportOnlyFilename(parameterParam.isReportOnlyFilename());
 		}
-		return options;
+		return this.options;
 	}
 
 	private boolean breakBuildOnModificationsParameter(Parameter parameterParam) {
@@ -524,7 +489,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (parameterParam != null) {
 			retVal = parameterParam.getBreakBuildOnModifications();
 		}
-		return retVal || breakBuildOnModifications;
+		return retVal || this.breakBuildOnModifications;
 	}
 
 	private boolean breakBuildOnBinaryIncompatibleModifications(Parameter parameterParam) {
@@ -532,7 +497,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (parameterParam != null) {
 			retVal = parameterParam.getBreakBuildOnBinaryIncompatibleModifications();
 		}
-		return retVal || breakBuildOnBinaryIncompatibleModifications;
+		return retVal || this.breakBuildOnBinaryIncompatibleModifications;
 	}
 
 	private boolean breakBuildOnSourceIncompatibleModifications(Parameter parameter) {
@@ -540,7 +505,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (parameter != null) {
 			retVal = parameter.getBreakBuildOnSourceIncompatibleModifications();
 		}
-		return retVal || breakBuildOnSourceIncompatibleModifications;
+		return retVal || this.breakBuildOnSourceIncompatibleModifications;
 	}
 
 	private boolean breakBuildBasedOnSemanticVersioning(Parameter parameter) {
@@ -548,7 +513,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (parameter != null) {
 			retVal = parameter.getBreakBuildBasedOnSemanticVersioning();
 		}
-		return retVal || breakBuildBasedOnSemanticVersioning;
+		return retVal || this.breakBuildBasedOnSemanticVersioning;
 	}
 
 	private File createJapiCmpBaseDir(PluginParameters pluginParameters) throws MojoFailureException {
@@ -625,7 +590,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (pluginParameters.getParameterParam() != null) {
 			skipReport = pluginParameters.getParameterParam().getSkipHtmlReport();
 		}
-		return skipReport || skipHtmlReport;
+		return skipReport || this.skipHtmlReport;
 	}
 
 	private boolean skipXmlReport(PluginParameters pluginParameters) {
@@ -633,7 +598,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (pluginParameters.getParameterParam() != null) {
 			skipReport = pluginParameters.getParameterParam().getSkipXmlReport();
 		}
-		return skipReport || skipXmlReport;
+		return skipReport || this.skipXmlReport;
 	}
 
 	private String createFilename(MavenParameters mavenParameters) {
@@ -704,47 +669,52 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		notNull(mavenParameters.getMavenProject(), "Maven parameter mavenProject should be provided by maven container.");
-		Set<Artifact> dependencyArtifacts = mavenParameters.getMavenProject().getArtifacts();
-		Set<String> classPathEntries = new HashSet<>();
-		for (Artifact artifact : dependencyArtifacts) {
-			String scope = artifact.getScope();
-			if (!"test".equals(scope)) {
-				Set<Artifact> artifacts = resolveArtifact(artifact, mavenParameters, false, pluginParameters, configurationVersion);
-				for (Artifact resolvedArtifact : artifacts) {
-					File resolvedFile = resolvedArtifact.getFile();
-					if (resolvedFile != null) {
-						String absolutePath = resolvedFile.getAbsolutePath();
-						if (!classPathEntries.contains(absolutePath)) {
-							if (getLog().isDebugEnabled()) {
-								getLog().debug("Adding to classpath: " + absolutePath + "; scope: " + scope);
-							}
-							classPathEntries.add(absolutePath);
+		MavenProject mavenProject = mavenParameters.getMavenProject();
+		notNull(mavenProject, "Maven parameter mavenProject should be provided by maven container.");
+		CollectRequest request = new CollectRequest();
+		DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(), mavenProject.getVersion());
+		request.setRoot(new org.eclipse.aether.graph.Dependency(defaultArtifact, "compile"));
+		try {
+			DependencyResult dependencyResult = mavenParameters.getRepoSystem().resolveDependencies(mavenParameters.getRepoSession(), new DependencyRequest(
+					request, new DependencyFilter() {
+				@Override
+				public boolean accept(final DependencyNode node, final List<DependencyNode> parents) {
+					return !"test".equalsIgnoreCase(node.getDependency().getScope());
+				}
+			}));
+			Set<String> classPathEntries = new HashSet<>();
+			for (ArtifactResult artifactResult : dependencyResult.getArtifactResults()) {
+				Artifact artifact = artifactResult.getArtifact();
+				File resolvedFile = artifact.getFile();
+				if (resolvedFile != null) {
+					String absolutePath = resolvedFile.getAbsolutePath();
+					if (!classPathEntries.contains(absolutePath)) {
+						if (getLog().isDebugEnabled()) {
+							getLog().debug("Adding to classpath: " + absolutePath);
 						}
-					} else {
-						handleMissingArtifactFile(pluginParameters, artifact);
+						classPathEntries.add(absolutePath);
 					}
+				} else {
+					handleMissingArtifactFile(pluginParameters, artifact);
 				}
 			}
-		}
-		for (String classPathEntry : classPathEntries) {
-			comparatorOptions.getClassPathEntries().add(classPathEntry);
-		}
-	}
-
-	private void handleMissingArtifactFile(PluginParameters pluginParameters, Artifact artifact) {
-		if (artifact.isOptional()) {
-			if (pluginParameters.getParameterParam().isIgnoreMissingOptionalDependency()) {
-				getLog().info("Ignoring missing optional dependency: " + toDescriptor(artifact));
-			} else {
-				getLog().warn("Could not resolve optional artifact: " + toDescriptor(artifact));
+			for (String classPathEntry : classPathEntries) {
+				comparatorOptions.getClassPathEntries().add(classPathEntry);
 			}
-		} else {
-			getLog().warn("Could not resolve artifact: " + toDescriptor(artifact));
+		} catch (final DependencyResolutionException e) {
+			throw new MojoFailureException(e.getMessage(), e);
 		}
 	}
 
-	private String toDescriptor(Artifact artifact) {
+	private void handleMissingArtifactFile(final PluginParameters pluginParameters, final Artifact artifact) {
+		if (pluginParameters.getParameterParam().isIgnoreMissingOptionalDependency()) {
+			getLog().info("Ignoring missing optional dependency: " + toDescriptor(artifact));
+		} else {
+			getLog().warn("Could not resolve optional artifact: " + toDescriptor(artifact));
+		}
+	}
+
+	private String toDescriptor(final Artifact artifact) {
 		return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
 	}
 
@@ -818,7 +788,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					handleMissingArtifactFile(pluginParameters, artifact);
 				}
 			}
-			if (jApiCmpArchives.size() == 0) {
+			if (jApiCmpArchives.isEmpty()) {
 				String message = String.format("Could not resolve dependency with descriptor '%s'.", descriptor);
 				if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
 					getLog().warn(message);
@@ -930,50 +900,51 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private Set<Artifact> resolveArtifact(Dependency dependency, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		notNull(mavenParameters.getArtifactRepositories(), "Maven parameter artifactRepositories should be provided by maven container.");
-		Artifact artifact = mavenParameters.getArtifactFactory().createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getType(), dependency.getClassifier());
-		return resolveArtifact(artifact, mavenParameters, transitively, pluginParameters, configurationVersion);
+		Artifact artifact = new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), dependency.getType(), dependency.getVersion());
+		return resolveArtifact(artifact, mavenParameters, pluginParameters, configurationVersion);
 	}
 
-	private Set<Artifact> resolveArtifact(Artifact artifact, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
+	private Set<Artifact> resolveArtifact(Artifact artifact, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		notNull(mavenParameters.getLocalRepository(), "Maven parameter localRepository should be provided by maven container.");
-		notNull(mavenParameters.getArtifactResolver(), "Maven parameter artifactResolver should be provided by maven container.");
-		ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+		notNull(mavenParameters.getRepoSystem(), "Maven parameter repoSystem should be provided by maven container.");
+		notNull(mavenParameters.getRepoSession(), "Maven parameter repoSession should be provided by maven container.");
+		ArtifactRequest request = new ArtifactRequest();
 		request.setArtifact(artifact);
-		request.setLocalRepository(mavenParameters.getLocalRepository());
-		request.setRemoteRepositories(mavenParameters.getArtifactRepositories());
-		request.setResolutionFilter(new ArtifactFilter() {
-			@Override
-			public boolean include(Artifact artifact) {
-				boolean include = true;
-				if (artifact != null) {
-					include = false;
+		request.setRepositories(mavenParameters.getRemoteRepos());
+		ArtifactResult resolutionResult = null;
+		try {
+			resolutionResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), request);
+			if (resolutionResult != null) {
+				if (resolutionResult.getExceptions() != null && !resolutionResult.getExceptions().isEmpty()) {
+					List<Exception> exceptions = resolutionResult.getExceptions();
+					String message = "Could not resolve " + artifact;
+					if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
+						getLog().warn(message);
+					} else {
+						throw new MojoFailureException(message, exceptions.get(0));
+					}
+					return new HashSet<>();
 				}
-				return include;
+				if (resolutionResult.isMissing()) {
+					String msg = "Could not resolve artifact " + request.getArtifact();
+					if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
+						getLog().warn(msg);
+					} else {
+						throw new MojoFailureException(msg);
+					}
+					return new HashSet<>();
+				}
+				return new HashSet<>(Collections.singletonList(resolutionResult.getArtifact()));
 			}
-		});
-		if (transitively) {
-			request.setResolveTransitively(true);
-		}
-		ArtifactResolutionResult resolutionResult = mavenParameters.getArtifactResolver().resolve(request);
-		if (resolutionResult.hasExceptions()) {
-			List<Exception> exceptions = resolutionResult.getExceptions();
-			String message = "Could not resolve " + artifact;
+			
+		} catch (final ArtifactResolutionException e) {
 			if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-				getLog().warn(message);
+				getLog().warn(e.getMessage());
 			} else {
-				throw new MojoFailureException(message, exceptions.get(0));
+				throw new MojoFailureException(e.getMessage(), e);
 			}
 		}
-		Set<Artifact> artifacts = resolutionResult.getArtifacts();
-		if (artifacts.size() == 0) {
-			String message = "Could not resolve " + artifact;
-			if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-				getLog().warn(message);
-			} else {
-				throw new MojoFailureException(message);
-			}
-		}
-		return artifacts;
+		return new HashSet<>();
 	}
 
 	private boolean isPomModuleNeedingSkip(PluginParameters pluginParameters, MavenParameters mavenParameters) {

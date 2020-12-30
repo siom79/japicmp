@@ -6,7 +6,6 @@ import japicmp.util.Optional;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoFailureException;
@@ -16,10 +15,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -48,7 +49,11 @@ public class JApiCmpReport extends AbstractMavenReport {
 	@Component
 	private ArtifactFactory artifactFactory;
 	@Component
-	private ArtifactResolver artifactResolver;
+	private RepositorySystem repoSystem;
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+	private RepositorySystemSession repoSession;
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+	private List<RemoteRepository> remoteRepos;
 	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${localRepository}")
 	private ArtifactRepository localRepository;
 	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project.remoteArtifactRepositories}")
@@ -69,11 +74,11 @@ public class JApiCmpReport extends AbstractMavenReport {
 	protected void executeReport(Locale locale) throws MavenReportException {
 		try {
 			JApiCmpMojo mojo = getMojo();
-			if (skip || isPomModuleNeedingSkip()) {
+			if (this.skip || isPomModuleNeedingSkip()) {
 				getLog().info("japicmp module set to skip");
 				return;
 			}
-			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(pluginParameters, mavenParameters);
+			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(this.pluginParameters, this.mavenParameters);
 			if (xmlOutputOptional.isPresent()) {
 				XmlOutput xmlOutput = xmlOutputOptional.get();
 				if (xmlOutput.getHtmlOutputStream().isPresent()) {
@@ -99,18 +104,21 @@ public class JApiCmpReport extends AbstractMavenReport {
 	}
 
 	private JApiCmpMojo getMojo() {
-		if (mojo != null) {
-			return mojo;
+		if (this.mojo != null) {
+			return this.mojo;
 		}
-		mojo = new JApiCmpMojo();
-		mavenParameters = new MavenParameters(artifactRepositories, artifactFactory, localRepository, artifactResolver, mavenProject, mojoExecution, versionRangeWithProjectVersion, metadataSource);
-		pluginParameters = new PluginParameters(skip, newVersion, oldVersion, parameter, dependencies, Optional.<File>absent(), Optional.of(outputDirectory), false, oldVersions, newVersions, oldClassPathDependencies, newClassPathDependencies);
-		return mojo;
+		this.mojo = new JApiCmpMojo();
+		this.mavenParameters = new MavenParameters(this.artifactRepositories, this.artifactFactory, this.localRepository,
+				this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.metadataSource, this.repoSystem, this.repoSession,
+				this.remoteRepos);
+		this.pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.<File>absent(), Optional.of(
+				this.outputDirectory), false, this.oldVersions, this.newVersions, this.oldClassPathDependencies, this.newClassPathDependencies);
+		return this.mojo;
 	}
 
 	private Options getOptions() {
 		try {
-			return getMojo().getOptions(pluginParameters, mavenParameters);
+			return getMojo().getOptions(this.pluginParameters, this.mavenParameters);
 		} catch (MojoFailureException e) {
 			getLog().debug("Failed to retrieve options: " + e.getLocalizedMessage(), e);
 			return null;
@@ -136,7 +144,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 	@Override
 	public String getDescription(Locale locale) {
 		getMojo();
-		if (skip || isPomModuleNeedingSkip()) {
+		if (this.skip || isPomModuleNeedingSkip()) {
 			return "skipping report";
 		}
 		Options options = getOptions();
@@ -147,7 +155,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 	}
 
 	private boolean isPomModuleNeedingSkip() {
-		return pluginParameters.getParameterParam().getSkipPomModules()
-			&& "pom".equalsIgnoreCase(mavenProject.getArtifact().getType());
+		return this.pluginParameters.getParameterParam().getSkipPomModules()
+			&& "pom".equalsIgnoreCase(this.mavenProject.getArtifact().getType());
 	}
 }
