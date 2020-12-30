@@ -115,16 +115,18 @@ public class InterfacesTest {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
 				CtClass superInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().name("method").addToClass(superInterface);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superInterface);
 				CtClass ctClass = CtClassBuilder.create().name("Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("method").addToClass(ctClass);
 				return Arrays.asList(superInterface, ctClass);
 			}
 
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
 				CtClass superInterface = CtInterfaceBuilder.create().name("Interface").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().name("method").addToClass(superInterface);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superInterface);
 				CtClass ctClass = CtClassBuilder.create().name("Test").implementsInterface(superInterface).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("method").addToClass(ctClass);
 				return Arrays.asList(superInterface, ctClass);
 			}
 		});

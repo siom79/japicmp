@@ -246,7 +246,7 @@ public class JApiCmpMojoTest {
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
 				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(classPool.get("java.lang.String")).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(classPool.get("java.text.SimpleDateFormat")).addToClassPool(classPool);
 				return Arrays.asList(typeCtClass, ctClass);
 			}
 		});

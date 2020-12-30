@@ -695,6 +695,7 @@ public class CompatibilityChanges {
 					checkIfMethodsHaveChangedIncompatible(interfaceClass, classMap);
 					checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
 				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
+					addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);
 					if (interfaceClass.getMethods().size() > 0) { //no marker interface
 						boolean allInterfaceMethodsImplemented = true;
 						for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {
@@ -714,7 +715,7 @@ public class CompatibilityChanges {
 							}
 						}
 						if (!allInterfaceMethodsImplemented) {
-							addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);
+							addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
 						}
 					}
 				}
