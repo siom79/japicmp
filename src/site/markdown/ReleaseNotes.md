@@ -2,9 +2,14 @@
 
 The following versions of japicmp are available:
 
+##0.15.1 (2020-12-30)##
+* No ArtifactNotFoundException when comparison list is build from maven project [#278](https://github.com/siom79/japicmp/issues/278)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.1).
+
 ##0.15.0 (2020-12-30)##
-* The maven plugin runs with Java-16. This also made changes necessary to migrate to the maven-resolver-API. Hence; the japicmp-maven plugin only runs with maven >= 3.1.0 [#263](https://github.com/siom79/japicmp/issues/275)
-* New change that is detected: METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE. [#273](https://github.com/siom79/japicmp/issues/267)
+* The maven plugin runs with Java-16. This also made changes necessary to migrate to the maven-resolver-API. Hence; the japicmp-maven plugin only runs with maven >= 3.1.0 [#275](https://github.com/siom79/japicmp/issues/275)
+* New change that is detected: METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE. [#267](https://github.com/siom79/japicmp/issues/267)
 * StdoutOutputGenerator does not print superclass if class itself has changed.
 
 Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.0).
