@@ -116,11 +116,11 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories, this.artifactFactory, this.localRepository,
-				this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.metadataSource, this.repoSystem, this.repoSession,
-				this.remoteRepos);
+			this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.metadataSource, this.repoSystem, this.repoSession,
+			this.remoteRepos);
 		PluginParameters pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.of(
-				this.projectBuildDir), Optional.<String>absent(), true, this.oldVersions, this.newVersions, this.oldClassPathDependencies,
-				this.newClassPathDependencies);
+			this.projectBuildDir), Optional.<String>absent(), true, this.oldVersions, this.newVersions, this.oldClassPathDependencies,
+			this.newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
@@ -249,17 +249,17 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private Artifact getComparisonArtifact(final MavenParameters mavenParameters, final PluginParameters pluginParameters) throws MojoFailureException, MojoExecutionException {
 		MavenProject mavenProject = mavenParameters.getMavenProject();
-		DefaultArtifact artifactVersionRange = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), null, mavenParameters.getVersionRangeWithProjectVersion());
+		DefaultArtifact artifactVersionRange = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(), mavenParameters.getVersionRangeWithProjectVersion());
 		VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifactVersionRange, mavenParameters.getRemoteRepos(), null);
 		try {
 			VersionRangeResult versionRangeResult = mavenParameters.getRepoSystem()
-					.resolveVersionRange(mavenParameters.getRepoSession(), versionRangeRequest);
+				.resolveVersionRange(mavenParameters.getRepoSession(), versionRangeRequest);
 			List<org.eclipse.aether.version.Version> versions = versionRangeResult.getVersions();
 			filterSnapshots(versions);
 			filterVersionPattern(versions, pluginParameters);
 			if (!versions.isEmpty()) {
-				DefaultArtifact artifactVersion = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), null,
-						versions.get(versions.size()-1).toString());
+				DefaultArtifact artifactVersion = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(),
+					versions.get(versions.size()-1).toString());
 				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
 				ArtifactResult artifactResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), artifactRequest);
 				if (artifactResult.isMissing() || (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty())){
@@ -268,7 +268,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				return artifactResult.getArtifact();
 			} else {
 				throw new MojoFailureException("Could not find previous version for artifact: " + artifactVersionRange.getGroupId() + ":"
-						+ artifactVersionRange.getArtifactId());
+					+ artifactVersionRange.getArtifactId());
 			}
 		} catch (final VersionRangeResolutionException | ArtifactResolutionException e) {
 			getLog().error("Failed to retrieve comparison artifact: " + e.getMessage(), e);
@@ -346,7 +346,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (pluginParameters.getNewVersionParam() == null && pluginParameters.getNewVersionsParam() == null) {
 			MavenProject mavenProject = mavenParameters.getMavenProject();
 			if (mavenProject != null && mavenProject.getArtifact() != null) {
-				DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), null, mavenProject.getVersion());
+				DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(), mavenProject.getVersion());
 				Set<Artifact> artifacts = resolveArtifact(defaultArtifact, mavenParameters, pluginParameters, ConfigurationVersion.NEW);
 				for (Artifact artifact : artifacts) {
 					File file = artifact.getFile();
@@ -464,7 +464,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					this.options.addIncludeFromArgument(Optional.fromNullable(include), parameterParam.isIncludeExlusively());
 				}
 			}
-			
+
 			this.options.setIncludeSynthetic(parameterParam.getIncludeSynthetic());
 			this.options.setIgnoreMissingClasses(parameterParam.getIgnoreMissingClasses());
 
@@ -676,7 +676,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		request.setRoot(new org.eclipse.aether.graph.Dependency(defaultArtifact, "compile"));
 		try {
 			DependencyResult dependencyResult = mavenParameters.getRepoSystem().resolveDependencies(mavenParameters.getRepoSession(), new DependencyRequest(
-					request, new DependencyFilter() {
+				request, new DependencyFilter() {
 				@Override
 				public boolean accept(final DependencyNode node, final List<DependencyNode> parents) {
 					return !"test".equalsIgnoreCase(node.getDependency().getScope());
@@ -771,7 +771,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private List<JApiCmpArchive> resolveDependencyToFile(String parameterName, Dependency dependency, MavenParameters mavenParameters,
-			boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
+														 boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>();
 		if (getLog().isDebugEnabled()) {
 			getLog().debug("Trying to resolve dependency '" + dependency + "' to file.");
@@ -936,7 +936,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 				return new HashSet<>(Collections.singletonList(resolutionResult.getArtifact()));
 			}
-			
+
 		} catch (final ArtifactResolutionException e) {
 			if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
 				getLog().warn(e.getMessage());
