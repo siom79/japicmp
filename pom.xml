@@ -324,9 +324,10 @@
 					<artifactId>maven-release-plugin</artifactId>
 					<version>3.0.0-M1</version>
 					<configuration>
-						<mavenExecutorId>forked-path</mavenExecutorId>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<useReleaseProfile>false</useReleaseProfile>
-						<arguments>${arguments} -Prelease</arguments>
+						<releaseProfiles>release</releaseProfiles>
+						<goals>deploy</goals>
 					</configuration>
 				</plugin>
 			</plugins>
