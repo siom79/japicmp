@@ -83,7 +83,7 @@ def replaceOldVersion(oldVersion, releaseVersion, dryRun):
 
 
 def releaseBuild(gpgpassphrase, dryRun, devVersion, releaseVersion, releaseTag):
-	args = ["mvn",
+	args = ["mvn","-v",
 			"release:clean",
 			"release:prepare",
 			"-DautoVersionSubmodules=true",
