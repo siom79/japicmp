@@ -195,4 +195,10 @@ public class Annotations {
 
 	@FromIntArrayToIntAnnotation(fromIntArrayToInt = 1)
 	public int fromIntArrayToIntField;
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	public @interface NewTypeAnnotation {
+		int newAttribute();
+	}
 }

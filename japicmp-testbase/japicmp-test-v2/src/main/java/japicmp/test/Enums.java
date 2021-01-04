@@ -13,4 +13,8 @@ public class Enums {
 	public enum AbcStaysAbc {
 		A, B, C
 	}
+	
+	public enum NewEnum {
+	
+	}
 }

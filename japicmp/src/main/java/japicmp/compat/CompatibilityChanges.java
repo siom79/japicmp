@@ -497,8 +497,16 @@ public class CompatibilityChanges {
 		}
 	}
 
-	private boolean isInterface(JApiClass jApiClass) {
+	private boolean isInterface(final JApiClass jApiClass) {
 		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.INTERFACE;
+	}
+	
+	private boolean isAnnotation(final JApiClass jApiClass) {
+		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ANNOTATION;
+	}
+	
+	private boolean isEnum(final JApiClass jApiClass) {
+		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ENUM;
 	}
 
 	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map<String, JApiClass> classMap, final JApiMethod method, List<Integer> returnValues) {
@@ -696,7 +704,8 @@ public class CompatibilityChanges {
 					checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
 				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
 					addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);
-					if (interfaceClass.getMethods().size() > 0) { //no marker interface
+					// no marker interface, no abstract class, no interface and annotation
+					if (!interfaceClass.getMethods().isEmpty() && !isAbstract(jApiClass) && !isInterface(jApiClass) && !isAnnotation(jApiClass) && !isEnum(jApiClass)) {
 						boolean allInterfaceMethodsImplemented = true;
 						for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {
 							boolean interfaceMethodImplemented = false;
