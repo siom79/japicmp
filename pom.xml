@@ -135,7 +135,7 @@
         <java.target>1.8</java.target>
 		<maven.site.plugin.skip>false</maven.site.plugin.skip>
 		<javassist.version>3.24.0-GA</javassist.version>
-		<guava.version>18.0</guava.version>
+		<guava.version>30.1-jre</guava.version>
 		<jaxb.version>2.2.7</jaxb.version>
 		<javax-activation.version>1.1</javax-activation.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
