@@ -2,6 +2,12 @@
 
 The following versions of japicmp are available:
 
+##0.15.2 (2021-01-07)##
+* New annotations or new enums are no longer tracked as incompatible (regression) [#279](https://github.com/siom79/japicmp/issues/279)
+* Updated guava version to 30.0-jre
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.2).
+
 ##0.15.1 (2020-12-30)##
 * No ArtifactNotFoundException when comparison list is build from maven project [#278](https://github.com/siom79/japicmp/issues/278)
 
