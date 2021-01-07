@@ -146,7 +146,6 @@
         <module>japicmp-testbase</module>
         <module>japicmp-maven-plugin</module>
 		<module>japicmp-ant-task</module>
-		<module>japicmp-webapp</module>
 	</modules>
 
     <dependencies>
