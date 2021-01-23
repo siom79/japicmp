@@ -41,14 +41,11 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.*;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
@@ -146,7 +143,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
 		try {
-			jApiClasses = applyPostAnalysisScript(pluginParameters.getParameterParam(), jApiClasses);
+			PostAnalysisScriptExecutor postAnalysisScriptExecutor = new PostAnalysisScriptExecutor();
+			jApiClasses = postAnalysisScriptExecutor.apply(pluginParameters.getParameterParam(), jApiClasses, getLog());
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
 			generateDiffOutput(mavenParameters, pluginParameters, options, jApiClasses, jApiCmpBuildDir);
 			XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters);
@@ -197,45 +195,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private List<JApiClass> applyPostAnalysisScript(Parameter parameter, List<JApiClass> jApiClasses) throws MojoFailureException {
-		List<JApiClass> filteredList = jApiClasses;
-		if (parameter != null) {
-			String postAnalysisFilterScript = parameter.getPostAnalysisScript();
-			if (postAnalysisFilterScript != null) {
-				if (Files.exists(Paths.get(postAnalysisFilterScript))) {
-					ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("groovy");
-					Bindings bindings = scriptEngine.createBindings();
-					bindings.put("jApiClasses", jApiClasses);
-					try (InputStreamReader fileReader = new InputStreamReader(new FileInputStream(postAnalysisFilterScript), Charset.forName("UTF-8"))) {
-						Object returnValue = scriptEngine.eval(fileReader, bindings);
-						if (returnValue instanceof List) {
-							List returnedList = (List) returnValue;
-							filteredList = new ArrayList<>(returnedList.size());
-							for (Object obj : returnedList) {
-								if (obj instanceof JApiClass) {
-									JApiClass jApiClass = (JApiClass) obj;
-									filteredList.add(jApiClass);
-								}
-							}
-						} else {
-							throw new MojoFailureException("Post-analysis script does not return a list.");
-						}
-					} catch (ScriptException e) {
-						throw new MojoFailureException("Execution of post-analysis script failed: " + e.getMessage(), e);
-					} catch (FileNotFoundException e) {
-						throw new MojoFailureException("Post-analysis script '" + postAnalysisFilterScript + " does not exist.", e);
-					} catch (IOException e) {
-						throw new MojoFailureException("Failed to load post-analysis script '" + postAnalysisFilterScript + ": " + e.getMessage(), e);
-					}
-				} else {
-					throw new MojoFailureException("Post-analysis script '" + postAnalysisFilterScript + " does not exist.");
-				}
-			} else {
-				getLog().debug("No post-analysis script provided.");
-			}
-		}
-		return filteredList;
-	}
+
 
 	private boolean skipModule(PluginParameters pluginParameters, MavenParameters mavenParameters) {
 		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, getLog());

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>com.github.siom79.japicmp</groupId>
+		<artifactId>japicmp-testbase</artifactId>
+		<version>0.15.3-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>japicmp-test-maven-plugin-post-analysis-script-artifact-test</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-test-maven-plugin-post-analysis-script-artifact</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.github.siom79.japicmp</groupId>
+				<artifactId>japicmp-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<oldVersion>
+						<dependency>
+							<groupId>com.github.siom79.japicmp</groupId>
+							<artifactId>japicmp-test-v1</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</oldVersion>
+					<newVersion>
+						<dependency>
+							<groupId>com.github.siom79.japicmp</groupId>
+							<artifactId>japicmp-test-v1</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</newVersion>
+					<parameter>
+						<!-- The post-analysis script is contained in "japicmp-test-maven-plugin-post-analysis-script-artifact" -->
+						<postAnalysisScript>post-analysis-script.groovy</postAnalysisScript>
+					</parameter>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.github.siom79.japicmp</groupId>
+						<artifactId>japicmp-test-maven-plugin-post-analysis-script-artifact</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
