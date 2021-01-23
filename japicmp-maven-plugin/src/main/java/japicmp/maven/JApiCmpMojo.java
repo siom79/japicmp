@@ -31,7 +31,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-//https://cwiki.apache.org/confluence/display/MAVEN/Migrating+from+org.sonatype.aether+to+Apache+Maven+Resolver
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -258,7 +257,9 @@ public class JApiCmpMojo extends AbstractMojo {
 			filterSnapshots(versions);
 			filterVersionPattern(versions, pluginParameters);
 			if (!versions.isEmpty()) {
-				DefaultArtifact artifactVersion = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(),
+				String packaging = mavenProject.getPackaging();
+				packaging = mapPackaging(packaging, "bundle".equalsIgnoreCase(packaging), "jar");
+				DefaultArtifact artifactVersion = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), packaging,
 					versions.get(versions.size()-1).toString());
 				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
 				ArtifactResult artifactResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), artifactRequest);
@@ -672,7 +673,9 @@ public class JApiCmpMojo extends AbstractMojo {
 		MavenProject mavenProject = mavenParameters.getMavenProject();
 		notNull(mavenProject, "Maven parameter mavenProject should be provided by maven container.");
 		CollectRequest request = new CollectRequest();
-		DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(), mavenProject.getVersion());
+		String packaging = mavenProject.getPackaging();
+		packaging = mapPackaging(packaging, "bundle".equalsIgnoreCase(packaging), "jar");
+		DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), packaging, mavenProject.getVersion());
 		request.setRoot(new org.eclipse.aether.graph.Dependency(defaultArtifact, "compile"));
 		try {
 			DependencyResult dependencyResult = mavenParameters.getRepoSystem().resolveDependencies(mavenParameters.getRepoSession(), new DependencyRequest(
@@ -704,6 +707,13 @@ public class JApiCmpMojo extends AbstractMojo {
 		} catch (final DependencyResolutionException e) {
 			throw new MojoFailureException(e.getMessage(), e);
 		}
+	}
+
+	private String mapPackaging(String packaging, boolean condition, final String mappedPackaging) {
+		if (condition) {
+			packaging = mappedPackaging;
+		}
+		return packaging;
 	}
 
 	private void handleMissingArtifactFile(final PluginParameters pluginParameters, final Artifact artifact) {

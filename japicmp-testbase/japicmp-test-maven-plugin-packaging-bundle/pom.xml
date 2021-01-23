@@ -6,6 +6,7 @@
 		<version>0.15.3-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
+<!--	<version>0.15.2</version>-->
 
 	<artifactId>japicmp-test-maven-plugin-packaging-bundle</artifactId>
 	<packaging>bundle</packaging>
@@ -29,6 +30,13 @@
 				<artifactId>japicmp-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<configuration>
+					<oldVersion>
+						<dependency>
+							<groupId>com.github.siom79.japicmp</groupId>
+							<artifactId>japicmp-test-v1</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</oldVersion>
 					<newVersion>
 						<dependency>
 							<groupId>com.github.siom79.japicmp</groupId>
