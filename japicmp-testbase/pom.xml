@@ -25,6 +25,7 @@
 		<module>japicmp-test-vx-client</module>
 		<module>japicmp-test-maven-plugin-ignoremissingartifact</module>
 		<module>japicmp-test-maven-plugin-packaging</module>
+		<module>japicmp-test-maven-plugin-packaging-bundle</module>
 		<module>japicmp-test-maven-plugin-userproperty</module>
 		<module>japicmp-test-ant-task</module>
 	</modules>
