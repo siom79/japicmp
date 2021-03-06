@@ -2,6 +2,13 @@
 
 The following versions of japicmp are available:
 
+##0.15.3 (2021-03-06)##
+* Exceptions during the artifact resolution do no longer break the build if the artifact was found. [#284](https://github.com/siom79/japicmp/issues/284)
+* Option ignoreNonResolvableArtifacts is evaluated correctly again. [#283](https://github.com/siom79/japicmp/issues/283)
+* Workaround was added to support bundle packaging. [#280](https://github.com/siom79/japicmp/issues/280)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.3).
+
 ##0.15.2 (2021-01-07)##
 * New annotations or new enums are no longer tracked as incompatible (regression) [#279](https://github.com/siom79/japicmp/issues/279)
 * Updated guava version to 30.0-jre
