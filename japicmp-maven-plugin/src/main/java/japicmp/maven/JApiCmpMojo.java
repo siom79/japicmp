@@ -206,7 +206,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		OLD, NEW
 	}
 
-	private Artifact getComparisonArtifact(final MavenParameters mavenParameters, final PluginParameters pluginParameters) throws MojoFailureException, MojoExecutionException {
+	private Artifact getComparisonArtifact(final MavenParameters mavenParameters, final PluginParameters pluginParameters,
+										   final ConfigurationVersion configurationVersion) throws MojoFailureException, MojoExecutionException {
 		MavenProject mavenProject = mavenParameters.getMavenProject();
 		DefaultArtifact artifactVersionRange = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(), mavenParameters.getVersionRangeWithProjectVersion());
 		VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifactVersionRange, mavenParameters.getRemoteRepos(), null);
@@ -223,9 +224,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					versions.get(versions.size()-1).toString());
 				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
 				ArtifactResult artifactResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), artifactRequest);
-				if (artifactResult.isMissing() || (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty())){
-					throw new MojoFailureException("Could not resolve artifact: " + artifactVersion);
-				}
+				processArtifacResult(artifactVersion, artifactResult, pluginParameters, configurationVersion);
 				return artifactResult.getArtifact();
 			} else {
 				throw new MojoFailureException("Could not find previous version for artifact: " + artifactVersionRange.getGroupId() + ":"
@@ -234,6 +233,23 @@ public class JApiCmpMojo extends AbstractMojo {
 		} catch (final VersionRangeResolutionException | ArtifactResolutionException e) {
 			getLog().error("Failed to retrieve comparison artifact: " + e.getMessage(), e);
 			throw new MojoFailureException(e.getMessage(), e);
+		}
+	}
+
+	private void processArtifacResult(DefaultArtifact artifactVersion, ArtifactResult artifactResult,
+									  PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
+		if (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty()) {
+			List<Exception> exceptions = artifactResult.getExceptions();
+			for (Exception exception : exceptions) {
+				getLog().debug(exception.getMessage(), exception);
+			}
+		}
+		if (artifactResult.isMissing()){
+			if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
+				getLog().warn("Ignoring missing artifact: " + artifactResult.getArtifact());
+			} else {
+				throw new MojoFailureException("Could not resolve artifact: " + artifactVersion);
+			}
 		}
 	}
 
@@ -278,7 +294,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 		if (pluginParameters.getOldVersionParam() == null && pluginParameters.getOldVersionsParam() == null) {
 			try {
-				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters, pluginParameters);
+				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters, pluginParameters, ConfigurationVersion.OLD);
 				if (comparisonArtifact.getVersion() != null) {
 					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, mavenParameters, pluginParameters, ConfigurationVersion.OLD);
 					for (Artifact artifact : artifacts) {
@@ -887,20 +903,15 @@ public class JApiCmpMojo extends AbstractMojo {
 			if (resolutionResult != null) {
 				if (resolutionResult.getExceptions() != null && !resolutionResult.getExceptions().isEmpty()) {
 					List<Exception> exceptions = resolutionResult.getExceptions();
-					String message = "Could not resolve " + artifact;
-					if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-						getLog().warn(message);
-					} else {
-						throw new MojoFailureException(message, exceptions.get(0));
+					for (Exception exception : exceptions) {
+						getLog().debug(exception.getMessage(), exception);
 					}
-					return new HashSet<>();
 				}
 				if (resolutionResult.isMissing()) {
-					String msg = "Could not resolve artifact " + request.getArtifact();
 					if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-						getLog().warn(msg);
+						getLog().warn("Ignoring missing artifact " + request.getArtifact());
 					} else {
-						throw new MojoFailureException(msg);
+						throw new MojoFailureException("Could not resolve artifact " + request.getArtifact());
 					}
 					return new HashSet<>();
 				}
