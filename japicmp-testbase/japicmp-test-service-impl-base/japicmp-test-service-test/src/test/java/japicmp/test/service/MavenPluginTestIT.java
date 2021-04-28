@@ -22,6 +22,9 @@ public class MavenPluginTestIT {
 		Optional<String> lineOptional = findLineThatContains(lines, "SubclassAddsNewStaticField");
 		assertThat(lineOptional.isPresent(), is(true));
 		assertThat(lineOptional.get().contains("***!"), is(true));
+		lineOptional = findLineThatContains(lines, "SuperclassChanged");
+		assertThat(lineOptional.isPresent(), is(true));
+		assertThat(lineOptional.get().contains("***!"), is(true));
 	}
 
 	private Optional<String> findLineThatContains(List<String> lines, String str) {
