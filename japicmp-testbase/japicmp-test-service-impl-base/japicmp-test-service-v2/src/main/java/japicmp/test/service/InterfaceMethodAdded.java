@@ -1,4 +1,4 @@
-package japicmp.test.service;
+package japicmp.test.service; // v2
 
 public interface InterfaceMethodAdded {
 
