@@ -598,7 +598,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		return sb.toString();
 	}
 
-	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions, PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
+	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions, PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
 		if (pluginParameters != null) {
 			if (pluginParameters.getDependenciesParam() != null) {
 				if (pluginParameters.getOldClassPathDependencies() != null || pluginParameters.getNewClassPathDependencies() != null) {
@@ -641,23 +641,59 @@ public class JApiCmpMojo extends AbstractMojo {
 					comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
 				} else {
 					if (getLog().isDebugEnabled()) {
-						getLog().debug("None of the elements <oldClassPathDependencies/>, <newClassPathDependencies/> or <dependencies/> found. Using " + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
+						getLog().debug("None of the elements <oldClassPathDependencies/>, <newClassPathDependencies/> or <dependencies/> found. Using " + JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
 					}
-					comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH);
+					comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
 				}
 			}
 		}
 		setUpClassPathUsingMavenProject(comparatorOptions, mavenParameters, pluginParameters, ConfigurationVersion.NEW);
 	}
 
-	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		MavenProject mavenProject = mavenParameters.getMavenProject();
-		notNull(mavenProject, "Maven parameter mavenProject should be provided by maven container.");
+	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException, MojoExecutionException {
+		if (comparatorOptions.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {
+			if (pluginParameters.getOldVersionParam() != null) {
+				Dependency dependency = pluginParameters.getOldVersionParam().getDependency();
+				if (dependency != null) {
+					Set<Artifact> comparisonArtifacts = resolveArtifact(dependency, mavenParameters, false, pluginParameters, ConfigurationVersion.OLD);
+					if (!comparisonArtifacts.isEmpty()) {
+						setUpClassPathEntries(comparisonArtifacts.iterator().next(), mavenParameters, pluginParameters, comparatorOptions.getOldClassPath());
+					}
+				}
+			} else if (pluginParameters.getOldVersionsParam() != null) {
+				// TODO
+			} else {
+				// TODO rather than calling getComparisonArtifact again, populateArchivesListsFromParameters should compute the old CP for various modes
+				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters, pluginParameters, ConfigurationVersion.OLD);
+				if (comparisonArtifact.getVersion() != null) {
+					setUpClassPathEntries(comparisonArtifact, mavenParameters, pluginParameters, comparatorOptions.getOldClassPath());
+				}
+			}
+		}
+		if (pluginParameters.getNewVersionParam() != null) {
+			Dependency dependency = pluginParameters.getNewVersionParam().getDependency();
+			if (dependency != null) {
+				Set<Artifact> comparisonArtifacts = resolveArtifact(dependency, mavenParameters, false, pluginParameters, ConfigurationVersion.NEW);
+				if (!comparisonArtifacts.isEmpty()) {
+					setUpClassPathEntries(comparisonArtifacts.iterator().next(), mavenParameters, pluginParameters, comparatorOptions.getNewClassPath());
+				}
+			}
+		} else if (pluginParameters.getNewVersionsParam() != null) {
+			// TODO
+		} else {
+			MavenProject mavenProject = mavenParameters.getMavenProject();
+			notNull(mavenProject, "Maven parameter mavenProject should be provided by maven container.");
+			String packaging = mavenProject.getPackaging();
+			packaging = mapPackaging(packaging, "bundle".equalsIgnoreCase(packaging), "jar");
+			DefaultArtifact artifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), packaging, mavenProject.getVersion());
+			setUpClassPathEntries(artifact, mavenParameters, pluginParameters, comparatorOptions.getClassPathEntries());
+		}
+	}
+
+	private void setUpClassPathEntries(Artifact comparisonArtifact, MavenParameters mavenParameters, PluginParameters pluginParameters, List<String> classPath) throws MojoFailureException {
+		getLog().debug("setting up classpath entries for " + comparisonArtifact);
 		CollectRequest request = new CollectRequest();
-		String packaging = mavenProject.getPackaging();
-		packaging = mapPackaging(packaging, "bundle".equalsIgnoreCase(packaging), "jar");
-		DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), packaging, mavenProject.getVersion());
-		request.setRoot(new org.eclipse.aether.graph.Dependency(defaultArtifact, "compile"));
+		request.setRoot(new org.eclipse.aether.graph.Dependency(comparisonArtifact, "compile"));
 		try {
 			DependencyResult dependencyResult = mavenParameters.getRepoSystem().resolveDependencies(mavenParameters.getRepoSession(), new DependencyRequest(
 				request, new DependencyFilter() {
@@ -683,7 +719,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				}
 			}
 			for (String classPathEntry : classPathEntries) {
-				comparatorOptions.getClassPathEntries().add(classPathEntry);
+				classPath.add(classPathEntry);
 			}
 		} catch (final DependencyResolutionException e) {
 			throw new MojoFailureException(e.getMessage(), e);

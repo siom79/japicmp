@@ -94,20 +94,6 @@
 							<version>${project.version}</version>
 						</dependency>
 					</newVersion>
-					<oldClassPathDependencies>
-						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-service-v1</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</oldClassPathDependencies>
-					<newClassPathDependencies>
-						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-service-v2</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</newClassPathDependencies>
 					<parameter>
 						<accessModifier>public</accessModifier>
 						<onlyModified>true</onlyModified>
