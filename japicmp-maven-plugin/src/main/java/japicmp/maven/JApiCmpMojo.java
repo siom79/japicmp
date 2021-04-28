@@ -141,6 +141,11 @@ public class JApiCmpMojo extends AbstractMojo {
 			getLog().warn("Skipping execution because no new version could be resolved/found.");
 			return Optional.absent();
 		}
+		if (jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
+			getLog().debug("comparing " + options.getOldArchives() + " to " + options.getNewArchives() + " using " + jarArchiveComparator.getCommonClasspathAsString());
+		} else {
+			getLog().debug("comparing " + options.getOldArchives() + " using " + jarArchiveComparator.getOldClassPathAsString() + " to " + options.getNewArchives() + " using " + jarArchiveComparator.getNewClassPathAsString());
+		}
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
 		try {
 			PostAnalysisScriptExecutor postAnalysisScriptExecutor = new PostAnalysisScriptExecutor();
