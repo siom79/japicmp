@@ -20,4 +20,10 @@ public class JApiCmpArchive {
 	public Version getVersion() {
 		return version;
 	}
+
+	@Override
+	public String toString() {
+		return file + "@" + version.getStringVersion();
+	}
+
 }
