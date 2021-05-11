@@ -140,7 +140,7 @@ An advanced configuration can utilize the following parameters:
 						<exclude>package.ClassToExclude</exclude>
 						<exclude>package.Class#methodToExclude(long,int)</exclude>
 						<exclude>package.Class#fieldToExclude</exclude>
-						<exclude>@my.AnnotationToExcluce</exclude>
+						<exclude>@my.AnnotationToExclude</exclude>
 					</excludes>
 					<includeExclusively>false</includeExclusively>
 					<excludeExclusively>false</excludeExclusively>
