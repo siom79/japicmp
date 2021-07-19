@@ -206,10 +206,26 @@ public class JApiCmpMojo extends AbstractMojo {
 		OLD, NEW
 	}
 
+	private static DefaultArtifact createDefaultArtifact(MavenProject mavenProject, String version) {
+
+        org.apache.maven.artifact.Artifact artifact = mavenProject.getArtifact();
+        return createDefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), artifact.getType(), version);
+	}
+
+    private static DefaultArtifact createDefaultArtifact(String groupId, String artifactId, String classifier, String type, String version) {
+        String mappedType = type;
+        if("bundle".equals(type)) {
+            mappedType ="jar";
+        }
+        DefaultArtifact artifactVersion = new DefaultArtifact(groupId, artifactId, classifier, mappedType,
+            version);
+        return artifactVersion;
+    }
+
 	private Artifact getComparisonArtifact(final MavenParameters mavenParameters, final PluginParameters pluginParameters,
 										   final ConfigurationVersion configurationVersion) throws MojoFailureException, MojoExecutionException {
 		MavenProject mavenProject = mavenParameters.getMavenProject();
-		DefaultArtifact artifactVersionRange = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(), mavenParameters.getVersionRangeWithProjectVersion());
+		DefaultArtifact artifactVersionRange = createDefaultArtifact(mavenProject, mavenParameters.getVersionRangeWithProjectVersion());
 		VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifactVersionRange, mavenParameters.getRemoteRepos(), null);
 		try {
 			VersionRangeResult versionRangeResult = mavenParameters.getRepoSystem()
@@ -218,10 +234,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			filterSnapshots(versions);
 			filterVersionPattern(versions, pluginParameters);
 			if (!versions.isEmpty()) {
-				String packaging = mavenProject.getPackaging();
-				packaging = mapPackaging(packaging, "bundle".equalsIgnoreCase(packaging), "jar");
-				DefaultArtifact artifactVersion = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), packaging,
-					versions.get(versions.size()-1).toString());
+				DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject, versions.get(versions.size()-1).toString());
 				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
 				ArtifactResult artifactResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), artifactRequest);
 				processArtifacResult(artifactVersion, artifactResult, pluginParameters, configurationVersion);
@@ -323,7 +336,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (pluginParameters.getNewVersionParam() == null && pluginParameters.getNewVersionsParam() == null) {
 			MavenProject mavenProject = mavenParameters.getMavenProject();
 			if (mavenProject != null && mavenProject.getArtifact() != null) {
-				DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getPackaging(), mavenProject.getVersion());
+				DefaultArtifact defaultArtifact = createDefaultArtifact(mavenProject, mavenProject.getVersion());
 				Set<Artifact> artifacts = resolveArtifact(defaultArtifact, mavenParameters, pluginParameters, ConfigurationVersion.NEW);
 				for (Artifact artifact : artifacts) {
 					File file = artifact.getFile();
@@ -649,9 +662,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		MavenProject mavenProject = mavenParameters.getMavenProject();
 		notNull(mavenProject, "Maven parameter mavenProject should be provided by maven container.");
 		CollectRequest request = new CollectRequest();
-		String packaging = mavenProject.getPackaging();
-		packaging = mapPackaging(packaging, "bundle".equalsIgnoreCase(packaging), "jar");
-		DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), packaging, mavenProject.getVersion());
+		DefaultArtifact defaultArtifact = createDefaultArtifact(mavenProject, mavenProject.getVersion());
 		request.setRoot(new org.eclipse.aether.graph.Dependency(defaultArtifact, "compile"));
 		try {
 			DependencyResult dependencyResult = mavenParameters.getRepoSystem().resolveDependencies(mavenParameters.getRepoSession(), new DependencyRequest(
@@ -683,13 +694,6 @@ public class JApiCmpMojo extends AbstractMojo {
 		} catch (final DependencyResolutionException e) {
 			throw new MojoFailureException(e.getMessage(), e);
 		}
-	}
-
-	private String mapPackaging(String packaging, boolean condition, final String mappedPackaging) {
-		if (condition) {
-			packaging = mappedPackaging;
-		}
-		return packaging;
 	}
 
 	private void handleMissingArtifactFile(final PluginParameters pluginParameters, final Artifact artifact) {
@@ -886,7 +890,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	private Set<Artifact> resolveArtifact(Dependency dependency, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		notNull(mavenParameters.getArtifactRepositories(), "Maven parameter artifactRepositories should be provided by maven container.");
-		Artifact artifact = new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), dependency.getType(), dependency.getVersion());
+		Artifact artifact = createDefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), dependency.getType(), dependency.getVersion());
 		return resolveArtifact(artifact, mavenParameters, pluginParameters, configurationVersion);
 	}
 
