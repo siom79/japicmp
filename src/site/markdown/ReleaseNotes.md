@@ -2,6 +2,13 @@
 
 The following versions of japicmp are available:
 
+##0.15.4 (2021-10-06)##
+* ignoreNonResolvableArtifacts is honored for first version of artifact. [#288](https://github.com/siom79/japicmp/issues/299)
+* Do not report METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE if it is implemented in superclass. [#281](https://github.com/siom79/japicmp/issues/281)
+* EOptional.or() returns secondChoice instead of this. [#297](https://github.com/siom79/japicmp/issues/297)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.3).
+
 ##0.15.3 (2021-03-06)##
 * Exceptions during the artifact resolution do no longer break the build if the artifact was found. [#284](https://github.com/siom79/japicmp/issues/284)
 * Option ignoreNonResolvableArtifacts is evaluated correctly again. [#283](https://github.com/siom79/japicmp/issues/283)
