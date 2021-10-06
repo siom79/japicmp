@@ -224,11 +224,17 @@ public class JApiCmpMojo extends AbstractMojo {
 					versions.get(versions.size()-1).toString());
 				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
 				ArtifactResult artifactResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), artifactRequest);
-				processArtifacResult(artifactVersion, artifactResult, pluginParameters, configurationVersion);
+				processArtifactResult(artifactVersion, artifactResult, pluginParameters, configurationVersion);
 				return artifactResult.getArtifact();
 			} else {
-				throw new MojoFailureException("Could not find previous version for artifact: " + artifactVersionRange.getGroupId() + ":"
-					+ artifactVersionRange.getArtifactId());
+				if (ignoreMissingOldVersion(pluginParameters, configurationVersion)) {
+					getLog().warn("Ignoring missing old artifact version: " +
+							artifactVersionRange.getGroupId() + ":" + artifactVersionRange.getArtifactId());
+					return null;
+				} else {
+					throw new MojoFailureException("Could not find previous version for artifact: " + artifactVersionRange.getGroupId() + ":"
+							+ artifactVersionRange.getArtifactId());
+				}
 			}
 		} catch (final VersionRangeResolutionException | ArtifactResolutionException e) {
 			getLog().error("Failed to retrieve comparison artifact: " + e.getMessage(), e);
@@ -236,8 +242,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void processArtifacResult(DefaultArtifact artifactVersion, ArtifactResult artifactResult,
-									  PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
+	private void processArtifactResult(DefaultArtifact artifactVersion, ArtifactResult artifactResult,
+									   PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
 		if (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty()) {
 			List<Exception> exceptions = artifactResult.getExceptions();
 			for (Exception exception : exceptions) {
@@ -295,7 +301,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (pluginParameters.getOldVersionParam() == null && pluginParameters.getOldVersionsParam() == null) {
 			try {
 				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters, pluginParameters, ConfigurationVersion.OLD);
-				if (comparisonArtifact.getVersion() != null) {
+				if (comparisonArtifact != null && comparisonArtifact.getVersion() != null) {
 					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, mavenParameters, pluginParameters, ConfigurationVersion.OLD);
 					for (Artifact artifact : artifacts) {
 						File file = artifact.getFile();
