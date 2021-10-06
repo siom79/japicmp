@@ -1724,4 +1724,61 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
 	}
+	
+	@Test
+	public void testNewInterfaceWithClass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				return Collections.emptyList();
+			}
+			
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass aInterface1 = CtInterfaceBuilder.create().name("japicmp.I1").addToClassPool(classPool);
+				CtMethodBuilder.create().abstractMethod().name("method").returnType(CtClass.booleanType).addToClass(aInterface1);
+				CtClass c1 = CtClassBuilder.create().name("japicmp.C1").implementsInterface(aInterface1).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").returnType(CtClass.booleanType).addToClass(c1);
+				CtClass c2 = CtClassBuilder.create().name("japicmp.C2").withSuperclass(c1).addToClassPool(classPool);
+				return Arrays.asList(aInterface1, c1, c2);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.I1");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		jApiClass = getJApiClass(jApiClasses, "japicmp.C1");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		jApiClass = getJApiClass(jApiClasses, "japicmp.C2");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+	}
+	
+	@Test
+	public void testNewClassExtendsExistingAbstractClass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass c1 = CtClassBuilder.create().name("CA").abstractModifier().addToClassPool(classPool);
+				return Arrays.asList(c1);
+			}
+			
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass c1 = CtClassBuilder.create().name("CA").abstractModifier().addToClassPool(classPool);
+				CtClass c = CtClassBuilder.create().name("C").withSuperclass(c1).addToClassPool(classPool);
+				return Arrays.asList(c1, c);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "C");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.NEW));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+	}
 }

@@ -543,8 +543,7 @@ public class CompatibilityChanges {
 	 * @param jApiMethod the method
 	 * @return <code>true</code> if it is implemented in a super class
 	 */
-	private boolean isImplemented(JApiMethod jApiMethod) {
-        JApiClass aClass = jApiMethod.getjApiClass();
+	private boolean isImplemented(JApiMethod jApiMethod, JApiClass aClass) {
 	    while(aClass != null) {
             for (JApiMethod method : aClass.getMethods()) {
                 if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameParameter(method) &&
@@ -610,7 +609,7 @@ public class CompatibilityChanges {
 						}
 					}
 					for (JApiMethod jApiMethod : superclass.getMethods()) {
-						if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED && !isImplemented(jApiMethod)) {
+						if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED && !isImplemented(jApiMethod, jApiMethod.getjApiClass())) {
 							boolean implemented = false;
 							for (JApiMethod implementedMethod : implementedMethods) {
 								if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
@@ -712,11 +711,9 @@ public class CompatibilityChanges {
 							if (isSynthetic(interfaceMethod)) {
 								continue;
 							}
-							for (JApiMethod classMethod : jApiClass.getMethods()) {
-								if (classMethod.getName().equals(interfaceMethod.getName()) && classMethod.hasSameSignature(interfaceMethod)) {
-									interfaceMethodImplemented = true;
-									break;
-								}
+							if (isImplemented(interfaceMethod, jApiClass)) {
+								interfaceMethodImplemented = true;
+								break;
 							}
 							if (!interfaceMethodImplemented) {
 								allInterfaceMethodsImplemented = false;
