@@ -71,8 +71,9 @@ public abstract class Optional<T> {
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public Optional<T> or(Optional<? extends T> secondChoice) {
-			return this;
+			return (Optional<T>) secondChoice;
 		}
 
 		@Override
