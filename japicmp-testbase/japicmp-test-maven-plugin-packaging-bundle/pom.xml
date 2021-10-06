@@ -33,14 +33,14 @@
 					<oldVersion>
 						<dependency>
 							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-v1</artifactId>
+							<artifactId>japicmp-testbundle-v1</artifactId>
 							<version>${project.version}</version>
 						</dependency>
 					</oldVersion>
 					<newVersion>
 						<dependency>
 							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-v1</artifactId>
+							<artifactId>japicmp-testbundle-v2</artifactId>
 							<version>${project.version}</version>
 						</dependency>
 					</newVersion>
