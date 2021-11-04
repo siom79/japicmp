@@ -231,7 +231,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			VersionRangeResult versionRangeResult = mavenParameters.getRepoSystem()
 				.resolveVersionRange(mavenParameters.getRepoSession(), versionRangeRequest);
 			List<org.eclipse.aether.version.Version> versions = versionRangeResult.getVersions();
-			filterSnapshots(versions);
+			filterSnapshots(versions, pluginParameters);
 			filterVersionPattern(versions, pluginParameters);
 			if (!versions.isEmpty()) {
 				DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject, versions.get(versions.size()-1).toString());
@@ -296,8 +296,10 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void filterSnapshots(List<org.eclipse.aether.version.Version> versions) {
-		versions.removeIf(version -> version.toString() != null && version.toString().endsWith("SNAPSHOT"));
+	private void filterSnapshots(List<org.eclipse.aether.version.Version> versions, PluginParameters pluginParameters) {
+		if (pluginParameters.getParameterParam() != null && !pluginParameters.getParameterParam().isIncludeSnapshots()) {
+			versions.removeIf(version -> version.toString() != null && version.toString().endsWith("SNAPSHOT"));
+		}
 	}
 
 	private void populateArchivesListsFromParameters(PluginParameters pluginParameters, MavenParameters mavenParameters, List<JApiCmpArchive> oldArchives, List<JApiCmpArchive> newArchives) throws MojoFailureException {

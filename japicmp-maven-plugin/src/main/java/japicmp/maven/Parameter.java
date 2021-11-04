@@ -42,7 +42,8 @@ public class Parameter {
 	private boolean ignoreMissingNewVersion;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String oldVersionPattern;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	@org.apache.maven.plugins.annotations.Parameter(required = false, defaultValue = "false")
+	private boolean includeSnapshots;
 	private boolean breakBuildIfCausedByExclusion = true;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean reportOnlyFilename;
@@ -168,6 +169,14 @@ public class Parameter {
 
 	public void setIncludes(List<String> includes) {
 		this.includes = includes;
+	}
+
+	public boolean isIncludeSnapshots() {
+		return includeSnapshots;
+	}
+
+	public void setIncludeSnapshots(boolean includeSnapshots) {
+		this.includeSnapshots = includeSnapshots;
 	}
 
 	public List<String> getExcludes() {

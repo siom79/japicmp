@@ -251,6 +251,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | includeModules								         | true  | n.a.			| List of regular expression that specify if an artifact should be excluded based on its artifact id.|
 | excludeModules								         | true  | n.a.			| List of regular expression that specify if an artifact should be included based on its artifact id.|
 | reportLinkName                                         | true  | japicmp      | Name of the Site Report. Defaults to 'japicmp'. You must specify different names when using a ReportSet.|
+| includeSnapshots                                       | true  | false        | If &lt;oldVersion&gt; is not used, this determines whether to include SNAPSHOT versions when resolving the version to compare. |
 
 The parameter overrideCompatibilityChangeParameters allows you to override the default values for binary and source compatibility as well as the semantic version level
 for each check. This allows you to customize the following verifications:
