@@ -214,7 +214,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
     private static DefaultArtifact createDefaultArtifact(String groupId, String artifactId, String classifier, String type, String version) {
         String mappedType = type;
-        if("bundle".equals(type)) {
+        if("bundle".equals(type) || "ejb".equals(type)) {
             mappedType ="jar";
         }
         DefaultArtifact artifactVersion = new DefaultArtifact(groupId, artifactId, classifier, mappedType,
