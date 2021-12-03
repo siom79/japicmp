@@ -416,6 +416,7 @@
 						<configuration>
 							<argLine>
 								--illegal-access=warn
+								--add-opens java.base/java.lang=ALL-UNNAMED
 							</argLine>
 						</configuration>
 					</plugin>
