@@ -53,7 +53,7 @@ public class ShowSyntheticTest {
 		String output = stdoutOutputGenerator.generate();
 		assertThat(output, containsString("+++  NEW CLASS: PUBLIC(+) SYNTHETIC(+) japicmp.SyntheticClass"));
 		assertThat(output, containsString("+++  NEW FIELD: PUBLIC(+) SYNTHETIC(+) int field"));
-		assertThat(output, containsString("+++  NEW METHOD: PUBLIC(+) SYNTHETIC(+) japicmp.Test method()"));
+		assertThat(output, containsString("+++  NEW METHOD: PUBLIC(+) SYNTHETIC(+) void method()"));
 	}
 
 	@Test

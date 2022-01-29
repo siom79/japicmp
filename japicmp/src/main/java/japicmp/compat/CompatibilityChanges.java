@@ -1,20 +1,18 @@
 package japicmp.compat;
 
-import japicmp.model.*;
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
+import japicmp.model.*;
 import japicmp.util.ClassHelper;
+import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
 import java.util.*;
 
-import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
-import static japicmp.util.ModifierHelper.isNotPrivate;
-import static japicmp.util.ModifierHelper.isSynthetic;
+import static japicmp.util.ModifierHelper.*;
 
 public class CompatibilityChanges {
 	private final JarArchiveComparator jarArchiveComparator;
@@ -386,8 +384,8 @@ public class CompatibilityChanges {
 		if (isInterface(jApiClass)) {
 			if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
 				if (method.getChangeStatus() == JApiChangeStatus.NEW && !isSynthetic(method)) {
-					List<JApiMethod> implementedMethods = getImplementedMethods(jApiClass, classMap, method);
-					if (implementedMethods.size() == 0) {
+					List<JApiMethod> methodsWithSameSignature = getMethodsInImplementedInterfacesWithSameSignature(jApiClass, classMap, method);
+					if (methodsWithSameSignature.size() == 0) {
 						// new default method in interface
 						if (method.getAbstractModifier().hasChangedTo(AbstractModifier.NON_ABSTRACT)) {
 							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_DEFAULT);
@@ -396,7 +394,7 @@ public class CompatibilityChanges {
 						}
 					} else {
 						boolean allNew = true;
-						for (JApiMethod jApiMethod : implementedMethods) {
+						for (JApiMethod jApiMethod : methodsWithSameSignature) {
 							if (jApiMethod.getChangeStatus() != JApiChangeStatus.NEW) {
 								allNew = false;
 							}
@@ -425,7 +423,7 @@ public class CompatibilityChanges {
 								overridesAbstract = true;
 							}
 						}
-						List<JApiMethod> implementedMethods = getImplementedMethods(jApiClass, classMap, method);
+						List<JApiMethod> implementedMethods = getMethodsInImplementedInterfacesWithSameSignature(jApiClass, classMap, method);
 						if (implementedMethods.size() > 0) {
 							overridesAbstract = true;
 						}
@@ -466,16 +464,14 @@ public class CompatibilityChanges {
 		return returnValues;
 	}
 
-	private List<JApiMethod> getImplementedMethods(final JApiClass jApiClass, final Map<String, JApiClass> classMap, final JApiMethod method) {
+	private List<JApiMethod> getMethodsInImplementedInterfacesWithSameSignature(final JApiClass jApiClass, final Map<String, JApiClass> classMap, final JApiMethod method) {
 		ArrayList<JApiMethod> jApiMethods = new ArrayList<>();
 		forAllImplementedInterfaces(jApiClass, classMap, jApiMethods, new ArrayList<>(), new OnImplementedInterfaceCallback<JApiMethod>() {
 			@Override
 			public JApiMethod callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
 				for (JApiMethod jApiMethod : implementedInterface.getMethods()) {
-					if (isAbstract(jApiMethod)) {
-						if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameSignature(method)) {
-							return jApiMethod;
-						}
+					if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameSignature(method)) {
+						return jApiMethod;
 					}
 				}
 				return null;
@@ -808,26 +804,26 @@ public class CompatibilityChanges {
 			abstractMethods.clear();
 			for (JApiImplementedInterface jApiImplementedInterface : implementedInterfaces) {
 				String fullyQualifiedName = jApiImplementedInterface.getFullyQualifiedName();
-				JApiClass foundClass = classMap.get(fullyQualifiedName);
-				if (foundClass == null) {
-					foundClass = loadClass(fullyQualifiedName, EnumSet.allOf(Classpath.class));
+				JApiClass interfaceClass = classMap.get(fullyQualifiedName);
+				if (interfaceClass == null) {
+					interfaceClass = loadClass(fullyQualifiedName, EnumSet.allOf(Classpath.class));
 				}
-				for (JApiMethod method : foundClass.getMethods()) {
+				for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {
 					boolean isImplemented = false;
 					for (JApiMethod implementedMethod : implementedMethods) {
-						if (method.getName().equals(implementedMethod.getName()) && method.hasSameSignature(implementedMethod)) {
+						if (interfaceMethod.getName().equals(implementedMethod.getName()) && interfaceMethod.hasSameSignature(implementedMethod)) {
 							isImplemented = true;
 							break;
 						}
 					}
 					if (!isImplemented) {
-						if (method.getChangeStatus() == JApiChangeStatus.NEW || jApiImplementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
-							if (method.getAbstractModifier().getNewModifier().isPresent()) {
-								AbstractModifier abstractModifier = method.getAbstractModifier().getNewModifier().get();
+						if (interfaceMethod.getChangeStatus() == JApiChangeStatus.NEW || jApiImplementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
+							if (interfaceMethod.getAbstractModifier().getNewModifier().isPresent()) {
+								AbstractModifier abstractModifier = interfaceMethod.getAbstractModifier().getNewModifier().get();
 								if (abstractModifier == AbstractModifier.ABSTRACT) {
-									abstractMethods.add(method);
+									abstractMethods.add(interfaceMethod);
 								} else {
-									defaultMethods.add(method);
+									defaultMethods.add(interfaceMethod);
 								}
 							}
 						}

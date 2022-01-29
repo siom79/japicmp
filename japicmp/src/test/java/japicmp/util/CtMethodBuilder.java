@@ -87,7 +87,7 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 
 	public CtMethod addToClass(CtClass declaringClass) throws CannotCompileException {
 		if (this.returnType == null) {
-			this.returnType = declaringClass;
+			this.returnType = CtClass.voidType;
 		}
 		CtMethod ctMethod = CtNewMethod.make(this.modifier, this.returnType, this.name, this.parameters, this.exceptions, this.body, declaringClass);
 		ctMethod.setModifiers(this.modifier);

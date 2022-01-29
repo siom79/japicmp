@@ -2,19 +2,8 @@ package japicmp.compat;
 
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.model.JApiConstructor;
-import japicmp.model.JApiField;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiSuperclass;
-import japicmp.util.CtClassBuilder;
-import japicmp.util.CtConstructorBuilder;
-import japicmp.util.CtFieldBuilder;
-import japicmp.util.CtInterfaceBuilder;
-import japicmp.util.CtMethodBuilder;
+import japicmp.model.*;
+import japicmp.util.*;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.hamcrest.core.Is;
@@ -24,14 +13,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static japicmp.util.Helper.getJApiClass;
-import static japicmp.util.Helper.getJApiConstructor;
-import static japicmp.util.Helper.getJApiField;
-import static japicmp.util.Helper.getJApiMethod;
+import static japicmp.util.Helper.*;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNot.not;
 
 public class CompatibilityChangesTest {
 
@@ -1462,6 +1448,40 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NEW_DEFAULT));
 		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
+	}
+
+	@Test
+	public void testInterfaceDefaultMethodOverriddenInSubInterface() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("japicmp.Interface").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.booleanType).name("defaultMethod").addToClass(ctInterface);
+				CtClass ctInterfaceSub = CtInterfaceBuilder.create().name("japicmp.InterfaceSub").withSuperInterface(ctInterface).addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").implementsInterface(ctInterfaceSub).addToClassPool(classPool);
+				return Arrays.asList(ctClass, ctInterface, ctInterfaceSub);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("japicmp.Interface").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.booleanType).name("defaultMethod").addToClass(ctInterface);
+				CtClass ctInterfaceSub = CtInterfaceBuilder.create().name("japicmp.InterfaceSub").withSuperInterface(ctInterface).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.booleanType).name("defaultMethod").addToClass(ctInterfaceSub);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").implementsInterface(ctInterfaceSub).addToClassPool(classPool);
+				return Arrays.asList(ctClass, ctInterface, ctInterfaceSub);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.InterfaceSub");
+		assertThat(jApiClass.getCompatibilityChanges().size(), is(0));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "defaultMethod");
+		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
+		jApiClass = getJApiClass(jApiClasses, "japicmp.Interface");
+		assertThat(jApiClass.getCompatibilityChanges().size(), is(0));
+		jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getCompatibilityChanges().size(), is(1));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE));
 	}
 
 	@Test
