@@ -63,7 +63,7 @@ public class CompatibilityChanges {
 		if (jApiClass.getClassType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_TYPE_CHANGED);
 		}
-		checkIfAnnotationDeprectedAdded(jApiClass);
+		checkIfAnnotationDeprecatedAdded(jApiClass);
 		if (hasModifierLevelDecreased(jApiClass)) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_LESS_ACCESSIBLE);
 		}
@@ -157,7 +157,7 @@ public class CompatibilityChanges {
 			if (isNotPrivate(field) && field.getType().hasChanged()) {
 				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_TYPE_CHANGED);
 			}
-			checkIfAnnotationDeprectedAdded(field);
+			checkIfAnnotationDeprecatedAdded(field);
 		}
 	}
 
@@ -262,10 +262,16 @@ public class CompatibilityChanges {
 			}
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(constructor)) {
-				addCompatibilityChange(constructor, JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE);
+				if (isNotFinal(jApiClass)  || constructor.getAccessModifier().hasChangedFrom(AccessModifier.PUBLIC)) {
+					addCompatibilityChange(constructor, JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE);
+				}
 			}
-			checkIfAnnotationDeprectedAdded(constructor);
+			checkIfAnnotationDeprecatedAdded(constructor);
 		}
+	}
+
+	private static boolean isNotFinal(JApiClass jApiClass) {
+		return !(jApiClass.getFinalModifier().getNewModifier().isPresent() && jApiClass.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL);
 	}
 
 	private void checkIfMethodsHaveChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
@@ -362,11 +368,11 @@ public class CompatibilityChanges {
 			}
 			checkAbstractMethod(jApiClass, classMap, method);
 			checkIfExceptionIsNowChecked(method);
-			checkIfAnnotationDeprectedAdded(method);
+			checkIfAnnotationDeprecatedAdded(method);
 		}
 	}
 
-	private void checkIfAnnotationDeprectedAdded(JApiHasAnnotations jApiHasAnnotations) {
+	private void checkIfAnnotationDeprecatedAdded(JApiHasAnnotations jApiHasAnnotations) {
 		for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {
 			if (annotation.getChangeStatus() == JApiChangeStatus.NEW || annotation.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 				if (annotation.getFullyQualifiedName().equals(Deprecated.class.getName())) {
@@ -500,11 +506,11 @@ public class CompatibilityChanges {
 	private boolean isInterface(final JApiClass jApiClass) {
 		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.INTERFACE;
 	}
-	
+
 	private boolean isAnnotation(final JApiClass jApiClass) {
 		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ANNOTATION;
 	}
-	
+
 	private boolean isEnum(final JApiClass jApiClass) {
 		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ENUM;
 	}

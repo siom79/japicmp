@@ -124,6 +124,10 @@
 			<url>https://github.com/mbenson</url>
 			<email>gudnabrsam@gmail.com</email>
 		</contributor>
+		<contributor>
+			<name>Stefano Cordio</name>
+			<url>https://github.com/scordio</url>
+		</contributor>
 	</contributors>
 
     <properties>
