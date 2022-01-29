@@ -6,10 +6,26 @@
 		<version>0.15.5-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-<!--	<version>0.15.2</version>-->
 
-	<artifactId>japicmp-test-maven-plugin-packaging-bundle</artifactId>
+	<artifactId>japicmp-testbundle</artifactId>
 	<packaging>bundle</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-testbundle-v1</artifactId>
+			<version>${project.version}</version>
+			<type>bundle</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.siom79.japicmp</groupId>
+			<artifactId>japicmp-testbundle-v2</artifactId>
+			<version>${project.version}</version>
+			<type>bundle</type>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -47,14 +63,12 @@
 					<parameter>
 						<accessModifier>public</accessModifier>
 						<onlyModified>true</onlyModified>
-						<!-- Test that japicmp-maven-plugin skips execution as this is a pom module -->
-						<skipPomModules>true</skipPomModules>
 					</parameter>
 					<skip>false</skip>
 				</configuration>
 				<executions>
 					<execution>
-						<phase>verify</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>cmp</goal>
 						</goals>
@@ -69,7 +83,6 @@
 						<phase>integration-test</phase>
 						<goals>
 							<goal>integration-test</goal>
-							<goal>verify</goal>
 						</goals>
 					</execution>
 				</executions>

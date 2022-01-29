@@ -9,11 +9,11 @@ import java.nio.file.Paths;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class ITNoReport {
+public class ITBundleReport {
 
 	@Test
-	public void testThatNoReportWasGenerated() {
+	public void testThatReportWasGenerated() {
 		Path path = Paths.get(System.getProperty("user.dir"), "target", "japicmp");
-		assertThat(Files.exists(path), is(false));
+		assertThat(Files.exists(path), is(true));
 	}
 }
