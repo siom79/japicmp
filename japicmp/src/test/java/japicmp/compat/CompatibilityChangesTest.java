@@ -1835,4 +1835,33 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
 	}
+
+	@Test
+	public void testClassBecomesInterfacesAndInterfaceClass() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superInterface = CtInterfaceBuilder.create().name("I").addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.voidType).publicAccess().abstractMethod().name("method").addToClass(superInterface);
+				CtClass subClass = CtClassBuilder.create().name("C").implementsInterface(superInterface).addToClassPool(classPool);
+				return Arrays.asList(superInterface, subClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superInterface = CtInterfaceBuilder.create().name("C").addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.voidType).publicAccess().abstractMethod().name("method").addToClass(superInterface);
+				CtClass subClass = CtClassBuilder.create().name("I").implementsInterface(superInterface).addToClassPool(classPool);
+				return Arrays.asList(superInterface, subClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "I");
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_TYPE_CHANGED));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
+		jApiClass = getJApiClass(jApiClasses, "C");
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_TYPE_CHANGED));
+	}
 }

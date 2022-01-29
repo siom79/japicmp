@@ -468,7 +468,7 @@ public class CompatibilityChanges {
 
 	private List<JApiMethod> getImplementedMethods(final JApiClass jApiClass, final Map<String, JApiClass> classMap, final JApiMethod method) {
 		ArrayList<JApiMethod> jApiMethods = new ArrayList<>();
-		forAllImplementedInterfaces(jApiClass, classMap, jApiMethods, new OnImplementedInterfaceCallback<JApiMethod>() {
+		forAllImplementedInterfaces(jApiClass, classMap, jApiMethods, new ArrayList<>(), new OnImplementedInterfaceCallback<JApiMethod>() {
 			@Override
 			public JApiMethod callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
 				for (JApiMethod jApiMethod : implementedInterface.getMethods()) {
@@ -516,30 +516,27 @@ public class CompatibilityChanges {
 	}
 
 	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map<String, JApiClass> classMap, final JApiMethod method, List<Integer> returnValues) {
-		forAllImplementedInterfaces(jApiClass, classMap, returnValues, new OnImplementedInterfaceCallback<Integer>() {
-			@Override
-			public Integer callback(JApiClass implementedInterface, Map<String, JApiClass> classMap) {
-				for (JApiMethod superMethod : implementedInterface.getMethods()) {
-					if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
-						return 1;
-					}
+		forAllImplementedInterfaces(jApiClass, classMap, returnValues, new ArrayList<>(), (implementedInterface, classMap1) -> {
+			for (JApiMethod superMethod : implementedInterface.getMethods()) {
+				if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+					return 1;
 				}
-				return 0;
 			}
+			return 0;
 		});
 	}
 
-	private <T> void forAllImplementedInterfaces(JApiClass jApiClass, Map<String, JApiClass> classMap, List<T> returnValues, OnImplementedInterfaceCallback<T> onImplementedInterfaceCallback) {
+	private <T> void forAllImplementedInterfaces(JApiClass jApiClass, Map<String, JApiClass> classMap, List<T> returnValues, List<JApiImplementedInterface> visited,
+												 OnImplementedInterfaceCallback<T> onImplementedInterfaceCallback) {
 		List<JApiImplementedInterface> interfaces = jApiClass.getInterfaces();
 		for (JApiImplementedInterface implementedInterface : interfaces) {
 			String fullyQualifiedName = implementedInterface.getFullyQualifiedName();
 			JApiClass foundClass = classMap.get(fullyQualifiedName);
-			if (foundClass != null) {
+			if (foundClass != null && visited.stream().noneMatch(v -> v.getFullyQualifiedName().equals(implementedInterface.getFullyQualifiedName()))) {
 				T returnValue = onImplementedInterfaceCallback.callback(foundClass, classMap);
 				returnValues.add(returnValue);
-				forAllImplementedInterfaces(foundClass, classMap, returnValues, onImplementedInterfaceCallback);
-			} else {
-				//TODO
+				visited.add(implementedInterface);
+				forAllImplementedInterfaces(foundClass, classMap, returnValues, visited, onImplementedInterfaceCallback);
 			}
 		}
 	}
