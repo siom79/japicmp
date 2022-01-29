@@ -2,12 +2,22 @@
 
 The following versions of japicmp are available:
 
+##0.15.5 (2022-01-29)##
+* METHOD_NEW_DEFAULT is not reported in case default methods overrides other default method. [#312](https://github.com/siom79/japicmp/issues/312)
+* Valid processing in case interface becomes class and vice versa. [#309](https://github.com/siom79/japicmp/issues/309)
+* Refine CONSTRUCTOR_LESS_ACCESSIBLE evaluation. [#310](https://github.com/siom79/japicmp/issues/310)
+* Packing type bundle is supported correctly. [#280](https://github.com/siom79/japicmp/issues/280)
+* Upgrade to ant 1.10.11 due to security issues
+* Upgrade to jsoup 1.14.2 due to security issues
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.5).
+
 ##0.15.4 (2021-10-06)##
 * ignoreNonResolvableArtifacts is honored for first version of artifact. [#288](https://github.com/siom79/japicmp/issues/299)
 * Do not report METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE if it is implemented in superclass. [#281](https://github.com/siom79/japicmp/issues/281)
 * EOptional.or() returns secondChoice instead of this. [#297](https://github.com/siom79/japicmp/issues/297)
 
-Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.3).
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.4).
 
 ##0.15.3 (2021-03-06)##
 * Exceptions during the artifact resolution do no longer break the build if the artifact was found. [#284](https://github.com/siom79/japicmp/issues/284)
