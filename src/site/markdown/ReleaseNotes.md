@@ -2,6 +2,14 @@
 
 The following versions of japicmp are available:
 
+##0.15.6 (2022-01-30)##
+* Correct resolution of artifact to compare for ejb packaging. [#302](https://github.com/siom79/japicmp/issues/302)
+* Add option to include SNAPSHOTs in compared version. [#301](https://github.com/siom79/japicmp/issues/301)
+* Build runs concurrently. [#300](https://github.com/siom79/japicmp/issues/300)
+* Fix typo in sample configuration. [#287](https://github.com/siom79/japicmp/issues/287)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.6).
+
 ##0.15.5 (2022-01-29)##
 * METHOD_NEW_DEFAULT is not reported in case default methods overrides other default method. [#312](https://github.com/siom79/japicmp/issues/312)
 * Valid processing in case interface becomes class and vice versa. [#309](https://github.com/siom79/japicmp/issues/309)
