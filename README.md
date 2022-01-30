@@ -3,7 +3,7 @@ The website is located at [https://siom79.github.io/japicmp](https://siom79.gith
 # japicmp
 japicmp is a tool to compare two versions of a jar archive:
 ``` bash
-java -jar japicmp-0.15.5-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+java -jar japicmp-0.15.6-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 ```
 It can also be used as a library:
 ```java
@@ -17,7 +17,7 @@ japicmp is available in the Maven Central Repository:
 <dependency>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp</artifactId>
-	<version>0.15.5</version>
+	<version>0.15.6</version>
 </dependency>
 ```
 A maven plugin allows you to integrate the checks into your build:
@@ -26,7 +26,7 @@ A maven plugin allows you to integrate the checks into your build:
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.15.5</version>
+	<version>0.15.6</version>
 	<configuration>
 		<oldVersion>
 			<dependency>
