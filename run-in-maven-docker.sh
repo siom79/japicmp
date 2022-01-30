@@ -5,4 +5,11 @@ if [ -z "$1" ]
     exit 1
 fi
 
-docker run -it --rm --name maven -v "$(pwd)":/opt/japicmp -v ~/.m2/repository:/root/.m2/repository -w /opt/japicmp maven:$1 mvn clean install
+docker run -it --rm \
+  --user $(id -u):$(id -g) \
+  -v ~/.m2:/var/maven/.m2:rw \
+  -e MAVEN_CONFIG=/var/maven/.m2 \
+  -v $PWD:$PWD:rw \
+  -w $PWD \
+  maven:$1 \
+  mvn -Duser.home=/var/maven clean install
