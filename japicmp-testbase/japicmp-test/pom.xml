@@ -103,6 +103,8 @@
 							</goals>
 							<configuration>
 								<skip>false</skip>
+								<!-- FIXME: remove once https://github.com/jboss-javassist/javassist/issues/400 has been fixed -->
+								<argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
 							</configuration>
 						</execution>
 					</executions>
