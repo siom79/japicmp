@@ -222,11 +222,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
                 <configuration>
                     <remoteTagging>false</remoteTagging>
                     <suppressCommitBeforeTag>false</suppressCommitBeforeTag>
-					<goals>deploy</goals>
                 </configuration>
             </plugin>
             <plugin>
@@ -330,7 +328,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>3.0.0-M1</version>
+					<version>2.5.3</version>
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<useReleaseProfile>false</useReleaseProfile>
@@ -343,9 +341,9 @@
     </build>
 
     <scm>
-        <connection>scm:git:git@github.com:${github.account}/${github.project}.git</connection>
-        <developerConnection>scm:git:git@github.com:${github.account}/${github.project}.git</developerConnection>
-        <url>git@github.com:${github.account}/${github.project}.git</url>
+        <connection>scm:git:https://github.com/${github.account}/${github.project}.git</connection>
+        <developerConnection>scm:git:https://github.com/${github.account}/${github.project}.git</developerConnection>
+        <url>https://github.com/${github.account}/${github.project}.git</url>
       <tag>HEAD</tag>
   </scm>
 
@@ -367,33 +365,6 @@
 	</distributionManagement>
 
     <profiles>
-        <profile>
-            <id>sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
            <id>doclint-java8-disabled</id>
            <activation>
@@ -518,7 +489,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.1</version>
+						<version>3.0.1</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -526,6 +497,12 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
+								<configuration>
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
