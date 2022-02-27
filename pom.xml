@@ -369,8 +369,8 @@
 			<url>${sonatypeOssDistMgmtSnapshotsUrl}</url>
 		</snapshotRepository>
 		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
+			<id>ossrh</id>
+			<name>Central Repository OSSRH</name>
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
