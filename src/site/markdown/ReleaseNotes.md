@@ -2,6 +2,12 @@
 
 The following versions of japicmp are available:
 
+##0.15.7 (2022-02-27)##
+* Do not report new methods in super-interface of interface as METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE. [#281](https://github.com/siom79/japicmp/issues/281)
+* Detect default implementation in newly added interface. [#321](https://github.com/siom79/japicmp/issues/321)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.15.7).
+
 ##0.15.6 (2022-01-30)##
 * Correct resolution of artifact to compare for ejb packaging. [#302](https://github.com/siom79/japicmp/issues/302)
 * Add option to include SNAPSHOTs in compared version. [#301](https://github.com/siom79/japicmp/issues/301)
