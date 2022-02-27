@@ -710,6 +710,9 @@ public class CompatibilityChanges {
 							if (isSynthetic(interfaceMethod)) {
 								continue;
 							}
+							if (!isAbstract(interfaceMethod)) { //default implementation
+								continue;
+							}
 							if (isImplemented(interfaceMethod, jApiClass)) {
 								interfaceMethodImplemented = true;
 								break;
@@ -729,6 +732,14 @@ public class CompatibilityChanges {
 		checkIfClassNowCheckedException(jApiClass);
 		checkIfAbstractMethodAddedInSuperclass(jApiClass, classMap);
 		checkIfAbstractMethodAdded(jApiClass, classMap);
+	}
+
+	private boolean isAbstract(JApiMethod jApiMethod) {
+		if (jApiMethod.getAbstractModifier().getNewModifier().isPresent()) {
+			AbstractModifier abstractModifier = jApiMethod.getAbstractModifier().getNewModifier().get();
+			return abstractModifier == AbstractModifier.ABSTRACT;
+		}
+		return false;
 	}
 
 	private boolean hasSameType(JApiField field, JApiField otherField) {

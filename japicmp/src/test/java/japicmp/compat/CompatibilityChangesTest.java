@@ -1884,4 +1884,28 @@ public class CompatibilityChangesTest {
 		jApiClass = getJApiClass(jApiClasses, "C");
 		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_TYPE_CHANGED));
 	}
+
+	@Test
+	public void testClassExtendsUnaryOperator() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass clazz = CtClassBuilder.create().name("com.acme.japicmp.NewOperator")
+						.implementsInterface(classPool.get("java.util.function.UnaryOperator")).addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(classPool.get("java.lang.Object")).publicAccess().name("apply")
+						.parameter(classPool.get("java.lang.Object")).addToClass(clazz);
+				return Collections.singletonList(clazz);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "com.acme.japicmp.NewOperator");
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.INTERFACE_ADDED));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+	}
 }
