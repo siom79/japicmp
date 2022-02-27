@@ -132,7 +132,11 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
 
 This is the release procedure:
 * Update ReleaseNotes.md.
-* Increment version in README.md
+* Set the release version in maven:
+```bash
+mvn versions:set -DnewVersion=<version>-SNAPSHOT
+```
+* Increment version in README.md / Site-Report
 ``` bash
 python3 release.py --release-version <release-version> --old-version <old-version>
 ```
