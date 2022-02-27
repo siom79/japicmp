@@ -9,7 +9,7 @@ import fileinput
 def main(argv):
 	(gpgpassphrase, dryRun, devVersion, releaseVersion, releaseTag, oldVersion) = parseCli(argv)
 	replaceOldVersion(oldVersion, releaseVersion, dryRun)
-	releaseBuild(gpgpassphrase, dryRun, devVersion, releaseVersion, releaseTag)
+	#releaseBuild(gpgpassphrase, dryRun, devVersion, releaseVersion, releaseTag)
 
 
 def parseCli(argv):
