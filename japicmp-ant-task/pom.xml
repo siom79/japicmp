@@ -79,6 +79,54 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>japicmp</artifactId>
+							<version>0.9.4</version>
+							<type>jar</type>
+							<overWrite>false</overWrite>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<destFileName>japicmp-0.9.4.jar</destFileName>
+						</artifactItem>
+						<artifactItem>
+							<groupId>org.javassist</groupId>
+							<artifactId>javassist</artifactId>
+							<version>3.23.1-GA</version>
+							<type>jar</type>
+							<overWrite>false</overWrite>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<destFileName>javassist-3.23.1-GA.jar</destFileName>
+						</artifactItem>
+						<artifactItem>
+							<groupId>com.google.guava</groupId>
+							<artifactId>guava</artifactId>
+							<version>18.0</version>
+							<type>jar</type>
+							<overWrite>false</overWrite>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<destFileName>guava-18.0.jar</destFileName>
+						</artifactItem>
+					</artifactItems>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+					<overWriteReleases>false</overWriteReleases>
+					<overWriteSnapshots>true</overWriteSnapshots>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
