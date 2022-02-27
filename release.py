@@ -57,7 +57,7 @@ def replaceOldVersion(oldVersion, releaseVersion):
 
 
 def printHelp():
-	print("release.py --gpg-passphrase <gpgpassphrase> --dry-run --new-version <new-version> --release-version <release-version> --release-tag <release-tag> --old-version <old-version>")
+	print("release.py --release-version <release-version> --old-version <old-version>")
 
 
 if __name__ == "__main__":
