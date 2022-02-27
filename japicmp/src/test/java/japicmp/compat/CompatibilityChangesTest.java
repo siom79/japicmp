@@ -1908,4 +1908,28 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.INTERFACE_ADDED));
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
 	}
+
+	@Test
+	public void testNewMethodInSuperInterface() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superInterface = CtInterfaceBuilder.create().name("I").addToClassPool(classPool);
+				CtClass si = CtInterfaceBuilder.create().name("SI").withSuperInterface(superInterface).addToClassPool(classPool);
+				return Arrays.asList(superInterface, si);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superInterface = CtInterfaceBuilder.create().name("I").addToClassPool(classPool);
+				CtMethodBuilder.create().returnType(CtClass.voidType).publicAccess().abstractMethod().name("method").addToClass(superInterface);
+				CtClass si = CtInterfaceBuilder.create().name("SI").withSuperInterface(superInterface).addToClassPool(classPool);
+				return Arrays.asList(superInterface, si);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "SI");
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+	}
 }

@@ -499,6 +499,10 @@ public class CompatibilityChanges {
 		}
 	}
 
+	private boolean isClass(final JApiClass jApiClass) {
+		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.CLASS;
+	}
+
 	private boolean isInterface(final JApiClass jApiClass) {
 		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.INTERFACE;
 	}
@@ -763,7 +767,7 @@ public class CompatibilityChanges {
 	}
 
 	private void checkIfAbstractMethodAddedInSuperclass(final JApiClass jApiClass, Map<String, JApiClass> classMap) {
-		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
+		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW && isClass(jApiClass)) {
 			final List<JApiMethod> abstractMethods = new ArrayList<>();
 			final List<JApiMethod> defaultMethods = new ArrayList<>();
 			final List<JApiMethod> implementedMethods = new ArrayList<>();
