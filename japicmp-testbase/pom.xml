@@ -35,7 +35,7 @@
 	</modules>
 
 	<properties>
-		<maven.site.plugin.skip>true</maven.site.plugin.skip>
+		<maven.site.skip>true</maven.site.skip>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 

@@ -137,7 +137,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <github.account>siom79</github.account>
         <github.project>japicmp</github.project>
-		<maven.site.plugin.skip>false</maven.site.plugin.skip>
+		<maven.site.skip>false</maven.site.skip>
 		<surefireVersion>3.0.0-M7</surefireVersion>
 		<javassist.version>3.24.0-GA</javassist.version>
 		<guava.version>30.1-jre</guava.version>
@@ -322,9 +322,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>3.12.0</version>
-					<configuration>
-						<skip>${maven.site.plugin.skip}</skip>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
