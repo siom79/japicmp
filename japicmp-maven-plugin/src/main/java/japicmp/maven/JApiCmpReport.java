@@ -3,8 +3,6 @@ package japicmp.maven;
 import japicmp.config.Options;
 import japicmp.output.xml.XmlOutput;
 import japicmp.util.Optional;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.MojoExecution;
@@ -47,8 +45,6 @@ public class JApiCmpReport extends AbstractMavenReport {
 	@org.apache.maven.plugins.annotations.Parameter(required = true, readonly = true, property = "project.reporting.outputDirectory")
 	private String outputDirectory;
 	@Component
-	private ArtifactFactory artifactFactory;
-	@Component
 	private RepositorySystem repoSystem;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
 	private RepositorySystemSession repoSession;
@@ -64,8 +60,6 @@ public class JApiCmpReport extends AbstractMavenReport {
 	private MojoExecution mojoExecution;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "(,${project.version})", readonly = true)
 	private String versionRangeWithProjectVersion;
-	@Component
-	private ArtifactMetadataSource metadataSource;
 	private JApiCmpMojo mojo;
 	private MavenParameters mavenParameters;
 	private PluginParameters pluginParameters;
@@ -108,8 +102,8 @@ public class JApiCmpReport extends AbstractMavenReport {
 			return this.mojo;
 		}
 		this.mojo = new JApiCmpMojo();
-		this.mavenParameters = new MavenParameters(this.artifactRepositories, this.artifactFactory, this.localRepository,
-				this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.metadataSource, this.repoSystem, this.repoSession,
+		this.mavenParameters = new MavenParameters(this.artifactRepositories, this.localRepository,
+				this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
 				this.remoteRepos);
 		this.pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.<File>absent(), Optional.of(
 				this.outputDirectory), false, this.oldVersions, this.newVersions, this.oldClassPathDependencies, this.newClassPathDependencies);
