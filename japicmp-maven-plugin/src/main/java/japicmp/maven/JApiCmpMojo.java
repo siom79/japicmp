@@ -679,13 +679,15 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject) {
-		Set<org.apache.maven.artifact.Artifact> projectArtifacts = mavenProject.getArtifacts();
-		if ((projectArtifacts == null) || projectArtifacts.isEmpty()) {
-			return Collections.emptySet();
-		}
+		org.apache.maven.artifact.Artifact projectArtifact = mavenProject.getArtifact();
+		Set<org.apache.maven.artifact.Artifact> projectArtifacts = new HashSet<>();
+		projectArtifacts.add(projectArtifact);
+		projectArtifacts.addAll(mavenProject.getArtifacts());
 		HashSet<Artifact> result = new HashSet<>(projectArtifacts.size());
 		for (org.apache.maven.artifact.Artifact a : projectArtifacts) {
-			if (a.getArtifactHandler().isAddedToClasspath()) {
+			if (a == projectArtifact) {
+				result.add(RepositoryUtils.toArtifact(a)); // will have no scope, is distinguished
+			} else if (a.getArtifactHandler().isAddedToClasspath()) {
 				if (org.apache.maven.artifact.Artifact.SCOPE_COMPILE.equals(a.getScope())
 						|| org.apache.maven.artifact.Artifact.SCOPE_PROVIDED.equals(a.getScope())
 						|| org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
