@@ -678,15 +678,13 @@ public class JApiCmpMojo extends AbstractMojo {
 		comparatorOptions.getClassPathEntries().addAll(classPathEntries);
 	}
 
-	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject)
-	{
+	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject) {
 		Set<org.apache.maven.artifact.Artifact> projectArtifacts = mavenProject.getArtifacts();
 		if ((projectArtifacts == null) || projectArtifacts.isEmpty()) {
 			return Collections.emptySet();
 		}
 		HashSet<Artifact> result = new HashSet<>(projectArtifacts.size());
-		for (org.apache.maven.artifact.Artifact a : projectArtifacts)
-		{
+		for (org.apache.maven.artifact.Artifact a : projectArtifacts) {
 			if (a.getArtifactHandler().isAddedToClasspath()) {
 				if (org.apache.maven.artifact.Artifact.SCOPE_COMPILE.equals(a.getScope())
 						|| org.apache.maven.artifact.Artifact.SCOPE_PROVIDED.equals(a.getScope())
