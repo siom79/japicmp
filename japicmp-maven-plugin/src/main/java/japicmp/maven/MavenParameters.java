@@ -15,7 +15,6 @@ public class MavenParameters {
 	private final MavenProject mavenProject;
 	private final MojoExecution mojoExecution;
 	private final String versionRangeWithProjectVersion;
-
 	private final RepositorySystem repoSystem;
 	private final RepositorySystemSession repoSession;
 	private final List<RemoteRepository> remoteRepos;
