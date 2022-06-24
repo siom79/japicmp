@@ -679,15 +679,15 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject) {
-		Set<org.apache.maven.artifact.Artifact> projectArtifacts = mavenProject.getArtifacts();
-		HashSet<Artifact> result = new HashSet<>(projectArtifacts.size());
+		Set<org.apache.maven.artifact.Artifact> projectDependencies = mavenProject.getArtifacts(); // dependencies that this project has, including transitive ones
+		HashSet<Artifact> result = new HashSet<>(1 + projectDependencies.size());
 		result.add(RepositoryUtils.toArtifact(mavenProject.getArtifact())); // distinguished: the project artifact
-		for (org.apache.maven.artifact.Artifact a : projectArtifacts) {
-			if (a.getArtifactHandler().isAddedToClasspath()) {
-				if (org.apache.maven.artifact.Artifact.SCOPE_COMPILE.equals(a.getScope())
-						|| org.apache.maven.artifact.Artifact.SCOPE_PROVIDED.equals(a.getScope())
-						|| org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
-					result.add(RepositoryUtils.toArtifact(a));
+		for (org.apache.maven.artifact.Artifact dep : projectDependencies) {
+			if (dep.getArtifactHandler().isAddedToClasspath()) {
+				if (org.apache.maven.artifact.Artifact.SCOPE_COMPILE.equals(dep.getScope())
+						|| org.apache.maven.artifact.Artifact.SCOPE_PROVIDED.equals(dep.getScope())
+						|| org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(dep.getScope())) {
+					result.add(RepositoryUtils.toArtifact(dep));
 				}
 			}
 		}
