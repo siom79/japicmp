@@ -1,8 +1,6 @@
 package japicmp.maven;
 
 import japicmp.util.Optional;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.logging.Log;
@@ -93,8 +91,8 @@ public class SkipModuleStrategyTest {
 
 	private MavenParameters createMavenParameters() {
 		RemoteRepository remoteRepository = new RemoteRepository.Builder("id", "type", "http://example.org").build();
-		return new MavenParameters(new ArrayList<ArtifactRepository>(), mock(ArtifactFactory.class), mock(ArtifactRepository.class),
-			new MavenProject(), mock(MojoExecution.class), "", mock(ArtifactMetadataSource.class), mock(RepositorySystem.class), mock(
+		return new MavenParameters(new ArrayList<ArtifactRepository>(), mock(ArtifactRepository.class),
+			new MavenProject(), mock(MojoExecution.class), "", mock(RepositorySystem.class), mock(
 				RepositorySystemSession.class), Collections.singletonList(remoteRepository));
 	}
 
