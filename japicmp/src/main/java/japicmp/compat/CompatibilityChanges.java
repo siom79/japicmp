@@ -265,6 +265,7 @@ public class CompatibilityChanges {
 				}
 			}
 			checkIfAnnotationDeprecatedAdded(constructor);
+			checkIfVarargsChanged(constructor);
 		}
 	}
 
@@ -367,6 +368,7 @@ public class CompatibilityChanges {
 			checkAbstractMethod(jApiClass, classMap, method);
 			checkIfExceptionIsNowChecked(method);
 			checkIfAnnotationDeprecatedAdded(method);
+			checkIfVarargsChanged(method);
 		}
 	}
 
@@ -377,6 +379,15 @@ public class CompatibilityChanges {
 					addCompatibilityChange((JApiCompatibility) jApiHasAnnotations, JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED);
 				}
 			}
+		}
+	}
+
+	private void checkIfVarargsChanged(JApiBehavior behavior) {
+		if (behavior.getVarargsModifier().hasChangedFromTo(VarargsModifier.VARARGS, VarargsModifier.NON_VARARGS)) {
+			addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NO_LONGER_VARARGS);
+		}
+		if (behavior.getVarargsModifier().hasChangedFromTo(VarargsModifier.NON_VARARGS, VarargsModifier.VARARGS)) {
+			addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NOW_VARARGS);
 		}
 	}
 
