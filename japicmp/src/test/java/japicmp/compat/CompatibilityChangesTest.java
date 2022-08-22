@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertEquals;
 
 public class CompatibilityChangesTest {
 
@@ -981,6 +982,56 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
+
+	@Test
+	public void testConstructorThrowsNewCheckedException() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().publicAccess().addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().publicAccess().exceptions(new CtClass[] {classPool.get("java.lang.Exception")}).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiConstructor constructor = jApiClass.getConstructors().get(0);
+		assertThat(constructor.isBinaryCompatible(), is(true));
+		assertThat(constructor.isSourceCompatible(), is(false));
+		assertEquals(constructor.getCompatibilityChanges(), Collections.singletonList(JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION));
+	}
+
+	@Test
+	public void testConstructorNoLongerThrowsNewCheckedException() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().publicAccess().exceptions(new CtClass[] {classPool.get("java.lang.Exception")}).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().publicAccess().addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiConstructor constructor = jApiClass.getConstructors().get(0);
+		assertThat(constructor.isBinaryCompatible(), is(true));
+		assertThat(constructor.isSourceCompatible(), is(false));
+		assertEquals(constructor.getCompatibilityChanges(), Collections.singletonList(JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION));
 	}
 
 	@Test

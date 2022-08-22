@@ -264,6 +264,7 @@ public class CompatibilityChanges {
 					addCompatibilityChange(constructor, JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE);
 				}
 			}
+			checkIfExceptionIsNowChecked(constructor);
 			checkIfAnnotationDeprecatedAdded(constructor);
 		}
 	}
@@ -488,13 +489,13 @@ public class CompatibilityChanges {
 		return isAbstract;
 	}
 
-	private void checkIfExceptionIsNowChecked(JApiMethod method) {
-		for (JApiException exception : method.getExceptions()) {
-			if (exception.getChangeStatus() == JApiChangeStatus.NEW && exception.isCheckedException() && method.getChangeStatus() != JApiChangeStatus.NEW) {
-				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION);
+	private void checkIfExceptionIsNowChecked(JApiBehavior behavior) {
+		for (JApiException exception : behavior.getExceptions()) {
+			if (exception.getChangeStatus() == JApiChangeStatus.NEW && exception.isCheckedException() && behavior.getChangeStatus() != JApiChangeStatus.NEW) {
+				addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION);
 			}
-			if (exception.getChangeStatus() == JApiChangeStatus.REMOVED && exception.isCheckedException() && method.getChangeStatus() != JApiChangeStatus.REMOVED) {
-				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION);
+			if (exception.getChangeStatus() == JApiChangeStatus.REMOVED && exception.isCheckedException() && behavior.getChangeStatus() != JApiChangeStatus.REMOVED) {
+				addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION);
 			}
 		}
 	}
