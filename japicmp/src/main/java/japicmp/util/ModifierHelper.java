@@ -1,6 +1,5 @@
 package japicmp.util;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.AccessModifier;

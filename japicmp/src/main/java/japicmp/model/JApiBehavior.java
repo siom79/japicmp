@@ -39,6 +39,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	private final JApiModifier<BridgeModifier> bridgeModifier;
 	private final JApiModifier<SyntheticModifier> syntheticModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
+	private final JApiModifier<VarargsModifier> varargsModifier;
 	private final List<JApiException> exceptions;
 	protected JApiChangeStatus changeStatus;
 	private final Optional<Integer> oldLineNumber;
@@ -57,6 +58,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 		this.bridgeModifier = extractBridgeModifier(oldBehavior, newBehavior);
 		this.syntheticModifier = extractSyntheticModifier(oldBehavior, newBehavior);
 		this.syntheticAttribute = extractSyntheticAttribute(oldBehavior, newBehavior);
+		this.varargsModifier = extractVarargsModifier(oldBehavior, newBehavior);
 		this.exceptions = computeExceptionChanges(oldBehavior, newBehavior);
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 		this.oldLineNumber = getLineNumber(oldBehavior);
@@ -179,6 +181,9 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				changeStatus = JApiChangeStatus.MODIFIED;
+			}
+			if (this.varargsModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			for (JApiException jApiException : exceptions) {
@@ -330,6 +335,25 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 		});
 	}
 
+	private JApiModifier<VarargsModifier> extractVarargsModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback<VarargsModifier>() {
+			private VarargsModifier getModifier(CtBehavior behavior) {
+				return Modifier.isVarArgs(behavior.getModifiers()) ? VarargsModifier.VARARGS : VarargsModifier.NON_VARARGS;
+			}
+
+			@Override
+			public VarargsModifier getModifierForOld(CtBehavior oldBehavior) {
+				return getModifier(oldBehavior);
+			}
+
+			@Override
+			public VarargsModifier getModifierForNew(CtBehavior newBehavior) {
+				return getModifier(newBehavior);
+			}
+		});
+	}
+
+	@Override
 	@XmlElementWrapper(name = "modifiers")
 	@XmlElement(name = "modifier")
 	public List<? extends JApiModifier<? extends Enum<? extends Enum<?>>>> getModifiers() {
@@ -342,6 +366,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	}
 
 	@XmlAttribute
+	@Override
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
 	}
@@ -357,20 +382,24 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	}
 
 	@XmlTransient
+	@Override
 	public JApiModifier<AccessModifier> getAccessModifier() {
 		return accessModifier;
 	}
 
 	@XmlTransient
+	@Override
 	public JApiModifier<FinalModifier> getFinalModifier() {
 		return finalModifier;
 	}
 
 	@XmlTransient
+	@Override
 	public JApiModifier<StaticModifier> getStaticModifier() {
 		return staticModifier;
 	}
 
+	@Override
 	public JApiModifier<AbstractModifier> getAbstractModifier() {
 		return this.abstractModifier;
 	}
@@ -384,18 +413,26 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	}
 
 	@XmlTransient
+	@Override
 	public JApiModifier<BridgeModifier> getBridgeModifier() {
 		return this.bridgeModifier;
 	}
 
 	@XmlTransient
+	@Override
 	public JApiModifier<SyntheticModifier> getSyntheticModifier() {
 		return this.syntheticModifier;
 	}
 
 	@XmlTransient
+	@Override
 	public JApiAttribute<SyntheticAttribute> getSyntheticAttribute() {
 		return syntheticAttribute;
+	}
+
+	@XmlTransient
+	public JApiModifier<VarargsModifier> getVarargsModifier() {
+		return varargsModifier;
 	}
 
 	@Override
@@ -424,12 +461,14 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 
 	@XmlElementWrapper(name = "compatibilityChanges")
 	@XmlElement(name = "compatibilityChange")
+	@Override
 	public List<JApiCompatibilityChange> getCompatibilityChanges() {
 		return compatibilityChanges;
 	}
 
 	@XmlElementWrapper(name = "annotations")
 	@XmlElement(name = "annotation")
+	@Override
 	public List<JApiAnnotation> getAnnotations() {
 		return annotations;
 	}

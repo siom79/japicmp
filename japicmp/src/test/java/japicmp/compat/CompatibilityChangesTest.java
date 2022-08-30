@@ -6,6 +6,8 @@ import japicmp.model.*;
 import japicmp.util.*;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.Modifier;
+
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -645,6 +647,66 @@ public class CompatibilityChangesTest {
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodNoLongerStatic");
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NO_LONGER_STATIC));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+	}
+
+	@Test
+	public void testMethodNowVarargs() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass arrayClass = classPool.getCtClass("[I");
+
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().parameter(arrayClass).name("methodNowVarargs").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass arrayClass = classPool.getCtClass("[I");
+
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().modifier(Modifier.VARARGS).publicAccess().parameter(arrayClass).name("methodNowVarargs").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodNowVarargs");
+		assertEquals(jApiMethod.getCompatibilityChanges(), Collections.singletonList(JApiCompatibilityChange.METHOD_NOW_VARARGS));
+	}
+
+	@Test
+	public void testMethodNoLongerVarargs() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass arrayClass = classPool.getCtClass("[I");
+
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().modifier(Modifier.VARARGS).publicAccess().parameter(arrayClass).name("methodNoLongerVarargs").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass arrayClass = classPool.getCtClass("[I");
+
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().parameter(arrayClass).name("methodNoLongerVarargs").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodNoLongerVarargs");
+		assertEquals(jApiMethod.getCompatibilityChanges(), Collections.singletonList(JApiCompatibilityChange.METHOD_NO_LONGER_VARARGS));
 	}
 
 	@Test
