@@ -135,6 +135,7 @@ This is the release procedure:
 * Set the release version in maven:
 ```bash
 mvn versions:set -DnewVersion=<version>-SNAPSHOT
+mvn versions:commit
 ```
 * Increment version in README.md / Site-Report
 ``` bash
