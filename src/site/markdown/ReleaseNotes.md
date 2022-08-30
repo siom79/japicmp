@@ -2,6 +2,13 @@
 
 The following versions of japicmp are available:
 
+##0.16.0 (2022-08-30)##
+* Detect method varargs changes (METHOD_NOW_VARARGS, METHOD_NO_LONGER_VARARGS). [#331](https://github.com/siom79/japicmp/issues/331)
+* Constructors are now also reported in case of changes of checked exceptions. [#332](https://github.com/siom79/japicmp/issues/332)
+* Reduced the maximum memory requirement of the JarArchiveComparator. [#333](https://github.com/siom79/japicmp/issues/333)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.16.0).
+
 ##0.15.7 (2022-02-27)##
 * Do not report new methods in super-interface of interface as METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE. [#281](https://github.com/siom79/japicmp/issues/281)
 * Detect default implementation in newly added interface. [#321](https://github.com/siom79/japicmp/issues/321)
