@@ -16,10 +16,12 @@ public class ClassesHelper {
 
 	public static List<JApiClass> compareClasses(JarArchiveComparatorOptions options, ClassesGenerator classesGenerator) throws Exception {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
-		List<CtClass> oldClasses = classesGenerator.createOldClasses(classPool);
+		ReducibleClassPool classPool = jarArchiveComparator.getCommonClassPool();
+		final List<CtClass> oldClasses = classesGenerator.createOldClasses(classPool);
 		List<CtClass> newClasses = classesGenerator.createNewClasses(classPool);
-		return jarArchiveComparator.compareClassLists(options, oldClasses, newClasses);
+		List<CtClass> filteredOldClasses = jarArchiveComparator.createListOfCtClasses(() -> oldClasses, classPool);
+		List<CtClass> filteredNewClasses = jarArchiveComparator.createListOfCtClasses(() -> newClasses, classPool);
+		return jarArchiveComparator.compareClassLists(options, filteredOldClasses, filteredNewClasses);
 	}
 
 	public static class CompareClassesResult {
