@@ -25,7 +25,7 @@
 	</licenses>
 
 	<properties>
-		<mavenVersion>3.6.3</mavenVersion> <!-- maven.version property is reserved! -->
+		<mavenVersion>3.8.1</mavenVersion> <!-- maven.version property is reserved! -->
 		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven version -->
 		<maven-plugin.version>3.6.4</maven-plugin.version>
 	</properties>
