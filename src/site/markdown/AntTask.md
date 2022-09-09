@@ -1,10 +1,13 @@
-#Ant Task#
+Ant Task
+========
 
-## Download ##
+Download
+--------
 
 You can download the Ant task from the Central Maven Repository: http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.siom79.japicmp%22%20AND%20a%3A%22japicmp-ant-task%22.
 
-##Basic Usage##
+Basic Usage
+-----------
 
 The Ant task can be included in the build file of a project like shown in the following (requires Ant >= 1.9.5):
 
@@ -34,7 +37,8 @@ invoked like any other Ant task. The attribute `oldjar` specifies the old versio
 defines the new one. `classpathref` lets you reference the classpath used by japicmp. If you only want to output
 binary incompatible changes, you can set the attribute `onlybinaryincompatible` to true.
 
-##Advanced Usage##
+Advanced Usage
+--------------
 
 The following table gives an overview of all available parameters of the Ant task.
 

@@ -1,6 +1,8 @@
-#Examples#
+Examples
+========
 
-##Comparing two versions of the guava library##
+Comparing two versions of the guava library
+-------------------------------------------
 
 In the following you see some of the differences between the versions 18.0 and 19.0 of Google's guava library.
 The differences between the two Java APIs are also printed on the command line for a quick overview.
@@ -71,7 +73,8 @@ You can also let japicmp create an XML report like the following one:
 			...
 ```
 
-##Tracking changes of an XML document marshalled with JAXB##
+Tracking changes of an XML document marshalled with JAXB
+--------------------------------------------------------
 
 The following output shows the changes of a model class with some JAXB bindings:
 

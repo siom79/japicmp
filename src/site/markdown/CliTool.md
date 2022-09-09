@@ -1,4 +1,5 @@
-#CLI-Tool#
+CLI-Tool
+========
 
 The command line tool has the following options:
 

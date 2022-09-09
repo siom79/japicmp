@@ -1,6 +1,8 @@
-#Maven Plugin#
+Maven Plugin
+============
 
-##Basic Usage##
+Basic Usage
+-----------
 
 The maven plugin can be included in the pom.xml file of your artifact in the following way (requires maven >= 3.0.3):
 
@@ -85,7 +87,8 @@ to configure the latest version more precisely (e.g. only GA versions), then you
 </plugin>
 ```
 
-##Properties##
+Properties
+----------
 
 The following properties can be set:
 
@@ -101,7 +104,8 @@ The following properties can be set:
 | japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero | Break the build in case of semantic versioning used with zero as major version number is violated. |
 
 
-##Advanced Usage##
+Advanced Usage
+--------------
 
 An advanced configuration can utilize the following parameters:
 
@@ -344,7 +348,8 @@ The maven plugin produces the two files `japicmp.diff` and `japicmp.xml` within 
 of your artifact. If you run the plugin multiple times within the same module using the &lt;executions&gt; element, the reports
 are named after the execution id.
 
-##Site report##
+Site report
+-----------
 
 Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
 [maven-site-plugin](https://maven.apache.org/plugins/maven-site-plugin/) and therewith to be integrated into the site report:
@@ -403,7 +408,8 @@ To create a summary report, you can also provide multiple old and new versions:
 ```
 The configuration above will create one report for all the declared dependencies.
 
-##Using Groovy scripts for post analysis##
+Using Groovy scripts for post analysis
+--------------------------------------
 
 The parameter &lt;postAnalysisScript/&gt; can be used to invoke a [Groovy](http://www.groovy-lang.org/) script after the analysis but before the output is written.
 This is helpful if you want to apply some custom filtering that is not possible with the standard means of japicmp. The following script for example filters out

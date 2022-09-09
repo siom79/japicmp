@@ -1,4 +1,5 @@
-#japicmp#
+japicmp
+=======
 
 japicmp is a tool to compare two versions of a jar archive:
 
@@ -71,7 +72,8 @@ By using the available Ant task, you can also integrate japicmp into your Ant bu
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
-##Motivation##
+Motivation
+----------
 
 Every time you release a new version of a library or a product, you have to tell your clients or customers what
 has changed in comparison to the last release. Without the appropriate tooling, this task is tedious and error-prone.
@@ -94,7 +96,8 @@ to integrate change tracking of other types of artifacts (configuration files, e
 to make compromises in terms of performance and ease of usage. japicmp for example compares two archives with about 1700 classes each
 in less than one second and therewith can be easily integrated in each build.
 
-##Features##
+Features
+--------
 
 * Comparison of two jar archives without the need to add all of their dependencies to the classpath.
 * Differences are printed on the command line in a simple diff format.
@@ -110,15 +113,18 @@ in less than one second and therewith can be easily integrated in each build.
 * Per default synthetic classes and class members (e.g. [bridge methods](https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html)) are hidden. They can be listed by using the option `--include-synthetic`.
 * The maven plugin allows project-specific filtering and reports using a custom [Groovy](groovy-lang.org) script.
 
-##Downloads##
+Downloads
+---------
 
 You can download the latest version from the [release page](https://github.com/siom79/japicmp/releases) or directly from the [maven central repository](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22japicmp%22).
 
-##Contact##
+Contact
+-------
 
 The issue tracker at [github](https://github.com/siom79/japicmp/issues) can be used to submit feature requests or bugs. Beyond that contributions in form of pull requests are highly appreciated.
 
-##Related work##
+Related work
+------------
 
 The following projects have related goals:
 

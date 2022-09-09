@@ -126,7 +126,6 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
  * findbugs
  * checkstyle
  * japicmp
- * cobertura test coverage
 
 ## Release
 
