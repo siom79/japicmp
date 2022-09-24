@@ -1,10 +1,6 @@
 package japicmp.cmp;
 
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiReturnType;
+import japicmp.model.*;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
@@ -285,7 +281,7 @@ public class MethodsTest {
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.booleanType).name("get").body("return 42;").addToClass(ctClass);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.booleanType).name("get").body("return false;").addToClass(ctClass);
 				return Collections.singletonList(ctClass);
 			}
 		});

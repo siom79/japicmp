@@ -6,6 +6,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.*;
 import japicmp.util.ClassHelper;
 import japicmp.util.Optional;
+import japicmp.util.SignatureParser;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
@@ -64,6 +65,26 @@ public class CompatibilityChanges {
 		checkIfAnnotationDeprecatedAdded(jApiClass);
 		if (hasModifierLevelDecreased(jApiClass)) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_LESS_ACCESSIBLE);
+		}
+		checkIfGenericTemplatesHaveChanged(jApiClass);
+	}
+
+	private void checkIfGenericTemplatesHaveChanged(JApiHasGenericTemplates jApiHasGenericTemplates) {
+		for (JApiGenericTemplate jApiGenericTemplate : jApiHasGenericTemplates.getGenericTemplates()) {
+			if (jApiGenericTemplate.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED);
+				break;
+			}
+		}
+		for (JApiGenericTemplate jApiGenericTemplate : jApiHasGenericTemplates.getGenericTemplates()) {
+			JApiChangeStatus changeStatus = jApiGenericTemplate.getChangeStatus();
+			if (changeStatus == JApiChangeStatus.MODIFIED || changeStatus == JApiChangeStatus.UNCHANGED) {
+				if (!SignatureParser.equalGenericTypes(jApiGenericTemplate.getOldGenericTypes(), jApiGenericTemplate.getNewGenericTypes())) {
+					jApiGenericTemplate.getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
+					((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
+					break;
+				}
+			}
 		}
 	}
 
@@ -156,6 +177,7 @@ public class CompatibilityChanges {
 				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_TYPE_CHANGED);
 			}
 			checkIfAnnotationDeprecatedAdded(field);
+			checkIfFieldGenericsChanged(field);
 		}
 	}
 
@@ -267,6 +289,8 @@ public class CompatibilityChanges {
 			checkIfExceptionIsNowChecked(constructor);
 			checkIfAnnotationDeprecatedAdded(constructor);
 			checkIfVarargsChanged(constructor);
+			checkIfParametersGenericsChanged(constructor);
+			checkIfGenericTemplatesHaveChanged(constructor);
 		}
 	}
 
@@ -342,10 +366,7 @@ public class CompatibilityChanges {
 					}
 				}
 			}
-			// section 13.4.15 of "Java Language Specification" SE7 (Method Result Type)
-			if (method.getReturnType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_RETURN_TYPE_CHANGED);
-			}
+			checkIfReturnTypeChanged(method);
 			// section 13.4.16 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getAbstractModifier().hasChangedFromTo(AbstractModifier.NON_ABSTRACT, AbstractModifier.ABSTRACT)) {
 				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_ABSTRACT);
@@ -370,6 +391,41 @@ public class CompatibilityChanges {
 			checkIfExceptionIsNowChecked(method);
 			checkIfAnnotationDeprecatedAdded(method);
 			checkIfVarargsChanged(method);
+			checkIfParametersGenericsChanged(method);
+			checkIfGenericTemplatesHaveChanged(method);
+		}
+	}
+
+	private void checkIfReturnTypeChanged(JApiMethod method) {
+		// section 13.4.15 of "Java Language Specification" SE7 (Method Result Type)
+		if (method.getReturnType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
+			addCompatibilityChange(method, JApiCompatibilityChange.METHOD_RETURN_TYPE_CHANGED);
+		}
+		if (method.getChangeStatus() == JApiChangeStatus.MODIFIED ||
+				method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+			if (!SignatureParser.equalGenericTypes(method.getReturnType().getOldGenericTypes(), method.getReturnType().getNewGenericTypes())) {
+				addCompatibilityChange(method.getReturnType(), JApiCompatibilityChange.METHOD_RETURN_TYPE_GENERICS_CHANGED);
+			}
+		}
+	}
+
+	private void checkIfParametersGenericsChanged(JApiBehavior jApiBehavior) {
+		if (jApiBehavior.getChangeStatus() == JApiChangeStatus.MODIFIED ||
+				jApiBehavior.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+			for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {
+				if (!SignatureParser.equalGenericTypes(jApiParameter.getOldGenericTypes(), jApiParameter.getNewGenericTypes())) {
+					jApiParameter.getCompatibilityChanges().add(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED);
+				}
+			}
+		}
+	}
+
+	private void checkIfFieldGenericsChanged(JApiField jApiField) {
+		if (jApiField.getChangeStatus() == JApiChangeStatus.MODIFIED ||
+				jApiField.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+			if (!SignatureParser.equalGenericTypes(jApiField.getOldGenericTypes(), jApiField.getNewGenericTypes())) {
+				jApiField.getCompatibilityChanges().add(JApiCompatibilityChange.FIELD_GENERICS_CHANGED);
+			}
 		}
 	}
 

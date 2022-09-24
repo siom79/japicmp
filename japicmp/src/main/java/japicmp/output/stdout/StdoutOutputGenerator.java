@@ -9,7 +9,10 @@ import japicmp.output.OutputGenerator;
 import japicmp.util.Optional;
 import javassist.bytecode.annotation.MemberValue;
 
+import java.util.Comparator;
 import java.util.List;
+
+import static japicmp.util.GenericTemplateHelper.haveGenericTemplateInterfacesChanges;
 
 public class StdoutOutputGenerator extends OutputGenerator<String> {
 	static final String NO_CHANGES = "No changes.";
@@ -60,18 +63,20 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	private void processConstructors(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiConstructor> constructors = jApiClass.getConstructors();
 		for (JApiConstructor jApiConstructor : constructors) {
-			appendMethod(sb, signs(jApiConstructor), jApiConstructor, "CONSTRUCTOR:");
+			appendBehavior(sb, signs(jApiConstructor), jApiConstructor, "CONSTRUCTOR:");
 			processAnnotations(sb, jApiConstructor, 2);
 			processExceptions(sb, jApiConstructor, 2);
+			processGenericTemplateChanges(sb, jApiConstructor, 2);
 		}
 	}
 
 	private void processMethods(StringBuilder sb, JApiClass jApiClass) {
 		List<JApiMethod> methods = jApiClass.getMethods();
 		for (JApiMethod jApiMethod : methods) {
-			appendMethod(sb, signs(jApiMethod), jApiMethod, "METHOD:");
+			appendBehavior(sb, signs(jApiMethod), jApiMethod, "METHOD:");
 			processAnnotations(sb, jApiMethod, 2);
 			processExceptions(sb, jApiMethod, 2);
+			processGenericTemplateChanges(sb, jApiMethod, 2);
 		}
 	}
 
@@ -125,7 +130,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		return retVal;
 	}
 
-	private void appendMethod(StringBuilder sb, String signs, JApiBehavior jApiBehavior, String classMemberType) {
+	private void appendBehavior(StringBuilder sb, String signs, JApiBehavior jApiBehavior, String classMemberType) {
 		sb.append("\t").append(signs).append(" ").append(jApiBehavior.getChangeStatus()).append(" ").append(classMemberType).append(" ")
 			.append(accessModifierAsString(jApiBehavior)).append(abstractModifierAsString(jApiBehavior)).append(staticModifierAsString(jApiBehavior))
 			.append(finalModifierAsString(jApiBehavior)).append(syntheticModifierAsString(jApiBehavior)).append(bridgeModifierAsString(jApiBehavior))
@@ -136,27 +141,101 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 				sb.append(", ");
 			}
 			sb.append(jApiParameter.getType());
+			appendGenericTypes(sb, jApiParameter);
 			paramCount++;
 		}
 		sb.append(")\n");
 	}
 
+	private void appendGenericTypes(StringBuilder sb, JApiHasGenericTypes jApiHasGenericTypes) {
+		if (!jApiHasGenericTypes.getNewGenericTypes().isEmpty() || !jApiHasGenericTypes.getOldGenericTypes().isEmpty()) {
+			if (jApiHasGenericTypes instanceof JApiCompatibility) {
+				List<JApiCompatibilityChange> compatibilityChanges = ((JApiCompatibility) jApiHasGenericTypes).getCompatibilityChanges();
+				appendGenericTypesForCompatibilityChanges(sb, jApiHasGenericTypes, compatibilityChanges);
+			}
+		}
+	}
+
+	private void appendGenericTypesForCompatibilityChanges(StringBuilder sb, JApiHasGenericTypes jApiHasGenericTypes, List<JApiCompatibilityChange> compatibilityChanges) {
+		if (compatibilityChanges.contains(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED) ||
+				compatibilityChanges.contains(JApiCompatibilityChange.METHOD_RETURN_TYPE_GENERICS_CHANGED) ||
+				compatibilityChanges.contains(JApiCompatibilityChange.FIELD_GENERICS_CHANGED) ||
+				compatibilityChanges.contains(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED)) {
+			appendGenericTypes(sb, false, jApiHasGenericTypes.getNewGenericTypes());
+			appendGenericTypes(sb, true, jApiHasGenericTypes.getOldGenericTypes());
+		} else {
+			if (!jApiHasGenericTypes.getNewGenericTypes().isEmpty()) {
+				appendGenericTypes(sb, false, jApiHasGenericTypes.getNewGenericTypes());
+			}
+			if (!jApiHasGenericTypes.getOldGenericTypes().isEmpty()) {
+				appendGenericTypes(sb, false, jApiHasGenericTypes.getOldGenericTypes());
+			}
+		}
+	}
+
+	private void appendGenericTypes(StringBuilder sb, boolean withChangeInParenthesis, List<JApiGenericType> genericTypes) {
+		if (!genericTypes.isEmpty()) {
+			if (withChangeInParenthesis) {
+				sb.append("(<- ");
+			}
+			sb.append("<");
+			int count = 0;
+			for (JApiGenericType genericType : genericTypes) {
+				if (count > 0) {
+					sb.append(",");
+				}
+				appendGenericType(sb, genericType);
+				if (!genericType.getGenericTypes().isEmpty()) {
+					appendGenericTypes(sb, false, genericType.getGenericTypes());
+				}
+				count++;
+			}
+			sb.append(">");
+			if (withChangeInParenthesis) {
+				sb.append(")");
+			}
+		}
+	}
+
+	private void appendGenericType(StringBuilder sb, JApiGenericType jApiGenericType) {
+		if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.NONE) {
+			sb.append(jApiGenericType.getType());
+		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.UNBOUNDED) {
+			sb.append("?");
+		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.EXTENDS) {
+			sb.append("? extends ").append(jApiGenericType.getType());
+		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.SUPER) {
+			sb.append("? super ").append(jApiGenericType.getType());
+		}
+	}
+
 	private String returnType(JApiBehavior jApiBehavior) {
-		String returnTypeAsString = "";
+		StringBuilder sb = new StringBuilder();
 		if (jApiBehavior instanceof JApiMethod) {
 			JApiMethod method = (JApiMethod) jApiBehavior;
 			JApiReturnType jApiReturnType = method.getReturnType();
 			if (jApiReturnType.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-				returnTypeAsString = jApiReturnType.getNewReturnType() + " ";
+				sb.append(jApiReturnType.getNewReturnType());
+				appendGenericTypes(sb, jApiReturnType);
+				sb.append(" ");
 			} else if (jApiReturnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				returnTypeAsString = jApiReturnType.getNewReturnType() + " (<-" + jApiReturnType.getOldReturnType() + ") ";
+				sb.append(jApiReturnType.getNewReturnType());
+				appendGenericTypes(sb, jApiReturnType);
+				sb.append(" (<-");
+				sb.append(jApiReturnType.getOldReturnType());
+				appendGenericTypes(sb, jApiReturnType);
+				sb.append(") ");
 			} else if (jApiReturnType.getChangeStatus() == JApiChangeStatus.NEW) {
-				returnTypeAsString = jApiReturnType.getNewReturnType() + " ";
+				sb.append(jApiReturnType.getNewReturnType());
+				appendGenericTypes(sb, jApiReturnType);
+				sb.append(" ");
 			} else {
-				returnTypeAsString = jApiReturnType.getOldReturnType() + " ";
+				sb.append(jApiReturnType.getOldReturnType());
+				appendGenericTypes(sb, jApiReturnType);
+				sb.append(" ");
 			}
 		}
-		return returnTypeAsString;
+		return sb.toString();
 	}
 
 	private void appendAnnotation(StringBuilder sb, String signs, JApiAnnotation jApiAnnotation, int numberOfTabs) {
@@ -232,9 +311,76 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
 		sb.append(signs).append(" ").append(jApiClass.getChangeStatus()).append(" ").append(processClassType(jApiClass)).append(": ").append(accessModifierAsString(jApiClass)).append(abstractModifierAsString(jApiClass)).append(staticModifierAsString(jApiClass)).append(finalModifierAsString(jApiClass)).append(syntheticModifierAsString(jApiClass)).append(jApiClass.getFullyQualifiedName()).append(" ").append(javaObjectSerializationStatus(jApiClass)).append("\n");
 		processClassFileFormatVersionChanges(sb, jApiClass);
+		processGenericTemplateChanges(sb, jApiClass, 1);
 		processInterfaceChanges(sb, jApiClass);
 		processSuperclassChanges(sb, jApiClass);
 		processFieldChanges(sb, jApiClass);
+	}
+
+	private void processGenericTemplateChanges(StringBuilder sb, JApiHasGenericTemplates jApiHasGenericTemplates, int numberOfTabs) {
+		List<JApiGenericTemplate> genericTemplates = jApiHasGenericTemplates.getGenericTemplates();
+		if (!genericTemplates.isEmpty()) {
+			sb.append(tabs(numberOfTabs)).append("GENERIC TEMPLATES: ");
+			genericTemplates.sort(Comparator.comparing(JApiGenericTemplate::getName));
+			int count = 0;
+			for (JApiGenericTemplate jApiGenericTemplate : genericTemplates) {
+				if (count > 0) {
+					sb.append(", ");
+				}
+				count++;
+				sb.append(signs(jApiGenericTemplate));
+				if (sb.charAt(sb.length()-1) != ' ') {
+					sb.append(" ");
+				}
+				sb.append(jApiGenericTemplate.getName()).append(":");
+				JApiChangeStatus changeStatus = jApiGenericTemplate.getChangeStatus();
+				if (changeStatus == JApiChangeStatus.NEW || changeStatus == JApiChangeStatus.UNCHANGED) {
+					sb.append(jApiGenericTemplate.getNewType());
+					if (jApiGenericTemplate instanceof JApiCompatibility) {
+						appendGenericTypesForCompatibilityChanges(sb, jApiGenericTemplate, ((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges());
+					}
+				} else if (changeStatus == JApiChangeStatus.REMOVED) {
+					sb.append(jApiGenericTemplate.getOldType());
+					if (jApiGenericTemplate instanceof JApiCompatibility) {
+						appendGenericTypesForCompatibilityChanges(sb, jApiGenericTemplate, ((JApiCompatibility) jApiHasGenericTemplates).getCompatibilityChanges());
+					}
+				} else {
+					sb.append(jApiGenericTemplate.getNewType());
+					appendGenericTypes(sb, false, jApiGenericTemplate.getNewGenericTypes());
+					sb.append(" (<-").append(jApiGenericTemplate.getOldType());
+					appendGenericTypes(sb, false, jApiGenericTemplate.getOldGenericTypes());
+					sb.append(")");
+				}
+				if (!jApiGenericTemplate.getOldInterfaceTypes().isEmpty() || !jApiGenericTemplate.getNewInterfaceTypes().isEmpty()) {
+					if (haveGenericTemplateInterfacesChanges(jApiGenericTemplate.getOldInterfaceTypes(), jApiGenericTemplate.getNewInterfaceTypes())) {
+						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, false, true);
+						sb.append(" (<-");
+						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, true, false);
+						sb.append(")");
+					} else {
+						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, false, true);
+					}
+				}
+			}
+			sb.append("\n");
+		}
+	}
+
+	private void appendGenericTemplatesInterfaces(StringBuilder sb, JApiGenericTemplate jApiGenericTemplate, boolean printOld, boolean printNew) {
+		if (printOld) {
+			for (JApiGenericType jApiGenericType : jApiGenericTemplate.getOldInterfaceTypes()) {
+				sb.append(" & ");
+				sb.append(jApiGenericType.getType());
+				appendGenericTypes(sb, false, jApiGenericType.getGenericTypes());
+			}
+		}
+		if (printNew) {
+			for (JApiGenericType jApiGenericType : jApiGenericTemplate.getNewInterfaceTypes()) {
+				sb.append(" & ");
+				sb.append(jApiGenericType.getType());
+				appendGenericTypes(sb, false, jApiGenericType.getGenericTypes());
+			}
+		}
 	}
 
 	private void processClassFileFormatVersionChanges(StringBuilder sb, JApiClass jApiClass) {
@@ -281,7 +427,9 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 			sb.append(tabs(1)).append(signs(jApiField)).append(" ").append(jApiField.getChangeStatus()).append(" FIELD: ")
 				.append(accessModifierAsString(jApiField)).append(staticModifierAsString(jApiField))
 				.append(finalModifierAsString(jApiField)).append(syntheticModifierAsString(jApiField))
-				.append(fieldTypeChangeAsString(jApiField)).append(jApiField.getName()).append("\n");
+				.append(fieldTypeChangeAsString(jApiField));
+			appendGenericTypes(sb, jApiField);
+			sb.append(" ").append(jApiField.getName()).append('\n');
 			processAnnotations(sb, jApiField, 2);
 		}
 	}
@@ -349,18 +497,18 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		JApiType type = field.getType();
 		if (type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
 			if (type.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				return type.getNewTypeOptional().get() + " (<- " + type.getOldTypeOptional().get() + ") ";
+				return type.getNewTypeOptional().get() + " (<- " + type.getOldTypeOptional().get() + ")";
 			} else if (type.getChangeStatus() == JApiChangeStatus.NEW) {
-				return type.getNewTypeOptional().get() + "(+) ";
+				return type.getNewTypeOptional().get() + "(+)";
 			} else if (type.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				return type.getOldTypeOptional().get() + "(-) ";
+				return type.getOldTypeOptional().get() + "(-)";
 			} else {
-				return type.getNewTypeOptional().get() + " ";
+				return type.getNewTypeOptional().get();
 			}
 		} else if (type.getOldTypeOptional().isPresent() && !type.getNewTypeOptional().isPresent()) {
-			return type.getOldTypeOptional().get() + " ";
+			return type.getOldTypeOptional().get();
 		} else if (!type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
-			return type.getNewTypeOptional().get() + " ";
+			return type.getNewTypeOptional().get();
 		}
 		return "n.a.";
 	}

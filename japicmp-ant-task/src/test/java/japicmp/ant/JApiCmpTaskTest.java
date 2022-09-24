@@ -25,7 +25,7 @@ public class JApiCmpTaskTest {
 		assertThat("Incorrect log message (expected modified class)", logContents,
 			containsString("***! MODIFIED CLASS: PUBLIC japicmp.cmp.JarArchiveComparator  (not serializable)"));
 		assertThat("Incorrect log message (expected removed method)", logContents,
-			containsString("---! REMOVED METHOD: PUBLIC(-) java.util.List compare(java.io.File, java.io.File)"));
+			containsString("---! REMOVED METHOD: PUBLIC(-) java.util.List<japicmp.model.JApiClass> compare(java.io.File, java.io.File)"));
 	}
 
 	@Test(expected = BuildException.class)

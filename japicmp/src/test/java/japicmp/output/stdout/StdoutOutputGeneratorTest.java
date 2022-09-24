@@ -6,9 +6,15 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
+import japicmp.util.CtClassBuilder;
+import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtInterfaceBuilder;
+import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtField;
+import javassist.CtMethod;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 public class StdoutOutputGeneratorTest {
@@ -58,6 +63,85 @@ public class StdoutOutputGeneratorTest {
 		Options options = Options.newDefault();
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String generated = generator.generate();
-		assertThat(generated, not(containsString("-1.-1")));
+		Assert.assertFalse(generated.contains("-1.-1"));
+	}
+
+	@Test
+	public void testMethodWithGenericTypes() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethod method = CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.util.List")).name("method").parameter(classPool.get("java.util.List")).body("return;").addToClass(ctClass);
+				method.setGenericSignature("(Ljava/util/List<Ljava/lang/Integer;>;)Ljava/util/List<Ljava/lang/Byte;>;");
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethod method = CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.util.List")).name("method").parameter(classPool.get("java.util.List")).body("return;").addToClass(ctClass);
+				method.setGenericSignature("(Ljava/util/List<Ljava/lang/Long;>;)Ljava/util/List<Ljava/lang/Short;>;");
+				return Collections.singletonList(ctClass);
+			}
+		});
+		Options options = Options.newDefault();
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
+		String generated = generator.generate();
+		Assert.assertTrue(generated.contains("===* UNCHANGED METHOD: PUBLIC java.util.List<java.lang.Short>(<- <java.lang.Byte>) method(java.util.List<java.lang.Long>(<- <java.lang.Integer>))"));
+	}
+
+	@Test
+	public void testMethodWithGenericTypesRemoved() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethod method = CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.util.List")).name("method").parameter(classPool.get("java.util.List")).body("return;").addToClass(ctClass);
+				method.setGenericSignature("(Ljava/util/List<Ljava/lang/Integer;>;)Ljava/util/List<Ljava/lang/Byte;>;");
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		Options options = Options.newDefault();
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
+		String generated = generator.generate();
+		Assert.assertTrue(generated.contains("---! REMOVED METHOD: PUBLIC(-) java.util.List<java.lang.Byte> method(java.util.List<java.lang.Integer>)"));
+	}
+
+	@Test
+	public void testFieldWithGenericTypes() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtField ctField = CtFieldBuilder.create().type(classPool.get("java.util.List")).name("list").addToClass(ctClass);
+				ctField.setGenericSignature("Ljava/util/List<Ljava/lang/Byte;>;");
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtField ctField = CtFieldBuilder.create().type(classPool.get("java.util.List")).name("list").addToClass(ctClass);
+				ctField.setGenericSignature("Ljava/util/List<Ljava/lang/Short;>;");
+				return Collections.singletonList(ctClass);
+			}
+		});
+		Options options = Options.newDefault();
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
+		String generated = generator.generate();
+		Assert.assertTrue(generated.contains("===* UNCHANGED FIELD: PUBLIC java.util.List<java.lang.Short>(<- <java.lang.Byte>) list"));
 	}
 }

@@ -1,9 +1,9 @@
 package japicmp.model;
 
+import japicmp.cmp.JarArchiveComparator;
 import japicmp.util.Optional;
 import japicmp.util.OptionalHelper;
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.util.MethodDescriptorParser;
+import japicmp.util.SignatureParser;
 import javassist.CtMethod;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -31,33 +31,52 @@ public class JApiMethod extends JApiBehavior {
 		return changeStatus;
 	}
 
+	@Override
+	public void enhanceGenericTypeToParameters() {
+		super.enhanceGenericTypeToParameters(this.jApiClass, this.oldMethod, this.newMethod);
+	}
+
 	private JApiReturnType computeReturnTypeChanges(Optional<CtMethod> oldMethodOptional, Optional<CtMethod> newMethodOptional) {
-		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.<String>absent(), Optional.<String>absent());
+		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.absent(), Optional.absent());
 		if (oldMethodOptional.isPresent() && newMethodOptional.isPresent()) {
-			String oldReturnType = computeReturnType(oldMethodOptional.get());
-			String newReturnType = computeReturnType(newMethodOptional.get());
+			SignatureParser.ParsedParameter oldReturnType = computeReturnType(oldMethodOptional.get());
+			SignatureParser.ParsedParameter newReturnType = computeReturnType(newMethodOptional.get());
 			JApiChangeStatus changeStatusReturnType = JApiChangeStatus.UNCHANGED;
-			if (!oldReturnType.equals(newReturnType)) {
+			if (!oldReturnType.getType().equals(newReturnType.getType())) {
 				changeStatusReturnType = JApiChangeStatus.MODIFIED;
 			}
-			jApiReturnType = new JApiReturnType(changeStatusReturnType, Optional.of(oldReturnType), Optional.of(newReturnType));
+			jApiReturnType = new JApiReturnType(changeStatusReturnType, Optional.of(oldReturnType.getType()), Optional.of(newReturnType.getType()));
+			SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(oldMethodOptional.get(), oldReturnType), jApiReturnType.getOldGenericTypes());
+			SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(newMethodOptional.get(), newReturnType), jApiReturnType.getNewGenericTypes());
 		} else {
 			if (oldMethodOptional.isPresent()) {
-				String oldReturnType = computeReturnType(oldMethodOptional.get());
-				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType), Optional.<String>absent());
+				SignatureParser.ParsedParameter oldReturnType = computeReturnType(oldMethodOptional.get());
+				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType.getType()), Optional.absent());
+				SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(oldMethodOptional.get(), oldReturnType), jApiReturnType.getOldGenericTypes());
 			}
 			if (newMethodOptional.isPresent()) {
-				String newReturnType = computeReturnType(newMethodOptional.get());
-				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.<String>absent(), Optional.of(newReturnType));
+				SignatureParser.ParsedParameter newReturnType = computeReturnType(newMethodOptional.get());
+				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.absent(), Optional.of(newReturnType.getType()));
+				SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(newMethodOptional.get(), newReturnType), jApiReturnType.getNewGenericTypes());
 			}
 		}
 		return jApiReturnType;
 	}
 
-	private String computeReturnType(CtMethod oldMethod) {
-		MethodDescriptorParser parser = new MethodDescriptorParser();
-		parser.parse(oldMethod.getSignature());
+	private SignatureParser.ParsedParameter computeReturnType(CtMethod ctMethod) {
+		SignatureParser parser = new SignatureParser();
+		parser.parse(ctMethod.getSignature());
 		return parser.getReturnType();
+	}
+
+	private SignatureParser.ParsedParameter computeReturnTypeGenericSignature(CtMethod ctMethod, SignatureParser.ParsedParameter rawSignatureParam) {
+		SignatureParser parser = new SignatureParser();
+		String genericSignature = ctMethod.getGenericSignature();
+		if (genericSignature != null) {
+			parser.parse(genericSignature);
+			return parser.getReturnType();
+		}
+		return rawSignatureParam;
 	}
 
 	public boolean hasSameReturnType(JApiMethod otherMethod) {
@@ -151,5 +170,20 @@ public class JApiMethod extends JApiBehavior {
 		return OptionalHelper.N_A;
 	}
 
-
+	@Override
+	public boolean isSourceCompatible() {
+		boolean sourceCompatible = super.isSourceCompatible();
+		if (sourceCompatible) {
+			sourceCompatible = returnType.isSourceCompatible();
+		}
+		for (JApiParameter jApiParameter : getParameters()) {
+			for (JApiCompatibilityChange compatibilityChange : jApiParameter.getCompatibilityChanges()) {
+				if (!compatibilityChange.isSourceCompatible()) {
+					sourceCompatible = false;
+					break;
+				}
+			}
+		}
+		return sourceCompatible;
+	}
 }

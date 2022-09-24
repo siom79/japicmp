@@ -1,20 +1,11 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
-import japicmp.util.AnnotationHelper;
-import japicmp.util.Constants;
-import japicmp.util.MethodDescriptorParser;
-import japicmp.util.ModifierHelper;
-import japicmp.util.SignatureParser;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtField;
-import javassist.CtMethod;
-import javassist.Modifier;
-import javassist.NotFoundException;
+import japicmp.util.Optional;
+import japicmp.util.*;
+import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 
@@ -22,16 +13,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
-	JApiCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
+	JApiCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic, JApiHasGenericTemplates {
 	private final JarArchiveComparator jarArchiveComparator;
 	private final String fullyQualifiedName;
 	private final JApiClassType classType;
@@ -40,22 +25,23 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final Optional<CtClass> newClass;
 	private final JApiChangeStatus changeStatus;
 	private final JApiSuperclass superclass;
-	private final List<JApiImplementedInterface> interfaces = new LinkedList<>();
-	private final List<JApiField> fields = new LinkedList<>();
-	private final List<JApiConstructor> constructors = new LinkedList<>();
-	private final List<JApiMethod> methods = new LinkedList<>();
-	private final List<JApiAnnotation> annotations = new LinkedList<>();
+	private final List<JApiImplementedInterface> interfaces = new ArrayList<>();
+	private final List<JApiField> fields = new ArrayList<>();
+	private final List<JApiConstructor> constructors = new ArrayList<>();
+	private final List<JApiMethod> methods = new ArrayList<>();
+	private final List<JApiAnnotation> annotations = new ArrayList<>();
 	private final JApiModifier<AccessModifier> accessModifier;
 	private final JApiModifier<FinalModifier> finalModifier;
 	private final JApiModifier<StaticModifier> staticModifier;
 	private final JApiModifier<AbstractModifier> abstractModifier;
 	private final JApiModifier<SyntheticModifier> syntheticModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
-	private final List<JApiCompatibilityChange> compatibilityChanges = new LinkedList<>();
+	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
 	private final JApiSerialVersionUid jApiSerialVersionUid;
 	private final JApiClassFileFormatVersion classFileFormatVersion;
 	private boolean changeCausedByClassElement = false;
 	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
+	private List<JApiGenericTemplate> genericTemplates = new ArrayList<>();
 
 	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass,
 					 Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
@@ -66,6 +52,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		this.oldClass = oldClass;
 		this.classType = classType;
 		this.superclass = extractSuperclass(oldClass, newClass);
+		computeGenericTemplateChanges(oldClass, newClass);
 		computeMethodChanges(this, oldClass, newClass);
 		computeInterfaceChanges(this.interfaces, oldClass, newClass);
 		computeFieldChanges(this.fields, oldClass, newClass);
@@ -79,6 +66,39 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		this.jApiSerialVersionUid = JavaObjectSerializationCompatibility.extractSerialVersionUid(options, jarArchiveComparator, oldClass, newClass);
 		this.classFileFormatVersion = extractClassFileFormatVersion(oldClass, newClass);
 		this.changeStatus = evaluateChangeStatus(changeStatus);
+	}
+
+	private void computeGenericTemplateChanges(Optional<CtClass> oldClass, Optional<CtClass> newClass) {
+		this.genericTemplates = GenericTemplateHelper.computeGenericTemplateChanges(new GenericTemplateHelper.SignatureParserCallback() {
+			@Override
+			public boolean isOldAndNewPresent() {
+				return oldClass.isPresent() && newClass.isPresent();
+			}
+
+			@Override
+			public boolean isOldPresent() {
+				return oldClass.isPresent();
+			}
+
+			@Override
+			public boolean isNewPresent() {
+				return newClass.isPresent();
+			}
+
+			@Override
+			public SignatureParser oldSignatureParser() {
+				SignatureParser signatureParser = new SignatureParser();
+				signatureParser.parseTemplatesOfClass(oldClass.get());
+				return signatureParser;
+			}
+
+			@Override
+			public SignatureParser newSignatureParser() {
+				SignatureParser signatureParser = new SignatureParser();
+				signatureParser.parseTemplatesOfClass(newClass.get());
+				return signatureParser;
+			}
+		});
 	}
 
 	private JApiClassFileFormatVersion extractClassFileFormatVersion(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -162,11 +182,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				CtField newField = newFieldsMap.get(oldFieldName);
 				if (newField != null) {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField), options);
+					enhanceGenericTypeToField(oldField, jApiField.getOldGenericTypes());
+					enhanceGenericTypeToField(newField, jApiField.getNewGenericTypes());
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				} else {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.REMOVED, Optional.of(oldField), Optional.<CtField>absent(), options);
+					enhanceGenericTypeToField(oldField, jApiField.getOldGenericTypes());
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -176,6 +199,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				CtField oldField = oldFieldsMap.get(newField.getName());
 				if (oldField == null) {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(newField), options);
+					enhanceGenericTypeToField(newField, jApiField.getNewGenericTypes());
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -186,6 +210,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				Map<String, CtField> fieldMap = buildFieldMap(oldClassOptional.get());
 				for (CtField field : fieldMap.values()) {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.REMOVED, Optional.of(field), Optional.<CtField>absent(), options);
+					enhanceGenericTypeToField(field, jApiField.getOldGenericTypes());
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -195,10 +220,22 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				Map<String, CtField> fieldMap = buildFieldMap(newClassOptional.get());
 				for (CtField field : fieldMap.values()) {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(field), options);
+					enhanceGenericTypeToField(field, jApiField.getNewGenericTypes());
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				}
+			}
+		}
+	}
+
+	private void enhanceGenericTypeToField(CtField field, List<JApiGenericType> genericTypes) {
+		if (field.getGenericSignature() != null) {
+			SignatureParser signatureParser = new SignatureParser();
+			List<SignatureParser.ParsedParameter> parsedParameters = signatureParser.parseTypes(field.getGenericSignature());
+			if (!parsedParameters.isEmpty()) {
+				SignatureParser.ParsedParameter parsedParameter = parsedParameters.get(0);
+				SignatureParser.copyGenericParameters(parsedParameter, genericTypes);
 			}
 		}
 	}
@@ -357,13 +394,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private void sortMethodsIntoLists(JApiClass jApiClass, Map<String, List<CtMethod>> oldMethodsMap, Map<String, List<CtMethod>> newMethodsMap) {
-		MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
+		SignatureParser methodDescriptorParser = new SignatureParser();
 		for (String methodName : oldMethodsMap.keySet()) {
 			List<CtMethod> oldMethodsWithSameName = oldMethodsMap.get(methodName);
 			Iterator<CtMethod> oldMethodsWithSameNameIterator = oldMethodsWithSameName.iterator();
 			while (oldMethodsWithSameNameIterator.hasNext()) {
 				CtMethod oldMethod = oldMethodsWithSameNameIterator.next();
-				methodDescriptorParser.parse(oldMethod.getSignature());
+				methodDescriptorParser.parse(oldMethod);
 				List<CtMethod> newMethodsWithSameName = newMethodsMap.get(methodName);
 				if (newMethodsWithSameName == null) {
 					JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>absent(), jarArchiveComparator);
@@ -395,7 +432,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		for (String methodName : newMethodsMap.keySet()) {
 			List<CtMethod> ctMethods = newMethodsMap.get(methodName);
 			for (CtMethod ctMethod : ctMethods) {
-				methodDescriptorParser.parse(ctMethod.getSignature());
+				methodDescriptorParser.parse(ctMethod);
 				List<CtMethod> methodsWithSameName = oldMethodsMap.get(ctMethod.getName());
 				if (methodsWithSameName == null) {
 					JApiMethod jApiMethod = new JApiMethod(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod), jarArchiveComparator);
@@ -427,39 +464,18 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private Optional<CtMethod> findMatchingMethod(CtMethod method, List<CtMethod> candidates) {
 		Optional<CtMethod> found = Optional.absent();
 		SignatureParser methodSignatureParser = new SignatureParser();
-		methodSignatureParser.parse(method.getSignature());
+		methodSignatureParser.parse(method);
 		List<CtMethod> methodsWithSameParameters = new ArrayList<>();
-		for (CtMethod candidate : candidates) {
-			boolean parameterListsEqual = true;
-			List<String> probeParameters = methodSignatureParser.getParameters();
-			SignatureParser candidateSignatureParser = new SignatureParser();
-			candidateSignatureParser.parse(candidate.getSignature());
-			List<String> candidateParameters = candidateSignatureParser.getParameters();
-			if (probeParameters.size() != candidateParameters.size()) {
-				parameterListsEqual = false;
-			}
-			if (parameterListsEqual) {
-				for (int i = 0; i < probeParameters.size(); i++) {
-					String probeParameter = probeParameters.get(i);
-					String candidateParameter = candidateParameters.get(i);
-					if (!probeParameter.equals(candidateParameter)) {
-						parameterListsEqual = false;
-					}
-				}
-			}
-			if (parameterListsEqual) {
-				methodsWithSameParameters.add(candidate);
-			}
-		}
+		findMatchingMethodsWithSameParameterTypes(candidates, methodSignatureParser, methodsWithSameParameters);
 		if (methodsWithSameParameters.size() == 1) {
 			found = Optional.of(methodsWithSameParameters.get(0));
 		} else if (methodsWithSameParameters.size() > 1) {
 			CtMethod methodWithSameReturnType = null;
-			String probeReturnType = methodSignatureParser.getReturnType();
+			SignatureParser.ParsedParameter probeReturnType = methodSignatureParser.getReturnType();
 			for (CtMethod candidate : methodsWithSameParameters) {
 				SignatureParser candidateSignatureParser = new SignatureParser();
-				candidateSignatureParser.parse(candidate.getSignature());
-				String candidateReturnType = candidateSignatureParser.getReturnType();
+				candidateSignatureParser.parse(candidate);
+				SignatureParser.ParsedParameter candidateReturnType = candidateSignatureParser.getReturnType();
 				if (probeReturnType.equals(candidateReturnType)) {
 					methodWithSameReturnType = candidate;
 				}
@@ -473,15 +489,42 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return found;
 	}
 
+	private void findMatchingMethodsWithSameParameterTypes(List<CtMethod> candidates, SignatureParser methodSignatureParser,
+														   List<CtMethod> methodsWithSameParameters) {
+		for (CtMethod candidate : candidates) {
+			boolean parameterListsEqual = true;
+			List<SignatureParser.ParsedParameter> probeParameters = methodSignatureParser.getParameters();
+			SignatureParser candidateSignatureParser = new SignatureParser();
+			candidateSignatureParser.parse(candidate);
+			List<SignatureParser.ParsedParameter> candidateParameters = candidateSignatureParser.getParameters();
+			if (probeParameters.size() != candidateParameters.size()) {
+				parameterListsEqual = false;
+			}
+			if (parameterListsEqual) {
+				for (int i = 0; i < probeParameters.size(); i++) {
+					SignatureParser.ParsedParameter probeParameter = probeParameters.get(i);
+					SignatureParser.ParsedParameter candidateParameter = candidateParameters.get(i);
+					if (!probeParameter.equals(candidateParameter)) {
+						parameterListsEqual = false;
+						break;
+					}
+				}
+			}
+			if (parameterListsEqual) {
+				methodsWithSameParameters.add(candidate);
+			}
+		}
+	}
+
 	private boolean includeMethod(JApiMethod jApiMethod) {
 		return ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier());
 	}
 
 	private void sortConstructorsIntoLists(JApiClass jApiClass, Map<String, CtConstructor> oldConstructorsMap, Map<String, CtConstructor> newConstructorsMap) {
-		MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
+		SignatureParser methodDescriptorParser = new SignatureParser();
 		for (CtConstructor ctMethod : oldConstructorsMap.values()) {
 			String longName = ctMethod.getLongName();
-			methodDescriptorParser.parse(ctMethod.getSignature());
+			methodDescriptorParser.parse(ctMethod);
 			CtConstructor foundMethod = newConstructorsMap.get(longName);
 			if (foundMethod == null) {
 				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>absent(), jarArchiveComparator);
@@ -499,7 +542,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 		for (CtConstructor ctMethod : newConstructorsMap.values()) {
 			String longName = ctMethod.getLongName();
-			methodDescriptorParser.parse(ctMethod.getSignature());
+			methodDescriptorParser.parse(ctMethod);
 			CtConstructor foundMethod = oldConstructorsMap.get(longName);
 			if (foundMethod == null) {
 				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>absent(), Optional.of(ctMethod), jarArchiveComparator);
@@ -515,10 +558,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return ModifierHelper.matchesModifierLevel(jApiConstructor, options.getAccessModifier());
 	}
 
-	private void addParametersToMethod(MethodDescriptorParser methodDescriptorParser, JApiBehavior jApiMethod) {
-		for (String param : methodDescriptorParser.getParameters()) {
-			jApiMethod.addParameter(new JApiParameter(param));
+	private void addParametersToMethod(SignatureParser methodDescriptorParser, JApiBehavior jApiBehavior) {
+		for (SignatureParser.ParsedParameter param : methodDescriptorParser.getParameters()) {
+			jApiBehavior.addParameter(new JApiParameter(param.getType(), Optional.absent()));
 		}
+		jApiBehavior.enhanceGenericTypeToParameters();
 	}
 
 	private Map<String, List<CtMethod>> createMethodMap(Optional<CtClass> ctClassOptional) {
@@ -924,6 +968,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return classFileFormatVersion;
 	}
 
+	@XmlElementWrapper(name = "genericTemplates")
+	@XmlElement(name = "genericTemplate")
+	public List<JApiGenericTemplate> getGenericTemplates() {
+		return genericTemplates;
+	}
+
 	public String toString()
 	{
 		return "JApiClass [fullyQualifiedName="
@@ -934,7 +984,4 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			+ compatibilityChanges
 			+ "]";
 	}
-
-
-
 }

@@ -1,12 +1,9 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.util.AnnotationHelper;
-import japicmp.util.Constants;
-import japicmp.util.ModifierHelper;
-import japicmp.util.OptionalHelper;
+import japicmp.util.Optional;
+import japicmp.util.*;
 import javassist.CtBehavior;
 import javassist.CtConstructor;
 import javassist.CtMethod;
@@ -18,16 +15,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier,
+public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier,
 	JApiHasFinalModifier, JApiHasAbstractModifier, JApiCompatibility, JApiHasAnnotations, JApiHasBridgeModifier,
-	JApiCanBeSynthetic, JApiHasLineNumber {
-	private final JApiClass jApiClass;
+	JApiCanBeSynthetic, JApiHasLineNumber, JApiHasGenericTemplates {
+	protected final JApiClass jApiClass;
 	private final String name;
 	private final JarArchiveComparator jarArchiveComparator;
 	private final List<JApiParameter> parameters = new LinkedList<>();
@@ -45,12 +38,14 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	private final Optional<Integer> oldLineNumber;
 	private final Optional<Integer> newLineNumber;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
+	private final List<JApiGenericTemplate> genericTemplates;
 
 	public JApiBehavior(JApiClass jApiClass, String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
 		this.jApiClass = jApiClass;
 		this.name = name;
 		this.jarArchiveComparator = jarArchiveComparator;
 		computeAnnotationChanges(annotations, oldBehavior, newBehavior, jarArchiveComparator.getJarArchiveComparatorOptions());
+		this.genericTemplates = computeGenericTemplateChanges(oldBehavior, newBehavior);
 		this.accessModifier = extractAccessModifier(oldBehavior, newBehavior);
 		this.finalModifier = extractFinalModifier(oldBehavior, newBehavior);
 		this.staticModifier = extractStaticModifier(oldBehavior, newBehavior);
@@ -63,6 +58,43 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 		this.oldLineNumber = getLineNumber(oldBehavior);
 		this.newLineNumber = getLineNumber(newBehavior);
+	}
+
+	public void setChangeStatus(JApiChangeStatus changeStatus) {
+		this.changeStatus = changeStatus;
+	}
+
+	private List<JApiGenericTemplate> computeGenericTemplateChanges(Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior) {
+		return GenericTemplateHelper.computeGenericTemplateChanges(new GenericTemplateHelper.SignatureParserCallback() {
+			@Override
+			public boolean isOldAndNewPresent() {
+				return oldBehavior.isPresent() && newBehavior.isPresent();
+			}
+
+			@Override
+			public boolean isOldPresent() {
+				return oldBehavior.isPresent();
+			}
+
+			@Override
+			public boolean isNewPresent() {
+				return newBehavior.isPresent();
+			}
+
+			@Override
+			public SignatureParser oldSignatureParser() {
+				SignatureParser signatureParser = new SignatureParser();
+				signatureParser.parse(oldBehavior.get().getGenericSignature());
+				return signatureParser;
+			}
+
+			@Override
+			public SignatureParser newSignatureParser() {
+				SignatureParser signatureParser = new SignatureParser();
+				signatureParser.parse(newBehavior.get().getGenericSignature());
+				return signatureParser;
+			}
+		});
 	}
 
 	private List<JApiException> computeExceptionChanges(Optional<? extends CtBehavior> oldMethodOptional, Optional<? extends CtBehavior> newMethodOptional) {
@@ -442,6 +474,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
 			if (!compatibilityChange.isBinaryCompatible()) {
 				binaryCompatible = false;
+				break;
 			}
 		}
 		return binaryCompatible;
@@ -454,6 +487,15 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
 			if (!compatibilityChange.isSourceCompatible()) {
 				sourceCompatible = false;
+				break;
+			}
+		}
+		for (JApiParameter jApiParameter : getParameters()) {
+			for (JApiCompatibilityChange compatibilityChange : jApiParameter.getCompatibilityChanges()) {
+				if (!compatibilityChange.isSourceCompatible()) {
+					sourceCompatible = false;
+					break;
+				}
 			}
 		}
 		return sourceCompatible;
@@ -502,5 +544,42 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 	@XmlTransient
 	public JApiClass getjApiClass() {
 		return this.jApiClass;
+	}
+
+	@XmlElementWrapper(name = "genericTemplates")
+	@XmlElement(name = "genericTemplate")
+	public List<JApiGenericTemplate> getGenericTemplates() {
+		return genericTemplates;
+	}
+
+	public abstract void enhanceGenericTypeToParameters();
+
+	protected void enhanceGenericTypeToParameters(JApiClass jApiClass, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior) {
+		if (oldBehavior.isPresent() && oldBehavior.get().getGenericSignature() != null) {
+			String genericSignature = oldBehavior.get().getGenericSignature();
+			SignatureParser signatureParser = new SignatureParser();
+			signatureParser.parse(genericSignature);
+			List<JApiParameter> jApiParameters = signatureParser.getJApiParameters(jApiClass, SignatureParser.DiffType.OLD_PARAMS);
+			if (jApiParameters.size() == this.getParameters().size()) {
+				for (int i = 0; i < getParameters().size(); i++) {
+					getParameters().get(i).setTemplateName(jApiParameters.get(i).getTemplateNameOptional());
+					getParameters().get(i).getOldGenericTypes().clear();
+					getParameters().get(i).getOldGenericTypes().addAll(jApiParameters.get(i).getOldGenericTypes());
+				}
+			}
+		}
+		if (newBehavior.isPresent() && newBehavior.get().getGenericSignature() != null) {
+			String genericSignature = newBehavior.get().getGenericSignature();
+			SignatureParser signatureParser = new SignatureParser();
+			signatureParser.parse(genericSignature);
+			List<JApiParameter> jApiParameters = signatureParser.getJApiParameters(jApiClass, SignatureParser.DiffType.NEW_PARAMS);
+			if (jApiParameters.size() == this.getParameters().size()) {
+				for (int i = 0; i < getParameters().size(); i++) {
+					getParameters().get(i).setTemplateName(jApiParameters.get(i).getTemplateNameOptional());
+					getParameters().get(i).getNewGenericTypes().clear();
+					getParameters().get(i).getNewGenericTypes().addAll(jApiParameters.get(i).getNewGenericTypes());
+				}
+			}
+		}
 	}
 }

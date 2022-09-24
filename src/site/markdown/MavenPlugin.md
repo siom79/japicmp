@@ -270,6 +270,8 @@ for each check. This allows you to customize the following verifications:
 | CLASS_TYPE_CHANGED | false | false | MAJOR |
 | CLASS_NOW_CHECKED_EXCEPTION | true | false | MINOR |
 | CLASS_LESS_ACCESSIBLE | false | false | MAJOR |
+| CLASS_GENERIC_TEMPLATE_CHANGED | true | false | MINOR |
+| CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED | true | false | MINOR |
 | SUPERCLASS_REMOVED | false | false | MAJOR |
 | SUPERCLASS_ADDED | true | true | MINOR |
 | SUPERCLASS_MODIFIED_INCOMPATIBLE | false | false | MAJOR |
@@ -281,6 +283,8 @@ for each check. This allows you to customize the following verifications:
 | METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS | false | false | MAJOR |
 | METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC | false | false | MAJOR |
 | METHOD_RETURN_TYPE_CHANGED | false | false | MAJOR |
+| METHOD_RETURN_TYPE_GENERICS_CHANGED | true | false | MINOR |
+| METHOD_PARAMETER_GENERICS_CHANGED | true | false | MINOR |
 | METHOD_NOW_ABSTRACT | false | false | MAJOR |
 | METHOD_NOW_FINAL | false | false | MAJOR |
 | METHOD_NOW_STATIC | false | false | MAJOR |
@@ -306,6 +310,7 @@ for each check. This allows you to customize the following verifications:
 | FIELD_REMOVED | false | false | MAJOR |
 | FIELD_REMOVED_IN_SUPERCLASS | false | false | MAJOR |
 | FIELD_LESS_ACCESSIBLE | false | false | MAJOR |
+| FIELD_GENERICS_CHANGED | true | false | MINOR |
 | CONSTRUCTOR_REMOVED | false | false | MAJOR |
 | CONSTRUCTOR_LESS_ACCESSIBLE | false | false | MAJOR |
 

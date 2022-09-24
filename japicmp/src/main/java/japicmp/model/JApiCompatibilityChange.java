@@ -13,6 +13,8 @@ public enum JApiCompatibilityChange {
 	CLASS_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),
 	CLASS_NOW_CHECKED_EXCEPTION(true, false, JApiSemanticVersionLevel.MINOR),
 	CLASS_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR),
+	CLASS_GENERIC_TEMPLATE_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),
+	CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),
 	SUPERCLASS_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),
 	SUPERCLASS_ADDED(true, true, JApiSemanticVersionLevel.MINOR),
 	SUPERCLASS_MODIFIED_INCOMPATIBLE(false, false, JApiSemanticVersionLevel.MAJOR),
@@ -24,6 +26,8 @@ public enum JApiCompatibilityChange {
 	METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),
 	METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),
 	METHOD_RETURN_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),
+	METHOD_RETURN_TYPE_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),
+	METHOD_PARAMETER_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_NOW_ABSTRACT(false, false, JApiSemanticVersionLevel.MAJOR),
 	METHOD_NOW_FINAL(false, false, JApiSemanticVersionLevel.MAJOR),
 	METHOD_NOW_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),
@@ -49,6 +53,7 @@ public enum JApiCompatibilityChange {
 	FIELD_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),
 	FIELD_REMOVED_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),
 	FIELD_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR),
+	FIELD_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),
 	CONSTRUCTOR_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),
 	CONSTRUCTOR_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR);
 

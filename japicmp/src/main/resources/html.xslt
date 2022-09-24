@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="html"/>
 
@@ -195,6 +195,12 @@
 						</table>
 					</div>
 				</xsl:if>
+				<div class="class_generictemplates">
+					<xsl:if test="count(genericTemplates/genericTemplate) > 0">
+						<span class="label_class_member">Generic Templates:</span>
+						<xsl:call-template name="genericTemplates"/>
+					</xsl:if>
+				</div>
 				<div class="class_superclass">
 					<xsl:if test="  count(superclass) > 0
                                     and (superclass/@superclassNew != 'n.a.' or superclass/@superclassOld != 'n.a.')
@@ -209,7 +215,7 @@
 								<tr>
 									<td>Status</td>
 									<td>Superclass</td>
-									<td>Compatibility Changes:</td>
+									<td>Compatibility Changes</td>
 								</tr>
 							</thead>
 							<tbody>
@@ -226,7 +232,7 @@
 								<tr>
 									<td>Status</td>
 									<td>Interface</td>
-									<td>Compatibility Changes:</td>
+									<td>Compatibility Changes</td>
 								</tr>
 							</thead>
 							<tbody>
@@ -324,6 +330,7 @@
 								<tr>
 									<td>Status</td>
 									<td>Modifier</td>
+									<td>Generic Templates</td>
 									<td>Constructor</td>
 									<td>Exceptions</td>
 									<td>Compatibility Changes:</td>
@@ -346,6 +353,7 @@
 								<tr>
 									<td>Status</td>
 									<td>Modifier</td>
+									<td>Generic Templates</td>
 									<td>Type</td>
 									<td>Method</td>
 									<td>Exceptions</td>
@@ -459,10 +467,10 @@
 				<xsl:call-template name="type"/>
 			</td>
 			<td>
-				<xsl:call-template name="compatibilityChanges"/>
+				<xsl:value-of select="@name"/><xsl:call-template name="annotations"/>
 			</td>
 			<td>
-				<xsl:value-of select="@name"/><xsl:call-template name="annotations"/>
+				<xsl:call-template name="compatibilityChanges"/>
 			</td>
 		</tr>
 	</xsl:template>
@@ -474,6 +482,9 @@
 			</td>
 			<td>
 				<xsl:call-template name="modifiers"/>
+			</td>
+			<td>
+				<xsl:call-template name="genericTemplates"/>
 			</td>
 			<td>
 				<xsl:value-of select="@name"/>(<xsl:apply-templates select="parameters"/>)<xsl:call-template name="annotations"/>
@@ -514,6 +525,9 @@
 			</td>
 			<td>
 				<xsl:call-template name="modifiers"/>
+			</td>
+			<td>
+				<xsl:call-template name="genericTemplates"/>
 			</td>
 			<td>
 				<xsl:apply-templates select="returnType"/>
@@ -680,9 +694,32 @@
 		<xsl:if test="count(parameter) > 0">
 			<xsl:for-each select="parameter">
 				<xsl:if test="position() > 1">,<wbr/></xsl:if>
-				<xsl:value-of select="@type"/>
+				<span>
+					<xsl:choose>
+						<xsl:when test="@changeStatus = 'MODIFIED'">
+							<xsl:attribute name="class">modified method_parameter</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@changeStatus = 'UNCHANGED'">
+							<xsl:attribute name="class">unchanged method_parameter</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@changeStatus = 'NEW'">
+							<xsl:attribute name="class">new method_parameter</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@changeStatus = 'REMOVED'">
+							<xsl:attribute name="class">removed method_parameter</xsl:attribute>
+						</xsl:when>
+					</xsl:choose>
+					<xsl:value-of select="@type"/>
+					<xsl:call-template name="genericParameterTypes"/>
+					<xsl:call-template name="binaryAndSourceCompatibility"/>
+				</span>
 			</xsl:for-each>
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template name="binaryAndSourceCompatibility">
+		<xsl:if test="@binaryCompatible = 'false'">&#160;(!)</xsl:if>
+		<xsl:if test="@binaryCompatible = 'true' and @sourceCompatible = 'false'">&#160;(*)</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="outputChangeStatus">
@@ -702,8 +739,7 @@
 				</xsl:when>
 			</xsl:choose>
 			<xsl:value-of select="@changeStatus"/>
-			<xsl:if test="@binaryCompatible = 'false'">&#160;(!)</xsl:if>
-			<xsl:if test="@binaryCompatible = 'true' and @sourceCompatible = 'false'">&#160;(*)</xsl:if>
+			<xsl:call-template name="binaryAndSourceCompatibility"/>
 		</span>
 	</xsl:template>
 
@@ -827,16 +863,16 @@
 			</xsl:choose>
 			<xsl:choose>
 				<xsl:when test="type/@changeStatus = 'MODIFIED'">
-					<xsl:value-of select="type/@newValue"/>&#160;(&lt;-&#160;<xsl:value-of select="type/@oldValue"/>)
+					<xsl:value-of select="type/@newValue"/>&#160;(&lt;-&#160;<xsl:value-of select="type/@oldValue"/>)<xsl:call-template name="genericParameterTypes"/>
 				</xsl:when>
 				<xsl:when test="type/@changeStatus = 'UNCHANGED'">
-					<xsl:value-of select="type/@newValue"/>
+					<xsl:value-of select="type/@newValue"/><xsl:call-template name="genericParameterTypes"/>
 				</xsl:when>
 				<xsl:when test="type/@changeStatus = 'NEW'">
-					<xsl:value-of select="type/@newValue"/>
+					<xsl:value-of select="type/@newValue"/><xsl:call-template name="genericParameterTypes"/>
 				</xsl:when>
 				<xsl:when test="type/@changeStatus = 'REMOVED'">
-					<xsl:value-of select="type/@oldValue"/>
+					<xsl:value-of select="type/@oldValue"/><xsl:call-template name="genericParameterTypes"/>
 				</xsl:when>
 			</xsl:choose>
 			<xsl:if test="@binaryCompatible = 'false'">
@@ -866,16 +902,16 @@
 			</xsl:choose>
 			<xsl:choose>
 				<xsl:when test="@changeStatus = 'MODIFIED'">
-					<xsl:value-of select="@newValue"/>&#160;(&lt;-&#160;<xsl:value-of select="@oldValue"/>)
+					<xsl:value-of select="@newValue"/>&#160;(&lt;-&#160;<xsl:value-of select="@oldValue"/>)<xsl:call-template name="genericParameterTypes"/>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'UNCHANGED'">
-					<xsl:value-of select="@newValue"/>
+					<xsl:value-of select="@newValue"/><xsl:call-template name="genericParameterTypes"/>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'NEW'">
-					<xsl:value-of select="@newValue"/>
+					<xsl:value-of select="@newValue"/><xsl:call-template name="genericParameterTypes"/>
 				</xsl:when>
 				<xsl:when test="@changeStatus = 'REMOVED'">
-					<xsl:value-of select="@oldValue"/>
+					<xsl:value-of select="@oldValue"/><xsl:call-template name="genericParameterTypes"/>
 				</xsl:when>
 			</xsl:choose>
 		</span>
@@ -923,5 +959,130 @@
 				<xsl:otherwise><xsl:attribute name="class">removed</xsl:attribute>&#160;(Serializable incompatible(!): <xsl:value-of select="@javaObjectSerializationCompatibleAsString"/>)&#160;</xsl:otherwise>
 			</xsl:choose>
 		</span>
+	</xsl:template>
+
+	<xsl:template name="genericParameterTypes">
+		<xsl:if test="count(newGenericTypes/newGenericType) > 0 or count(oldGenericTypes/oldGenericType) > 0">
+			<div class="tooltip">
+				<span>
+					<xsl:choose>
+						<xsl:when test="@sourceCompatible = 'false'">
+							<xsl:attribute name="class">modified method_parameter</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="class">unchanged method_parameter</xsl:attribute>
+						</xsl:otherwise>
+					</xsl:choose>
+					&#60;..&#62;
+				</span>
+				<div class="tooltiptext">
+					<table>
+						<xsl:if test="count(newGenericTypes/newGenericType) > 0">
+							<tr>
+								<td class="table_head_td">New: </td>
+								<xsl:for-each select="newGenericTypes/newGenericType">
+									<td>
+										<xsl:call-template name="genericParameterWithWildcard"/>
+										<xsl:call-template name="genericParameterTypesRecursive"/>
+									</td>
+								</xsl:for-each>
+							</tr>
+						</xsl:if>
+						<xsl:if test="count(oldGenericTypes/oldGenericType) > 0">
+							<tr>
+								<td class="table_head_td">Old: </td>
+								<xsl:for-each select="oldGenericTypes/oldGenericType">
+									<td>
+										<xsl:call-template name="genericParameterWithWildcard"/>
+										<xsl:call-template name="genericParameterTypesRecursive"/>
+									</td>
+								</xsl:for-each>
+							</tr>
+						</xsl:if>
+					</table>
+				</div>
+			</div>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template name="genericParameterTypesRecursive">
+		<xsl:if test="count(genericTypes/genericType) > 0">
+			&#60;
+			<xsl:for-each select="genericTypes/genericType">
+				<xsl:if test="position() > 1">,<wbr/></xsl:if>
+				<xsl:call-template name="genericParameterWithWildcard"/>
+				<xsl:call-template name="genericParameterTypesRecursive"/>
+			</xsl:for-each>
+			&#62;
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template name="genericParameterWithWildcard">
+		<xsl:choose>
+			<xsl:when test="@genericWildCard = 'NONE'">
+				<xsl:value-of select="@type"/>
+			</xsl:when>
+			<xsl:when test="@genericWildCard = 'EXTENDS'">
+				? extends <xsl:value-of select="@type"/>
+			</xsl:when>
+			<xsl:when test="@genericWildCard = 'SUPER'">
+				? super <xsl:value-of select="@type"/>
+			</xsl:when>
+			<xsl:when test="@genericWildCard = 'UNBOUNDED'">
+				?
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="genericTemplates">
+		<xsl:if test="count(genericTemplates/genericTemplate) > 0">
+			<table>
+				<thead>
+					<tr>
+						<td>Change Status</td>
+						<td>Name</td>
+						<td>Old Type</td>
+						<td>New Type</td>
+						<td>Generics</td>
+					</tr>
+				</thead>
+				<tbody>
+					<xsl:for-each select="genericTemplates/genericTemplate">
+						<tr>
+							<td>
+								<xsl:call-template name="outputChangeStatus"/>
+							</td>
+							<td>
+								<xsl:value-of select="@name"/>
+							</td>
+							<td>
+								<xsl:value-of select="@oldType"/>
+								<xsl:if test="count(oldInterfaceTypes/oldInterfaceType) > 0">
+									<xsl:for-each select="oldInterfaceTypes/oldInterfaceType">
+										&#038; <xsl:value-of select="@type"/>
+										<xsl:call-template name="genericParameterTypesRecursive"/>
+									</xsl:for-each>
+								</xsl:if>
+							</td>
+							<td>
+								<xsl:value-of select="@newType"/>
+								<xsl:if test="count(newInterfaceTypes/newInterfaceType) > 0">
+									<xsl:for-each select="newInterfaceTypes/newInterfaceType">
+										&#038; <xsl:value-of select="@type"/>
+										<xsl:call-template name="genericParameterTypesRecursive"/>
+									</xsl:for-each>
+								</xsl:if>
+							</td>
+							<td>
+								<xsl:call-template name="genericParameterTypes"/>
+							</td>
+						</tr>
+					</xsl:for-each>
+				</tbody>
+			</table>
+		</xsl:if>
+		<xsl:if test="count(genericTemplates/genericTemplate) &lt;= 0">
+			n.a.
+		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>

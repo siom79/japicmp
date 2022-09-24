@@ -1,7 +1,7 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
+import japicmp.util.Optional;
 import javassist.CtConstructor;
 
 import javax.xml.bind.annotation.XmlTransient;
@@ -41,5 +41,22 @@ public class JApiConstructor extends JApiBehavior {
 			+ "]";
 	}
 
+	@Override
+	public void enhanceGenericTypeToParameters() {
+		super.enhanceGenericTypeToParameters(this.jApiClass, this.oldConstructor, this.newConstructor);
+	}
 
+	@Override
+	public boolean isSourceCompatible() {
+		boolean sourceCompatible = super.isSourceCompatible();
+		for (JApiParameter jApiParameter : getParameters()) {
+			for (JApiCompatibilityChange compatibilityChange : jApiParameter.getCompatibilityChanges()) {
+				if (!compatibilityChange.isSourceCompatible()) {
+					sourceCompatible = false;
+					break;
+				}
+			}
+		}
+		return sourceCompatible;
+	}
 }

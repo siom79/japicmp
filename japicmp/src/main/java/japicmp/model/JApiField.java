@@ -1,11 +1,7 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.util.AnnotationHelper;
-import japicmp.util.Constants;
-import japicmp.util.MethodDescriptorParser;
-import japicmp.util.ModifierHelper;
+import japicmp.util.*;
 import javassist.CtField;
 import javassist.Modifier;
 import javassist.bytecode.AnnotationsAttribute;
@@ -20,7 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier,
-	JApiHasFinalModifier, JApiHasTransientModifier, JApiCompatibility, JApiHasAnnotations, JApiCanBeSynthetic {
+	JApiHasFinalModifier, JApiHasTransientModifier, JApiCompatibility, JApiHasAnnotations, JApiCanBeSynthetic,
+	JApiHasGenericTypes {
 	private final JApiChangeStatus changeStatus;
 	private final JApiClass jApiClass;
 	private final Optional<CtField> oldFieldOptional;
@@ -33,6 +30,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	private final JApiModifier<SyntheticModifier> syntheticModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
+	private final List<JApiGenericType> oldGenericTypes = new ArrayList<>();
+	private final List<JApiGenericType> newGenericTypes = new ArrayList<>();
 	private final JApiType type;
 
 	public JApiField(JApiClass jApiClass, JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional, JarArchiveComparatorOptions options) {
@@ -86,10 +85,10 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	}
 
 	private String signatureToType(String signature) {
-		MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
-		List<String> types = methodDescriptorParser.parseTypes(signature);
+		SignatureParser methodDescriptorParser = new SignatureParser();
+		List<SignatureParser.ParsedParameter> types = methodDescriptorParser.parseTypes(signature);
 		if (types.size() > 0) {
-			return types.get(0);
+			return types.get(0).getType();
 		}
 		return "n.a.";
 	}
@@ -389,4 +388,15 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 			+ "]";
 	}
 
+	@XmlElementWrapper(name = "oldGenericTypes")
+	@XmlElement(name = "oldGenericType")
+	public List<JApiGenericType> getOldGenericTypes() {
+		return oldGenericTypes;
+	}
+
+	@XmlElementWrapper(name = "newGenericTypes")
+	@XmlElement(name = "newGenericType")
+	public List<JApiGenericType> getNewGenericTypes() {
+		return newGenericTypes;
+	}
 }

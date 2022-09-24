@@ -69,14 +69,14 @@ public class JavadocLikeBehaviorFilter implements BehaviorFilter {
 			methodMatches = false;
 		}
 		SignatureParser signatureParser = new SignatureParser();
-		signatureParser.parse(ctBehavior.getSignature());
-		List<String> parameters = signatureParser.getParameters();
+		signatureParser.parse(ctBehavior);
+		List<SignatureParser.ParsedParameter> parameters = signatureParser.getParameters();
 		if (parameters.size() != parameterPatterns.size()) {
 			parameterMatches = false;
 		} else {
 			for (int i = 0; i < parameters.size(); i++) {
 				Pattern pattern = parameterPatterns.get(i);
-				if (!pattern.matcher(parameters.get(i)).matches()) {
+				if (!pattern.matcher(parameters.get(i).getType()).matches()) {
 					parameterMatches = false;
 				}
 			}
