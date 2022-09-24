@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [ 8, 11, 17, 18-ea, 19-ea ]
+        java: [ 8, 11, 17, 18, 19 ]
     runs-on: ubuntu-latest
 
     steps:
