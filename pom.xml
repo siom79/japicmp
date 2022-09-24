@@ -157,20 +157,6 @@
 		<module>japicmp-ant-task</module>
 	</modules>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.stefanbirkner</groupId>
-			<artifactId>system-rules</artifactId>
-			<version>1.12.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -234,7 +220,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>enforce-versions</id>
