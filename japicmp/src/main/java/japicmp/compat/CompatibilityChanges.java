@@ -307,7 +307,7 @@ public class CompatibilityChanges {
 					@Override
 					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
 						for (JApiMethod superMethod : superclass.getMethods()) {
-							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
 								return 1;
 							}
 						}
@@ -341,7 +341,7 @@ public class CompatibilityChanges {
 					@Override
 					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
 						for (JApiMethod superMethod : superclass.getMethods()) {
-							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
 								if (superMethod.getAccessModifier().getNewModifier().isPresent() && method.getAccessModifier().getNewModifier().isPresent()) {
 									if (superMethod.getAccessModifier().getNewModifier().get().getLevel() > method.getAccessModifier().getNewModifier().get().getLevel()) {
 										return 1;
@@ -586,7 +586,7 @@ public class CompatibilityChanges {
 	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map<String, JApiClass> classMap, final JApiMethod method, List<Integer> returnValues) {
 		forAllImplementedInterfaces(jApiClass, classMap, returnValues, new ArrayList<>(), (implementedInterface, classMap1) -> {
 			for (JApiMethod superMethod : implementedInterface.getMethods()) {
-				if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+				if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
 					return 1;
 				}
 			}
