@@ -909,6 +909,28 @@ public class CompatibilityChanges {
 					}
 				}
 			}
+			final List<JApiMethod> abstractMethodsWithDefaultInInterface = new ArrayList<>();
+			for (JApiMethod abstractMethod : abstractMethods) {
+				for (JApiImplementedInterface implementedInterface : implementedInterfaces) {
+					final JApiClass interfaceClass = getJApiClass(implementedInterface, classMap);
+					for (JApiMethod defaultMethodCandidate : interfaceClass.getMethods()) {
+						if (!isAbstract(defaultMethodCandidate)
+								&& areMatching(abstractMethod, defaultMethodCandidate)) {
+							// we have a default implementation for this method
+							// double-check that we extend interface that the method comes from
+							for (JApiImplementedInterface extendedInterface : interfaceClass.getInterfaces()) {
+								JApiClass extendedInterfaceClass = getJApiClass(extendedInterface, classMap);
+
+								if (abstractMethod.getjApiClass().equals(extendedInterfaceClass)) {
+									abstractMethodsWithDefaultInInterface.add(abstractMethod);
+								}
+							}
+						}
+					}
+				}
+			}
+			abstractMethods.removeAll(abstractMethodsWithDefaultInInterface);
+
 			if (!abstractMethods.isEmpty()) {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}

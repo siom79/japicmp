@@ -15,6 +15,7 @@ import static japicmp.test.util.Helper.getArchive;
 import static japicmp.test.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 
 public class DefaultMethodTest {
@@ -43,4 +44,54 @@ public class DefaultMethodTest {
         assertThat(jApiClass.isSourceCompatible(), is(false));
         MatcherAssert.assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE));
     }
+
+	@Test
+	public void testCompatibilityAddMethodAndDefaultInSubInterfaces() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, DefaultMethod.DefaultInSubInterface.CClass.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(
+				jApiClass.getCompatibilityChanges(),
+				containsInAnyOrder(
+						JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
+
+	@Test
+	public void testCompatibilityAddMethodAndDefaultInSubInterfacesChecksForExactMatch() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, DefaultMethod.UnrelatedDefaultInSubInterface.CClass.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(
+				jApiClass.getCompatibilityChanges(),
+				containsInAnyOrder(
+						JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE,
+						JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+	}
+
+	@Test
+	public void testCompatibilityAddMethodWithDefaultAndOverrideInSubInterfaces() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, DefaultMethod.DefaultInParentInterface.CClass.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(
+				jApiClass.getCompatibilityChanges(),
+				containsInAnyOrder(
+						JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE,
+						JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+	}
+
+	@Test
+	public void testCompatibilityAddSuperClass() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, DefaultMethod.DefaultInSubInterfaceAddedSuperclass.CClass.class.getName());
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(
+				jApiClass.getCompatibilityChanges(),
+				containsInAnyOrder(
+						JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
 }
