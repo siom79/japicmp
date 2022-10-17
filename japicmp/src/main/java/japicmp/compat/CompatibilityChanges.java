@@ -890,7 +890,7 @@ public class CompatibilityChanges {
 				for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {
 					boolean isImplemented = false;
 					for (JApiMethod implementedMethod : implementedMethods) {
-						if (interfaceMethod.getName().equals(implementedMethod.getName()) && interfaceMethod.hasSameSignature(implementedMethod)) {
+						if (areMatching(interfaceMethod, implementedMethod)) {
 							isImplemented = true;
 							break;
 						}
@@ -916,6 +916,11 @@ public class CompatibilityChanges {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
 		}
+	}
+
+	private static boolean areMatching(JApiMethod left, JApiMethod right) {
+		return left.getName().equals(right.getName())
+				&& left.hasSameSignature(right);
 	}
 
 	private JApiClass getJApiClass(JApiImplementedInterface implementedInterface, Map<String, JApiClass> classMap) {
