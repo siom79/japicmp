@@ -886,15 +886,11 @@ public class CompatibilityChanges {
 			}
 			abstractMethods.clear();
 			for (JApiImplementedInterface jApiImplementedInterface : implementedInterfaces) {
-				String fullyQualifiedName = jApiImplementedInterface.getFullyQualifiedName();
-				JApiClass interfaceClass = classMap.get(fullyQualifiedName);
-				if (interfaceClass == null) {
-					interfaceClass = loadClass(fullyQualifiedName, EnumSet.allOf(Classpath.class));
-				}
+				JApiClass interfaceClass = getJApiClass(jApiImplementedInterface, classMap);
 				for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {
 					boolean isImplemented = false;
 					for (JApiMethod implementedMethod : implementedMethods) {
-						if (interfaceMethod.getName().equals(implementedMethod.getName()) && interfaceMethod.hasSameSignature(implementedMethod)) {
+						if (areMatching(interfaceMethod, implementedMethod)) {
 							isImplemented = true;
 							break;
 						}
@@ -913,6 +909,28 @@ public class CompatibilityChanges {
 					}
 				}
 			}
+			final List<JApiMethod> abstractMethodsWithDefaultInInterface = new ArrayList<>();
+			for (JApiMethod abstractMethod : abstractMethods) {
+				for (JApiImplementedInterface implementedInterface : implementedInterfaces) {
+					final JApiClass interfaceClass = getJApiClass(implementedInterface, classMap);
+					for (JApiMethod defaultMethodCandidate : interfaceClass.getMethods()) {
+						if (!isAbstract(defaultMethodCandidate)
+								&& areMatching(abstractMethod, defaultMethodCandidate)) {
+							// we have a default implementation for this method
+							// double-check that we extend interface that the method comes from
+							for (JApiImplementedInterface extendedInterface : interfaceClass.getInterfaces()) {
+								JApiClass extendedInterfaceClass = getJApiClass(extendedInterface, classMap);
+
+								if (abstractMethod.getjApiClass().equals(extendedInterfaceClass)) {
+									abstractMethodsWithDefaultInInterface.add(abstractMethod);
+								}
+							}
+						}
+					}
+				}
+			}
+			abstractMethods.removeAll(abstractMethodsWithDefaultInInterface);
+
 			if (!abstractMethods.isEmpty()) {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
@@ -920,6 +938,20 @@ public class CompatibilityChanges {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
 		}
+	}
+
+	private static boolean areMatching(JApiMethod left, JApiMethod right) {
+		return left.getName().equals(right.getName())
+				&& left.hasSameSignature(right);
+	}
+
+	private JApiClass getJApiClass(JApiImplementedInterface implementedInterface, Map<String, JApiClass> classMap) {
+		String fullyQualifiedName = implementedInterface.getFullyQualifiedName();
+		JApiClass interfaceClass = classMap.get(fullyQualifiedName);
+		if (interfaceClass == null) {
+			interfaceClass = loadClass(fullyQualifiedName, EnumSet.allOf(Classpath.class));
+		}
+		return interfaceClass;
 	}
 
 	private void checkIfClassNowCheckedException(JApiClass jApiClass) {
