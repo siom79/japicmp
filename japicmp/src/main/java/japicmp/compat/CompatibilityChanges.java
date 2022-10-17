@@ -378,6 +378,26 @@ public class CompatibilityChanges {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);
 				}
 			}
+			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.REMOVED) {
+				List<Integer> returnValues = new ArrayList<>();
+				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
+					@Override
+					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
+						for (JApiMethod superMethod : superclass.getMethods()) {
+							if (areMatching(superMethod, method)) {
+								if (method.getFinalModifier().getOldModifier().get() == FinalModifier.NON_FINAL
+										&& superMethod.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL) {
+									return 1;
+								}
+							}
+						}
+						return 0;
+					}
+				});
+				if (returnValues.stream().anyMatch(value -> value == 1)) {
+					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);
+				}
+			}
 			// section 13.4.18 of "Java Language Specification" SE7
 			if (isNotPrivate(method)) {
 				if (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {
