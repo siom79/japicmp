@@ -56,6 +56,28 @@ public class GenericTemplateTest {
 	}
 
 	@Test
+	public void testNewClassNotDetectedAsIncompatibility() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				ctClass.setGenericSignature("<T:Ljava/lang/Object;U:Ljava/lang/Short;>Ljava/lang/Object;");
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		Assert.assertEquals(2, jApiClass.getGenericTemplates().size());
+		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().noneMatch(c -> c == JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED));
+	}
+
+	@Test
 	public void testClassWithTwoGenericTemplateParametersRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);

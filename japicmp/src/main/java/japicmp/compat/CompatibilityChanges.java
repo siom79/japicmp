@@ -66,7 +66,9 @@ public class CompatibilityChanges {
 		if (hasModifierLevelDecreased(jApiClass)) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_LESS_ACCESSIBLE);
 		}
-		checkIfGenericTemplatesHaveChanged(jApiClass);
+		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {
+			checkIfGenericTemplatesHaveChanged(jApiClass);
+		}
 	}
 
 	private void checkIfGenericTemplatesHaveChanged(JApiHasGenericTemplates jApiHasGenericTemplates) {
