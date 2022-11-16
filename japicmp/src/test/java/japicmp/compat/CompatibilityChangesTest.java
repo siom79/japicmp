@@ -7,7 +7,6 @@ import japicmp.util.*;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.Modifier;
-
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -2044,5 +2043,65 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "SI");
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+	}
+
+	@Test
+	public void testMoveMethodToSuperclassAndMakeFinal() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superClass = CtClassBuilder.create().name("SuperClass").addToClassPool(classPool);
+				CtClass subClass = CtClassBuilder.create().name("SubClass").withSuperclass(superClass).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").addToClass(subClass);
+				return Arrays.asList(superClass, subClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superClass = CtClassBuilder.create().name("SuperClass").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().finalMethod().name("method").addToClass(superClass);
+				CtClass subClass = CtClassBuilder.create().name("SubClass").withSuperclass(superClass).addToClassPool(classPool);
+				return Arrays.asList(superClass, subClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "SubClass");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_FINAL));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_MOVED_TO_SUPERCLASS));
+		jApiClass = getJApiClass(jApiClasses, "SuperClass");
+		jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_FINAL));
+	}
+
+	@Test
+	public void testRemoveMethodInSubClassAndSuperClass() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass superClass = CtClassBuilder.create().name("SuperClass").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").addToClass(superClass);
+				CtClass subClass = CtClassBuilder.create().name("SubClass").withSuperclass(superClass).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").addToClass(subClass);
+				return Arrays.asList(superClass, subClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass superClass = CtClassBuilder.create().name("SuperClass").addToClassPool(classPool);
+				CtClass subClass = CtClassBuilder.create().name("SubClass").withSuperclass(superClass).addToClassPool(classPool);
+				return Arrays.asList(superClass, subClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "SubClass");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		jApiClass = getJApiClass(jApiClasses, "SuperClass");
+		jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
 	}
 }

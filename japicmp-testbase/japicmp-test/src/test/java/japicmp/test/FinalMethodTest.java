@@ -2,7 +2,6 @@ package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.compat.CompatibilityChanges;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiCompatibilityChange;
@@ -50,7 +49,7 @@ public class FinalMethodTest {
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		MatcherAssert.assertThat(
 				getMethodCompatibilityChanges(jApiClass),
-				containsInAnyOrder(JApiCompatibilityChange.METHOD_NOW_FINAL));
+				containsInAnyOrder(JApiCompatibilityChange.METHOD_NOW_FINAL, JApiCompatibilityChange.METHOD_MOVED_TO_SUPERCLASS));
 	}
 
 	private static Collection<JApiCompatibilityChange> getMethodCompatibilityChanges(JApiClass jApiClass) {
