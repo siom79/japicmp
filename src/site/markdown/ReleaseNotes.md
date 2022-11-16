@@ -3,6 +3,12 @@ Versions
 
 The following versions of japicmp are available:
 
+0.17.0 (2022-11-16)
+-------------------
+* Support for generic type information in class files. [#337](https://github.com/siom79/japicmp/issues/337)
+* Check implemented interfaces for default methods of super interface. [#343](https://github.com/siom79/japicmp/issues/343)
+* Detect methods moved to super class with added final. [#344](https://github.com/siom79/japicmp/issues/344)
+
 0.16.0 (2022-08-30)
 -------------------
 * Detect method varargs changes (METHOD_NOW_VARARGS, METHOD_NO_LONGER_VARARGS). [#331](https://github.com/siom79/japicmp/issues/331)
