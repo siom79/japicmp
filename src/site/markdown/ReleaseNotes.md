@@ -3,6 +3,11 @@ Versions
 
 The following versions of japicmp are available:
 
+0.17.1 (2022-11-16)
+-------------------
+* Added new compatibility check METHOD_MOVED_TO_SUPERCLASS. [#350](https://github.com/siom79/japicmp/issues/350)
+* No IllegalStateException when method is removed from sub and super class. [#349](https://github.com/siom79/japicmp/issues/349)
+
 0.17.0 (2022-11-16)
 -------------------
 * Support for generic type information in class files. [#337](https://github.com/siom79/japicmp/issues/337)
