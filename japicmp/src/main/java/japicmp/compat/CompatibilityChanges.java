@@ -307,7 +307,7 @@ public class CompatibilityChanges {
 					@Override
 					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
 						for (JApiMethod superMethod : superclass.getMethods()) {
-							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
 								return 1;
 							}
 						}
@@ -341,7 +341,7 @@ public class CompatibilityChanges {
 					@Override
 					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
 						for (JApiMethod superMethod : superclass.getMethods()) {
-							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+							if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
 								if (superMethod.getAccessModifier().getNewModifier().isPresent() && method.getAccessModifier().getNewModifier().isPresent()) {
 									if (superMethod.getAccessModifier().getNewModifier().get().getLevel() > method.getAccessModifier().getNewModifier().get().getLevel()) {
 										return 1;
@@ -375,6 +375,26 @@ public class CompatibilityChanges {
 			if (isNotPrivate(method) && method.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
 				if ((jApiClass.getFinalModifier().getOldModifier().isPresent() && jApiClass.getFinalModifier().getOldModifier().get() != FinalModifier.FINAL) &&
 					!(method.getStaticModifier().getOldModifier().isPresent() && method.getStaticModifier().getOldModifier().get() == StaticModifier.STATIC)) {
+					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);
+				}
+			}
+			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.REMOVED) {
+				List<Integer> returnValues = new ArrayList<>();
+				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback<Integer>() {
+					@Override
+					public Integer callback(JApiClass superclass, Map<String, JApiClass> classMap, JApiChangeStatus changeStatusOfSuperclass) {
+						for (JApiMethod superMethod : superclass.getMethods()) {
+							if (areMatching(superMethod, method)) {
+								if (method.getFinalModifier().getOldModifier().get() == FinalModifier.NON_FINAL
+										&& superMethod.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL) {
+									return 1;
+								}
+							}
+						}
+						return 0;
+					}
+				});
+				if (returnValues.stream().anyMatch(value -> value == 1)) {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);
 				}
 			}
@@ -586,7 +606,7 @@ public class CompatibilityChanges {
 	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map<String, JApiClass> classMap, final JApiMethod method, List<Integer> returnValues) {
 		forAllImplementedInterfaces(jApiClass, classMap, returnValues, new ArrayList<>(), (implementedInterface, classMap1) -> {
 			for (JApiMethod superMethod : implementedInterface.getMethods()) {
-				if (superMethod.getName().equals(method.getName()) && superMethod.hasSameParameter(method) && superMethod.hasSameReturnType(method)) {
+				if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
 					return 1;
 				}
 			}
