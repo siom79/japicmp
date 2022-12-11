@@ -77,7 +77,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>withOldVersion</id>
@@ -86,9 +86,9 @@
 							<executable>java</executable>
 							<arguments>
 								<argument>-classpath</argument>
-								<argumnet>
+								<argument>
 									${project.build.directory}/${project.artifactId}-${project.version}.jar${path.separator}${project.build.directory}/japicmp-test-v1.jar
-								</argumnet>
+								</argument>
 								<argument>japicmp.test.client.JApiCmpClient</argument>
 							</arguments>
 						</configuration>
@@ -103,9 +103,9 @@
 							<executable>java</executable>
 							<arguments>
 								<argument>-classpath</argument>
-								<argumnet>
+								<argument>
 									${project.build.directory}/${project.artifactId}-${project.version}.jar${path.separator}${project.build.directory}/japicmp-test-v2.jar
-								</argumnet>
+								</argument>
 								<argument>japicmp.test.client.JApiCmpClient</argument>
 							</arguments>
 						</configuration>

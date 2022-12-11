@@ -24,12 +24,6 @@
 		</license>
 	</licenses>
 
-	<properties>
-		<mavenVersion>3.8.1</mavenVersion> <!-- maven.version property is reserved! -->
-		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven version -->
-		<maven-plugin.version>3.6.4</maven-plugin.version>
-	</properties>
-
 	<prerequisites>
 		<maven>${maven-api.version}</maven>
 	</prerequisites>
@@ -103,7 +97,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
 				<version>${plugin-annotation.version}</version>
 				<executions>
@@ -171,8 +164,8 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
+				<version>${plugin-annotation.version}</version>
 				<reportSets>
 					<reportSet>
 						<reports>
