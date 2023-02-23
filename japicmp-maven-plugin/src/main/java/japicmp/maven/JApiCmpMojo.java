@@ -90,8 +90,6 @@ public class JApiCmpMojo extends AbstractMojo {
 	private RepositorySystemSession repoSession;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
 	private List<RemoteRepository> remoteRepos;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${localRepository}")
-	private ArtifactRepository localRepository;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteArtifactRepositories}")
 	private List<ArtifactRepository> artifactRepositories;
 	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project}")
@@ -103,7 +101,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private Options options;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories, this.localRepository,
+		MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories,
 			this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
 			this.remoteRepos);
 		PluginParameters pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.of(
@@ -903,7 +901,6 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private Set<Artifact> resolveArtifact(Artifact artifact, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		notNull(mavenParameters.getLocalRepository(), "Maven parameter localRepository should be provided by maven container.");
 		notNull(mavenParameters.getRepoSystem(), "Maven parameter repoSystem should be provided by maven container.");
 		notNull(mavenParameters.getRepoSession(), "Maven parameter repoSession should be provided by maven container.");
 		ArtifactRequest request = new ArtifactRequest();
