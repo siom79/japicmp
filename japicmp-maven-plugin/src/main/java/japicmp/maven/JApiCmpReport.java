@@ -102,7 +102,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 			return this.mojo;
 		}
 		this.mojo = new JApiCmpMojo();
-		this.mavenParameters = new MavenParameters(this.artifactRepositories, this.localRepository,
+		this.mavenParameters = new MavenParameters(this.artifactRepositories,
 				this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
 				this.remoteRepos);
 		this.pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.<File>absent(), Optional.of(
