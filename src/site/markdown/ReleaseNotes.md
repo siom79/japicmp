@@ -3,6 +3,11 @@ Versions
 
 The following versions of japicmp are available:
 
+0.17.2 (2023-03-01)
+-------------------
+* Less warnings in maven build. [#358](https://github.com/siom79/japicmp/pull/358)
+* No warning in maven 3.9.1 due to unused parameter. [#357](https://github.com/siom79/japicmp/pull/357)
+
 0.17.1 (2022-11-16)
 -------------------
 * Added new compatibility check METHOD_MOVED_TO_SUPERCLASS. [#350](https://github.com/siom79/japicmp/issues/350)
