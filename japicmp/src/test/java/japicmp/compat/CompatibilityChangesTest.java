@@ -1553,11 +1553,11 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.Interface");
-		assertThat(jApiClass.isBinaryCompatible(), is(false));
-		assertThat(jApiClass.isSourceCompatible(), is(false));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "defaultMethod");
-		assertThat(jApiMethod.isBinaryCompatible(), is(false));
-		assertThat(jApiMethod.isSourceCompatible(), is(false));
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiMethod.isSourceCompatible(), is(true));
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NEW_DEFAULT));
 		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
 	}
