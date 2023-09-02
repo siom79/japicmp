@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.17.3 (2023-09-02)
+-------------------
+* METHOD_NEW_DEFAULT is now binary and source compatible. [#289](https://github.com/siom79/japicmp/issues/289)
+
 0.17.2 (2023-03-01)
 -------------------
 * Less warnings in maven build. [#358](https://github.com/siom79/japicmp/pull/358)
