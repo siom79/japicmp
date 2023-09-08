@@ -83,4 +83,16 @@ public class Interfaces {
 			return 0;
 		}
 	}
+
+	public interface InterfaceWithStaticMethod {
+		static void test() {
+
+		}
+	}
+
+	public interface InterfaceWithDefaultMethod {
+		default void test() {
+
+		}
+	}
 }

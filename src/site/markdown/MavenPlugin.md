@@ -300,8 +300,11 @@ for each check. This allows you to customize the following verifications:
 | METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE | true | false | MINOR |
 | METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE | true | true | MINOR |
 | METHOD_NEW_DEFAULT | true | true | MINOR |
+| METHOD_NEW_STATIC_ADDED_TO_INTERFACE | true | true | MINOR |
 | METHOD_ABSTRACT_NOW_DEFAULT | false | false | MAJOR |
 | METHOD_MOVED_TO_SUPERCLASS | true | true | PATCH |
+| METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC | true | true | MINOR |
+| METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC | false | false | MAJOR |
 | FIELD_STATIC_AND_OVERRIDES_STATIC | false | false | MAJOR |
 | FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS | false | false | MAJOR |
 | FIELD_NOW_FINAL | false | false | MAJOR |

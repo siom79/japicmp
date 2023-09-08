@@ -77,4 +77,12 @@ public class Interfaces {
 	public static class ClassImplementsComparable {
 
 	}
+
+	public interface InterfaceWithStaticMethod {
+
+	}
+
+	public interface InterfaceWithDefaultMethod {
+
+	}
 }

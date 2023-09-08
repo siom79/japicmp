@@ -402,7 +402,7 @@ public class CompatibilityChanges {
 				}
 			}
 			// section 13.4.18 of "Java Language Specification" SE7
-			if (isNotPrivate(method)) {
+			if (isNotPrivate(method) && !isInterface(method.getjApiClass())) {
 				if (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {
 					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_STATIC);
 				}
@@ -478,8 +478,12 @@ public class CompatibilityChanges {
 					List<JApiMethod> methodsWithSameSignature = getMethodsInImplementedInterfacesWithSameSignature(jApiClass, classMap, method);
 					if (methodsWithSameSignature.size() == 0) {
 						// new default method in interface
-						if (method.getAbstractModifier().hasChangedTo(AbstractModifier.NON_ABSTRACT)) {
-							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_DEFAULT);
+						if (method.getAbstractModifier().getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
+							if (method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
+								addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_STATIC_ADDED_TO_INTERFACE);
+							} else {
+								addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_DEFAULT);
+							}
 						} else {
 							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
 						}
@@ -488,6 +492,7 @@ public class CompatibilityChanges {
 						for (JApiMethod jApiMethod : methodsWithSameSignature) {
 							if (jApiMethod.getChangeStatus() != JApiChangeStatus.NEW) {
 								allNew = false;
+								break;
 							}
 						}
 						if (allNew) {
@@ -496,10 +501,16 @@ public class CompatibilityChanges {
 					}
 				} else if (method.getChangeStatus() == JApiChangeStatus.MODIFIED || method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 					JApiModifier<AbstractModifier> abstractModifier = method.getAbstractModifier();
-					// method changed from abstract to default
 					if (abstractModifier.getOldModifier().isPresent() && abstractModifier.getOldModifier().get() == AbstractModifier.ABSTRACT &&
 						abstractModifier.getNewModifier().isPresent() && abstractModifier.getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
+						// method changed from abstract to default
 						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT);
+					}
+					JApiModifier<StaticModifier> staticModifier = method.getStaticModifier();
+					if (staticModifier.hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {
+						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC);
+					} else if (staticModifier.hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {
+						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC);
 					}
 				}
 			}
