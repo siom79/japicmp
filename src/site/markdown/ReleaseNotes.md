@@ -3,7 +3,7 @@ Versions
 
 The following versions of japicmp are available:
 
-0.17.4 (2023-09-22)
+0.18.0 (2023-09-22)
 -------------------
 * added METHOD_NEW_STATIC_ADDED_TO_INTERFACE, METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC and METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC. [#289](https://github.com/siom79/japicmp/issues/289)
 * htmlTitle is used as title for maven report. [#362](https://github.com/siom79/japicmp/issues/362)
