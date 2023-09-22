@@ -140,6 +140,7 @@ mvn versions:commit
 ``` bash
 python3 release.py --release-version <release-version> --old-version <old-version>
 ```
+* Push changes to remote repository.
 * Run release [Action](https://github.com/siom79/japicmp/actions/workflows/release.yml)
 * Login to [Sonatype's Nexus repository](https://oss.sonatype.org/)
 	* Download released artifact from staging repository.
