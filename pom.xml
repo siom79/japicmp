@@ -4,7 +4,7 @@
 
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-base</artifactId>
-	<version>0.17.4</version>
+	<version>0.17.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>japicmp-base</name>
@@ -395,7 +395,7 @@
 		<connection>scm:git:https://github.com/${github.account}/${github.project}.git</connection>
 		<developerConnection>scm:git:https://github.com/${github.account}/${github.project}.git</developerConnection>
 		<url>https://github.com/${github.account}/${github.project}.git</url>
-		<tag>japicmp-base-0.17.4</tag>
+		<tag>japicmp-base-0.15.7</tag>
 	</scm>
 
 	<distributionManagement>
