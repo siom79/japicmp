@@ -84,6 +84,14 @@ public class JApiCmpReport extends AbstractMavenReport {
 					htmlString = htmlString.replaceAll("<title>[^<]*</title>", "");
 					htmlString = htmlString.replaceAll("<META[^>]*>", "");
 					Sink sink = getSink();
+					String htmlTitle = getHtmlTitle();
+					if (htmlTitle != null) {
+						sink.head();
+						sink.title();
+						sink.text(pluginParameters.getParameterParam().getHtmlTitle());
+						sink.title_();
+						sink.head_();
+					}
 					sink.rawText(htmlString);
 					sink.close();
 				}
@@ -119,6 +127,13 @@ public class JApiCmpReport extends AbstractMavenReport {
 		}
 	}
 
+	private String getHtmlTitle() {
+		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getHtmlTitle() != null) {
+			return pluginParameters.getParameterParam().getHtmlTitle();
+		}
+		return null;
+	}
+
 	@Override
 	public String getOutputName() {
 		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
@@ -150,6 +165,6 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	private boolean isPomModuleNeedingSkip() {
 		return this.pluginParameters.getParameterParam().getSkipPomModules()
-			&& "pom".equalsIgnoreCase(this.mavenProject.getArtifact().getType());
+				&& "pom".equalsIgnoreCase(this.mavenProject.getArtifact().getType());
 	}
 }

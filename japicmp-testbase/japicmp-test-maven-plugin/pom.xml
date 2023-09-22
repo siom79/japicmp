@@ -703,6 +703,7 @@
 						<ignoreNonResolvableArtifacts>true</ignoreNonResolvableArtifacts>
 						<onlyModified>true</onlyModified>
 						<reportOnlyFilename>true</reportOnlyFilename>
+						<htmlTitle>Test-Title for Site-Report</htmlTitle>
 					</parameter>
 				</configuration>
 				<reportSets>
