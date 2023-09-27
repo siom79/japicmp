@@ -1155,37 +1155,6 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNotStaticChangesToStaticInInterface() throws Exception {
-		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.setIncludeSynthetic(true);
-		options.setAccessModifier(AccessModifier.PRIVATE);
-		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
-			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtInterfaceBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().name("method").addToClass(ctClass);
-				return Collections.singletonList(ctClass);
-			}
-
-			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtInterfaceBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().staticAccess().name("method").addToClass(ctClass);
-				return Collections.singletonList(ctClass);
-			}
-		});
-		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.isSourceCompatible(), is(true));
-		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC));
-		assertThat(jApiMethod.isBinaryCompatible(), is(true));
-		assertThat(jApiMethod.isSourceCompatible(), is(true));
-	}
-
-	@Test
 	public void testMethodStaticChangesToNotStaticInInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
@@ -1652,6 +1621,38 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.isSourceCompatible(), is(true));
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NEW_DEFAULT));
 		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
+	}
+
+	@Test
+	public void testInterfaceMethodDefaultToStatic() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("japicmp.Interface").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("defaultMethodToStatic").addToClass(ctInterface);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").implementsInterface(ctInterface).addToClassPool(classPool);
+				return Arrays.asList(ctClass, ctInterface);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("japicmp.Interface").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().staticAccess().name("defaultMethodToStatic").addToClass(ctInterface);
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").implementsInterface(ctInterface).addToClassPool(classPool);
+				return Arrays.asList(ctClass, ctInterface);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		jApiClass = getJApiClass(jApiClasses, "japicmp.Interface");
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "defaultMethodToStatic");
+		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+		assertThat(jApiMethod.isSourceCompatible(), is(false));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_DEFAULT_NOW_STATIC));
 	}
 
 	@Test

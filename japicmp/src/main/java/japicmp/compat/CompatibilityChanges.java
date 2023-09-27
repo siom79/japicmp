@@ -508,7 +508,12 @@ public class CompatibilityChanges {
 					}
 					JApiModifier<StaticModifier> staticModifier = method.getStaticModifier();
 					if (staticModifier.hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {
-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC);
+						// changed from default to static
+						if (abstractModifier.getChangeStatus() == JApiChangeStatus.UNCHANGED && abstractModifier.getNewModifier().isPresent() && abstractModifier.getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
+							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_DEFAULT_NOW_STATIC);
+						} else {
+							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC);
+						}
 					} else if (staticModifier.hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {
 						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC);
 					}
