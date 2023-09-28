@@ -47,7 +47,7 @@ public enum JApiCompatibilityChange {
 	METHOD_NEW_STATIC_ADDED_TO_INTERFACE(true, true, JApiSemanticVersionLevel.MINOR),
 	METHOD_MOVED_TO_SUPERCLASS(true, true, JApiSemanticVersionLevel.PATCH),
 	METHOD_ABSTRACT_NOW_DEFAULT(false, false, JApiSemanticVersionLevel.MAJOR),
-	METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC(true, true, JApiSemanticVersionLevel.MINOR),
+	METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC(false, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),
 	FIELD_STATIC_AND_OVERRIDES_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),
 	FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),
