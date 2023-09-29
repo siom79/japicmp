@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.18.1 (2023-09-29)
+-------------------
+* METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC not source and binary incompatible [#363](https://github.com/siom79/japicmp/issues/363)
+
 0.18.0 (2023-09-22)
 -------------------
 * added METHOD_NEW_STATIC_ADDED_TO_INTERFACE, METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC and METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC. [#289](https://github.com/siom79/japicmp/issues/289)
