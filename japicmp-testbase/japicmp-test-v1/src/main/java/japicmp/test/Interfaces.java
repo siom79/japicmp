@@ -85,26 +85,4 @@ public class Interfaces {
 	public interface InterfaceWithDefaultMethod {
 
 	}
-
-	public interface InterfaceAbstractMethodToStatic {
-		void doSomething();
-	}
-
-	public static class ClassAbstractMethodToStatic implements InterfaceAbstractMethodToStatic {
-
-		@Override
-		public void doSomething() {
-			System.out.println("test");
-		}
-	}
-
-	public interface InterfaceDefaultMethodToStatic {
-		default void doSomething() {
-			System.out.println("Test");
-		}
-	}
-
-	public static class ClassDefaultMethodToStatic implements InterfaceDefaultMethodToStatic {
-
-	}
 }

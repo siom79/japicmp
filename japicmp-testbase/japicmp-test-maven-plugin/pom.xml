@@ -637,12 +637,6 @@
 										<sourceCompatible>true</sourceCompatible>
 										<semanticVersionLevel>PATCH</semanticVersionLevel>
 									</overrideCompatibilityChangeParameter>
-									<overrideCompatibilityChangeParameter>
-										<compatibilityChange>METHOD_DEFAULT_NOW_STATIC</compatibilityChange>
-										<binaryCompatible>true</binaryCompatible>
-										<sourceCompatible>true</sourceCompatible>
-										<semanticVersionLevel>PATCH</semanticVersionLevel>
-									</overrideCompatibilityChangeParameter>
 								</overrideCompatibilityChangeParameters>
 								<breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
 								<breakBuildOnSourceIncompatibleModifications>true</breakBuildOnSourceIncompatibleModifications>

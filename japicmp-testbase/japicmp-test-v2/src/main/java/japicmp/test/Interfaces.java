@@ -95,27 +95,4 @@ public class Interfaces {
 
 		}
 	}
-
-	public interface InterfaceAbstractMethodToStatic {
-		static void doSomething() {
-
-		}
-	}
-
-	public static class ClassAbstractMethodToStatic implements InterfaceAbstractMethodToStatic {
-
-		public void doSomething() {
-			System.out.println("test");
-		}
-	}
-
-	public interface InterfaceDefaultMethodToStatic {
-		static void doSomething() {
-			System.out.println("Test");
-		}
-	}
-
-	public static class ClassDefaultMethodToStatic implements InterfaceDefaultMethodToStatic {
-
-	}
 }

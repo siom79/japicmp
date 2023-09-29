@@ -43,7 +43,6 @@ public enum JApiCompatibilityChange {
 	METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE(true, true, JApiSemanticVersionLevel.MINOR),
 	METHOD_NEW_DEFAULT(true, true, JApiSemanticVersionLevel.MINOR),
-	METHOD_DEFAULT_NOW_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),
 	METHOD_NEW_STATIC_ADDED_TO_INTERFACE(true, true, JApiSemanticVersionLevel.MINOR),
 	METHOD_MOVED_TO_SUPERCLASS(true, true, JApiSemanticVersionLevel.PATCH),
 	METHOD_ABSTRACT_NOW_DEFAULT(false, false, JApiSemanticVersionLevel.MAJOR),
