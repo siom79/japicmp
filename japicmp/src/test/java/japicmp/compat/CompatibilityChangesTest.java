@@ -2196,4 +2196,32 @@ public class CompatibilityChangesTest {
 		jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
 		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
 	}
+
+	@Test
+	public void testPackagePrivateClassChangesToPublicClassWithMethodReturnTypeChangeIssue365() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterfaceF = CtInterfaceBuilder.create().name("F").addToClassPool(classPool);
+				CtClass ctClassC = CtClassBuilder.create().name("C").protectedModifier().addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().staticAccess().name("M").returnType(ctInterfaceF).addToClass(ctClassC);
+				return Arrays.asList(ctInterfaceF, ctClassC);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterfaceF = CtInterfaceBuilder.create().name("F").addToClassPool(classPool);
+				CtClass ctClassFImpl = CtClassBuilder.create().name("FImpl").implementsInterface(ctInterfaceF).addToClassPool(classPool);
+				CtClass ctClassC = CtClassBuilder.create().name("C").protectedModifier().addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().staticAccess().name("M").returnType(ctClassFImpl).addToClass(ctClassC);
+				return Arrays.asList(ctInterfaceF, ctClassC);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "C");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "M");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_RETURN_TYPE_CHANGED));
+	}
 }

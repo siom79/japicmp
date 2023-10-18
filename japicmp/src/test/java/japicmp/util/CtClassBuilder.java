@@ -52,6 +52,13 @@ public class CtClassBuilder {
 		return this;
 	}
 
+	public CtClassBuilder protectedModifier() {
+		this.modifier = this.modifier & ~Modifier.PUBLIC;
+		this.modifier = this.modifier & ~Modifier.PRIVATE;
+		this.modifier |= Modifier.PROTECTED;
+		return this;
+	}
+
 	public CtClassBuilder enumModifier() {
 		this.modifier = this.modifier | Modifier.ENUM;
 		return this;
