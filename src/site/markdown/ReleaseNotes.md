@@ -3,6 +3,11 @@ Versions
 
 The following versions of japicmp are available:
 
+0.18.2 (2023-10-18)
+-------------------
+* Upgrade to groovy 4.0.15 [#364](https://github.com/siom79/japicmp/issues/364)
+* correct name of package_protected in documentation [#365](https://github.com/siom79/japicmp/issues/365)
+
 0.18.1 (2023-09-29)
 -------------------
 * METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC not source and binary incompatible [#363](https://github.com/siom79/japicmp/issues/363)
