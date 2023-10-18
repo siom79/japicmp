@@ -45,17 +45,9 @@ public class CtClassBuilder {
 		return this;
 	}
 
-	public CtClassBuilder privateModifier() {
+	// class cannot be private or (package) protected (see https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.1)
+	public CtClassBuilder notPublicModifier() {
 		this.modifier = this.modifier & ~Modifier.PUBLIC;
-		this.modifier = this.modifier & ~Modifier.PROTECTED;
-		this.modifier |= Modifier.PRIVATE;
-		return this;
-	}
-
-	public CtClassBuilder protectedModifier() {
-		this.modifier = this.modifier & ~Modifier.PUBLIC;
-		this.modifier = this.modifier & ~Modifier.PRIVATE;
-		this.modifier |= Modifier.PROTECTED;
 		return this;
 	}
 

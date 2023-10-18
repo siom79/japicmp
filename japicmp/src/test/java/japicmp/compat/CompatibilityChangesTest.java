@@ -104,7 +104,7 @@ public class CompatibilityChangesTest {
 
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().privateModifier().name("japicmp.Test").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().notPublicModifier().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 		});
@@ -416,7 +416,7 @@ public class CompatibilityChangesTest {
 
 			@Override
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().privateModifier().name("japicmp.Test").addToClassPool(classPool);
+				CtClass ctClass = CtClassBuilder.create().notPublicModifier().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 		});
@@ -2205,7 +2205,7 @@ public class CompatibilityChangesTest {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
 				CtClass ctInterfaceF = CtInterfaceBuilder.create().name("F").addToClassPool(classPool);
-				CtClass ctClassC = CtClassBuilder.create().name("C").protectedModifier().addToClassPool(classPool);
+				CtClass ctClassC = CtClassBuilder.create().name("C").notPublicModifier().addToClassPool(classPool);
 				CtMethodBuilder.create().publicAccess().staticAccess().name("M").returnType(ctInterfaceF).addToClass(ctClassC);
 				return Arrays.asList(ctInterfaceF, ctClassC);
 			}
@@ -2214,7 +2214,7 @@ public class CompatibilityChangesTest {
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
 				CtClass ctInterfaceF = CtInterfaceBuilder.create().name("F").addToClassPool(classPool);
 				CtClass ctClassFImpl = CtClassBuilder.create().name("FImpl").implementsInterface(ctInterfaceF).addToClassPool(classPool);
-				CtClass ctClassC = CtClassBuilder.create().name("C").protectedModifier().addToClassPool(classPool);
+				CtClass ctClassC = CtClassBuilder.create().name("C").notPublicModifier().addToClassPool(classPool);
 				CtMethodBuilder.create().publicAccess().staticAccess().name("M").returnType(ctClassFImpl).addToClass(ctClassC);
 				return Arrays.asList(ctInterfaceF, ctClassC);
 			}
