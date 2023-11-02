@@ -2214,7 +2214,7 @@ public class CompatibilityChangesTest {
 			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
 				CtClass ctInterfaceF = CtInterfaceBuilder.create().name("F").addToClassPool(classPool);
 				CtClass ctClassFImpl = CtClassBuilder.create().name("FImpl").implementsInterface(ctInterfaceF).addToClassPool(classPool);
-				CtClass ctClassC = CtClassBuilder.create().name("C").notPublicModifier().addToClassPool(classPool);
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
 				CtMethodBuilder.create().publicAccess().staticAccess().name("M").returnType(ctClassFImpl).addToClass(ctClassC);
 				return Arrays.asList(ctInterfaceF, ctClassC);
 			}
@@ -2222,6 +2222,8 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "C");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "M");
 		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_RETURN_TYPE_CHANGED));
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiMethod.isSourceCompatible(), is(true));
+		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
 	}
 }

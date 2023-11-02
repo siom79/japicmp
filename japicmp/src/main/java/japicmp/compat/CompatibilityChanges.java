@@ -38,6 +38,9 @@ public class CompatibilityChanges {
 	}
 
 	private void evaluateBinaryCompatibility(JApiClass jApiClass, Map<String, JApiClass> classMap) {
+		if (jApiClass.getAccessModifier().hasChangedTo(AccessModifier.PUBLIC)) {
+			return; // class appears as "new" public class
+		}
 		if (jApiClass.getChangeStatus() == JApiChangeStatus.REMOVED) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_REMOVED);
 		} else if (jApiClass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
@@ -583,11 +586,11 @@ public class CompatibilityChanges {
 	}
 
 	private boolean isAbstract(JApiHasAbstractModifier jApiHasAbstractModifier) {
-		boolean isAbstract = false;
-		if (jApiHasAbstractModifier.getAbstractModifier().hasChangedTo(AbstractModifier.ABSTRACT)) {
-			isAbstract = true;
+		if (jApiHasAbstractModifier.getAbstractModifier().getNewModifier().isPresent()) {
+			AbstractModifier abstractModifier = jApiHasAbstractModifier.getAbstractModifier().getNewModifier().get();
+			return abstractModifier == AbstractModifier.ABSTRACT;
 		}
-		return isAbstract;
+		return false;
 	}
 
 	private void checkIfExceptionIsNowChecked(JApiBehavior behavior) {
@@ -838,14 +841,6 @@ public class CompatibilityChanges {
 		checkIfClassNowCheckedException(jApiClass);
 		checkIfAbstractMethodAddedInSuperclass(jApiClass, classMap);
 		checkIfAbstractMethodAdded(jApiClass, classMap);
-	}
-
-	private boolean isAbstract(JApiMethod jApiMethod) {
-		if (jApiMethod.getAbstractModifier().getNewModifier().isPresent()) {
-			AbstractModifier abstractModifier = jApiMethod.getAbstractModifier().getNewModifier().get();
-			return abstractModifier == AbstractModifier.ABSTRACT;
-		}
-		return false;
 	}
 
 	private boolean hasSameType(JApiField field, JApiField otherField) {
