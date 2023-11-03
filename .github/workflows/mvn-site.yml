@@ -18,5 +18,4 @@ jobs:
           java-version: 17
       - name: Generate website
         run: |
-          mvn package
-          mvn site:site site:stage scm-publish:publish-scm
+          mvn install site:site site:stage scm-publish:publish-scm
