@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiConstructor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiConstructor.java</span></div><h1>JApiConstructor.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.util.Optional;
+import javassist.CtConstructor;
+
+import javax.xml.bind.annotation.XmlTransient;
+
+public class JApiConstructor extends JApiBehavior {
+	private final Optional&lt;CtConstructor&gt; oldConstructor;
+	private final Optional&lt;CtConstructor&gt; newConstructor;
+
+	public JApiConstructor(JApiClass jApiClass, String name, JApiChangeStatus changeStatus, Optional&lt;CtConstructor&gt; oldConstructor, Optional&lt;CtConstructor&gt; newConstructor, JarArchiveComparator jarArchiveComparator) {
+<span class="fc" id="L14">		super(jApiClass, name, oldConstructor, newConstructor, changeStatus, jarArchiveComparator);</span>
+<span class="fc" id="L15">		this.oldConstructor = oldConstructor;</span>
+<span class="fc" id="L16">		this.newConstructor = newConstructor;</span>
+<span class="fc" id="L17">	}</span>
+
+	@XmlTransient
+	public Optional&lt;CtConstructor&gt; getNewConstructor() {
+<span class="nc" id="L21">		return newConstructor;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;CtConstructor&gt; getOldConstructor() {
+<span class="nc" id="L26">		return oldConstructor;</span>
+	}
+
+	public String toString()
+	{
+<span class="nc" id="L31">		return &quot;JApiConstructor [oldConstructor=&quot;</span>
+			+ oldConstructor
+			+ &quot;, newConstructor=&quot;
+			+ newConstructor
+			+ &quot;, getNewConstructor()=&quot;
+<span class="nc" id="L36">			+ getNewConstructor()</span>
+			+ &quot;, getOldConstructor()=&quot;
+<span class="nc" id="L38">			+ getOldConstructor()</span>
+			+ &quot;, getCompatibilityChanges()=&quot;
+<span class="nc" id="L40">			+ getCompatibilityChanges()</span>
+			+ &quot;]&quot;;
+	}
+
+	@Override
+	public void enhanceGenericTypeToParameters() {
+<span class="fc" id="L46">		super.enhanceGenericTypeToParameters(this.jApiClass, this.oldConstructor, this.newConstructor);</span>
+<span class="fc" id="L47">	}</span>
+
+	@Override
+	public boolean isSourceCompatible() {
+<span class="fc" id="L51">		boolean sourceCompatible = super.isSourceCompatible();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">		for (JApiParameter jApiParameter : getParameters()) {</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">			for (JApiCompatibilityChange compatibilityChange : jApiParameter.getCompatibilityChanges()) {</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">				if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="nc" id="L55">					sourceCompatible = false;</span>
+<span class="nc" id="L56">					break;</span>
+				}
+<span class="nc" id="L58">			}</span>
+<span class="fc" id="L59">		}</span>
+<span class="fc" id="L60">		return sourceCompatible;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ListJoiner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.util</a> &gt; <span class="el_source">ListJoiner.java</span></div><h1>ListJoiner.java</h1><pre class="source lang-java linenums">package japicmp.util;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+<span class="nc" id="L7">public class ListJoiner&lt;T&gt; {</span>
+<span class="nc" id="L8">	private String separator = &quot;;&quot;;</span>
+<span class="nc" id="L9">	private Comparator&lt;T&gt; comparator = null;</span>
+<span class="nc" id="L10">	private ListJoinerToString&lt;T&gt; toStringBuilder = null;</span>
+
+	public ListJoiner&lt;T&gt; on(String separator) {
+<span class="nc" id="L13">		this.separator = separator;</span>
+<span class="nc" id="L14">		return this;</span>
+	}
+
+	public ListJoiner&lt;T&gt; sort(Comparator&lt;T&gt; comparator) {
+<span class="nc" id="L18">		this.comparator = comparator;</span>
+<span class="nc" id="L19">		return this;</span>
+	}
+
+	public ListJoiner&lt;T&gt; toStringBuilder(ListJoinerToString&lt;T&gt; listJoinerToString) {
+<span class="nc" id="L23">		this.toStringBuilder = listJoinerToString;</span>
+<span class="nc" id="L24">		return this;</span>
+	}
+
+	public interface ListJoinerToString&lt;T&gt; {
+		String toString(T t);
+	}
+
+	public String join(List&lt;T&gt; items) {
+<span class="nc" id="L32">		return join(new StringBuilder(), items).toString();</span>
+	}
+
+	public StringBuilder join(StringBuilder sb, List&lt;T&gt; items) {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">		if (items.size() == 0) {</span>
+<span class="nc" id="L37">			sb.append(&quot;n.a.&quot;);</span>
+		} else {
+<span class="nc bnc" id="L39" title="All 2 branches missed.">			if (this.comparator != null) {</span>
+<span class="nc" id="L40">				Collections.sort(items, this.comparator);</span>
+			}
+<span class="nc" id="L42">			int counter = 0;</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">			for (T item : items) {</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">				if (item == null) {</span>
+<span class="nc" id="L45">					continue;</span>
+				}
+<span class="nc bnc" id="L47" title="All 2 branches missed.">				if (counter &gt; 0) {</span>
+<span class="nc" id="L48">					sb.append(this.separator);</span>
+				}
+<span class="nc bnc" id="L50" title="All 2 branches missed.">				if (this.toStringBuilder != null) {</span>
+<span class="nc" id="L51">					sb.append(this.toStringBuilder.toString(item));</span>
+				} else {
+<span class="nc" id="L53">					sb.append(item.toString());</span>
+				}
+<span class="nc" id="L55">				counter++;</span>
+<span class="nc" id="L56">			}</span>
+		}
+<span class="nc" id="L58">		return sb;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

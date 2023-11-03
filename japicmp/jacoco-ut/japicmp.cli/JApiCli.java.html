@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiCli.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.cli</a> &gt; <span class="el_source">JApiCli.java</span></div><h1>JApiCli.java</h1><pre class="source lang-java linenums">package japicmp.cli;
+
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
+import japicmp.model.JApiClass;
+import japicmp.output.incompatible.IncompatibleErrorOutput;
+import japicmp.output.semver.SemverOut;
+import japicmp.output.stdout.StdoutOutputGenerator;
+import japicmp.output.xml.XmlOutput;
+import japicmp.output.xml.XmlOutputGenerator;
+import japicmp.output.xml.XmlOutputGeneratorOptions;
+
+import java.util.List;
+
+<span class="fc" id="L17">public class JApiCli {</span>
+
+<span class="fc" id="L19">	public enum ClassPathMode {</span>
+<span class="fc" id="L20">		ONE_COMMON_CLASSPATH, TWO_SEPARATE_CLASSPATHS</span>
+	}
+
+	public void run(String[] args) {
+<span class="fc" id="L24">		CliParser cliParser = new CliParser();</span>
+<span class="fc" id="L25">		Options options = cliParser.parse(args);</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">		if (options.isHelpRequested()) {</span>
+<span class="fc" id="L27">			CliParser.printHelp();</span>
+<span class="fc" id="L28">			return;</span>
+		}
+<span class="fc" id="L30">		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(JarArchiveComparatorOptions.of(options));</span>
+<span class="fc" id="L31">		List&lt;JApiClass&gt; jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());</span>
+<span class="fc" id="L32">		generateOutput(options, jApiClasses, jarArchiveComparator);</span>
+<span class="fc" id="L33">	}</span>
+
+	private void generateOutput(Options options, List&lt;JApiClass&gt; jApiClasses, JarArchiveComparator jarArchiveComparator) {
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">		if (options.isSemanticVersioning()) {</span>
+<span class="nc" id="L37">			SemverOut semverOut = new SemverOut(options, jApiClasses);</span>
+<span class="nc" id="L38">			String output = semverOut.generate();</span>
+<span class="nc" id="L39">			System.out.println(output);</span>
+<span class="nc" id="L40">			return;</span>
+		}
+<span class="pc bpc" id="L42" title="2 of 4 branches missed.">		if (options.getXmlOutputFile().isPresent() || options.getHtmlOutputFile().isPresent()) {</span>
+<span class="nc" id="L43">			SemverOut semverOut = new SemverOut(options, jApiClasses);</span>
+<span class="nc" id="L44">			XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();</span>
+<span class="nc" id="L45">			xmlOutputGeneratorOptions.setCreateSchemaFile(true);</span>
+<span class="nc" id="L46">			xmlOutputGeneratorOptions.setSemanticVersioningInformation(semverOut.generate());</span>
+<span class="nc" id="L47">			XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);</span>
+<span class="nc" id="L48">			try (XmlOutput xmlOutput = xmlGenerator.generate()) {</span>
+<span class="nc" id="L49">				XmlOutputGenerator.writeToFiles(options, xmlOutput);</span>
+<span class="nc" id="L50">			} catch (Exception e) {</span>
+<span class="nc" id="L51">				throw new JApiCmpException(JApiCmpException.Reason.IoException, &quot;Could not close output streams: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L52">			}</span>
+		}
+<span class="fc" id="L54">		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);</span>
+<span class="fc" id="L55">		String output = stdoutOutputGenerator.generate();</span>
+<span class="fc" id="L56">		System.out.println(output);</span>
+
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">		if (options.isErrorOnBinaryIncompatibility()</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">			|| options.isErrorOnSourceIncompatibility()</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">			|| options.isErrorOnExclusionIncompatibility()</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">			|| options.isErrorOnModifications()</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">			|| options.isErrorOnSemanticIncompatibility()) {</span>
+<span class="fc" id="L63">			IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses, jarArchiveComparator);</span>
+<span class="fc" id="L64">			errorOutput.generate();</span>
+		}
+<span class="fc" id="L66">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

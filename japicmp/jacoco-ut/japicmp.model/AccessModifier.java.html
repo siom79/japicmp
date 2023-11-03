@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessModifier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">AccessModifier.java</span></div><h1>AccessModifier.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import japicmp.exception.JApiCmpException;
+
+/**
+ * Represents the access modifiers as defined in the Java Language Specification.
+ */
+<span class="fc" id="L9">public enum AccessModifier implements JApiModifierBase {</span>
+<span class="fc" id="L10">	PUBLIC(3), PROTECTED(2), PACKAGE_PROTECTED(1), PRIVATE(0);</span>
+
+	private int level;
+
+<span class="fc" id="L14">	AccessModifier(int level) {</span>
+<span class="fc" id="L15">		this.level = level;</span>
+<span class="fc" id="L16">	}</span>
+
+	public int getLevel() {
+<span class="fc" id="L19">		return level;</span>
+	}
+
+	public static String listOfAccessModifier() {
+<span class="nc" id="L23">		StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L24">		int i = 0;</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">		for (AccessModifier am : values()) {</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">			if (i &gt; 0) {</span>
+<span class="nc" id="L27">				sb.append(&quot;,&quot;);</span>
+			}
+<span class="nc" id="L29">			sb.append(am.toString());</span>
+<span class="nc" id="L30">			i++;</span>
+		}
+<span class="nc" id="L32">		return sb.toString();</span>
+	}
+
+	public static Optional&lt;AccessModifier&gt; toModifier(String accessModifierArg) {
+<span class="nc" id="L36">		Optional&lt;String&gt; stringOptional = Optional.fromNullable(accessModifierArg);</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">		if (stringOptional.isPresent()) {</span>
+			try {
+<span class="nc" id="L39">				return Optional.of(valueOf(stringOptional.get().toUpperCase()));</span>
+<span class="nc" id="L40">			} catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L41">				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Invalid value for option accessModifier: %s. Possible values are: %s.&quot;,</span>
+<span class="nc" id="L42">					accessModifierArg, listOfAccessModifier()), e);</span>
+			}
+		} else {
+<span class="nc" id="L45">			return Optional.of(PROTECTED);</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

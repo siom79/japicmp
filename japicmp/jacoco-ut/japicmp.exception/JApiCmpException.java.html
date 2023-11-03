@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiCmpException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.exception</a> &gt; <span class="el_source">JApiCmpException.java</span></div><h1>JApiCmpException.java</h1><pre class="source lang-java linenums">package japicmp.exception;
+
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
+
+public class JApiCmpException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
+	private final Reason reason;
+
+<span class="fc" id="L10">	public enum Reason {</span>
+<span class="fc" id="L11">		CliError,</span>
+<span class="fc" id="L12">		NormalTermination,</span>
+<span class="fc" id="L13">		IoException,</span>
+<span class="fc" id="L14">		JaxbException,</span>
+<span class="fc" id="L15">		ClassLoading,</span>
+<span class="fc" id="L16">		IllegalState,</span>
+<span class="fc" id="L17">		IllegalArgument,</span>
+<span class="fc" id="L18">		XsltError,</span>
+<span class="fc" id="L19">		IncompatibleChange</span>
+	}
+
+	public JApiCmpException(Reason reason, String msg) {
+<span class="fc" id="L23">		super(msg);</span>
+<span class="fc" id="L24">		this.reason = reason;</span>
+<span class="fc" id="L25">	}</span>
+
+	public JApiCmpException(Reason reason, String msg, Throwable t) {
+<span class="fc" id="L28">		super(msg, t);</span>
+<span class="fc" id="L29">		this.reason = reason;</span>
+<span class="fc" id="L30">	}</span>
+
+	public Reason getReason() {
+<span class="fc" id="L33">		return reason;</span>
+	}
+
+	public static JApiCmpException cliError(String format, Object... args) {
+<span class="fc" id="L37">		return of(Reason.CliError, format, args);</span>
+	}
+
+	public static JApiCmpException of(Reason reason, String format, Object... args) {
+<span class="fc" id="L41">		String msg = String.format(format, args);</span>
+<span class="fc" id="L42">		return new JApiCmpException(reason, msg);</span>
+	}
+
+	public static JApiCmpException forClassLoading(Exception e, String name, JarArchiveComparator jarArchiveComparator) {
+<span class="fc" id="L46">		String classPathAsString = &quot;(CLASSPATH=&quot; + jarArchiveComparator.getCommonClasspathAsString() + &quot;)&quot;;</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">		if (jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {</span>
+<span class="nc" id="L48">			classPathAsString = &quot;(OLD CLASSPATH=&quot; + jarArchiveComparator.getOldClassPathAsString() + &quot; / NEW CLASSPATH=&quot; + jarArchiveComparator.getNewClassPathAsString() + &quot;)&quot;;</span>
+		}
+<span class="fc" id="L50">		return new JApiCmpException(JApiCmpException.Reason.ClassLoading, &quot;Could not load '&quot; + name + &quot;': &quot; + e.getMessage() + &quot;. Please make sure that all libraries have been added to the classpath &quot; + classPathAsString + &quot; or try the option '--ignore-missing-classes'.&quot;, e);</span>
+	}
+
+	public static JApiCmpException forClassLoading(String name, JarArchiveComparator jarArchiveComparator) {
+<span class="nc" id="L54">		String classPathAsString = &quot;(CLASSPATH=&quot; + jarArchiveComparator.getCommonClasspathAsString() + &quot;)&quot;;</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">		if (jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {</span>
+<span class="nc" id="L56">			classPathAsString = &quot;(OLD CLASSPATH=&quot; + jarArchiveComparator.getOldClassPathAsString() + &quot; / NEW CLASSPATH=&quot; + jarArchiveComparator.getNewClassPathAsString() + &quot;)&quot;;</span>
+		}
+<span class="nc" id="L58">		return new JApiCmpException(JApiCmpException.Reason.ClassLoading, &quot;Could not load '&quot; + name + &quot;'. Please make sure that all libraries have been added to the classpath &quot; + classPathAsString + &quot; or try the option '--ignore-missing-classes'.&quot;);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

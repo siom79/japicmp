@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XmlOutput.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.xml</a> &gt; <span class="el_source">XmlOutput.java</span></div><h1>XmlOutput.java</h1><pre class="source lang-java linenums">package japicmp.output.xml;
+
+import japicmp.util.Optional;
+import japicmp.output.xml.model.JApiCmpXmlRoot;
+
+import java.io.ByteArrayOutputStream;
+
+<span class="fc" id="L8">public class XmlOutput implements AutoCloseable {</span>
+<span class="fc" id="L9">	private Optional&lt;ByteArrayOutputStream&gt; xmlOutputStream = Optional.absent();</span>
+<span class="fc" id="L10">	private Optional&lt;ByteArrayOutputStream&gt; htmlOutputStream = Optional.absent();</span>
+	private japicmp.output.xml.model.JApiCmpXmlRoot JApiCmpXmlRoot;
+
+	public Optional&lt;ByteArrayOutputStream&gt; getXmlOutputStream() {
+<span class="fc" id="L14">		return xmlOutputStream;</span>
+	}
+
+	public void setXmlOutputStream(Optional&lt;ByteArrayOutputStream&gt; xmlOutputStream) {
+<span class="nc" id="L18">		this.xmlOutputStream = xmlOutputStream;</span>
+<span class="nc" id="L19">	}</span>
+
+	public Optional&lt;ByteArrayOutputStream&gt; getHtmlOutputStream() {
+<span class="fc" id="L22">		return htmlOutputStream;</span>
+	}
+
+	public void setHtmlOutputStream(Optional&lt;ByteArrayOutputStream&gt; htmlOutputStream) {
+<span class="fc" id="L26">		this.htmlOutputStream = htmlOutputStream;</span>
+<span class="fc" id="L27">	}</span>
+
+	@Override
+	public void close() throws Exception {
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">		if (this.xmlOutputStream.isPresent()) {</span>
+<span class="nc" id="L32">			this.xmlOutputStream.get().close();</span>
+		}
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">		if (this.htmlOutputStream.isPresent()) {</span>
+<span class="fc" id="L35">			this.htmlOutputStream.get().close();</span>
+		}
+<span class="fc" id="L37">	}</span>
+
+	public void setJApiCmpXmlRoot(JApiCmpXmlRoot JApiCmpXmlRoot) {
+<span class="fc" id="L40">		this.JApiCmpXmlRoot = JApiCmpXmlRoot;</span>
+<span class="fc" id="L41">	}</span>
+
+	public JApiCmpXmlRoot getJApiCmpXmlRoot() {
+<span class="nc" id="L44">		return JApiCmpXmlRoot;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

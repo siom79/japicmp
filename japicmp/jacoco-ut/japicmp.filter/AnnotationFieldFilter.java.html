@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AnnotationFieldFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.filter</a> &gt; <span class="el_source">AnnotationFieldFilter.java</span></div><h1>AnnotationFieldFilter.java</h1><pre class="source lang-java linenums">package japicmp.filter;
+
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.NotFoundException;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class AnnotationFieldFilter extends AnnotationFilterBase implements FieldFilter {
+<span class="fc" id="L12">	private static final Logger LOGGER = Logger.getLogger(AnnotationBehaviorFilter.class.getName());</span>
+
+	public AnnotationFieldFilter(String filterString) {
+<span class="fc" id="L15">		super(filterString.substring(1));</span>
+<span class="fc" id="L16">	}</span>
+
+	@Override
+	public boolean matches(CtField ctField) {
+<span class="fc" id="L20">		List attributes = ctField.getFieldInfo().getAttributes();</span>
+<span class="fc" id="L21">		boolean hasAnnotation = hasAnnotation(attributes);</span>
+<span class="fc bfc" id="L22" title="All 2 branches covered.">		if (!hasAnnotation) {</span>
+<span class="fc" id="L23">			CtClass declaringClass = ctField.getDeclaringClass();</span>
+<span class="fc" id="L24">			hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">			if (!hasAnnotation) {</span>
+				try {
+<span class="fc" id="L27">					declaringClass = declaringClass.getDeclaringClass();</span>
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">					if (declaringClass != null) {</span>
+<span class="nc" id="L29">						hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());</span>
+					}
+<span class="nc" id="L31">				} catch (NotFoundException e) {</span>
+<span class="nc" id="L32">					LOGGER.log(Level.FINE, &quot;Failed to load class '&quot; + declaringClass.getName() + &quot;': &quot; + e.getLocalizedMessage(), e);</span>
+<span class="fc" id="L33">				}</span>
+			}
+		}
+<span class="fc" id="L36">		return hasAnnotation;</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc" id="L41">		return &quot;@&quot; + annotationClassName;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

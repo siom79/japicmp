@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OutputFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output</a> &gt; <span class="el_source">OutputFilter.java</span></div><h1>OutputFilter.java</h1><pre class="source lang-java linenums">package japicmp.output;
+
+import com.google.common.collect.ImmutableList;
+import japicmp.config.Options;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiAnnotation;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiConstructor;
+import japicmp.model.JApiField;
+import japicmp.model.JApiHasAnnotations;
+import japicmp.model.JApiImplementedInterface;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiSuperclass;
+import japicmp.util.ModifierHelper;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
+public class OutputFilter extends Filter {
+	private final Options options;
+
+<span class="fc" id="L25">	public OutputFilter(Options options) {</span>
+<span class="fc" id="L26">		this.options = options;</span>
+<span class="fc" id="L27">	}</span>
+
+	public void filter(List&lt;JApiClass&gt; jApiClasses) {
+<span class="fc" id="L30">		filter(jApiClasses, new FilterVisitor() {</span>
+			@Override
+			public void visit(Iterator&lt;JApiField&gt; iterator, JApiField element) {
+<span class="fc" id="L33">				boolean remove = false;</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">				if (options.isOutputOnlyModifications()) {</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc bnc" id="L36" title="All 4 branches missed.">						if (hasOnlyUnchangedAnnotations(element) &amp;&amp; element.isSourceCompatible()) {</span>
+<span class="nc" id="L37">							remove = true;</span>
+						}
+					}
+				}
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">				if (options.isOutputOnlyBinaryIncompatibleModifications()) {</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">					if (element.isBinaryCompatible()) {</span>
+<span class="nc" id="L43">						remove = true;</span>
+					}
+				}
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">				if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {</span>
+<span class="nc" id="L47">					remove = true;</span>
+				}
+<span class="fc bfc" id="L49" title="All 2 branches covered.">				if (!ModifierHelper.includeSynthetic(element, options)) {</span>
+<span class="fc" id="L50">					remove = true;</span>
+				}
+<span class="fc bfc" id="L52" title="All 2 branches covered.">				if (remove) {</span>
+<span class="fc" id="L53">					iterator.remove();</span>
+				}
+<span class="fc" id="L55">			}</span>
+
+			private boolean hasOnlyUnchangedAnnotations(JApiHasAnnotations jApiHasAnnotations) {
+<span class="nc" id="L58">				boolean hasOnlyUnchangedAnnotations = true;</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">				for (JApiAnnotation jApiAnnotation : jApiHasAnnotations.getAnnotations()) {</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">					if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L61">						hasOnlyUnchangedAnnotations = false;</span>
+<span class="nc" id="L62">						break;</span>
+					}
+<span class="nc" id="L64">				}</span>
+<span class="nc" id="L65">				return hasOnlyUnchangedAnnotations;</span>
+			}
+
+			@Override
+			public void visit(Iterator&lt;JApiAnnotation&gt; iterator, JApiAnnotation element) {
+<span class="nc" id="L70">				boolean remove = false;</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">				if (options.isOutputOnlyModifications()) {</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L73">						remove = true;</span>
+					}
+				}
+<span class="nc bnc" id="L76" title="All 2 branches missed.">				if (options.isOutputOnlyBinaryIncompatibleModifications()) {</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">					if (element.isBinaryCompatible()) {</span>
+<span class="nc" id="L78">						remove = true;</span>
+					}
+				}
+<span class="nc bnc" id="L81" title="All 2 branches missed.">				if (remove) {</span>
+<span class="nc" id="L82">					iterator.remove();</span>
+				}
+<span class="nc" id="L84">			}</span>
+
+			@Override
+			public void visit(JApiSuperclass jApiSuperclass) {
+				// cannot remove superclass
+<span class="fc" id="L89">			}</span>
+
+			@Override
+			public void visit(Iterator&lt;JApiImplementedInterface&gt; iterator, JApiImplementedInterface element) {
+<span class="nc" id="L93">				boolean remove = false;</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">				if (options.isOutputOnlyModifications()) {</span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED &amp;&amp; element.isSourceCompatible()) {</span>
+<span class="nc" id="L96">						remove = true;</span>
+					}
+				}
+<span class="nc bnc" id="L99" title="All 2 branches missed.">				if (options.isOutputOnlyBinaryIncompatibleModifications()) {</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">					if (element.isBinaryCompatible()) {</span>
+<span class="nc" id="L101">						remove = true;</span>
+					}
+				}
+<span class="nc bnc" id="L104" title="All 2 branches missed.">				if (remove) {</span>
+<span class="nc" id="L105">					iterator.remove();</span>
+				}
+<span class="nc" id="L107">			}</span>
+
+			@Override
+			public void visit(Iterator&lt;JApiConstructor&gt; iterator, JApiConstructor element) {
+<span class="nc" id="L111">				boolean remove = false;</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">				if (options.isOutputOnlyModifications()) {</span>
+<span class="nc bnc" id="L113" title="All 4 branches missed.">					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED &amp;&amp; element.isSourceCompatible()) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">						if (hasOnlyUnchangedAnnotations(element)) {</span>
+<span class="nc" id="L115">							remove = true;</span>
+						}
+					}
+				}
+<span class="nc bnc" id="L119" title="All 2 branches missed.">				if (options.isOutputOnlyBinaryIncompatibleModifications()) {</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">					if (element.isBinaryCompatible()) {</span>
+<span class="nc" id="L121">						remove = true;</span>
+					}
+				}
+<span class="nc bnc" id="L124" title="All 2 branches missed.">				if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {</span>
+<span class="nc" id="L125">					remove = true;</span>
+				}
+<span class="nc bnc" id="L127" title="All 2 branches missed.">				if (!ModifierHelper.includeSynthetic(element, options)) {</span>
+<span class="nc" id="L128">					remove = true;</span>
+				}
+<span class="nc bnc" id="L130" title="All 2 branches missed.">				if (remove) {</span>
+<span class="nc" id="L131">					iterator.remove();</span>
+				}
+<span class="nc" id="L133">			}</span>
+
+			@Override
+			public void visit(Iterator&lt;JApiMethod&gt; iterator, JApiMethod element) {
+<span class="fc" id="L137">				boolean remove = false;</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">				if (options.isOutputOnlyModifications()) {</span>
+<span class="nc bnc" id="L139" title="All 4 branches missed.">					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED &amp;&amp; element.isSourceCompatible()) {</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">						if (hasOnlyUnchangedAnnotations(element)) {</span>
+<span class="nc" id="L141">							remove = true;</span>
+						}
+					}
+				}
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">				if (options.isOutputOnlyBinaryIncompatibleModifications()) {</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">					if (element.isBinaryCompatible()) {</span>
+<span class="nc" id="L147">						remove = true;</span>
+					}
+				}
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">				if (!ModifierHelper.matchesModifierLevel(element, OutputFilter.this.options.getAccessModifier())) {</span>
+<span class="nc" id="L151">					remove = true;</span>
+				}
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">				if (!ModifierHelper.includeSynthetic(element, options)) {</span>
+<span class="nc" id="L154">					remove = true;</span>
+				}
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">				if (remove) {</span>
+<span class="nc" id="L157">					iterator.remove();</span>
+				}
+<span class="fc" id="L159">			}</span>
+
+			@Override
+			public void visit(Iterator&lt;JApiClass&gt; iterator, JApiClass jApiClass) {
+<span class="fc" id="L163">				boolean remove = false;</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">				if (options.isOutputOnlyModifications()) {</span>
+<span class="nc bnc" id="L165" title="All 4 branches missed.">					if (jApiClass.getChangeStatus() == JApiChangeStatus.UNCHANGED &amp;&amp; jApiClass.isSourceCompatible()) {</span>
+<span class="nc" id="L166">						ImmutableList&lt;Boolean&gt; list = findOneChangedElement(jApiClass);</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">						if (list.isEmpty()) { //filter out this class if it does not have any changed element (e.g. annotations)</span>
+<span class="nc" id="L168">							remove = true;</span>
+						}
+					}
+				}
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">				if (options.isOutputOnlyBinaryIncompatibleModifications()) {</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">					if (jApiClass.isBinaryCompatible()) {</span>
+<span class="nc" id="L174">						remove = true;</span>
+					}
+				}
+<span class="fc bfc" id="L177" title="All 2 branches covered.">				if (!ModifierHelper.matchesModifierLevel(jApiClass, OutputFilter.this.options.getAccessModifier())) {</span>
+<span class="fc" id="L178">					remove = true;</span>
+				}
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">				if (jApiClass.getJavaObjectSerializationCompatible().isIncompatible()) {</span>
+<span class="nc" id="L181">					remove = false;</span>
+				}
+<span class="fc bfc" id="L183" title="All 2 branches covered.">				if (!ModifierHelper.includeSynthetic(jApiClass, options)) {</span>
+<span class="fc" id="L184">					remove = true;</span>
+				}
+<span class="fc bfc" id="L186" title="All 2 branches covered.">				if (remove) {</span>
+<span class="fc" id="L187">					iterator.remove();</span>
+				}
+<span class="fc" id="L189">			}</span>
+
+			private ImmutableList&lt;Boolean&gt; findOneChangedElement(JApiClass jApiClass) {
+<span class="nc" id="L192">				final ImmutableList.Builder&lt;Boolean&gt; builder = ImmutableList.builder();</span>
+<span class="nc" id="L193">				Filter.filter(Collections.singletonList(jApiClass), new FilterVisitor() {</span>
+					@Override
+					public void visit(Iterator&lt;JApiClass&gt; iterator, JApiClass jApiClass) {
+<span class="nc" id="L196">						evaluateAnnotations(jApiClass);</span>
+<span class="nc" id="L197">					}</span>
+
+					@Override
+					public void visit(Iterator&lt;JApiMethod&gt; iterator, JApiMethod jApiMethod) {
+<span class="nc bnc" id="L201" title="All 2 branches missed.">						if (jApiMethod.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L202">							builder.add(Boolean.TRUE);</span>
+						} else {
+<span class="nc" id="L204">							evaluateAnnotations(jApiMethod);</span>
+						}
+<span class="nc" id="L206">					}</span>
+
+					@Override
+					public void visit(Iterator&lt;JApiConstructor&gt; iterator, JApiConstructor jApiConstructor) {
+<span class="nc bnc" id="L210" title="All 2 branches missed.">						if (jApiConstructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L211">							builder.add(Boolean.TRUE);</span>
+						} else {
+<span class="nc" id="L213">							evaluateAnnotations(jApiConstructor);</span>
+						}
+<span class="nc" id="L215">					}</span>
+
+					@Override
+					public void visit(Iterator&lt;JApiImplementedInterface&gt; iterator, JApiImplementedInterface jApiImplementedInterface) {
+<span class="nc bnc" id="L219" title="All 2 branches missed.">						if (jApiImplementedInterface.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L220">							builder.add(Boolean.TRUE);</span>
+						}
+<span class="nc" id="L222">					}</span>
+
+					@Override
+					public void visit(Iterator&lt;JApiField&gt; iterator, JApiField jApiField) {
+<span class="nc bnc" id="L226" title="All 2 branches missed.">						if (jApiField.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L227">							builder.add(Boolean.TRUE);</span>
+						} else {
+<span class="nc" id="L229">							evaluateAnnotations(jApiField);</span>
+						}
+<span class="nc" id="L231">					}</span>
+
+					private void evaluateAnnotations(JApiHasAnnotations jApiHasAnnotations) {
+<span class="nc bnc" id="L234" title="All 2 branches missed.">						for (JApiAnnotation jApiAnnotation : jApiHasAnnotations.getAnnotations()) {</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">							if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L236">								builder.add(Boolean.TRUE);</span>
+							}
+<span class="nc" id="L238">						}</span>
+<span class="nc" id="L239">					}</span>
+
+					@Override
+					public void visit(Iterator&lt;JApiAnnotation&gt; iterator, JApiAnnotation jApiAnnotation) {
+<span class="nc bnc" id="L243" title="All 2 branches missed.">						if (jApiAnnotation.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L244">							builder.add(Boolean.TRUE);</span>
+						}
+<span class="nc" id="L246">					}</span>
+
+					@Override
+					public void visit(JApiSuperclass jApiSuperclass) {
+<span class="nc bnc" id="L250" title="All 2 branches missed.">						if (jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L251">							builder.add(Boolean.TRUE);</span>
+						}
+<span class="nc" id="L253">					}</span>
+				});
+<span class="nc" id="L255">				return builder.build();</span>
+			}
+		});
+<span class="fc" id="L258">	}</span>
+
+	public static void sortClassesAndMethods(List&lt;JApiClass&gt; jApiClasses) {
+<span class="fc" id="L261">		Collections.sort(jApiClasses, new Comparator&lt;JApiClass&gt;() {</span>
+			public int compare(JApiClass o1, JApiClass o2) {
+<span class="fc" id="L263">				return o1.getFullyQualifiedName().compareToIgnoreCase(o2.getFullyQualifiedName());</span>
+			}
+		});
+<span class="fc bfc" id="L266" title="All 2 branches covered.">		for (JApiClass jApiClass : jApiClasses) {</span>
+<span class="fc" id="L267">			Collections.sort(jApiClass.getMethods(), new Comparator&lt;JApiMethod&gt;() {</span>
+				public int compare(JApiMethod o1, JApiMethod o2) {
+<span class="fc" id="L269">					return o1.getName().compareToIgnoreCase(o2.getName());</span>
+				}
+			});
+<span class="fc" id="L272">		}</span>
+<span class="fc" id="L273">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

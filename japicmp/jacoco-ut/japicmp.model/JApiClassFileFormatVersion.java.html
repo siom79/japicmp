@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiClassFileFormatVersion.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiClassFileFormatVersion.java</span></div><h1>JApiClassFileFormatVersion.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JApiClassFileFormatVersion implements JApiHasChangeStatus, JApiCompatibility {
+
+	private final int majorVersionOld;
+	private final int minorVersionOld;
+	private final int majorVersionNew;
+	private final int minorVersionNew;
+	private final JApiChangeStatus changeStatus;
+<span class="fc" id="L14">	private final List&lt;JApiCompatibilityChange&gt; compatibilityChanges = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L16">	public JApiClassFileFormatVersion(int majorVersionOld, int minorVersionOld, int majorVersionNew, int minorVersionNew) {</span>
+<span class="fc" id="L17">		this.majorVersionOld = majorVersionOld;</span>
+<span class="fc" id="L18">		this.minorVersionOld = minorVersionOld;</span>
+<span class="fc" id="L19">		this.majorVersionNew = majorVersionNew;</span>
+<span class="fc" id="L20">		this.minorVersionNew = minorVersionNew;</span>
+<span class="fc" id="L21">		this.changeStatus = computeChangeStatus();</span>
+<span class="fc" id="L22">	}</span>
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L26">		return this.changeStatus;</span>
+	}
+
+	private JApiChangeStatus computeChangeStatus() {
+<span class="fc" id="L30">		JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;</span>
+<span class="fc bfc" id="L31" title="All 4 branches covered.">		if (this.majorVersionOld != -1 &amp;&amp; this.majorVersionNew != -1) {</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">			if (this.majorVersionOld != this.majorVersionNew) {</span>
+<span class="nc" id="L33">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+			} else {
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">				if (this.minorVersionOld != this.minorVersionNew) {</span>
+<span class="nc" id="L36">					changeStatus = JApiChangeStatus.MODIFIED;</span>
+				}
+			}
+<span class="fc bfc" id="L39" title="All 4 branches covered.">		} else if (this.majorVersionOld == -1 &amp;&amp; this.majorVersionNew != -1) {</span>
+<span class="fc" id="L40">			changeStatus = JApiChangeStatus.NEW;</span>
+<span class="pc bpc" id="L41" title="1 of 4 branches missed.">		} else if (this.majorVersionOld != -1 &amp;&amp; this.majorVersionNew == -1) {</span>
+<span class="fc" id="L42">			changeStatus = JApiChangeStatus.REMOVED;</span>
+		}
+<span class="fc" id="L44">		return changeStatus;</span>
+	}
+
+	@XmlAttribute(name = &quot;majorVersionOld&quot;)
+	public int getMajorVersionOld() {
+<span class="fc" id="L49">		return majorVersionOld;</span>
+	}
+
+	@XmlAttribute(name = &quot;minorVersionOld&quot;)
+	public int getMinorVersionOld() {
+<span class="fc" id="L54">		return minorVersionOld;</span>
+	}
+
+	@XmlAttribute(name = &quot;majorVersionNew&quot;)
+	public int getMajorVersionNew() {
+<span class="fc" id="L59">		return majorVersionNew;</span>
+	}
+
+	@XmlAttribute(name = &quot;minorVersionNew&quot;)
+	public int getMinorVersionNew() {
+<span class="fc" id="L64">		return minorVersionNew;</span>
+	}
+
+	@Override
+	public boolean isBinaryCompatible() {
+<span class="fc" id="L69">		boolean compatible = true;</span>
+<span class="fc bfc" id="L70" title="All 4 branches covered.">		if (this.majorVersionOld != -1 &amp;&amp; this.majorVersionNew != -1) {</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">			if (this.majorVersionOld != this.majorVersionNew) {</span>
+<span class="nc" id="L72">				compatible = false;</span>
+			}
+		}
+<span class="fc" id="L75">		return compatible;</span>
+	}
+
+	@Override
+	public boolean isSourceCompatible() {
+<span class="fc" id="L80">		return true;</span>
+	}
+
+	@Override
+	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
+<span class="nc" id="L85">		return this.compatibilityChanges;</span>
+	}
+
+	public String toString()
+	{
+<span class="nc" id="L90">		return &quot;JApiClassFileFormatVersion [majorVersionOld=&quot;</span>
+			+ majorVersionOld
+			+ &quot;, minorVersionOld=&quot;
+			+ minorVersionOld
+			+ &quot;, majorVersionNew=&quot;
+			+ majorVersionNew
+			+ &quot;, minorVersionNew=&quot;
+			+ minorVersionNew
+			+ &quot;, changeStatus=&quot;
+			+ changeStatus
+			+ &quot;, compatibilityChanges=&quot;
+			+ compatibilityChanges
+			+ &quot;]&quot;;
+	}
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

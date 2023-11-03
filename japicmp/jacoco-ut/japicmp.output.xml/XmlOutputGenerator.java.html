@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XmlOutputGenerator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.xml</a> &gt; <span class="el_source">XmlOutputGenerator.java</span></div><h1>XmlOutputGenerator.java</h1><pre class="source lang-java linenums">package japicmp.output.xml;
+
+import com.google.common.base.Joiner;
+import japicmp.util.Optional;
+import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
+import japicmp.exception.JApiCmpException.Reason;
+import japicmp.filter.Filter;
+import japicmp.model.JApiClass;
+import japicmp.output.OutputFilter;
+import japicmp.output.OutputGenerator;
+import japicmp.output.extapi.jpa.JpaAnalyzer;
+import japicmp.output.extapi.jpa.model.JpaTable;
+import japicmp.output.xml.model.JApiCmpXmlRoot;
+import japicmp.util.Streams;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.SchemaOutputResolver;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+public class XmlOutputGenerator extends OutputGenerator&lt;XmlOutput&gt; {
+	private static final String XSD_FILENAME = &quot;japicmp.xsd&quot;;
+	private static final String XML_SCHEMA = XSD_FILENAME;
+<span class="fc" id="L50">	private static final Logger LOGGER = Logger.getLogger(XmlOutputGenerator.class.getName());</span>
+	private final XmlOutputGeneratorOptions xmlOutputGeneratorOptions;
+
+	@Deprecated
+	public XmlOutputGenerator(List&lt;JApiClass&gt; jApiClasses, Options options, boolean createSchemaFile) {
+<span class="nc" id="L55">		super(options, jApiClasses);</span>
+<span class="nc" id="L56">		this.xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();</span>
+<span class="nc" id="L57">		this.xmlOutputGeneratorOptions.setCreateSchemaFile(createSchemaFile);</span>
+<span class="nc" id="L58">	}</span>
+
+	public XmlOutputGenerator(List&lt;JApiClass&gt; jApiClasses, Options options, XmlOutputGeneratorOptions xmlOutputGeneratorOptions) {
+<span class="fc" id="L61">		super(options, jApiClasses);</span>
+<span class="fc" id="L62">		this.xmlOutputGeneratorOptions = xmlOutputGeneratorOptions;</span>
+<span class="fc" id="L63">	}</span>
+
+	@Override
+	public XmlOutput generate() {
+<span class="fc" id="L67">		JApiCmpXmlRoot jApiCmpXmlRoot = createRootElement(jApiClasses, options);</span>
+		//analyzeJpaAnnotations(jApiCmpXmlRoot, jApiClasses);
+<span class="fc" id="L69">		filterClasses(jApiClasses, options);</span>
+<span class="fc" id="L70">		return createXmlDocumentAndSchema(options, jApiCmpXmlRoot);</span>
+	}
+
+	public static List&lt;File&gt; writeToFiles(Options options, XmlOutput xmlOutput) {
+<span class="fc" id="L74">		List&lt;File&gt; filesWritten = new ArrayList&lt;&gt;();</span>
+		try {
+<span class="pc bpc" id="L76" title="3 of 4 branches missed.">			if (xmlOutput.getXmlOutputStream().isPresent() &amp;&amp; options.getXmlOutputFile().isPresent()) {</span>
+<span class="nc" id="L77">				File xmlFile = new File(options.getXmlOutputFile().get());</span>
+<span class="nc" id="L78">				try (FileOutputStream fos = new FileOutputStream(xmlFile)) {</span>
+<span class="nc" id="L79">					ByteArrayOutputStream outputStream = xmlOutput.getXmlOutputStream().get();</span>
+<span class="nc" id="L80">					outputStream.writeTo(fos);</span>
+<span class="nc" id="L81">					filesWritten.add(xmlFile);</span>
+<span class="nc" id="L82">				} catch (IOException e) {</span>
+<span class="nc" id="L83">					throw new JApiCmpException(JApiCmpException.Reason.IoException, &quot;Failed to write XML file '&quot; + xmlFile.getAbsolutePath() + &quot;': &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L84">				}</span>
+			}
+<span class="pc bpc" id="L86" title="2 of 4 branches missed.">			if (xmlOutput.getHtmlOutputStream().isPresent() &amp;&amp; options.getHtmlOutputFile().isPresent()) {</span>
+<span class="fc" id="L87">				File htmlFile = new File(options.getHtmlOutputFile().get());</span>
+<span class="fc" id="L88">				try (FileOutputStream fos = new FileOutputStream(htmlFile)) {</span>
+<span class="fc" id="L89">					ByteArrayOutputStream outputStream = xmlOutput.getHtmlOutputStream().get();</span>
+<span class="fc" id="L90">					outputStream.writeTo(fos);</span>
+<span class="fc" id="L91">					filesWritten.add(htmlFile);</span>
+<span class="nc" id="L92">				} catch (IOException e) {</span>
+<span class="nc" id="L93">					throw new JApiCmpException(JApiCmpException.Reason.IoException, &quot;Failed to write HTML file '&quot; + htmlFile.getAbsolutePath() + &quot;': &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L94">				}</span>
+			}
+		} finally {
+			try {
+<span class="fc" id="L98">				xmlOutput.close();</span>
+<span class="nc" id="L99">			} catch (Exception e) {</span>
+<span class="nc" id="L100">				LOGGER.log(Level.FINE, &quot;Failed to close XML file: &quot; + e.getLocalizedMessage(), e);</span>
+<span class="fc" id="L101">			}</span>
+		}
+<span class="fc" id="L103">		return filesWritten;</span>
+	}
+
+	private void analyzeJpaAnnotations(JApiCmpXmlRoot jApiCmpXmlRoot, List&lt;JApiClass&gt; jApiClasses) {
+<span class="nc" id="L107">		JpaAnalyzer jpaAnalyzer = new JpaAnalyzer();</span>
+<span class="nc" id="L108">		List&lt;JpaTable&gt; jpaEntities = jpaAnalyzer.analyze(jApiClasses);</span>
+		//jApiCmpXmlRoot.setJpaTables(jpaEntities);
+<span class="nc" id="L110">	}</span>
+
+	private XmlOutput createXmlDocumentAndSchema(Options options, JApiCmpXmlRoot jApiCmpXmlRoot) {
+<span class="fc" id="L113">		XmlOutput xmlOutput = new XmlOutput();</span>
+<span class="fc" id="L114">		xmlOutput.setJApiCmpXmlRoot(jApiCmpXmlRoot);</span>
+<span class="fc" id="L115">		ByteArrayOutputStream xmlBaos = null;</span>
+<span class="fc" id="L116">		InputStream styleSheetAsInputStream = null;</span>
+<span class="fc" id="L117">		InputStream xsltAsInputStream = null;</span>
+		try {
+<span class="fc" id="L119">			JAXBContext jaxbContext = JAXBContext.newInstance(JApiCmpXmlRoot.class);</span>
+<span class="fc" id="L120">			Marshaller marshaller = jaxbContext.createMarshaller();</span>
+<span class="fc" id="L121">			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);</span>
+<span class="fc" id="L122">			marshaller.setProperty(Marshaller.JAXB_ENCODING, &quot;UTF-8&quot;);</span>
+<span class="fc" id="L123">			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, XML_SCHEMA);</span>
+<span class="fc" id="L124">			xmlBaos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L125">			marshaller.marshal(jApiCmpXmlRoot, xmlBaos);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">			if (options.getXmlOutputFile().isPresent()) {</span>
+<span class="nc" id="L127">				xmlOutput.setXmlOutputStream(Optional.of(xmlBaos));</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">				if (xmlOutputGeneratorOptions.isCreateSchemaFile()) {</span>
+<span class="nc" id="L129">					final File xmlFile = new File(options.getXmlOutputFile().get());</span>
+<span class="nc" id="L130">					SchemaOutputResolver outputResolver = new SchemaOutputResolver() {</span>
+						@Override
+						public Result createOutput(String namespaceUri, String suggestedFileName) throws IOException {
+<span class="nc" id="L133">							File schemaFile = xmlFile.getParentFile();</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">							if (schemaFile == null) {</span>
+<span class="nc" id="L135">								LOGGER.warning(String.format(&quot;File '%s' has no parent file. Using instead: '%s'.&quot;, xmlFile.getAbsolutePath(), XSD_FILENAME));</span>
+<span class="nc" id="L136">								schemaFile = new File(XSD_FILENAME);</span>
+							} else {
+<span class="nc" id="L138">								schemaFile = new File(schemaFile + File.separator + XSD_FILENAME);</span>
+							}
+<span class="nc" id="L140">							StreamResult result = new StreamResult(schemaFile);</span>
+<span class="nc" id="L141">							result.setSystemId(schemaFile.getAbsolutePath());</span>
+<span class="nc" id="L142">							return result;</span>
+						}
+					};
+<span class="nc" id="L145">					jaxbContext.generateSchema(outputResolver);</span>
+				}
+			}
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">			if (options.getHtmlOutputFile().isPresent()) {</span>
+<span class="fc" id="L149">				TransformerFactory transformerFactory = TransformerFactory.newInstance();</span>
+<span class="fc" id="L150">				xsltAsInputStream = XmlOutputGenerator.class.getResourceAsStream(&quot;/html.xslt&quot;);</span>
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">				if (xsltAsInputStream == null) {</span>
+<span class="nc" id="L152">					throw new JApiCmpException(Reason.XsltError, &quot;Failed to load XSLT.&quot;);</span>
+				}
+<span class="fc bfc" id="L154" title="All 2 branches covered.">				if (options.getHtmlStylesheet().isPresent()) {</span>
+<span class="fc" id="L155">					styleSheetAsInputStream = new FileInputStream(options.getHtmlStylesheet().get());</span>
+				} else {
+<span class="fc" id="L157">					styleSheetAsInputStream = XmlOutputGenerator.class.getResourceAsStream(&quot;/style.css&quot;);</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">					if (styleSheetAsInputStream == null) {</span>
+<span class="nc" id="L159">						throw new JApiCmpException(Reason.XsltError, &quot;Failed to load stylesheet.&quot;);</span>
+					}
+				}
+<span class="fc" id="L162">				String xsltAsString = integrateStylesheetIntoXslt(xsltAsInputStream, styleSheetAsInputStream);</span>
+<span class="fc" id="L163">				Transformer transformer = transformerFactory.newTransformer(new StreamSource(new StringReader(xsltAsString)));</span>
+<span class="fc" id="L164">				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(xmlBaos.toByteArray());</span>
+<span class="fc" id="L165">				ByteArrayOutputStream htmlOutputStream = new ByteArrayOutputStream();</span>
+<span class="fc" id="L166">				transformer.transform(new StreamSource(byteArrayInputStream), new StreamResult(htmlOutputStream));</span>
+<span class="fc" id="L167">				xmlOutput.setHtmlOutputStream(Optional.of(htmlOutputStream));</span>
+			}
+<span class="nc" id="L169">		} catch (JAXBException e) {</span>
+<span class="nc" id="L170">			throw new JApiCmpException(Reason.JaxbException, String.format(&quot;Marshalling of XML document failed: %s&quot;, e.getMessage()), e);</span>
+<span class="fc" id="L171">		} catch (IOException e) {</span>
+<span class="fc" id="L172">			throw new JApiCmpException(Reason.IoException, String.format(&quot;Marshalling of XML document failed: %s&quot;, e.getMessage()), e);</span>
+<span class="nc" id="L173">		} catch (TransformerConfigurationException e) {</span>
+<span class="nc" id="L174">			throw new JApiCmpException(Reason.XsltError, String.format(&quot;Configuration of XSLT transformer failed: %s&quot;, e.getMessage()), e);</span>
+<span class="nc" id="L175">		} catch (TransformerException e) {</span>
+<span class="nc" id="L176">			throw new JApiCmpException(Reason.XsltError, String.format(&quot;XSLT transformation failed: %s&quot;, e.getMessage()), e);</span>
+		} finally {
+			try {
+<span class="fc bfc" id="L179" title="All 2 branches covered.">				if (styleSheetAsInputStream != null) {</span>
+<span class="fc" id="L180">					styleSheetAsInputStream.close();</span>
+				}
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">				if (xsltAsInputStream != null) {</span>
+<span class="fc" id="L183">					xsltAsInputStream.close();</span>
+				}
+<span class="nc" id="L185">			} catch (IOException e) {</span>
+<span class="nc" id="L186">				LOGGER.log(Level.FINE, &quot;Failed to close CSS and/or XSLT file: &quot; + e.getLocalizedMessage(), e);</span>
+<span class="fc" id="L187">			}</span>
+		}
+<span class="fc" id="L189">		return xmlOutput;</span>
+	}
+
+	private String integrateStylesheetIntoXslt(InputStream xsltAsInputStream, InputStream styleSheetAsInputStream) {
+<span class="fc" id="L193">		String xsltAsString = Streams.asString(xsltAsInputStream);</span>
+<span class="fc" id="L194">		String styleSheetAsString = Streams.asString(styleSheetAsInputStream);</span>
+<span class="fc" id="L195">		xsltAsString = xsltAsString.replace(&quot;&lt;style type=\&quot;text/css\&quot;&gt;&lt;/style&gt;&quot;, &quot;&lt;style type=\&quot;text/css\&quot;&gt;\n&quot; + styleSheetAsString + &quot;\n&lt;/style&gt;&quot;);</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">		if (System.getProperty(&quot;japicmp.dump.xslt&quot;) != null) {</span>
+			try {
+<span class="nc" id="L198">				Files.write(Paths.get(System.getProperty(&quot;japicmp.dump.xslt&quot;)), Collections.singletonList(xsltAsString), Charset.forName(&quot;UTF-8&quot;), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);</span>
+<span class="nc" id="L199">			} catch (IOException e) {</span>
+<span class="nc" id="L200">				LOGGER.log(Level.WARNING, &quot;Could not dump XSLT file: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L201">			}</span>
+		}
+<span class="fc" id="L203">		return xsltAsString;</span>
+	}
+
+	private void filterClasses(List&lt;JApiClass&gt; jApiClasses, Options options) {
+<span class="fc" id="L207">		OutputFilter outputFilter = new OutputFilter(options);</span>
+<span class="fc" id="L208">		outputFilter.filter(jApiClasses);</span>
+<span class="fc" id="L209">	}</span>
+
+	private JApiCmpXmlRoot createRootElement(List&lt;JApiClass&gt; jApiClasses, Options options) {
+<span class="fc" id="L212">		JApiCmpXmlRoot jApiCmpXmlRoot = new JApiCmpXmlRoot();</span>
+<span class="fc" id="L213">		jApiCmpXmlRoot.setOldJar(options.joinOldArchives());</span>
+<span class="fc" id="L214">		jApiCmpXmlRoot.setNewJar(options.joinNewArchives());</span>
+<span class="fc" id="L215">		jApiCmpXmlRoot.setOldVersion(options.joinOldVersions());</span>
+<span class="fc" id="L216">		jApiCmpXmlRoot.setNewVersion(options.joinNewVersions());</span>
+<span class="fc" id="L217">		jApiCmpXmlRoot.setClasses(jApiClasses);</span>
+<span class="fc" id="L218">		jApiCmpXmlRoot.setAccessModifier(options.getAccessModifier().name());</span>
+<span class="fc" id="L219">		jApiCmpXmlRoot.setOnlyModifications(options.isOutputOnlyModifications());</span>
+<span class="fc" id="L220">		jApiCmpXmlRoot.setOnlyBinaryIncompatibleModifications(options.isOutputOnlyBinaryIncompatibleModifications());</span>
+<span class="fc" id="L221">		jApiCmpXmlRoot.setPackagesInclude(filtersAsString(options.getIncludes(), true));</span>
+<span class="fc" id="L222">		jApiCmpXmlRoot.setPackagesExclude(filtersAsString(options.getExcludes(), false));</span>
+<span class="fc" id="L223">		jApiCmpXmlRoot.setIgnoreMissingClasses(options.getIgnoreMissingClasses().isIgnoreAllMissingClasses());</span>
+<span class="fc" id="L224">		jApiCmpXmlRoot.setIgnoreMissingClassesByRegularExpressions(regExAsString(options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression()));</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">		if (xmlOutputGeneratorOptions.getTitle().isPresent()) {</span>
+<span class="nc" id="L226">			jApiCmpXmlRoot.setTitle(xmlOutputGeneratorOptions.getTitle().get());</span>
+		}
+<span class="fc" id="L228">		jApiCmpXmlRoot.setSemanticVersioning(xmlOutputGeneratorOptions.getSemanticVersioningInformation());</span>
+<span class="fc" id="L229">		return jApiCmpXmlRoot;</span>
+	}
+
+	private String regExAsString(List&lt;Pattern&gt; ignoreMissingClassRegularExpression) {
+<span class="fc" id="L233">		StringBuilder sb = new StringBuilder();</span>
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">		for (Pattern pattern : ignoreMissingClassRegularExpression) {</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">			if (sb.length() &gt; 0) {</span>
+<span class="nc" id="L236">				sb.append(&quot;;&quot;);</span>
+			}
+<span class="nc" id="L238">			sb.append(pattern.toString());</span>
+<span class="nc" id="L239">		}</span>
+<span class="fc" id="L240">		return sb.toString();</span>
+	}
+
+	private String filtersAsString(List&lt;Filter&gt; filters, boolean include) {
+		String join;
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">		if (filters.size() == 0) {</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">			if (include) {</span>
+<span class="fc" id="L247">				join = &quot;all&quot;;</span>
+			} else {
+<span class="fc" id="L249">				join = &quot;n.a.&quot;;</span>
+			}
+		} else {
+<span class="nc" id="L252">			join = Joiner.on(&quot;;&quot;).skipNulls().join(filters);</span>
+		}
+<span class="fc" id="L254">		return join;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

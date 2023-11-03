@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CliParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.cli</a> &gt; <span class="el_source">CliParser.java</span></div><h1>CliParser.java</h1><pre class="source lang-java linenums">package japicmp.cli;
+
+import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
+import japicmp.util.Optional;
+import japicmp.util.StringArrayEnumeration;
+
+import static japicmp.model.AccessModifier.toModifier;
+import static japicmp.util.FileHelper.createFileList;
+
+<span class="fc" id="L11">public class CliParser {</span>
+	public static final String IGNORE_MISSING_CLASSES = &quot;--ignore-missing-classes&quot;;
+	public static final String IGNORE_MISSING_CLASSES_BY_REGEX = &quot;--ignore-missing-classes-by-regex&quot;;
+	public static final String OLD_CLASSPATH = &quot;--old-classpath&quot;;
+	public static final String NEW_CLASSPATH = &quot;--new-classpath&quot;;
+
+	public Options parse(String[] args) throws IllegalArgumentException {
+<span class="fc" id="L18">		Options options = Options.newDefault();</span>
+<span class="fc" id="L19">		boolean includeExclusively = false;</span>
+<span class="fc" id="L20">		boolean excludeExclusively = false;</span>
+<span class="fc" id="L21">		StringArrayEnumeration sae = new StringArrayEnumeration(args);</span>
+<span class="fc bfc" id="L22" title="All 2 branches covered.">		while (sae.hasMoreElements()) {</span>
+<span class="fc" id="L23">			String arg = sae.nextElement();</span>
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">			if (&quot;--include-exclusively&quot;.equals(arg)) {</span>
+<span class="nc" id="L25">				includeExclusively = true;</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">			} else if (&quot;--exclude-exclusively&quot;.equals(arg)) {</span>
+<span class="nc" id="L27">				excludeExclusively = true;</span>
+<span class="fc bfc" id="L28" title="All 4 branches covered.">			} else if (&quot;-h&quot;.equals(arg) || &quot;--help&quot;.equals(arg)) {</span>
+<span class="fc" id="L29">				options.setHelpRequested(true);</span>
+			}
+<span class="fc" id="L31">		}</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">		if (options.isHelpRequested()) {</span>
+<span class="fc" id="L33">			return options;</span>
+		}
+<span class="fc" id="L35">		sae = new StringArrayEnumeration(args);</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">		while (sae.hasMoreElements()) {</span>
+<span class="fc" id="L37">			String arg = sae.nextElement();</span>
+<span class="pc bpc" id="L38" title="2 of 4 branches missed.">			if (&quot;--include-exclusively&quot;.equals(arg) || &quot;--exclude-exclusively&quot;.equals(arg)){</span>
+                // Do nothing
+<span class="pc bpc" id="L40" title="1 of 4 branches missed.">			} else if (&quot;-n&quot;.equals(arg) || &quot;--new&quot;.equals(arg)) {</span>
+<span class="fc" id="L41">				String newArchive = getOptionWithArgument(&quot;-n, --new&quot;, sae);</span>
+<span class="fc" id="L42">				options.getNewArchives().addAll(createFileList(checkNonNull(newArchive, &quot;Required option -n is missing.&quot;)));</span>
+<span class="pc bpc" id="L43" title="3 of 4 branches missed.">			} else if (&quot;-o&quot;.equals(arg) || &quot;--old&quot;.equals(arg)) {</span>
+<span class="fc" id="L44">				String oldArchive = getOptionWithArgument(&quot;-o, --old&quot;, sae);</span>
+<span class="fc" id="L45">				options.getOldArchives().addAll(createFileList(checkNonNull(oldArchive, &quot;Required option -o is missing.&quot;)));</span>
+<span class="pc bnc" id="L46" title="All 4 branches missed.">			} else if (&quot;-m&quot;.equals(arg) || &quot;--only-modified&quot;.equals(arg)) {</span>
+<span class="nc" id="L47">				options.setOutputOnlyModifications(true);</span>
+<span class="nc bnc" id="L48" title="All 4 branches missed.">			} else if (&quot;-b&quot;.equals(arg) || &quot;--only-incompatible&quot;.equals(arg)) {</span>
+<span class="nc" id="L49">				options.setOutputOnlyBinaryIncompatibleModifications(true);</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">			} else if (&quot;-a&quot;.equals(arg)) {</span>
+<span class="nc" id="L51">				String accessModifier = getOptionWithArgument(&quot;-a&quot;, sae);</span>
+<span class="nc" id="L52">				options.setAccessModifier(toModifier(accessModifier));</span>
+<span class="nc bnc" id="L53" title="All 4 branches missed.">			} else if (&quot;-i&quot;.equals(arg) || &quot;--include&quot;.equals(arg)) {</span>
+<span class="nc" id="L54">				String includes = getOptionWithArgument(&quot;-i, --include&quot;, sae);</span>
+<span class="nc" id="L55">				options.addIncludeFromArgument(Optional.fromNullable(includes), includeExclusively);</span>
+<span class="nc bnc" id="L56" title="All 4 branches missed.">			} else if (&quot;-e&quot;.equals(arg) || &quot;--exclude&quot;.equals(arg)) {</span>
+<span class="nc" id="L57">				String excludes = getOptionWithArgument(&quot;-e, --exclude&quot;, sae);</span>
+<span class="nc" id="L58">				options.addExcludeFromArgument(Optional.fromNullable(excludes), excludeExclusively);</span>
+<span class="nc bnc" id="L59" title="All 4 branches missed.">			} else if (&quot;-x&quot;.equals(arg) || &quot;--xml-file&quot;.equals(arg)) {</span>
+<span class="nc" id="L60">				String pathToXmlOutputFile = getOptionWithArgument(&quot;-x, --xml-file&quot;, sae);</span>
+<span class="nc" id="L61">				options.setXmlOutputFile(Optional.fromNullable(pathToXmlOutputFile));</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">			} else if (&quot;--html-file&quot;.equals(arg)) {</span>
+<span class="nc" id="L63">				String pathToHtmlOutputFile = getOptionWithArgument(&quot;--html-file&quot;, sae);</span>
+<span class="nc" id="L64">				options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));</span>
+<span class="nc bnc" id="L65" title="All 4 branches missed.">			} else if (&quot;-s&quot;.equals(arg) || &quot;--semantic-versioning&quot;.equals(arg)) {</span>
+<span class="nc" id="L66">				options.setSemanticVersioning(true);</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">			} else if (&quot;--include-synthetic&quot;.equals(arg)) {</span>
+<span class="nc" id="L68">				options.setIncludeSynthetic(true);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">			} else if (IGNORE_MISSING_CLASSES.equals(arg)) {</span>
+<span class="nc" id="L70">				options.setIgnoreMissingClasses(true);</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">			} else if (IGNORE_MISSING_CLASSES_BY_REGEX.equals(arg)) {</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">				while (sae.hasMoreElements()) {</span>
+<span class="nc" id="L73">					String nextElement = sae.inspectNextElement();</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">					if (!nextElement.startsWith(&quot;-&quot;)) {</span>
+<span class="nc" id="L75">						nextElement = sae.nextElement();</span>
+<span class="nc" id="L76">						options.addIgnoreMissingClassRegularExpression(nextElement);</span>
+					}
+<span class="nc" id="L78">				}</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">			} else if (&quot;--html-stylesheet&quot;.equals(arg)) {</span>
+<span class="nc" id="L80">				String htmlStylesheet = getOptionWithArgument(&quot;--html-stylesheet&quot;, sae);</span>
+<span class="nc" id="L81">				options.setHtmlStylesheet(Optional.fromNullable(htmlStylesheet));</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">			} else if (OLD_CLASSPATH.equals(arg)) {</span>
+<span class="nc" id="L83">				String oldClassPath = getOptionWithArgument(OLD_CLASSPATH, sae);</span>
+<span class="nc" id="L84">				options.setOldClassPath(Optional.fromNullable(oldClassPath));</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">			} else if (NEW_CLASSPATH.equals(arg)) {</span>
+<span class="nc" id="L86">				String newClassPath = getOptionWithArgument(NEW_CLASSPATH, sae);</span>
+<span class="nc" id="L87">				options.setNewClassPath(Optional.fromNullable(newClassPath));</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">			} else if (&quot;--no-annotations&quot;.equals(arg)) {</span>
+<span class="nc" id="L89">				options.setNoAnnotations(true);</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">			} else if (&quot;--report-only-filename&quot;.equals(arg)) {</span>
+<span class="nc" id="L91">				options.setReportOnlyFilename(true);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">			} else if (&quot;--error-on-binary-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L93">				options.setErrorOnBinaryIncompatibility(true);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">			} else if (&quot;--error-on-source-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L95">				options.setErrorOnSourceIncompatibility(true);</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">			} else if (&quot;--no-error-on-exclusion-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L97">				options.setErrorOnExclusionIncompatibility(false);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">			} else if (&quot;--error-on-modifications&quot;.equals(arg)) {</span>
+<span class="nc" id="L99">				options.setErrorOnModifications(true);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">			} else if (&quot;--error-on-semantic-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L101">				options.setErrorOnSemanticIncompatibility(true);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-old-version&quot;.equals(arg)) {</span>
+<span class="nc" id="L103">				options.setIgnoreMissingOldVersion(true);</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-new-version&quot;.equals(arg)) {</span>
+<span class="nc" id="L105">				options.setIgnoreMissingNewVersion(true);</span>
+			} else {
+<span class="nc" id="L107">				throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Unknown argument: &quot; + arg);</span>
+			}
+<span class="fc" id="L109">		}</span>
+<span class="fc" id="L110">		options.verify();</span>
+<span class="fc" id="L111">		return options;</span>
+	}
+
+	public static void printHelp() {
+<span class="fc" id="L115">		System.out.println(&quot;SYNOPSIS\n&quot; +</span>
+			&quot;        java -jar japicmp.jar [-a &lt;accessModifier&gt;] [(-b | --only-incompatible)]\n&quot; +
+			&quot;                [(-e &lt;excludes&gt; | --exclude &lt;excludes&gt;)] [--exclude-exclusively]\n&quot; +
+			&quot;                [(-h | --help)] [--html-file &lt;pathToHtmlOutputFile&gt;]\n&quot; +
+			&quot;                [--html-stylesheet &lt;pathToHtmlStylesheet&gt;]\n&quot; +
+			&quot;                [(-i &lt;includes&gt; | --include &lt;includes&gt;)] [--ignore-missing-classes]\n&quot; +
+			&quot;                [--ignore-missing-classes-by-regex &lt;ignoreMissingClassesByRegEx&gt;...]\n&quot; +
+			&quot;                [--include-exclusively] [--include-synthetic] [(-m | --only-modified)]\n&quot; +
+			&quot;                [(-n &lt;pathToNewVersionJar&gt; | --new &lt;pathToNewVersionJar&gt;)]\n&quot; +
+			&quot;                [--new-classpath &lt;newClassPath&gt;] [--no-annotations]\n&quot; +
+			&quot;                [(-o &lt;pathToOldVersionJar&gt; | --old &lt;pathToOldVersionJar&gt;)]\n&quot; +
+			&quot;                [--old-classpath &lt;oldClassPath&gt;] [--report-only-filename]\n&quot; +
+			&quot;                [(-s | --semantic-versioning)]\n&quot; +
+			&quot;                [(-x &lt;pathToXmlOutputFile&gt; | --xml-file &lt;pathToXmlOutputFile&gt;)]\n&quot; +
+			&quot;                [--error-on-binary-incompatibility]\n&quot; +
+			&quot;                [--error-on-source-incompatibility]\n&quot; +
+			&quot;                [--error-on-modifications]\n&quot; +
+			&quot;                [--no-error-on-exclusion-incompatibility]\n&quot; +
+			&quot;                [--error-on-semantic-incompatibility]\n&quot; +
+			&quot;                [--ignore-missing-old-version] [--ignore-missing-new-version]\n&quot; +
+			&quot;\n&quot; +
+			&quot;OPTIONS\n&quot; +
+			&quot;        -a &lt;accessModifier&gt;\n&quot; +
+			&quot;            Sets the access modifier level (public, package, protected,\n&quot; +
+			&quot;            private), which should be used.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -b, --only-incompatible\n&quot; +
+			&quot;            Outputs only classes/methods that are binary incompatible. If not\n&quot; +
+			&quot;            given, all classes and methods are printed.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -e &lt;excludes&gt;, --exclude &lt;excludes&gt;\n&quot; +
+			&quot;            Semicolon separated list of elements to exclude in the form\n&quot; +
+			&quot;            package.Class#classMember, * can be used as wildcard. Annotations\n&quot; +
+			&quot;            are given as FQN starting with @. Examples:\n&quot; +
+			&quot;            mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --exclude-exclusively\n&quot; +
+			&quot;            Exclude only packages specified in the \&quot;exclude\&quot; option, include\n&quot; +
+			&quot;            their sub-packages\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -h, --help\n&quot; +
+			&quot;            Display help information\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --html-file &lt;pathToHtmlOutputFile&gt;\n&quot; +
+			&quot;            Provides the path to the html output file.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --html-stylesheet &lt;pathToHtmlStylesheet&gt;\n&quot; +
+			&quot;            Provides the path to your own stylesheet.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -i &lt;includes&gt;, --include &lt;includes&gt;\n&quot; +
+			&quot;            Semicolon separated list of elements to include in the form\n&quot; +
+			&quot;            package.Class#classMember, * can be used as wildcard. Annotations\n&quot; +
+			&quot;            are given as FQN starting with @. Examples:\n&quot; +
+			&quot;            mypackage;my.Class;other.Class#method(int,long);foo.Class#field;@my.Annotation.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --ignore-missing-classes\n&quot; +
+			&quot;            Ignores all superclasses/interfaces missing on the classpath.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --ignore-missing-classes-by-regex &lt;ignoreMissingClassesByRegEx&gt;\n&quot; +
+			&quot;            Ignores only those superclasses/interface missing on the classpath\n&quot; +
+			&quot;            that are selected by a regular expression.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --include-exclusively\n&quot; +
+			&quot;            Include only packages specified in the \&quot;include\&quot; option, exclude\n&quot; +
+			&quot;            their sub-packages\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --include-synthetic\n&quot; +
+			&quot;            Include synthetic classes and class members that are hidden per\n&quot; +
+			&quot;            default.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -m, --only-modified\n&quot; +
+			&quot;            Outputs only modified classes/methods.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -n &lt;pathToNewVersionJar&gt;, --new &lt;pathToNewVersionJar&gt;\n&quot; +
+			&quot;            Provides the path to the new version(s) of the jar(s). Use ; to\n&quot; +
+			&quot;            separate jar files.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --new-classpath &lt;newClassPath&gt;\n&quot; +
+			&quot;            The classpath for the new version.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --no-annotations\n&quot; +
+			&quot;            Do not evaluate annotations.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -o &lt;pathToOldVersionJar&gt;, --old &lt;pathToOldVersionJar&gt;\n&quot; +
+			&quot;            Provides the path to the old version(s) of the jar(s). Use ; to\n&quot; +
+			&quot;            separate jar files.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --old-classpath &lt;oldClassPath&gt;\n&quot; +
+			&quot;            The classpath for the old version.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --report-only-filename\n&quot; +
+			&quot;            Reports just filenames (not full paths) in report description.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -s, --semantic-versioning\n&quot; +
+			&quot;            Tells you which part of the version to increment.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        -x &lt;pathToXmlOutputFile&gt;, --xml-file &lt;pathToXmlOutputFile&gt;\n&quot; +
+			&quot;            Provides the path to the xml output file.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --error-on-binary-incompatibility\n&quot; +
+			&quot;            Exit with an error if a binary incompatibility is detected.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --error-on-source-incompatibility\n&quot; +
+			&quot;            Exit with an error if a source incompatibility is detected.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --error-on-modifications\n&quot; +
+			&quot;            Exit with an error if any change between versions is detected.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --no-error-on-exclusion-incompatibility\n&quot; +
+			&quot;            Ignore incompatible changes caused by an excluded class\n&quot; +
+			&quot;            (e.g. excluded interface removed from not excluded class) when\n&quot; +
+			&quot;            deciding whether to exit with an error.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --error-on-semantic-incompatibility\n&quot; +
+			&quot;            Exit with an error if the binary compatibility changes are\n&quot; +
+			&quot;            inconsistent with Semantic Versioning. This expects versions of\n&quot; +
+			&quot;            the form Major.Minor.Patch (e.g. 1.2.3 or 1.2.3-SNAPSHOT).\n&quot; +
+			&quot;            See http://semver.org/spec/v2.0.0.html for more information about\n&quot; +
+			&quot;            Semantic Versioning.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --ignore-missing-old-version\n&quot; +
+			&quot;            When --error-on-semantic-incompatibility is passed, ignore\n&quot; +
+			&quot;            non-resolvable artifacts for the old version.\n&quot; +
+			&quot;\n&quot; +
+			&quot;        --ignore-missing-new-version\n&quot; +
+			&quot;            When --error-on-semantic-incompatibility is passed, ignore\n&quot; +
+			&quot;            non-resolvable artifacts for the new version.\n&quot;);
+<span class="fc" id="L242">	}</span>
+
+	private String getOptionWithArgument(String option, StringArrayEnumeration sae) {
+<span class="fc bfc" id="L245" title="All 2 branches covered.">		if (sae.hasMoreElements()) {</span>
+<span class="fc" id="L246">			String value = sae.nextElement();</span>
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">			if (value.startsWith(&quot;-&quot;)) {</span>
+<span class="nc" id="L248">				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
+			}
+<span class="fc" id="L250">			return value;</span>
+		} else {
+<span class="fc" id="L252">			throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
+		}
+	}
+
+	private &lt;T&gt; T checkNonNull(T in, String errorMessage) {
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">		if (in == null) {</span>
+<span class="nc" id="L258">			throw new JApiCmpException(JApiCmpException.Reason.CliError, errorMessage);</span>
+		} else {
+<span class="fc" id="L260">			return in;</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

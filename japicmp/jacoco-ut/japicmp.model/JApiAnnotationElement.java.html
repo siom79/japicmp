@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiAnnotationElement.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiAnnotationElement.java</span></div><h1>JApiAnnotationElement.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import javassist.bytecode.annotation.*;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibility {
+	private final String name;
+	private final Optional&lt;MemberValue&gt; oldValue;
+	private final Optional&lt;MemberValue&gt; newValue;
+	private final JApiChangeStatus changeStatus;
+
+<span class="fc" id="L20">	public JApiAnnotationElement(String name, Optional&lt;MemberValue&gt; oldValue, Optional&lt;MemberValue&gt; newValue, JApiChangeStatus changeStatus) {</span>
+<span class="fc" id="L21">		this.name = name;</span>
+<span class="fc" id="L22">		this.oldValue = oldValue;</span>
+<span class="fc" id="L23">		this.newValue = newValue;</span>
+<span class="fc" id="L24">		this.changeStatus = evaluateChangeStatus(changeStatus);</span>
+<span class="fc" id="L25">	}</span>
+
+
+
+
+	public String toString()
+	{
+<span class="nc" id="L32">		return &quot;JApiAnnotationElement [name=&quot;</span>
+			+ name
+			+ &quot;, oldValue=&quot;
+			+ oldValue
+			+ &quot;, newValue=&quot;
+			+ newValue
+			+ &quot;, changeStatus=&quot;
+			+ changeStatus
+			+ &quot;, compatibilityChanges=&quot;
+<span class="nc" id="L41">			+ getCompatibilityChanges()</span>
+			+ &quot;]&quot;;
+	}
+
+
+
+
+	private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+<span class="fc bfc" id="L49" title="All 2 branches covered.">		if (changeStatus == JApiChangeStatus.UNCHANGED) {</span>
+<span class="pc bpc" id="L50" title="2 of 4 branches missed.">			if (oldValue.isPresent() &amp;&amp; newValue.isPresent()) {</span>
+<span class="fc" id="L51">				MemberValue memberValueOld = oldValue.get();</span>
+<span class="fc" id="L52">				MemberValue memberValueNew = newValue.get();</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">				if (!getMemberValue(memberValueOld).equals(getMemberValue(memberValueNew))) {</span>
+<span class="nc" id="L54">					changeStatus = JApiChangeStatus.MODIFIED;</span>
+				}
+<span class="pc bnc" id="L56" title="All 4 branches missed.">			} else if (!oldValue.isPresent() &amp;&amp; newValue.isPresent()) {</span>
+<span class="nc" id="L57">				changeStatus = JApiChangeStatus.NEW;</span>
+<span class="nc bnc" id="L58" title="All 4 branches missed.">			} else if (oldValue.isPresent() &amp;&amp; !newValue.isPresent()) {</span>
+<span class="nc" id="L59">				changeStatus = JApiChangeStatus.REMOVED;</span>
+			}
+		}
+<span class="fc" id="L62">		return changeStatus;</span>
+	}
+
+	static JApiAnnotationElementValue getMemberValue(MemberValue memberValue) {
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">		if (memberValue instanceof DoubleMemberValue) {</span>
+<span class="nc" id="L67">			DoubleMemberValue value = (DoubleMemberValue) memberValue;</span>
+<span class="nc" id="L68">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Double, value.getValue(), Double.class.getName());</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">		} else if (memberValue instanceof CharMemberValue) {</span>
+<span class="nc" id="L70">			CharMemberValue value = (CharMemberValue) memberValue;</span>
+<span class="nc" id="L71">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Char, value.getValue(), Character.class.getName());</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">		} else if (memberValue instanceof LongMemberValue) {</span>
+<span class="nc" id="L73">			LongMemberValue value = (LongMemberValue) memberValue;</span>
+<span class="nc" id="L74">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Long, value.getValue(), Long.class.getName());</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">		} else if (memberValue instanceof IntegerMemberValue) {</span>
+<span class="nc" id="L76">			IntegerMemberValue value = (IntegerMemberValue) memberValue;</span>
+<span class="nc" id="L77">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Integer, value.getValue(), Integer.class.getName());</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">		} else if (memberValue instanceof FloatMemberValue) {</span>
+<span class="nc" id="L79">			FloatMemberValue value = (FloatMemberValue) memberValue;</span>
+<span class="nc" id="L80">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Float, value.getValue(), Float.class.getName());</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">		} else if (memberValue instanceof AnnotationMemberValue) {</span>
+<span class="nc" id="L82">			AnnotationMemberValue value = (AnnotationMemberValue) memberValue;</span>
+<span class="nc" id="L83">			Annotation annotation = value.getValue();</span>
+<span class="nc" id="L84">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Annotation, annotation, annotation.getTypeName());</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">		} else if (memberValue instanceof ClassMemberValue) {</span>
+<span class="nc" id="L86">			ClassMemberValue value = (ClassMemberValue) memberValue;</span>
+<span class="nc" id="L87">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Class, value.getValue(), value.getValue());</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">		} else if (memberValue instanceof ByteMemberValue) {</span>
+<span class="nc" id="L89">			ByteMemberValue value = (ByteMemberValue) memberValue;</span>
+<span class="nc" id="L90">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Byte, value.getValue(), Byte.class.getName());</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">		} else if (memberValue instanceof EnumMemberValue) {</span>
+<span class="nc" id="L92">			EnumMemberValue value = (EnumMemberValue) memberValue;</span>
+<span class="nc" id="L93">			String type = value.getType();</span>
+<span class="nc" id="L94">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Enum, value.getValue(), type);</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">		} else if (memberValue instanceof ArrayMemberValue) {</span>
+<span class="nc" id="L96">			ArrayMemberValue value = (ArrayMemberValue) memberValue;</span>
+<span class="nc" id="L97">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Array, value.getValue(), &quot;[]&quot;);</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">		} else if (memberValue instanceof ShortMemberValue) {</span>
+<span class="nc" id="L99">			ShortMemberValue value = (ShortMemberValue) memberValue;</span>
+<span class="nc" id="L100">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Short, value.getValue(), Short.class.getName());</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">		} else if (memberValue instanceof BooleanMemberValue) {</span>
+<span class="nc" id="L102">			BooleanMemberValue value = (BooleanMemberValue) memberValue;</span>
+<span class="nc" id="L103">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.Boolean, value.getValue(), Boolean.class.getName());</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">		} else if (memberValue instanceof StringMemberValue) {</span>
+<span class="fc" id="L105">			StringMemberValue value = (StringMemberValue) memberValue;</span>
+<span class="fc" id="L106">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.String, value.getValue(), String.class.getName());</span>
+		} else {
+<span class="nc" id="L108">			return new JApiAnnotationElementValue(JApiAnnotationElementValue.Type.UnsupportedType, &quot;n.a.&quot;, &quot;n.a.&quot;);</span>
+		}
+	}
+
+	@XmlAttribute(name = &quot;name&quot;)
+	public String getName() {
+<span class="nc" id="L114">		return name;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;MemberValue&gt; getOldValue() {
+<span class="nc" id="L119">		return oldValue;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;MemberValue&gt; getNewValue() {
+<span class="nc" id="L124">		return newValue;</span>
+	}
+
+	@Override
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L130">		return this.changeStatus;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;oldElementValues&quot;)
+	@XmlElement(name = &quot;oldElementValue&quot;)
+	public List&lt;JApiAnnotationElementValue&gt; getOldElementValues() {
+<span class="nc" id="L136">		List&lt;JApiAnnotationElementValue&gt; values = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">		if (this.oldValue.isPresent()) {</span>
+<span class="nc" id="L138">			JApiAnnotationElementValue memberValue = getMemberValue(this.oldValue.get());</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">			if (memberValue.getType() == JApiAnnotationElementValue.Type.Array) {</span>
+<span class="nc" id="L140">				values.addAll(memberValue.getValues());</span>
+			} else {
+<span class="nc" id="L142">				values.add(memberValue);</span>
+			}
+		}
+<span class="nc" id="L145">		return values;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;newElementValues&quot;)
+	@XmlElement(name = &quot;newElementValue&quot;)
+	public List&lt;JApiAnnotationElementValue&gt; getNewElementValues() {
+<span class="nc" id="L151">		List&lt;JApiAnnotationElementValue&gt; values = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">		if (this.newValue.isPresent()) {</span>
+<span class="nc" id="L153">			JApiAnnotationElementValue memberValue = getMemberValue(this.newValue.get());</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">			if (memberValue.getType() == JApiAnnotationElementValue.Type.Array) {</span>
+<span class="nc" id="L155">				values.addAll(memberValue.getValues());</span>
+			} else {
+<span class="nc" id="L157">				values.add(memberValue);</span>
+			}
+		}
+<span class="nc" id="L160">		return values;</span>
+	}
+
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+<span class="nc" id="L165">		return true;</span>
+	}
+
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+<span class="nc" id="L170">		return true;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
+	@XmlElement(name = &quot;compatibilityChange&quot;)
+	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
+<span class="nc" id="L176">		return Collections.emptyList();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

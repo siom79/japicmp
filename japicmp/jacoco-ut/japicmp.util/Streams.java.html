@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Streams.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.util</a> &gt; <span class="el_source">Streams.java</span></div><h1>Streams.java</h1><pre class="source lang-java linenums">package japicmp.util;
+
+import japicmp.exception.JApiCmpException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class Streams {
+
+	private Streams() {
+
+	}
+
+	public static String asString(InputStream inputStream) {
+		try {
+<span class="fc" id="L17">			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();</span>
+<span class="fc" id="L18">			byte[] buffer = new byte[1024];</span>
+<span class="fc" id="L19">			int read = inputStream.read(buffer);</span>
+<span class="fc bfc" id="L20" title="All 2 branches covered.">			while (read != -1) {</span>
+<span class="fc" id="L21">				byteArrayOutputStream.write(buffer, 0, read);</span>
+<span class="fc" id="L22">				read = inputStream.read(buffer);</span>
+			}
+<span class="fc" id="L24">			return byteArrayOutputStream.toString(&quot;UTF-8&quot;);</span>
+<span class="nc" id="L25">		} catch (IOException e) {</span>
+<span class="nc" id="L26">			throw new JApiCmpException(JApiCmpException.Reason.IoException, &quot;Failed to read from input stream: &quot; + e.getMessage(), e);</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

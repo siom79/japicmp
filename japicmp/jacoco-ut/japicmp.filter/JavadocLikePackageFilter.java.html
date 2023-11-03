@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JavadocLikePackageFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.filter</a> &gt; <span class="el_source">JavadocLikePackageFilter.java</span></div><h1>JavadocLikePackageFilter.java</h1><pre class="source lang-java linenums">package japicmp.filter;
+
+import javassist.CtClass;
+
+import java.util.regex.Pattern;
+
+public class JavadocLikePackageFilter implements ClassFilter {
+	private final Pattern pattern;
+	private final String packageName;
+
+<span class="fc" id="L11">	public JavadocLikePackageFilter(String packageName, boolean exclusive) {</span>
+<span class="fc" id="L12">		this.packageName = packageName;</span>
+<span class="fc" id="L13">		String regEx = packageName.replace(&quot;.&quot;, &quot;\\.&quot;);</span>
+<span class="fc" id="L14">		regEx = regEx.replace(&quot;*&quot;, &quot;.*&quot;);</span>
+<span class="fc bfc" id="L15" title="All 2 branches covered.">		regEx += exclusive ? &quot;&quot; : &quot;(\\.[^\\.]+)*&quot;;</span>
+<span class="fc" id="L16">		pattern = Pattern.compile(regEx);</span>
+<span class="fc" id="L17">	}</span>
+
+	@Override
+	public String toString() {
+<span class="nc" id="L21">		return this.packageName;</span>
+	}
+
+	@Override
+	public boolean matches(CtClass ctClass) {
+<span class="fc" id="L26">		String name = ctClass.getPackageName();</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">		name = name == null ? &quot;&quot; : name;</span>
+<span class="fc" id="L28">		return pattern.matcher(name).matches();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

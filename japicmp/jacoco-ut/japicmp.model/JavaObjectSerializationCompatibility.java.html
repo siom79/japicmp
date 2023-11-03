@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JavaObjectSerializationCompatibility.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JavaObjectSerializationCompatibility.java</span></div><h1>JavaObjectSerializationCompatibility.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.exception.JApiCmpException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.NotFoundException;
+import javassist.SerialVersionUID;
+
+import java.io.Externalizable;
+import java.io.Serializable;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+<span class="fc" id="L19">public class JavaObjectSerializationCompatibility {</span>
+<span class="fc" id="L20">	private static final Logger LOGGER = Logger.getLogger(JavaObjectSerializationCompatibility.class.getName());</span>
+	private static final String SERIAL_VERSION_UID = &quot;serialVersionUID&quot;;
+
+	public static JApiSerialVersionUid extractSerialVersionUid(JarArchiveComparatorOptions options, JarArchiveComparator jarArchiveComparator, Optional&lt;CtClass&gt; oldClass, Optional&lt;CtClass&gt; newClass) {
+<span class="fc" id="L24">		SerialVersionUidResult resultOld = computeSerialVersionUid(options, oldClass, jarArchiveComparator);</span>
+<span class="fc" id="L25">		SerialVersionUidResult resultNew = computeSerialVersionUid(options, newClass, jarArchiveComparator);</span>
+<span class="fc" id="L26">		return new JApiSerialVersionUid(resultOld.serializable, resultNew.serializable, resultOld.serialVersionUidDefault,</span>
+			resultNew.serialVersionUidDefault, resultOld.serialVersionUid, resultNew.serialVersionUid);
+	}
+
+	public void evaluate(List&lt;JApiClass&gt; jApiClasses) {
+<span class="fc bfc" id="L31" title="All 2 branches covered.">		for (JApiClass jApiClass : jApiClasses) {</span>
+<span class="fc" id="L32">			computeChangeStatus(jApiClass);</span>
+<span class="fc" id="L33">		}</span>
+<span class="fc" id="L34">	}</span>
+
+<span class="fc" id="L36">	private static class SerialVersionUidResult {</span>
+<span class="fc" id="L37">		boolean serializable = false;</span>
+<span class="fc" id="L38">		Optional&lt;Long&gt; serialVersionUid = Optional.absent();</span>
+<span class="fc" id="L39">		Optional&lt;Long&gt; serialVersionUidDefault = Optional.absent();</span>
+	}
+
+	private static SerialVersionUidResult computeSerialVersionUid(JarArchiveComparatorOptions options, Optional&lt;CtClass&gt; ctClassOptional, JarArchiveComparator jarArchiveComparator) {
+<span class="fc" id="L43">		SerialVersionUidResult result = new SerialVersionUidResult();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">		if (ctClassOptional.isPresent()) {</span>
+<span class="fc" id="L45">			CtClass ctClass = ctClassOptional.get();</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">			if (isCtClassSerializable(options, ctClass, jarArchiveComparator)) {</span>
+<span class="fc" id="L47">				result.serializable = true;</span>
+				try {
+<span class="fc" id="L49">					CtField declaredField = ctClass.getDeclaredField(SERIAL_VERSION_UID);</span>
+<span class="fc" id="L50">					Object constantValue = declaredField.getConstantValue();</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">					if (constantValue instanceof Long) {</span>
+<span class="fc" id="L52">						result.serialVersionUid = Optional.of((Long) constantValue);</span>
+					}
+<span class="fc" id="L54">				} catch (Exception e) {</span>
+<span class="fc" id="L55">					LOGGER.log(Level.FINE, &quot;Failed to get serialVersionUid from class &quot; + ctClass.getName() + &quot;: &quot; + e.getLocalizedMessage(), e);</span>
+					try {
+<span class="fc" id="L57">						SerialVersionUID.setSerialVersionUID(ctClass);</span>
+<span class="fc" id="L58">						CtField declaredField = ctClass.getDeclaredField(SERIAL_VERSION_UID);</span>
+<span class="fc" id="L59">						Object constantValue = declaredField.getConstantValue();</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">						if (constantValue instanceof Long) {</span>
+<span class="fc" id="L61">							result.serialVersionUidDefault = Optional.of((Long) constantValue);</span>
+						}
+<span class="fc" id="L63">						ctClass.removeField(declaredField);</span>
+<span class="nc" id="L64">					} catch (Exception ex) {</span>
+<span class="nc" id="L65">						LOGGER.log(Level.FINE, &quot;Failed to compute default serialVersionUid for class &quot; + ctClass.getName() + &quot;: &quot; + ex.getLocalizedMessage(), ex);</span>
+<span class="fc" id="L66">					}</span>
+<span class="fc" id="L67">				}</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">				if (!result.serialVersionUidDefault.isPresent()) {</span>
+					try {
+<span class="fc" id="L70">						CtField declaredFieldOriginal = ctClass.getDeclaredField(SERIAL_VERSION_UID);</span>
+<span class="fc" id="L71">						ctClass.removeField(declaredFieldOriginal);</span>
+<span class="fc" id="L72">						SerialVersionUID.setSerialVersionUID(ctClass);</span>
+<span class="fc" id="L73">						CtField declaredField = ctClass.getDeclaredField(SERIAL_VERSION_UID);</span>
+<span class="fc" id="L74">						Object constantValue = declaredField.getConstantValue();</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">						if (constantValue instanceof Long) {</span>
+<span class="fc" id="L76">							result.serialVersionUidDefault = Optional.of((Long) constantValue);</span>
+						}
+<span class="fc" id="L78">						ctClass.removeField(declaredField);</span>
+<span class="fc" id="L79">						ctClass.addField(declaredFieldOriginal);</span>
+<span class="nc" id="L80">					} catch (Exception ex) {</span>
+<span class="nc" id="L81">						LOGGER.log(Level.FINE, &quot;Failed to compute default serialVersionUid for class &quot; + ctClass.getName() + &quot;: &quot; + ex.getLocalizedMessage(), ex);</span>
+<span class="fc" id="L82">					}</span>
+				}
+			}
+		}
+<span class="fc" id="L86">		return result;</span>
+	}
+
+	private static boolean isCtClassSerializable(JarArchiveComparatorOptions options, CtClass clazz, JarArchiveComparator jarArchiveComparator) {
+<span class="fc" id="L90">		ClassPool pool = clazz.getClassPool();</span>
+		try {
+<span class="fc" id="L92">			return clazz.subtypeOf(pool.get(&quot;java.io.Serializable&quot;));</span>
+<span class="fc" id="L93">		} catch (NotFoundException e) {</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">			if (options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {</span>
+<span class="fc" id="L95">				return false;</span>
+			} else {
+<span class="nc" id="L97">				throw JApiCmpException.forClassLoading(e, clazz.getName(), jarArchiveComparator);</span>
+			}
+		}
+	}
+
+	private void computeChangeStatus(JApiClass jApiClass) {
+<span class="fc" id="L103">		JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;</span>
+<span class="fc" id="L104">		JApiSerialVersionUid jApiSerialVersionUid = jApiClass.getSerialVersionUid();</span>
+<span class="fc bfc" id="L105" title="All 4 branches covered.">		if (jApiSerialVersionUid.isSerializableOld() || jApiSerialVersionUid.isSerializableNew()) {</span>
+<span class="fc" id="L106">			state = checkChanges(jApiClass);</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">			if (!state.isIncompatible()) {</span>
+<span class="fc bfc" id="L108" title="All 4 branches covered.">				if (jApiSerialVersionUid.getSerialVersionUidInClassOld().isPresent() &amp;&amp; jApiSerialVersionUid.getSerialVersionUidInClassNew().isPresent()) {</span>
+<span class="fc" id="L109">					Long suidOld = jApiSerialVersionUid.getSerialVersionUidInClassOld().get();</span>
+<span class="fc" id="L110">					Long suidNew = jApiSerialVersionUid.getSerialVersionUidInClassNew().get();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">					if (suidOld.equals(suidNew)) {</span>
+<span class="fc" id="L112">						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+					} else {
+<span class="fc" id="L114">						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_MODIFIED;</span>
+					}
+<span class="fc bfc" id="L116" title="All 2 branches covered.">				} else if (jApiSerialVersionUid.getSerialVersionUidInClassOld().isPresent()) {</span>
+<span class="fc" id="L117">					Long suidOld = jApiSerialVersionUid.getSerialVersionUidInClassOld().get();</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">					if (jApiClass.getChangeStatus() != JApiChangeStatus.REMOVED) {</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">						if (jApiSerialVersionUid.isSerializableNew()) {</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">							if (jApiSerialVersionUid.getSerialVersionUidDefaultNew().isPresent()) {</span>
+<span class="fc" id="L121">								Long suidNewDefault = jApiSerialVersionUid.getSerialVersionUidDefaultNew().get();</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">								if (suidOld.equals(suidNewDefault)) {</span>
+<span class="nc" id="L123">									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+								} else {
+<span class="fc" id="L125">									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MATCHES_NEW_DEFAULT;</span>
+								}
+<span class="fc" id="L127">							} else {</span>
+<span class="nc" id="L128">								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_REMOVED;</span>
+							}
+						} else {
+<span class="nc" id="L131">							state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALIZABLE_REMOVED;</span>
+						}
+					} else {
+<span class="nc" id="L134">						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_REMOVED;</span>
+					}
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">				} else if (jApiSerialVersionUid.getSerialVersionUidInClassNew().isPresent()) {</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">					if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">						if (jApiSerialVersionUid.isSerializableOld()) {</span>
+<span class="nc" id="L139">							Long suidNew = jApiSerialVersionUid.getSerialVersionUidInClassNew().get();</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">							if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().isPresent()) {</span>
+<span class="nc" id="L141">								Long suidOldDefault = jApiSerialVersionUid.getSerialVersionUidDefaultOld().get();</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">								if (suidNew.equals(suidOldDefault)) {</span>
+<span class="nc" id="L143">									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+								} else {
+<span class="nc" id="L145">									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MATCHES_NEW_DEFAULT;</span>
+								}
+<span class="nc" id="L147">							} else {</span>
+<span class="nc" id="L148">								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+							}
+<span class="nc" id="L150">						}</span>
+					} else {
+<span class="nc" id="L152">						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+					}
+				} else {
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">					if (jApiClass.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="nc" id="L156">						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">					} else if (jApiClass.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc" id="L158">						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_REMOVED;</span>
+					} else {
+<span class="fc bfc" id="L160" title="All 2 branches covered.">						if (!isEnum(jApiClass)) { //default serialVersionUID is ignored for enums (section 1.12 &quot;Serialization of Enum Constants&quot;)</span>
+<span class="pc bpc" id="L161" title="2 of 4 branches missed.">							if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().isPresent() &amp;&amp; jApiSerialVersionUid.getSerialVersionUidDefaultNew().isPresent()) {</span>
+<span class="fc" id="L162">								Long defaultOld = jApiSerialVersionUid.getSerialVersionUidDefaultOld().get();</span>
+<span class="fc" id="L163">								Long defaultNew = jApiSerialVersionUid.getSerialVersionUidDefaultNew().get();</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">								if (defaultOld.equals(defaultNew)) {</span>
+<span class="fc" id="L165">									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+								} else {
+<span class="nc" id="L167">									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_DEFAULT_SERIALVERSIONUID_CHANGED;</span>
+								}
+<span class="pc bnc" id="L169" title="All 2 branches missed.">							} else if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().isPresent()) {</span>
+<span class="nc" id="L170">								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALIZABLE_REMOVED;</span>
+							} else {
+<span class="nc" id="L172">								state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+							}
+						}
+					}
+				}
+			}
+		}
+<span class="fc" id="L179">		jApiClass.setJavaObjectSerializationCompatible(state);</span>
+<span class="fc" id="L180">	}</span>
+
+	private boolean isEnum(JApiClass jApiClass) {
+<span class="pc bpc" id="L183" title="1 of 4 branches missed.">		return jApiClass.getClassType().getNewTypeOptional().isPresent() &amp;&amp; jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ENUM;</span>
+	}
+
+	/**
+	 * Checks compatibility of changes according to http://docs.oracle.com/javase/7/docs/platform/serialization/spec/version.html#5172.
+	 *
+	 * @param jApiClass the class to check
+	 * @return either SERIALIZABLE_INCOMPATIBLE or SERIALIZABLE_COMPATIBLE
+	 */
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChanges(JApiClass jApiClass) {
+<span class="fc" id="L193">		JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;</span>
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">		if (jApiClass.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc" id="L195">			return JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_REMOVED;</span>
+		}
+<span class="fc" id="L197">		state = checkChangesForClassType(jApiClass, state);</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">		if (state != JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE) {</span>
+<span class="nc" id="L199">			return state;</span>
+		}
+<span class="fc" id="L201">		state = checkChangesForSuperclass(jApiClass, state);</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">		if (state != JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE) {</span>
+<span class="fc" id="L203">			return state;</span>
+		}
+<span class="fc" id="L205">		state = checkChangesForFields(jApiClass, state);</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">		if (state != JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE) {</span>
+<span class="fc" id="L207">			return state;</span>
+		}
+<span class="fc" id="L209">		state = checkChangesForInterfaces(jApiClass, state);</span>
+<span class="fc" id="L210">		return state;</span>
+	}
+
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForSuperclass(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
+<span class="fc" id="L214">		JApiSuperclass jApiClassSuperclass = jApiClass.getSuperclass();</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">		if (jApiClassSuperclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="fc" id="L216">			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SUPERCLASS_MODIFIED;</span>
+		}
+<span class="fc" id="L218">		return state;</span>
+	}
+
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForClassType(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
+<span class="fc" id="L222">		JApiClassType classType = jApiClass.getClassType();</span>
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">		if (classType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L224">			JApiClassType.ClassType oldClassType = classType.getOldTypeOptional().get();</span>
+<span class="nc" id="L225">			JApiClassType.ClassType newClassType = classType.getNewTypeOptional().get();</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">			if (oldClassType != newClassType) {</span>
+<span class="nc" id="L227">				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_TYPE_MODIFIED;</span>
+			}
+		}
+<span class="fc" id="L230">		return state;</span>
+	}
+
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForInterfaces(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
+<span class="fc" id="L234">		boolean serializableAdded = false;</span>
+<span class="fc" id="L235">		boolean serializableRemoved = false;</span>
+<span class="fc" id="L236">		boolean serializableUnchanged = false;</span>
+<span class="fc" id="L237">		boolean externalizableAdded = false;</span>
+<span class="fc" id="L238">		boolean externalizableRemoved = false;</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {</span>
+<span class="fc bfc" id="L240" title="All 2 branches covered.">			if (Serializable.class.getCanonicalName().equals(implementedInterface.getFullyQualifiedName())) {</span>
+<span class="pc bpc" id="L241" title="1 of 2 branches missed.">				if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="nc" id="L242">					serializableAdded = true;</span>
+<span class="pc bpc" id="L243" title="1 of 2 branches missed.">				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc" id="L244">					serializableRemoved = true;</span>
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L246">					serializableUnchanged = true;</span>
+				}
+			}
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">			if (Externalizable.class.getCanonicalName().equals(implementedInterface.getFullyQualifiedName())) {</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">				if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="nc" id="L251">					externalizableAdded = true;</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc" id="L253">					externalizableRemoved = true;</span>
+				}
+			}
+<span class="fc" id="L256">		}</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">		if (serializableRemoved) {</span>
+<span class="nc" id="L258">			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALIZABLE_REMOVED;</span>
+		}
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">		if (externalizableRemoved) {</span>
+<span class="nc" id="L261">			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_EXTERNALIZABLE_REMOVED;</span>
+		}
+<span class="pc bpc" id="L263" title="5 of 8 branches missed.">		if ((serializableRemoved || serializableUnchanged || serializableAdded) &amp;&amp; externalizableAdded) {</span>
+<span class="nc" id="L264">			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CHANGED_FROM_SERIALIZABLE_TO_EXTERNALIZABLE;</span>
+		}
+<span class="pc bpc" id="L266" title="4 of 6 branches missed.">		if ((serializableUnchanged || serializableAdded) &amp;&amp; externalizableRemoved) {</span>
+<span class="nc" id="L267">			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CHANGED_FROM_EXTERNALIZABLE_TO_SERIALIZABLE;</span>
+		}
+<span class="fc" id="L269">		return state;</span>
+	}
+
+	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForFields(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
+<span class="fc bfc" id="L273" title="All 2 branches covered.">		for (JApiField field : jApiClass.getFields()) {</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">			if (field.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc bfc" id="L275" title="All 2 branches covered.">				if (!&quot;serialVersionUID&quot;.equals(field.getName())) {</span>
+<span class="fc" id="L276">					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED;</span>
+				}
+			}
+<span class="fc" id="L279">			JApiModifier&lt;StaticModifier&gt; staticModifier = field.getStaticModifier();</span>
+<span class="fc bfc" id="L280" title="All 4 branches covered.">			if (staticModifier.getOldModifier().isPresent() &amp;&amp; staticModifier.getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L281" title="3 of 4 branches missed.">				if (staticModifier.getOldModifier().get() == StaticModifier.NON_STATIC &amp;&amp; staticModifier.getNewModifier().get() == StaticModifier.STATIC) {</span>
+<span class="nc" id="L282">					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_CHANGED_FROM_NONSTATIC_TO_STATIC;</span>
+				}
+			}
+<span class="fc" id="L285">			JApiModifier&lt;TransientModifier&gt; transientModifier = field.getTransientModifier();</span>
+<span class="fc bfc" id="L286" title="All 4 branches covered.">			if (transientModifier.getOldModifier().isPresent() &amp;&amp; transientModifier.getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L287" title="2 of 4 branches missed.">				if (transientModifier.getOldModifier().get() == TransientModifier.NON_TRANSIENT &amp;&amp; transientModifier.getNewModifier().get() == TransientModifier.TRANSIENT) {</span>
+<span class="nc" id="L288">					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_CHANGED_FROM_NONTRANSIENT_TO_TRANSIENT;</span>
+				}
+			}
+<span class="pc bpc" id="L291" title="1 of 2 branches missed.">			if (field.getType().getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L292">				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_TYPE_MODIFIED;</span>
+			}
+<span class="fc" id="L294">		}</span>
+<span class="fc" id="L295">		return state;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

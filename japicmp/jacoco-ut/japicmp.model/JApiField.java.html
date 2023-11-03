@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiField.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiField.java</span></div><h1>JApiField.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.util.*;
+import javassist.CtField;
+import javassist.Modifier;
+import javassist.bytecode.AnnotationsAttribute;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier,
+	JApiHasFinalModifier, JApiHasTransientModifier, JApiCompatibility, JApiHasAnnotations, JApiCanBeSynthetic,
+	JApiHasGenericTypes {
+	private final JApiChangeStatus changeStatus;
+	private final JApiClass jApiClass;
+	private final Optional&lt;CtField&gt; oldFieldOptional;
+	private final Optional&lt;CtField&gt; newFieldOptional;
+<span class="fc" id="L25">	private final List&lt;JApiAnnotation&gt; annotations = new LinkedList&lt;&gt;();</span>
+	private final JApiModifier&lt;AccessModifier&gt; accessModifier;
+	private final JApiModifier&lt;StaticModifier&gt; staticModifier;
+	private final JApiModifier&lt;FinalModifier&gt; finalModifier;
+	private final JApiModifier&lt;TransientModifier&gt; transientModifier;
+	private final JApiModifier&lt;SyntheticModifier&gt; syntheticModifier;
+	private final JApiAttribute&lt;SyntheticAttribute&gt; syntheticAttribute;
+<span class="fc" id="L32">	private final List&lt;JApiCompatibilityChange&gt; compatibilityChanges = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L33">	private final List&lt;JApiGenericType&gt; oldGenericTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L34">	private final List&lt;JApiGenericType&gt; newGenericTypes = new ArrayList&lt;&gt;();</span>
+	private final JApiType type;
+
+<span class="fc" id="L37">	public JApiField(JApiClass jApiClass, JApiChangeStatus changeStatus, Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional, JarArchiveComparatorOptions options) {</span>
+<span class="fc" id="L38">		this.jApiClass = jApiClass;</span>
+<span class="fc" id="L39">		this.oldFieldOptional = oldFieldOptional;</span>
+<span class="fc" id="L40">		this.newFieldOptional = newFieldOptional;</span>
+<span class="fc" id="L41">		computeAnnotationChanges(this.annotations, oldFieldOptional, newFieldOptional, options);</span>
+<span class="fc" id="L42">		this.accessModifier = extractAccessModifier(oldFieldOptional, newFieldOptional);</span>
+<span class="fc" id="L43">		this.staticModifier = extractStaticModifier(oldFieldOptional, newFieldOptional);</span>
+<span class="fc" id="L44">		this.finalModifier = extractFinalModifier(oldFieldOptional, newFieldOptional);</span>
+<span class="fc" id="L45">		this.transientModifier = extractTransientModifier(oldFieldOptional, newFieldOptional);</span>
+<span class="fc" id="L46">		this.syntheticModifier = extractSyntheticModifier(oldFieldOptional, newFieldOptional);</span>
+<span class="fc" id="L47">		this.syntheticAttribute = extractSyntheticAttribute(oldFieldOptional, newFieldOptional);</span>
+<span class="fc" id="L48">		this.type = extractType(oldFieldOptional, newFieldOptional);</span>
+<span class="fc" id="L49">		this.changeStatus = evaluateChangeStatus(changeStatus);</span>
+<span class="fc" id="L50">	}</span>
+
+	private void computeAnnotationChanges(List&lt;JApiAnnotation&gt; annotations, Optional&lt;CtField&gt; oldBehavior, Optional&lt;CtField&gt; newBehavior, JarArchiveComparatorOptions options) {
+<span class="fc" id="L53">		AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, options, new AnnotationHelper.AnnotationsAttributeCallback&lt;CtField&gt;() {</span>
+			@Override
+			public AnnotationsAttribute getAnnotationsAttribute(CtField field) {
+<span class="fc" id="L56">				return (AnnotationsAttribute) field.getFieldInfo().getAttribute(AnnotationsAttribute.visibleTag);</span>
+			}
+		});
+<span class="fc" id="L59">	}</span>
+
+	private JApiType extractType(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional) {
+<span class="fc" id="L62">		JApiType jApiType = new JApiType(Optional.&lt;String&gt;absent(), Optional.&lt;String&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
+<span class="fc bfc" id="L63" title="All 4 branches covered.">		if (oldFieldOptional.isPresent() &amp;&amp; newFieldOptional.isPresent()) {</span>
+<span class="fc" id="L64">			CtField oldField = oldFieldOptional.get();</span>
+<span class="fc" id="L65">			CtField newField = newFieldOptional.get();</span>
+<span class="fc" id="L66">			String oldType = signatureToType(oldField.getSignature());</span>
+<span class="fc" id="L67">			String newType = signatureToType(newField.getSignature());</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">			if (oldType.equals(newType)) {</span>
+<span class="fc" id="L69">				jApiType = new JApiType(Optional.of(oldType), Optional.of(newType), JApiChangeStatus.UNCHANGED);</span>
+			} else {
+<span class="fc" id="L71">				jApiType = new JApiType(Optional.of(oldType), Optional.of(newType), JApiChangeStatus.MODIFIED);</span>
+			}
+<span class="fc" id="L73">		} else {</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">			if (oldFieldOptional.isPresent()) {</span>
+<span class="fc" id="L75">				CtField oldField = oldFieldOptional.get();</span>
+<span class="fc" id="L76">				String oldType = signatureToType(oldField.getSignature());</span>
+<span class="fc" id="L77">				jApiType = new JApiType(Optional.of(oldType), Optional.&lt;String&gt;absent(), JApiChangeStatus.REMOVED);</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">			} else if (newFieldOptional.isPresent()) {</span>
+<span class="fc" id="L79">				CtField newField = newFieldOptional.get();</span>
+<span class="fc" id="L80">				String newType = signatureToType(newField.getSignature());</span>
+<span class="fc" id="L81">				jApiType = new JApiType(Optional.&lt;String&gt;absent(), Optional.of(newType), JApiChangeStatus.NEW);</span>
+			}
+		}
+<span class="fc" id="L84">		return jApiType;</span>
+	}
+
+	private String signatureToType(String signature) {
+<span class="fc" id="L88">		SignatureParser methodDescriptorParser = new SignatureParser();</span>
+<span class="fc" id="L89">		List&lt;SignatureParser.ParsedParameter&gt; types = methodDescriptorParser.parseTypes(signature);</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">		if (types.size() &gt; 0) {</span>
+<span class="fc" id="L91">			return types.get(0).getType();</span>
+		}
+<span class="nc" id="L93">		return &quot;n.a.&quot;;</span>
+	}
+
+	private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+<span class="fc bfc" id="L97" title="All 2 branches covered.">		if (changeStatus == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">			if (this.accessModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L99">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+			}
+<span class="fc bfc" id="L101" title="All 2 branches covered.">			if (this.staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L102">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+			}
+<span class="fc bfc" id="L104" title="All 2 branches covered.">			if (this.finalModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L105">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+			}
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">			if (this.transientModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L108">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+			}
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">			if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L111">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+			}
+<span class="fc bfc" id="L113" title="All 2 branches covered.">			if (this.type.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L114">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+			}
+		}
+<span class="fc" id="L117">		return changeStatus;</span>
+	}
+
+	private JApiAttribute&lt;SyntheticAttribute&gt; extractSyntheticAttribute(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional) {
+<span class="fc" id="L121">		JApiAttribute&lt;SyntheticAttribute&gt; jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));</span>
+<span class="fc bfc" id="L122" title="All 4 branches covered.">		if (oldFieldOptional.isPresent() &amp;&amp; newFieldOptional.isPresent()) {</span>
+<span class="fc" id="L123">			CtField oldField = oldFieldOptional.get();</span>
+<span class="fc" id="L124">			CtField newField = newFieldOptional.get();</span>
+<span class="fc" id="L125">			byte[] attributeOldField = oldField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);</span>
+<span class="fc" id="L126">			byte[] attributeNewField = newField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);</span>
+<span class="pc bpc" id="L127" title="3 of 4 branches missed.">			if (attributeOldField != null &amp;&amp; attributeNewField != null) {</span>
+<span class="nc" id="L128">				jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">			} else if (attributeOldField != null) {</span>
+<span class="nc" id="L130">				jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">			} else if (attributeNewField != null) {</span>
+<span class="nc" id="L132">				jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));</span>
+			} else {
+<span class="fc" id="L134">				jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));</span>
+			}
+<span class="fc" id="L136">		} else {</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">			if (oldFieldOptional.isPresent()) {</span>
+<span class="fc" id="L138">				CtField ctField = oldFieldOptional.get();</span>
+<span class="fc" id="L139">				byte[] attribute = ctField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">				if (attribute != null) {</span>
+<span class="nc" id="L141">					jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.&lt;SyntheticAttribute&gt;absent());</span>
+				} else {
+<span class="fc" id="L143">					jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.&lt;SyntheticAttribute&gt;absent());</span>
+				}
+			}
+<span class="fc bfc" id="L146" title="All 2 branches covered.">			if (newFieldOptional.isPresent()) {</span>
+<span class="fc" id="L147">				CtField ctField = newFieldOptional.get();</span>
+<span class="fc" id="L148">				byte[] attribute = ctField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">				if (attribute != null) {</span>
+<span class="nc" id="L150">					jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.NEW, Optional.&lt;SyntheticAttribute&gt;absent(), Optional.of(SyntheticAttribute.SYNTHETIC));</span>
+				} else {
+<span class="fc" id="L152">					jApiAttribute = new JApiAttribute&lt;&gt;(JApiChangeStatus.NEW, Optional.&lt;SyntheticAttribute&gt;absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));</span>
+				}
+			}
+		}
+<span class="fc" id="L156">		return jApiAttribute;</span>
+	}
+
+	private JApiModifier&lt;StaticModifier&gt; extractStaticModifier(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional) {
+<span class="fc" id="L160">		return ModifierHelper.extractModifierFromField(oldFieldOptional, newFieldOptional, new ModifierHelper.ExtractModifierFromFieldCallback&lt;StaticModifier&gt;() {</span>
+			@Override
+			public StaticModifier getModifierForOld(CtField oldField) {
+<span class="fc bfc" id="L163" title="All 2 branches covered.">				return Modifier.isStatic(oldField.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
+			}
+
+			@Override
+			public StaticModifier getModifierForNew(CtField newField) {
+<span class="fc bfc" id="L168" title="All 2 branches covered.">				return Modifier.isStatic(newField.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
+			}
+		});
+	}
+
+	private JApiModifier&lt;FinalModifier&gt; extractFinalModifier(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional) {
+<span class="fc" id="L174">		return ModifierHelper.extractModifierFromField(oldFieldOptional, newFieldOptional, new ModifierHelper.ExtractModifierFromFieldCallback&lt;FinalModifier&gt;() {</span>
+			@Override
+			public FinalModifier getModifierForOld(CtField oldField) {
+<span class="fc bfc" id="L177" title="All 2 branches covered.">				return Modifier.isFinal(oldField.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;</span>
+			}
+
+			@Override
+			public FinalModifier getModifierForNew(CtField newField) {
+<span class="fc bfc" id="L182" title="All 2 branches covered.">				return Modifier.isFinal(newField.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;</span>
+			}
+		});
+	}
+
+	private JApiModifier&lt;AccessModifier&gt; extractAccessModifier(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional) {
+<span class="fc" id="L188">		return ModifierHelper.extractModifierFromField(oldFieldOptional, newFieldOptional, new ModifierHelper.ExtractModifierFromFieldCallback&lt;AccessModifier&gt;() {</span>
+			@Override
+			public AccessModifier getModifierForOld(CtField oldField) {
+<span class="fc" id="L191">				return ModifierHelper.translateToModifierLevel(oldField.getModifiers());</span>
+			}
+
+			@Override
+			public AccessModifier getModifierForNew(CtField newField) {
+<span class="fc" id="L196">				return ModifierHelper.translateToModifierLevel(newField.getModifiers());</span>
+			}
+		});
+	}
+
+	private JApiModifier&lt;AbstractModifier&gt; extractAbstractModifier(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional) {
+<span class="nc" id="L202">		return ModifierHelper.extractModifierFromField(oldFieldOptional, newFieldOptional, new ModifierHelper.ExtractModifierFromFieldCallback&lt;AbstractModifier&gt;() {</span>
+			@Override
+			public AbstractModifier getModifierForOld(CtField oldField) {
+<span class="nc bnc" id="L205" title="All 2 branches missed.">				return Modifier.isAbstract(oldField.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;</span>
+			}
+
+			@Override
+			public AbstractModifier getModifierForNew(CtField newField) {
+<span class="nc bnc" id="L210" title="All 2 branches missed.">				return Modifier.isAbstract(newField.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;</span>
+			}
+		});
+	}
+
+	private JApiModifier&lt;TransientModifier&gt; extractTransientModifier(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional) {
+<span class="fc" id="L216">		return ModifierHelper.extractModifierFromField(oldFieldOptional, newFieldOptional, new ModifierHelper.ExtractModifierFromFieldCallback&lt;TransientModifier&gt;() {</span>
+			@Override
+			public TransientModifier getModifierForOld(CtField oldField) {
+<span class="fc bfc" id="L219" title="All 2 branches covered.">				return Modifier.isTransient(oldField.getModifiers()) ? TransientModifier.TRANSIENT : TransientModifier.NON_TRANSIENT;</span>
+			}
+
+			@Override
+			public TransientModifier getModifierForNew(CtField newField) {
+<span class="fc bfc" id="L224" title="All 2 branches covered.">				return Modifier.isTransient(newField.getModifiers()) ? TransientModifier.TRANSIENT : TransientModifier.NON_TRANSIENT;</span>
+			}
+		});
+	}
+
+	private JApiModifier&lt;SyntheticModifier&gt; extractSyntheticModifier(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional) {
+<span class="fc" id="L230">		return ModifierHelper.extractModifierFromField(oldFieldOptional, newFieldOptional, new ModifierHelper.ExtractModifierFromFieldCallback&lt;SyntheticModifier&gt;() {</span>
+			@Override
+			public SyntheticModifier getModifierForOld(CtField oldField) {
+<span class="fc bfc" id="L233" title="All 2 branches covered.">				return ModifierHelper.isSynthetic(oldField.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;</span>
+			}
+
+			@Override
+			public SyntheticModifier getModifierForNew(CtField newField) {
+<span class="fc bfc" id="L238" title="All 2 branches covered.">				return ModifierHelper.isSynthetic(newField.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;</span>
+			}
+		});
+	}
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L245">		return changeStatus;</span>
+	}
+
+	@XmlAttribute(name = &quot;name&quot;)
+	public String getName() {
+<span class="fc" id="L250">		String name = &quot;n.a.&quot;;</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">		if (oldFieldOptional.isPresent()) {</span>
+<span class="fc" id="L252">			name = oldFieldOptional.get().getName();</span>
+		}
+<span class="fc bfc" id="L254" title="All 2 branches covered.">		if (newFieldOptional.isPresent()) {</span>
+<span class="fc" id="L255">			name = newFieldOptional.get().getName();</span>
+		}
+<span class="fc" id="L257">		return name;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;CtField&gt; getOldFieldOptional() {
+<span class="nc" id="L262">		return oldFieldOptional;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;CtField&gt; getNewFieldOptional() {
+<span class="nc" id="L267">		return newFieldOptional;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;modifiers&quot;)
+	@XmlElement(name = &quot;modifier&quot;)
+	public List&lt;? extends JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt;&gt; getModifiers() {
+<span class="nc" id="L273">		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.syntheticModifier);</span>
+	}
+
+	@XmlTransient
+	public JApiModifier&lt;StaticModifier&gt; getStaticModifier() {
+<span class="fc" id="L278">		return staticModifier;</span>
+	}
+
+	@XmlTransient
+	public JApiModifier&lt;FinalModifier&gt; getFinalModifier() {
+<span class="fc" id="L283">		return finalModifier;</span>
+	}
+
+	@XmlTransient
+	public JApiModifier&lt;TransientModifier&gt; getTransientModifier() {
+<span class="fc" id="L288">		return transientModifier;</span>
+	}
+
+	@XmlTransient
+	public JApiModifier&lt;AccessModifier&gt; getAccessModifier() {
+<span class="fc" id="L293">		return accessModifier;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;attributes&quot;)
+	@XmlElement(name = &quot;attribute&quot;)
+	public List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; getAttributes() {
+<span class="nc" id="L299">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L300">		list.add(this.syntheticAttribute);</span>
+<span class="nc" id="L301">		return list;</span>
+	}
+
+	@XmlTransient
+	public JApiModifier&lt;SyntheticModifier&gt; getSyntheticModifier() {
+<span class="fc" id="L306">		return this.syntheticModifier;</span>
+	}
+
+	@XmlTransient
+	public JApiAttribute&lt;SyntheticAttribute&gt; getSyntheticAttribute() {
+<span class="fc" id="L311">		return syntheticAttribute;</span>
+	}
+
+	@XmlElement(name = &quot;type&quot;)
+	public JApiType getType() {
+<span class="fc" id="L316">		return type;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+<span class="fc" id="L322">		boolean binaryCompatible = true;</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
+<span class="fc" id="L325">				binaryCompatible = false;</span>
+			}
+<span class="fc" id="L327">		}</span>
+<span class="fc" id="L328">		return binaryCompatible;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+<span class="fc" id="L334">		boolean sourceCompatible = true;</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="pc bpc" id="L336" title="1 of 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="fc" id="L337">				sourceCompatible = false;</span>
+			}
+<span class="fc" id="L339">		}</span>
+<span class="fc" id="L340">		return sourceCompatible;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
+	@XmlElement(name = &quot;compatibilityChange&quot;)
+	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
+<span class="fc" id="L346">		return compatibilityChanges;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;annotations&quot;)
+	@XmlElement(name = &quot;annotation&quot;)
+	public List&lt;JApiAnnotation&gt; getAnnotations() {
+<span class="fc" id="L352">		return annotations;</span>
+	}
+
+	@XmlTransient
+	public JApiClass getjApiClass() {
+<span class="fc" id="L357">		return jApiClass;</span>
+	}
+
+	public String toString()
+	{
+<span class="nc" id="L362">		return &quot;JApiField [changeStatus=&quot;</span>
+			+ changeStatus
+			+ &quot;, jApiClass=&quot;
+			+ jApiClass
+			+ &quot;, oldFieldOptional=&quot;
+			+ oldFieldOptional
+			+ &quot;, newFieldOptional=&quot;
+			+ newFieldOptional
+			+ &quot;, annotations=&quot;
+			+ annotations
+			+ &quot;, accessModifier=&quot;
+			+ accessModifier
+			+ &quot;, staticModifier=&quot;
+			+ staticModifier
+			+ &quot;, finalModifier=&quot;
+			+ finalModifier
+			+ &quot;, transientModifier=&quot;
+			+ transientModifier
+			+ &quot;, syntheticModifier=&quot;
+			+ syntheticModifier
+			+ &quot;, syntheticAttribute=&quot;
+			+ syntheticAttribute
+			+ &quot;, compatibilityChanges=&quot;
+			+ compatibilityChanges
+			+ &quot;, type=&quot;
+			+ type
+			+ &quot;]&quot;;
+	}
+
+	@XmlElementWrapper(name = &quot;oldGenericTypes&quot;)
+	@XmlElement(name = &quot;oldGenericType&quot;)
+	public List&lt;JApiGenericType&gt; getOldGenericTypes() {
+<span class="fc" id="L394">		return oldGenericTypes;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;newGenericTypes&quot;)
+	@XmlElement(name = &quot;newGenericType&quot;)
+	public List&lt;JApiGenericType&gt; getNewGenericTypes() {
+<span class="fc" id="L400">		return newGenericTypes;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

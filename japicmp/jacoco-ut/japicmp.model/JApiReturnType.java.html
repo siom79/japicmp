@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiReturnType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiReturnType.java</span></div><h1>JApiReturnType.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import japicmp.util.OptionalHelper;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JApiReturnType implements JApiHasGenericTypes, JApiCompatibility {
+	private final Optional&lt;String&gt; oldReturnTypeOptional;
+	private final Optional&lt;String&gt; newReturnTypeOptional;
+	private final JApiChangeStatus changeStatus;
+<span class="fc" id="L16">	private final List&lt;JApiGenericType&gt; oldGenericTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L17">	private final List&lt;JApiGenericType&gt; newGenericTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L18">	private final List&lt;JApiCompatibilityChange&gt; compatibilityChanges = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L20">	public JApiReturnType(JApiChangeStatus changeStatus, Optional&lt;String&gt; oldReturnTypeOptional, Optional&lt;String&gt; newReturnTypeOptional) {</span>
+<span class="fc" id="L21">		this.changeStatus = changeStatus;</span>
+<span class="fc" id="L22">		this.oldReturnTypeOptional = oldReturnTypeOptional;</span>
+<span class="fc" id="L23">		this.newReturnTypeOptional = newReturnTypeOptional;</span>
+<span class="fc" id="L24">	}</span>
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L28">		return changeStatus;</span>
+	}
+
+	@XmlAttribute(name = &quot;oldValue&quot;)
+	public String getOldReturnType() {
+<span class="fc" id="L33">		return OptionalHelper.optionalToString(oldReturnTypeOptional);</span>
+	}
+
+	@XmlAttribute(name = &quot;newValue&quot;)
+	public String getNewReturnType() {
+<span class="fc" id="L38">		return OptionalHelper.optionalToString(newReturnTypeOptional);</span>
+	}
+
+	@XmlElementWrapper(name = &quot;oldGenericTypes&quot;)
+	@XmlElement(name = &quot;oldGenericType&quot;)
+	public List&lt;JApiGenericType&gt; getOldGenericTypes() {
+<span class="fc" id="L44">		return oldGenericTypes;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;newGenericTypes&quot;)
+	@XmlElement(name = &quot;newGenericType&quot;)
+	public List&lt;JApiGenericType&gt; getNewGenericTypes() {
+<span class="fc" id="L50">		return newGenericTypes;</span>
+	}
+
+	public String toString()
+	{
+<span class="nc" id="L55">		return &quot;JApiReturnType [oldReturnTypeOptional=&quot;</span>
+			+ oldReturnTypeOptional
+			+ &quot;, newReturnTypeOptional=&quot;
+			+ newReturnTypeOptional
+			+ &quot;, changeStatus=&quot;
+			+ changeStatus
+			+ &quot;]&quot;;
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+<span class="nc" id="L67">		boolean binaryCompatible = true;</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
+<span class="nc" id="L70">				binaryCompatible = false;</span>
+<span class="nc" id="L71">				break;</span>
+			}
+<span class="nc" id="L73">		}</span>
+<span class="nc" id="L74">		return binaryCompatible;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+<span class="fc" id="L80">		boolean sourceCompatible = true;</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="nc" id="L83">				sourceCompatible = false;</span>
+<span class="nc" id="L84">				break;</span>
+			}
+<span class="nc" id="L86">		}</span>
+<span class="fc" id="L87">		return sourceCompatible;</span>
+	}
+
+	@Override
+	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
+	@XmlElement(name = &quot;compatibilityChange&quot;)
+	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
+<span class="fc" id="L94">		return this.compatibilityChanges;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

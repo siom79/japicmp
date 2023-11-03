@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiAnnotationElementValue.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiAnnotationElementValue.java</span></div><h1>JApiAnnotationElementValue.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import com.google.common.xml.XmlEscapers;
+import japicmp.util.OptionalHelper;
+import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.MemberValue;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+public class JApiAnnotationElementValue {
+	private final String fullyQualifiedName;
+	private final Type type;
+	private final Object value;
+<span class="fc" id="L21">	private Optional&lt;String&gt; name = Optional.absent();</span>
+
+<span class="fc" id="L23">	public enum Type {</span>
+<span class="fc" id="L24">		Double, Char, Long, Integer, Float, Byte, Enum, Annotation, Class, Short, Boolean, UnsupportedType, Array, String</span>
+	}
+
+<span class="fc" id="L27">	public JApiAnnotationElementValue(Type type, Object value, String fullyQualifiedName) {</span>
+<span class="fc" id="L28">		this.type = type;</span>
+<span class="fc" id="L29">		this.value = value;</span>
+<span class="fc" id="L30">		this.fullyQualifiedName = fullyQualifiedName;</span>
+<span class="fc" id="L31">	}</span>
+
+	@XmlTransient
+	public Type getType() {
+<span class="nc" id="L35">		return type;</span>
+	}
+
+	@XmlAttribute(name = &quot;type&quot;)
+	public String getTypeString() {
+<span class="nc" id="L40">		return type.name();</span>
+	}
+
+	@XmlTransient
+	public Object getValue() {
+<span class="nc" id="L45">		return value;</span>
+	}
+
+	@XmlAttribute(name = &quot;value&quot;)
+	public String getValueString() {
+<span class="nc bnc" id="L50" title="All 4 branches missed.">		if (type != Type.Array &amp;&amp; type != Type.Annotation) {</span>
+<span class="nc" id="L51">			return XmlEscapers.xmlAttributeEscaper().escape(value.toString());</span>
+		}
+<span class="nc" id="L53">		return &quot;n.a.&quot;;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;values&quot;)
+	@XmlElement(name = &quot;value&quot;)
+	public List&lt;JApiAnnotationElementValue&gt; getValues() {
+<span class="nc" id="L59">		List&lt;JApiAnnotationElementValue&gt; values = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">		if (type == Type.Array) {</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">			if (value instanceof MemberValue[]) {</span>
+<span class="nc" id="L62">				MemberValue[] memberValues = (MemberValue[]) value;</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">				for (MemberValue memberValue : memberValues) {</span>
+<span class="nc" id="L64">					JApiAnnotationElementValue elementValue = JApiAnnotationElement.getMemberValue(memberValue);</span>
+<span class="nc" id="L65">					values.add(elementValue);</span>
+				}
+<span class="nc" id="L67">			}</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">		} else if (type == Type.Annotation) {</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">			if (value instanceof Annotation) {</span>
+<span class="nc" id="L70">				Annotation annotation = (Annotation) value;</span>
+				@SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L72">				Set&lt;String&gt; memberNames = annotation.getMemberNames();</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">				if (memberNames != null) {</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">					for (String memberName : memberNames) {</span>
+<span class="nc" id="L75">						MemberValue memberValue = annotation.getMemberValue(memberName);</span>
+<span class="nc" id="L76">						JApiAnnotationElementValue elementValue = JApiAnnotationElement.getMemberValue(memberValue);</span>
+<span class="nc" id="L77">						elementValue.setName(Optional.of(memberName));</span>
+<span class="nc" id="L78">						values.add(elementValue);</span>
+<span class="nc" id="L79">					}</span>
+				}
+			}
+		}
+<span class="nc" id="L83">		return values;</span>
+	}
+
+	@Override
+	public boolean equals(Object o) {
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">		if (this == o) return true;</span>
+<span class="pc bpc" id="L89" title="2 of 4 branches missed.">		if (o == null || getClass() != o.getClass()) return false;</span>
+
+<span class="fc" id="L91">		JApiAnnotationElementValue that = (JApiAnnotationElementValue) o;</span>
+
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">		if (type != that.type) {</span>
+<span class="nc" id="L94">			return false;</span>
+		}
+<span class="pc bpc" id="L96" title="2 of 4 branches missed.">		if (type == Type.Array || type == Type.Annotation) {</span>
+<span class="nc" id="L97">			List&lt;JApiAnnotationElementValue&gt; values = getValues();</span>
+<span class="nc" id="L98">			List&lt;JApiAnnotationElementValue&gt; thatValues = that.getValues();</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">			if (values.size() != thatValues.size()) {</span>
+<span class="nc" id="L100">				return false;</span>
+			}
+<span class="nc bnc" id="L102" title="All 2 branches missed.">			for (int i = 0; i &lt; values.size(); i++) {</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">				if (!values.get(i).equals(thatValues.get(i))) {</span>
+<span class="nc" id="L104">					return false;</span>
+				}
+			}
+<span class="nc" id="L107">		} else {</span>
+<span class="pc bpc" id="L108" title="4 of 6 branches missed.">			if (value != null ? !value.equals(that.value) : that.value != null)</span>
+<span class="nc" id="L109">				return false;</span>
+		}
+
+<span class="fc" id="L112">		return true;</span>
+	}
+
+	@Override
+	public int hashCode() {
+<span class="nc bnc" id="L117" title="All 2 branches missed.">		int result = fullyQualifiedName != null ? fullyQualifiedName.hashCode() : 0;</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">		result = 31 * result + (type != null ? type.hashCode() : 0);</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">		result = 31 * result + (value != null ? value.hashCode() : 0);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">		result = 31 * result + (name != null ? name.hashCode() : 0);</span>
+<span class="nc" id="L121">		return result;</span>
+	}
+
+	@XmlAttribute(name = &quot;fullyQualifiedName&quot;)
+	public String getFullyQualifiedName() {
+<span class="nc" id="L126">		return fullyQualifiedName;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;String&gt; getName() {
+<span class="nc" id="L131">		return this.name;</span>
+	}
+
+	@XmlAttribute(name = &quot;name&quot;)
+	public String getNameString() {
+<span class="nc" id="L136">		return OptionalHelper.optionalToString(this.name);</span>
+	}
+
+	public void setName(Optional&lt;String&gt; name) {
+<span class="nc" id="L140">		this.name = name;</span>
+<span class="nc" id="L141">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

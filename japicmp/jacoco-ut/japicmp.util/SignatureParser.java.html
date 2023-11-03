@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SignatureParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.util</a> &gt; <span class="el_source">SignatureParser.java</span></div><h1>SignatureParser.java</h1><pre class="source lang-java linenums">package japicmp.util;
+
+import japicmp.exception.JApiCmpException;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiGenericTemplate;
+import japicmp.model.JApiGenericType;
+import japicmp.model.JApiParameter;
+import javassist.CtBehavior;
+import javassist.CtClass;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+<span class="fc" id="L18">public class SignatureParser {</span>
+<span class="fc" id="L19">	private static final Logger LOGGER = Logger.getLogger(SignatureParser.class.getName());</span>
+<span class="fc" id="L20">	private final List&lt;ParsedParameter&gt; parameters = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L21">	private ParsedParameter returnType = new ParsedParameter(&quot;void&quot;);</span>
+<span class="fc" id="L22">	private final List&lt;ParsedTemplate&gt; templates = new ArrayList&lt;&gt;();</span>
+
+	public interface HasGenericTypes {
+		List&lt;ParsedParameter&gt; getGenericTypes();
+	}
+
+	public static class ParsedParameter implements HasGenericTypes {
+<span class="fc" id="L29">		String type = &quot;&quot;;</span>
+<span class="fc" id="L30">		List&lt;ParsedParameter&gt; genericTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L31">		JApiGenericType.JApiGenericWildCard genericWildCard = JApiGenericType.JApiGenericWildCard.NONE;</span>
+<span class="fc" id="L32">		boolean template = false;</span>
+
+<span class="fc" id="L34">		public ParsedParameter() {</span>
+
+<span class="fc" id="L36">		}</span>
+
+<span class="fc" id="L38">		public ParsedParameter(String type) {</span>
+<span class="fc" id="L39">			this.type = type;</span>
+<span class="fc" id="L40">		}</span>
+
+		public String getType() {
+<span class="fc" id="L43">			return type;</span>
+		}
+
+		public List&lt;ParsedParameter&gt; getGenericTypes() {
+<span class="fc" id="L47">			return genericTypes;</span>
+		}
+
+		public JApiGenericType.JApiGenericWildCard getGenericWildCard() {
+<span class="fc" id="L51">			return genericWildCard;</span>
+		}
+
+		public boolean isTemplate() {
+<span class="fc" id="L55">			return template;</span>
+		}
+
+		public void setTemplate(boolean template) {
+<span class="nc" id="L59">			this.template = template;</span>
+<span class="nc" id="L60">		}</span>
+
+		@Override
+		public boolean equals(Object o) {
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">			if (this == o) return true;</span>
+<span class="pc bpc" id="L65" title="2 of 4 branches missed.">			if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="fc" id="L66">			ParsedParameter that = (ParsedParameter) o;</span>
+<span class="fc" id="L67">			return Objects.equals(type, that.type);</span>
+		}
+
+		@Override
+		public int hashCode() {
+<span class="nc" id="L72">			return Objects.hash(type);</span>
+		}
+	}
+
+<span class="fc" id="L76">	public static class ParsedTemplate implements HasGenericTypes {</span>
+<span class="fc" id="L77">		String name = &quot;&quot;;</span>
+<span class="fc" id="L78">		String type = &quot;&quot;;</span>
+<span class="fc" id="L79">		List&lt;ParsedParameter&gt; genericTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L80">		List&lt;ParsedParameter&gt; interfaces = new ArrayList&lt;&gt;();</span>
+
+		public String getName() {
+<span class="fc" id="L83">			return name;</span>
+		}
+
+		public String getType() {
+<span class="fc" id="L87">			return type;</span>
+		}
+
+		@Override
+		public List&lt;ParsedParameter&gt; getGenericTypes() {
+<span class="fc" id="L92">			return genericTypes;</span>
+		}
+
+		public List&lt;ParsedParameter&gt; getInterfaces() {
+<span class="fc" id="L96">			return interfaces;</span>
+		}
+	}
+
+	public void parse(CtBehavior behavior) {
+<span class="fc" id="L101">		String signature = behavior.getSignature();</span>
+<span class="fc" id="L102">		parse(signature);</span>
+<span class="fc" id="L103">	}</span>
+
+	public void parse(String signature) {
+<span class="fc bfc" id="L106" title="All 2 branches covered.">		if (signature == null) {</span>
+<span class="fc" id="L107">			return;</span>
+		}
+<span class="fc" id="L109">		int parenthesisOpenIndex = signature.indexOf('(');</span>
+<span class="fc" id="L110">		int parenthesisCloseIndex = signature.indexOf(')');</span>
+<span class="pc bpc" id="L111" title="1 of 4 branches missed.">		if (parenthesisOpenIndex &gt; 0 &amp;&amp; signature.startsWith(&quot;&lt;&quot;)) {</span>
+<span class="fc" id="L112">			String templateDefWithBrackets = signature.substring(0, parenthesisOpenIndex);</span>
+<span class="pc bpc" id="L113" title="3 of 6 branches missed.">			if (templateDefWithBrackets.startsWith(&quot;&lt;&quot;) &amp;&amp; templateDefWithBrackets.endsWith(&quot;&gt;&quot;) &amp;&amp; templateDefWithBrackets.length() &gt; 2) {</span>
+<span class="fc" id="L114">				parseTemplateDefinition(templateDefWithBrackets.substring(1, templateDefWithBrackets.length()-1));</span>
+			}
+		}
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">		if (parenthesisCloseIndex &gt; -1) {</span>
+<span class="fc" id="L118">			parseParameters(signature, parenthesisCloseIndex);</span>
+<span class="fc" id="L119">			parseReturnValue(signature, parenthesisCloseIndex);</span>
+		}
+<span class="fc" id="L121">	}</span>
+
+	private void parseReturnValue(String signature, int parenthesisCloseIndex) {
+<span class="fc" id="L124">		String retValPart = signature.substring(parenthesisCloseIndex + 1);</span>
+<span class="fc" id="L125">		List&lt;ParsedParameter&gt; retValTypes = parseTypes(retValPart);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">		if (!retValTypes.isEmpty()) {</span>
+<span class="fc" id="L127">			returnType = retValTypes.get(0);</span>
+		}
+<span class="fc" id="L129">	}</span>
+
+	private void parseParameters(String signature, int parenthesisCloseIndex) {
+<span class="fc" id="L132">		int parenthesisOpenIndex = signature.indexOf('(');</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">		if (parenthesisOpenIndex &lt; 0) {</span>
+<span class="nc" id="L134">			throw new JApiCmpException(JApiCmpException.Reason.IllegalState, &quot;Signature does not contain '('.&quot;);</span>
+		}
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">		if (parenthesisCloseIndex - parenthesisOpenIndex &lt; 1) {</span>
+<span class="nc" id="L137">			throw new JApiCmpException(JApiCmpException.Reason.IllegalState, &quot;Signature must contain the char '(' before the char ')'.&quot;);</span>
+		}
+<span class="fc" id="L139">		String paramPart = signature.substring(parenthesisOpenIndex + 1, parenthesisCloseIndex);</span>
+<span class="fc" id="L140">		parameters.clear();</span>
+<span class="fc" id="L141">		List&lt;ParsedParameter&gt; paramTypes = parseTypes(paramPart);</span>
+<span class="fc" id="L142">		parameters.addAll(paramTypes);</span>
+<span class="fc" id="L143">	}</span>
+
+	public List&lt;ParsedTemplate&gt; parseTemplatesOfClass(CtClass ctClass) {
+<span class="fc" id="L146">		String genericSignature = ctClass.getGenericSignature();</span>
+<span class="fc bfc" id="L147" title="All 4 branches covered.">		if (genericSignature != null &amp;&amp; genericSignature.startsWith(&quot;&lt;&quot;)) {</span>
+<span class="fc" id="L148">			int lastClosingBracket = genericSignature.lastIndexOf('&gt;');</span>
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">			if (lastClosingBracket &gt; 0 &amp;&amp; genericSignature.length()-2 &gt; 0) {</span>
+<span class="fc" id="L150">				parseTemplateDefinition(genericSignature.substring(1, genericSignature.length()-1));</span>
+<span class="fc" id="L151">				return this.templates;</span>
+			}
+		}
+<span class="fc" id="L154">		return Collections.emptyList();</span>
+	}
+
+	public List&lt;ParsedParameter&gt; parseTypes(String paramPart) {
+<span class="fc" id="L158">		List&lt;ParsedParameter&gt; types = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L159">		ParsedParameter parsedParameter = new ParsedParameter();</span>
+<span class="fc" id="L160">		boolean arrayNotation = false;</span>
+<span class="fc" id="L161">		int i = 0;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">		while (i &lt; paramPart.length()) {</span>
+<span class="fc" id="L163">			char c = paramPart.charAt(i);</span>
+			String type;
+<span class="pc bpc" id="L165" title="2 of 12 branches missed.">			switch (c) {</span>
+				case 'Z':
+<span class="fc" id="L167">					type = &quot;boolean&quot;;</span>
+<span class="fc" id="L168">					break;</span>
+				case 'B':
+<span class="fc" id="L170">					type = &quot;byte&quot;;</span>
+<span class="fc" id="L171">					break;</span>
+				case 'C':
+<span class="fc" id="L173">					type = &quot;char&quot;;</span>
+<span class="fc" id="L174">					break;</span>
+				case 'S':
+<span class="nc" id="L176">					type = &quot;short&quot;;</span>
+<span class="nc" id="L177">					break;</span>
+				case 'I':
+<span class="fc" id="L179">					type = &quot;int&quot;;</span>
+<span class="fc" id="L180">					break;</span>
+				case 'J':
+<span class="fc" id="L182">					type = &quot;long&quot;;</span>
+<span class="fc" id="L183">					break;</span>
+				case 'F':
+<span class="fc" id="L185">					type = &quot;float&quot;;</span>
+<span class="fc" id="L186">					break;</span>
+				case 'D':
+<span class="fc" id="L188">					type = &quot;double&quot;;</span>
+<span class="fc" id="L189">					break;</span>
+				case 'V':
+<span class="fc" id="L191">					type = &quot;void&quot;;</span>
+<span class="fc" id="L192">					break;</span>
+				case '[':
+<span class="fc" id="L194">					arrayNotation = true;</span>
+<span class="fc" id="L195">					i++;</span>
+<span class="fc" id="L196">					continue;</span>
+				case 'L':
+				case 'T':
+<span class="fc" id="L199">					StringBuilder fqn = new StringBuilder();</span>
+<span class="fc" id="L200">					i++;</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">					boolean template = c == 'T';</span>
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">					while (i &lt; paramPart.length()) {</span>
+<span class="fc" id="L203">						c = paramPart.charAt(i);</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">						if (c == ';') {</span>
+<span class="fc" id="L205">							break;</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">						} else if (c == '/') {</span>
+<span class="fc" id="L207">							fqn.append('.');</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">						} else if (c == '&lt;') {</span>
+<span class="fc" id="L209">							i = parseGenerics(parsedParameter, paramPart, ++i, false);</span>
+						} else {
+<span class="fc" id="L211">							fqn.append(c);</span>
+						}
+<span class="fc" id="L213">						i++;</span>
+					}
+<span class="fc" id="L215">					type = fqn.toString();</span>
+<span class="fc" id="L216">					parsedParameter.template = template;</span>
+<span class="fc" id="L217">					break;</span>
+				default:
+<span class="nc" id="L219">					LOGGER.log(Level.FINE, &quot;Unknown type signature: '&quot; + c + &quot;' in &quot; + paramPart);</span>
+<span class="nc" id="L220">					return Collections.emptyList();</span>
+			}
+<span class="fc bfc" id="L222" title="All 2 branches covered.">			if (arrayNotation) {</span>
+<span class="fc" id="L223">				type += &quot;[]&quot;;</span>
+<span class="fc" id="L224">				arrayNotation = false;</span>
+			}
+<span class="fc" id="L226">			parsedParameter.type = type;</span>
+<span class="fc" id="L227">			types.add(parsedParameter);</span>
+<span class="fc" id="L228">			parsedParameter = new ParsedParameter();</span>
+<span class="fc" id="L229">			i++;</span>
+<span class="fc" id="L230">		}</span>
+<span class="fc" id="L231">		return types;</span>
+	}
+
+	private int parseGenerics(ParsedParameter parentParameter, String paramPart, int i, boolean parseUntilColon) {
+<span class="fc" id="L235">		StringBuilder fqn = new StringBuilder();</span>
+<span class="fc" id="L236">		ParsedParameter lastParameter = new ParsedParameter();</span>
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">		while (i &lt; paramPart.length()) {</span>
+<span class="fc" id="L238">			char c = paramPart.charAt(i);</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">			if (c == ';') {</span>
+<span class="fc" id="L240">				lastParameter.type = fqn.toString();</span>
+<span class="pc bpc" id="L241" title="1 of 4 branches missed.">				if (lastParameter.type.startsWith(&quot;+&quot;) &amp;&amp; lastParameter.type.length() &gt; 1) {</span>
+<span class="fc" id="L242">					lastParameter.type = lastParameter.type.substring(1);</span>
+<span class="fc" id="L243">					lastParameter.genericWildCard = JApiGenericType.JApiGenericWildCard.EXTENDS;</span>
+				}
+<span class="pc bpc" id="L245" title="1 of 4 branches missed.">				if (lastParameter.type.startsWith(&quot;-&quot;) &amp;&amp; lastParameter.type.length() &gt; 1) {</span>
+<span class="fc" id="L246">					lastParameter.type = lastParameter.type.substring(1);</span>
+<span class="fc" id="L247">					lastParameter.genericWildCard = JApiGenericType.JApiGenericWildCard.SUPER;</span>
+				}
+<span class="pc bpc" id="L249" title="1 of 4 branches missed.">				if (lastParameter.type.startsWith(&quot;[&quot;) &amp;&amp; lastParameter.type.length() &gt; 1) {</span>
+<span class="fc" id="L250">					lastParameter.type = lastParameter.type.substring(1) + &quot;[]&quot;;</span>
+				}
+<span class="pc bpc" id="L252" title="1 of 4 branches missed.">				if (lastParameter.type.startsWith(&quot;L&quot;) &amp;&amp; lastParameter.type.length() &gt; 1) {</span>
+<span class="fc" id="L253">					lastParameter.type = lastParameter.type.substring(1);</span>
+				}
+<span class="pc bpc" id="L255" title="1 of 4 branches missed.">				if (lastParameter.type.startsWith(&quot;T&quot;) &amp;&amp; lastParameter.type.length() &gt; 1) {</span>
+<span class="fc" id="L256">					lastParameter.type = lastParameter.type.substring(1);</span>
+				}
+<span class="fc bfc" id="L258" title="All 2 branches covered.">				if (parseUntilColon) {</span>
+<span class="fc" id="L259">					parentParameter.type = lastParameter.type;</span>
+<span class="fc" id="L260">					parentParameter.genericTypes = lastParameter.genericTypes;</span>
+<span class="fc" id="L261">					parentParameter.genericWildCard = lastParameter.genericWildCard;</span>
+<span class="fc" id="L262">					parentParameter.template = lastParameter.template;</span>
+<span class="fc" id="L263">					return i;</span>
+				}
+<span class="fc" id="L265">				fqn = new StringBuilder();</span>
+<span class="fc" id="L266">				parentParameter.genericTypes.add(lastParameter);</span>
+<span class="fc" id="L267">				lastParameter = new ParsedParameter();</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">			} else if (c == '*') {</span>
+<span class="fc" id="L269">				lastParameter.type = &quot;?&quot;;</span>
+<span class="fc" id="L270">				lastParameter.genericWildCard = JApiGenericType.JApiGenericWildCard.UNBOUNDED;</span>
+<span class="fc" id="L271">				fqn = new StringBuilder();</span>
+<span class="fc" id="L272">				parentParameter.genericTypes.add(lastParameter);</span>
+<span class="fc" id="L273">				lastParameter = new ParsedParameter();</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">			} else if (c == '/') {</span>
+<span class="fc" id="L275">				fqn.append('.');</span>
+<span class="fc bfc" id="L276" title="All 2 branches covered.">			} else if (c == '&lt;') {</span>
+<span class="fc" id="L277">				i = parseGenerics(lastParameter, paramPart, ++i, false);</span>
+<span class="fc bfc" id="L278" title="All 2 branches covered.">			} else if (c == '&gt;') {</span>
+<span class="fc" id="L279">				break;</span>
+			} else {
+<span class="fc" id="L281">				fqn.append(c);</span>
+			}
+<span class="fc" id="L283">			i++;</span>
+<span class="fc" id="L284">		}</span>
+<span class="fc" id="L285">		return i;</span>
+	}
+
+	// example: &lt;TEST:Ljapicmp/test/Generics$GenericsParamTest&lt;*Ljava/lang/Short;&gt;;TEST2:Ljava/lang/Integer;&gt;
+	private void parseTemplateDefinition(String str) {
+<span class="fc" id="L290">		StringBuilder name = new StringBuilder();</span>
+<span class="fc" id="L291">		ParsedTemplate currentTemplate = new ParsedTemplate();</span>
+<span class="fc" id="L292">		int i = 0;</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">		while (i &lt; str.length()) {</span>
+<span class="fc" id="L294">			char c = str.charAt(i);</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">			if (c == ':') {</span>
+<span class="pc bpc" id="L296" title="1 of 4 branches missed.">				if (i+1 &lt; str.length() &amp;&amp; str.charAt(i+1) == ':') {</span>
+<span class="fc" id="L297">					i++;</span>
+				}
+<span class="fc" id="L299">				currentTemplate.name = name.toString();</span>
+
+<span class="fc" id="L301">				ParsedParameter parsedParameter = new ParsedParameter();</span>
+<span class="fc" id="L302">				i = parseGenerics(parsedParameter, str, i+1, true);</span>
+<span class="fc" id="L303">				currentTemplate.type = parsedParameter.type;</span>
+<span class="fc" id="L304">				currentTemplate.genericTypes = parsedParameter.genericTypes;</span>
+<span class="fc bfc" id="L305" title="All 4 branches covered.">				while (i+1 &lt; str.length() &amp;&amp; str.charAt(i+1) == ':') {</span>
+<span class="fc" id="L306">					ParsedParameter parsedInterface = new ParsedParameter();</span>
+<span class="fc" id="L307">					i = parseGenerics(parsedInterface, str, i+2, true);</span>
+<span class="fc" id="L308">					currentTemplate.interfaces.add(parsedInterface);</span>
+<span class="fc" id="L309">				}</span>
+<span class="fc" id="L310">				this.templates.add(currentTemplate);</span>
+
+<span class="fc" id="L312">				name = new StringBuilder();</span>
+<span class="fc" id="L313">				currentTemplate = new ParsedTemplate();</span>
+<span class="fc" id="L314">			} else {</span>
+<span class="fc" id="L315">				name.append(c);</span>
+			}
+<span class="fc" id="L317">			i++;</span>
+<span class="fc" id="L318">		}</span>
+<span class="fc" id="L319">	}</span>
+
+	public List&lt;ParsedParameter&gt; getParameters() {
+<span class="fc" id="L322">		return parameters;</span>
+	}
+
+<span class="fc" id="L325">	public enum DiffType {</span>
+<span class="fc" id="L326">		NEW_PARAMS,</span>
+<span class="fc" id="L327">		OLD_PARAMS</span>
+	}
+
+	public List&lt;JApiParameter&gt; getJApiParameters(JApiClass jApiClass, DiffType diffType) {
+<span class="fc" id="L331">		List&lt;JApiParameter&gt; jApiParameters = new ArrayList&lt;&gt;(this.parameters.size());</span>
+<span class="fc bfc" id="L332" title="All 2 branches covered.">		for (ParsedParameter parsedParameter : this.parameters) {</span>
+<span class="fc" id="L333">			String type = parsedParameter.getType();</span>
+<span class="fc" id="L334">			Optional&lt;String&gt; templateName = Optional.absent();</span>
+<span class="fc" id="L335">			JApiParameter jApiParameter = null;</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">			if (parsedParameter.isTemplate()) {</span>
+<span class="fc" id="L337">				jApiParameter = resolveTemplate(jApiClass, type, diffType);</span>
+			}
+<span class="fc bfc" id="L339" title="All 2 branches covered.">			if (jApiParameter == null) {</span>
+<span class="fc" id="L340">				jApiParameter = new JApiParameter(type, templateName);</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">				if (diffType == DiffType.NEW_PARAMS) {</span>
+<span class="fc" id="L342">					copyGenericParameters(parsedParameter, jApiParameter.getNewGenericTypes());</span>
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">				} else if (diffType == DiffType.OLD_PARAMS) {</span>
+<span class="fc" id="L344">					copyGenericParameters(parsedParameter, jApiParameter.getOldGenericTypes());</span>
+				}
+			}
+<span class="fc" id="L347">			jApiParameters.add(jApiParameter);</span>
+<span class="fc" id="L348">		}</span>
+<span class="fc" id="L349">		return jApiParameters;</span>
+	}
+
+	private JApiParameter resolveTemplate(JApiClass jApiClass, String templateName, DiffType diffType) {
+<span class="fc" id="L353">		JApiParameter jApiParameter = null;</span>
+<span class="fc bfc" id="L354" title="All 2 branches covered.">		for (ParsedTemplate parsedTemplate : this.templates) {</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">			if (parsedTemplate.name.equals(templateName)) {</span>
+<span class="fc" id="L356">				jApiParameter = new JApiParameter(parsedTemplate.type, Optional.of(templateName));</span>
+<span class="fc bfc" id="L357" title="All 2 branches covered.">				if (diffType == DiffType.NEW_PARAMS) {</span>
+<span class="fc" id="L358">					copyGenericParameters(parsedTemplate, jApiParameter.getNewGenericTypes());</span>
+<span class="pc bpc" id="L359" title="1 of 2 branches missed.">				} else if (diffType == DiffType.OLD_PARAMS) {</span>
+<span class="fc" id="L360">					copyGenericParameters(parsedTemplate, jApiParameter.getOldGenericTypes());</span>
+				}
+			}
+<span class="fc" id="L363">		}</span>
+<span class="fc bfc" id="L364" title="All 2 branches covered.">		if (jApiParameter == null) {</span>
+<span class="fc" id="L365">			List&lt;JApiGenericTemplate&gt; genericTemplates = jApiClass.getGenericTemplates();</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">			for (JApiGenericTemplate jApiGenericTemplate : genericTemplates) {</span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">				if (jApiGenericTemplate.getName().equals(templateName)) {</span>
+<span class="pc bpc" id="L368" title="1 of 4 branches missed.">					if (diffType == DiffType.NEW_PARAMS &amp;&amp; jApiGenericTemplate.getNewTypeOptional().isPresent()) {</span>
+<span class="fc" id="L369">						jApiParameter = new JApiParameter(jApiGenericTemplate.getNewTypeOptional().get(), Optional.of(templateName));</span>
+<span class="fc" id="L370">						jApiParameter.getNewGenericTypes().addAll(jApiGenericTemplate.getNewGenericTypes());</span>
+<span class="pc bpc" id="L371" title="2 of 4 branches missed.">					} else if (diffType == DiffType.OLD_PARAMS &amp;&amp; jApiGenericTemplate.getOldTypeOptional().isPresent()) {</span>
+<span class="fc" id="L372">						jApiParameter = new JApiParameter(jApiGenericTemplate.getOldTypeOptional().get(), Optional.of(templateName));</span>
+<span class="fc" id="L373">						jApiParameter.getOldGenericTypes().addAll(jApiGenericTemplate.getOldGenericTypes());</span>
+					}
+				}
+<span class="fc" id="L376">			}</span>
+		}
+<span class="fc" id="L378">		return jApiParameter;</span>
+	}
+
+	public static void copyGenericParameters(HasGenericTypes hasGenericTypes, List&lt;JApiGenericType&gt; genericTypes) {
+<span class="fc" id="L382">		copyGenericParameters(genericTypes, hasGenericTypes.getGenericTypes());</span>
+<span class="fc" id="L383">	}</span>
+
+	public static void copyGenericTypeInterfaces(ParsedTemplate parsedTemplate, List&lt;JApiGenericType&gt; genericTypes) {
+<span class="fc" id="L386">		copyGenericParameters(genericTypes, parsedTemplate.getInterfaces());</span>
+<span class="fc" id="L387">	}</span>
+
+	private static void copyGenericParameters(List&lt;JApiGenericType&gt; genericTypes, List&lt;ParsedParameter&gt; genericTypesAsParsedParameter) {
+<span class="fc bfc" id="L390" title="All 2 branches covered.">		if (!genericTypesAsParsedParameter.isEmpty()) {</span>
+<span class="fc bfc" id="L391" title="All 2 branches covered.">			for (ParsedParameter genericParam : genericTypesAsParsedParameter) {</span>
+<span class="fc" id="L392">				JApiGenericType jApiGenericType = new JApiGenericType(genericParam.getType(), genericParam.getGenericWildCard());</span>
+<span class="fc" id="L393">				genericTypes.add(jApiGenericType);</span>
+<span class="fc bfc" id="L394" title="All 2 branches covered.">				if (!genericParam.getGenericTypes().isEmpty()) {</span>
+<span class="fc" id="L395">					copyGenericParams(genericParam, jApiGenericType);</span>
+				}
+<span class="fc" id="L397">			}</span>
+		}
+<span class="fc" id="L399">	}</span>
+
+	private static void copyGenericParams(ParsedParameter genericParam, JApiGenericType jApiGenericType) {
+<span class="fc bfc" id="L402" title="All 2 branches covered.">		for (ParsedParameter genericOfGenericParam : genericParam.getGenericTypes()) {</span>
+<span class="fc" id="L403">			JApiGenericType jApiGenericTypeInner = new JApiGenericType(genericOfGenericParam.getType(), genericParam.getGenericWildCard());</span>
+<span class="fc" id="L404">			jApiGenericType.getGenericTypes().add(jApiGenericTypeInner);</span>
+<span class="pc bpc" id="L405" title="1 of 2 branches missed.">			if (!genericOfGenericParam.getGenericTypes().isEmpty()) {</span>
+<span class="nc" id="L406">				copyGenericParams(genericOfGenericParam, jApiGenericTypeInner);</span>
+			}
+<span class="fc" id="L408">		}</span>
+<span class="fc" id="L409">	}</span>
+
+	public static boolean equalGenericTypes(List&lt;JApiGenericType&gt; oldGenericTypes, List&lt;JApiGenericType&gt; newGenericTypes) {
+<span class="pc bpc" id="L412" title="1 of 2 branches missed.">		if (oldGenericTypes.size() != newGenericTypes.size()) {</span>
+<span class="nc" id="L413">			return false;</span>
+		}
+<span class="fc bfc" id="L415" title="All 2 branches covered.">		for (int i=0; i&lt; oldGenericTypes.size(); i++) {</span>
+<span class="fc bfc" id="L416" title="All 2 branches covered.">			if (!oldGenericTypes.get(i).getType().equals(newGenericTypes.get(i).getType()) ||</span>
+<span class="pc bpc" id="L417" title="1 of 2 branches missed.">					!oldGenericTypes.get(i).getGenericWildCard().equals(newGenericTypes.get(i).getGenericWildCard())) {</span>
+<span class="fc" id="L418">				return false;</span>
+			}
+		}
+<span class="fc" id="L421">		return true;</span>
+	}
+
+	public ParsedParameter getReturnType() {
+<span class="fc" id="L425">		return returnType;</span>
+	}
+
+	public List&lt;ParsedTemplate&gt; getTemplates() {
+<span class="fc" id="L429">		return templates;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

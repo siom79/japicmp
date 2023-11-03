@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiGenericType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiGenericType.java</span></div><h1>JApiGenericType.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JApiGenericType {
+	private final String type;
+	private List&lt;JApiGenericType&gt; genericTypes;
+	private final JApiGenericWildCard genericWildCard;
+
+<span class="fc" id="L14">	public enum JApiGenericWildCard {</span>
+<span class="fc" id="L15">		NONE, EXTENDS, SUPER, UNBOUNDED</span>
+	}
+
+<span class="fc" id="L18">	public JApiGenericType(String type, JApiGenericWildCard genericWildCard) {</span>
+<span class="fc" id="L19">		this.type = type;</span>
+<span class="fc" id="L20">		this.genericWildCard = genericWildCard;</span>
+<span class="fc" id="L21">	}</span>
+
+	@XmlAttribute(name = &quot;type&quot;)
+	public String getType() {
+<span class="fc" id="L25">		return type;</span>
+	}
+
+	@XmlAttribute(name = &quot;genericWildCard&quot;)
+	public JApiGenericWildCard getGenericWildCard() {
+<span class="fc" id="L30">		return genericWildCard;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;genericTypes&quot;)
+	@XmlElement(name = &quot;genericType&quot;)
+	public List&lt;JApiGenericType&gt; getGenericTypes() {
+<span class="fc bfc" id="L36" title="All 2 branches covered.">		if (genericTypes == null) {</span>
+<span class="fc" id="L37">			genericTypes = new ArrayList&lt;&gt;();</span>
+		}
+<span class="fc" id="L39">		return genericTypes;</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc bnc" id="L44" title="All 2 branches missed.">		if (this.genericWildCard == JApiGenericWildCard.NONE) {</span>
+<span class="nc" id="L45">			return this.type;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">		} else if (this.genericWildCard == JApiGenericWildCard.UNBOUNDED) {</span>
+<span class="nc" id="L47">			return &quot;?&quot;;</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">		} else if (this.genericWildCard == JApiGenericWildCard.EXTENDS) {</span>
+<span class="nc" id="L49">			return &quot;? extends &quot; + this.type;</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">		} else if (this.genericWildCard == JApiGenericWildCard.SUPER) {</span>
+<span class="nc" id="L51">			return &quot;? super &quot; + this.type;</span>
+		} else {
+<span class="nc" id="L53">			return this.type;</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

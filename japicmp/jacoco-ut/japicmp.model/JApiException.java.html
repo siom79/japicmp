@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiException.java</span></div><h1>JApiException.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import japicmp.cmp.JarArchiveComparator;
+import javassist.CtClass;
+
+import javax.xml.bind.annotation.XmlAttribute;
+
+public class JApiException implements JApiHasChangeStatus {
+	private final String name;
+	private final JApiChangeStatus changeStatus;
+	private final boolean checkedException;
+
+<span class="fc" id="L14">	public JApiException(JarArchiveComparator jarArchiveComparator, String name, Optional&lt;CtClass&gt; ctClassOptional, JApiChangeStatus changeStatus) {</span>
+<span class="fc" id="L15">		this.name = name;</span>
+<span class="fc" id="L16">		this.changeStatus = changeStatus;</span>
+<span class="fc" id="L17">		this.checkedException = isCheckedException(ctClassOptional, jarArchiveComparator);</span>
+<span class="fc" id="L18">	}</span>
+
+	private boolean isCheckedException(Optional&lt;CtClass&gt; ctClassOptional, JarArchiveComparator jarArchiveComparator) throws OutOfMemoryError {
+<span class="fc" id="L21">		boolean checkedException = false;</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">		if (ctClassOptional.isPresent()) {</span>
+<span class="fc" id="L23">			boolean subClassOfException = false;</span>
+<span class="fc" id="L24">			CtClass ctClass = ctClassOptional.get();</span>
+<span class="fc" id="L25">			Optional&lt;CtClass&gt; exceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, Exception.class.getName());</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">			if (exceptionOptional.isPresent()) {</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">				if (ctClass.subclassOf(exceptionOptional.get())) {</span>
+<span class="fc" id="L28">					subClassOfException = true;</span>
+				}
+			}
+<span class="fc bfc" id="L31" title="All 2 branches covered.">			if (subClassOfException) {</span>
+<span class="fc" id="L32">				Optional&lt;CtClass&gt; runtimeExceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, RuntimeException.class.getName());</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">				if (runtimeExceptionOptional.isPresent()) {</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">					if (!ctClass.subclassOf(runtimeExceptionOptional.get())) {</span>
+<span class="fc" id="L35">						checkedException = true;</span>
+					}
+				}
+			}
+		}
+<span class="fc" id="L40">		return checkedException;</span>
+	}
+
+	@XmlAttribute(name = &quot;name&quot;)
+	public String getName() {
+<span class="nc" id="L45">		return name;</span>
+	}
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L50">		return changeStatus;</span>
+	}
+
+	public boolean isCheckedException() {
+<span class="fc" id="L54">		return checkedException;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiGenericTemplate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiGenericTemplate.java</span></div><h1>JApiGenericTemplate.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JApiGenericTemplate implements JApiHasChangeStatus, JApiHasGenericTypes, JApiCompatibility {
+	private final String name;
+	private final Optional&lt;String&gt; oldType;
+	private final Optional&lt;String&gt; newType;
+	private List&lt;JApiGenericType&gt; oldInterfaceTypes;
+	private List&lt;JApiGenericType&gt; newInterfaceTypes;
+	private List&lt;JApiGenericType&gt; oldGenericTypes;
+	private List&lt;JApiGenericType&gt; newGenericTypes;
+	private final JApiChangeStatus changeStatus;
+<span class="fc" id="L21">	private final List&lt;JApiCompatibilityChange&gt; compatibilityChanges = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L23">	public JApiGenericTemplate(JApiChangeStatus changeStatus, String name, Optional&lt;String&gt; oldType, Optional&lt;String&gt; newType) {</span>
+<span class="fc" id="L24">		this.changeStatus = changeStatus;</span>
+<span class="fc" id="L25">		this.name = name;</span>
+<span class="fc" id="L26">		this.oldType = oldType;</span>
+<span class="fc" id="L27">		this.newType = newType;</span>
+<span class="fc" id="L28">	}</span>
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L32">		return changeStatus;</span>
+	}
+
+	@XmlAttribute(name = &quot;name&quot;)
+	public String getName() {
+<span class="fc" id="L37">		return name;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;String&gt; getOldTypeOptional() {
+<span class="fc" id="L42">		return this.oldType;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;String&gt; getNewTypeOptional() {
+<span class="fc" id="L47">		return this.newType;</span>
+	}
+
+	@XmlAttribute(name = &quot;oldType&quot;)
+	public String getOldType() {
+<span class="fc" id="L52">		return this.oldType.or(&quot;n.a.&quot;);</span>
+	}
+
+	@XmlAttribute(name = &quot;newType&quot;)
+	public String getNewType() {
+<span class="fc" id="L57">		return this.newType.or(&quot;n.a.&quot;);</span>
+	}
+
+	@XmlElementWrapper(name = &quot;oldGenericTypes&quot;)
+	@XmlElement(name = &quot;oldGenericType&quot;)
+	public List&lt;JApiGenericType&gt; getOldGenericTypes() {
+<span class="fc bfc" id="L63" title="All 2 branches covered.">		if (oldGenericTypes == null) {</span>
+<span class="fc" id="L64">			oldGenericTypes = new ArrayList&lt;&gt;();</span>
+		}
+<span class="fc" id="L66">		return oldGenericTypes;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;newGenericTypes&quot;)
+	@XmlElement(name = &quot;newGenericType&quot;)
+	public List&lt;JApiGenericType&gt; getNewGenericTypes() {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">		if (newGenericTypes == null) {</span>
+<span class="fc" id="L73">			newGenericTypes = new ArrayList&lt;&gt;();</span>
+		}
+<span class="fc" id="L75">		return newGenericTypes;</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc" id="L80">		return this.name + &quot;:&quot; + this.oldType;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+<span class="fc" id="L86">		boolean binaryCompatible = true;</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
+<span class="nc" id="L89">				binaryCompatible = false;</span>
+<span class="nc" id="L90">				break;</span>
+			}
+<span class="fc" id="L92">		}</span>
+<span class="fc" id="L93">		return binaryCompatible;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+<span class="fc" id="L99">		boolean sourceCompatible = true;</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="fc" id="L102">				sourceCompatible = false;</span>
+<span class="fc" id="L103">				break;</span>
+			}
+<span class="nc" id="L105">		}</span>
+<span class="fc" id="L106">		return sourceCompatible;</span>
+	}
+
+	@Override
+	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
+	@XmlElement(name = &quot;compatibilityChange&quot;)
+	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
+<span class="fc" id="L113">		return this.compatibilityChanges;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;oldInterfaceTypes&quot;)
+	@XmlElement(name = &quot;oldInterfaceType&quot;)
+	public List&lt;JApiGenericType&gt; getOldInterfaceTypes() {
+<span class="fc bfc" id="L119" title="All 2 branches covered.">		if (oldInterfaceTypes == null) {</span>
+<span class="fc" id="L120">			oldInterfaceTypes = new ArrayList&lt;&gt;();</span>
+		}
+<span class="fc" id="L122">		return oldInterfaceTypes;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;newInterfaceTypes&quot;)
+	@XmlElement(name = &quot;newInterfaceType&quot;)
+	public List&lt;JApiGenericType&gt; getNewInterfaceTypes() {
+<span class="fc bfc" id="L128" title="All 2 branches covered.">		if (newInterfaceTypes == null) {</span>
+<span class="fc" id="L129">			newInterfaceTypes = new ArrayList&lt;&gt;();</span>
+		}
+<span class="fc" id="L131">		return newInterfaceTypes;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

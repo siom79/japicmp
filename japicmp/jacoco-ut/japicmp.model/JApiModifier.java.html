@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiModifier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiModifier.java</span></div><h1>JApiModifier.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import japicmp.util.OptionalHelper;
+
+import javax.xml.bind.annotation.XmlAttribute;
+
+public class JApiModifier&lt;T&gt; {
+	private final Optional&lt;T&gt; oldModifier;
+	private final Optional&lt;T&gt; newModifier;
+	private final JApiChangeStatus changeStatus;
+
+<span class="fc" id="L13">	public JApiModifier(Optional&lt;T&gt; oldModifier, Optional&lt;T&gt; newModifier, JApiChangeStatus changeStatus) {</span>
+<span class="fc" id="L14">		this.oldModifier = oldModifier;</span>
+<span class="fc" id="L15">		this.newModifier = newModifier;</span>
+<span class="fc" id="L16">		this.changeStatus = changeStatus;</span>
+<span class="fc" id="L17">	}</span>
+
+	public Optional&lt;T&gt; getOldModifier() {
+<span class="fc" id="L20">		return oldModifier;</span>
+	}
+
+	public Optional&lt;T&gt; getNewModifier() {
+<span class="fc" id="L24">		return newModifier;</span>
+	}
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L29">		return changeStatus;</span>
+	}
+
+	@XmlAttribute(name = &quot;oldValue&quot;)
+	public String getValueOld() {
+<span class="nc" id="L34">		return OptionalHelper.optionalToString(this.oldModifier);</span>
+	}
+
+	@XmlAttribute(name = &quot;newValue&quot;)
+	public String getValueNew() {
+<span class="nc" id="L39">		return OptionalHelper.optionalToString(this.newModifier);</span>
+	}
+
+	public boolean hasChangedFromTo(T oldValue, T newValue) {
+<span class="fc" id="L43">		boolean hasChanged = false;</span>
+<span class="fc bfc" id="L44" title="All 4 branches covered.">		if (oldModifier.isPresent() &amp;&amp; newModifier.isPresent()) {</span>
+<span class="fc bfc" id="L45" title="All 4 branches covered.">			if (oldModifier.get() == oldValue &amp;&amp; newModifier.get() == newValue) {</span>
+<span class="fc" id="L46">				hasChanged = true;</span>
+			}
+		}
+<span class="fc" id="L49">		return hasChanged;</span>
+	}
+
+	public boolean hasChangedFrom(T oldValue) {
+<span class="fc" id="L53">		boolean hasChanged = false;</span>
+<span class="pc bpc" id="L54" title="2 of 4 branches missed.">		if (oldModifier.isPresent() &amp;&amp; newModifier.isPresent()) {</span>
+<span class="fc bfc" id="L55" title="All 4 branches covered.">			if (oldModifier.get() == oldValue &amp;&amp; newModifier.get() != oldValue) {</span>
+<span class="fc" id="L56">				hasChanged = true;</span>
+			}
+<span class="nc bnc" id="L58" title="All 2 branches missed.">		} else if (oldModifier.isPresent()) {</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">			if (oldModifier.get() == oldValue) {</span>
+<span class="nc" id="L60">				hasChanged = true;</span>
+			}
+		} else {
+<span class="nc" id="L63">			hasChanged = true;</span>
+		}
+<span class="fc" id="L65">		return hasChanged;</span>
+	}
+
+	public boolean hasChangedTo(T value) {
+<span class="fc" id="L69">		boolean hasChangedTo = false;</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">		if (newModifier.isPresent()) {</span>
+<span class="fc" id="L71">			T newValue = newModifier.get();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">			if (value == newValue) {</span>
+<span class="fc" id="L73">				hasChangedTo = true;</span>
+			}
+		}
+<span class="fc" id="L76">		return hasChangedTo;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

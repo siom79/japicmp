@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassesComparator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.cmp</a> &gt; <span class="el_source">ClassesComparator.java</span></div><h1>ClassesComparator.java</h1><pre class="source lang-java linenums">package japicmp.cmp;
+
+import japicmp.util.Optional;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiClassType;
+import japicmp.util.ClassHelper;
+import japicmp.util.ModifierHelper;
+import javassist.CtClass;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+public class ClassesComparator {
+<span class="fc" id="L17">	private List&lt;JApiClass&gt; classes = new LinkedList&lt;&gt;();</span>
+	private final JarArchiveComparator jarArchiveComparator;
+	private final JarArchiveComparatorOptions options;
+
+<span class="fc" id="L21">	public ClassesComparator(JarArchiveComparator jarArchiveComparator, JarArchiveComparatorOptions options) {</span>
+<span class="fc" id="L22">		this.jarArchiveComparator = jarArchiveComparator;</span>
+<span class="fc" id="L23">		this.options = options;</span>
+<span class="fc" id="L24">	}</span>
+
+	public void compare(List&lt;CtClass&gt; oldClassesArg, List&lt;CtClass&gt; newClassesArg) {
+<span class="fc" id="L27">		classes = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L28">		Map&lt;String, CtClass&gt; oldClassesMap = createClassMap(oldClassesArg);</span>
+<span class="fc" id="L29">		Map&lt;String, CtClass&gt; newClassesMap = createClassMap(newClassesArg);</span>
+<span class="fc" id="L30">		sortIntoLists(oldClassesMap, newClassesMap);</span>
+<span class="fc" id="L31">	}</span>
+
+	private void sortIntoLists(Map&lt;String, CtClass&gt; oldClassesMap, Map&lt;String, CtClass&gt; newClassesMap) {
+<span class="fc bfc" id="L34" title="All 2 branches covered.">		for (CtClass oldCtClass : oldClassesMap.values()) {</span>
+<span class="fc" id="L35">			CtClass newCtClass = newClassesMap.get(oldCtClass.getName());</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">			if (newCtClass == null) {</span>
+<span class="fc" id="L37">				JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldCtClass)), Optional.&lt;JApiClassType.ClassType&gt;absent(), JApiChangeStatus.REMOVED);</span>
+<span class="fc" id="L38">				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.&lt;CtClass&gt;absent(), JApiChangeStatus.REMOVED, classType);</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">				if (includeClass(jApiClass)) {</span>
+<span class="fc" id="L40">					classes.add(jApiClass);</span>
+				}
+<span class="fc" id="L42">			} else {</span>
+<span class="fc" id="L43">				JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;</span>
+<span class="fc" id="L44">				JApiClassType.ClassType oldType = ClassHelper.getType(oldCtClass);</span>
+<span class="fc" id="L45">				JApiClassType.ClassType newType = ClassHelper.getType(newCtClass);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">				if (oldType != newType) {</span>
+<span class="fc" id="L47">					changeStatus = JApiChangeStatus.MODIFIED;</span>
+				}
+<span class="fc" id="L49">				JApiClassType classType = new JApiClassType(Optional.of(oldType), Optional.of(newType), changeStatus);</span>
+<span class="fc" id="L50">				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, oldCtClass.getName(), Optional.of(oldCtClass), Optional.of(newCtClass), changeStatus, classType);</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">				if (includeClass(jApiClass)) {</span>
+<span class="fc" id="L52">					classes.add(jApiClass);</span>
+				}
+			}
+<span class="fc" id="L55">		}</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">		for (CtClass newCtClass : newClassesMap.values()) {</span>
+<span class="fc" id="L57">			CtClass oldCtClass = oldClassesMap.get(newCtClass.getName());</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">			if (oldCtClass == null) {</span>
+<span class="fc" id="L59">				JApiClassType.ClassType newType = ClassHelper.getType(newCtClass);</span>
+<span class="fc" id="L60">				JApiClassType classType = new JApiClassType(Optional.&lt;JApiClassType.ClassType&gt;absent(), Optional.of(newType), JApiChangeStatus.NEW);</span>
+<span class="fc" id="L61">				JApiClass jApiClass = new JApiClass(this.jarArchiveComparator, newCtClass.getName(), Optional.&lt;CtClass&gt;absent(), Optional.of(newCtClass), JApiChangeStatus.NEW, classType);</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">				if (includeClass(jApiClass)) {</span>
+<span class="fc" id="L63">					classes.add(jApiClass);</span>
+				}
+			}
+<span class="fc" id="L66">		}</span>
+<span class="fc" id="L67">	}</span>
+
+	private boolean includeClass(JApiClass jApiClass) {
+<span class="fc" id="L70">		return ModifierHelper.matchesModifierLevel(jApiClass, options.getAccessModifier());</span>
+	}
+
+	private Map&lt;String, CtClass&gt; createClassMap(List&lt;CtClass&gt; oldClassesArg) {
+<span class="fc" id="L74">		Map&lt;String, CtClass&gt; oldClassesMap = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">		for (CtClass ctClass : oldClassesArg) {</span>
+<span class="fc" id="L76">			oldClassesMap.put(ctClass.getName(), ctClass);</span>
+<span class="fc" id="L77">		}</span>
+<span class="fc" id="L78">		return oldClassesMap;</span>
+	}
+
+	public List&lt;JApiClass&gt; getClasses() {
+<span class="fc" id="L82">		return classes;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

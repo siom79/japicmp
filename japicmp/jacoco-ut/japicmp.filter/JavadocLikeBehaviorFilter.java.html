@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JavadocLikeBehaviorFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.filter</a> &gt; <span class="el_source">JavadocLikeBehaviorFilter.java</span></div><h1>JavadocLikeBehaviorFilter.java</h1><pre class="source lang-java linenums">package japicmp.filter;
+
+import com.google.common.base.Splitter;
+import japicmp.exception.JApiCmpException;
+import japicmp.util.SignatureParser;
+import javassist.CtBehavior;
+import javassist.CtClass;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
+public class JavadocLikeBehaviorFilter implements BehaviorFilter {
+	private final String filterString;
+	private final Pattern classPattern;
+	private final Pattern methodPattern;
+<span class="fc" id="L17">	private final List&lt;Pattern&gt; parameterPatterns = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L19">	public JavadocLikeBehaviorFilter(String filterString) {</span>
+<span class="fc" id="L20">		this.filterString = filterString;</span>
+<span class="fc" id="L21">		String regEx = filterString.replace(&quot;.&quot;, &quot;\\.&quot;);</span>
+<span class="fc" id="L22">		regEx = regEx.replace(&quot;*&quot;, &quot;.*&quot;);</span>
+<span class="fc" id="L23">		regEx = regEx.replace(&quot;$&quot;, &quot;\\$&quot;);</span>
+<span class="fc" id="L24">		regEx = regEx.replace(&quot;[&quot;, &quot;\\[&quot;);</span>
+<span class="fc" id="L25">		regEx = regEx.replace(&quot;]&quot;, &quot;\\]&quot;);</span>
+<span class="fc" id="L26">		String[] parts = regEx.split(&quot;#&quot;);</span>
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">		if (parts.length != 2) {</span>
+<span class="nc" id="L28">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Filter option '&quot; + filterString + &quot;' should not contain more than one '#'.&quot;);</span>
+		}
+<span class="fc" id="L30">		classPattern = Pattern.compile(parts[0]);</span>
+<span class="fc" id="L31">		String methodPart = parts[1];</span>
+<span class="fc" id="L32">		int indexOpeningBracket = methodPart.indexOf('(');</span>
+<span class="fc" id="L33">		int indexClosingBracket = methodPart.indexOf(')');</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">		if (indexOpeningBracket == -1) {</span>
+<span class="nc" id="L35">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Filter option '&quot; + filterString + &quot;' should contain one opening '('.&quot;);</span>
+		}
+<span class="fc bfc" id="L37" title="All 2 branches covered.">		if (indexClosingBracket == -1) {</span>
+<span class="fc" id="L38">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Filter option '&quot; + filterString + &quot;' should contain one opening ')'.&quot;);</span>
+		}
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">		if (indexClosingBracket &lt;= indexOpeningBracket) {</span>
+<span class="nc" id="L41">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Filter option '&quot; + filterString + &quot;' should contain first an opening '(' and then a closing ')'.&quot;);</span>
+		}
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">		if (indexOpeningBracket == 0) {</span>
+<span class="nc" id="L44">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Filter option '&quot; + filterString + &quot;' should contain at least one character before the opening '('.&quot;);</span>
+		}
+<span class="fc" id="L46">		String methodName = methodPart.substring(0, indexOpeningBracket);</span>
+<span class="fc" id="L47">		methodPattern = Pattern.compile(methodName);</span>
+<span class="fc" id="L48">		String paramList = methodPart.substring(indexOpeningBracket + 1, indexClosingBracket);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">		if (paramList.length() &gt; 0) {</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">			for (String param : Splitter.on(&quot;,&quot;).trimResults().omitEmptyStrings().split(paramList)) {</span>
+<span class="fc" id="L51">				param = param.replaceAll(&quot;\\s+&quot;, &quot;&quot;);</span>
+<span class="fc" id="L52">				parameterPatterns.add(Pattern.compile(param));</span>
+<span class="fc" id="L53">			}</span>
+		}
+<span class="fc" id="L55">	}</span>
+
+	@Override
+	public boolean matches(CtBehavior ctBehavior) {
+<span class="fc" id="L59">		boolean classMatches = true;</span>
+<span class="fc" id="L60">		boolean methodMatches = true;</span>
+<span class="fc" id="L61">		boolean parameterMatches = true;</span>
+<span class="fc" id="L62">		CtClass declaringClass = ctBehavior.getDeclaringClass();</span>
+<span class="fc" id="L63">		String name = declaringClass.getName();</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">		if (!classPattern.matcher(name).matches()) {</span>
+<span class="fc" id="L65">			classMatches = false;</span>
+		}
+<span class="fc" id="L67">		String methodName = ctBehavior.getName();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">		if (!methodPattern.matcher(methodName).matches()) {</span>
+<span class="fc" id="L69">			methodMatches = false;</span>
+		}
+<span class="fc" id="L71">		SignatureParser signatureParser = new SignatureParser();</span>
+<span class="fc" id="L72">		signatureParser.parse(ctBehavior);</span>
+<span class="fc" id="L73">		List&lt;SignatureParser.ParsedParameter&gt; parameters = signatureParser.getParameters();</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">		if (parameters.size() != parameterPatterns.size()) {</span>
+<span class="fc" id="L75">			parameterMatches = false;</span>
+		} else {
+<span class="fc bfc" id="L77" title="All 2 branches covered.">			for (int i = 0; i &lt; parameters.size(); i++) {</span>
+<span class="fc" id="L78">				Pattern pattern = parameterPatterns.get(i);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">				if (!pattern.matcher(parameters.get(i).getType()).matches()) {</span>
+<span class="fc" id="L80">					parameterMatches = false;</span>
+				}
+			}
+		}
+<span class="fc bfc" id="L84" title="All 6 branches covered.">		return (classMatches &amp;&amp; methodMatches &amp;&amp; parameterMatches);</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc" id="L89">		return this.filterString;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

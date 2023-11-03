@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JpaName.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.extapi.jpa.model</a> &gt; <span class="el_source">JpaName.java</span></div><h1>JpaName.java</h1><pre class="source lang-java linenums">package japicmp.output.extapi.jpa.model;
+
+import japicmp.util.Optional;
+import japicmp.model.JApiChangeStatus;
+import japicmp.util.OptionalHelper;
+
+import javax.xml.bind.annotation.XmlAttribute;
+
+public class JpaName {
+	private final Optional&lt;String&gt; newName;
+	private final Optional&lt;String&gt; oldName;
+	private final JApiChangeStatus changeStatus;
+
+<span class="nc" id="L14">	public JpaName(Optional&lt;String&gt; oldName, Optional&lt;String&gt; newName, JApiChangeStatus changeStatus) {</span>
+<span class="nc" id="L15">		this.oldName = oldName;</span>
+<span class="nc" id="L16">		this.newName = newName;</span>
+<span class="nc" id="L17">		this.changeStatus = changeStatus;</span>
+<span class="nc" id="L18">	}</span>
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="nc" id="L22">		return changeStatus;</span>
+	}
+
+	@XmlAttribute(name = &quot;newName&quot;)
+	public String getNewName() {
+<span class="nc" id="L27">		return OptionalHelper.optionalToString(this.newName);</span>
+	}
+
+	@XmlAttribute(name = &quot;oldName&quot;)
+	public String getOldName() {
+<span class="nc" id="L32">		return OptionalHelper.optionalToString(this.oldName);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

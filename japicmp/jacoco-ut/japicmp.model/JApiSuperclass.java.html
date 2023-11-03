@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiSuperclass.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiSuperclass.java</span></div><h1>JApiSuperclass.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.util.ClassHelper;
+import japicmp.util.OptionalHelper;
+import javassist.CtClass;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.LinkedList;
+import java.util.List;
+
+public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
+	private final JApiClass jApiClass;
+	private final Optional&lt;CtClass&gt; oldSuperclassOptional;
+	private final Optional&lt;CtClass&gt; newSuperclassOptional;
+	private final JApiChangeStatus changeStatus;
+	private final JarArchiveComparator jarArchiveComparator;
+<span class="fc" id="L22">	private final List&lt;JApiCompatibilityChange&gt; compatibilityChanges = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L23">	private Optional&lt;JApiClass&gt; correspondingJApiClass = Optional.absent();</span>
+
+<span class="fc" id="L25">	public JApiSuperclass(JApiClass jApiClass, Optional&lt;CtClass&gt; oldSuperclassOptional, Optional&lt;CtClass&gt; newSuperclassOptional, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {</span>
+<span class="fc" id="L26">		this.jApiClass = jApiClass;</span>
+<span class="fc" id="L27">		this.oldSuperclassOptional = oldSuperclassOptional;</span>
+<span class="fc" id="L28">		this.newSuperclassOptional = newSuperclassOptional;</span>
+<span class="fc" id="L29">		this.changeStatus = changeStatus;</span>
+<span class="fc" id="L30">		this.jarArchiveComparator = jarArchiveComparator;</span>
+<span class="fc" id="L31">	}</span>
+
+	/**
+	 * Returns the {@link japicmp.model.JApiClass} representation of this superclass.
+	 * The return value is Optional.absent() in case the superclass for the old and new version is absent.
+	 *
+	 * @return the {@link japicmp.model.JApiClass} representation of this superclass as {@link com.google.common.base.Optional}
+	 */
+	public Optional&lt;JApiClass&gt; getJApiClass() {
+<span class="pc bpc" id="L40" title="1 of 4 branches missed.">		if (oldSuperclassOptional.isPresent() &amp;&amp; newSuperclassOptional.isPresent()) {</span>
+<span class="fc" id="L41">			CtClass oldSuperclass = oldSuperclassOptional.get();</span>
+<span class="fc" id="L42">			CtClass newSuperclass = newSuperclassOptional.get();</span>
+<span class="fc" id="L43">			String oldSuperclassName = oldSuperclass.getName();</span>
+<span class="fc" id="L44">			String newSuperclassName = newSuperclass.getName();</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">			if (oldSuperclassName.equals(newSuperclassName)) {</span>
+<span class="fc" id="L46">				JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.UNCHANGED);</span>
+<span class="fc" id="L47">				JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.of(newSuperclass), JApiChangeStatus.UNCHANGED, classType);</span>
+<span class="fc" id="L48">				return Optional.of(jApiClass);</span>
+			} else {
+<span class="fc" id="L50">				return Optional.absent();</span>
+			}
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">		} else if (oldSuperclassOptional.isPresent()) {</span>
+<span class="nc" id="L53">			CtClass oldSuperclass = oldSuperclassOptional.get();</span>
+<span class="nc" id="L54">			String oldSuperclassName = oldSuperclass.getName();</span>
+<span class="nc" id="L55">			JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.&lt;JApiClassType.ClassType&gt;absent(), JApiChangeStatus.REMOVED);</span>
+<span class="nc" id="L56">			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.&lt;CtClass&gt;absent(), JApiChangeStatus.REMOVED, classType);</span>
+<span class="nc" id="L57">			return Optional.of(jApiClass);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">		} else if (newSuperclassOptional.isPresent()) {</span>
+<span class="fc" id="L59">			CtClass newSuperclass = newSuperclassOptional.get();</span>
+<span class="fc" id="L60">			String newSuperclassName = newSuperclass.getName();</span>
+<span class="fc" id="L61">			JApiClassType classType = new JApiClassType(Optional.&lt;JApiClassType.ClassType&gt;absent(), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.NEW);</span>
+<span class="fc" id="L62">			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.&lt;CtClass&gt;absent(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType);</span>
+<span class="fc" id="L63">			return Optional.of(jApiClass);</span>
+		}
+<span class="fc" id="L65">		return Optional.absent();</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;CtClass&gt; getOldSuperclass() {
+<span class="fc" id="L70">		return oldSuperclassOptional;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;CtClass&gt; getNewSuperclass() {
+<span class="fc" id="L75">		return newSuperclassOptional;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;String&gt; getOldSuperclassName() {
+<span class="fc bfc" id="L80" title="All 2 branches covered.">		return oldSuperclassOptional.isPresent() ? Optional.of(oldSuperclassOptional.get().getName()) : Optional.&lt;String&gt;absent();</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;String&gt; getNewSuperclassName() {
+<span class="fc bfc" id="L85" title="All 2 branches covered.">		return newSuperclassOptional.isPresent() ? Optional.of(newSuperclassOptional.get().getName()) : Optional.&lt;String&gt;absent();</span>
+	}
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L90">		return changeStatus;</span>
+	}
+
+	@XmlAttribute(name = &quot;superclassOld&quot;)
+	public String getSuperclassOld() {
+<span class="nc" id="L95">		return OptionalHelper.optionalToString(getOldSuperclassName());</span>
+	}
+
+	@XmlAttribute(name = &quot;superclassNew&quot;)
+	public String getSuperclassNew() {
+<span class="nc" id="L100">		return OptionalHelper.optionalToString(getNewSuperclassName());</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+<span class="fc" id="L106">		boolean binaryCompatible = true;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
+<span class="fc" id="L109">				binaryCompatible = false;</span>
+			}
+<span class="fc" id="L111">		}</span>
+<span class="fc" id="L112">		return binaryCompatible;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+<span class="fc" id="L118">		boolean sourceCompatible = true;</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="fc" id="L121">				sourceCompatible = false;</span>
+			}
+<span class="fc" id="L123">		}</span>
+<span class="fc" id="L124">		return sourceCompatible;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
+	@XmlElement(name = &quot;compatibilityChange&quot;)
+	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
+<span class="fc" id="L130">		return this.compatibilityChanges;</span>
+	}
+
+	void setJApiClass(JApiClass jApiClass) {
+<span class="fc" id="L134">		this.correspondingJApiClass = Optional.of(jApiClass);</span>
+<span class="fc" id="L135">	}</span>
+
+	/**
+	 * Returns the {@link japicmp.model.JApiClass} this superclass belongs to.
+	 * @return the JApiClass this superclass belongs to.
+     */
+	@XmlTransient
+	public JApiClass getJApiClassOwning() {
+<span class="fc" id="L143">		return jApiClass;</span>
+	}
+
+	public String toString()
+	{
+<span class="fc" id="L148">		String oldSuperClass = &quot;n.a.&quot;;</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">		if(oldSuperclassOptional.isPresent()) {</span>
+<span class="fc" id="L150">			oldSuperClass = oldSuperclassOptional.get().getName();</span>
+		}
+<span class="fc" id="L152">		String newSuperClass = &quot;n.a.&quot;;</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">		if(newSuperclassOptional.isPresent()) {</span>
+<span class="fc" id="L154">			newSuperClass = newSuperclassOptional.get().getName();</span>
+		}
+
+<span class="fc" id="L157">		return &quot;JApiSuperclass [jApiClass=&quot;</span>
+			+ jApiClass
+			+ &quot;, oldSuperclass=&quot;
+			+ oldSuperClass
+			+ &quot;, newSuperclass=&quot;
+			+ newSuperClass
+			+ &quot;, changeStatus=&quot;
+			+ changeStatus
+			+ &quot;, compatibilityChanges=&quot;
+			+ compatibilityChanges
+			+ &quot;]&quot;;
+	}
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

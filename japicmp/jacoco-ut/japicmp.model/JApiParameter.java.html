@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiParameter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiParameter.java</span></div><h1>JApiParameter.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class JApiParameter implements JApiHasGenericTypes, JApiHasChangeStatus, JApiCompatibility {
+	private String type;
+	private Optional&lt;String&gt; templateName;
+<span class="fc" id="L15">	private final List&lt;JApiGenericType&gt; oldGenericTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L16">	private final List&lt;JApiGenericType&gt; newGenericTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L17">	private final List&lt;JApiCompatibilityChange&gt; compatibilityChanges = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L18">	private final JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;</span>
+
+<span class="fc" id="L20">	public JApiParameter(String type, Optional&lt;String&gt; templateName) {</span>
+<span class="fc" id="L21">		this.type = type;</span>
+<span class="fc" id="L22">		this.templateName = templateName;</span>
+<span class="fc" id="L23">	}</span>
+
+	public void setType(String type) {
+<span class="nc" id="L26">		this.type = type;</span>
+<span class="nc" id="L27">	}</span>
+
+	public void setTemplateName(Optional&lt;String&gt; templateName) {
+<span class="fc" id="L30">		this.templateName = templateName;</span>
+<span class="fc" id="L31">	}</span>
+
+	@XmlAttribute(name = &quot;changeStatus&quot;)
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L35">		return changeStatus;</span>
+	}
+
+	@XmlAttribute(name = &quot;type&quot;)
+	public String getType() {
+<span class="fc" id="L40">		return type;</span>
+	}
+
+	@XmlAttribute(name = &quot;templateName&quot;)
+	public String getTemplateName() {
+<span class="fc" id="L45">		return templateName.or(&quot;N/A&quot;);</span>
+	}
+
+	public Optional&lt;String&gt; getTemplateNameOptional() {
+<span class="fc" id="L49">		return templateName;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;oldGenericTypes&quot;)
+	@XmlElement(name = &quot;oldGenericType&quot;)
+	public List&lt;JApiGenericType&gt; getOldGenericTypes() {
+<span class="fc" id="L55">		return oldGenericTypes;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;newGenericTypes&quot;)
+	@XmlElement(name = &quot;newGenericType&quot;)
+	public List&lt;JApiGenericType&gt; getNewGenericTypes() {
+<span class="fc" id="L61">		return newGenericTypes;</span>
+	}
+
+	@Override
+	public boolean equals(Object o) {
+<span class="nc bnc" id="L66" title="All 2 branches missed.">		if (this == o) return true;</span>
+<span class="nc bnc" id="L67" title="All 4 branches missed.">		if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="nc" id="L68">		JApiParameter that = (JApiParameter) o;</span>
+<span class="nc" id="L69">		return Objects.equals(type, that.type);</span>
+	}
+
+	@Override
+	public int hashCode() {
+<span class="nc" id="L74">		return Objects.hash(type);</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+<span class="nc" id="L80">		boolean binaryCompatible = true;</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
+<span class="nc" id="L83">				binaryCompatible = false;</span>
+<span class="nc" id="L84">				break;</span>
+			}
+<span class="nc" id="L86">		}</span>
+<span class="nc" id="L87">		return binaryCompatible;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+<span class="nc" id="L93">		boolean sourceCompatible = true;</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="nc" id="L96">				sourceCompatible = false;</span>
+<span class="nc" id="L97">				break;</span>
+			}
+<span class="nc" id="L99">		}</span>
+<span class="nc" id="L100">		return sourceCompatible;</span>
+	}
+
+	@Override
+	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
+	@XmlElement(name = &quot;compatibilityChange&quot;)
+	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
+<span class="fc" id="L107">		return this.compatibilityChanges;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

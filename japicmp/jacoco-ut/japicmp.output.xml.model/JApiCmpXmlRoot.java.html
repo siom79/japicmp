@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiCmpXmlRoot.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.xml.model</a> &gt; <span class="el_source">JApiCmpXmlRoot.java</span></div><h1>JApiCmpXmlRoot.java</h1><pre class="source lang-java linenums">package japicmp.output.xml.model;
+
+import japicmp.util.Optional;
+import japicmp.model.JApiClass;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+@XmlRootElement(name = &quot;japicmp&quot;)
+<span class="fc" id="L17">public class JApiCmpXmlRoot {</span>
+<span class="fc" id="L18">	private String oldJar = &quot;&quot;;</span>
+<span class="fc" id="L19">	private String newJar = &quot;&quot;;</span>
+<span class="fc" id="L20">	private String oldVersion = &quot;&quot;;</span>
+<span class="fc" id="L21">	private String newVersion = &quot;&quot;;</span>
+<span class="fc" id="L22">	private String accessModifier = &quot;&quot;;</span>
+<span class="fc" id="L23">	private List&lt;JApiClass&gt; classes = new LinkedList&lt;&gt;();</span>
+	private boolean onlyModifications;
+	private boolean onlyBinaryIncompatibleModifications;
+	private String packagesInclude;
+	private String packagesExclude;
+	private boolean ignoreMissingClasses;
+	private String ignoreMissingClassesByRegularExpressions;
+<span class="fc" id="L30">	private Optional&lt;String&gt; titleOptional = Optional.absent();</span>
+<span class="fc" id="L31">	private String semanticVersioning = &quot;n.a.&quot;;</span>
+
+	@XmlElementWrapper(name = &quot;classes&quot;)
+	@XmlElement(name = &quot;class&quot;)
+	public List&lt;JApiClass&gt; getClasses() {
+<span class="fc" id="L36">		return classes;</span>
+	}
+
+	public void setClasses(List&lt;JApiClass&gt; classes) {
+<span class="fc" id="L40">		this.classes = classes;</span>
+<span class="fc" id="L41">	}</span>
+
+	@XmlAttribute
+	public String getNewJar() {
+<span class="fc" id="L45">		return newJar;</span>
+	}
+
+	public void setNewJar(String newJar) {
+<span class="fc" id="L49">		this.newJar = newJar;</span>
+<span class="fc" id="L50">	}</span>
+
+	@XmlAttribute
+	public String getOldJar() {
+<span class="fc" id="L54">		return oldJar;</span>
+	}
+
+	public void setOldJar(String oldJar) {
+<span class="fc" id="L58">		this.oldJar = oldJar;</span>
+<span class="fc" id="L59">	}</span>
+
+	@XmlAttribute
+	public String getCreationTimestamp() {
+<span class="fc" id="L63">		SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss.SSSZ&quot;);</span>
+<span class="fc" id="L64">		return sdf.format(new Date());</span>
+	}
+
+	@XmlAttribute
+	public String getAccessModifier() {
+<span class="fc" id="L69">		return accessModifier;</span>
+	}
+
+	public void setAccessModifier(String accessModifier) {
+<span class="fc" id="L73">		this.accessModifier = accessModifier;</span>
+<span class="fc" id="L74">	}</span>
+
+	public void setOnlyModifications(boolean onlyModifications) {
+<span class="fc" id="L77">		this.onlyModifications = onlyModifications;</span>
+<span class="fc" id="L78">	}</span>
+
+	@XmlAttribute
+	public boolean isOnlyModifications() {
+<span class="fc" id="L82">		return onlyModifications;</span>
+	}
+
+	public void setOnlyBinaryIncompatibleModifications(boolean onlyBinaryIncompatibleModifications) {
+<span class="fc" id="L86">		this.onlyBinaryIncompatibleModifications = onlyBinaryIncompatibleModifications;</span>
+<span class="fc" id="L87">	}</span>
+
+	@XmlAttribute
+	public boolean isOnlyBinaryIncompatibleModifications() {
+<span class="fc" id="L91">		return onlyBinaryIncompatibleModifications;</span>
+	}
+
+	public void setPackagesInclude(String packagesInclude) {
+<span class="fc" id="L95">		this.packagesInclude = packagesInclude;</span>
+<span class="fc" id="L96">	}</span>
+
+	@XmlAttribute
+	public String getPackagesInclude() {
+<span class="fc" id="L100">		return packagesInclude;</span>
+	}
+
+	public void setPackagesExclude(String packagesExclude) {
+<span class="fc" id="L104">		this.packagesExclude = packagesExclude;</span>
+<span class="fc" id="L105">	}</span>
+
+	@XmlAttribute
+	public String getPackagesExclude() {
+<span class="fc" id="L109">		return packagesExclude;</span>
+	}
+
+	@XmlAttribute
+	public boolean isIgnoreMissingClasses() {
+<span class="fc" id="L114">		return ignoreMissingClasses;</span>
+	}
+
+	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
+<span class="fc" id="L118">		this.ignoreMissingClasses = ignoreMissingClasses;</span>
+<span class="fc" id="L119">	}</span>
+
+	@XmlAttribute
+	public String getTitle() {
+		String title;
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">		if (this.titleOptional.isPresent()) {</span>
+<span class="nc" id="L125">			title = this.titleOptional.get();</span>
+		} else {
+<span class="fc" id="L127">			title = &quot;JApiCmp-Report&quot;;</span>
+		}
+<span class="fc" id="L129">		return title;</span>
+	}
+
+	public void setTitle(String title) {
+<span class="nc" id="L133">		this.titleOptional = Optional.fromNullable(title);</span>
+<span class="nc" id="L134">	}</span>
+
+	@XmlAttribute
+	public String getSemanticVersioning() {
+<span class="fc" id="L138">		return semanticVersioning;</span>
+	}
+
+	public void setSemanticVersioning(String semanticVersioning) {
+<span class="fc" id="L142">		this.semanticVersioning = semanticVersioning;</span>
+<span class="fc" id="L143">	}</span>
+
+	@XmlAttribute
+	public String getIgnoreMissingClassesByRegularExpressions() {
+<span class="fc" id="L147">		return ignoreMissingClassesByRegularExpressions;</span>
+	}
+
+	public void setIgnoreMissingClassesByRegularExpressions(String ignoreMissingClassesByRegularExpressions) {
+<span class="fc" id="L151">		this.ignoreMissingClassesByRegularExpressions = ignoreMissingClassesByRegularExpressions;</span>
+<span class="fc" id="L152">	}</span>
+
+	@XmlTransient
+	public Optional&lt;String&gt; getTitleOptional() {
+<span class="nc" id="L156">		return titleOptional;</span>
+	}
+
+	public void setTitleOptional(Optional&lt;String&gt; titleOptional) {
+<span class="nc" id="L160">		this.titleOptional = titleOptional;</span>
+<span class="nc" id="L161">	}</span>
+
+	@XmlAttribute
+	public String getOldVersion() {
+<span class="fc" id="L165">		return oldVersion;</span>
+	}
+
+	public void setOldVersion(String oldVersion) {
+<span class="fc" id="L169">		this.oldVersion = oldVersion;</span>
+<span class="fc" id="L170">	}</span>
+
+	@XmlAttribute
+	public String getNewVersion() {
+<span class="fc" id="L174">		return newVersion;</span>
+	}
+
+	public void setNewVersion(String newVersion) {
+<span class="fc" id="L178">		this.newVersion = newVersion;</span>
+<span class="fc" id="L179">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

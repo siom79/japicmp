@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiImplementedInterface.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiImplementedInterface.java</span></div><h1>JApiImplementedInterface.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.util.Optional;
+import javassist.CtClass;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompatibility {
+	private final CtClass ctClass;
+	private final String fullyQualifiedName;
+	private final JApiChangeStatus changeStatus;
+<span class="fc" id="L17">	private final List&lt;JApiCompatibilityChange&gt; compatibilityChanges = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L18">	private Optional&lt;JApiClass&gt; correspondingJApiClass = Optional.absent();</span>
+
+<span class="fc" id="L20">	public JApiImplementedInterface(CtClass ctClass, String fullyQualifiedName, JApiChangeStatus changeStatus) {</span>
+<span class="fc" id="L21">		this.ctClass = ctClass;</span>
+<span class="fc" id="L22">		this.fullyQualifiedName = fullyQualifiedName;</span>
+<span class="fc" id="L23">		this.changeStatus = changeStatus;</span>
+<span class="fc" id="L24">	}</span>
+
+	@XmlAttribute
+	public String getFullyQualifiedName() {
+<span class="fc" id="L28">		return fullyQualifiedName;</span>
+	}
+
+	@XmlAttribute
+	public JApiChangeStatus getChangeStatus() {
+<span class="fc" id="L33">		return changeStatus;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isBinaryCompatible() {
+<span class="nc" id="L39">		boolean binaryCompatible = true;</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
+<span class="nc" id="L42">				binaryCompatible = false;</span>
+			}
+<span class="nc" id="L44">		}</span>
+<span class="nc bnc" id="L45" title="All 4 branches missed.">		if (binaryCompatible &amp;&amp; correspondingJApiClass.isPresent()) {</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">			if (!correspondingJApiClass.get().isBinaryCompatible()) {</span>
+<span class="nc" id="L47">				binaryCompatible = false;</span>
+			}
+		}
+<span class="nc" id="L50">		return binaryCompatible;</span>
+	}
+
+	@Override
+	@XmlAttribute
+	public boolean isSourceCompatible() {
+<span class="nc" id="L56">		boolean sourceCompatible = true;</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="nc" id="L59">				sourceCompatible = false;</span>
+			}
+<span class="nc" id="L61">		}</span>
+<span class="nc bnc" id="L62" title="All 4 branches missed.">		if (sourceCompatible &amp;&amp; correspondingJApiClass.isPresent()) {</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">			if (!correspondingJApiClass.get().isSourceCompatible()) {</span>
+<span class="nc" id="L64">				sourceCompatible = false;</span>
+			}
+		}
+<span class="nc" id="L67">		return sourceCompatible;</span>
+	}
+
+	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
+	@XmlElement(name = &quot;compatibilityChange&quot;)
+	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
+<span class="fc" id="L73">		return compatibilityChanges;</span>
+	}
+
+	public void setJApiClass(JApiClass jApiClass) {
+<span class="fc" id="L77">		this.correspondingJApiClass = Optional.of(jApiClass);</span>
+<span class="fc" id="L78">	}</span>
+
+	@XmlTransient
+	public CtClass getCtClass() {
+<span class="fc" id="L82">		return ctClass;</span>
+	}
+
+	public String toString()
+	{
+<span class="nc" id="L87">		return &quot;JApiImplementedInterface [fullyQualifiedName=&quot;</span>
+			+ fullyQualifiedName
+			+ &quot;, changeStatus=&quot;
+			+ changeStatus
+			+ &quot;, compatibilityChanges=&quot;
+			+ compatibilityChanges
+			+ &quot;]&quot;;
+	}
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

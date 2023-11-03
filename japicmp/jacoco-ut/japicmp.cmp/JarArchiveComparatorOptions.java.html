@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JarArchiveComparatorOptions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.cmp</a> &gt; <span class="el_source">JarArchiveComparatorOptions.java</span></div><h1>JarArchiveComparatorOptions.java</h1><pre class="source lang-java linenums">package japicmp.cmp;
+
+import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiSemanticVersionLevel;
+import japicmp.util.Optional;
+import japicmp.config.IgnoreMissingClasses;
+import japicmp.config.Options;
+import japicmp.exception.JApiCmpException;
+import japicmp.filter.Filters;
+import japicmp.model.AccessModifier;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * This class represents all options for the comparison.
+ */
+<span class="fc" id="L21">public class JarArchiveComparatorOptions {</span>
+<span class="fc" id="L22">	private final List&lt;String&gt; classPathEntries = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L23">	private AccessModifier accessModifier = AccessModifier.PROTECTED;</span>
+<span class="fc" id="L24">	private final Filters filters = new Filters();</span>
+<span class="fc" id="L25">	private boolean includeSynthetic = false;</span>
+<span class="fc" id="L26">	private IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();</span>
+<span class="fc" id="L27">	private ClassPathMode classPathMode = ClassPathMode.ONE_COMMON_CLASSPATH;</span>
+<span class="fc" id="L28">	private List&lt;String&gt; oldClassPath = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L29">	private List&lt;String&gt; newClassPath = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L30">	private boolean noAnnotations = false;</span>
+<span class="fc" id="L31">	private boolean includeClassFileFormatVersion = false;</span>
+<span class="fc" id="L32">	private List&lt;OverrideCompatibilityChange&gt; overrideCompatibilityChanges = new ArrayList&lt;&gt;();</span>
+
+	public static class OverrideCompatibilityChange {
+		private JApiCompatibilityChange compatibilityChange;
+		private boolean binaryCompatible;
+		private boolean sourceCompatible;
+		private JApiSemanticVersionLevel semanticVersionLevel;
+
+		public OverrideCompatibilityChange(JApiCompatibilityChange compatibilityChange, boolean binaryCompatible,
+<span class="fc" id="L41">										   boolean sourceCompatible, JApiSemanticVersionLevel semanticVersionLevel) {</span>
+<span class="fc" id="L42">			this.compatibilityChange = compatibilityChange;</span>
+<span class="fc" id="L43">			this.binaryCompatible = binaryCompatible;</span>
+<span class="fc" id="L44">			this.sourceCompatible = sourceCompatible;</span>
+<span class="fc" id="L45">			this.semanticVersionLevel = semanticVersionLevel;</span>
+<span class="fc" id="L46">		}</span>
+
+		public JApiCompatibilityChange getCompatibilityChange() {
+<span class="fc" id="L49">			return compatibilityChange;</span>
+		}
+
+		public boolean isBinaryCompatible() {
+<span class="fc" id="L53">			return binaryCompatible;</span>
+		}
+
+		public boolean isSourceCompatible() {
+<span class="fc" id="L57">			return sourceCompatible;</span>
+		}
+
+		public JApiSemanticVersionLevel getSemanticVersionLevel() {
+<span class="fc" id="L61">			return semanticVersionLevel;</span>
+		}
+	}
+
+	/**
+	 * When both versions of the archives under comparison use the exact same classpath
+	 * only one classpath has to be provided. If the two class paths differ, both separate class paths
+	 * can be provided.
+	 */
+<span class="fc" id="L70">	public enum ClassPathMode {</span>
+<span class="fc" id="L71">		ONE_COMMON_CLASSPATH, TWO_SEPARATE_CLASSPATHS</span>
+	}
+
+	public static JarArchiveComparatorOptions of(Options options) {
+<span class="fc" id="L75">		JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();</span>
+<span class="fc" id="L76">		comparatorOptions.getFilters().getExcludes().addAll(options.getExcludes());</span>
+<span class="fc" id="L77">		comparatorOptions.getFilters().getIncludes().addAll(options.getIncludes());</span>
+<span class="fc" id="L78">		comparatorOptions.setAccessModifier(options.getAccessModifier());</span>
+<span class="fc" id="L79">		comparatorOptions.setIncludeSynthetic(options.isIncludeSynthetic());</span>
+<span class="fc" id="L80">		comparatorOptions.setIgnoreMissingClasses(options.getIgnoreMissingClasses());</span>
+<span class="fc" id="L81">		toJarArchiveComparatorClassPathMode(options, comparatorOptions);</span>
+<span class="fc" id="L82">		toJarArchiveComparatorClassPath(options.getOldClassPath(), comparatorOptions.getOldClassPath());</span>
+<span class="fc" id="L83">		toJarArchiveComparatorClassPath(options.getNewClassPath(), comparatorOptions.getNewClassPath());</span>
+<span class="fc" id="L84">		comparatorOptions.setNoAnnotations(options.isNoAnnotations());</span>
+<span class="fc" id="L85">		return comparatorOptions;</span>
+	}
+
+	private void setIgnoreMissingClasses(IgnoreMissingClasses ignoreMissingClasses) {
+<span class="fc" id="L89">		this.ignoreMissingClasses = ignoreMissingClasses;</span>
+<span class="fc" id="L90">	}</span>
+
+	private static void toJarArchiveComparatorClassPathMode(Options options, JarArchiveComparatorOptions comparatorOptions) {
+<span class="pc bpc" id="L93" title="2 of 3 branches missed.">		switch (options.getClassPathMode()) {</span>
+			case TWO_SEPARATE_CLASSPATHS:
+<span class="nc" id="L95">				comparatorOptions.setClassPathMode(ClassPathMode.TWO_SEPARATE_CLASSPATHS);</span>
+<span class="nc" id="L96">				break;</span>
+			case ONE_COMMON_CLASSPATH:
+<span class="fc" id="L98">				comparatorOptions.setClassPathMode(ClassPathMode.ONE_COMMON_CLASSPATH);</span>
+<span class="fc" id="L99">				break;</span>
+			default:
+<span class="nc" id="L101">				throw new JApiCmpException(JApiCmpException.Reason.IllegalState, &quot;Unknown classPathMode: &quot; + options.getClassPathMode());</span>
+		}
+<span class="fc" id="L103">	}</span>
+
+	private static void toJarArchiveComparatorClassPath(Optional&lt;String&gt; classPathOptional, List&lt;String&gt; comparatorClassPath) {
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">		if (classPathOptional.isPresent()) {</span>
+<span class="nc" id="L107">			String classPathAsString = classPathOptional.get();</span>
+<span class="nc" id="L108">			Collections.addAll(comparatorClassPath, classPathAsString.split(File.pathSeparator));</span>
+		}
+<span class="fc" id="L110">	}</span>
+
+	public Filters getFilters() {
+<span class="fc" id="L113">		return filters;</span>
+	}
+
+	public List&lt;String&gt; getClassPathEntries() {
+<span class="fc" id="L117">		return classPathEntries;</span>
+	}
+
+	public void setAccessModifier(AccessModifier accessModifier) {
+<span class="fc" id="L121">		this.accessModifier = accessModifier;</span>
+<span class="fc" id="L122">	}</span>
+
+	public AccessModifier getAccessModifier() {
+<span class="fc" id="L125">		return accessModifier;</span>
+	}
+
+	public void setIncludeSynthetic(boolean includeSynthetic) {
+<span class="fc" id="L129">		this.includeSynthetic = includeSynthetic;</span>
+<span class="fc" id="L130">	}</span>
+
+	public boolean isIncludeSynthetic() {
+<span class="nc" id="L133">		return includeSynthetic;</span>
+	}
+
+	public void setClassPathMode(ClassPathMode classPathMode) {
+<span class="fc" id="L137">		this.classPathMode = classPathMode;</span>
+<span class="fc" id="L138">	}</span>
+
+	public ClassPathMode getClassPathMode() {
+<span class="fc" id="L141">		return classPathMode;</span>
+	}
+
+	public void setOldClassPath(List&lt;String&gt; oldClassPath) {
+<span class="nc" id="L145">		this.oldClassPath = oldClassPath;</span>
+<span class="nc" id="L146">	}</span>
+
+	public List&lt;String&gt; getOldClassPath() {
+<span class="fc" id="L149">		return oldClassPath;</span>
+	}
+
+	public void setNewClassPath(List&lt;String&gt; newClassPath) {
+<span class="nc" id="L153">		this.newClassPath = newClassPath;</span>
+<span class="nc" id="L154">	}</span>
+
+	public List&lt;String&gt; getNewClassPath() {
+<span class="fc" id="L157">		return newClassPath;</span>
+	}
+
+	public void setNoAnnotations(boolean noAnnotations) {
+<span class="fc" id="L161">		this.noAnnotations = noAnnotations;</span>
+<span class="fc" id="L162">	}</span>
+
+	public boolean isNoAnnotations() {
+<span class="fc" id="L165">		return noAnnotations;</span>
+	}
+
+	public IgnoreMissingClasses getIgnoreMissingClasses() {
+<span class="fc" id="L169">		return ignoreMissingClasses;</span>
+	}
+
+	public boolean isIncludeClassFileFormatVersion() {
+<span class="nc" id="L173">		return includeClassFileFormatVersion;</span>
+	}
+
+	public void addOverrideCompatibilityChange(OverrideCompatibilityChange overrideCompatibilityChange) {
+<span class="fc" id="L177">		this.overrideCompatibilityChanges.add(overrideCompatibilityChange);</span>
+<span class="fc" id="L178">	}</span>
+
+	public List&lt;OverrideCompatibilityChange&gt; getOverrideCompatibilityChanges() {
+<span class="fc" id="L181">		return overrideCompatibilityChanges;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

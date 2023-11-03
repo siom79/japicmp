@@ -1,0 +1,1010 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CompatibilityChanges.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.compat</a> &gt; <span class="el_source">CompatibilityChanges.java</span></div><h1>CompatibilityChanges.java</h1><pre class="source lang-java linenums">package japicmp.compat;
+
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.cmp.JarArchiveComparatorOptions;
+import japicmp.exception.JApiCmpException;
+import japicmp.model.*;
+import japicmp.util.ClassHelper;
+import japicmp.util.Optional;
+import japicmp.util.SignatureParser;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.NotFoundException;
+
+import java.util.*;
+
+import static japicmp.util.ModifierHelper.*;
+
+public class CompatibilityChanges {
+	private final JarArchiveComparator jarArchiveComparator;
+
+<span class="fc" id="L21">	public CompatibilityChanges(JarArchiveComparator jarArchiveComparator) {</span>
+<span class="fc" id="L22">		this.jarArchiveComparator = jarArchiveComparator;</span>
+<span class="fc" id="L23">	}</span>
+
+	public void evaluate(List&lt;JApiClass&gt; classes) {
+<span class="fc" id="L26">		Map&lt;String, JApiClass&gt; classMap = buildClassMap(classes);</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">		for (JApiClass clazz : classes) {</span>
+<span class="fc" id="L28">			evaluateBinaryCompatibility(clazz, classMap);</span>
+<span class="fc" id="L29">		}</span>
+<span class="fc" id="L30">	}</span>
+
+	private Map&lt;String, JApiClass&gt; buildClassMap(List&lt;JApiClass&gt; classes) {
+<span class="fc" id="L33">		Map&lt;String, JApiClass&gt; classMap = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">		for (JApiClass clazz : classes) {</span>
+<span class="fc" id="L35">			classMap.put(clazz.getFullyQualifiedName(), clazz);</span>
+<span class="fc" id="L36">		}</span>
+<span class="fc" id="L37">		return classMap;</span>
+	}
+
+	private void evaluateBinaryCompatibility(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap) {
+<span class="fc bfc" id="L41" title="All 2 branches covered.">		if (jApiClass.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L42">			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_REMOVED);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">		} else if (jApiClass.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+			// section 13.4.1 of &quot;Java Language Specification&quot; SE7
+<span class="fc bfc" id="L45" title="All 2 branches covered.">			if (jApiClass.getAbstractModifier().hasChangedFromTo(AbstractModifier.NON_ABSTRACT, AbstractModifier.ABSTRACT)) {</span>
+<span class="fc" id="L46">				addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NOW_ABSTRACT);</span>
+			}
+			// section 13.4.2 of &quot;Java Language Specification&quot; SE7
+<span class="fc bfc" id="L49" title="All 2 branches covered.">			if (jApiClass.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {</span>
+<span class="fc" id="L50">				addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NOW_FINAL);</span>
+			}
+			// section 13.4.3 of &quot;Java Language Specification&quot; SE7
+<span class="fc bfc" id="L53" title="All 2 branches covered.">			if (jApiClass.getAccessModifier().hasChangedFrom(AccessModifier.PUBLIC)) {</span>
+<span class="fc" id="L54">				addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NO_LONGER_PUBLIC);</span>
+			}
+		}
+		// section 13.4.4 of &quot;Java Language Specification&quot; SE7
+<span class="fc" id="L58">		checkIfSuperclassesOrInterfacesChangedIncompatible(jApiClass, classMap);</span>
+<span class="fc" id="L59">		checkIfMethodsHaveChangedIncompatible(jApiClass, classMap);</span>
+<span class="fc" id="L60">		checkIfConstructorsHaveChangedIncompatible(jApiClass, classMap);</span>
+<span class="fc" id="L61">		checkIfFieldsHaveChangedIncompatible(jApiClass, classMap);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">		if (jApiClass.getClassType().getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="fc" id="L63">			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_TYPE_CHANGED);</span>
+		}
+<span class="fc" id="L65">		checkIfAnnotationDeprecatedAdded(jApiClass);</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">		if (hasModifierLevelDecreased(jApiClass)) {</span>
+<span class="fc" id="L67">			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_LESS_ACCESSIBLE);</span>
+		}
+<span class="fc bfc" id="L69" title="All 2 branches covered.">		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L70">			checkIfGenericTemplatesHaveChanged(jApiClass);</span>
+		}
+<span class="fc" id="L72">	}</span>
+
+	private void checkIfGenericTemplatesHaveChanged(JApiHasGenericTemplates jApiHasGenericTemplates) {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">		for (JApiGenericTemplate jApiGenericTemplate : jApiHasGenericTemplates.getGenericTemplates()) {</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">			if (jApiGenericTemplate.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L77">				((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED);</span>
+<span class="fc" id="L78">				break;</span>
+			}
+<span class="fc" id="L80">		}</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">		for (JApiGenericTemplate jApiGenericTemplate : jApiHasGenericTemplates.getGenericTemplates()) {</span>
+<span class="fc" id="L82">			JApiChangeStatus changeStatus = jApiGenericTemplate.getChangeStatus();</span>
+<span class="fc bfc" id="L83" title="All 4 branches covered.">			if (changeStatus == JApiChangeStatus.MODIFIED || changeStatus == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">				if (!SignatureParser.equalGenericTypes(jApiGenericTemplate.getOldGenericTypes(), jApiGenericTemplate.getNewGenericTypes())) {</span>
+<span class="fc" id="L85">					jApiGenericTemplate.getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);</span>
+<span class="fc" id="L86">					((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);</span>
+<span class="fc" id="L87">					break;</span>
+				}
+			}
+<span class="fc" id="L90">		}</span>
+<span class="fc" id="L91">	}</span>
+
+	private void checkIfFieldsHaveChangedIncompatible(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap) {
+<span class="fc bfc" id="L94" title="All 2 branches covered.">		for (final JApiField field : jApiClass.getFields()) {</span>
+			// section 13.4.6 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L96" title="1 of 4 branches missed.">			if (isNotPrivate(field) &amp;&amp; field.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L97">				ArrayList&lt;Integer&gt; returnValues = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L98">				forAllSuperclasses(jApiClass, classMap, returnValues, (superclass, classMap1, changeStatusOfSuperclass) -&gt; {</span>
+<span class="fc" id="L99">					int movedToSuperclass = 0;</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">					for (JApiField superclassField : superclass.getFields()) {</span>
+<span class="pc bpc" id="L101" title="3 of 6 branches missed.">						if (superclassField.getName().equals(field.getName()) &amp;&amp; fieldTypeMatches(superclassField, field) &amp;&amp; isNotPrivate(superclassField)) {</span>
+<span class="fc" id="L102">							movedToSuperclass = 1;</span>
+						}
+<span class="fc" id="L104">					}</span>
+<span class="fc" id="L105">					return movedToSuperclass;</span>
+				});
+<span class="fc" id="L107">				boolean movedToSuperclass = false;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">				for (Integer returnValue : returnValues) {</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">					if (returnValue == 1) {</span>
+<span class="fc" id="L110">						movedToSuperclass = true;</span>
+					}
+<span class="fc" id="L112">				}</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">				if (!movedToSuperclass) {</span>
+<span class="fc" id="L114">					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_REMOVED);</span>
+				}
+			}
+			// section 13.4.7 of &quot;Java Language Specification&quot; SE7
+<span class="fc bfc" id="L118" title="All 2 branches covered.">			if (hasModifierLevelDecreased(field)) {</span>
+<span class="fc" id="L119">				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_LESS_ACCESSIBLE);</span>
+			}
+			// section 13.4.8 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L122" title="1 of 4 branches missed.">			if (isNotPrivate(field) &amp;&amp; field.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L123">				ArrayList&lt;Integer&gt; returnValues = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L124">				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback&lt;Integer&gt;() {</span>
+					@Override
+					public Integer callback(JApiClass superclass, Map&lt;String, JApiClass&gt; classMap, JApiChangeStatus changeStatusOfSuperclass) {
+<span class="fc" id="L127">						int changedIncompatible = 0;</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">						for (JApiField superclassField : superclass.getFields()) {</span>
+<span class="pc bpc" id="L129" title="2 of 4 branches missed.">							if (superclassField.getName().equals(field.getName()) &amp;&amp; fieldTypeMatches(superclassField, field)) {</span>
+<span class="fc" id="L130">								boolean superclassFieldIsStatic = false;</span>
+<span class="fc" id="L131">								boolean subclassFieldIsStatic = false;</span>
+<span class="fc" id="L132">								boolean accessModifierSubclassLess = false;</span>
+<span class="pc bpc" id="L133" title="1 of 4 branches missed.">								if (field.getStaticModifier().getNewModifier().isPresent() &amp;&amp; field.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {</span>
+<span class="fc" id="L134">									subclassFieldIsStatic = true;</span>
+								}
+<span class="pc bpc" id="L136" title="2 of 6 branches missed.">								if (superclassField.getStaticModifier().getNewModifier().isPresent() &amp;&amp; superclassField.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC &amp;&amp; superclassField.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L137">									superclassFieldIsStatic = true;</span>
+								}
+<span class="pc bpc" id="L139" title="2 of 4 branches missed.">								if (field.getAccessModifier().getNewModifier().isPresent() &amp;&amp; superclassField.getAccessModifier().getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L140" title="1 of 4 branches missed.">									if (field.getAccessModifier().getNewModifier().get().getLevel() &lt; superclassField.getAccessModifier().getNewModifier().get().getLevel() &amp;&amp; superclassField.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L141">										accessModifierSubclassLess = true;</span>
+									}
+								}
+<span class="fc bfc" id="L144" title="All 2 branches covered.">								if (superclassFieldIsStatic) {</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">									if (subclassFieldIsStatic) {</span>
+<span class="fc" id="L146">										changedIncompatible = 1;</span>
+									}
+								}
+<span class="fc bfc" id="L149" title="All 2 branches covered.">								if (accessModifierSubclassLess) {</span>
+<span class="fc" id="L150">									changedIncompatible = 2;</span>
+								}
+							}
+<span class="fc" id="L153">						}</span>
+<span class="fc" id="L154">						return changedIncompatible;</span>
+					}
+				});
+<span class="fc bfc" id="L157" title="All 2 branches covered.">				for (int returnValue : returnValues) {</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">					if (returnValue == 1) {</span>
+<span class="fc" id="L159">						addCompatibilityChange(field, JApiCompatibilityChange.FIELD_STATIC_AND_OVERRIDES_STATIC);</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">					} else if (returnValue == 2) {</span>
+<span class="fc" id="L161">						addCompatibilityChange(field, JApiCompatibilityChange.FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS);</span>
+					}
+<span class="fc" id="L163">				}</span>
+			}
+			// section 13.4.9 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L166" title="1 of 4 branches missed.">			if (isNotPrivate(field) &amp;&amp; field.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {</span>
+<span class="fc" id="L167">				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NOW_FINAL);</span>
+			}
+			// section 13.4.10 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">			if (isNotPrivate(field)) {</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">				if (field.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {</span>
+<span class="fc" id="L172">					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NOW_STATIC);</span>
+				}
+<span class="fc bfc" id="L174" title="All 2 branches covered.">				if (field.getStaticModifier().hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {</span>
+<span class="fc" id="L175">					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NO_LONGER_STATIC);</span>
+				}
+			}
+<span class="pc bpc" id="L178" title="1 of 4 branches missed.">			if (isNotPrivate(field) &amp;&amp; field.getType().hasChanged()) {</span>
+<span class="fc" id="L179">				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_TYPE_CHANGED);</span>
+			}
+<span class="fc" id="L181">			checkIfAnnotationDeprecatedAdded(field);</span>
+<span class="fc" id="L182">			checkIfFieldGenericsChanged(field);</span>
+<span class="fc" id="L183">		}</span>
+<span class="fc" id="L184">	}</span>
+
+	private interface OnSuperclassCallback&lt;T&gt; {
+		T callback(JApiClass superclass, Map&lt;String, JApiClass&gt; classMap, JApiChangeStatus changeStatusOfSuperclass);
+	}
+
+	private interface OnImplementedInterfaceCallback&lt;T&gt; {
+		T callback(JApiClass implementedInterface, Map&lt;String, JApiClass&gt; classMap);
+	}
+
+	private &lt;T&gt; void forAllSuperclasses(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap, List&lt;T&gt; returnValues, OnSuperclassCallback&lt;T&gt; onSuperclassCallback) {
+<span class="fc" id="L195">		JApiSuperclass superclass = jApiClass.getSuperclass();</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">		if (superclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc" id="L197">			String newSuperclassName = superclass.getNewSuperclassName().get();</span>
+<span class="fc" id="L198">			JApiClass foundClass = classMap.get(newSuperclassName);</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">			if (foundClass == null) {</span>
+<span class="fc" id="L200">				Optional&lt;JApiClass&gt; superclassJApiClassOptional = superclass.getJApiClass();</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">				if (superclassJApiClassOptional.isPresent()) {</span>
+<span class="fc" id="L202">					foundClass = superclassJApiClassOptional.get();</span>
+				} else {
+<span class="fc" id="L204">					foundClass = loadClass(newSuperclassName, EnumSet.of(Classpath.NEW_CLASSPATH));</span>
+<span class="fc" id="L205">					evaluate(Collections.singletonList(foundClass));</span>
+				}
+<span class="fc" id="L207">				classMap.put(foundClass.getFullyQualifiedName(), foundClass);</span>
+			}
+<span class="fc" id="L209">			T returnValue = onSuperclassCallback.callback(foundClass, classMap, superclass.getChangeStatus());</span>
+<span class="fc" id="L210">			returnValues.add(returnValue);</span>
+<span class="fc" id="L211">			forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);</span>
+		}
+<span class="fc" id="L213">	}</span>
+
+<span class="fc" id="L215">	private enum Classpath {</span>
+<span class="fc" id="L216">		OLD_CLASSPATH,</span>
+<span class="fc" id="L217">		NEW_CLASSPATH</span>
+	}
+
+	private JApiClass loadClass(String newSuperclassName, EnumSet&lt;Classpath&gt; classpaths) {
+		JApiClass foundClass;
+<span class="fc" id="L222">		Optional&lt;CtClass&gt; oldClassOptional = Optional.absent();</span>
+<span class="fc" id="L223">		Optional&lt;CtClass&gt; newClassOptional = Optional.absent();</span>
+<span class="fc" id="L224">		JarArchiveComparatorOptions.ClassPathMode classPathMode = this.jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode();</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">		if (classPathMode == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {</span>
+<span class="fc" id="L226">			ClassPool classPool = this.jarArchiveComparator.getCommonClassPool();</span>
+			try {
+<span class="fc" id="L228">				oldClassOptional = Optional.of(classPool.get(newSuperclassName));</span>
+<span class="pc" id="L229">			} catch (NotFoundException ignored) {}</span>
+			try {
+<span class="fc" id="L231">				newClassOptional = Optional.of(classPool.get(newSuperclassName));</span>
+<span class="pc" id="L232">			} catch (NotFoundException ignored) {}</span>
+<span class="fc" id="L233">		} else {</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">			if (classpaths.contains(Classpath.OLD_CLASSPATH)) {</span>
+<span class="nc" id="L235">				ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();</span>
+				try {
+<span class="nc" id="L237">					oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));</span>
+<span class="nc" id="L238">				} catch (NotFoundException ignored) {}</span>
+			}
+<span class="nc bnc" id="L240" title="All 2 branches missed.">			if (classpaths.contains(Classpath.NEW_CLASSPATH)) {</span>
+<span class="nc" id="L241">				ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();</span>
+				try {
+<span class="nc" id="L243">					newClassOptional = Optional.of(newClassPool.get(newSuperclassName));</span>
+<span class="nc" id="L244">				} catch (NotFoundException ignored) {}</span>
+			}
+		}
+<span class="pc bpc" id="L247" title="3 of 4 branches missed.">		if (!oldClassOptional.isPresent() &amp;&amp; !newClassOptional.isPresent()) {</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">			if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(newSuperclassName)) {</span>
+<span class="nc" id="L249">				throw JApiCmpException.forClassLoading(newSuperclassName, this.jarArchiveComparator);</span>
+			}
+		}
+		JApiClassType classType;
+<span class="fc" id="L253">		JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;</span>
+<span class="pc bpc" id="L254" title="2 of 4 branches missed.">		if (oldClassOptional.isPresent() &amp;&amp; newClassOptional.isPresent()) {</span>
+<span class="fc" id="L255">			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.UNCHANGED);</span>
+<span class="nc bnc" id="L256" title="All 4 branches missed.">		} else if (oldClassOptional.isPresent() &amp;&amp; !newClassOptional.isPresent()) {</span>
+<span class="nc" id="L257">			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.&lt;JApiClassType.ClassType&gt;absent(), JApiChangeStatus.REMOVED);</span>
+<span class="nc bnc" id="L258" title="All 4 branches missed.">		} else if (!oldClassOptional.isPresent() &amp;&amp; newClassOptional.isPresent()) {</span>
+<span class="nc" id="L259">			classType = new JApiClassType(Optional.&lt;JApiClassType.ClassType&gt;absent(), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.NEW);</span>
+		} else {
+<span class="nc" id="L261">			classType = new JApiClassType(Optional.&lt;JApiClassType.ClassType&gt;absent(), Optional.&lt;JApiClassType.ClassType&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
+		}
+<span class="fc" id="L263">		foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType);</span>
+<span class="fc" id="L264">		return foundClass;</span>
+	}
+
+	private boolean fieldTypeMatches(JApiField field1, JApiField field2) {
+<span class="fc" id="L268">		boolean matches = true;</span>
+<span class="fc" id="L269">		JApiType type1 = field1.getType();</span>
+<span class="fc" id="L270">		JApiType type2 = field2.getType();</span>
+<span class="pc bpc" id="L271" title="1 of 4 branches missed.">		if (type1.getNewTypeOptional().isPresent() &amp;&amp; type2.getNewTypeOptional().isPresent()) {</span>
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">			if (!type1.getNewTypeOptional().get().equals(type2.getNewTypeOptional().get())) {</span>
+<span class="nc" id="L273">				matches = false;</span>
+			}
+		}
+<span class="fc" id="L276">		return matches;</span>
+	}
+
+	private void checkIfConstructorsHaveChangedIncompatible(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap) {
+<span class="fc bfc" id="L280" title="All 2 branches covered.">		for (JApiConstructor constructor : jApiClass.getConstructors()) {</span>
+			// section 13.4.6 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L282" title="1 of 4 branches missed.">			if (isNotPrivate(constructor) &amp;&amp; constructor.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L283">				addCompatibilityChange(constructor, JApiCompatibilityChange.CONSTRUCTOR_REMOVED);</span>
+			}
+			// section 13.4.7 of &quot;Java Language Specification&quot; SE7
+<span class="fc bfc" id="L286" title="All 2 branches covered.">			if (hasModifierLevelDecreased(constructor)) {</span>
+<span class="fc bfc" id="L287" title="All 4 branches covered.">				if (isNotFinal(jApiClass)  || constructor.getAccessModifier().hasChangedFrom(AccessModifier.PUBLIC)) {</span>
+<span class="fc" id="L288">					addCompatibilityChange(constructor, JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE);</span>
+				}
+			}
+<span class="fc" id="L291">			checkIfExceptionIsNowChecked(constructor);</span>
+<span class="fc" id="L292">			checkIfAnnotationDeprecatedAdded(constructor);</span>
+<span class="fc" id="L293">			checkIfVarargsChanged(constructor);</span>
+<span class="fc" id="L294">			checkIfParametersGenericsChanged(constructor);</span>
+<span class="fc" id="L295">			checkIfGenericTemplatesHaveChanged(constructor);</span>
+<span class="fc" id="L296">		}</span>
+<span class="fc" id="L297">	}</span>
+
+	private static boolean isNotFinal(JApiClass jApiClass) {
+<span class="pc bpc" id="L300" title="1 of 4 branches missed.">		return !(jApiClass.getFinalModifier().getNewModifier().isPresent() &amp;&amp; jApiClass.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL);</span>
+	}
+
+	private void checkIfMethodsHaveChangedIncompatible(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap) {
+<span class="fc bfc" id="L304" title="All 2 branches covered.">		for (final JApiMethod method : jApiClass.getMethods()) {</span>
+			// section 13.4.6 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L306" title="1 of 4 branches missed.">			if (isNotPrivate(method) &amp;&amp; method.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L307">				final List&lt;Integer&gt; returnValues = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L308">				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback&lt;Integer&gt;() {</span>
+					@Override
+					public Integer callback(JApiClass superclass, Map&lt;String, JApiClass&gt; classMap, JApiChangeStatus changeStatusOfSuperclass) {
+<span class="fc bfc" id="L311" title="All 2 branches covered.">						for (JApiMethod superMethod : superclass.getMethods()) {</span>
+<span class="pc bpc" id="L312" title="1 of 4 branches missed.">							if (superMethod.getName().equals(method.getName()) &amp;&amp; superMethod.hasSameSignature(method)) {</span>
+<span class="fc" id="L313">								return 1;</span>
+							}
+<span class="fc" id="L315">						}</span>
+<span class="fc" id="L316">						return 0;</span>
+					}
+				});
+<span class="fc" id="L319">				checkIfMethodHasBeenPulledUp(jApiClass, classMap, method, returnValues);</span>
+<span class="fc" id="L320">				boolean superclassHasSameMethod = false;</span>
+<span class="fc bfc" id="L321" title="All 2 branches covered.">				for (Integer returnValue : returnValues) {</span>
+<span class="fc bfc" id="L322" title="All 2 branches covered.">					if (returnValue == 1) {</span>
+<span class="fc" id="L323">						superclassHasSameMethod = true;</span>
+					}
+<span class="fc" id="L325">				}</span>
+<span class="fc bfc" id="L326" title="All 2 branches covered.">				if (!superclassHasSameMethod) {</span>
+<span class="fc" id="L327">					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_REMOVED);</span>
+				}
+			}
+
+<span class="fc bfc" id="L331" title="All 6 branches covered.">			if (!isInterface(jApiClass) &amp;&amp; method.getChangeStatus() == JApiChangeStatus.NEW &amp;&amp; method.getAccessModifier().getNewModifier().get().getLevel() == AccessModifier.PUBLIC.getLevel()) {</span>
+<span class="fc" id="L332">				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_PUBLIC_CLASS);</span>
+			}
+
+			// section 13.4.7 of &quot;Java Language Specification&quot; SE7
+<span class="fc bfc" id="L336" title="All 2 branches covered.">			if (hasModifierLevelDecreased(method)) {</span>
+<span class="fc" id="L337">				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_LESS_ACCESSIBLE);</span>
+			}
+			// section 13.4.12 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L340" title="1 of 4 branches missed.">			if (isNotPrivate(method) &amp;&amp; method.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L341">				List&lt;Integer&gt; returnValues = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L342">				forAllSuperclasses(jApiClass, classMap, returnValues, new OnSuperclassCallback&lt;Integer&gt;() {</span>
+					@Override
+					public Integer callback(JApiClass superclass, Map&lt;String, JApiClass&gt; classMap, JApiChangeStatus changeStatusOfSuperclass) {
+<span class="fc bfc" id="L345" title="All 2 branches covered.">						for (JApiMethod superMethod : superclass.getMethods()) {</span>
+<span class="pc bpc" id="L346" title="1 of 4 branches missed.">							if (superMethod.getName().equals(method.getName()) &amp;&amp; superMethod.hasSameSignature(method)) {</span>
+<span class="pc bpc" id="L347" title="1 of 4 branches missed.">								if (superMethod.getAccessModifier().getNewModifier().isPresent() &amp;&amp; method.getAccessModifier().getNewModifier().isPresent()) {</span>
+<span class="fc bfc" id="L348" title="All 2 branches covered.">									if (superMethod.getAccessModifier().getNewModifier().get().getLevel() &gt; method.getAccessModifier().getNewModifier().get().getLevel()) {</span>
+<span class="fc" id="L349">										return 1;</span>
+									}
+								}
+<span class="pc bpc" id="L352" title="1 of 4 branches missed.">								if (superMethod.getStaticModifier().getNewModifier().isPresent() &amp;&amp; method.getStaticModifier().getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L353" title="1 of 2 branches missed.">									if (superMethod.getStaticModifier().getNewModifier().get() == StaticModifier.NON_STATIC</span>
+<span class="fc bfc" id="L354" title="All 2 branches covered.">										&amp;&amp; method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {</span>
+<span class="fc" id="L355">										return 2;</span>
+									}
+								}
+							}
+<span class="fc" id="L359">						}</span>
+<span class="fc" id="L360">						return 0;</span>
+					}
+				});
+<span class="fc bfc" id="L363" title="All 2 branches covered.">				for (Integer returnValue : returnValues) {</span>
+<span class="fc bfc" id="L364" title="All 2 branches covered.">					if (returnValue == 1) {</span>
+<span class="fc" id="L365">						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS);</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">					} else if (returnValue == 2) {</span>
+<span class="fc" id="L367">						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC);</span>
+					}
+<span class="fc" id="L369">				}</span>
+			}
+<span class="fc" id="L371">			checkIfReturnTypeChanged(method);</span>
+			// section 13.4.16 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L373" title="1 of 4 branches missed.">			if (isNotPrivate(method) &amp;&amp; method.getAbstractModifier().hasChangedFromTo(AbstractModifier.NON_ABSTRACT, AbstractModifier.ABSTRACT)) {</span>
+<span class="fc" id="L374">				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_ABSTRACT);</span>
+			}
+			// section 13.4.17 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L377" title="1 of 4 branches missed.">			if (isNotPrivate(method) &amp;&amp; method.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {</span>
+<span class="pc bpc" id="L378" title="1 of 4 branches missed.">				if ((jApiClass.getFinalModifier().getOldModifier().isPresent() &amp;&amp; jApiClass.getFinalModifier().getOldModifier().get() != FinalModifier.FINAL) &amp;&amp;</span>
+<span class="pc bpc" id="L379" title="2 of 4 branches missed.">					!(method.getStaticModifier().getOldModifier().isPresent() &amp;&amp; method.getStaticModifier().getOldModifier().get() == StaticModifier.STATIC)) {</span>
+<span class="fc" id="L380">					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);</span>
+				}
+			}
+<span class="pc bpc" id="L383" title="1 of 4 branches missed.">			if (isNotPrivate(method) &amp;&amp; method.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L384">				List&lt;Integer&gt; returnValues = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L385">				forAllSuperclasses(jApiClass, classMap, returnValues, (superclass, classMap1, changeStatusOfSuperclass) -&gt; {</span>
+<span class="fc bfc" id="L386" title="All 2 branches covered.">					for (JApiMethod superMethod : superclass.getMethods()) {</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">						if (areMatching(superMethod, method)) {</span>
+<span class="pc bpc" id="L388" title="1 of 2 branches missed.">							if (method.getFinalModifier().getOldModifier().isPresent()</span>
+<span class="pc bpc" id="L389" title="1 of 2 branches missed.">									&amp;&amp; method.getFinalModifier().getOldModifier().get() == FinalModifier.NON_FINAL</span>
+<span class="fc bfc" id="L390" title="All 2 branches covered.">									&amp;&amp; superMethod.getFinalModifier().getNewModifier().isPresent()</span>
+<span class="fc bfc" id="L391" title="All 2 branches covered.">									&amp;&amp; superMethod.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL) {</span>
+<span class="fc" id="L392">								addCompatibilityChange(superMethod, JApiCompatibilityChange.METHOD_NOW_FINAL);</span>
+<span class="fc" id="L393">								return 1;</span>
+							}
+						}
+<span class="fc" id="L396">					}</span>
+<span class="fc" id="L397">					return 0;</span>
+				});
+<span class="fc bfc" id="L399" title="All 4 branches covered.">				if (returnValues.stream().anyMatch(value -&gt; value == 1)) {</span>
+<span class="fc" id="L400">					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);</span>
+<span class="fc" id="L401">					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_MOVED_TO_SUPERCLASS);</span>
+				}
+			}
+			// section 13.4.18 of &quot;Java Language Specification&quot; SE7
+<span class="pc bpc" id="L405" title="1 of 4 branches missed.">			if (isNotPrivate(method) &amp;&amp; !isInterface(method.getjApiClass())) {</span>
+<span class="fc bfc" id="L406" title="All 2 branches covered.">				if (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {</span>
+<span class="fc" id="L407">					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_STATIC);</span>
+				}
+<span class="fc bfc" id="L409" title="All 2 branches covered.">				if (method.getStaticModifier().hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {</span>
+<span class="fc" id="L410">					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NO_LONGER_STATIC);</span>
+				}
+			}
+<span class="fc" id="L413">			checkAbstractMethod(jApiClass, classMap, method);</span>
+<span class="fc" id="L414">			checkIfExceptionIsNowChecked(method);</span>
+<span class="fc" id="L415">			checkIfAnnotationDeprecatedAdded(method);</span>
+<span class="fc" id="L416">			checkIfVarargsChanged(method);</span>
+<span class="fc" id="L417">			checkIfParametersGenericsChanged(method);</span>
+<span class="fc" id="L418">			checkIfGenericTemplatesHaveChanged(method);</span>
+<span class="fc" id="L419">		}</span>
+<span class="fc" id="L420">	}</span>
+
+	private void checkIfReturnTypeChanged(JApiMethod method) {
+		// section 13.4.15 of &quot;Java Language Specification&quot; SE7 (Method Result Type)
+<span class="fc bfc" id="L424" title="All 2 branches covered.">		if (method.getReturnType().getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="fc" id="L425">			addCompatibilityChange(method, JApiCompatibilityChange.METHOD_RETURN_TYPE_CHANGED);</span>
+		}
+<span class="fc bfc" id="L427" title="All 2 branches covered.">		if (method.getChangeStatus() == JApiChangeStatus.MODIFIED ||</span>
+<span class="fc bfc" id="L428" title="All 2 branches covered.">				method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc bfc" id="L429" title="All 2 branches covered.">			if (!SignatureParser.equalGenericTypes(method.getReturnType().getOldGenericTypes(), method.getReturnType().getNewGenericTypes())) {</span>
+<span class="fc" id="L430">				addCompatibilityChange(method.getReturnType(), JApiCompatibilityChange.METHOD_RETURN_TYPE_GENERICS_CHANGED);</span>
+			}
+		}
+<span class="fc" id="L433">	}</span>
+
+	private void checkIfParametersGenericsChanged(JApiBehavior jApiBehavior) {
+<span class="fc bfc" id="L436" title="All 2 branches covered.">		if (jApiBehavior.getChangeStatus() == JApiChangeStatus.MODIFIED ||</span>
+<span class="fc bfc" id="L437" title="All 2 branches covered.">				jApiBehavior.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc bfc" id="L438" title="All 2 branches covered.">			for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {</span>
+<span class="fc bfc" id="L439" title="All 2 branches covered.">				if (!SignatureParser.equalGenericTypes(jApiParameter.getOldGenericTypes(), jApiParameter.getNewGenericTypes())) {</span>
+<span class="fc" id="L440">					jApiParameter.getCompatibilityChanges().add(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED);</span>
+				}
+<span class="fc" id="L442">			}</span>
+		}
+<span class="fc" id="L444">	}</span>
+
+	private void checkIfFieldGenericsChanged(JApiField jApiField) {
+<span class="fc bfc" id="L447" title="All 2 branches covered.">		if (jApiField.getChangeStatus() == JApiChangeStatus.MODIFIED ||</span>
+<span class="fc bfc" id="L448" title="All 2 branches covered.">				jApiField.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc bfc" id="L449" title="All 2 branches covered.">			if (!SignatureParser.equalGenericTypes(jApiField.getOldGenericTypes(), jApiField.getNewGenericTypes())) {</span>
+<span class="fc" id="L450">				jApiField.getCompatibilityChanges().add(JApiCompatibilityChange.FIELD_GENERICS_CHANGED);</span>
+			}
+		}
+<span class="fc" id="L453">	}</span>
+
+	private void checkIfAnnotationDeprecatedAdded(JApiHasAnnotations jApiHasAnnotations) {
+<span class="fc bfc" id="L456" title="All 2 branches covered.">		for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {</span>
+<span class="pc bpc" id="L457" title="1 of 4 branches missed.">			if (annotation.getChangeStatus() == JApiChangeStatus.NEW || annotation.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="fc bfc" id="L458" title="All 2 branches covered.">				if (annotation.getFullyQualifiedName().equals(Deprecated.class.getName())) {</span>
+<span class="fc" id="L459">					addCompatibilityChange((JApiCompatibility) jApiHasAnnotations, JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED);</span>
+				}
+			}
+<span class="fc" id="L462">		}</span>
+<span class="fc" id="L463">	}</span>
+
+	private void checkIfVarargsChanged(JApiBehavior behavior) {
+<span class="fc bfc" id="L466" title="All 2 branches covered.">		if (behavior.getVarargsModifier().hasChangedFromTo(VarargsModifier.VARARGS, VarargsModifier.NON_VARARGS)) {</span>
+<span class="fc" id="L467">			addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NO_LONGER_VARARGS);</span>
+		}
+<span class="fc bfc" id="L469" title="All 2 branches covered.">		if (behavior.getVarargsModifier().hasChangedFromTo(VarargsModifier.NON_VARARGS, VarargsModifier.VARARGS)) {</span>
+<span class="fc" id="L470">			addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NOW_VARARGS);</span>
+		}
+<span class="fc" id="L472">	}</span>
+
+	private void checkAbstractMethod(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap, JApiMethod method) {
+<span class="fc bfc" id="L475" title="All 2 branches covered.">		if (isInterface(jApiClass)) {</span>
+<span class="fc bfc" id="L476" title="All 2 branches covered.">			if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="pc bpc" id="L477" title="1 of 4 branches missed.">				if (method.getChangeStatus() == JApiChangeStatus.NEW &amp;&amp; !isSynthetic(method)) {</span>
+<span class="fc" id="L478">					List&lt;JApiMethod&gt; methodsWithSameSignature = getMethodsInImplementedInterfacesWithSameSignature(jApiClass, classMap, method);</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">					if (methodsWithSameSignature.size() == 0) {</span>
+						// new default method in interface
+<span class="fc bfc" id="L481" title="All 2 branches covered.">						if (method.getAbstractModifier().getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {</span>
+<span class="fc bfc" id="L482" title="All 2 branches covered.">							if (method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {</span>
+<span class="fc" id="L483">								addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_STATIC_ADDED_TO_INTERFACE);</span>
+							} else {
+<span class="fc" id="L485">								addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_DEFAULT);</span>
+							}
+						} else {
+<span class="fc" id="L488">							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);</span>
+						}
+					} else {
+<span class="fc" id="L491">						boolean allNew = true;</span>
+<span class="fc bfc" id="L492" title="All 2 branches covered.">						for (JApiMethod jApiMethod : methodsWithSameSignature) {</span>
+<span class="fc bfc" id="L493" title="All 2 branches covered.">							if (jApiMethod.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L494">								allNew = false;</span>
+<span class="fc" id="L495">								break;</span>
+							}
+<span class="fc" id="L497">						}</span>
+<span class="fc bfc" id="L498" title="All 2 branches covered.">						if (allNew) {</span>
+<span class="fc" id="L499">							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);</span>
+						}
+					}
+<span class="fc bfc" id="L502" title="All 4 branches covered.">				} else if (method.getChangeStatus() == JApiChangeStatus.MODIFIED || method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L503">					JApiModifier&lt;AbstractModifier&gt; abstractModifier = method.getAbstractModifier();</span>
+<span class="pc bpc" id="L504" title="1 of 4 branches missed.">					if (abstractModifier.getOldModifier().isPresent() &amp;&amp; abstractModifier.getOldModifier().get() == AbstractModifier.ABSTRACT &amp;&amp;</span>
+<span class="pc bpc" id="L505" title="1 of 4 branches missed.">						abstractModifier.getNewModifier().isPresent() &amp;&amp; abstractModifier.getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {</span>
+						// method changed from abstract to default
+<span class="fc" id="L507">						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT);</span>
+					}
+<span class="fc" id="L509">					JApiModifier&lt;StaticModifier&gt; staticModifier = method.getStaticModifier();</span>
+<span class="fc bfc" id="L510" title="All 2 branches covered.">					if (staticModifier.hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {</span>
+<span class="fc" id="L511">						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC);</span>
+<span class="fc bfc" id="L512" title="All 2 branches covered.">					} else if (staticModifier.hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {</span>
+<span class="fc" id="L513">						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC);</span>
+					}
+<span class="fc" id="L515">				}</span>
+			}
+		} else {
+<span class="fc bfc" id="L518" title="All 2 branches covered.">			if (isAbstract(method)) {</span>
+<span class="pc bpc" id="L519" title="1 of 2 branches missed.">				if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="pc bpc" id="L520" title="1 of 4 branches missed.">					if (method.getChangeStatus() == JApiChangeStatus.NEW &amp;&amp; !isSynthetic(method)) {</span>
+<span class="fc" id="L521">						List&lt;JApiMethod&gt; overriddenMethods = getOverriddenMethods(jApiClass, classMap, method);</span>
+<span class="fc" id="L522">						boolean overridesAbstract = false;</span>
+<span class="fc bfc" id="L523" title="All 2 branches covered.">						for (JApiMethod jApiMethod : overriddenMethods) {</span>
+<span class="pc bpc" id="L524" title="1 of 4 branches missed.">							if (isAbstract(jApiMethod) &amp;&amp; jApiMethod.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L525">								overridesAbstract = true;</span>
+							}
+<span class="fc" id="L527">						}</span>
+<span class="fc" id="L528">						List&lt;JApiMethod&gt; implementedMethods = getMethodsInImplementedInterfacesWithSameSignature(jApiClass, classMap, method);</span>
+<span class="pc bpc" id="L529" title="1 of 2 branches missed.">						if (implementedMethods.size() &gt; 0) {</span>
+<span class="nc" id="L530">							overridesAbstract = true;</span>
+						}
+<span class="fc bfc" id="L532" title="All 2 branches covered.">						if (!overridesAbstract) {</span>
+<span class="fc" id="L533">							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_TO_CLASS);</span>
+						}
+					}
+				}
+			}
+		}
+<span class="fc" id="L539">	}</span>
+
+	private List&lt;JApiMethod&gt; getOverriddenMethods(final JApiClass jApiClass, final Map&lt;String, JApiClass&gt; classMap, final JApiMethod method) {
+<span class="fc" id="L542">		ArrayList&lt;JApiMethod&gt; jApiMethods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L543">		forAllSuperclasses(jApiClass, classMap, jApiMethods, new OnSuperclassCallback&lt;JApiMethod&gt;() {</span>
+			@Override
+			public JApiMethod callback(JApiClass superclass, Map&lt;String, JApiClass&gt; classMap, JApiChangeStatus changeStatusOfSuperclass) {
+<span class="fc bfc" id="L546" title="All 2 branches covered.">				for (JApiMethod jApiMethod : superclass.getMethods()) {</span>
+<span class="fc bfc" id="L547" title="All 2 branches covered.">					if (isAbstract(jApiMethod)) {</span>
+<span class="pc bpc" id="L548" title="2 of 4 branches missed.">						if (jApiMethod.getName().equals(method.getName()) &amp;&amp; jApiMethod.hasSameSignature(method)) {</span>
+<span class="fc" id="L549">							return jApiMethod;</span>
+						}
+					}
+<span class="fc" id="L552">				}</span>
+<span class="fc" id="L553">				return null;</span>
+			}
+		});
+<span class="fc" id="L556">		return removeNullValues(jApiMethods);</span>
+	}
+
+	private List&lt;JApiMethod&gt; removeNullValues(ArrayList&lt;JApiMethod&gt; jApiMethods) {
+<span class="fc" id="L560">		ArrayList&lt;JApiMethod&gt; returnValues = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L561" title="All 2 branches covered.">		for (JApiMethod jApiMethod : jApiMethods) {</span>
+<span class="fc bfc" id="L562" title="All 2 branches covered.">			if (jApiMethod != null) {</span>
+<span class="fc" id="L563">				returnValues.add(jApiMethod);</span>
+			}
+<span class="fc" id="L565">		}</span>
+<span class="fc" id="L566">		return returnValues;</span>
+	}
+
+	private List&lt;JApiMethod&gt; getMethodsInImplementedInterfacesWithSameSignature(final JApiClass jApiClass, final Map&lt;String, JApiClass&gt; classMap, final JApiMethod method) {
+<span class="fc" id="L570">		ArrayList&lt;JApiMethod&gt; jApiMethods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L571">		forAllImplementedInterfaces(jApiClass, classMap, jApiMethods, new ArrayList&lt;&gt;(), new OnImplementedInterfaceCallback&lt;JApiMethod&gt;() {</span>
+			@Override
+			public JApiMethod callback(JApiClass implementedInterface, Map&lt;String, JApiClass&gt; classMap) {
+<span class="pc bpc" id="L574" title="1 of 2 branches missed.">				for (JApiMethod jApiMethod : implementedInterface.getMethods()) {</span>
+<span class="pc bpc" id="L575" title="2 of 4 branches missed.">					if (jApiMethod.getName().equals(method.getName()) &amp;&amp; jApiMethod.hasSameSignature(method)) {</span>
+<span class="fc" id="L576">						return jApiMethod;</span>
+					}
+<span class="nc" id="L578">				}</span>
+<span class="nc" id="L579">				return null;</span>
+			}
+		});
+<span class="fc" id="L582">		return removeNullValues(jApiMethods);</span>
+	}
+
+	private boolean isAbstract(JApiHasAbstractModifier jApiHasAbstractModifier) {
+<span class="fc" id="L586">		boolean isAbstract = false;</span>
+<span class="fc bfc" id="L587" title="All 2 branches covered.">		if (jApiHasAbstractModifier.getAbstractModifier().hasChangedTo(AbstractModifier.ABSTRACT)) {</span>
+<span class="fc" id="L588">			isAbstract = true;</span>
+		}
+<span class="fc" id="L590">		return isAbstract;</span>
+	}
+
+	private void checkIfExceptionIsNowChecked(JApiBehavior behavior) {
+<span class="fc bfc" id="L594" title="All 2 branches covered.">		for (JApiException exception : behavior.getExceptions()) {</span>
+<span class="fc bfc" id="L595" title="All 6 branches covered.">			if (exception.getChangeStatus() == JApiChangeStatus.NEW &amp;&amp; exception.isCheckedException() &amp;&amp; behavior.getChangeStatus() != JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L596">				addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION);</span>
+			}
+<span class="pc bpc" id="L598" title="1 of 6 branches missed.">			if (exception.getChangeStatus() == JApiChangeStatus.REMOVED &amp;&amp; exception.isCheckedException() &amp;&amp; behavior.getChangeStatus() != JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L599">				addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION);</span>
+			}
+<span class="fc" id="L601">		}</span>
+<span class="fc" id="L602">	}</span>
+
+	private boolean isClass(final JApiClass jApiClass) {
+<span class="fc bfc" id="L605" title="All 4 branches covered.">		return jApiClass.getClassType().getNewTypeOptional().isPresent() &amp;&amp; jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.CLASS;</span>
+	}
+
+	private boolean isInterface(final JApiClass jApiClass) {
+<span class="pc bpc" id="L609" title="1 of 4 branches missed.">		return jApiClass.getClassType().getNewTypeOptional().isPresent() &amp;&amp; jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.INTERFACE;</span>
+	}
+
+	private boolean isAnnotation(final JApiClass jApiClass) {
+<span class="pc bpc" id="L613" title="2 of 4 branches missed.">		return jApiClass.getClassType().getNewTypeOptional().isPresent() &amp;&amp; jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ANNOTATION;</span>
+	}
+
+	private boolean isEnum(final JApiClass jApiClass) {
+<span class="pc bpc" id="L617" title="2 of 4 branches missed.">		return jApiClass.getClassType().getNewTypeOptional().isPresent() &amp;&amp; jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ENUM;</span>
+	}
+
+	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap, final JApiMethod method, List&lt;Integer&gt; returnValues) {
+<span class="fc" id="L621">		forAllImplementedInterfaces(jApiClass, classMap, returnValues, new ArrayList&lt;&gt;(), (implementedInterface, classMap1) -&gt; {</span>
+<span class="pc bpc" id="L622" title="1 of 2 branches missed.">			for (JApiMethod superMethod : implementedInterface.getMethods()) {</span>
+<span class="pc bpc" id="L623" title="2 of 4 branches missed.">				if (superMethod.getName().equals(method.getName()) &amp;&amp; superMethod.hasSameSignature(method)) {</span>
+<span class="fc" id="L624">					return 1;</span>
+				}
+<span class="nc" id="L626">			}</span>
+<span class="nc" id="L627">			return 0;</span>
+		});
+<span class="fc" id="L629">	}</span>
+
+	private &lt;T&gt; void forAllImplementedInterfaces(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap, List&lt;T&gt; returnValues, List&lt;JApiImplementedInterface&gt; visited,
+												 OnImplementedInterfaceCallback&lt;T&gt; onImplementedInterfaceCallback) {
+<span class="fc" id="L633">		List&lt;JApiImplementedInterface&gt; interfaces = jApiClass.getInterfaces();</span>
+<span class="fc bfc" id="L634" title="All 2 branches covered.">		for (JApiImplementedInterface implementedInterface : interfaces) {</span>
+<span class="fc" id="L635">			String fullyQualifiedName = implementedInterface.getFullyQualifiedName();</span>
+<span class="fc" id="L636">			JApiClass foundClass = classMap.get(fullyQualifiedName);</span>
+<span class="pc bpc" id="L637" title="1 of 4 branches missed.">			if (foundClass != null &amp;&amp; visited.stream().noneMatch(v -&gt; v.getFullyQualifiedName().equals(implementedInterface.getFullyQualifiedName()))) {</span>
+<span class="fc" id="L638">				T returnValue = onImplementedInterfaceCallback.callback(foundClass, classMap);</span>
+<span class="fc" id="L639">				returnValues.add(returnValue);</span>
+<span class="fc" id="L640">				visited.add(implementedInterface);</span>
+<span class="fc" id="L641">				forAllImplementedInterfaces(foundClass, classMap, returnValues, visited, onImplementedInterfaceCallback);</span>
+			}
+<span class="fc" id="L643">		}</span>
+<span class="fc" id="L644">	}</span>
+
+	/**
+	 * Is a method implemented in a super class
+	 * @param jApiMethod the method
+	 * @return &lt;code&gt;true&lt;/code&gt; if it is implemented in a super class
+	 */
+	private boolean isImplemented(JApiMethod jApiMethod, JApiClass aClass) {
+<span class="fc bfc" id="L652" title="All 2 branches covered.">	    while(aClass != null) {</span>
+<span class="fc bfc" id="L653" title="All 2 branches covered.">            for (JApiMethod method : aClass.getMethods()) {</span>
+<span class="pc bpc" id="L654" title="1 of 4 branches missed.">                if (jApiMethod.getName().equals(method.getName()) &amp;&amp; jApiMethod.hasSameParameter(method) &amp;&amp;</span>
+<span class="pc bpc" id="L655" title="2 of 6 branches missed.">                    !isAbstract(method) &amp;&amp; method.getChangeStatus() != JApiChangeStatus.REMOVED &amp;&amp; isNotPrivate(method)) {</span>
+<span class="fc" id="L656">                    return true;</span>
+                }
+<span class="fc" id="L658">            }</span>
+
+<span class="pc bpc" id="L660" title="1 of 4 branches missed.">            if(aClass.getSuperclass() != null &amp;&amp; aClass.getSuperclass().getJApiClass().isPresent()) {</span>
+<span class="fc" id="L661">                aClass = aClass.getSuperclass().getJApiClass().get();</span>
+            } else {
+<span class="fc" id="L663">                aClass = null;</span>
+            }
+	    }
+<span class="fc" id="L666">	    return false;</span>
+	}
+
+	private void checkIfSuperclassesOrInterfacesChangedIncompatible(final JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap) {
+<span class="fc" id="L670">		final JApiSuperclass superclass = jApiClass.getSuperclass();</span>
+		// section 13.4.4 of &quot;Java Language Specification&quot; SE7
+<span class="fc bfc" id="L672" title="All 2 branches covered.">		if (superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED</span>
+<span class="fc bfc" id="L673" title="All 2 branches covered.">			|| superclass.getChangeStatus() == JApiChangeStatus.MODIFIED</span>
+<span class="fc bfc" id="L674" title="All 2 branches covered.">			|| superclass.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L675">			final List&lt;JApiMethod&gt; implementedMethods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L676">			final List&lt;JApiMethod&gt; removedAndNotOverriddenMethods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L677">			final List&lt;JApiField&gt; fields = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L678">			final List&lt;JApiField&gt; removedAndNotOverriddenFields = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L679" title="All 2 branches covered.">			for (JApiMethod jApiMethod : jApiClass.getMethods()) {</span>
+<span class="pc bpc" id="L680" title="1 of 6 branches missed.">				if (!isAbstract(jApiMethod) &amp;&amp; jApiMethod.getChangeStatus() != JApiChangeStatus.REMOVED &amp;&amp; isNotPrivate(jApiMethod)) {</span>
+<span class="fc" id="L681">					implementedMethods.add(jApiMethod);</span>
+				}
+<span class="fc" id="L683">			}</span>
+<span class="fc bfc" id="L684" title="All 2 branches covered.">			for (JApiField jApiField : jApiClass.getFields()) {</span>
+<span class="pc bpc" id="L685" title="1 of 4 branches missed.">				if (jApiField.getChangeStatus() != JApiChangeStatus.REMOVED &amp;&amp; isNotPrivate(jApiField)) {</span>
+<span class="fc" id="L686">					fields.add(jApiField);</span>
+				}
+<span class="fc" id="L688">			}</span>
+<span class="fc" id="L689">			forAllSuperclasses(jApiClass, classMap, new ArrayList&lt;Integer&gt;(), new OnSuperclassCallback&lt;Integer&gt;() {</span>
+				@Override
+				public Integer callback(JApiClass superclass, Map&lt;String, JApiClass&gt; classMap, JApiChangeStatus changeStatusOfSuperclass) {
+<span class="fc bfc" id="L692" title="All 2 branches covered.">					for (JApiMethod jApiMethod : superclass.getMethods()) {</span>
+<span class="fc bfc" id="L693" title="All 6 branches covered.">						if (!isAbstract(jApiMethod) &amp;&amp; jApiMethod.getChangeStatus() != JApiChangeStatus.REMOVED &amp;&amp; isNotPrivate(jApiMethod)) {</span>
+<span class="fc" id="L694">							implementedMethods.add(jApiMethod);</span>
+						}
+<span class="fc" id="L696">						Iterator&lt;JApiMethod&gt; iterator = removedAndNotOverriddenMethods.iterator();</span>
+<span class="fc bfc" id="L697" title="All 2 branches covered.">						while (iterator.hasNext()) {</span>
+<span class="fc" id="L698">							JApiMethod removedAndNotOverriddenMethod = iterator.next();</span>
+<span class="pc bpc" id="L699" title="1 of 4 branches missed.">							if (jApiMethod.getName().equals(removedAndNotOverriddenMethod.getName()) &amp;&amp; jApiMethod.hasSameSignature(removedAndNotOverriddenMethod)) {</span>
+<span class="fc" id="L700">								iterator.remove();</span>
+							}
+<span class="fc" id="L702">						}</span>
+<span class="fc" id="L703">					}</span>
+<span class="fc bfc" id="L704" title="All 2 branches covered.">					for (JApiField jApiField : superclass.getFields()) {</span>
+<span class="fc bfc" id="L705" title="All 4 branches covered.">						if (jApiField.getChangeStatus() != JApiChangeStatus.REMOVED &amp;&amp; isNotPrivate(jApiField)) {</span>
+<span class="fc" id="L706">							fields.add(jApiField);</span>
+						}
+<span class="fc" id="L708">						Iterator&lt;JApiField&gt; iterator = removedAndNotOverriddenFields.iterator();</span>
+<span class="fc bfc" id="L709" title="All 2 branches covered.">						while (iterator.hasNext()) {</span>
+<span class="fc" id="L710">							JApiField removedAndNotOverriddenField = iterator.next();</span>
+<span class="pc bpc" id="L711" title="2 of 4 branches missed.">							if (jApiField.getName().equals(removedAndNotOverriddenField.getName()) &amp;&amp; hasSameType(jApiField, removedAndNotOverriddenField)) {</span>
+<span class="fc" id="L712">								iterator.remove();</span>
+							}
+<span class="fc" id="L714">						}</span>
+<span class="fc" id="L715">					}</span>
+<span class="fc bfc" id="L716" title="All 2 branches covered.">					for (JApiMethod jApiMethod : superclass.getMethods()) {</span>
+<span class="fc bfc" id="L717" title="All 4 branches covered.">						if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED &amp;&amp; !isImplemented(jApiMethod, jApiMethod.getjApiClass())) {</span>
+<span class="fc" id="L718">							boolean implemented = false;</span>
+<span class="fc bfc" id="L719" title="All 2 branches covered.">							for (JApiMethod implementedMethod : implementedMethods) {</span>
+<span class="pc bpc" id="L720" title="2 of 4 branches missed.">								if (jApiMethod.getName().equals(implementedMethod.getName()) &amp;&amp; jApiMethod.hasSameSignature(implementedMethod)) {</span>
+<span class="fc" id="L721">									implemented = true;</span>
+<span class="fc" id="L722">									break;</span>
+								}
+<span class="nc" id="L724">							}</span>
+<span class="fc bfc" id="L725" title="All 2 branches covered.">							if (!implemented) {</span>
+<span class="fc" id="L726">						        removedAndNotOverriddenMethods.add(jApiMethod);</span>
+							}
+						}
+<span class="fc" id="L729">					}</span>
+<span class="fc bfc" id="L730" title="All 2 branches covered.">					for (JApiField jApiField : superclass.getFields()) {</span>
+<span class="fc bfc" id="L731" title="All 2 branches covered.">						if (jApiField.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L732">							boolean overridden = false;</span>
+<span class="fc bfc" id="L733" title="All 2 branches covered.">							for (JApiField field : fields) {</span>
+<span class="pc bpc" id="L734" title="2 of 4 branches missed.">								if (field.getName().equals(jApiField.getName()) &amp;&amp; hasSameType(jApiField, field)) {</span>
+<span class="fc" id="L735">									overridden = true;</span>
+								}
+<span class="fc" id="L737">							}</span>
+<span class="fc bfc" id="L738" title="All 2 branches covered.">							if (!overridden) {</span>
+<span class="fc" id="L739">								removedAndNotOverriddenFields.add(jApiField);</span>
+							}
+						}
+<span class="fc" id="L742">					}</span>
+<span class="fc" id="L743">					return 0;</span>
+				}
+			});
+<span class="fc bfc" id="L746" title="All 2 branches covered.">			if (removedAndNotOverriddenMethods.size() &gt; 0) {</span>
+<span class="fc" id="L747">				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS);</span>
+			}
+<span class="fc bfc" id="L749" title="All 2 branches covered.">			if (removedAndNotOverriddenFields.size() &gt; 0) {</span>
+<span class="fc" id="L750">				addCompatibilityChange(jApiClass, JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS);</span>
+			}
+<span class="fc bfc" id="L752" title="All 4 branches covered.">			if (superclass.getOldSuperclassName().isPresent() &amp;&amp; superclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc bfc" id="L753" title="All 2 branches covered.">				if (!superclass.getOldSuperclassName().get().equals(superclass.getNewSuperclassName().get())) {</span>
+<span class="fc" id="L754">					boolean superClassChangedToObject = false;</span>
+<span class="fc" id="L755">					boolean superClassChangedFromObject = false;</span>
+<span class="fc bfc" id="L756" title="All 4 branches covered.">					if (!superclass.getOldSuperclassName().get().equals(&quot;java.lang.Object&quot;) &amp;&amp; superclass.getNewSuperclassName().get().equals(&quot;java.lang.Object&quot;)) {</span>
+<span class="fc" id="L757">						superClassChangedToObject = true;</span>
+					}
+<span class="pc bpc" id="L759" title="1 of 4 branches missed.">					if (superclass.getOldSuperclassName().get().equals(&quot;java.lang.Object&quot;) &amp;&amp; !superclass.getNewSuperclassName().get().equals(&quot;java.lang.Object&quot;)) {</span>
+<span class="fc" id="L760">						superClassChangedFromObject = true;</span>
+					}
+<span class="fc bfc" id="L762" title="All 2 branches covered.">					if (superClassChangedToObject) {</span>
+<span class="fc" id="L763">						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);</span>
+<span class="fc bfc" id="L764" title="All 2 branches covered.">					} else if (superClassChangedFromObject) {</span>
+<span class="fc" id="L765">						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);</span>
+					} else {
+						// check if the old superclass is still an ancestor of the new superclass
+<span class="fc" id="L768">						List&lt;JApiSuperclass&gt; ancestors = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L769">						final List&lt;JApiSuperclass&gt; matchingAncestors = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L770">						forAllSuperclasses(jApiClass, classMap, ancestors, new OnSuperclassCallback&lt;JApiSuperclass&gt;() {</span>
+							@Override
+							public JApiSuperclass callback(JApiClass clazz, Map&lt;String, JApiClass&gt; classMap, JApiChangeStatus changeStatusOfSuperclass) {
+<span class="fc" id="L773">								JApiSuperclass ancestor = clazz.getSuperclass();</span>
+<span class="fc bfc" id="L774" title="All 4 branches covered.">								if (ancestor.getNewSuperclassName().isPresent() &amp;&amp; ancestor.getNewSuperclassName().get().equals(superclass.getOldSuperclassName().get())) {</span>
+<span class="fc" id="L775">									matchingAncestors.add(ancestor);</span>
+								}
+<span class="fc" id="L777">								return ancestor;</span>
+							}
+						});
+<span class="fc bfc" id="L780" title="All 2 branches covered.">						if (matchingAncestors.isEmpty()) {</span>
+<span class="fc" id="L781">							addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);</span>
+						} else {
+							// really, superclass(es) inserted - but the old superclass is still an ancestor
+<span class="fc" id="L784">							addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);</span>
+						}
+					}
+<span class="fc" id="L787">				}</span>
+			} else {
+<span class="fc bfc" id="L789" title="All 2 branches covered.">				if (superclass.getOldSuperclassName().isPresent()) {</span>
+<span class="fc" id="L790">					addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);</span>
+<span class="pc bpc" id="L791" title="1 of 2 branches missed.">				} else if (superclass.getNewSuperclassName().isPresent()) {</span>
+<span class="nc" id="L792">					addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);</span>
+				}
+			}
+		}
+		// section 13.4.4 of &quot;Java Language Specification&quot; SE7
+<span class="fc bfc" id="L797" title="All 2 branches covered.">		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {</span>
+<span class="fc bfc" id="L798" title="All 2 branches covered.">			if (implementedInterface.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L799">				addCompatibilityChange(implementedInterface, JApiCompatibilityChange.INTERFACE_REMOVED);</span>
+			} else {
+<span class="fc" id="L801">				JApiClass interfaceClass = classMap.get(implementedInterface.getFullyQualifiedName());</span>
+<span class="fc bfc" id="L802" title="All 2 branches covered.">				if (interfaceClass == null) {</span>
+<span class="fc" id="L803">					interfaceClass = loadClass(implementedInterface.getFullyQualifiedName(), EnumSet.allOf(Classpath.class));</span>
+				}
+<span class="pc bpc" id="L805" title="1 of 4 branches missed.">				if (implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED || implementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L806">					implementedInterface.setJApiClass(interfaceClass);</span>
+<span class="fc" id="L807">					checkIfMethodsHaveChangedIncompatible(interfaceClass, classMap);</span>
+<span class="fc" id="L808">					checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);</span>
+<span class="pc bpc" id="L809" title="1 of 2 branches missed.">				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L810">					addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);</span>
+					// no marker interface, no abstract class, no interface and annotation
+<span class="pc bpc" id="L812" title="3 of 10 branches missed.">					if (!interfaceClass.getMethods().isEmpty() &amp;&amp; !isAbstract(jApiClass) &amp;&amp; !isInterface(jApiClass) &amp;&amp; !isAnnotation(jApiClass) &amp;&amp; !isEnum(jApiClass)) {</span>
+<span class="fc" id="L813">						boolean allInterfaceMethodsImplemented = true;</span>
+<span class="fc bfc" id="L814" title="All 2 branches covered.">						for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {</span>
+<span class="fc" id="L815">							boolean interfaceMethodImplemented = false;</span>
+<span class="fc bfc" id="L816" title="All 2 branches covered.">							if (isSynthetic(interfaceMethod)) {</span>
+<span class="fc" id="L817">								continue;</span>
+							}
+<span class="fc bfc" id="L819" title="All 2 branches covered.">							if (!isAbstract(interfaceMethod)) { //default implementation</span>
+<span class="fc" id="L820">								continue;</span>
+							}
+<span class="fc bfc" id="L822" title="All 2 branches covered.">							if (isImplemented(interfaceMethod, jApiClass)) {</span>
+<span class="fc" id="L823">								interfaceMethodImplemented = true;</span>
+<span class="fc" id="L824">								break;</span>
+							}
+<span class="pc bpc" id="L826" title="1 of 2 branches missed.">							if (!interfaceMethodImplemented) {</span>
+<span class="fc" id="L827">								allInterfaceMethodsImplemented = false;</span>
+<span class="fc" id="L828">								break;</span>
+							}
+<span class="nc" id="L830">						}</span>
+<span class="fc bfc" id="L831" title="All 2 branches covered.">						if (!allInterfaceMethodsImplemented) {</span>
+<span class="fc" id="L832">							addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);</span>
+						}
+					}
+				}
+			}
+<span class="fc" id="L837">		}</span>
+<span class="fc" id="L838">		checkIfClassNowCheckedException(jApiClass);</span>
+<span class="fc" id="L839">		checkIfAbstractMethodAddedInSuperclass(jApiClass, classMap);</span>
+<span class="fc" id="L840">		checkIfAbstractMethodAdded(jApiClass, classMap);</span>
+<span class="fc" id="L841">	}</span>
+
+	private boolean isAbstract(JApiMethod jApiMethod) {
+<span class="fc bfc" id="L844" title="All 2 branches covered.">		if (jApiMethod.getAbstractModifier().getNewModifier().isPresent()) {</span>
+<span class="fc" id="L845">			AbstractModifier abstractModifier = jApiMethod.getAbstractModifier().getNewModifier().get();</span>
+<span class="fc bfc" id="L846" title="All 2 branches covered.">			return abstractModifier == AbstractModifier.ABSTRACT;</span>
+		}
+<span class="fc" id="L848">		return false;</span>
+	}
+
+	private boolean hasSameType(JApiField field, JApiField otherField) {
+<span class="fc" id="L852">		boolean hasSameNewType = false;</span>
+<span class="pc bpc" id="L853" title="1 of 4 branches missed.">		if (field.getType().getNewTypeOptional().isPresent() &amp;&amp; otherField.getType().getNewTypeOptional().isPresent()) {</span>
+<span class="nc" id="L854">			hasSameNewType = field.getType().getNewTypeOptional().get().equals(otherField.getType().getNewTypeOptional().get());</span>
+<span class="pc bpc" id="L855" title="1 of 4 branches missed.">		} else if (field.getType().getOldTypeOptional().isPresent() &amp;&amp; otherField.getType().getNewTypeOptional().isPresent()) {</span>
+<span class="fc" id="L856">			hasSameNewType = field.getType().getOldTypeOptional().get().equals(otherField.getType().getNewTypeOptional().get());</span>
+<span class="pc bpc" id="L857" title="3 of 4 branches missed.">		} else if (field.getType().getOldTypeOptional().isPresent() &amp;&amp; otherField.getType().getOldTypeOptional().isPresent()) {</span>
+<span class="nc" id="L858">			hasSameNewType = field.getType().getOldTypeOptional().get().equals(otherField.getType().getOldTypeOptional().get());</span>
+<span class="pc bpc" id="L859" title="2 of 4 branches missed.">		} else if (field.getType().getNewTypeOptional().isPresent() &amp;&amp; otherField.getType().getOldTypeOptional().isPresent()) {</span>
+<span class="fc" id="L860">			hasSameNewType = field.getType().getNewTypeOptional().get().equals(otherField.getType().getOldTypeOptional().get());</span>
+		}
+<span class="fc" id="L862">		return hasSameNewType;</span>
+	}
+
+	private void checkIfAbstractMethodAdded(JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap) {
+<span class="fc bfc" id="L866" title="All 4 branches covered.">		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW &amp;&amp; !isAbstract(jApiClass)) {</span>
+			//TODO compute hull of all methods and check if there are any abstract methods not implemented
+		}
+<span class="fc" id="L869">	}</span>
+
+	private void checkIfAbstractMethodAddedInSuperclass(final JApiClass jApiClass, Map&lt;String, JApiClass&gt; classMap) {
+<span class="fc bfc" id="L872" title="All 4 branches covered.">		if (jApiClass.getChangeStatus() != JApiChangeStatus.NEW &amp;&amp; isClass(jApiClass)) {</span>
+<span class="fc" id="L873">			final List&lt;JApiMethod&gt; abstractMethods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L874">			final List&lt;JApiMethod&gt; defaultMethods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L875">			final List&lt;JApiMethod&gt; implementedMethods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L876">			final List&lt;JApiImplementedInterface&gt; implementedInterfaces = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L877" title="All 2 branches covered.">			for (JApiMethod jApiMethod : jApiClass.getMethods()) {</span>
+<span class="fc bfc" id="L878" title="All 2 branches covered.">				if (!isAbstract(jApiMethod)) {</span>
+<span class="fc" id="L879">					implementedMethods.add(jApiMethod);</span>
+				}
+<span class="fc" id="L881">			}</span>
+<span class="fc" id="L882">			forAllSuperclasses(jApiClass, classMap, new ArrayList&lt;Integer&gt;(), new OnSuperclassCallback&lt;Integer&gt;() {</span>
+				@Override
+				public Integer callback(JApiClass superclass, Map&lt;String, JApiClass&gt; classMap, JApiChangeStatus changeStatusOfSuperclass) {
+<span class="fc bfc" id="L885" title="All 2 branches covered.">					for (JApiMethod jApiMethod : superclass.getMethods()) {</span>
+<span class="fc bfc" id="L886" title="All 2 branches covered.">						if (!isAbstract(jApiMethod)) {</span>
+<span class="fc" id="L887">							implementedMethods.add(jApiMethod);</span>
+						}
+<span class="fc" id="L889">					}</span>
+<span class="fc bfc" id="L890" title="All 2 branches covered.">					for (JApiMethod jApiMethod : superclass.getMethods()) {</span>
+<span class="fc bfc" id="L891" title="All 2 branches covered.">						if (isAbstract(jApiMethod)) {</span>
+<span class="fc" id="L892">							boolean isImplemented = false;</span>
+<span class="fc bfc" id="L893" title="All 2 branches covered.">							for (JApiMethod implementedMethod : implementedMethods) {</span>
+<span class="fc bfc" id="L894" title="All 4 branches covered.">								if (jApiMethod.getName().equals(implementedMethod.getName()) &amp;&amp; jApiMethod.hasSameSignature(implementedMethod)) {</span>
+<span class="fc" id="L895">									isImplemented = true;</span>
+<span class="fc" id="L896">									break;</span>
+								}
+<span class="fc" id="L898">							}</span>
+<span class="fc bfc" id="L899" title="All 2 branches covered.">							if (!isImplemented) {</span>
+<span class="pc bpc" id="L900" title="1 of 6 branches missed.">								if (jApiMethod.getChangeStatus() == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.MODIFIED) {</span>
+<span class="pc bpc" id="L901" title="1 of 2 branches missed.">									if (jApiMethod.getAbstractModifier().getNewModifier().isPresent()) {</span>
+<span class="fc" id="L902">										AbstractModifier abstractModifier = jApiMethod.getAbstractModifier().getNewModifier().get();</span>
+<span class="pc bpc" id="L903" title="1 of 2 branches missed.">										if (abstractModifier == AbstractModifier.ABSTRACT) {</span>
+<span class="fc" id="L904">											abstractMethods.add(jApiMethod);</span>
+										} else {
+<span class="nc" id="L906">											defaultMethods.add(jApiMethod);</span>
+										}
+									}
+								}
+							}
+						}
+<span class="fc" id="L912">					}</span>
+<span class="fc" id="L913">					implementedInterfaces.addAll(superclass.getInterfaces());</span>
+<span class="fc" id="L914">					return 0;</span>
+				}
+			});
+<span class="fc" id="L917">			implementedInterfaces.addAll(jApiClass.getInterfaces());</span>
+<span class="fc bfc" id="L918" title="All 2 branches covered.">			if (abstractMethods.size() &gt; 0) {</span>
+<span class="fc" id="L919">				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_SUPERCLASS);</span>
+			}
+<span class="fc" id="L921">			abstractMethods.clear();</span>
+<span class="fc bfc" id="L922" title="All 2 branches covered.">			for (JApiImplementedInterface jApiImplementedInterface : implementedInterfaces) {</span>
+<span class="fc" id="L923">				JApiClass interfaceClass = getJApiClass(jApiImplementedInterface, classMap);</span>
+<span class="fc bfc" id="L924" title="All 2 branches covered.">				for (JApiMethod interfaceMethod : interfaceClass.getMethods()) {</span>
+<span class="fc" id="L925">					boolean isImplemented = false;</span>
+<span class="fc bfc" id="L926" title="All 2 branches covered.">					for (JApiMethod implementedMethod : implementedMethods) {</span>
+<span class="fc bfc" id="L927" title="All 2 branches covered.">						if (areMatching(interfaceMethod, implementedMethod)) {</span>
+<span class="fc" id="L928">							isImplemented = true;</span>
+<span class="fc" id="L929">							break;</span>
+						}
+<span class="fc" id="L931">					}</span>
+<span class="fc bfc" id="L932" title="All 2 branches covered.">					if (!isImplemented) {</span>
+<span class="fc bfc" id="L933" title="All 4 branches covered.">						if (interfaceMethod.getChangeStatus() == JApiChangeStatus.NEW || jApiImplementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="pc bpc" id="L934" title="1 of 2 branches missed.">							if (interfaceMethod.getAbstractModifier().getNewModifier().isPresent()) {</span>
+<span class="fc" id="L935">								AbstractModifier abstractModifier = interfaceMethod.getAbstractModifier().getNewModifier().get();</span>
+<span class="fc bfc" id="L936" title="All 2 branches covered.">								if (abstractModifier == AbstractModifier.ABSTRACT) {</span>
+<span class="fc" id="L937">									abstractMethods.add(interfaceMethod);</span>
+								} else {
+<span class="fc" id="L939">									defaultMethods.add(interfaceMethod);</span>
+								}
+							}
+						}
+					}
+<span class="fc" id="L944">				}</span>
+<span class="fc" id="L945">			}</span>
+<span class="fc" id="L946">			final List&lt;JApiMethod&gt; abstractMethodsWithDefaultInInterface = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L947" title="All 2 branches covered.">			for (JApiMethod abstractMethod : abstractMethods) {</span>
+<span class="fc bfc" id="L948" title="All 2 branches covered.">				for (JApiImplementedInterface implementedInterface : implementedInterfaces) {</span>
+<span class="fc" id="L949">					final JApiClass interfaceClass = getJApiClass(implementedInterface, classMap);</span>
+<span class="fc bfc" id="L950" title="All 2 branches covered.">					for (JApiMethod defaultMethodCandidate : interfaceClass.getMethods()) {</span>
+<span class="pc bpc" id="L951" title="1 of 2 branches missed.">						if (!isAbstract(defaultMethodCandidate)</span>
+<span class="nc bnc" id="L952" title="All 2 branches missed.">								&amp;&amp; areMatching(abstractMethod, defaultMethodCandidate)) {</span>
+							// we have a default implementation for this method
+							// double-check that we extend interface that the method comes from
+<span class="nc bnc" id="L955" title="All 2 branches missed.">							for (JApiImplementedInterface extendedInterface : interfaceClass.getInterfaces()) {</span>
+<span class="nc" id="L956">								JApiClass extendedInterfaceClass = getJApiClass(extendedInterface, classMap);</span>
+
+<span class="nc bnc" id="L958" title="All 2 branches missed.">								if (abstractMethod.getjApiClass().equals(extendedInterfaceClass)) {</span>
+<span class="nc" id="L959">									abstractMethodsWithDefaultInInterface.add(abstractMethod);</span>
+								}
+<span class="nc" id="L961">							}</span>
+						}
+<span class="fc" id="L963">					}</span>
+<span class="fc" id="L964">				}</span>
+<span class="fc" id="L965">			}</span>
+<span class="fc" id="L966">			abstractMethods.removeAll(abstractMethodsWithDefaultInInterface);</span>
+
+<span class="fc bfc" id="L968" title="All 2 branches covered.">			if (!abstractMethods.isEmpty()) {</span>
+<span class="fc" id="L969">				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);</span>
+			}
+<span class="fc bfc" id="L971" title="All 2 branches covered.">			if (!defaultMethods.isEmpty()) {</span>
+<span class="fc" id="L972">				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE);</span>
+			}
+		}
+<span class="fc" id="L975">	}</span>
+
+	private static boolean areMatching(JApiMethod left, JApiMethod right) {
+<span class="fc bfc" id="L978" title="All 2 branches covered.">		return left.getName().equals(right.getName())</span>
+<span class="fc bfc" id="L979" title="All 2 branches covered.">				&amp;&amp; left.hasSameSignature(right);</span>
+	}
+
+	private JApiClass getJApiClass(JApiImplementedInterface implementedInterface, Map&lt;String, JApiClass&gt; classMap) {
+<span class="fc" id="L983">		String fullyQualifiedName = implementedInterface.getFullyQualifiedName();</span>
+<span class="fc" id="L984">		JApiClass interfaceClass = classMap.get(fullyQualifiedName);</span>
+<span class="fc bfc" id="L985" title="All 2 branches covered.">		if (interfaceClass == null) {</span>
+<span class="fc" id="L986">			interfaceClass = loadClass(fullyQualifiedName, EnumSet.allOf(Classpath.class));</span>
+		}
+<span class="fc" id="L988">		return interfaceClass;</span>
+	}
+
+	private void checkIfClassNowCheckedException(JApiClass jApiClass) {
+<span class="fc" id="L992">		JApiSuperclass jApiClassSuperclass = jApiClass.getSuperclass();</span>
+<span class="fc bfc" id="L993" title="All 2 branches covered.">		if (jApiClassSuperclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="pc bpc" id="L994" title="1 of 2 branches missed.">			if (jApiClassSuperclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc" id="L995">				String fqn = jApiClassSuperclass.getNewSuperclassName().get();</span>
+<span class="fc bfc" id="L996" title="All 2 branches covered.">				if (&quot;java.lang.Exception&quot;.equals(fqn)) {</span>
+<span class="fc" id="L997">					addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NOW_CHECKED_EXCEPTION);</span>
+				}
+			}
+		}
+<span class="fc" id="L1001">	}</span>
+
+	private void addCompatibilityChange(JApiCompatibility binaryCompatibility, JApiCompatibilityChange compatibilityChange) {
+<span class="fc" id="L1004">		List&lt;JApiCompatibilityChange&gt; compatibilityChanges = binaryCompatibility.getCompatibilityChanges();</span>
+<span class="fc bfc" id="L1005" title="All 2 branches covered.">		if (!compatibilityChanges.contains(compatibilityChange)) {</span>
+<span class="fc" id="L1006">			compatibilityChanges.add(compatibilityChange);</span>
+		}
+<span class="fc" id="L1008">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

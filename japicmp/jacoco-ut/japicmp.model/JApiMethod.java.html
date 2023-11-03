@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiMethod.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiMethod.java</span></div><h1>JApiMethod.java</h1><pre class="source lang-java linenums">package japicmp.model;
+
+import japicmp.cmp.JarArchiveComparator;
+import japicmp.util.Optional;
+import japicmp.util.OptionalHelper;
+import japicmp.util.SignatureParser;
+import javassist.CtMethod;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+public class JApiMethod extends JApiBehavior {
+	private final Optional&lt;CtMethod&gt; oldMethod;
+	private final Optional&lt;CtMethod&gt; newMethod;
+	private final JApiReturnType returnType;
+
+	public JApiMethod(JApiClass jApiClass, String name, JApiChangeStatus changeStatus, Optional&lt;CtMethod&gt; oldMethod, Optional&lt;CtMethod&gt; newMethod, JarArchiveComparator jarArchiveComparator) {
+<span class="fc" id="L18">		super(jApiClass, name, oldMethod, newMethod, changeStatus, jarArchiveComparator);</span>
+<span class="fc" id="L19">		this.oldMethod = oldMethod;</span>
+<span class="fc" id="L20">		this.newMethod = newMethod;</span>
+<span class="fc" id="L21">		this.returnType = computeReturnTypeChanges(oldMethod, newMethod);</span>
+<span class="fc" id="L22">		this.changeStatus = evaluateChangeStatus(this.changeStatus);</span>
+<span class="fc" id="L23">	}</span>
+
+	private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+<span class="fc bfc" id="L26" title="All 2 branches covered.">		if (changeStatus == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">			if (this.returnType.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L28">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+			}
+		}
+<span class="fc" id="L31">		return changeStatus;</span>
+	}
+
+	@Override
+	public void enhanceGenericTypeToParameters() {
+<span class="fc" id="L36">		super.enhanceGenericTypeToParameters(this.jApiClass, this.oldMethod, this.newMethod);</span>
+<span class="fc" id="L37">	}</span>
+
+	private JApiReturnType computeReturnTypeChanges(Optional&lt;CtMethod&gt; oldMethodOptional, Optional&lt;CtMethod&gt; newMethodOptional) {
+<span class="fc" id="L40">		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.absent(), Optional.absent());</span>
+<span class="fc bfc" id="L41" title="All 4 branches covered.">		if (oldMethodOptional.isPresent() &amp;&amp; newMethodOptional.isPresent()) {</span>
+<span class="fc" id="L42">			SignatureParser.ParsedParameter oldReturnType = computeReturnType(oldMethodOptional.get());</span>
+<span class="fc" id="L43">			SignatureParser.ParsedParameter newReturnType = computeReturnType(newMethodOptional.get());</span>
+<span class="fc" id="L44">			JApiChangeStatus changeStatusReturnType = JApiChangeStatus.UNCHANGED;</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">			if (!oldReturnType.getType().equals(newReturnType.getType())) {</span>
+<span class="fc" id="L46">				changeStatusReturnType = JApiChangeStatus.MODIFIED;</span>
+			}
+<span class="fc" id="L48">			jApiReturnType = new JApiReturnType(changeStatusReturnType, Optional.of(oldReturnType.getType()), Optional.of(newReturnType.getType()));</span>
+<span class="fc" id="L49">			SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(oldMethodOptional.get(), oldReturnType), jApiReturnType.getOldGenericTypes());</span>
+<span class="fc" id="L50">			SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(newMethodOptional.get(), newReturnType), jApiReturnType.getNewGenericTypes());</span>
+<span class="fc" id="L51">		} else {</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">			if (oldMethodOptional.isPresent()) {</span>
+<span class="fc" id="L53">				SignatureParser.ParsedParameter oldReturnType = computeReturnType(oldMethodOptional.get());</span>
+<span class="fc" id="L54">				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType.getType()), Optional.absent());</span>
+<span class="fc" id="L55">				SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(oldMethodOptional.get(), oldReturnType), jApiReturnType.getOldGenericTypes());</span>
+			}
+<span class="fc bfc" id="L57" title="All 2 branches covered.">			if (newMethodOptional.isPresent()) {</span>
+<span class="fc" id="L58">				SignatureParser.ParsedParameter newReturnType = computeReturnType(newMethodOptional.get());</span>
+<span class="fc" id="L59">				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.absent(), Optional.of(newReturnType.getType()));</span>
+<span class="fc" id="L60">				SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(newMethodOptional.get(), newReturnType), jApiReturnType.getNewGenericTypes());</span>
+			}
+		}
+<span class="fc" id="L63">		return jApiReturnType;</span>
+	}
+
+	private SignatureParser.ParsedParameter computeReturnType(CtMethod ctMethod) {
+<span class="fc" id="L67">		SignatureParser parser = new SignatureParser();</span>
+<span class="fc" id="L68">		parser.parse(ctMethod.getSignature());</span>
+<span class="fc" id="L69">		return parser.getReturnType();</span>
+	}
+
+	private SignatureParser.ParsedParameter computeReturnTypeGenericSignature(CtMethod ctMethod, SignatureParser.ParsedParameter rawSignatureParam) {
+<span class="fc" id="L73">		SignatureParser parser = new SignatureParser();</span>
+<span class="fc" id="L74">		String genericSignature = ctMethod.getGenericSignature();</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">		if (genericSignature != null) {</span>
+<span class="fc" id="L76">			parser.parse(genericSignature);</span>
+<span class="fc" id="L77">			return parser.getReturnType();</span>
+		}
+<span class="fc" id="L79">		return rawSignatureParam;</span>
+	}
+
+	public boolean hasSameReturnType(JApiMethod otherMethod) {
+<span class="fc" id="L83">		boolean haveSameReturnType = false;</span>
+<span class="fc" id="L84">		JApiReturnType otherReturnType = otherMethod.getReturnType();</span>
+<span class="pc bpc" id="L85" title="1 of 4 branches missed.">		if (otherReturnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || otherReturnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="pc bpc" id="L86" title="1 of 4 branches missed.">			if (this.returnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || this.returnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="pc bpc" id="L87" title="2 of 4 branches missed.">				if (otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType()) &amp;&amp; otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {</span>
+<span class="fc" id="L88">					haveSameReturnType = true;</span>
+				}
+<span class="fc bfc" id="L90" title="All 2 branches covered.">			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">				if (otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {</span>
+<span class="fc" id="L92">					haveSameReturnType = true;</span>
+				}
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">				if (otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType())) {</span>
+<span class="fc" id="L96">					haveSameReturnType = true;</span>
+				}
+			}
+<span class="fc bfc" id="L99" title="All 2 branches covered.">		} else if (otherReturnType.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="pc bpc" id="L100" title="1 of 4 branches missed.">			if (this.returnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || this.returnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">				if (otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {</span>
+<span class="fc" id="L102">					haveSameReturnType = true;</span>
+				}
+<span class="fc bfc" id="L104" title="All 2 branches covered.">			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">				if (otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {</span>
+<span class="fc" id="L106">					haveSameReturnType = true;</span>
+				}
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">				if (otherReturnType.getNewReturnType().equals(this.returnType.getOldReturnType())) {</span>
+<span class="fc" id="L110">					haveSameReturnType = true;</span>
+				}
+			}
+		} else {
+<span class="pc bpc" id="L114" title="1 of 4 branches missed.">			if (this.returnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || this.returnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">				if (otherReturnType.getOldReturnType().equals(this.returnType.getNewReturnType())) {</span>
+<span class="fc" id="L116">					haveSameReturnType = true;</span>
+				}
+<span class="fc bfc" id="L118" title="All 2 branches covered.">			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">				if (otherReturnType.getOldReturnType().equals(this.returnType.getNewReturnType())) {</span>
+<span class="fc" id="L120">					haveSameReturnType = true;</span>
+				}
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">				if (otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType())) {</span>
+<span class="fc" id="L124">					haveSameReturnType = true;</span>
+				}
+			}
+		}
+<span class="fc" id="L128">		return haveSameReturnType;</span>
+	}
+
+	public boolean hasSameSignature(JApiMethod jApiMethod) {
+<span class="pc bpc" id="L132" title="1 of 4 branches missed.">		return hasSameReturnType(jApiMethod) &amp;&amp; hasSameParameter(jApiMethod);</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;CtMethod&gt; getNewMethod() {
+<span class="nc" id="L137">		return newMethod;</span>
+	}
+
+	@XmlTransient
+	public Optional&lt;CtMethod&gt; getOldMethod() {
+<span class="nc" id="L142">		return oldMethod;</span>
+	}
+
+	@XmlElement(name = &quot;returnType&quot;)
+	public JApiReturnType getReturnType() {
+<span class="fc" id="L147">		return returnType;</span>
+	}
+
+	public String toString()
+	{
+<span class="nc" id="L152">		return &quot;JApiMethod [oldMethod=&quot;</span>
+<span class="nc" id="L153">			+ toString(oldMethod)</span>
+			+ &quot;, newMethod=&quot;
+<span class="nc" id="L155">			+ toString(newMethod)</span>
+			+ &quot;, returnType=&quot;
+			+ returnType
+			+ &quot;, getCompatibilityChanges()=&quot;
+<span class="nc" id="L159">			+ getCompatibilityChanges()</span>
+			+ &quot;]&quot;;
+	}
+
+	public static String toString(Optional&lt;CtMethod&gt; method) {
+<span class="nc bnc" id="L164" title="All 2 branches missed.">		if(method == null ) {</span>
+<span class="nc" id="L165">			return OptionalHelper.N_A;</span>
+		}
+<span class="nc bnc" id="L167" title="All 2 branches missed.">		if(method.isPresent()) {</span>
+<span class="nc" id="L168">			return method.get().getLongName();</span>
+		}
+<span class="nc" id="L170">		return OptionalHelper.N_A;</span>
+	}
+
+	@Override
+	public boolean isSourceCompatible() {
+<span class="fc" id="L175">		boolean sourceCompatible = super.isSourceCompatible();</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">		if (sourceCompatible) {</span>
+<span class="fc" id="L177">			sourceCompatible = returnType.isSourceCompatible();</span>
+		}
+<span class="fc bfc" id="L179" title="All 2 branches covered.">		for (JApiParameter jApiParameter : getParameters()) {</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">			for (JApiCompatibilityChange compatibilityChange : jApiParameter.getCompatibilityChanges()) {</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">				if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="fc" id="L182">					sourceCompatible = false;</span>
+<span class="fc" id="L183">					break;</span>
+				}
+<span class="nc" id="L185">			}</span>
+<span class="fc" id="L186">		}</span>
+<span class="fc" id="L187">		return sourceCompatible;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
