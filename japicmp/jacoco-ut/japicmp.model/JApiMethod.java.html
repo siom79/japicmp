@@ -84,7 +84,7 @@ public class JApiMethod extends JApiBehavior {
 <span class="fc" id="L84">		JApiReturnType otherReturnType = otherMethod.getReturnType();</span>
 <span class="pc bpc" id="L85" title="1 of 4 branches missed.">		if (otherReturnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || otherReturnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
 <span class="pc bpc" id="L86" title="1 of 4 branches missed.">			if (this.returnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || this.returnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="pc bpc" id="L87" title="2 of 4 branches missed.">				if (otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType()) &amp;&amp; otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {</span>
+<span class="pc bpc" id="L87" title="1 of 4 branches missed.">				if (otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType()) &amp;&amp; otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {</span>
 <span class="fc" id="L88">					haveSameReturnType = true;</span>
 				}
 <span class="fc bfc" id="L90" title="All 2 branches covered.">			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.NEW) {</span>
@@ -129,7 +129,7 @@ public class JApiMethod extends JApiBehavior {
 	}
 
 	public boolean hasSameSignature(JApiMethod jApiMethod) {
-<span class="pc bpc" id="L132" title="1 of 4 branches missed.">		return hasSameReturnType(jApiMethod) &amp;&amp; hasSameParameter(jApiMethod);</span>
+<span class="fc bfc" id="L132" title="All 4 branches covered.">		return hasSameReturnType(jApiMethod) &amp;&amp; hasSameParameter(jApiMethod);</span>
 	}
 
 	@XmlTransient
