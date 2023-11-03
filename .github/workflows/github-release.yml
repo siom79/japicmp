@@ -1,7 +1,7 @@
 name: Github Release
 
 on:
-  push:
+  create:
     tags:
       - '*'
 
