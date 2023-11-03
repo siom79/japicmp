@@ -22,4 +22,4 @@ jobs:
           git config --global user.name '${{ github.actor }}'
           git config --global user.email '${{ github.actor }}@users.noreply.github.com'
           mvn install
-          mvn site:site site:stage scm-publish:publish-scm -Dgithub.actor=${{ github.actor } -Dgithub.token=${{ secrets.GITHUB_TOKEN }}
+          mvn site:site site:stage scm-publish:publish-scm -Dgithub.actor=${{ github.actor }} -Dgithub.token=${{ secrets.GITHUB_TOKEN }}
