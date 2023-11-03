@@ -3,6 +3,11 @@ Versions
 
 The following versions of japicmp are available:
 
+0.18.3 (2023-11-03)
+-------------------
+* skip-Tag in plugin configuration and -Djapicmp.skip work [#366](https://github.com/siom79/japicmp/issues/366)
+* Do not report any incompatibilities if class becomes public. [#365](https://github.com/siom79/japicmp/issues/365)
+
 0.18.2 (2023-10-18)
 -------------------
 * Upgrade to groovy 4.0.15 [#364](https://github.com/siom79/japicmp/issues/364)
