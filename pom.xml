@@ -137,6 +137,8 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<github.account>siom79</github.account>
 		<github.project>japicmp</github.project>
+		<github.actor>siom79</github.actor>
+		<github.token>secret</github.token>
 		<maven.site.skip>false</maven.site.skip>
 		<maven-api.version>3.6.3</maven-api.version>
 		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven api version -->
@@ -400,7 +402,7 @@
 	</build>
 
 	<scm>
-		<connection>scm:git:https://github.com/${github.account}/${github.project}.git</connection>
+		<connection>scm:git:https://${github.actor}:${github.token}@github.com/${github.account}/${github.project}.git</connection>
 		<developerConnection>scm:git:https://github.com/${github.account}/${github.project}.git</developerConnection>
 		<url>https://github.com/${github.account}/${github.project}.git</url>
 		<tag>japicmp-base-0.15.7</tag>
