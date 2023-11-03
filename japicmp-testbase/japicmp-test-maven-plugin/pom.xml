@@ -650,6 +650,37 @@
 							</dependencies>
 						</configuration>
 					</execution>
+					<execution>
+						<id>skip</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+							<oldVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldVersion>
+							<newVersion>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newVersion>
+							<dependencies>
+								<dependency>
+									<groupId>org.apache.commons</groupId>
+									<artifactId>commons-math3</artifactId>
+									<version>3.4</version>
+								</dependency>
+							</dependencies>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<!-- run site plugin to build reports during 'pre-integration-test' phase

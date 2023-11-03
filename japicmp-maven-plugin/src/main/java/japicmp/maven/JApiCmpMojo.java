@@ -66,8 +66,10 @@ public class JApiCmpMojo extends AbstractMojo {
 	private List<Dependency> oldClassPathDependencies;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<Dependency> newClassPathDependencies;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skip", required = false)
+	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "false")
 	private boolean skip;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skip", defaultValue = "false")
+	private boolean skipExec;
 	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipXmlReport", required = false)
 	private boolean skipXmlReport;
 	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipHtmlReport", required = false)
@@ -104,7 +106,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories,
 			this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
 			this.remoteRepos);
-		PluginParameters pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.of(
+		PluginParameters pluginParameters = new PluginParameters(this.skipExec || this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.of(
 			this.projectBuildDir), Optional.<String>absent(), true, this.oldVersions, this.newVersions, this.oldClassPathDependencies,
 			this.newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
@@ -185,8 +187,6 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-
-
 	private boolean skipModule(PluginParameters pluginParameters, MavenParameters mavenParameters) {
 		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, getLog());
 		return skipModuleStrategy.skip();
@@ -197,7 +197,6 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private static DefaultArtifact createDefaultArtifact(MavenProject mavenProject, String version) {
-
         org.apache.maven.artifact.Artifact artifact = mavenProject.getArtifact();
         return createDefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), artifact.getType(), version);
 	}
