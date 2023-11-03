@@ -19,5 +19,7 @@ jobs:
           cache: maven
       - name: Generate website
         run: |
+          git config user.name '${{ github.actor }}'
+          git config user.email '${{ github.actor }}@users.noreply.github.com'
           mvn install
           mvn site:site site:stage scm-publish:publish-scm
