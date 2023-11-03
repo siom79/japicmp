@@ -387,6 +387,14 @@
 						</execution>
 					</executions>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-scm-publish-plugin</artifactId>
+					<version>3.0.0</version>
+					<configuration>
+						<scmBranch>gh-pages</scmBranch>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -400,8 +408,8 @@
 
 	<distributionManagement>
 		<site>
-			<id>japicmp</id>
-			<url>file://${user.dir}/target/deploy/site</url>
+			<id>github</id>
+			<url>scm:git:https://github.com/${github.account}/${github.project}.git</url>
 		</site>
 		<snapshotRepository>
 			<id>sonatype-nexus-snapshots</id>

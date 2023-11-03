@@ -1,0 +1,22 @@
+name: mvn site
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+
+    name: Site
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Maven Central
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Generate website
+        run: |
+          mvn package
+          mvn site:site site:stage scm-publish:publish-scm
