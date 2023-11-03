@@ -1,7 +1,2 @@
-Comparing source compatibility of /tmp/japicmp/japicmp/target/japicmp-0.18.2.jar against /home/mmois/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.1/japicmp-0.18.1.jar
----! REMOVED CLASS: PUBLIC(-) japicmp.compat.Test  (class removed)
-	---  CLASS FILE FORMAT VERSION: n.a. <- 52.0
-	---! REMOVED INTERFACE: java.lang.Cloneable
-	---! REMOVED INTERFACE: java.io.Serializable
-	---! REMOVED SUPERCLASS: java.text.SimpleDateFormat
-	---! REMOVED CONSTRUCTOR: PUBLIC(-) Test()
+Comparing source compatibility of /home/mmois/Programmierung/japicmp/japicmp/target/japicmp-0.18.4-SNAPSHOT.jar against /home/mmois/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.2/japicmp-0.18.2.jar
+No changes.

@@ -29,7 +29,7 @@ japicmp,japicmp.model,JApiClass,233,2233,35,267,37,493,37,175,6,55
 japicmp,japicmp.model,JApiAnnotationElement,292,101,32,18,53,29,33,5,9,4
 japicmp,japicmp.model,JApiParameter,80,55,14,0,21,17,12,9,5,9
 japicmp,japicmp.model,JApiClassFileFormatVersion,48,101,4,18,5,27,6,16,2,9
-japicmp,japicmp.model,JApiModifier,22,87,6,18,6,24,6,15,2,7
+japicmp,japicmp.model,JApiModifier,22,98,6,22,6,25,6,17,2,7
 japicmp,japicmp.model,JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus,0,223,0,4,0,24,0,6,0,4
 japicmp,japicmp.model,JApiField,177,490,12,46,16,113,17,45,6,27
 japicmp,japicmp.model,JApiType,8,44,0,6,2,13,2,8,2,5
@@ -82,7 +82,7 @@ japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclas
 japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},0,39,1,5,0,6,1,4,0,2
 japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},0,91,4,16,0,12,4,8,0,2
 japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},0,42,2,6,0,7,2,4,0,2
-japicmp,japicmp.compat,CompatibilityChanges,166,2345,91,433,29,482,79,227,0,44
+japicmp,japicmp.compat,CompatibilityChanges,166,2340,91,433,29,480,79,226,0,43
 japicmp,japicmp.config,Options,252,555,23,33,63,156,35,64,15,56
 japicmp,japicmp.config,IgnoreMissingClasses,0,57,0,8,0,18,0,10,0,6
 japicmp,japicmp.filter,Filters,145,306,13,61,11,81,12,32,0,7

@@ -67,13 +67,14 @@ public class JApiModifier&lt;T&gt; {
 
 	public boolean hasChangedTo(T value) {
 <span class="fc" id="L69">		boolean hasChangedTo = false;</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">		if (newModifier.isPresent()) {</span>
+<span class="fc bfc" id="L70" title="All 4 branches covered.">		if (oldModifier.isPresent() &amp;&amp; newModifier.isPresent()) {</span>
 <span class="fc" id="L71">			T newValue = newModifier.get();</span>
-<span class="fc bfc" id="L72" title="All 2 branches covered.">			if (value == newValue) {</span>
-<span class="fc" id="L73">				hasChangedTo = true;</span>
+<span class="fc" id="L72">			T oldValue = oldModifier.get();</span>
+<span class="fc bfc" id="L73" title="All 4 branches covered.">			if (value == newValue &amp;&amp; oldValue != value) {</span>
+<span class="fc" id="L74">				hasChangedTo = true;</span>
 			}
 		}
-<span class="fc" id="L76">		return hasChangedTo;</span>
+<span class="fc" id="L77">		return hasChangedTo;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
