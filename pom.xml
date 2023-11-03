@@ -402,7 +402,7 @@
 	</build>
 
 	<scm>
-		<connection>scm:git:https://${github.actor}:${github.token}@github.com/${github.account}/${github.project}.git</connection>
+		<connection>scm:git:https://github.com/${github.account}/${github.project}.git</connection>
 		<developerConnection>scm:git:https://github.com/${github.account}/${github.project}.git</developerConnection>
 		<url>https://github.com/${github.account}/${github.project}.git</url>
 		<tag>japicmp-base-0.15.7</tag>
@@ -411,7 +411,7 @@
 	<distributionManagement>
 		<site>
 			<id>github</id>
-			<url>scm:git:https://github.com/${github.account}/${github.project}.git</url>
+			<url>scm:git:https://${github.actor}:${github.token}@github.com/${github.account}/${github.project}.git</url>
 		</site>
 		<snapshotRepository>
 			<id>sonatype-nexus-snapshots</id>
