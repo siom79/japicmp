@@ -15,6 +15,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.*;
 
+import static japicmp.util.ModifierHelper.isSynthetic;
+
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
 	JApiCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic, JApiHasGenericTemplates {
 	private final JarArchiveComparator jarArchiveComparator;
@@ -610,7 +612,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
-			if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+			if (syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			for (JApiImplementedInterface implementedInterface : interfaces) {
@@ -622,19 +624,19 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			for (JApiField field : fields) {
-				if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(field)) {
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiMethod method : methods) {
-				if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(method)) {
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiConstructor constructor : constructors) {
-				if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(constructor)) {
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
@@ -703,12 +705,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return ModifierHelper.extractModifierFromClass(oldClassOptional, newClassOptional, new ModifierHelper.ExtractModifierFromClassCallback<SyntheticModifier>() {
 			@Override
 			public SyntheticModifier getModifierForOld(CtClass oldClass) {
-				return ModifierHelper.isSynthetic(oldClass.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;
+				return isSynthetic(oldClass.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;
 			}
 
 			@Override
 			public SyntheticModifier getModifierForNew(CtClass newClass) {
-				return ModifierHelper.isSynthetic(newClass.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;
+				return isSynthetic(newClass.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;
 			}
 		});
 	}
