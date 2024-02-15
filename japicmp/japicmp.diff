@@ -1,2 +1,25 @@
-Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.18.4-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.3/japicmp-0.18.3.jar
-No changes.
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.18.5-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.3/japicmp-0.18.3.jar
+***  MODIFIED CLASS: PUBLIC japicmp.model.JApiAttribute  (not serializable)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	GENERIC TEMPLATES: === T:java.lang.Object
+	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
+***  MODIFIED CLASS: PUBLIC japicmp.model.JApiClassType  (not serializable)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
+***  MODIFIED ENUM: PUBLIC FINAL japicmp.model.JApiCompatibilityChange  (compatible)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChange FIELD_NOW_TRANSIENT
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChange FIELD_NO_LONGER_TRANSIENT
+***  MODIFIED CLASS: PUBLIC japicmp.model.JApiModifier  (not serializable)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	GENERIC TEMPLATES: === T:java.lang.Object
+	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
+***  MODIFIED CLASS: PUBLIC japicmp.model.JApiReturnType  (not serializable)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
+***  MODIFIED CLASS: PUBLIC japicmp.model.JApiType  (not serializable)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
+***  MODIFIED CLASS: PUBLIC japicmp.output.extapi.jpa.model.JpaName  (not serializable)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus

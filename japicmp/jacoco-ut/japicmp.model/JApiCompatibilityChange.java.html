@@ -51,69 +51,71 @@ public enum JApiCompatibilityChange {
 <span class="fc" id="L51">	FIELD_STATIC_AND_OVERRIDES_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
 <span class="fc" id="L52">	FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),</span>
 <span class="fc" id="L53">	FIELD_NOW_FINAL(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L54">	FIELD_NOW_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L55">	FIELD_NO_LONGER_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L56">	FIELD_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L57">	FIELD_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L58">	FIELD_REMOVED_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L59">	FIELD_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L60">	FIELD_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L61">	CONSTRUCTOR_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L62">	CONSTRUCTOR_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR);</span>
+<span class="fc" id="L54">	FIELD_NOW_TRANSIENT(true, true, JApiSemanticVersionLevel.PATCH),</span>
+<span class="fc" id="L55">	FIELD_NOW_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
+<span class="fc" id="L56">	FIELD_NO_LONGER_TRANSIENT(true, true, JApiSemanticVersionLevel.PATCH),</span>
+<span class="fc" id="L57">	FIELD_NO_LONGER_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
+<span class="fc" id="L58">	FIELD_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
+<span class="fc" id="L59">	FIELD_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
+<span class="fc" id="L60">	FIELD_REMOVED_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),</span>
+<span class="fc" id="L61">	FIELD_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR),</span>
+<span class="fc" id="L62">	FIELD_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),</span>
+<span class="fc" id="L63">	CONSTRUCTOR_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
+<span class="fc" id="L64">	CONSTRUCTOR_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR);</span>
 
 	private boolean binaryCompatible;
 	private boolean sourceCompatible;
 	private JApiSemanticVersionLevel semanticVersionLevel;
-<span class="fc" id="L67">	private Boolean binaryCompatibleOverridden = null;</span>
-<span class="fc" id="L68">	private Boolean sourceCompatibleOverridden = null;</span>
-<span class="fc" id="L69">	private JApiSemanticVersionLevel semanticVersionLevelOverridden = null;</span>
+<span class="fc" id="L69">	private Boolean binaryCompatibleOverridden = null;</span>
+<span class="fc" id="L70">	private Boolean sourceCompatibleOverridden = null;</span>
+<span class="fc" id="L71">	private JApiSemanticVersionLevel semanticVersionLevelOverridden = null;</span>
 
 	JApiCompatibilityChange(boolean binaryCompatible, boolean sourceCompatible,
-<span class="fc" id="L72">							JApiSemanticVersionLevel jApiSemanticVersionLevel) {</span>
-<span class="fc" id="L73">		this.binaryCompatible = binaryCompatible;</span>
-<span class="fc" id="L74">		this.sourceCompatible = sourceCompatible;</span>
-<span class="fc" id="L75">		this.semanticVersionLevel = jApiSemanticVersionLevel;</span>
-<span class="fc" id="L76">	}</span>
+<span class="fc" id="L74">							JApiSemanticVersionLevel jApiSemanticVersionLevel) {</span>
+<span class="fc" id="L75">		this.binaryCompatible = binaryCompatible;</span>
+<span class="fc" id="L76">		this.sourceCompatible = sourceCompatible;</span>
+<span class="fc" id="L77">		this.semanticVersionLevel = jApiSemanticVersionLevel;</span>
+<span class="fc" id="L78">	}</span>
 
 	@XmlAttribute(name = &quot;binaryCompatible&quot;)
 	public boolean isBinaryCompatible() {
-<span class="fc bfc" id="L80" title="All 2 branches covered.">		if (binaryCompatibleOverridden != null) {</span>
-<span class="fc" id="L81">			return binaryCompatibleOverridden;</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">		if (binaryCompatibleOverridden != null) {</span>
+<span class="fc" id="L83">			return binaryCompatibleOverridden;</span>
 		}
-<span class="fc" id="L83">		return binaryCompatible;</span>
+<span class="fc" id="L85">		return binaryCompatible;</span>
 	}
 
 	@XmlAttribute(name = &quot;sourceCompatible&quot;)
 	public boolean isSourceCompatible() {
-<span class="fc bfc" id="L88" title="All 2 branches covered.">		if (sourceCompatibleOverridden != null) {</span>
-<span class="fc" id="L89">			return sourceCompatibleOverridden;</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">		if (sourceCompatibleOverridden != null) {</span>
+<span class="fc" id="L91">			return sourceCompatibleOverridden;</span>
 		}
-<span class="fc" id="L91">		return sourceCompatible;</span>
+<span class="fc" id="L93">		return sourceCompatible;</span>
 	}
 
 	public JApiSemanticVersionLevel getSemanticVersionLevel() {
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">		if (semanticVersionLevelOverridden != null) {</span>
-<span class="nc" id="L96">			return semanticVersionLevelOverridden;</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">		if (semanticVersionLevelOverridden != null) {</span>
+<span class="nc" id="L98">			return semanticVersionLevelOverridden;</span>
 		}
-<span class="fc" id="L98">		return semanticVersionLevel;</span>
+<span class="fc" id="L100">		return semanticVersionLevel;</span>
 	}
 
 	public void setBinaryCompatible(boolean binaryCompatible) {
-<span class="fc" id="L102">		this.binaryCompatibleOverridden = binaryCompatible;</span>
-<span class="fc" id="L103">	}</span>
+<span class="fc" id="L104">		this.binaryCompatibleOverridden = binaryCompatible;</span>
+<span class="fc" id="L105">	}</span>
 
 	public void setSourceCompatible(boolean sourceCompatible) {
-<span class="fc" id="L106">		this.sourceCompatibleOverridden = sourceCompatible;</span>
-<span class="fc" id="L107">	}</span>
+<span class="fc" id="L108">		this.sourceCompatibleOverridden = sourceCompatible;</span>
+<span class="fc" id="L109">	}</span>
 
 	public void setSemanticVersionLevel(JApiSemanticVersionLevel semanticVersionLevel) {
-<span class="fc" id="L110">		this.semanticVersionLevelOverridden = semanticVersionLevel;</span>
-<span class="fc" id="L111">	}</span>
+<span class="fc" id="L112">		this.semanticVersionLevelOverridden = semanticVersionLevel;</span>
+<span class="fc" id="L113">	}</span>
 
 	public void resetOverrides() {
-<span class="fc" id="L114">		this.binaryCompatibleOverridden = null;</span>
-<span class="fc" id="L115">		this.sourceCompatibleOverridden = null;</span>
-<span class="fc" id="L116">		this.semanticVersionLevelOverridden = null;</span>
-<span class="fc" id="L117">	}</span>
+<span class="fc" id="L116">		this.binaryCompatibleOverridden = null;</span>
+<span class="fc" id="L117">		this.sourceCompatibleOverridden = null;</span>
+<span class="fc" id="L118">		this.semanticVersionLevelOverridden = null;</span>
+<span class="fc" id="L119">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

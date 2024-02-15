@@ -571,7 +571,9 @@
       <xs:enumeration value="FIELD_STATIC_AND_OVERRIDES_STATIC"/>
       <xs:enumeration value="FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS"/>
       <xs:enumeration value="FIELD_NOW_FINAL"/>
+      <xs:enumeration value="FIELD_NOW_TRANSIENT"/>
       <xs:enumeration value="FIELD_NOW_STATIC"/>
+      <xs:enumeration value="FIELD_NO_LONGER_TRANSIENT"/>
       <xs:enumeration value="FIELD_NO_LONGER_STATIC"/>
       <xs:enumeration value="FIELD_TYPE_CHANGED"/>
       <xs:enumeration value="FIELD_REMOVED"/>

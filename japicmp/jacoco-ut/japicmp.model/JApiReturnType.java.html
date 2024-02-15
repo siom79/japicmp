@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JApiReturnType implements JApiHasGenericTypes, JApiCompatibility {
+public class JApiReturnType implements JApiHasGenericTypes, JApiHasChangeStatus, JApiCompatibility {
 	private final Optional&lt;String&gt; oldReturnTypeOptional;
 	private final Optional&lt;String&gt; newReturnTypeOptional;
 	private final JApiChangeStatus changeStatus;
@@ -23,36 +23,37 @@ public class JApiReturnType implements JApiHasGenericTypes, JApiCompatibility {
 <span class="fc" id="L23">		this.newReturnTypeOptional = newReturnTypeOptional;</span>
 <span class="fc" id="L24">	}</span>
 
+	@Override
 	@XmlAttribute(name = &quot;changeStatus&quot;)
 	public JApiChangeStatus getChangeStatus() {
-<span class="fc" id="L28">		return changeStatus;</span>
+<span class="fc" id="L29">		return changeStatus;</span>
 	}
 
 	@XmlAttribute(name = &quot;oldValue&quot;)
 	public String getOldReturnType() {
-<span class="fc" id="L33">		return OptionalHelper.optionalToString(oldReturnTypeOptional);</span>
+<span class="fc" id="L34">		return OptionalHelper.optionalToString(oldReturnTypeOptional);</span>
 	}
 
 	@XmlAttribute(name = &quot;newValue&quot;)
 	public String getNewReturnType() {
-<span class="fc" id="L38">		return OptionalHelper.optionalToString(newReturnTypeOptional);</span>
+<span class="fc" id="L39">		return OptionalHelper.optionalToString(newReturnTypeOptional);</span>
 	}
 
 	@XmlElementWrapper(name = &quot;oldGenericTypes&quot;)
 	@XmlElement(name = &quot;oldGenericType&quot;)
 	public List&lt;JApiGenericType&gt; getOldGenericTypes() {
-<span class="fc" id="L44">		return oldGenericTypes;</span>
+<span class="fc" id="L45">		return oldGenericTypes;</span>
 	}
 
 	@XmlElementWrapper(name = &quot;newGenericTypes&quot;)
 	@XmlElement(name = &quot;newGenericType&quot;)
 	public List&lt;JApiGenericType&gt; getNewGenericTypes() {
-<span class="fc" id="L50">		return newGenericTypes;</span>
+<span class="fc" id="L51">		return newGenericTypes;</span>
 	}
 
 	public String toString()
 	{
-<span class="nc" id="L55">		return &quot;JApiReturnType [oldReturnTypeOptional=&quot;</span>
+<span class="nc" id="L56">		return &quot;JApiReturnType [oldReturnTypeOptional=&quot;</span>
 			+ oldReturnTypeOptional
 			+ &quot;, newReturnTypeOptional=&quot;
 			+ newReturnTypeOptional
@@ -64,34 +65,34 @@ public class JApiReturnType implements JApiHasGenericTypes, JApiCompatibility {
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-<span class="nc" id="L67">		boolean binaryCompatible = true;</span>
-<span class="nc bnc" id="L68" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
-<span class="nc" id="L70">				binaryCompatible = false;</span>
-<span class="nc" id="L71">				break;</span>
+<span class="nc" id="L68">		boolean binaryCompatible = true;</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
+<span class="nc" id="L71">				binaryCompatible = false;</span>
+<span class="nc" id="L72">				break;</span>
 			}
-<span class="nc" id="L73">		}</span>
-<span class="nc" id="L74">		return binaryCompatible;</span>
+<span class="nc" id="L74">		}</span>
+<span class="nc" id="L75">		return binaryCompatible;</span>
 	}
 
 	@Override
 	@XmlAttribute
 	public boolean isSourceCompatible() {
-<span class="fc" id="L80">		boolean sourceCompatible = true;</span>
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
-<span class="nc bnc" id="L82" title="All 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
-<span class="nc" id="L83">				sourceCompatible = false;</span>
-<span class="nc" id="L84">				break;</span>
+<span class="fc" id="L81">		boolean sourceCompatible = true;</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="nc" id="L84">				sourceCompatible = false;</span>
+<span class="nc" id="L85">				break;</span>
 			}
-<span class="nc" id="L86">		}</span>
-<span class="fc" id="L87">		return sourceCompatible;</span>
+<span class="nc" id="L87">		}</span>
+<span class="fc" id="L88">		return sourceCompatible;</span>
 	}
 
 	@Override
 	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
 	@XmlElement(name = &quot;compatibilityChange&quot;)
 	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
-<span class="fc" id="L94">		return this.compatibilityChanges;</span>
+<span class="fc" id="L95">		return this.compatibilityChanges;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

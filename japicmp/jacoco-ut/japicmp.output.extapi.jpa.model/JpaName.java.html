@@ -2,34 +2,36 @@
 
 import japicmp.util.Optional;
 import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiHasChangeStatus;
 import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class JpaName {
+public class JpaName implements JApiHasChangeStatus {
 	private final Optional&lt;String&gt; newName;
 	private final Optional&lt;String&gt; oldName;
 	private final JApiChangeStatus changeStatus;
 
-<span class="nc" id="L14">	public JpaName(Optional&lt;String&gt; oldName, Optional&lt;String&gt; newName, JApiChangeStatus changeStatus) {</span>
-<span class="nc" id="L15">		this.oldName = oldName;</span>
-<span class="nc" id="L16">		this.newName = newName;</span>
-<span class="nc" id="L17">		this.changeStatus = changeStatus;</span>
-<span class="nc" id="L18">	}</span>
+<span class="nc" id="L15">	public JpaName(Optional&lt;String&gt; oldName, Optional&lt;String&gt; newName, JApiChangeStatus changeStatus) {</span>
+<span class="nc" id="L16">		this.oldName = oldName;</span>
+<span class="nc" id="L17">		this.newName = newName;</span>
+<span class="nc" id="L18">		this.changeStatus = changeStatus;</span>
+<span class="nc" id="L19">	}</span>
 
+	@Override
 	@XmlAttribute(name = &quot;changeStatus&quot;)
 	public JApiChangeStatus getChangeStatus() {
-<span class="nc" id="L22">		return changeStatus;</span>
+<span class="nc" id="L24">		return changeStatus;</span>
 	}
 
 	@XmlAttribute(name = &quot;newName&quot;)
 	public String getNewName() {
-<span class="nc" id="L27">		return OptionalHelper.optionalToString(this.newName);</span>
+<span class="nc" id="L29">		return OptionalHelper.optionalToString(this.newName);</span>
 	}
 
 	@XmlAttribute(name = &quot;oldName&quot;)
 	public String getOldName() {
-<span class="nc" id="L32">		return OptionalHelper.optionalToString(this.oldName);</span>
+<span class="nc" id="L34">		return OptionalHelper.optionalToString(this.oldName);</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

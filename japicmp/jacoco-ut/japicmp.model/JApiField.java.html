@@ -104,8 +104,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 <span class="fc bfc" id="L104" title="All 2 branches covered.">			if (this.finalModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
 <span class="fc" id="L105">				changeStatus = JApiChangeStatus.MODIFIED;</span>
 			}
-<span class="pc bpc" id="L107" title="1 of 2 branches missed.">			if (this.transientModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
-<span class="nc" id="L108">				changeStatus = JApiChangeStatus.MODIFIED;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">			if (this.transientModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L108">				changeStatus = JApiChangeStatus.MODIFIED;</span>
 			}
 <span class="pc bpc" id="L110" title="1 of 2 branches missed.">			if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
 <span class="nc" id="L111">				changeStatus = JApiChangeStatus.MODIFIED;</span>
@@ -270,7 +270,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	@XmlElementWrapper(name = &quot;modifiers&quot;)
 	@XmlElement(name = &quot;modifier&quot;)
 	public List&lt;? extends JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt;&gt; getModifiers() {
-<span class="nc" id="L273">		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.syntheticModifier);</span>
+<span class="nc" id="L273">		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.transientModifier, this.syntheticModifier);</span>
 	}
 
 	@XmlTransient
@@ -333,7 +333,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	public boolean isSourceCompatible() {
 <span class="fc" id="L334">		boolean sourceCompatible = true;</span>
 <span class="fc bfc" id="L335" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
-<span class="pc bpc" id="L336" title="1 of 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">			if (!compatibilityChange.isSourceCompatible()) {</span>
 <span class="fc" id="L337">				sourceCompatible = false;</span>
 			}
 <span class="fc" id="L339">		}</span>

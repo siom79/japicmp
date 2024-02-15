@@ -6,7 +6,7 @@ import japicmp.util.OptionalHelper;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
-public class JApiType {
+public class JApiType implements JApiHasChangeStatus {
 	private final Optional&lt;String&gt; oldTypeOptional;
 	private final Optional&lt;String&gt; newTypeOptional;
 	private final JApiChangeStatus changeStatus;
@@ -27,29 +27,30 @@ public class JApiType {
 <span class="fc" id="L27">		return newTypeOptional;</span>
 	}
 
+	@Override
 	@XmlAttribute(name = &quot;changeStatus&quot;)
 	public JApiChangeStatus getChangeStatus() {
-<span class="fc" id="L32">		return changeStatus;</span>
+<span class="fc" id="L33">		return changeStatus;</span>
 	}
 
 	@XmlAttribute(name = &quot;oldValue&quot;)
 	public String getOldValue() {
-<span class="nc" id="L37">		return OptionalHelper.optionalToString(this.oldTypeOptional);</span>
+<span class="nc" id="L38">		return OptionalHelper.optionalToString(this.oldTypeOptional);</span>
 	}
 
 	@XmlAttribute(name = &quot;newValue&quot;)
 	public String getNewValue() {
-<span class="nc" id="L42">		return OptionalHelper.optionalToString(this.newTypeOptional);</span>
+<span class="nc" id="L43">		return OptionalHelper.optionalToString(this.newTypeOptional);</span>
 	}
 
 	public boolean hasChanged() {
-<span class="fc" id="L46">		boolean hasChanged = false;</span>
-<span class="fc bfc" id="L47" title="All 4 branches covered.">		if (oldTypeOptional.isPresent() &amp;&amp; newTypeOptional.isPresent()) {</span>
-<span class="fc bfc" id="L48" title="All 2 branches covered.">			if (!oldTypeOptional.get().equals(newTypeOptional.get())) {</span>
-<span class="fc" id="L49">				hasChanged = true;</span>
+<span class="fc" id="L47">		boolean hasChanged = false;</span>
+<span class="fc bfc" id="L48" title="All 4 branches covered.">		if (oldTypeOptional.isPresent() &amp;&amp; newTypeOptional.isPresent()) {</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">			if (!oldTypeOptional.get().equals(newTypeOptional.get())) {</span>
+<span class="fc" id="L50">				hasChanged = true;</span>
 			}
 		}
-<span class="fc" id="L52">		return hasChanged;</span>
+<span class="fc" id="L53">		return hasChanged;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
