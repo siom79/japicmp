@@ -123,6 +123,14 @@ Contact
 
 The issue tracker at [github](https://github.com/siom79/japicmp/issues) can be used to submit feature requests or bugs. Beyond that contributions in form of pull requests are highly appreciated.
 
+Buy me a coffee
+---------------
+
+If you like japicmp and would like to do me a favor for all the work I've done over
+the years, please consider buying me a coffee [here](https://www.buymeacoffee.com/mmois).
+
+<a href="https://www.buymeacoffee.com/mmois" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 Related work
 ------------
 
