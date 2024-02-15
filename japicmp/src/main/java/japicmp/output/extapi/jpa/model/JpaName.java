@@ -2,11 +2,12 @@ package japicmp.output.extapi.jpa.model;
 
 import japicmp.util.Optional;
 import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiHasChangeStatus;
 import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class JpaName {
+public class JpaName implements JApiHasChangeStatus {
 	private final Optional<String> newName;
 	private final Optional<String> oldName;
 	private final JApiChangeStatus changeStatus;
@@ -17,6 +18,7 @@ public class JpaName {
 		this.changeStatus = changeStatus;
 	}
 
+	@Override
 	@XmlAttribute(name = "changeStatus")
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;

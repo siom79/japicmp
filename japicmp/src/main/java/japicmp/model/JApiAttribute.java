@@ -6,7 +6,7 @@ import japicmp.util.OptionalHelper;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
-public class JApiAttribute<T> {
+public class JApiAttribute<T> implements JApiHasChangeStatus {
 	private final Optional<T> oldAttribute;
 	private final Optional<T> newAttribute;
 	private final JApiChangeStatus changeStatus;
@@ -27,6 +27,7 @@ public class JApiAttribute<T> {
 		return newAttribute;
 	}
 
+	@Override
 	@XmlAttribute(name = "changeStatus")
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
