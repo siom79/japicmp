@@ -3,28 +3,46 @@ Versions
 
 The following versions of japicmp are available:
 
+0.18.4 (2024-02-15)
+-------------------
+* Do not mark class as changed in case of synthetic members [#375](https://github.com/siom79/japicmp/issues/375)
+* Make classes implement JApiHasChangeStatus if they already do. [#373](https://github.com/siom79/japicmp/issues/373)
+* Take transient modifier into account. [#372](https://github.com/siom79/japicmp/issues/372)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.18.4).
+
 0.18.3 (2023-11-03)
 -------------------
 * skip-Tag in plugin configuration and -Djapicmp.skip work [#366](https://github.com/siom79/japicmp/issues/366)
 * Do not report any incompatibilities if class becomes public. [#365](https://github.com/siom79/japicmp/issues/365)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.18.3).
 
 0.18.2 (2023-10-18)
 -------------------
 * Upgrade to groovy 4.0.15 [#364](https://github.com/siom79/japicmp/issues/364)
 * correct name of package_protected in documentation [#365](https://github.com/siom79/japicmp/issues/365)
 
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.18.2).
+
 0.18.1 (2023-09-29)
 -------------------
 * METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC not source and binary incompatible [#363](https://github.com/siom79/japicmp/issues/363)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.18.1).
 
 0.18.0 (2023-09-22)
 -------------------
 * added METHOD_NEW_STATIC_ADDED_TO_INTERFACE, METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC and METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC. [#289](https://github.com/siom79/japicmp/issues/289)
 * htmlTitle is used as title for maven report. [#362](https://github.com/siom79/japicmp/issues/362)
 
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.18.0).
+
 0.17.3 (2023-09-02)
 -------------------
 * METHOD_NEW_DEFAULT is now binary and source compatible. [#289](https://github.com/siom79/japicmp/issues/289)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.17.3).
 
 0.17.2 (2023-03-01)
 -------------------
