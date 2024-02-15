@@ -270,7 +270,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	@XmlElementWrapper(name = "modifiers")
 	@XmlElement(name = "modifier")
 	public List<? extends JApiModifier<? extends Enum<? extends Enum<?>>>> getModifiers() {
-		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.syntheticModifier);
+		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.transientModifier, this.syntheticModifier);
 	}
 
 	@XmlTransient

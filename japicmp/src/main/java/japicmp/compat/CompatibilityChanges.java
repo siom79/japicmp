@@ -178,6 +178,13 @@ public class CompatibilityChanges {
 					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NO_LONGER_STATIC);
 				}
 			}
+			// section 13.4.11 of "Java Language Specification" SE7
+			if (field.getTransientModifier().hasChangedFromTo(TransientModifier.NON_TRANSIENT, TransientModifier.TRANSIENT)) {
+				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NOW_TRANSIENT);
+			}
+			if (field.getTransientModifier().hasChangedFromTo(TransientModifier.TRANSIENT, TransientModifier.NON_TRANSIENT)) {
+				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NO_LONGER_TRANSIENT);
+			}
 			if (isNotPrivate(field) && field.getType().hasChanged()) {
 				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_TYPE_CHANGED);
 			}
