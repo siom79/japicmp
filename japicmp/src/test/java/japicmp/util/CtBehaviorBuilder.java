@@ -7,6 +7,7 @@ public abstract class CtBehaviorBuilder {
 	protected int modifier = 0;
 	protected CtClass[] parameters = new CtClass[]{};
 	protected CtClass[] exceptions = new CtClass[]{};
+	protected String signature = null;
 
 	public CtBehaviorBuilder parameters(CtClass[] parameters) {
 		this.parameters = parameters;
@@ -57,6 +58,11 @@ public abstract class CtBehaviorBuilder {
 
 	public CtBehaviorBuilder finalMethod() {
 		this.modifier = this.modifier | Modifier.FINAL;
+		return this;
+	}
+
+	public CtBehaviorBuilder signature(String signature) {
+		this.signature = signature;
 		return this;
 	}
 }

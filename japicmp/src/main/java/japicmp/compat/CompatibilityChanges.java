@@ -76,7 +76,7 @@ public class CompatibilityChanges {
 
 	private void checkIfGenericTemplatesHaveChanged(JApiHasGenericTemplates jApiHasGenericTemplates) {
 		for (JApiGenericTemplate jApiGenericTemplate : jApiHasGenericTemplates.getGenericTemplates()) {
-			if (jApiGenericTemplate.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+			if (jApiGenericTemplate.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 				((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED);
 				break;
 			}

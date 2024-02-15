@@ -5,8 +5,8 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
+import javassist.bytecode.SignatureAttribute;
 import javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
@@ -85,6 +85,11 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return this;
 	}
 
+	public CtMethodBuilder signature(String signature) {
+		super.signature(signature);
+		return this;
+	}
+
 	public CtMethod addToClass(CtClass declaringClass) throws CannotCompileException {
 		if (this.returnType == null) {
 			this.returnType = CtClass.voidType;
@@ -93,12 +98,15 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		ctMethod.setModifiers(this.modifier);
 		declaringClass.addMethod(ctMethod);
 		for (String annotation : annotations) {
-			ClassFile classFile = declaringClass.getClassFile();
-			ConstPool constPool = classFile.getConstPool();
+            ConstPool constPool = declaringClass.getClassFile().getConstPool();
 			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
 			Annotation annot = new Annotation(annotation, constPool);
 			attr.setAnnotation(annot);
 			ctMethod.getMethodInfo().addAttribute(attr);
+		}
+		if (signature != null) {
+			SignatureAttribute signatureAttribute = new SignatureAttribute(declaringClass.getClassFile().getConstPool(), signature);
+			ctMethod.getMethodInfo().addAttribute(signatureAttribute);
 		}
 		return ctMethod;
 	}

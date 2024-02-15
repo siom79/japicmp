@@ -4,9 +4,7 @@ import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.*;
 import japicmp.util.*;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.Modifier;
+import javassist.*;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -2285,5 +2283,109 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(true));
 		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
+	}
+
+	@Test
+	public void testNewMethodWithGenerics() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				return Collections.singletonList(ctClassC);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				CtMethodBuilder.create()
+					.returnType(classPool.get("java.lang.Object"))
+					.name("newMethod")
+					.parameter(classPool.get("java.lang.Object"))
+					.signature("<T:Ljava/lang/Object;>(TT;)TT;")
+					.addToClass(ctClassC);
+				return Collections.singletonList(ctClassC);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "C");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "newMethod");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiMethod.isSourceCompatible(), is(true));
+		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
+	}
+
+	@Test
+	public void testRemovedMethodWithGenerics() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws NotFoundException, CannotCompileException {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				CtMethodBuilder.create()
+					.returnType(classPool.get("java.lang.Object"))
+					.name("oldMethod")
+					.parameter(classPool.get("java.lang.Object"))
+					.signature("<T:Ljava/lang/Object;>(TT;)TT;")
+					.addToClass(ctClassC);
+				return Collections.singletonList(ctClassC);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				return Collections.singletonList(ctClassC);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "C");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "oldMethod");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+		assertThat(jApiMethod.isSourceCompatible(), is(false));
+		assertThat(jApiMethod.getCompatibilityChanges().size(), is(1));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_REMOVED));
+	}
+
+	@Test
+	public void testMethodWithGenericsChanged() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws NotFoundException, CannotCompileException {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				CtMethodBuilder.create()
+					.returnType(classPool.get("java.lang.Object"))
+					.name("method")
+					.parameter(classPool.get("java.lang.Object"))
+					.signature("<T:Ljava/lang/Object;>(TT;)TT;")
+					.addToClass(ctClassC);
+				return Collections.singletonList(ctClassC);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				CtMethodBuilder.create()
+					.returnType(classPool.get("java.lang.Object"))
+					.name("method")
+					.parameter(classPool.get("java.lang.Object"))
+					.signature("<T:Ljava/lang/String;>(TT;)TT;")
+					.addToClass(ctClassC);
+				return Collections.singletonList(ctClassC);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "C");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiMethod.isSourceCompatible(), is(false));
+		assertThat(jApiMethod.getCompatibilityChanges().size(), is(1));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED));
 	}
 }
