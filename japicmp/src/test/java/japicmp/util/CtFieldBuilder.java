@@ -94,6 +94,11 @@ public class CtFieldBuilder {
 		return this;
 	}
 
+	public CtFieldBuilder transientAccess() {
+		this.modifier = this.modifier | Modifier.TRANSIENT;
+		return this;
+	}
+
 	public CtFieldBuilder finalAccess() {
 		this.modifier = this.modifier | Modifier.FINAL;
 		return this;
