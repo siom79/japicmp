@@ -146,7 +146,7 @@
 		<plugin-annotation.version>3.6.4</plugin-annotation.version>
 		<surefireVersion>3.0.0-M7</surefireVersion>
 		<javassist.version>3.30.0-GA</javassist.version>
-		<guava.version>30.1-jre</guava.version>
+		<guava.version>33.0.0-jre</guava.version>
 		<jaxb.version>2.3.2</jaxb.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots</sonatypeOssDistMgmtSnapshotsUrl>
 	</properties>
