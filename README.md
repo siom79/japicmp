@@ -116,6 +116,13 @@ in less than one second and therewith can be easily integrated in each build.
 
 You can download the latest version from the [release page](https://github.com/siom79/japicmp/releases) or directly from the [maven central repository](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22japicmp%22).
 
+## Buy me a coffee
+
+If you like japicmp and would like to do me a favor for all the work I've done over
+the years, please consider buying me a coffee [here](https://www.buymeacoffee.com/mmois).
+
+<a href="https://www.buymeacoffee.com/mmois" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 # Development
 
 * ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
