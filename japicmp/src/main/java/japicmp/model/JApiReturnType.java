@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JApiReturnType implements JApiHasGenericTypes, JApiCompatibility {
+public class JApiReturnType implements JApiHasGenericTypes, JApiHasChangeStatus, JApiCompatibility {
 	private final Optional<String> oldReturnTypeOptional;
 	private final Optional<String> newReturnTypeOptional;
 	private final JApiChangeStatus changeStatus;
@@ -23,6 +23,7 @@ public class JApiReturnType implements JApiHasGenericTypes, JApiCompatibility {
 		this.newReturnTypeOptional = newReturnTypeOptional;
 	}
 
+	@Override
 	@XmlAttribute(name = "changeStatus")
 	public JApiChangeStatus getChangeStatus() {
 		return changeStatus;
