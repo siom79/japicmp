@@ -185,6 +185,9 @@ public class CompatibilityChanges {
 			if (field.getTransientModifier().hasChangedFromTo(TransientModifier.TRANSIENT, TransientModifier.NON_TRANSIENT)) {
 				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NO_LONGER_TRANSIENT);
 			}
+			if (isNotPrivate(field) && field.getType().hasChanged()) {
+				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_TYPE_CHANGED);
+			}
 			checkIfAnnotationDeprecatedAdded(field);
 			checkIfFieldGenericsChanged(field);
 		}
