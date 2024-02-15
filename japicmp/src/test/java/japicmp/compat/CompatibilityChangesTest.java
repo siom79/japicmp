@@ -27,13 +27,13 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				return Collections.emptyList();
 			}
 		});
@@ -49,13 +49,13 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().abstractModifier().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -72,13 +72,13 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().finalModifier().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -95,13 +95,13 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().notPublicModifier().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -118,7 +118,7 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -141,7 +141,7 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
 				return Arrays.asList(ctClass, superclass);
@@ -165,14 +165,14 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
 				return Arrays.asList(ctClass, superclass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass2").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
 				return Arrays.asList(ctClass, superclass);
@@ -190,13 +190,13 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
 				return Arrays.asList(ctClass, superclass);
@@ -217,13 +217,13 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -251,7 +251,7 @@ public class CompatibilityChangesTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
 				return Arrays.asList(ctClass, superclass);
@@ -305,7 +305,7 @@ public class CompatibilityChangesTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass superclass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(superclass).addToClassPool(classPool);
 				return Arrays.asList(ctClass, superclass);
@@ -358,7 +358,7 @@ public class CompatibilityChangesTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -407,13 +407,13 @@ public class CompatibilityChangesTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().notPublicModifier().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -953,7 +953,7 @@ public class CompatibilityChangesTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -1008,7 +1008,7 @@ public class CompatibilityChangesTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -1281,7 +1281,7 @@ public class CompatibilityChangesTest {
 		options.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -1310,7 +1310,7 @@ public class CompatibilityChangesTest {
 		options.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass superClass = CtClassBuilder.create().abstractModifier().name("japicmp.Superclass").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().abstractModifier().name("japicmp.Test").addToClassPool(classPool);
 				return Arrays.asList(ctClass, superClass);
@@ -1342,7 +1342,7 @@ public class CompatibilityChangesTest {
 		options.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				return Collections.emptyList();
 			}
 
@@ -1502,7 +1502,7 @@ public class CompatibilityChangesTest {
 		options.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -1609,7 +1609,7 @@ public class CompatibilityChangesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -1807,13 +1807,13 @@ public class CompatibilityChangesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(aClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withAnnotation("java.lang.Deprecated").addToClassPool(classPool);
 				return Collections.singletonList(aClass);
 			}
@@ -1827,13 +1827,13 @@ public class CompatibilityChangesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withAnnotation("java.lang.Deprecated").addToClassPool(classPool);
 				return Collections.singletonList(aClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(aClass);
 			}
@@ -1844,7 +1844,6 @@ public class CompatibilityChangesTest {
 
 	/**
 	 * Tests that no regression of issue #222 occurs
-	 * @throws Exception
 	 */
 	@Test
 	public void testMethodMovedToSuperClass() throws Exception {
@@ -2043,7 +2042,7 @@ public class CompatibilityChangesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				return Collections.emptyList();
 			}
 
@@ -2066,7 +2065,7 @@ public class CompatibilityChangesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				return Collections.emptyList();
 			}
 
@@ -2099,13 +2098,13 @@ public class CompatibilityChangesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass c1 = CtClassBuilder.create().name("CA").abstractModifier().addToClassPool(classPool);
-				return Arrays.asList(c1);
+				return Collections.singletonList(c1);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass c1 = CtClassBuilder.create().name("CA").abstractModifier().addToClassPool(classPool);
 				CtClass c = CtClassBuilder.create().name("C").withSuperclass(c1).addToClassPool(classPool);
 				return Arrays.asList(c1, c);
@@ -2153,7 +2152,7 @@ public class CompatibilityChangesTest {
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				return Collections.emptyList();
 			}
 
@@ -2241,7 +2240,7 @@ public class CompatibilityChangesTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass superClass = CtClassBuilder.create().name("SuperClass").addToClassPool(classPool);
 				CtClass subClass = CtClassBuilder.create().name("SubClass").withSuperclass(superClass).addToClassPool(classPool);
 				return Arrays.asList(superClass, subClass);
@@ -2335,7 +2334,7 @@ public class CompatibilityChangesTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
 				return Collections.singletonList(ctClassC);
 			}
