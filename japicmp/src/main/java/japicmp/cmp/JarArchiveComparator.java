@@ -1,7 +1,5 @@
 package japicmp.cmp;
 
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.util.Optional;
 import japicmp.compat.CompatibilityChanges;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
@@ -10,28 +8,24 @@ import japicmp.filter.Filter;
 import japicmp.filter.Filters;
 import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import japicmp.util.AnnotationHelper;
-import java.util.function.Supplier;
+import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static japicmp.util.FileHelper.toFileList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class provides the basic methods to compare the classes within to jar archives.
@@ -94,7 +88,7 @@ public class JarArchiveComparator {
 	 * @throws JApiCmpException if the comparison fails
 	 */
 	public List<JApiClass> compare(List<JApiCmpArchive> oldArchives, List<JApiCmpArchive> newArchives) {
-		return createAndCompareClassLists(toFileList(oldArchives), toFileList(newArchives));
+		return createAndCompareClassLists(oldArchives, newArchives);
 	}
 
 	private void checkJavaObjectSerializationCompatibility(List<JApiClass> jApiClasses) {
@@ -124,7 +118,7 @@ public class JarArchiveComparator {
 	private String appendSystemClassPath(ClassPool classPool, String classPathAsString) {
 		String retVal = classPathAsString;
 		classPool.appendSystemPath();
-		if (retVal.length() > 0 && !retVal.endsWith(File.pathSeparator)) {
+		if (!retVal.isEmpty() && !retVal.endsWith(File.pathSeparator)) {
 			retVal += File.pathSeparator;
 		}
 		return retVal;
@@ -178,7 +172,7 @@ public class JarArchiveComparator {
 		compatibilityChanges.evaluate(classList);
 	}
 
-	private List<JApiClass> createAndCompareClassLists(List<File> oldArchives, List<File> newArchives) {
+	private List<JApiClass> createAndCompareClassLists(List<JApiCmpArchive> oldArchives, List<JApiCmpArchive> newArchives) {
 		List<CtClass> oldClasses;
 		List<CtClass> newClasses;
 		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
@@ -217,21 +211,84 @@ public class JarArchiveComparator {
 		return classList;
 	}
 
-	private List<CtClass> createListOfCtClasses(List<File> archives, ReducibleClassPool classPool) {
-		return createListOfCtClasses(() -> new JarsCtClassIterable(archives, classPool), classPool);
+	private List<CtClass> createListOfCtClasses(List<JApiCmpArchive> archives, ReducibleClassPool classPool) {
+		List<CtClass> ctClasses = archives.stream()
+			.flatMap(archive -> toCtClassStream(archive, classPool))
+			.collect(Collectors.toList());
+		ctClasses = filterClasses(ctClasses, classPool, false);
+		return ctClasses;
 	}
 
-	List<CtClass> createListOfCtClasses(Supplier<Iterable<CtClass>> ctClasses, ReducibleClassPool classPool) {
-		return loadAndFilterClasses(ctClasses, classPool, false);
+	private Stream<CtClass> toCtClassStream(JApiCmpArchive archive, ReducibleClassPool classPool) {
+		if (archive.getFile() != null) {
+			try (JarFile jarFile = new JarFile(archive.getFile())) {
+				return jarFile.stream()
+					.map(jarEntry -> ctClass(classPool, jarFile, jarEntry))
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList()).stream();
+			} catch (IOException e) {
+				throw new JApiCmpException(Reason.IoException, "Failed to load archive from file: " + e.getMessage(), e);
+			}
+		} else if (archive.getBytes() != null) {
+			return bytesToCtClasses(archive, classPool);
+		} else {
+			throw new JApiCmpException(Reason.IllegalArgument, JApiCmpArchive.class.getSimpleName() + " has no file and no bytes: " + archive);
+		}
 	}
 
-	private List<CtClass> loadAndFilterClasses(Supplier<Iterable<CtClass>> ctClasses, ReducibleClassPool classPool, boolean ignorePackageFilters) {
+	private static Stream<CtClass> bytesToCtClasses(JApiCmpArchive archive, ReducibleClassPool classPool) {
+		List<CtClass> ctClasses = new ArrayList<>();
+		try (JarInputStream jarInputStream = new JarInputStream(new ByteArrayInputStream(archive.getBytes()))) {
+			JarEntry nextJarEntry = jarInputStream.getNextJarEntry();
+			while (nextJarEntry != null) {
+				if (!nextJarEntry.isDirectory() && nextJarEntry.getName().endsWith(".class")) {
+					byte[] byteArray = getJarEntryContent(jarInputStream);
+					CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(byteArray));
+					ctClasses.add(ctClass);
+				}
+				nextJarEntry = jarInputStream.getNextJarEntry();
+			}
+		} catch (IOException e) {
+			throw new JApiCmpException(Reason.IoException, "Failed to load archive from byte array: " + e.getMessage(), e);
+		}
+		return ctClasses.stream();
+	}
+
+	private static byte[] getJarEntryContent(JarInputStream jarInputStream) throws IOException {
+		int len;
+		byte[] buffer = new byte[1024];
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		while ((len = jarInputStream.read(buffer)) > 0) {
+			baos.write(buffer, 0, len);
+		}
+        return baos.toByteArray();
+	}
+
+	private CtClass ctClass(ClassPool classPool, JarFile jarFile, JarEntry jarEntry) {
+		String name = jarEntry.getName();
+		if (name.endsWith(".class")) {
+			CtClass ctClass;
+			try (InputStream classFile = jarFile.getInputStream(jarEntry)) {
+				ctClass = classPool.makeClass(classFile);
+			} catch (Exception e) {
+				throw new JApiCmpException(Reason.IoException, String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()), e);
+			}
+			return ctClass;
+		} else {
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine(String.format("Skipping file '%s' because filename does not end with '.class'.", name));
+			}
+		}
+		return null;
+	}
+
+	public List<CtClass> filterClasses(List<CtClass> ctClasses, ReducibleClassPool classPool, boolean ignorePackageFilters) {
 		// marks whether any package was found
 		// if so we need to go over _all_ classes again
 		boolean packageFilterEncountered = false;
 
 		List<CtClass> classes = new LinkedList<>();
-		for (CtClass ctClass : ctClasses.get()) {
+		for (CtClass ctClass : ctClasses) {
 			if (!packageFilterEncountered) {
 				if (options.getFilters().includeClass(ctClass)) {
 					classes.add(ctClass);
@@ -257,8 +314,8 @@ public class JarArchiveComparator {
 		}
 
 		return packageFilterEncountered
-				? loadAndFilterClasses(ctClasses, classPool, true)
-				: classes;
+			? filterClasses(ctClasses, classPool, true)
+			: classes;
 	}
 
 
@@ -274,7 +331,7 @@ public class JarArchiveComparator {
 				}
 			}
 		}
-		if (newFilters.size() > 0) {
+		if (!newFilters.isEmpty()) {
 			filters.getIncludes().addAll(newFilters);
 			newFilters.clear();
 			filtersUpdated = true;
@@ -287,7 +344,7 @@ public class JarArchiveComparator {
 				}
 			}
 		}
-		if (newFilters.size() > 0) {
+		if (!newFilters.isEmpty()) {
 			filters.getExcludes().addAll(newFilters);
 			newFilters.clear();
 			filtersUpdated = true;
@@ -318,7 +375,7 @@ public class JarArchiveComparator {
 	 * Returns the javassist ClassPool that is used for the old version.
 	 *
 	 * @return an instance of ClassPool
-     */
+	 */
 	public ClassPool getOldClassPool() {
 		return oldClassPool;
 	}
@@ -338,8 +395,9 @@ public class JarArchiveComparator {
 
 	/**
 	 * Loads a class either from the old, new or common classpath.
+	 *
 	 * @param archiveType specify if this class should be loaded from the old or new class path
-	 * @param name the name of the class (FQN)
+	 * @param name        the name of the class (FQN)
 	 * @return the loaded class (if options are not set to ignore missing classes)
 	 * @throws japicmp.exception.JApiCmpException if loading the class fails
 	 */
@@ -377,109 +435,5 @@ public class JarArchiveComparator {
 			throw new JApiCmpException(Reason.IllegalState, "Unknown classpath mode: " + this.options.getClassPathMode());
 		}
 		return loadedClass;
-	}
-
-	private static class JarsCtClassIterable implements Iterable<CtClass>, Iterator<CtClass> {
-		private final Iterator<File> archives;
-		private final ClassPool classPool;
-
-		private Iterator<CtClass> currentIterator = null;
-
-		public JarsCtClassIterable(List<File> archives, ClassPool classPool) {
-			this.archives = archives.iterator();
-			this.classPool = classPool;
-		}
-
-		@Override
-		public boolean hasNext() {
-			if (currentIterator != null) {
-				if (currentIterator.hasNext()) {
-					return true;
-				} else {
-					currentIterator = null;
-				}
-			}
-			if (archives.hasNext()) {
-				final File archive = archives.next();
-				currentIterator = new JarCtClassIterator(archive, classPool);
-				return hasNext();
-			}
-			return false;
-		}
-
-		@Override
-		public CtClass next() {
-			return currentIterator.next();
-		}
-
-		@Override
-		public Iterator<CtClass> iterator() {
-			return this;
-		}
-	}
-
-	private static class JarCtClassIterator implements Iterator<CtClass> {
-
-		private final File archive;
-		private final JarFile jarFile;
-		private final Enumeration<JarEntry> entryEnumeration;
-		private final ClassPool classPool;
-
-		private CtClass next = null;
-
-		public JarCtClassIterator(File archive, ClassPool classPool) {
-			this.archive = archive;
-			try {
-				this.jarFile = new JarFile(archive);
-			} catch (IOException e) {
-				throw new JApiCmpException(Reason.IoException, String.format("Processing of jar file %s failed: %s", archive.getAbsolutePath(), e.getMessage()), e);
-			}
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Loading classes from jar file '" + archive.getAbsolutePath() + "'");
-			}
-			this.entryEnumeration = jarFile.entries();
-			this.classPool = classPool;
-		}
-
-		@Override
-		public boolean hasNext() {
-			if (next != null) {
-				return true;
-			}
-
-			while (entryEnumeration.hasMoreElements()) {
-				JarEntry jarEntry = entryEnumeration.nextElement();
-				String name = jarEntry.getName();
-				if (name.endsWith(".class")) {
-					CtClass ctClass;
-					try (InputStream classFile = jarFile.getInputStream(jarEntry)) {
-						ctClass = classPool.makeClass(classFile);
-					} catch (Exception e) {
-						throw new JApiCmpException(Reason.IoException, String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()), e);
-					}
-					next = ctClass;
-					return true;
-				} else {
-					if (LOGGER.isLoggable(Level.FINE)) {
-						LOGGER.fine(String.format("Skipping file '%s' because filename does not end with '.class'.", name));
-					}
-				}
-			}
-			try {
-				jarFile.close();
-			} catch (IOException e) {
-				throw new JApiCmpException(Reason.IoException, String.format("Processing of jar file %s failed: %s", archive.getAbsolutePath(), e.getMessage()), e);
-			}
-			return false;
-		}
-
-		@Override
-		public CtClass next() {
-			try {
-				return next;
-			} finally {
-				next = null;
-			}
-		}
 	}
 }
