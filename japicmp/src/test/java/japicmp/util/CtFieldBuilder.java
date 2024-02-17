@@ -99,6 +99,11 @@ public class CtFieldBuilder {
 		return this;
 	}
 
+	public CtFieldBuilder volatileAccess() {
+		this.modifier = this.modifier | Modifier.VOLATILE;
+		return this;
+	}
+
 	public CtFieldBuilder finalAccess() {
 		this.modifier = this.modifier | Modifier.FINAL;
 		return this;
