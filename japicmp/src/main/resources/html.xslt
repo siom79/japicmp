@@ -806,6 +806,9 @@
 			<xsl:when test="$modifier = 'NON_TRANSIENT'">
 				<xsl:if test="$changeStatus = 'MODIFIED'">not_transient</xsl:if>
 			</xsl:when>
+			<xsl:when test="$modifier = 'NON_VOLATILE'">
+				<xsl:if test="$changeStatus = 'MODIFIED'">not_volatile</xsl:if>
+			</xsl:when>
 			<xsl:when test="$modifier = 'NON_STATIC'">
 				<xsl:if test="$changeStatus = 'MODIFIED'">not_static</xsl:if>
 			</xsl:when>
