@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier,
-	JApiHasFinalModifier, JApiHasTransientModifier, JApiCompatibility, JApiHasAnnotations, JApiCanBeSynthetic,
+	JApiHasFinalModifier, JApiHasTransientModifier, JApiHasVolatileModifier, JApiCompatibility, JApiHasAnnotations, JApiCanBeSynthetic,
 	JApiHasGenericTypes {
 	private final JApiChangeStatus changeStatus;
 	private final JApiClass jApiClass;
@@ -27,6 +27,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	private final JApiModifier<StaticModifier> staticModifier;
 	private final JApiModifier<FinalModifier> finalModifier;
 	private final JApiModifier<TransientModifier> transientModifier;
+	private final JApiModifier<VolatileModifier> volatileModifier;
 	private final JApiModifier<SyntheticModifier> syntheticModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
@@ -43,6 +44,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 		this.staticModifier = extractStaticModifier(oldFieldOptional, newFieldOptional);
 		this.finalModifier = extractFinalModifier(oldFieldOptional, newFieldOptional);
 		this.transientModifier = extractTransientModifier(oldFieldOptional, newFieldOptional);
+		this.volatileModifier = extractVolatileModifier(oldFieldOptional, newFieldOptional);
 		this.syntheticModifier = extractSyntheticModifier(oldFieldOptional, newFieldOptional);
 		this.syntheticAttribute = extractSyntheticAttribute(oldFieldOptional, newFieldOptional);
 		this.type = extractType(oldFieldOptional, newFieldOptional);
@@ -105,6 +107,9 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			if (this.transientModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				changeStatus = JApiChangeStatus.MODIFIED;
+			}
+			if (this.volatileModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
@@ -226,6 +231,20 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 		});
 	}
 
+	private JApiModifier<VolatileModifier> extractVolatileModifier(Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
+		return ModifierHelper.extractModifierFromField(oldFieldOptional, newFieldOptional, new ModifierHelper.ExtractModifierFromFieldCallback<VolatileModifier>() {
+			@Override
+			public VolatileModifier getModifierForOld(CtField oldField) {
+				return Modifier.isVolatile(oldField.getModifiers()) ? VolatileModifier.VOLATILE : VolatileModifier.NON_VOLATILE;
+			}
+
+			@Override
+			public VolatileModifier getModifierForNew(CtField newField) {
+				return Modifier.isVolatile(newField.getModifiers()) ? VolatileModifier.VOLATILE : VolatileModifier.NON_VOLATILE;
+			}
+		});
+	}
+
 	private JApiModifier<SyntheticModifier> extractSyntheticModifier(Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
 		return ModifierHelper.extractModifierFromField(oldFieldOptional, newFieldOptional, new ModifierHelper.ExtractModifierFromFieldCallback<SyntheticModifier>() {
 			@Override
@@ -270,7 +289,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	@XmlElementWrapper(name = "modifiers")
 	@XmlElement(name = "modifier")
 	public List<? extends JApiModifier<? extends Enum<? extends Enum<?>>>> getModifiers() {
-		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.transientModifier, this.syntheticModifier);
+		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.transientModifier, this.volatileModifier, this.syntheticModifier);
 	}
 
 	@XmlTransient
@@ -286,6 +305,11 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	@XmlTransient
 	public JApiModifier<TransientModifier> getTransientModifier() {
 		return transientModifier;
+	}
+
+	@XmlTransient
+	public JApiModifier<VolatileModifier> getVolatileModifier() {
+		return volatileModifier;
 	}
 
 	@XmlTransient
@@ -377,6 +401,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 			+ finalModifier
 			+ ", transientModifier="
 			+ transientModifier
+			+ ", volatileModifier="
+			+ volatileModifier
 			+ ", syntheticModifier="
 			+ syntheticModifier
 			+ ", syntheticAttribute="
