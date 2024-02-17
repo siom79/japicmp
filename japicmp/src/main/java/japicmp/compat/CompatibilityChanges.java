@@ -95,6 +95,13 @@ public class CompatibilityChanges {
 
 	private void checkIfFieldsHaveChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
 		for (final JApiField field : jApiClass.getFields()) {
+			// section 8.3.1.4 of "Java Language Specification" SE7
+			if (field.getVolatileModifier().hasChangedFromTo(VolatileModifier.NON_VOLATILE, VolatileModifier.VOLATILE)) {
+				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NOW_VOLATILE);
+			}
+			if (field.getVolatileModifier().hasChangedFromTo(VolatileModifier.VOLATILE, VolatileModifier.NON_VOLATILE)) {
+				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NO_LONGER_VOLATILE);
+			}
 			// section 13.4.6 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.REMOVED) {
 				ArrayList<Integer> returnValues = new ArrayList<>();
