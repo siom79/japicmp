@@ -142,22 +142,22 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 						});
 
 					String semver = semverOut.generate();
-					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals("1.0.0")) {
+					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals(SemverOut.SEMVER_MAJOR)) {
 						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, "Versions of archives indicate a minor change but binary incompatible changes found.");
 					}
-					if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals("1.0.0")) {
+					if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals(SemverOut.SEMVER_MAJOR)) {
 						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, "Versions of archives indicate a patch change but binary incompatible changes found.");
 					}
-					if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals("0.1.0")) {
+					if (changeType == SemanticVersion.ChangeType.PATCH && semver.equals(SemverOut.SEMVER_MINOR)) {
 						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, "Versions of archives indicate a patch change but binary compatible changes found.");
 					}
-					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("1.0.0")) {
+					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals(SemverOut.SEMVER_MAJOR)) {
 						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, "Versions of archives indicate no API changes but binary incompatible changes found.");
 					}
-					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("0.1.0")) {
+					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals(SemverOut.SEMVER_MINOR)) {
 						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, "Versions of archives indicate no API changes but binary compatible changes found.");
 					}
-					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals("0.0.1")) {
+					if (changeType == SemanticVersion.ChangeType.UNCHANGED && semver.equals(SemverOut.SEMVER_PATCH)) {
 						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, "Versions of archives indicate no API changes but found API changes.");
 					}
 				} else {
