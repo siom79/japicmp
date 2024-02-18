@@ -427,7 +427,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 			sb.append(tabs(1)).append(signs(jApiField)).append(" ").append(jApiField.getChangeStatus()).append(" FIELD: ")
 				.append(accessModifierAsString(jApiField)).append(staticModifierAsString(jApiField))
 				.append(finalModifierAsString(jApiField)).append(transientModifierAsString(jApiField))
-				.append(syntheticModifierAsString(jApiField))
+				.append(volatileModifierAsString(jApiField)).append(syntheticModifierAsString(jApiField))
 				.append(fieldTypeChangeAsString(jApiField));
 			appendGenericTypes(sb, jApiField);
 			sb.append(" ").append(jApiField.getName()).append('\n');
@@ -448,6 +448,11 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	private String transientModifierAsString(JApiHasTransientModifier hasTransientModifier) {
 		JApiModifier<TransientModifier> modifier = hasTransientModifier.getTransientModifier();
 		return modifierAsString(modifier, TransientModifier.NON_TRANSIENT);
+	}
+
+	private String volatileModifierAsString(JApiHasVolatileModifier hasTransientModifier) {
+		JApiModifier<VolatileModifier> modifier = hasTransientModifier.getVolatileModifier();
+		return modifierAsString(modifier, VolatileModifier.NON_VOLATILE);
 	}
 
 	private String staticModifierAsString(JApiHasStaticModifier hasStaticModifier) {
