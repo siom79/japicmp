@@ -5,20 +5,47 @@ import japicmp.versioning.Version;
 import java.io.File;
 
 public class JApiCmpArchive {
-	private final File file;
+	private File file;
+	private byte[] bytes;
 	private final Version version;
 
-<span class="fc" id="L11">	public JApiCmpArchive(File file, String version) {</span>
-<span class="fc" id="L12">		this.file = file;</span>
-<span class="fc" id="L13">		this.version = new Version(version);</span>
-<span class="fc" id="L14">	}</span>
+<span class="fc" id="L12">	public JApiCmpArchive(File file, String version) {</span>
+<span class="fc" id="L13">		this.file = file;</span>
+<span class="fc" id="L14">		this.version = new Version(version);</span>
+<span class="fc" id="L15">	}</span>
+
+<span class="nc" id="L17">	public JApiCmpArchive(byte[] bytes, String version) {</span>
+<span class="nc" id="L18">		this.bytes = bytes;</span>
+<span class="nc" id="L19">		this.version = new Version(version);</span>
+<span class="nc" id="L20">	}</span>
 
 	public File getFile() {
-<span class="fc" id="L17">		return file;</span>
+<span class="fc" id="L23">		return file;</span>
 	}
 
 	public Version getVersion() {
-<span class="fc" id="L21">		return version;</span>
+<span class="fc" id="L27">		return version;</span>
+	}
+
+	public byte[] getBytes() {
+<span class="nc" id="L31">		return bytes;</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc" id="L36">		final StringBuilder sb = new StringBuilder(&quot;JApiCmpArchive{&quot;);</span>
+<span class="nc" id="L37">		sb.append(&quot;file=&quot;).append(file);</span>
+<span class="nc" id="L38">		sb.append(&quot;, bytes=&quot;);</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">		if (bytes == null) sb.append(&quot;null&quot;);</span>
+		else {
+<span class="nc" id="L41">			sb.append('[');</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">			for (int i = 0; i &lt; bytes.length; ++i)</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">				sb.append(i == 0 ? &quot;&quot; : &quot;, &quot;).append(bytes[i]);</span>
+<span class="nc" id="L44">			sb.append(']');</span>
+		}
+<span class="nc" id="L46">		sb.append(&quot;, version=&quot;).append(version);</span>
+<span class="nc" id="L47">		sb.append('}');</span>
+<span class="nc" id="L48">		return sb.toString();</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

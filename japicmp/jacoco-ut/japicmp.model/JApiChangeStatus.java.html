@@ -4,6 +4,10 @@
  * Represents the change status.
  */
 <span class="fc" id="L6">public enum JApiChangeStatus {</span>
-<span class="fc" id="L7">	NEW, REMOVED, UNCHANGED, MODIFIED</span>
+<span class="fc" id="L7">	NEW, REMOVED, UNCHANGED, MODIFIED;</span>
+
+	public boolean isNotNewOrRemoved() {
+<span class="fc bfc" id="L10" title="All 4 branches covered.">		return this != NEW &amp;&amp; this != REMOVED;</span>
+	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

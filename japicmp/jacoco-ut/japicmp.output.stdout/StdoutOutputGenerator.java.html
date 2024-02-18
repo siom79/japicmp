@@ -427,7 +427,7 @@ public class StdoutOutputGenerator extends OutputGenerator&lt;String&gt; {
 <span class="fc" id="L427">			sb.append(tabs(1)).append(signs(jApiField)).append(&quot; &quot;).append(jApiField.getChangeStatus()).append(&quot; FIELD: &quot;)</span>
 <span class="fc" id="L428">				.append(accessModifierAsString(jApiField)).append(staticModifierAsString(jApiField))</span>
 <span class="fc" id="L429">				.append(finalModifierAsString(jApiField)).append(transientModifierAsString(jApiField))</span>
-<span class="fc" id="L430">				.append(syntheticModifierAsString(jApiField))</span>
+<span class="fc" id="L430">				.append(volatileModifierAsString(jApiField)).append(syntheticModifierAsString(jApiField))</span>
 <span class="fc" id="L431">				.append(fieldTypeChangeAsString(jApiField));</span>
 <span class="fc" id="L432">			appendGenericTypes(sb, jApiField);</span>
 <span class="fc" id="L433">			sb.append(&quot; &quot;).append(jApiField.getName()).append('\n');</span>
@@ -450,98 +450,103 @@ public class StdoutOutputGenerator extends OutputGenerator&lt;String&gt; {
 <span class="fc" id="L450">		return modifierAsString(modifier, TransientModifier.NON_TRANSIENT);</span>
 	}
 
+	private String volatileModifierAsString(JApiHasVolatileModifier hasTransientModifier) {
+<span class="fc" id="L454">		JApiModifier&lt;VolatileModifier&gt; modifier = hasTransientModifier.getVolatileModifier();</span>
+<span class="fc" id="L455">		return modifierAsString(modifier, VolatileModifier.NON_VOLATILE);</span>
+	}
+
 	private String staticModifierAsString(JApiHasStaticModifier hasStaticModifier) {
-<span class="fc" id="L454">		JApiModifier&lt;StaticModifier&gt; modifier = hasStaticModifier.getStaticModifier();</span>
-<span class="fc" id="L455">		return modifierAsString(modifier, StaticModifier.NON_STATIC);</span>
+<span class="fc" id="L459">		JApiModifier&lt;StaticModifier&gt; modifier = hasStaticModifier.getStaticModifier();</span>
+<span class="fc" id="L460">		return modifierAsString(modifier, StaticModifier.NON_STATIC);</span>
 	}
 
 	private String accessModifierAsString(JApiHasAccessModifier modifier) {
-<span class="fc" id="L459">		JApiModifier&lt;AccessModifier&gt; accessModifier = modifier.getAccessModifier();</span>
-<span class="fc" id="L460">		return modifierAsString(accessModifier, AccessModifier.PACKAGE_PROTECTED);</span>
+<span class="fc" id="L464">		JApiModifier&lt;AccessModifier&gt; accessModifier = modifier.getAccessModifier();</span>
+<span class="fc" id="L465">		return modifierAsString(accessModifier, AccessModifier.PACKAGE_PROTECTED);</span>
 	}
 
 	private String syntheticModifierAsString(JApiHasSyntheticModifier modifier) {
-<span class="fc" id="L464">		JApiModifier&lt;SyntheticModifier&gt; syntheticModifier = modifier.getSyntheticModifier();</span>
-<span class="fc" id="L465">		return modifierAsString(syntheticModifier, SyntheticModifier.NON_SYNTHETIC);</span>
+<span class="fc" id="L469">		JApiModifier&lt;SyntheticModifier&gt; syntheticModifier = modifier.getSyntheticModifier();</span>
+<span class="fc" id="L470">		return modifierAsString(syntheticModifier, SyntheticModifier.NON_SYNTHETIC);</span>
 	}
 
 	private String bridgeModifierAsString(JApiHasBridgeModifier modifier) {
-<span class="fc" id="L469">		JApiModifier&lt;BridgeModifier&gt; bridgeModifier = modifier.getBridgeModifier();</span>
-<span class="fc" id="L470">		return modifierAsString(bridgeModifier, BridgeModifier.NON_BRIDGE);</span>
+<span class="fc" id="L474">		JApiModifier&lt;BridgeModifier&gt; bridgeModifier = modifier.getBridgeModifier();</span>
+<span class="fc" id="L475">		return modifierAsString(bridgeModifier, BridgeModifier.NON_BRIDGE);</span>
 	}
 
 	private &lt;T&gt; String modifierAsString(JApiModifier&lt;T&gt; modifier, T notPrintValue) {
-<span class="fc bfc" id="L474" title="All 4 branches covered.">		if (modifier.getOldModifier().isPresent() &amp;&amp; modifier.getNewModifier().isPresent()) {</span>
-<span class="pc bpc" id="L475" title="1 of 2 branches missed.">			if (modifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L476">				return modifier.getNewModifier().get() + &quot; (&lt;- &quot; + modifier.getOldModifier().get() + &quot;) &quot;;</span>
-<span class="pc bpc" id="L477" title="1 of 2 branches missed.">			} else if (modifier.getChangeStatus() == JApiChangeStatus.NEW) {</span>
-<span class="nc bnc" id="L478" title="All 2 branches missed.">				if (modifier.getNewModifier().get() != notPrintValue) {</span>
-<span class="nc" id="L479">					return modifier.getNewModifier().get() + &quot;(+) &quot;;</span>
+<span class="fc bfc" id="L479" title="All 4 branches covered.">		if (modifier.getOldModifier().isPresent() &amp;&amp; modifier.getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L480" title="1 of 2 branches missed.">			if (modifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L481">				return modifier.getNewModifier().get() + &quot; (&lt;- &quot; + modifier.getOldModifier().get() + &quot;) &quot;;</span>
+<span class="pc bpc" id="L482" title="1 of 2 branches missed.">			} else if (modifier.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="nc bnc" id="L483" title="All 2 branches missed.">				if (modifier.getNewModifier().get() != notPrintValue) {</span>
+<span class="nc" id="L484">					return modifier.getNewModifier().get() + &quot;(+) &quot;;</span>
 				}
-<span class="pc bpc" id="L481" title="1 of 2 branches missed.">			} else if (modifier.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
-<span class="nc bnc" id="L482" title="All 2 branches missed.">				if (modifier.getOldModifier().get() != notPrintValue) {</span>
-<span class="nc" id="L483">					return modifier.getOldModifier().get() + &quot;(-) &quot;;</span>
+<span class="pc bpc" id="L486" title="1 of 2 branches missed.">			} else if (modifier.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc bnc" id="L487" title="All 2 branches missed.">				if (modifier.getOldModifier().get() != notPrintValue) {</span>
+<span class="nc" id="L488">					return modifier.getOldModifier().get() + &quot;(-) &quot;;</span>
 				}
 			} else {
-<span class="fc bfc" id="L486" title="All 2 branches covered.">				if (modifier.getNewModifier().get() != notPrintValue) {</span>
-<span class="fc" id="L487">					return modifier.getNewModifier().get() + &quot; &quot;;</span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">				if (modifier.getNewModifier().get() != notPrintValue) {</span>
+<span class="fc" id="L492">					return modifier.getNewModifier().get() + &quot; &quot;;</span>
 				}
 			}
-<span class="fc bfc" id="L490" title="All 2 branches covered.">		} else if (modifier.getOldModifier().isPresent()) {</span>
-<span class="fc bfc" id="L491" title="All 2 branches covered.">			if (modifier.getOldModifier().get() != notPrintValue) {</span>
-<span class="fc" id="L492">				return modifier.getOldModifier().get() + &quot;(-) &quot;;</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">		} else if (modifier.getOldModifier().isPresent()) {</span>
+<span class="fc bfc" id="L496" title="All 2 branches covered.">			if (modifier.getOldModifier().get() != notPrintValue) {</span>
+<span class="fc" id="L497">				return modifier.getOldModifier().get() + &quot;(-) &quot;;</span>
 			}
-<span class="pc bpc" id="L494" title="1 of 2 branches missed.">		} else if (modifier.getNewModifier().isPresent()) {</span>
-<span class="fc bfc" id="L495" title="All 2 branches covered.">			if (modifier.getNewModifier().get() != notPrintValue) {</span>
-<span class="fc" id="L496">				return modifier.getNewModifier().get() + &quot;(+) &quot;;</span>
+<span class="pc bpc" id="L499" title="1 of 2 branches missed.">		} else if (modifier.getNewModifier().isPresent()) {</span>
+<span class="fc bfc" id="L500" title="All 2 branches covered.">			if (modifier.getNewModifier().get() != notPrintValue) {</span>
+<span class="fc" id="L501">				return modifier.getNewModifier().get() + &quot;(+) &quot;;</span>
 			}
 		}
-<span class="fc" id="L499">		return &quot;&quot;;</span>
+<span class="fc" id="L504">		return &quot;&quot;;</span>
 	}
 
 	private String fieldTypeChangeAsString(JApiField field) {
-<span class="fc" id="L503">		JApiType type = field.getType();</span>
-<span class="pc bpc" id="L504" title="1 of 4 branches missed.">		if (type.getOldTypeOptional().isPresent() &amp;&amp; type.getNewTypeOptional().isPresent()) {</span>
-<span class="pc bpc" id="L505" title="1 of 2 branches missed.">			if (type.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L506">				return type.getNewTypeOptional().get() + &quot; (&lt;- &quot; + type.getOldTypeOptional().get() + &quot;)&quot;;</span>
-<span class="pc bpc" id="L507" title="1 of 2 branches missed.">			} else if (type.getChangeStatus() == JApiChangeStatus.NEW) {</span>
-<span class="nc" id="L508">				return type.getNewTypeOptional().get() + &quot;(+)&quot;;</span>
-<span class="pc bpc" id="L509" title="1 of 2 branches missed.">			} else if (type.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
-<span class="nc" id="L510">				return type.getOldTypeOptional().get() + &quot;(-)&quot;;</span>
+<span class="fc" id="L508">		JApiType type = field.getType();</span>
+<span class="pc bpc" id="L509" title="1 of 4 branches missed.">		if (type.getOldTypeOptional().isPresent() &amp;&amp; type.getNewTypeOptional().isPresent()) {</span>
+<span class="pc bpc" id="L510" title="1 of 2 branches missed.">			if (type.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L511">				return type.getNewTypeOptional().get() + &quot; (&lt;- &quot; + type.getOldTypeOptional().get() + &quot;)&quot;;</span>
+<span class="pc bpc" id="L512" title="1 of 2 branches missed.">			} else if (type.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="nc" id="L513">				return type.getNewTypeOptional().get() + &quot;(+)&quot;;</span>
+<span class="pc bpc" id="L514" title="1 of 2 branches missed.">			} else if (type.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc" id="L515">				return type.getOldTypeOptional().get() + &quot;(-)&quot;;</span>
 			} else {
-<span class="fc" id="L512">				return type.getNewTypeOptional().get();</span>
+<span class="fc" id="L517">				return type.getNewTypeOptional().get();</span>
 			}
-<span class="pc bpc" id="L514" title="3 of 4 branches missed.">		} else if (type.getOldTypeOptional().isPresent() &amp;&amp; !type.getNewTypeOptional().isPresent()) {</span>
-<span class="nc" id="L515">			return type.getOldTypeOptional().get();</span>
-<span class="pc bpc" id="L516" title="2 of 4 branches missed.">		} else if (!type.getOldTypeOptional().isPresent() &amp;&amp; type.getNewTypeOptional().isPresent()) {</span>
-<span class="fc" id="L517">			return type.getNewTypeOptional().get();</span>
+<span class="pc bpc" id="L519" title="3 of 4 branches missed.">		} else if (type.getOldTypeOptional().isPresent() &amp;&amp; !type.getNewTypeOptional().isPresent()) {</span>
+<span class="nc" id="L520">			return type.getOldTypeOptional().get();</span>
+<span class="pc bpc" id="L521" title="2 of 4 branches missed.">		} else if (!type.getOldTypeOptional().isPresent() &amp;&amp; type.getNewTypeOptional().isPresent()) {</span>
+<span class="fc" id="L522">			return type.getNewTypeOptional().get();</span>
 		}
-<span class="nc" id="L519">		return &quot;n.a.&quot;;</span>
+<span class="nc" id="L524">		return &quot;n.a.&quot;;</span>
 	}
 
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L523">		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();</span>
-<span class="pc bpc" id="L524" title="3 of 4 branches missed.">		if (!options.isOutputOnlyModifications() || jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
-<span class="fc" id="L525">			sb.append(tabs(1)).append(signs(jApiSuperclass)).append(&quot; &quot;).append(jApiSuperclass.getChangeStatus()).append(&quot; SUPERCLASS: &quot;).append(superclassChangeAsString(jApiSuperclass)).append(&quot;\n&quot;);</span>
+<span class="fc" id="L528">		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();</span>
+<span class="pc bpc" id="L529" title="3 of 4 branches missed.">		if (!options.isOutputOnlyModifications() || jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L530">			sb.append(tabs(1)).append(signs(jApiSuperclass)).append(&quot; &quot;).append(jApiSuperclass.getChangeStatus()).append(&quot; SUPERCLASS: &quot;).append(superclassChangeAsString(jApiSuperclass)).append(&quot;\n&quot;);</span>
 		}
-<span class="fc" id="L527">	}</span>
+<span class="fc" id="L532">	}</span>
 
 	private String superclassChangeAsString(JApiSuperclass jApiSuperclass) {
-<span class="fc bfc" id="L530" title="All 4 branches covered.">		if (jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
-<span class="fc" id="L531">			return jApiSuperclass.getNewSuperclassName().get() + &quot; (&lt;- &quot; + jApiSuperclass.getOldSuperclassName().get() + &quot;)&quot;;</span>
-<span class="pc bpc" id="L532" title="1 of 4 branches missed.">		} else if (jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; !jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
-<span class="fc" id="L533">			return jApiSuperclass.getOldSuperclassName().get();</span>
-<span class="pc bpc" id="L534" title="2 of 4 branches missed.">		} else if (!jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
-<span class="fc" id="L535">			return jApiSuperclass.getNewSuperclassName().get();</span>
+<span class="fc bfc" id="L535" title="All 4 branches covered.">		if (jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc" id="L536">			return jApiSuperclass.getNewSuperclassName().get() + &quot; (&lt;- &quot; + jApiSuperclass.getOldSuperclassName().get() + &quot;)&quot;;</span>
+<span class="pc bpc" id="L537" title="1 of 4 branches missed.">		} else if (jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; !jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc" id="L538">			return jApiSuperclass.getOldSuperclassName().get();</span>
+<span class="pc bpc" id="L539" title="2 of 4 branches missed.">		} else if (!jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc" id="L540">			return jApiSuperclass.getNewSuperclassName().get();</span>
 		}
-<span class="nc" id="L537">		return &quot;n.a.&quot;;</span>
+<span class="nc" id="L542">		return &quot;n.a.&quot;;</span>
 	}
 
 	private void processInterfaceChanges(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L541">		List&lt;JApiImplementedInterface&gt; interfaces = jApiClass.getInterfaces();</span>
-<span class="pc bpc" id="L542" title="1 of 2 branches missed.">		for (JApiImplementedInterface implementedInterface : interfaces) {</span>
-<span class="nc" id="L543">			sb.append(tabs(1)).append(signs(implementedInterface)).append(&quot; &quot;).append(implementedInterface.getChangeStatus()).append(&quot; INTERFACE: &quot;).append(implementedInterface.getFullyQualifiedName()).append(&quot;\n&quot;);</span>
-<span class="nc" id="L544">		}</span>
-<span class="fc" id="L545">	}</span>
+<span class="fc" id="L546">		List&lt;JApiImplementedInterface&gt; interfaces = jApiClass.getInterfaces();</span>
+<span class="pc bpc" id="L547" title="1 of 2 branches missed.">		for (JApiImplementedInterface implementedInterface : interfaces) {</span>
+<span class="nc" id="L548">			sb.append(tabs(1)).append(signs(implementedInterface)).append(&quot; &quot;).append(implementedInterface.getChangeStatus()).append(&quot; INTERFACE: &quot;).append(implementedInterface.getFullyQualifiedName()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L549">		}</span>
+<span class="fc" id="L550">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

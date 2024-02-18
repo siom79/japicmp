@@ -1,25 +1,42 @@
-Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.18.5-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.3/japicmp-0.18.3.jar
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiAttribute  (not serializable)
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.18.6-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.4/japicmp-0.18.4.jar
+***  MODIFIED CLASS: PUBLIC japicmp.cmp.JApiCmpArchive  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	GENERIC TEMPLATES: === T:java.lang.Object
-	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiClassType  (not serializable)
+	+++  NEW CONSTRUCTOR: PUBLIC(+) JApiCmpArchive(byte[], java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) byte[] getBytes()
+	+++  NEW METHOD: PUBLIC(+) java.lang.String toString()
+***  MODIFIED CLASS: PUBLIC japicmp.cmp.JarArchiveComparator  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
+	+++  NEW METHOD: PUBLIC(+) java.util.List<javassist.CtClass> filterClasses(java.util.List<javassist.CtClass>, japicmp.cmp.ReducibleClassPool, boolean)
+***  MODIFIED ENUM: PUBLIC FINAL japicmp.model.JApiChangeStatus  (compatible)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	+++  NEW METHOD: PUBLIC(+) boolean isNotNewOrRemoved()
 ***  MODIFIED ENUM: PUBLIC FINAL japicmp.model.JApiCompatibilityChange  (compatible)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChange FIELD_NOW_TRANSIENT
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChange FIELD_NO_LONGER_TRANSIENT
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiModifier  (not serializable)
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChange FIELD_NOW_VOLATILE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChange FIELD_NO_LONGER_VOLATILE
+***  MODIFIED CLASS: PUBLIC japicmp.model.JApiField  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	GENERIC TEMPLATES: === T:java.lang.Object
-	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiReturnType  (not serializable)
+	+++  NEW INTERFACE: japicmp.model.JApiHasVolatileModifier
+	+++  NEW METHOD: PUBLIC(+) japicmp.model.JApiModifier<japicmp.model.VolatileModifier> getVolatileModifier()
+		+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlTransient
++++  NEW INTERFACE: PUBLIC(+) ABSTRACT(+) japicmp.model.JApiHasVolatileModifier  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW METHOD: PUBLIC(+) ABSTRACT(+) japicmp.model.JApiModifier<japicmp.model.VolatileModifier> getVolatileModifier()
++++  NEW ENUM: PUBLIC(+) FINAL(+) japicmp.model.VolatileModifier  (compatible)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW INTERFACE: japicmp.model.JApiModifierBase
+	+++  NEW INTERFACE: java.lang.constant.Constable
+	+++  NEW INTERFACE: java.lang.Comparable
+	+++  NEW INTERFACE: java.io.Serializable
+	+++  NEW SUPERCLASS: java.lang.Enum
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.VolatileModifier VOLATILE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.VolatileModifier NON_VOLATILE
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) japicmp.model.VolatileModifier valueOf(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) japicmp.model.VolatileModifier[] values()
+***  MODIFIED CLASS: PUBLIC japicmp.output.semver.SemverOut  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiType  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
-***  MODIFIED CLASS: PUBLIC japicmp.output.extapi.jpa.model.JpaName  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW INTERFACE: japicmp.model.JApiHasChangeStatus
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String SEMVER_COMPATIBLE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String SEMVER_PATCH
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String SEMVER_MINOR
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String SEMVER_MAJOR

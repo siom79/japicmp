@@ -11,8 +11,9 @@ japicmp,japicmp.model,JApiAnnotationElementValue.Type,0,87,0,0,0,2,0,1,0,1
 japicmp,japicmp.model,FinalModifier,0,15,0,0,0,2,0,1,0,1
 japicmp,japicmp.model,AbstractModifier,0,15,0,0,0,2,0,1,0,1
 japicmp,japicmp.model,JApiAnnotationElementValue,220,52,42,8,46,13,35,2,10,2
-japicmp,japicmp.model,JApiCompatibilityChange,3,589,1,5,1,84,1,11,0,9
+japicmp,japicmp.model,JApiCompatibilityChange,3,607,1,5,1,86,1,11,0,9
 japicmp,japicmp.model,JApiAttribute,8,21,0,0,2,8,2,4,2,4
+japicmp,japicmp.model,VolatileModifier,0,15,0,0,0,2,0,1,0,1
 japicmp,japicmp.model,JApiReturnType,55,58,7,1,12,17,6,8,2,8
 japicmp,japicmp.model,JApiBehavior.new ModifierHelper.ExtractModifierFromBehaviorCallback() {...},0,22,0,2,0,4,0,5,0,4
 japicmp,japicmp.model,SyntheticAttribute,0,15,0,0,0,2,0,1,0,1
@@ -31,13 +32,14 @@ japicmp,japicmp.model,JApiParameter,80,55,14,0,21,17,12,9,5,9
 japicmp,japicmp.model,JApiClassFileFormatVersion,48,101,4,18,5,27,6,16,2,9
 japicmp,japicmp.model,JApiModifier,22,98,6,22,6,25,6,17,2,7
 japicmp,japicmp.model,JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus,0,150,0,4,0,24,0,6,0,4
-japicmp,japicmp.model,JApiField,180,492,10,48,15,114,15,47,6,27
+japicmp,japicmp.model,JApiField,190,516,10,50,15,119,15,50,6,29
 japicmp,japicmp.model,JApiType,8,44,0,6,2,13,2,8,2,5
 japicmp,japicmp.model,JApiSerialVersionUid,16,39,0,0,4,14,4,7,4,7
 japicmp,japicmp.model,JApiField.new ModifierHelper.ExtractModifierFromFieldCallback() {...},0,14,0,0,0,3,0,3,0,3
 japicmp,japicmp.model,JApiField.new ModifierHelper.ExtractModifierFromFieldCallback() {...},0,22,0,4,0,3,0,5,0,3
 japicmp,japicmp.model,JApiField.new ModifierHelper.ExtractModifierFromFieldCallback() {...},0,22,0,4,0,3,0,5,0,3
 japicmp,japicmp.model,JApiField.new AnnotationHelper.AnnotationsAttributeCallback() {...},0,12,0,0,0,2,0,2,0,2
+japicmp,japicmp.model,JApiField.new ModifierHelper.ExtractModifierFromFieldCallback() {...},0,22,0,4,0,3,0,5,0,3
 japicmp,japicmp.model,JApiField.new ModifierHelper.ExtractModifierFromFieldCallback() {...},0,22,0,4,0,3,0,5,0,3
 japicmp,japicmp.model,JApiField.new ModifierHelper.ExtractModifierFromFieldCallback() {...},0,22,0,4,0,3,0,5,0,3
 japicmp,japicmp.model,JApiField.new ModifierHelper.ExtractModifierFromFieldCallback() {...},22,0,4,0,3,0,5,0,3,0
@@ -62,7 +64,7 @@ japicmp,japicmp.model,JApiImplementedInterface,92,37,20,0,19,13,13,6,3,6
 japicmp,japicmp.model,JApiBehavior.new GenericTemplateHelper.SignatureParserCallback() {...},0,58,0,4,0,10,0,8,0,6
 japicmp,japicmp.model,JApiGenericTemplate,17,131,2,14,4,37,3,20,1,14
 japicmp,japicmp.model,JApiClassType.ClassType,0,27,0,0,0,2,0,1,0,1
-japicmp,japicmp.model,JApiChangeStatus,0,27,0,0,0,2,0,1,0,1
+japicmp,japicmp.model,JApiChangeStatus,0,37,0,4,0,3,0,4,0,2
 japicmp,japicmp.model,JApiAnnotation,106,222,5,27,18,52,12,17,7,6
 japicmp,japicmp.model,VarargsModifier,0,15,0,0,0,2,0,1,0,1
 japicmp,japicmp.model,JApiConstructor,49,48,3,3,10,11,5,4,3,3
@@ -74,15 +76,7 @@ japicmp,japicmp.output.extapi.jpa.model,JpaTable,520,0,65,0,112,0,49,0,15,0
 japicmp,japicmp.output.extapi.jpa.model,JpaAttribute,13,0,2,0,5,0,3,0,2,0
 japicmp,japicmp.output.xml.model,JApiCmpXmlRoot,18,139,1,1,6,53,4,29,3,29
 japicmp,japicmp.compat,CompatibilityChanges.Classpath,0,15,0,0,0,3,0,1,0,1
-japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnImplementedInterfaceCallback() {...},3,34,3,3,2,4,3,2,0,2
-japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},1,231,7,45,1,42,7,21,0,2
-japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},0,36,0,4,0,5,0,4,0,2
-japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},5,125,3,23,1,22,3,12,0,2
-japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},0,119,9,21,0,21,9,8,0,2
-japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},0,39,1,5,0,6,1,4,0,2
-japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},0,91,4,16,0,12,4,8,0,2
-japicmp,japicmp.compat,CompatibilityChanges.new CompatibilityChanges.OnSuperclassCallback() {...},0,42,2,6,0,7,2,4,0,2
-japicmp,japicmp.compat,CompatibilityChanges,166,2360,91,437,29,484,79,228,0,43
+japicmp,japicmp.compat,CompatibilityChanges,175,2944,121,563,33,597,109,286,0,53
 japicmp,japicmp.config,Options,252,555,23,33,63,156,35,64,15,56
 japicmp,japicmp.config,IgnoreMissingClasses,0,57,0,8,0,18,0,10,0,6
 japicmp,japicmp.filter,Filters,145,306,13,61,11,81,12,32,0,7
@@ -102,7 +96,7 @@ japicmp,japicmp.util,SignatureParser,37,924,28,122,8,224,28,72,0,20
 japicmp,japicmp.util,Optional.Present,22,14,4,0,4,6,6,4,4,4
 japicmp,japicmp.util,Optional,5,24,1,3,1,7,1,5,0,4
 japicmp,japicmp.util,SignatureParser.ParsedParameter,17,68,3,3,3,17,5,7,2,7
-japicmp,japicmp.util,GenericTemplateHelper,55,232,7,21,10,48,6,11,1,2
+japicmp,japicmp.util,GenericTemplateHelper,27,260,6,22,5,53,5,12,1,2
 japicmp,japicmp.util,ListJoiner,91,0,12,0,27,0,12,0,6,0
 japicmp,japicmp.util,Streams,16,28,0,2,2,7,0,2,0,1
 japicmp,japicmp.util,StringArrayEnumeration,13,47,2,4,3,9,2,5,1,3
@@ -110,7 +104,7 @@ japicmp,japicmp.util,ModifierHelper,30,577,17,103,6,125,16,60,1,15
 japicmp,japicmp.util,AnnotationHelper,40,257,3,37,8,55,4,21,2,3
 japicmp,japicmp.util,SignatureParser.DiffType,0,15,0,0,0,3,0,1,0,1
 japicmp,japicmp.util,Optional.Absent,20,7,2,0,6,2,7,2,6,2
-japicmp,japicmp.util,FileHelper,25,67,2,4,5,12,2,4,1,2
+japicmp,japicmp.util,FileHelper,49,43,4,2,10,7,4,2,2,1
 japicmp,japicmp.util,SignatureParser.ParsedTemplate,0,31,0,0,0,9,0,5,0,5
 japicmp,japicmp.output.incompatible,IncompatibleErrorOutput.new Filter.FilterVisitor() {...},248,440,65,67,48,87,50,29,2,11
 japicmp,japicmp.output.incompatible,IncompatibleErrorOutput.new SemverOut.Listener() {...},32,49,3,7,2,7,3,5,0,2
@@ -118,17 +112,15 @@ japicmp,japicmp.output.incompatible,IncompatibleErrorOutput,150,229,32,22,24,51,
 japicmp,japicmp.output.incompatible,IncompatibleErrorOutput.BreakBuildResult,0,31,1,7,0,7,1,5,0,2
 japicmp,japicmp.exception,JApiCmpException,70,75,3,1,5,13,3,6,1,6
 japicmp,japicmp.exception,JApiCmpException.Reason,0,57,0,0,0,10,0,1,0,1
-japicmp,japicmp.cmp,JarArchiveComparator.JarsCtClassIterable,0,54,0,6,0,16,0,7,0,4
 japicmp,japicmp.cmp,ReducibleClassPool,0,9,0,0,0,3,0,2,0,2
 japicmp,japicmp.cmp,JarArchiveComparatorOptions.ClassPathMode,0,15,0,0,0,2,0,1,0,1
-japicmp,japicmp.cmp,JarArchiveComparator,410,323,52,24,76,76,37,27,5,21
+japicmp,japicmp.cmp,JarArchiveComparator,565,378,64,28,102,93,46,30,7,23
 japicmp,japicmp.cmp,JarArchiveComparator.ArchiveType,0,15,0,0,0,2,0,1,0,1
 japicmp,japicmp.cmp,JarArchiveComparatorOptions.OverrideCompatibilityChange,0,27,0,0,0,10,0,5,0,5
-japicmp,japicmp.cmp,JApiCmpArchive,0,18,0,0,0,6,0,3,0,3
+japicmp,japicmp.cmp,JApiCmpArchive,83,18,6,0,16,6,6,3,3,3
 japicmp,japicmp.cmp,ClassesComparator,0,215,3,15,0,45,3,12,0,6
-japicmp,japicmp.cmp,JarArchiveComparator.JarCtClassIterator,88,82,3,7,9,26,3,5,0,3
 japicmp,japicmp.cmp,JarArchiveComparatorOptions,42,165,3,2,11,50,7,19,4,19
-japicmp,japicmp.output.stdout,StdoutOutputGenerator,662,1276,94,136,91,264,71,85,4,34
+japicmp,japicmp.output.stdout,StdoutOutputGenerator,662,1288,94,136,91,266,71,86,4,35
 japicmp,japicmp.output.xml,XmlOutputGeneratorOptions,12,22,0,0,5,8,3,4,3,4
 japicmp,japicmp.output.xml,XmlOutput,12,37,2,2,4,13,4,6,2,6
 japicmp,japicmp.output.xml,XmlOutputGenerator.new SchemaOutputResolver() {...},62,0,2,0,9,0,3,0,2,0

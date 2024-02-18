@@ -13,11 +13,11 @@ public class FileHelper {
 	}
 
 	public static List&lt;File&gt; toFileList(List&lt;JApiCmpArchive&gt; archives) {
-<span class="fc" id="L16">		List&lt;File&gt; files = new ArrayList&lt;&gt;(archives.size());</span>
-<span class="fc bfc" id="L17" title="All 2 branches covered.">		for (JApiCmpArchive archive : archives) {</span>
-<span class="fc" id="L18">			files.add(archive.getFile());</span>
-<span class="fc" id="L19">		}</span>
-<span class="fc" id="L20">		return files;</span>
+<span class="nc" id="L16">		List&lt;File&gt; files = new ArrayList&lt;&gt;(archives.size());</span>
+<span class="nc bnc" id="L17" title="All 2 branches missed.">		for (JApiCmpArchive archive : archives) {</span>
+<span class="nc" id="L18">			files.add(archive.getFile());</span>
+<span class="nc" id="L19">		}</span>
+<span class="nc" id="L20">		return files;</span>
 	}
 
 	public static List&lt;String&gt; toVersionList(List&lt;JApiCmpArchive&gt; archives) {

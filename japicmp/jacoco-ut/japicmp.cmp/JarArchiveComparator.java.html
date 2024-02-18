@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JarArchiveComparator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.cmp</a> &gt; <span class="el_source">JarArchiveComparator.java</span></div><h1>JarArchiveComparator.java</h1><pre class="source lang-java linenums">package japicmp.cmp;
 
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.util.Optional;
 import japicmp.compat.CompatibilityChanges;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
@@ -10,40 +8,36 @@ import japicmp.filter.Filter;
 import japicmp.filter.Filters;
 import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiClass;
+import japicmp.model.JApiCompatibilityChange;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import japicmp.util.AnnotationHelper;
-import java.util.function.Supplier;
+import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static japicmp.util.FileHelper.toFileList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class provides the basic methods to compare the classes within to jar archives.
  */
 public class JarArchiveComparator {
-<span class="fc" id="L40">	private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());</span>
+<span class="fc" id="L34">	private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());</span>
 	private ReducibleClassPool commonClassPool;
 	private ReducibleClassPool oldClassPool;
 	private ReducibleClassPool newClassPool;
-<span class="fc" id="L44">	private String commonClassPathAsString = &quot;&quot;;</span>
-<span class="fc" id="L45">	private String oldClassPathAsString = &quot;&quot;;</span>
-<span class="fc" id="L46">	private String newClassPathAsString = &quot;&quot;;</span>
+<span class="fc" id="L38">	private String commonClassPathAsString = &quot;&quot;;</span>
+<span class="fc" id="L39">	private String oldClassPathAsString = &quot;&quot;;</span>
+<span class="fc" id="L40">	private String newClassPathAsString = &quot;&quot;;</span>
 	private final JarArchiveComparatorOptions options;
 
 	/**
@@ -51,27 +45,27 @@ public class JarArchiveComparator {
 	 *
 	 * @param options the options used in the further processing
 	 */
-<span class="fc" id="L54">	public JarArchiveComparator(JarArchiveComparatorOptions options) {</span>
-<span class="fc" id="L55">		this.options = options;</span>
-<span class="fc" id="L56">		setupClasspaths();</span>
-<span class="fc" id="L57">		setupCompatibilityChanges(options);</span>
-<span class="fc" id="L58">	}</span>
+<span class="fc" id="L48">	public JarArchiveComparator(JarArchiveComparatorOptions options) {</span>
+<span class="fc" id="L49">		this.options = options;</span>
+<span class="fc" id="L50">		setupClasspaths();</span>
+<span class="fc" id="L51">		setupCompatibilityChanges(options);</span>
+<span class="fc" id="L52">	}</span>
 
 	private void setupCompatibilityChanges(JarArchiveComparatorOptions options) {
-<span class="fc bfc" id="L61" title="All 2 branches covered.">		for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {</span>
-<span class="fc" id="L62">			jApiCompatibility.resetOverrides();</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">		for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {</span>
+<span class="fc" id="L56">			jApiCompatibility.resetOverrides();</span>
 		}
-<span class="fc bfc" id="L64" title="All 2 branches covered.">		for (JarArchiveComparatorOptions.OverrideCompatibilityChange change : options.getOverrideCompatibilityChanges()) {</span>
-<span class="fc" id="L65">			JApiCompatibilityChange compatibilityChange = change.getCompatibilityChange();</span>
-<span class="fc bfc" id="L66" title="All 2 branches covered.">			for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">				if (jApiCompatibility == compatibilityChange) {</span>
-<span class="fc" id="L68">					jApiCompatibility.setBinaryCompatible(change.isBinaryCompatible());</span>
-<span class="fc" id="L69">					jApiCompatibility.setSourceCompatible(change.isSourceCompatible());</span>
-<span class="fc" id="L70">					jApiCompatibility.setSemanticVersionLevel(change.getSemanticVersionLevel());</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">		for (JarArchiveComparatorOptions.OverrideCompatibilityChange change : options.getOverrideCompatibilityChanges()) {</span>
+<span class="fc" id="L59">			JApiCompatibilityChange compatibilityChange = change.getCompatibilityChange();</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">			for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">				if (jApiCompatibility == compatibilityChange) {</span>
+<span class="fc" id="L62">					jApiCompatibility.setBinaryCompatible(change.isBinaryCompatible());</span>
+<span class="fc" id="L63">					jApiCompatibility.setSourceCompatible(change.isSourceCompatible());</span>
+<span class="fc" id="L64">					jApiCompatibility.setSemanticVersionLevel(change.getSemanticVersionLevel());</span>
 				}
 			}
-<span class="fc" id="L73">		}</span>
-<span class="fc" id="L74">	}</span>
+<span class="fc" id="L67">		}</span>
+<span class="fc" id="L68">	}</span>
 
 	/**
 	 * Compares the two given archives.
@@ -82,7 +76,7 @@ public class JarArchiveComparator {
 	 * @throws JApiCmpException if the comparison fails
 	 */
 	public List&lt;JApiClass&gt; compare(JApiCmpArchive oldArchive, JApiCmpArchive newArchive) {
-<span class="fc" id="L85">		return compare(Collections.singletonList(oldArchive), Collections.singletonList(newArchive));</span>
+<span class="fc" id="L79">		return compare(Collections.singletonList(oldArchive), Collections.singletonList(newArchive));</span>
 	}
 
 	/**
@@ -94,56 +88,56 @@ public class JarArchiveComparator {
 	 * @throws JApiCmpException if the comparison fails
 	 */
 	public List&lt;JApiClass&gt; compare(List&lt;JApiCmpArchive&gt; oldArchives, List&lt;JApiCmpArchive&gt; newArchives) {
-<span class="fc" id="L97">		return createAndCompareClassLists(toFileList(oldArchives), toFileList(newArchives));</span>
+<span class="fc" id="L91">		return createAndCompareClassLists(oldArchives, newArchives);</span>
 	}
 
 	private void checkJavaObjectSerializationCompatibility(List&lt;JApiClass&gt; jApiClasses) {
-<span class="fc" id="L101">		JavaObjectSerializationCompatibility javaObjectSerializationCompatibility = new JavaObjectSerializationCompatibility();</span>
-<span class="fc" id="L102">		javaObjectSerializationCompatibility.evaluate(jApiClasses);</span>
-<span class="fc" id="L103">	}</span>
+<span class="fc" id="L95">		JavaObjectSerializationCompatibility javaObjectSerializationCompatibility = new JavaObjectSerializationCompatibility();</span>
+<span class="fc" id="L96">		javaObjectSerializationCompatibility.evaluate(jApiClasses);</span>
+<span class="fc" id="L97">	}</span>
 
 	private void setupClasspaths() {
-<span class="pc bpc" id="L106" title="1 of 2 branches missed.">		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {</span>
-<span class="fc" id="L107">			commonClassPool = new ReducibleClassPool();</span>
-<span class="fc" id="L108">			commonClassPathAsString = setupClasspath(commonClassPool, this.options.getClassPathEntries());</span>
-<span class="nc bnc" id="L109" title="All 2 branches missed.">		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {</span>
-<span class="nc" id="L110">			oldClassPool = new ReducibleClassPool();</span>
-<span class="nc" id="L111">			oldClassPathAsString = setupClasspath(oldClassPool, this.options.getOldClassPath());</span>
-<span class="nc" id="L112">			newClassPool = new ReducibleClassPool();</span>
-<span class="nc" id="L113">			newClassPathAsString = setupClasspath(newClassPool, this.options.getNewClassPath());</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {</span>
+<span class="fc" id="L101">			commonClassPool = new ReducibleClassPool();</span>
+<span class="fc" id="L102">			commonClassPathAsString = setupClasspath(commonClassPool, this.options.getClassPathEntries());</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {</span>
+<span class="nc" id="L104">			oldClassPool = new ReducibleClassPool();</span>
+<span class="nc" id="L105">			oldClassPathAsString = setupClasspath(oldClassPool, this.options.getOldClassPath());</span>
+<span class="nc" id="L106">			newClassPool = new ReducibleClassPool();</span>
+<span class="nc" id="L107">			newClassPathAsString = setupClasspath(newClassPool, this.options.getNewClassPath());</span>
 		} else {
-<span class="nc" id="L115">			throw new JApiCmpException(Reason.IllegalState, &quot;Unknown classpath mode: &quot; + this.options.getClassPathMode());</span>
+<span class="nc" id="L109">			throw new JApiCmpException(Reason.IllegalState, &quot;Unknown classpath mode: &quot; + this.options.getClassPathMode());</span>
 		}
-<span class="fc" id="L117">	}</span>
+<span class="fc" id="L111">	}</span>
 
 	private String setupClasspath(ClassPool classPool, List&lt;String&gt; classPathEntries) {
-<span class="fc" id="L120">		String classPathAsString = appendUserDefinedClassPathEntries(classPool, classPathEntries);</span>
-<span class="fc" id="L121">		return appendSystemClassPath(classPool, classPathAsString);</span>
+<span class="fc" id="L114">		String classPathAsString = appendUserDefinedClassPathEntries(classPool, classPathEntries);</span>
+<span class="fc" id="L115">		return appendSystemClassPath(classPool, classPathAsString);</span>
 	}
 
 	private String appendSystemClassPath(ClassPool classPool, String classPathAsString) {
-<span class="fc" id="L125">		String retVal = classPathAsString;</span>
-<span class="fc" id="L126">		classPool.appendSystemPath();</span>
-<span class="pc bpc" id="L127" title="3 of 4 branches missed.">		if (retVal.length() &gt; 0 &amp;&amp; !retVal.endsWith(File.pathSeparator)) {</span>
-<span class="nc" id="L128">			retVal += File.pathSeparator;</span>
+<span class="fc" id="L119">		String retVal = classPathAsString;</span>
+<span class="fc" id="L120">		classPool.appendSystemPath();</span>
+<span class="pc bpc" id="L121" title="3 of 4 branches missed.">		if (!retVal.isEmpty() &amp;&amp; !retVal.endsWith(File.pathSeparator)) {</span>
+<span class="nc" id="L122">			retVal += File.pathSeparator;</span>
 		}
-<span class="fc" id="L130">		return retVal;</span>
+<span class="fc" id="L124">		return retVal;</span>
 	}
 
 	private String appendUserDefinedClassPathEntries(ClassPool classPool, List&lt;String&gt; classPathEntries) {
-<span class="fc" id="L134">		StringBuilder classPathAsString = new StringBuilder();</span>
-<span class="pc bpc" id="L135" title="1 of 2 branches missed.">		for (String classPathEntry : classPathEntries) {</span>
+<span class="fc" id="L128">		StringBuilder classPathAsString = new StringBuilder();</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">		for (String classPathEntry : classPathEntries) {</span>
 			try {
-<span class="nc" id="L137">				classPool.appendClassPath(classPathEntry);</span>
-<span class="nc bnc" id="L138" title="All 2 branches missed.">				if (!classPathAsString.toString().endsWith(File.pathSeparator)) {</span>
-<span class="nc" id="L139">					classPathAsString.append(File.pathSeparator);</span>
+<span class="nc" id="L131">				classPool.appendClassPath(classPathEntry);</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">				if (!classPathAsString.toString().endsWith(File.pathSeparator)) {</span>
+<span class="nc" id="L133">					classPathAsString.append(File.pathSeparator);</span>
 				}
-<span class="nc" id="L141">				classPathAsString.append(classPathEntry);</span>
-<span class="nc" id="L142">			} catch (NotFoundException e) {</span>
-<span class="nc" id="L143">				throw JApiCmpException.forClassLoading(e, classPathEntry, this);</span>
-<span class="nc" id="L144">			}</span>
-<span class="nc" id="L145">		}</span>
-<span class="fc" id="L146">		return classPathAsString.toString();</span>
+<span class="nc" id="L135">				classPathAsString.append(classPathEntry);</span>
+<span class="nc" id="L136">			} catch (NotFoundException e) {</span>
+<span class="nc" id="L137">				throw JApiCmpException.forClassLoading(e, classPathEntry, this);</span>
+<span class="nc" id="L138">			}</span>
+<span class="nc" id="L139">		}</span>
+<span class="fc" id="L140">		return classPathAsString.toString();</span>
 	}
 
 	/**
@@ -152,7 +146,7 @@ public class JarArchiveComparator {
 	 * @return the common classpath as String
 	 */
 	public String getCommonClasspathAsString() {
-<span class="fc" id="L155">		return commonClassPathAsString;</span>
+<span class="fc" id="L149">		return commonClassPathAsString;</span>
 	}
 
 	/**
@@ -161,7 +155,7 @@ public class JarArchiveComparator {
 	 * @return the classpath for the old version
 	 */
 	public String getOldClassPathAsString() {
-<span class="nc" id="L164">		return oldClassPathAsString;</span>
+<span class="nc" id="L158">		return oldClassPathAsString;</span>
 	}
 
 	/**
@@ -170,27 +164,27 @@ public class JarArchiveComparator {
 	 * @return the classpath for the new version
 	 */
 	public String getNewClassPathAsString() {
-<span class="nc" id="L173">		return newClassPathAsString;</span>
+<span class="nc" id="L167">		return newClassPathAsString;</span>
 	}
 
 	private void checkBinaryCompatibility(List&lt;JApiClass&gt; classList) {
-<span class="fc" id="L177">		CompatibilityChanges compatibilityChanges = new CompatibilityChanges(this);</span>
-<span class="fc" id="L178">		compatibilityChanges.evaluate(classList);</span>
-<span class="fc" id="L179">	}</span>
+<span class="fc" id="L171">		CompatibilityChanges compatibilityChanges = new CompatibilityChanges(this);</span>
+<span class="fc" id="L172">		compatibilityChanges.evaluate(classList);</span>
+<span class="fc" id="L173">	}</span>
 
-	private List&lt;JApiClass&gt; createAndCompareClassLists(List&lt;File&gt; oldArchives, List&lt;File&gt; newArchives) {
+	private List&lt;JApiClass&gt; createAndCompareClassLists(List&lt;JApiCmpArchive&gt; oldArchives, List&lt;JApiCmpArchive&gt; newArchives) {
 		List&lt;CtClass&gt; oldClasses;
 		List&lt;CtClass&gt; newClasses;
-<span class="pc bpc" id="L184" title="1 of 2 branches missed.">		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {</span>
-<span class="fc" id="L185">			oldClasses = createListOfCtClasses(oldArchives, commonClassPool);</span>
-<span class="fc" id="L186">			newClasses = createListOfCtClasses(newArchives, commonClassPool);</span>
-<span class="fc" id="L187">			return compareClassLists(options, oldClasses, newClasses);</span>
-<span class="nc bnc" id="L188" title="All 2 branches missed.">		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {</span>
-<span class="nc" id="L189">			oldClasses = createListOfCtClasses(oldArchives, oldClassPool);</span>
-<span class="nc" id="L190">			newClasses = createListOfCtClasses(newArchives, newClassPool);</span>
-<span class="nc" id="L191">			return compareClassLists(options, oldClasses, newClasses);</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {</span>
+<span class="fc" id="L179">			oldClasses = createListOfCtClasses(oldArchives, commonClassPool);</span>
+<span class="fc" id="L180">			newClasses = createListOfCtClasses(newArchives, commonClassPool);</span>
+<span class="fc" id="L181">			return compareClassLists(options, oldClasses, newClasses);</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {</span>
+<span class="nc" id="L183">			oldClasses = createListOfCtClasses(oldArchives, oldClassPool);</span>
+<span class="nc" id="L184">			newClasses = createListOfCtClasses(newArchives, newClassPool);</span>
+<span class="nc" id="L185">			return compareClassLists(options, oldClasses, newClasses);</span>
 		} else {
-<span class="nc" id="L193">			throw new JApiCmpException(Reason.IllegalState, &quot;Unknown classpath mode: &quot; + this.options.getClassPathMode());</span>
+<span class="nc" id="L187">			throw new JApiCmpException(Reason.IllegalState, &quot;Unknown classpath mode: &quot; + this.options.getClassPathMode());</span>
 		}
 	}
 
@@ -203,96 +197,159 @@ public class JarArchiveComparator {
 	 * @return a list of {@link japicmp.model.JApiClass} that represent the changes
 	 */
 	List&lt;JApiClass&gt; compareClassLists(JarArchiveComparatorOptions options, List&lt;CtClass&gt; oldClasses, List&lt;CtClass&gt; newClasses) {
-<span class="fc" id="L206">		ClassesComparator classesComparator = new ClassesComparator(this, options);</span>
-<span class="fc" id="L207">		classesComparator.compare(oldClasses, newClasses);</span>
-<span class="fc" id="L208">		List&lt;JApiClass&gt; classList = classesComparator.getClasses();</span>
-<span class="pc bpc" id="L209" title="1 of 2 branches missed.">		if (LOGGER.isLoggable(Level.FINE)) {</span>
-<span class="nc bnc" id="L210" title="All 2 branches missed.">			for (JApiClass jApiClass : classList) {</span>
-<span class="nc" id="L211">				LOGGER.fine(jApiClass.toString());</span>
-<span class="nc" id="L212">			}</span>
+<span class="fc" id="L200">		ClassesComparator classesComparator = new ClassesComparator(this, options);</span>
+<span class="fc" id="L201">		classesComparator.compare(oldClasses, newClasses);</span>
+<span class="fc" id="L202">		List&lt;JApiClass&gt; classList = classesComparator.getClasses();</span>
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">		if (LOGGER.isLoggable(Level.FINE)) {</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">			for (JApiClass jApiClass : classList) {</span>
+<span class="nc" id="L205">				LOGGER.fine(jApiClass.toString());</span>
+<span class="nc" id="L206">			}</span>
 		}
-<span class="fc" id="L214">		checkBinaryCompatibility(classList);</span>
-<span class="fc" id="L215">		checkJavaObjectSerializationCompatibility(classList);</span>
-<span class="fc" id="L216">		OutputFilter.sortClassesAndMethods(classList);</span>
-<span class="fc" id="L217">		return classList;</span>
+<span class="fc" id="L208">		checkBinaryCompatibility(classList);</span>
+<span class="fc" id="L209">		checkJavaObjectSerializationCompatibility(classList);</span>
+<span class="fc" id="L210">		OutputFilter.sortClassesAndMethods(classList);</span>
+<span class="fc" id="L211">		return classList;</span>
 	}
 
-	private List&lt;CtClass&gt; createListOfCtClasses(List&lt;File&gt; archives, ReducibleClassPool classPool) {
-<span class="fc" id="L221">		return createListOfCtClasses(() -&gt; new JarsCtClassIterable(archives, classPool), classPool);</span>
+	private List&lt;CtClass&gt; createListOfCtClasses(List&lt;JApiCmpArchive&gt; archives, ReducibleClassPool classPool) {
+<span class="fc" id="L215">		List&lt;CtClass&gt; ctClasses = archives.stream()</span>
+<span class="fc" id="L216">			.flatMap(archive -&gt; toCtClassStream(archive, classPool))</span>
+<span class="fc" id="L217">			.collect(Collectors.toList());</span>
+<span class="fc" id="L218">		ctClasses = filterClasses(ctClasses, classPool, false);</span>
+<span class="fc" id="L219">		return ctClasses;</span>
 	}
 
-	List&lt;CtClass&gt; createListOfCtClasses(Supplier&lt;Iterable&lt;CtClass&gt;&gt; ctClasses, ReducibleClassPool classPool) {
-<span class="fc" id="L225">		return loadAndFilterClasses(ctClasses, classPool, false);</span>
+	private Stream&lt;CtClass&gt; toCtClassStream(JApiCmpArchive archive, ReducibleClassPool classPool) {
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">		if (archive.getFile() != null) {</span>
+<span class="fc" id="L224">			try (JarFile jarFile = new JarFile(archive.getFile())) {</span>
+<span class="fc" id="L225">				return jarFile.stream()</span>
+<span class="fc" id="L226">					.map(jarEntry -&gt; ctClass(classPool, jarFile, jarEntry))</span>
+<span class="fc" id="L227">					.filter(Objects::nonNull)</span>
+<span class="fc" id="L228">					.collect(Collectors.toList()).stream();</span>
+<span class="nc" id="L229">			} catch (IOException e) {</span>
+<span class="nc" id="L230">				throw new JApiCmpException(Reason.IoException, &quot;Failed to load archive from file: &quot; + e.getMessage(), e);</span>
+			}
+<span class="nc bnc" id="L232" title="All 2 branches missed.">		} else if (archive.getBytes() != null) {</span>
+<span class="nc" id="L233">			return bytesToCtClasses(archive, classPool);</span>
+		} else {
+<span class="nc" id="L235">			throw new JApiCmpException(Reason.IllegalArgument, JApiCmpArchive.class.getSimpleName() + &quot; has no file and no bytes: &quot; + archive);</span>
+		}
 	}
 
-	private List&lt;CtClass&gt; loadAndFilterClasses(Supplier&lt;Iterable&lt;CtClass&gt;&gt; ctClasses, ReducibleClassPool classPool, boolean ignorePackageFilters) {
+	private static Stream&lt;CtClass&gt; bytesToCtClasses(JApiCmpArchive archive, ReducibleClassPool classPool) {
+<span class="nc" id="L240">		List&lt;CtClass&gt; ctClasses = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L241">		try (JarInputStream jarInputStream = new JarInputStream(new ByteArrayInputStream(archive.getBytes()))) {</span>
+<span class="nc" id="L242">			JarEntry nextJarEntry = jarInputStream.getNextJarEntry();</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">			while (nextJarEntry != null) {</span>
+<span class="nc bnc" id="L244" title="All 4 branches missed.">				if (!nextJarEntry.isDirectory() &amp;&amp; nextJarEntry.getName().endsWith(&quot;.class&quot;)) {</span>
+<span class="nc" id="L245">					byte[] byteArray = getJarEntryContent(jarInputStream);</span>
+<span class="nc" id="L246">					CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(byteArray));</span>
+<span class="nc" id="L247">					ctClasses.add(ctClass);</span>
+				}
+<span class="nc" id="L249">				nextJarEntry = jarInputStream.getNextJarEntry();</span>
+			}
+<span class="nc" id="L251">		} catch (IOException e) {</span>
+<span class="nc" id="L252">			throw new JApiCmpException(Reason.IoException, &quot;Failed to load archive from byte array: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L253">		}</span>
+<span class="nc" id="L254">		return ctClasses.stream();</span>
+	}
+
+	private static byte[] getJarEntryContent(JarInputStream jarInputStream) throws IOException {
+		int len;
+<span class="nc" id="L259">		byte[] buffer = new byte[1024];</span>
+<span class="nc" id="L260">		ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="nc bnc" id="L261" title="All 2 branches missed.">		while ((len = jarInputStream.read(buffer)) &gt; 0) {</span>
+<span class="nc" id="L262">			baos.write(buffer, 0, len);</span>
+		}
+<span class="nc" id="L264">        return baos.toByteArray();</span>
+	}
+
+	private CtClass ctClass(ClassPool classPool, JarFile jarFile, JarEntry jarEntry) {
+<span class="fc" id="L268">		String name = jarEntry.getName();</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">		if (name.endsWith(&quot;.class&quot;)) {</span>
+			CtClass ctClass;
+<span class="fc" id="L271">			try (InputStream classFile = jarFile.getInputStream(jarEntry)) {</span>
+<span class="fc" id="L272">				ctClass = classPool.makeClass(classFile);</span>
+<span class="nc" id="L273">			} catch (Exception e) {</span>
+<span class="nc" id="L274">				throw new JApiCmpException(Reason.IoException, String.format(&quot;Failed to load file from jar '%s' as class file: %s.&quot;, name, e.getMessage()), e);</span>
+<span class="fc" id="L275">			}</span>
+<span class="fc" id="L276">			return ctClass;</span>
+		} else {
+<span class="pc bpc" id="L278" title="1 of 2 branches missed.">			if (LOGGER.isLoggable(Level.FINE)) {</span>
+<span class="nc" id="L279">				LOGGER.fine(String.format(&quot;Skipping file '%s' because filename does not end with '.class'.&quot;, name));</span>
+			}
+		}
+<span class="fc" id="L282">		return null;</span>
+	}
+
+	public List&lt;CtClass&gt; filterClasses(List&lt;CtClass&gt; ctClasses, ReducibleClassPool classPool, boolean ignorePackageFilters) {
 		// marks whether any package was found
 		// if so we need to go over _all_ classes again
-<span class="fc" id="L231">		boolean packageFilterEncountered = false;</span>
+<span class="fc" id="L288">		boolean packageFilterEncountered = false;</span>
 
-<span class="fc" id="L233">		List&lt;CtClass&gt; classes = new LinkedList&lt;&gt;();</span>
-<span class="fc bfc" id="L234" title="All 2 branches covered.">		for (CtClass ctClass : ctClasses.get()) {</span>
-<span class="pc bpc" id="L235" title="1 of 2 branches missed.">			if (!packageFilterEncountered) {</span>
-<span class="fc bfc" id="L236" title="All 2 branches covered.">				if (options.getFilters().includeClass(ctClass)) {</span>
-<span class="fc" id="L237">					classes.add(ctClass);</span>
-<span class="pc bpc" id="L238" title="1 of 2 branches missed.">					if (LOGGER.isLoggable(Level.FINE)) {</span>
-<span class="nc" id="L239">						LOGGER.fine(String.format(&quot;Adding class '%s' with jar name '%s' to list.&quot;, ctClass.getName(), ctClass.getName()));</span>
+<span class="fc" id="L290">		List&lt;CtClass&gt; classes = new LinkedList&lt;&gt;();</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">		for (CtClass ctClass : ctClasses) {</span>
+<span class="pc bpc" id="L292" title="1 of 2 branches missed.">			if (!packageFilterEncountered) {</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">				if (options.getFilters().includeClass(ctClass)) {</span>
+<span class="fc" id="L294">					classes.add(ctClass);</span>
+<span class="pc bpc" id="L295" title="1 of 2 branches missed.">					if (LOGGER.isLoggable(Level.FINE)) {</span>
+<span class="nc" id="L296">						LOGGER.fine(String.format(&quot;Adding class '%s' with jar name '%s' to list.&quot;, ctClass.getName(), ctClass.getName()));</span>
 					}
 				} else {
-<span class="fc" id="L242">					classPool.remove(ctClass);</span>
-<span class="pc bpc" id="L243" title="1 of 2 branches missed.">					if (LOGGER.isLoggable(Level.FINE)) {</span>
-<span class="nc" id="L244">						LOGGER.fine(String.format(&quot;Ignoring class '%s' with jar name '%s'.&quot;, ctClass.getName(), ctClass.getName()));</span>
+<span class="fc" id="L299">					classPool.remove(ctClass);</span>
+<span class="pc bpc" id="L300" title="1 of 2 branches missed.">					if (LOGGER.isLoggable(Level.FINE)) {</span>
+<span class="nc" id="L301">						LOGGER.fine(String.format(&quot;Ignoring class '%s' with jar name '%s'.&quot;, ctClass.getName(), ctClass.getName()));</span>
 					}
 				}
 			}
-<span class="pc bpc" id="L248" title="2 of 4 branches missed.">			if (!ignorePackageFilters &amp;&amp; ctClass.getName().endsWith(&quot;package-info&quot;)) {</span>
-<span class="nc" id="L249">				packageFilterEncountered |= updatePackageFilter(ctClass);</span>
-<span class="nc bnc" id="L250" title="All 2 branches missed.">				if (packageFilterEncountered) {</span>
+<span class="pc bpc" id="L305" title="2 of 4 branches missed.">			if (!ignorePackageFilters &amp;&amp; ctClass.getName().endsWith(&quot;package-info&quot;)) {</span>
+<span class="nc" id="L306">				packageFilterEncountered |= updatePackageFilter(ctClass);</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">				if (packageFilterEncountered) {</span>
 					// we found a package filter, so any filtering we did so far may be invalid
 					// reset everything and restart after having read all remaining filters
-<span class="nc" id="L253">					classes.forEach(classPool::remove);</span>
-<span class="nc" id="L254">					classes.clear();</span>
+<span class="nc" id="L310">					classes.forEach(classPool::remove);</span>
+<span class="nc" id="L311">					classes.clear();</span>
 				}
 			}
-<span class="fc" id="L257">		}</span>
+<span class="fc" id="L314">		}</span>
 
-<span class="pc bpc" id="L259" title="1 of 2 branches missed.">		return packageFilterEncountered</span>
-<span class="nc" id="L260">				? loadAndFilterClasses(ctClasses, classPool, true)</span>
-<span class="fc" id="L261">				: classes;</span>
+<span class="pc bpc" id="L316" title="1 of 2 branches missed.">		return packageFilterEncountered</span>
+<span class="nc" id="L317">			? filterClasses(ctClasses, classPool, true)</span>
+<span class="fc" id="L318">			: classes;</span>
 	}
 
 
 	private boolean updatePackageFilter(CtClass ctClass) {
-<span class="nc" id="L266">		boolean filtersUpdated = false;</span>
-<span class="nc" id="L267">		Filters filters = options.getFilters();</span>
-<span class="nc" id="L268">		List&lt;Filter&gt; newFilters = new LinkedList&lt;&gt;();</span>
-<span class="nc bnc" id="L269" title="All 2 branches missed.">		for (Filter filter : filters.getIncludes()) {</span>
-<span class="nc bnc" id="L270" title="All 2 branches missed.">			if (filter instanceof AnnotationFilterBase) {</span>
-<span class="nc" id="L271">				String className = ((AnnotationFilterBase) filter).getClassName();</span>
-<span class="nc bnc" id="L272" title="All 2 branches missed.">				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {</span>
-<span class="nc" id="L273">					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName(), false));</span>
+<span class="nc" id="L323">		boolean filtersUpdated = false;</span>
+<span class="nc" id="L324">		Filters filters = options.getFilters();</span>
+<span class="nc" id="L325">		List&lt;Filter&gt; newFilters = new LinkedList&lt;&gt;();</span>
+<span class="nc bnc" id="L326" title="All 2 branches missed.">		for (Filter filter : filters.getIncludes()) {</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">			if (filter instanceof AnnotationFilterBase) {</span>
+<span class="nc" id="L328">				String className = ((AnnotationFilterBase) filter).getClassName();</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {</span>
+<span class="nc" id="L330">					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName(), false));</span>
 				}
 			}
-<span class="nc" id="L276">		}</span>
-<span class="nc bnc" id="L277" title="All 2 branches missed.">		if (newFilters.size() &gt; 0) {</span>
-<span class="nc" id="L278">			filters.getIncludes().addAll(newFilters);</span>
-<span class="nc" id="L279">			newFilters.clear();</span>
-<span class="nc" id="L280">			filtersUpdated = true;</span>
+<span class="nc" id="L333">		}</span>
+<span class="nc bnc" id="L334" title="All 2 branches missed.">		if (!newFilters.isEmpty()) {</span>
+<span class="nc" id="L335">			filters.getIncludes().addAll(newFilters);</span>
+<span class="nc" id="L336">			newFilters.clear();</span>
+<span class="nc" id="L337">			filtersUpdated = true;</span>
 		}
-<span class="nc bnc" id="L282" title="All 2 branches missed.">		for (Filter filter : filters.getExcludes()) {</span>
-<span class="nc bnc" id="L283" title="All 2 branches missed.">			if (filter instanceof AnnotationFilterBase) {</span>
-<span class="nc" id="L284">				String className = ((AnnotationFilterBase) filter).getClassName();</span>
-<span class="nc bnc" id="L285" title="All 2 branches missed.">				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {</span>
-<span class="nc" id="L286">					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName(), false));</span>
+<span class="nc bnc" id="L339" title="All 2 branches missed.">		for (Filter filter : filters.getExcludes()) {</span>
+<span class="nc bnc" id="L340" title="All 2 branches missed.">			if (filter instanceof AnnotationFilterBase) {</span>
+<span class="nc" id="L341">				String className = ((AnnotationFilterBase) filter).getClassName();</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {</span>
+<span class="nc" id="L343">					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName(), false));</span>
 				}
 			}
-<span class="nc" id="L289">		}</span>
-<span class="nc bnc" id="L290" title="All 2 branches missed.">		if (newFilters.size() &gt; 0) {</span>
-<span class="nc" id="L291">			filters.getExcludes().addAll(newFilters);</span>
-<span class="nc" id="L292">			newFilters.clear();</span>
-<span class="nc" id="L293">			filtersUpdated = true;</span>
+<span class="nc" id="L346">		}</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">		if (!newFilters.isEmpty()) {</span>
+<span class="nc" id="L348">			filters.getExcludes().addAll(newFilters);</span>
+<span class="nc" id="L349">			newFilters.clear();</span>
+<span class="nc" id="L350">			filtersUpdated = true;</span>
 		}
-<span class="nc" id="L295">		return filtersUpdated;</span>
+<span class="nc" id="L352">		return filtersUpdated;</span>
 	}
 
 	/**
@@ -301,7 +358,7 @@ public class JarArchiveComparator {
 	 * @return an instance of {@link japicmp.cmp.JarArchiveComparatorOptions}
 	 */
 	public JarArchiveComparatorOptions getJarArchiveComparatorOptions() {
-<span class="fc" id="L304">		return this.options;</span>
+<span class="fc" id="L361">		return this.options;</span>
 	}
 
 	/**
@@ -311,16 +368,16 @@ public class JarArchiveComparator {
 	 * @return an instance of ClassPool
 	 */
 	public ReducibleClassPool getCommonClassPool() {
-<span class="fc" id="L314">		return commonClassPool;</span>
+<span class="fc" id="L371">		return commonClassPool;</span>
 	}
 
 	/**
 	 * Returns the javassist ClassPool that is used for the old version.
 	 *
 	 * @return an instance of ClassPool
-     */
+	 */
 	public ClassPool getOldClassPool() {
-<span class="nc" id="L323">		return oldClassPool;</span>
+<span class="nc" id="L380">		return oldClassPool;</span>
 	}
 
 	/**
@@ -329,158 +386,55 @@ public class JarArchiveComparator {
 	 * @return an instance of ClassPool
 	 */
 	public ClassPool getNewClassPool() {
-<span class="nc" id="L332">		return newClassPool;</span>
+<span class="nc" id="L389">		return newClassPool;</span>
 	}
 
-<span class="fc" id="L335">	public enum ArchiveType {</span>
-<span class="fc" id="L336">		OLD, NEW</span>
+<span class="fc" id="L392">	public enum ArchiveType {</span>
+<span class="fc" id="L393">		OLD, NEW</span>
 	}
 
 	/**
 	 * Loads a class either from the old, new or common classpath.
+	 *
 	 * @param archiveType specify if this class should be loaded from the old or new class path
-	 * @param name the name of the class (FQN)
+	 * @param name        the name of the class (FQN)
 	 * @return the loaded class (if options are not set to ignore missing classes)
 	 * @throws japicmp.exception.JApiCmpException if loading the class fails
 	 */
 	public Optional&lt;CtClass&gt; loadClass(ArchiveType archiveType, String name) {
-<span class="fc" id="L347">		Optional&lt;CtClass&gt; loadedClass = Optional.absent();</span>
-<span class="pc bpc" id="L348" title="1 of 2 branches missed.">		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {</span>
+<span class="fc" id="L405">		Optional&lt;CtClass&gt; loadedClass = Optional.absent();</span>
+<span class="pc bpc" id="L406" title="1 of 2 branches missed.">		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {</span>
 			try {
-<span class="fc" id="L350">				loadedClass = Optional.of(commonClassPool.get(name));</span>
-<span class="nc" id="L351">			} catch (NotFoundException e) {</span>
-<span class="nc bnc" id="L352" title="All 2 branches missed.">				if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {</span>
-<span class="nc" id="L353">					throw JApiCmpException.forClassLoading(e, name, this);</span>
+<span class="fc" id="L408">				loadedClass = Optional.of(commonClassPool.get(name));</span>
+<span class="nc" id="L409">			} catch (NotFoundException e) {</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">				if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {</span>
+<span class="nc" id="L411">					throw JApiCmpException.forClassLoading(e, name, this);</span>
 				}
-<span class="pc" id="L355">			}</span>
-<span class="nc bnc" id="L356" title="All 2 branches missed.">		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {</span>
-<span class="nc bnc" id="L357" title="All 2 branches missed.">			if (archiveType == ArchiveType.OLD) {</span>
+<span class="pc" id="L413">			}</span>
+<span class="nc bnc" id="L414" title="All 2 branches missed.">		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {</span>
+<span class="nc bnc" id="L415" title="All 2 branches missed.">			if (archiveType == ArchiveType.OLD) {</span>
 				try {
-<span class="nc" id="L359">					loadedClass = Optional.of(oldClassPool.get(name));</span>
-<span class="nc" id="L360">				} catch (NotFoundException e) {</span>
-<span class="nc bnc" id="L361" title="All 2 branches missed.">					if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {</span>
-<span class="nc" id="L362">						throw JApiCmpException.forClassLoading(e, name, this);</span>
+<span class="nc" id="L417">					loadedClass = Optional.of(oldClassPool.get(name));</span>
+<span class="nc" id="L418">				} catch (NotFoundException e) {</span>
+<span class="nc bnc" id="L419" title="All 2 branches missed.">					if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {</span>
+<span class="nc" id="L420">						throw JApiCmpException.forClassLoading(e, name, this);</span>
 					}
-<span class="nc" id="L364">				}</span>
-<span class="nc bnc" id="L365" title="All 2 branches missed.">			} else if (archiveType == ArchiveType.NEW) {</span>
+<span class="nc" id="L422">				}</span>
+<span class="nc bnc" id="L423" title="All 2 branches missed.">			} else if (archiveType == ArchiveType.NEW) {</span>
 				try {
-<span class="nc" id="L367">					loadedClass = Optional.of(newClassPool.get(name));</span>
-<span class="nc" id="L368">				} catch (NotFoundException e) {</span>
-<span class="nc bnc" id="L369" title="All 2 branches missed.">					if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {</span>
-<span class="nc" id="L370">						throw JApiCmpException.forClassLoading(e, name, this);</span>
+<span class="nc" id="L425">					loadedClass = Optional.of(newClassPool.get(name));</span>
+<span class="nc" id="L426">				} catch (NotFoundException e) {</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">					if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {</span>
+<span class="nc" id="L428">						throw JApiCmpException.forClassLoading(e, name, this);</span>
 					}
-<span class="nc" id="L372">				}</span>
+<span class="nc" id="L430">				}</span>
 			} else {
-<span class="nc" id="L374">				throw new JApiCmpException(Reason.IllegalState, &quot;Unknown archive type: &quot; + archiveType);</span>
+<span class="nc" id="L432">				throw new JApiCmpException(Reason.IllegalState, &quot;Unknown archive type: &quot; + archiveType);</span>
 			}
 		} else {
-<span class="nc" id="L377">			throw new JApiCmpException(Reason.IllegalState, &quot;Unknown classpath mode: &quot; + this.options.getClassPathMode());</span>
+<span class="nc" id="L435">			throw new JApiCmpException(Reason.IllegalState, &quot;Unknown classpath mode: &quot; + this.options.getClassPathMode());</span>
 		}
-<span class="fc" id="L379">		return loadedClass;</span>
-	}
-
-	private static class JarsCtClassIterable implements Iterable&lt;CtClass&gt;, Iterator&lt;CtClass&gt; {
-		private final Iterator&lt;File&gt; archives;
-		private final ClassPool classPool;
-
-<span class="fc" id="L386">		private Iterator&lt;CtClass&gt; currentIterator = null;</span>
-
-<span class="fc" id="L388">		public JarsCtClassIterable(List&lt;File&gt; archives, ClassPool classPool) {</span>
-<span class="fc" id="L389">			this.archives = archives.iterator();</span>
-<span class="fc" id="L390">			this.classPool = classPool;</span>
-<span class="fc" id="L391">		}</span>
-
-		@Override
-		public boolean hasNext() {
-<span class="fc bfc" id="L395" title="All 2 branches covered.">			if (currentIterator != null) {</span>
-<span class="fc bfc" id="L396" title="All 2 branches covered.">				if (currentIterator.hasNext()) {</span>
-<span class="fc" id="L397">					return true;</span>
-				} else {
-<span class="fc" id="L399">					currentIterator = null;</span>
-				}
-			}
-<span class="fc bfc" id="L402" title="All 2 branches covered.">			if (archives.hasNext()) {</span>
-<span class="fc" id="L403">				final File archive = archives.next();</span>
-<span class="fc" id="L404">				currentIterator = new JarCtClassIterator(archive, classPool);</span>
-<span class="fc" id="L405">				return hasNext();</span>
-			}
-<span class="fc" id="L407">			return false;</span>
-		}
-
-		@Override
-		public CtClass next() {
-<span class="fc" id="L412">			return currentIterator.next();</span>
-		}
-
-		@Override
-		public Iterator&lt;CtClass&gt; iterator() {
-<span class="fc" id="L417">			return this;</span>
-		}
-	}
-
-	private static class JarCtClassIterator implements Iterator&lt;CtClass&gt; {
-
-		private final File archive;
-		private final JarFile jarFile;
-		private final Enumeration&lt;JarEntry&gt; entryEnumeration;
-		private final ClassPool classPool;
-
-<span class="fc" id="L428">		private CtClass next = null;</span>
-
-<span class="fc" id="L430">		public JarCtClassIterator(File archive, ClassPool classPool) {</span>
-<span class="fc" id="L431">			this.archive = archive;</span>
-			try {
-<span class="fc" id="L433">				this.jarFile = new JarFile(archive);</span>
-<span class="nc" id="L434">			} catch (IOException e) {</span>
-<span class="nc" id="L435">				throw new JApiCmpException(Reason.IoException, String.format(&quot;Processing of jar file %s failed: %s&quot;, archive.getAbsolutePath(), e.getMessage()), e);</span>
-<span class="fc" id="L436">			}</span>
-<span class="pc bpc" id="L437" title="1 of 2 branches missed.">			if (LOGGER.isLoggable(Level.FINE)) {</span>
-<span class="nc" id="L438">				LOGGER.fine(&quot;Loading classes from jar file '&quot; + archive.getAbsolutePath() + &quot;'&quot;);</span>
-			}
-<span class="fc" id="L440">			this.entryEnumeration = jarFile.entries();</span>
-<span class="fc" id="L441">			this.classPool = classPool;</span>
-<span class="fc" id="L442">		}</span>
-
-		@Override
-		public boolean hasNext() {
-<span class="pc bpc" id="L446" title="1 of 2 branches missed.">			if (next != null) {</span>
-<span class="nc" id="L447">				return true;</span>
-			}
-
-<span class="fc bfc" id="L450" title="All 2 branches covered.">			while (entryEnumeration.hasMoreElements()) {</span>
-<span class="fc" id="L451">				JarEntry jarEntry = entryEnumeration.nextElement();</span>
-<span class="fc" id="L452">				String name = jarEntry.getName();</span>
-<span class="fc bfc" id="L453" title="All 2 branches covered.">				if (name.endsWith(&quot;.class&quot;)) {</span>
-					CtClass ctClass;
-<span class="fc" id="L455">					try (InputStream classFile = jarFile.getInputStream(jarEntry)) {</span>
-<span class="fc" id="L456">						ctClass = classPool.makeClass(classFile);</span>
-<span class="nc" id="L457">					} catch (Exception e) {</span>
-<span class="nc" id="L458">						throw new JApiCmpException(Reason.IoException, String.format(&quot;Failed to load file from jar '%s' as class file: %s.&quot;, name, e.getMessage()), e);</span>
-<span class="fc" id="L459">					}</span>
-<span class="fc" id="L460">					next = ctClass;</span>
-<span class="fc" id="L461">					return true;</span>
-				} else {
-<span class="pc bpc" id="L463" title="1 of 2 branches missed.">					if (LOGGER.isLoggable(Level.FINE)) {</span>
-<span class="nc" id="L464">						LOGGER.fine(String.format(&quot;Skipping file '%s' because filename does not end with '.class'.&quot;, name));</span>
-					}
-				}
-<span class="fc" id="L467">			}</span>
-			try {
-<span class="fc" id="L469">				jarFile.close();</span>
-<span class="nc" id="L470">			} catch (IOException e) {</span>
-<span class="nc" id="L471">				throw new JApiCmpException(Reason.IoException, String.format(&quot;Processing of jar file %s failed: %s&quot;, archive.getAbsolutePath(), e.getMessage()), e);</span>
-<span class="fc" id="L472">			}</span>
-<span class="fc" id="L473">			return false;</span>
-		}
-
-		@Override
-		public CtClass next() {
-			try {
-<span class="fc" id="L479">				return next;</span>
-			} finally {
-<span class="fc" id="L481">				next = null;</span>
-			}
-		}
+<span class="fc" id="L437">		return loadedClass;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -142,22 +142,22 @@ public class IncompatibleErrorOutput extends OutputGenerator&lt;Void&gt; {
 						});
 
 <span class="fc" id="L144">					String semver = semverOut.generate();</span>
-<span class="pc bpc" id="L145" title="1 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.MINOR &amp;&amp; semver.equals(&quot;1.0.0&quot;)) {</span>
+<span class="pc bpc" id="L145" title="1 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.MINOR &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
 <span class="fc" id="L146">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a minor change but binary incompatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L148" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.PATCH &amp;&amp; semver.equals(&quot;1.0.0&quot;)) {</span>
+<span class="pc bpc" id="L148" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.PATCH &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
 <span class="nc" id="L149">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a patch change but binary incompatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L151" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.PATCH &amp;&amp; semver.equals(&quot;0.1.0&quot;)) {</span>
+<span class="pc bpc" id="L151" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.PATCH &amp;&amp; semver.equals(SemverOut.SEMVER_MINOR)) {</span>
 <span class="nc" id="L152">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a patch change but binary compatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L154" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(&quot;1.0.0&quot;)) {</span>
+<span class="pc bpc" id="L154" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
 <span class="nc" id="L155">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but binary incompatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L157" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(&quot;0.1.0&quot;)) {</span>
+<span class="pc bpc" id="L157" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_MINOR)) {</span>
 <span class="nc" id="L158">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but binary compatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L160" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(&quot;0.0.1&quot;)) {</span>
+<span class="pc bpc" id="L160" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_PATCH)) {</span>
 <span class="nc" id="L161">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but found API changes.&quot;);</span>
 					}
 <span class="fc" id="L163">				} else {</span>

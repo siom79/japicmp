@@ -67,12 +67,12 @@ import java.util.Map;
 <span class="fc" id="L67">			}</span>
 <span class="fc bfc" id="L68" title="All 2 branches covered.">		} else if (callback.isOldPresent()) {</span>
 <span class="fc" id="L69">			SignatureParser oldSignatureParser = callback.oldSignatureParser();</span>
-<span class="pc bpc" id="L70" title="1 of 2 branches missed.">			for (SignatureParser.ParsedTemplate oldParsedTemplate : oldSignatureParser.getTemplates()) {</span>
-<span class="nc" id="L71">				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.REMOVED, oldParsedTemplate.getName(), japicmp.util.Optional.of(oldParsedTemplate.getType()), japicmp.util.Optional.absent());</span>
-<span class="nc" id="L72">				SignatureParser.copyGenericParameters(oldParsedTemplate, jApiGenericTemplate.getOldGenericTypes());</span>
-<span class="nc" id="L73">				SignatureParser.copyGenericTypeInterfaces(oldParsedTemplate, jApiGenericTemplate.getOldInterfaceTypes());</span>
-<span class="nc" id="L74">				genericTemplates.add(jApiGenericTemplate);</span>
-<span class="nc" id="L75">			}</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">			for (SignatureParser.ParsedTemplate oldParsedTemplate : oldSignatureParser.getTemplates()) {</span>
+<span class="fc" id="L71">				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.REMOVED, oldParsedTemplate.getName(), japicmp.util.Optional.of(oldParsedTemplate.getType()), japicmp.util.Optional.absent());</span>
+<span class="fc" id="L72">				SignatureParser.copyGenericParameters(oldParsedTemplate, jApiGenericTemplate.getOldGenericTypes());</span>
+<span class="fc" id="L73">				SignatureParser.copyGenericTypeInterfaces(oldParsedTemplate, jApiGenericTemplate.getOldInterfaceTypes());</span>
+<span class="fc" id="L74">				genericTemplates.add(jApiGenericTemplate);</span>
+<span class="fc" id="L75">			}</span>
 		}
 <span class="fc" id="L77">		return genericTemplates;</span>
 	}
