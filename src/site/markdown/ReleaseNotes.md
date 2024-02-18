@@ -3,6 +3,14 @@ Versions
 
 The following versions of japicmp are available:
 
+0.18.5 (2024-02-18)
+-------------------
+* JApiCmpArchive accepts byte array. [#377](https://github.com/siom79/japicmp/issues/377)
+* Add CLASS_GENERIC_TEMPLATE_CHANGED only if change status of generic template is MODIFIED. [#368](https://github.com/siom79/japicmp/issues/368)
+* Take `volatile` modifier into account. [#378](https://github.com/siom79/japicmp/issues/378)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.18.5).
+
 0.18.4 (2024-02-15)
 -------------------
 * Do not mark class as changed in case of synthetic members [#375](https://github.com/siom79/japicmp/issues/375)
