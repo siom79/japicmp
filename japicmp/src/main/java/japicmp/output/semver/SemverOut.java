@@ -28,6 +28,11 @@ import japicmp.util.ModifierHelper;
 
 public class SemverOut extends OutputGenerator<String> {
 
+	public static final String SEMVER_MAJOR = "1.0.0";
+	public static final String SEMVER_MINOR = "0.1.0";
+	public static final String SEMVER_PATCH = "0.0.1";
+	public static final String SEMVER_COMPATIBLE = "0.0.0";
+
 	private Listener m_Listener = Listener.NULL;
 
 	public SemverOut(Options options, List<JApiClass> jApiClasses) {
@@ -80,13 +85,13 @@ public class SemverOut extends OutputGenerator<String> {
 		});
 		ImmutableSet<JApiSemanticVersionLevel> build = builder.build();
 		if (build.contains(JApiSemanticVersionLevel.MAJOR)) {
-			return "1.0.0";
+			return SEMVER_MAJOR;
 		} else if (build.contains(JApiSemanticVersionLevel.MINOR)) {
-			return "0.1.0";
+			return SEMVER_MINOR;
 		} else if (build.contains(JApiSemanticVersionLevel.PATCH)) {
-			return "0.0.1";
+			return SEMVER_PATCH;
 		} else if (build.isEmpty()) {
-			return "0.0.0";
+			return SEMVER_COMPATIBLE;
 		} else {
 			return "N/A";
 		}

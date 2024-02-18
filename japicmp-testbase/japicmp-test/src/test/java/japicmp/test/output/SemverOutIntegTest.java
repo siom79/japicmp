@@ -24,63 +24,63 @@ public class SemverOutIntegTest {
 	public void testSemver001_implementation_of_method_changes() {
 		String lastPackage = "semver001.a";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("0.0.1", string);
+		assertEquals(SemverOut.SEMVER_PATCH, string);
 	}
 
 	@Test
 	public void testSemver010_added_deprecated_annotation() {
 		String lastPackage = "semver010.a";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("0.1.0", string);
+		assertEquals(SemverOut.SEMVER_MINOR, string);
 	}
 
 	@Test
 	public void testSemver100_change_method() {
 		String lastPackage = "semver100.a";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("1.0.0", string);
+		assertEquals(SemverOut.SEMVER_MAJOR, string);
 	}
 
 	@Test
 	public void testSemver100_reduce_class_visibility() {
 		String lastPackage = "semver100.b";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("1.0.0", string);
+		assertEquals(SemverOut.SEMVER_MAJOR, string);
 	}
 
 	@Test
 	public void testSemver100_reduce_method_visibility() {
 		String lastPackage = "semver100.c";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("1.0.0", string);
+		assertEquals(SemverOut.SEMVER_MAJOR, string);
 	}
 
 	@Test
 	public void testSemver100_superclass_with_field() {
 		String lastPackage = "semver100.d";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("1.0.0", string);
+		assertEquals(SemverOut.SEMVER_MAJOR, string);
 	}
 
 	@Test
 	public void testSemver_class_with_private_final_field() {
 		String lastPackage = "semver.finalfield";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("0.0.1", string);
+		assertEquals(SemverOut.SEMVER_PATCH, string);
 	}
 
 	@Test
 	public void testSemver_class_with_public_final_method() {
 		String lastPackage = "semver.finalpublicmethod";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("1.0.0", string);
+		assertEquals(SemverOut.SEMVER_MAJOR, string);
 	}
 
 	@Test
 	public void testSemver_private_inner_class_changes() {
 		String lastPackage = "semver.privateinnerclass";
 		String string = getSemverDiff(lastPackage);
-		assertEquals("1.0.0", string); // private inner class becomes package protected -> change is binary incompatible
+		assertEquals(SemverOut.SEMVER_MAJOR, string); // private inner class becomes package protected -> change is binary incompatible
 	}
 
 	private String getSemverDiff(String lastPackage) {

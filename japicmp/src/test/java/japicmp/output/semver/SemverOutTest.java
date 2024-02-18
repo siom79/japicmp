@@ -33,6 +33,6 @@ public class SemverOutTest {
 		Options options = Options.newDefault();
 		SemverOut semverOut = new SemverOut(options, jApiClasses);
 		String output = semverOut.generate();
-		assertThat(output, is("0.0.0"));
+		assertThat(output, is(SemverOut.SEMVER_COMPATIBLE));
 	}
 }
