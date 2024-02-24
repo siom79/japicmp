@@ -130,7 +130,7 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 		return this.compatibilityChanges;
 	}
 
-	void setJApiClass(JApiClass jApiClass) {
+	public void setJApiClass(JApiClass jApiClass) {
 		this.correspondingJApiClass = Optional.of(jApiClass);
 	}
 
