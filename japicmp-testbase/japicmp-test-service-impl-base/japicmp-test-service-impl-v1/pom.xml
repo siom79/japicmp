@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>japicmp-test-service-impl-base</artifactId>
 		<groupId>com.github.siom79.japicmp</groupId>
-		<version>0.18.5-SNAPSHOT</version>
+		<version>0.18.6-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
