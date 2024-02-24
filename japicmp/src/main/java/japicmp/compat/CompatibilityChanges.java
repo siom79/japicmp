@@ -77,7 +77,7 @@ public class CompatibilityChanges {
 	private void checkIfGenericTemplatesHaveChanged(JApiHasGenericTemplates jApiHasGenericTemplates) {
 		for (JApiGenericTemplate jApiGenericTemplate : jApiHasGenericTemplates.getGenericTemplates()) {
 			if (jApiGenericTemplate.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-				((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED);
+				jApiHasGenericTemplates.getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED);
 				break;
 			}
 		}
@@ -86,7 +86,7 @@ public class CompatibilityChanges {
 			if (changeStatus == JApiChangeStatus.MODIFIED || changeStatus == JApiChangeStatus.UNCHANGED) {
 				if (!SignatureParser.equalGenericTypes(jApiGenericTemplate.getOldGenericTypes(), jApiGenericTemplate.getNewGenericTypes())) {
 					jApiGenericTemplate.getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
-					((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
+					jApiHasGenericTemplates.getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
 					break;
 				}
 			}
@@ -470,7 +470,7 @@ public class CompatibilityChanges {
 		for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {
 			if (annotation.getChangeStatus() == JApiChangeStatus.NEW || annotation.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 				if (annotation.getFullyQualifiedName().equals(Deprecated.class.getName())) {
-					addCompatibilityChange((JApiCompatibility) jApiHasAnnotations, JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED);
+					addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED);
 				}
 			}
 		}
