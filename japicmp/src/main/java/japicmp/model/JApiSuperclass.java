@@ -134,6 +134,10 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 		this.correspondingJApiClass = Optional.of(jApiClass);
 	}
 
+	public Optional<JApiClass> getCorrespondingJApiClass() {
+		return correspondingJApiClass;
+	}
+
 	/**
 	 * Returns the {@link japicmp.model.JApiClass} this superclass belongs to.
 	 * @return the JApiClass this superclass belongs to.
