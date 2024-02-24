@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Implemented by all elements that can have annotations.
  */
-public interface JApiHasAnnotations {
+public interface JApiHasAnnotations extends JApiCompatibility {
 	/**
 	 * Returns a list of annotations as {@link japicmp.model.JApiAnnotation}.
 	 *
