@@ -9,6 +9,7 @@ import japicmp.output.OutputGenerator;
 import japicmp.util.Optional;
 import javassist.bytecode.annotation.MemberValue;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,11 +33,11 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 			sb.append(WARNING).append(": You are using the option '").append(CliParser.IGNORE_MISSING_CLASSES)
 				.append("', i.e. superclasses and interfaces that could not be found on the classpath are ignored.")
 				.append(" Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
-		} else if (options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression().size() > 0) {
+		} else if (!options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression().isEmpty()) {
 			sb.append(WARNING).append(": You have ignored certain classes, i.e. superclasses and interfaces that could not ")
 				.append("be found on the classpath are ignored. Hence changes caused by these superclasses and interfaces are not reflected in the output.\n");
 		}
-		if (jApiClasses.size() > 0) {
+		if (!jApiClasses.isEmpty()) {
 			for (JApiClass jApiClass : jApiClasses) {
 				processClass(sb, jApiClass);
 				processConstructors(sb, jApiClass);
@@ -157,10 +158,11 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	}
 
 	private void appendGenericTypesForCompatibilityChanges(StringBuilder sb, JApiHasGenericTypes jApiHasGenericTypes, List<JApiCompatibilityChange> compatibilityChanges) {
-		if (compatibilityChanges.contains(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED) ||
-				compatibilityChanges.contains(JApiCompatibilityChange.METHOD_RETURN_TYPE_GENERICS_CHANGED) ||
-				compatibilityChanges.contains(JApiCompatibilityChange.FIELD_GENERICS_CHANGED) ||
-				compatibilityChanges.contains(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED)) {
+		if (compatibilityChangesContains(compatibilityChanges,
+				JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED,
+				JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED,
+				JApiCompatibilityChangeType.FIELD_GENERICS_CHANGED,
+				JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED)) {
 			appendGenericTypes(sb, false, jApiHasGenericTypes.getNewGenericTypes());
 			appendGenericTypes(sb, true, jApiHasGenericTypes.getOldGenericTypes());
 		} else {
@@ -171,6 +173,13 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 				appendGenericTypes(sb, false, jApiHasGenericTypes.getOldGenericTypes());
 			}
 		}
+	}
+
+	private boolean compatibilityChangesContains(List<JApiCompatibilityChange> compatibilityChanges,
+												 JApiCompatibilityChangeType... types) {
+		return compatibilityChanges.stream()
+			.anyMatch(cc -> Arrays.stream(types)
+				.anyMatch(type -> cc.getType() == type));
 	}
 
 	private void appendGenericTypes(StringBuilder sb, boolean withChangeInParenthesis, List<JApiGenericType> genericTypes) {
@@ -329,7 +338,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 				}
 				count++;
 				sb.append(signs(jApiGenericTemplate));
-				if (sb.charAt(sb.length()-1) != ' ') {
+				if (sb.charAt(sb.length() - 1) != ' ') {
 					sb.append(" ");
 				}
 				sb.append(jApiGenericTemplate.getName()).append(":");
@@ -337,7 +346,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 				if (changeStatus == JApiChangeStatus.NEW || changeStatus == JApiChangeStatus.UNCHANGED) {
 					sb.append(jApiGenericTemplate.getNewType());
 					if (jApiGenericTemplate instanceof JApiCompatibility) {
-						appendGenericTypesForCompatibilityChanges(sb, jApiGenericTemplate, ((JApiCompatibility)jApiHasGenericTemplates).getCompatibilityChanges());
+						appendGenericTypesForCompatibilityChanges(sb, jApiGenericTemplate, ((JApiCompatibility) jApiHasGenericTemplates).getCompatibilityChanges());
 					}
 				} else if (changeStatus == JApiChangeStatus.REMOVED) {
 					sb.append(jApiGenericTemplate.getOldType());

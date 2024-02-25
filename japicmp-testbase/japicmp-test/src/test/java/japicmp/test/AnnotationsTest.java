@@ -2,22 +2,15 @@ package japicmp.test;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.compat.CompatibilityChanges;
 import japicmp.model.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.getArchive;
-import static japicmp.test.util.Helper.getJApiAnnotation;
-import static japicmp.test.util.Helper.getJApiAnnotationElement;
-import static japicmp.test.util.Helper.getJApiClass;
-import static japicmp.test.util.Helper.getJApiField;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static japicmp.test.util.Helper.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AnnotationsTest {
 	private static List<JApiClass> jApiClasses;
@@ -95,12 +88,12 @@ public class AnnotationsTest {
 		JApiAnnotationElement element = getJApiAnnotationElement(fieldAnnotation.getElements(), "value");
 		assertThat(element.getChangeStatus(), is(JApiChangeStatus.REMOVED));
 	}
-	
+
 	@Test
 	public void testNewAnnotation() {
 		JApiClass jApiClass = getJApiClass(jApiClasses, Annotations.NewTypeAnnotation.class.getName());
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE))));
 	}
 }

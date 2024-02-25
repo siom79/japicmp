@@ -1,11 +1,6 @@
 package japicmp.cmp;
 
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiSuperclass;
+import japicmp.model.*;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
@@ -16,13 +11,9 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static japicmp.util.Helper.getJApiClass;
-import static japicmp.util.Helper.getJApiImplementedInterface;
-import static japicmp.util.Helper.getJApiMethod;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static japicmp.util.Helper.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class InterfacesTest {
 
@@ -133,7 +124,7 @@ public class InterfacesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.INTERFACE_ADDED));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_ADDED)));
 	}
 
 	@Test
@@ -218,7 +209,7 @@ public class InterfacesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.REMOVED));
-		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getCompatibilityChanges(), hasItem(JApiCompatibilityChange.INTERFACE_REMOVED));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_REMOVED)));
 	}
 
 	@Test
@@ -275,7 +266,7 @@ public class InterfacesTest {
 		assertThat(jApiClass.getInterfaces().size(), is(2));
 		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "SubInterface").getChangeStatus(), is(JApiChangeStatus.REMOVED));
-		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "SubInterface").getCompatibilityChanges(), hasItem(JApiCompatibilityChange.INTERFACE_REMOVED));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "SubInterface").getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_REMOVED)));
 	}
 
 	@Test
@@ -336,13 +327,13 @@ public class InterfacesTest {
 		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();
 		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.NEW));
 		// not has INTERFACE_ADDED because it is only moved not added/removed
-		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.INTERFACE_ADDED)));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_ADDED))));
 		assertThat(jApiSuperclass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 		jApiClass = getJApiClass(jApiClasses, "SuperClass");
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		assertThat(jApiClass.getInterfaces().size(), is(1));
 		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getChangeStatus(), is(JApiChangeStatus.REMOVED));
-		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getCompatibilityChanges(), hasItem(JApiCompatibilityChange.INTERFACE_REMOVED));
+		assertThat(getJApiImplementedInterface(jApiClass.getInterfaces(), "Interface").getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_REMOVED)));
 	}
 }

@@ -8,7 +8,7 @@ import japicmp.filter.Filter;
 import japicmp.filter.Filters;
 import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import japicmp.util.AnnotationHelper;
@@ -52,12 +52,12 @@ public class JarArchiveComparator {
 	}
 
 	private void setupCompatibilityChanges(JarArchiveComparatorOptions options) {
-		for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {
+		for (JApiCompatibilityChangeType jApiCompatibility : JApiCompatibilityChangeType.values()) {
 			jApiCompatibility.resetOverrides();
 		}
 		for (JarArchiveComparatorOptions.OverrideCompatibilityChange change : options.getOverrideCompatibilityChanges()) {
-			JApiCompatibilityChange compatibilityChange = change.getCompatibilityChange();
-			for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {
+			JApiCompatibilityChangeType compatibilityChange = change.getCompatibilityChange();
+			for (JApiCompatibilityChangeType jApiCompatibility : JApiCompatibilityChangeType.values()) {
 				if (jApiCompatibility == compatibilityChange) {
 					jApiCompatibility.setBinaryCompatible(change.isBinaryCompatible());
 					jApiCompatibility.setSourceCompatible(change.isSourceCompatible());

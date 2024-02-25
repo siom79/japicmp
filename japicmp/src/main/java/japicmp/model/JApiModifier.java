@@ -77,4 +77,16 @@ public class JApiModifier<T> implements JApiHasChangeStatus {
 		}
 		return hasChangedTo;
 	}
+
+	public boolean hasChangedToMoreVisible() {
+		boolean hasChangedTo = false;
+		if (oldModifier.isPresent() && newModifier.isPresent()) {
+			T oldValue = oldModifier.get();
+			T newValue = newModifier.get();
+			if (oldValue instanceof AccessModifier && newValue instanceof AccessModifier) {
+				return ((AccessModifier)newValue).getLevel() > ((AccessModifier)oldValue).getLevel();
+			}
+		}
+		return hasChangedTo;
+	}
 }

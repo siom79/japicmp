@@ -3,7 +3,7 @@ package japicmp.cmp;
 import japicmp.config.Options;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JApiMethod;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.util.CtClassBuilder;
@@ -42,7 +42,7 @@ public class GenericTemplateTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		Assert.assertEquals(2, jApiClass.getGenericTemplates().size());
-		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c == JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED));
+		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c.getType() == JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED));
 		Assert.assertEquals(JApiChangeStatus.NEW, jApiClass.getGenericTemplates().get(0).getChangeStatus());
 		Assert.assertEquals("T", jApiClass.getGenericTemplates().get(0).getName());
 		Assert.assertEquals("java.lang.Object", jApiClass.getGenericTemplates().get(0).getNewType());
@@ -74,7 +74,7 @@ public class GenericTemplateTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		Assert.assertEquals(2, jApiClass.getGenericTemplates().size());
-		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().noneMatch(c -> c == JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED));
+		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().noneMatch(c -> c.getType() == JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED));
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class GenericTemplateTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		Assert.assertEquals(2, jApiClass.getGenericTemplates().size());
-		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c == JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED));
+		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c.getType() == JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED));
 		Assert.assertEquals(JApiChangeStatus.REMOVED, jApiClass.getGenericTemplates().get(0).getChangeStatus());
 		Assert.assertEquals("T", jApiClass.getGenericTemplates().get(0).getName());
 		Assert.assertEquals("java.lang.Object", jApiClass.getGenericTemplates().get(0).getOldTypeOptional().get());
@@ -131,7 +131,7 @@ public class GenericTemplateTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		Assert.assertEquals(2, jApiClass.getGenericTemplates().size());
-		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c == JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED));
+		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c.getType() == JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED));
 		Assert.assertEquals(JApiChangeStatus.MODIFIED, jApiClass.getGenericTemplates().get(0).getChangeStatus());
 		Assert.assertEquals("T", jApiClass.getGenericTemplates().get(0).getName());
 		Assert.assertEquals("java.lang.Object", jApiClass.getGenericTemplates().get(0).getOldTypeOptional().get());
@@ -166,8 +166,8 @@ public class GenericTemplateTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		Assert.assertEquals(1, jApiClass.getGenericTemplates().size());
-		Assert.assertFalse(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c == JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED));
-		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c == JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED));
+		Assert.assertFalse(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c.getType() == JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED));
+		Assert.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c.getType() == JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED));
 		Assert.assertEquals(JApiChangeStatus.UNCHANGED, jApiClass.getGenericTemplates().get(0).getChangeStatus());
 		Assert.assertEquals("T", jApiClass.getGenericTemplates().get(0).getName());
 		Assert.assertEquals("java.util.List", jApiClass.getGenericTemplates().get(0).getOldTypeOptional().get());

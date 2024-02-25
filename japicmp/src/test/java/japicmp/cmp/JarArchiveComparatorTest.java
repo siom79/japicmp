@@ -1,7 +1,7 @@
 package japicmp.cmp;
 
 import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JApiMethod;
 import japicmp.model.JApiSemanticVersionLevel;
 import japicmp.util.CtClassBuilder;
@@ -15,16 +15,16 @@ import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
 import static japicmp.util.Helper.getJApiMethod;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class JarArchiveComparatorTest {
 
 	@Test
 	public void testOverrideCompatibilityChangeClassRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChange.CLASS_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
-		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChange.SUPERCLASS_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
+		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChangeType.CLASS_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
+		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChangeType.SUPERCLASS_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
@@ -45,7 +45,7 @@ public class JarArchiveComparatorTest {
 	@Test
 	public void testOverrideCompatibilityChangeMethodRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
-		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChange.METHOD_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
+		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {

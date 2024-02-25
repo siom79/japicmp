@@ -9,7 +9,7 @@ import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JApiSemanticVersionLevel;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.semver.SemverOut;
@@ -159,15 +159,15 @@ public class JApiCmpMojo extends AbstractMojo {
 			for (Parameter.OverrideCompatibilityChangeParameter configChange : overrideCompatibilityChangeParameters) {
 
 				String compatibilityChange = configChange.getCompatibilityChange();
-				JApiCompatibilityChange foundChange = null;
-				for (JApiCompatibilityChange change : JApiCompatibilityChange.values()) {
+				JApiCompatibilityChangeType foundChange = null;
+				for (JApiCompatibilityChangeType change : JApiCompatibilityChangeType.values()) {
 					if (change.name().equalsIgnoreCase(compatibilityChange)) {
 						foundChange = change;
 						break;
 					}
 				}
 				if (foundChange == null) {
-					throw new MojoFailureException("Unknown compatibility change '" + compatibilityChange + "'. Supported values: " + Joiner.on(',').join(JApiCompatibilityChange.values()));
+					throw new MojoFailureException("Unknown compatibility change '" + compatibilityChange + "'. Supported values: " + Joiner.on(',').join(JApiCompatibilityChangeType.values()));
 				}
 
 				JApiSemanticVersionLevel foundSemanticVersionLevel = foundChange.getSemanticVersionLevel();
