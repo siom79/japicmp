@@ -207,6 +207,8 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_ADDED));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		JApiSuperclass superclass = jApiClass.getSuperclass();
+		assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
+		assertEquals("japicmp.Superclass", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
 		assertThat(superclass.isBinaryCompatible(), is(true));
 		assertThat(superclass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_ADDED));
 	}
@@ -233,6 +235,8 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getCompatibilityChanges().size(), is(0));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		JApiSuperclass superclass = jApiClass.getSuperclass();
+		assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
+		assertEquals("java.lang.Object", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
 		assertThat(superclass.isBinaryCompatible(), is(true));
 		assertThat(superclass.getCompatibilityChanges().size(), is(0));
 	}
@@ -370,6 +374,8 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_REMOVED));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		JApiSuperclass superclass = jApiClass.getSuperclass();
+		assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
+		assertEquals("java.lang.Object", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
 		assertThat(superclass.isBinaryCompatible(), is(true));
 		assertThat(superclass.getCompatibilityChanges().size(), is(0));
 	}
