@@ -221,6 +221,7 @@ public class CompatibilityChanges {
 				}
 				classMap.put(foundClass.getFullyQualifiedName(), foundClass);
 			}
+			superclass.setJApiClass(foundClass);
 			T returnValue = onSuperclassCallback.callback(foundClass, classMap, superclass.getChangeStatus());
 			returnValues.add(returnValue);
 			forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
