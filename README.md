@@ -73,6 +73,11 @@ By using the available Ant task, you can also integrate japicmp into your Ant bu
 
 [melix](https://github.com/melix) has developed a [gradle plugin](https://github.com/melix/japicmp-gradle-plugin) for japicmp.
 
+## Online-Version
+
+There is an online version of japicmp that lets you compare two artifacts from the maven central repository
+without installing the tool first. Just click [this](https://www.japicmp.de) link and give it a try.
+
 ## Motivation
 
 Every time you release a new version of a library or a product, you have to tell your clients or customers what
