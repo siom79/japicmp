@@ -842,7 +842,7 @@
 				<tbody>
 					<xsl:for-each select="compatibilityChanges/compatibilityChange">
 						<tr>
-							<td><xsl:value-of select="text()"/></td>
+							<td><xsl:value-of select="@type"/></td>
 						</tr>
 					</xsl:for-each>
 				</tbody>

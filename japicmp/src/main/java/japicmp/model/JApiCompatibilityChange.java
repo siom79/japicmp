@@ -14,6 +14,7 @@ public class JApiCompatibilityChange {
 		this.sourceCompatible = type.isSourceCompatible();
 	}
 
+	@XmlAttribute(name = "type")
 	public JApiCompatibilityChangeType getType() {
 		return type;
 	}
