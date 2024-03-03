@@ -1,4 +1,4 @@
-Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.19.1-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.5/japicmp-0.18.5.jar
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.19.2-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.5/japicmp-0.18.5.jar
 ***! MODIFIED CLASS: PUBLIC STATIC japicmp.cmp.JarArchiveComparatorOptions$OverrideCompatibilityChange  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
 	---! REMOVED CONSTRUCTOR: PUBLIC(-) JarArchiveComparatorOptions$OverrideCompatibilityChange(japicmp.model.JApiCompatibilityChange, boolean, boolean, japicmp.model.JApiSemanticVersionLevel)
@@ -72,6 +72,8 @@ Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/targ
 	+++  NEW CONSTRUCTOR: PUBLIC(+) JApiCompatibilityChange(japicmp.model.JApiCompatibilityChangeType)
 	+++  NEW METHOD: PUBLIC(+) boolean equals(java.lang.Object)
 	+++  NEW METHOD: PUBLIC(+) japicmp.model.JApiCompatibilityChangeType getType()
+		+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlAttribute
+			+++  NEW ELEMENT: name=type (+)
 	+++  NEW METHOD: PUBLIC(+) int hashCode()
 	---! REMOVED METHOD: PUBLIC(-) void resetOverrides()
 	---! REMOVED METHOD: PUBLIC(-) void setSemanticVersionLevel(japicmp.model.JApiSemanticVersionLevel)
