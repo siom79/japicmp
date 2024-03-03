@@ -1,13 +1,13 @@
 package japicmp.cmp;
 
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.model.JApiSemanticVersionLevel;
-import japicmp.util.Optional;
 import japicmp.config.IgnoreMissingClasses;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.filter.Filters;
 import japicmp.model.AccessModifier;
+import japicmp.model.JApiCompatibilityChangeType;
+import japicmp.model.JApiSemanticVersionLevel;
+import japicmp.util.Optional;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,20 +32,20 @@ public class JarArchiveComparatorOptions {
 	private List<OverrideCompatibilityChange> overrideCompatibilityChanges = new ArrayList<>();
 
 	public static class OverrideCompatibilityChange {
-		private JApiCompatibilityChange compatibilityChange;
+		private JApiCompatibilityChangeType compatibilityChange;
 		private boolean binaryCompatible;
 		private boolean sourceCompatible;
 		private JApiSemanticVersionLevel semanticVersionLevel;
 
-		public OverrideCompatibilityChange(JApiCompatibilityChange compatibilityChange, boolean binaryCompatible,
-										   boolean sourceCompatible, JApiSemanticVersionLevel semanticVersionLevel) {
+		public OverrideCompatibilityChange(JApiCompatibilityChangeType compatibilityChange, boolean binaryCompatible,
+                                           boolean sourceCompatible, JApiSemanticVersionLevel semanticVersionLevel) {
 			this.compatibilityChange = compatibilityChange;
 			this.binaryCompatible = binaryCompatible;
 			this.sourceCompatible = sourceCompatible;
 			this.semanticVersionLevel = semanticVersionLevel;
 		}
 
-		public JApiCompatibilityChange getCompatibilityChange() {
+		public JApiCompatibilityChangeType getCompatibilityChange() {
 			return compatibilityChange;
 		}
 

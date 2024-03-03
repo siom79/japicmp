@@ -17,7 +17,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertEquals;
 
 public class CompatibilityChangesTest {
 
@@ -39,7 +38,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.REMOVED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_REMOVED));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_REMOVED)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -62,7 +61,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_NOW_ABSTRACT));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_NOW_ABSTRACT)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -85,7 +84,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_NOW_FINAL));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_NOW_FINAL)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -108,7 +107,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_NO_LONGER_PUBLIC));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_NO_LONGER_PUBLIC)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -131,7 +130,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_TYPE_CHANGED));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_TYPE_CHANGED)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -155,7 +154,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_REMOVED));
+		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.SUPERCLASS_REMOVED)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -180,7 +179,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_REMOVED));
+		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.SUPERCLASS_REMOVED)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -204,13 +203,13 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_ADDED));
+		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.SUPERCLASS_ADDED)));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		JApiSuperclass superclass = jApiClass.getSuperclass();
 		assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
 		assertEquals("japicmp.Superclass", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
 		assertThat(superclass.isBinaryCompatible(), is(true));
-		assertThat(superclass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.SUPERCLASS_ADDED));
+		assertThat(superclass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.SUPERCLASS_ADDED)));
 	}
 
 	@Test
@@ -263,7 +262,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -317,7 +316,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_REMOVED_IN_SUPERCLASS)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 	}
 
@@ -371,7 +370,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "isRemoved");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_REMOVED));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		JApiSuperclass superclass = jApiClass.getSuperclass();
 		assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
@@ -403,7 +402,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "isRemoved");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_LESS_ACCESSIBLE));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_LESS_ACCESSIBLE)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
 
@@ -427,7 +426,7 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_LESS_ACCESSIBLE));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_LESS_ACCESSIBLE)));
 	}
 
 	@Test
@@ -456,7 +455,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "isRemoved");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
 
@@ -486,7 +485,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "isOverridden");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
 
@@ -513,8 +512,66 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "returnTypeChanges");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_RETURN_TYPE_CHANGED));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_RETURN_TYPE_CHANGED)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
+	}
+
+	@Test
+	public void testMethodReturnTypeChangesAndVisibilityIncreasesProtectedToPublic() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().protectedAccess().returnType(CtClass.intType).name("returnTypeChanges").body("return 42;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.booleanType).name("returnTypeChanges").body("return true;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "returnTypeChanges");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_RETURN_TYPE_CHANGED)));
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiMethod.isSourceCompatible(), is(true));
+	}
+
+	@Test
+	public void testMethodReturnTypeChangesAndVisibilityIncreasesPrivateToProtected() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().privateAccess().returnType(CtClass.intType).name("returnTypeChanges").body("return 42;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().protectedAccess().returnType(CtClass.booleanType).name("returnTypeChanges").body("return true;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "returnTypeChanges");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_RETURN_TYPE_CHANGED)));
+		assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiMethod.isSourceCompatible(), is(true));
 	}
 
 	@Test
@@ -540,7 +597,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodBecomesAbstract");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_ABSTRACT));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_ABSTRACT)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
 
@@ -567,7 +624,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodBecomesFinal");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_FINAL));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_FINAL)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
 
@@ -621,7 +678,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodBecomesStatic");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_STATIC));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_STATIC)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
 
@@ -648,7 +705,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodNoLongerStatic");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NO_LONGER_STATIC));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NO_LONGER_STATIC)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 	}
 
@@ -679,7 +736,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodNowVarargs");
-		assertEquals(jApiMethod.getCompatibilityChanges(), Collections.singletonList(JApiCompatibilityChange.METHOD_NOW_VARARGS));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_VARARGS)));
 	}
 
 	@Test
@@ -709,7 +766,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "methodNoLongerVarargs");
-		assertEquals(jApiMethod.getCompatibilityChanges(), Collections.singletonList(JApiCompatibilityChange.METHOD_NO_LONGER_VARARGS));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NO_LONGER_VARARGS)));
 	}
 
 	@Test
@@ -738,7 +795,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_STATIC_AND_OVERRIDES_STATIC));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_STATIC_AND_OVERRIDES_STATIC)));
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
@@ -769,7 +826,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS)));
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
@@ -797,7 +854,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_NOW_FINAL));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_NOW_FINAL)));
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
@@ -826,7 +883,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_NOW_TRANSIENT));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_NOW_TRANSIENT)));
 		assertThat(jApiField.isBinaryCompatible(), is(true));
 		assertThat(jApiField.isBinaryCompatible(), is(true));
 	}
@@ -856,7 +913,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_NOW_VOLATILE));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_NOW_VOLATILE)));
 		assertThat(jApiField.isBinaryCompatible(), is(true));
 		assertThat(jApiField.isBinaryCompatible(), is(true));
 	}
@@ -885,7 +942,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_NOW_STATIC));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_NOW_STATIC)));
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
@@ -914,7 +971,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_NO_LONGER_TRANSIENT));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_NO_LONGER_TRANSIENT)));
 		assertThat(jApiField.isBinaryCompatible(), is(true));
 		assertThat(jApiField.isBinaryCompatible(), is(true));
 	}
@@ -944,7 +1001,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_NO_LONGER_VOLATILE));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_NO_LONGER_VOLATILE)));
 		assertThat(jApiField.isBinaryCompatible(), is(true));
 		assertThat(jApiField.isBinaryCompatible(), is(true));
 	}
@@ -973,7 +1030,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_NO_LONGER_STATIC));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_NO_LONGER_STATIC)));
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
@@ -1001,7 +1058,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_TYPE_CHANGED));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_TYPE_CHANGED)));
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
@@ -1028,7 +1085,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_REMOVED));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_REMOVED)));
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
@@ -1056,7 +1113,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
-		assertThat(jApiField.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.FIELD_LESS_ACCESSIBLE));
+		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_LESS_ACCESSIBLE)));
 		assertThat(jApiField.isBinaryCompatible(), is(false));
 	}
 
@@ -1083,7 +1140,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiConstructor jApiConstructor = getJApiConstructor(jApiClass.getConstructors(), Collections.singletonList("int"));
-		assertThat(jApiConstructor.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CONSTRUCTOR_REMOVED));
+		assertThat(jApiConstructor.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CONSTRUCTOR_REMOVED)));
 		assertThat(jApiConstructor.isBinaryCompatible(), is(false));
 	}
 
@@ -1111,7 +1168,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiConstructor jApiConstructor = getJApiConstructor(jApiClass.getConstructors(), Collections.singletonList("int"));
-		assertThat(jApiConstructor.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE));
+		assertThat(jApiConstructor.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CONSTRUCTOR_LESS_ACCESSIBLE)));
 		assertThat(jApiConstructor.isBinaryCompatible(), is(false));
 	}
 
@@ -1139,7 +1196,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
 		JApiConstructor jApiConstructor = getJApiConstructor(jApiClass.getConstructors(), Collections.singletonList("int"));
-		assertThat(jApiConstructor.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE));
+		assertThat(jApiConstructor.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CONSTRUCTOR_LESS_ACCESSIBLE)));
 		assertThat(jApiConstructor.isBinaryCompatible(), is(false));
 	}
 
@@ -1191,7 +1248,7 @@ public class CompatibilityChangesTest {
 		JApiConstructor constructor = jApiClass.getConstructors().get(0);
 		assertThat(constructor.isBinaryCompatible(), is(true));
 		assertThat(constructor.isSourceCompatible(), is(false));
-		assertEquals(constructor.getCompatibilityChanges(), Collections.singletonList(JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION));
+		assertThat(constructor.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_THROWS_CHECKED_EXCEPTION)));
 	}
 
 	@Test
@@ -1216,7 +1273,7 @@ public class CompatibilityChangesTest {
 		JApiConstructor constructor = jApiClass.getConstructors().get(0);
 		assertThat(constructor.isBinaryCompatible(), is(true));
 		assertThat(constructor.isSourceCompatible(), is(false));
-		assertEquals(constructor.getCompatibilityChanges(), Collections.singletonList(JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION));
+		assertThat(constructor.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION)));
 	}
 
 	@Test
@@ -1243,7 +1300,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ADDED_TO_INTERFACE)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
@@ -1273,7 +1330,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
 		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NEW_STATIC_ADDED_TO_INTERFACE));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NEW_STATIC_ADDED_TO_INTERFACE)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(true));
 	}
@@ -1304,7 +1361,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
 		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
@@ -1335,7 +1392,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
 		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
@@ -1364,7 +1421,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_PUBLIC_CLASS));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ADDED_TO_PUBLIC_CLASS)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(true));
 	}
@@ -1396,7 +1453,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.isSourceCompatible(), is(false));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.Superclass");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "newAbstractMethod");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_TO_CLASS));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_TO_CLASS)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
@@ -1583,7 +1640,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(false));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_NOW_CHECKED_EXCEPTION));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_NOW_CHECKED_EXCEPTION)));
 	}
 
 	@Test
@@ -1611,7 +1668,7 @@ public class CompatibilityChangesTest {
 		assertThat(method.getExceptions().get(0).isCheckedException(), Is.is(true));
 		assertThat(method.isBinaryCompatible(), is(true));
 		assertThat(method.isSourceCompatible(), is(false));
-		assertThat(method.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION));
+		assertThat(method.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_THROWS_CHECKED_EXCEPTION)));
 	}
 
 	@Test
@@ -1639,7 +1696,7 @@ public class CompatibilityChangesTest {
 		assertThat(method.getExceptions().get(0).isCheckedException(), Is.is(true));
 		assertThat(method.isBinaryCompatible(), is(true));
 		assertThat(method.isSourceCompatible(), is(false));
-		assertThat(method.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION));
+		assertThat(method.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION)));
 	}
 
 	@Test
@@ -1774,8 +1831,8 @@ public class CompatibilityChangesTest {
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "defaultMethod");
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(true));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NEW_DEFAULT));
-		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NEW_DEFAULT)));
+		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ADDED_TO_INTERFACE))));
 	}
 
 	@Test
@@ -1809,7 +1866,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getCompatibilityChanges().size(), is(0));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getCompatibilityChanges().size(), is(1));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE)));
 	}
 
 	@Test
@@ -1841,8 +1898,8 @@ public class CompatibilityChangesTest {
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "defaultMethod");
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT));
-		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE)));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_NOW_DEFAULT)));
+		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ADDED_TO_INTERFACE))));
 	}
 
 	@Test
@@ -1865,7 +1922,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED)));
 	}
 
 	@Test
@@ -1885,7 +1942,7 @@ public class CompatibilityChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED)));
 	}
 
 	@Test
@@ -1905,7 +1962,7 @@ public class CompatibilityChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED))));
 	}
 
 	/**
@@ -1937,7 +1994,7 @@ public class CompatibilityChangesTest {
             }
         });
         JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.C");
-        assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS)));
+        assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS))));
 
 	}
 
@@ -1966,9 +2023,9 @@ public class CompatibilityChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.C");
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.B");
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS))));
 	}
 
 	@Test
@@ -2000,16 +2057,16 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.A");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.Bb");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.B");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.C");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS))));
 	}
 
 	@Test
@@ -2041,16 +2098,16 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.A");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_REMOVED_IN_SUPERCLASS))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.Bb");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_REMOVED_IN_SUPERCLASS))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.B");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_REMOVED_IN_SUPERCLASS))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.C");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.FIELD_REMOVED_IN_SUPERCLASS))));
 	}
 
 	@Test
@@ -2075,7 +2132,7 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.C");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE)));
 	}
 
 	@Test
@@ -2100,7 +2157,7 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.C");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(false));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
 	}
 
 	@Test
@@ -2123,7 +2180,7 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.I2");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE))));
 	}
 
 	@Test
@@ -2148,15 +2205,15 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.I1");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.C1");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE))));
 		jApiClass = getJApiClass(jApiClasses, "japicmp.C2");
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE))));
 	}
 
 	@Test
@@ -2180,7 +2237,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.NEW));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE))));
 	}
 
 	@Test
@@ -2205,11 +2262,11 @@ public class CompatibilityChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "I");
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_TYPE_CHANGED));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_TYPE_CHANGED)));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
 		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
 		jApiClass = getJApiClass(jApiClasses, "C");
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_TYPE_CHANGED));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_TYPE_CHANGED)));
 	}
 
 	@Test
@@ -2232,8 +2289,8 @@ public class CompatibilityChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "com.acme.japicmp.NewOperator");
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.INTERFACE_ADDED));
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_ADDED)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE))));
 	}
 
 	@Test
@@ -2257,7 +2314,7 @@ public class CompatibilityChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "SI");
-		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE))));
 	}
 
 	@Test
@@ -2284,11 +2341,11 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "SubClass");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
 		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_FINAL));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_MOVED_TO_SUPERCLASS));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_FINAL)));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_MOVED_TO_SUPERCLASS)));
 		jApiClass = getJApiClass(jApiClasses, "SuperClass");
 		jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_NOW_FINAL));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_FINAL)));
 	}
 
 	@Test
@@ -2412,7 +2469,7 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 		assertThat(jApiMethod.getCompatibilityChanges().size(), is(1));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.METHOD_REMOVED));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED)));
 	}
 
 	@Test
@@ -2451,6 +2508,6 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.isBinaryCompatible(), is(true));
 		assertThat(jApiMethod.isSourceCompatible(), is(false));
 		assertThat(jApiMethod.getCompatibilityChanges().size(), is(1));
-		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED)));
 	}
 }

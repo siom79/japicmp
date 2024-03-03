@@ -45,7 +45,7 @@ public class GenericsTest {
 		Assert.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
 		JApiReturnType returnType = jApiMethod.getReturnType();
 		Assert.assertEquals(JApiChangeStatus.UNCHANGED, returnType.getChangeStatus());
-		Assert.assertTrue(returnType.getCompatibilityChanges().contains(JApiCompatibilityChange.METHOD_RETURN_TYPE_GENERICS_CHANGED));
+		Assert.assertTrue(returnType.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED)));
 		Assert.assertEquals(1, returnType.getOldGenericTypes().size());
 		Assert.assertTrue(returnType.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Object")));
 		Assert.assertEquals(1, returnType.getNewGenericTypes().size());
@@ -80,7 +80,7 @@ public class GenericsTest {
 		Assert.assertEquals(1, jApiMethod.getParameters().size());
 		JApiParameter firstParam = jApiMethod.getParameters().get(0);
 		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
-		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED));
+		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
 		Assert.assertEquals(1, firstParam.getOldGenericTypes().size());
 		Assert.assertTrue(firstParam.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Integer")));
 		Assert.assertEquals(1, firstParam.getNewGenericTypes().size());
@@ -115,7 +115,7 @@ public class GenericsTest {
 		Assert.assertEquals(1, jApiConstructor.getParameters().size());
 		JApiParameter firstParam = jApiConstructor.getParameters().get(0);
 		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
-		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED));
+		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
 		Assert.assertEquals(1, firstParam.getOldGenericTypes().size());
 		Assert.assertTrue(firstParam.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Integer")));
 		Assert.assertEquals(1, firstParam.getNewGenericTypes().size());
@@ -184,7 +184,7 @@ public class GenericsTest {
 		Assert.assertEquals(1, jApiMethod.getParameters().size());
 		JApiParameter firstParam = jApiMethod.getParameters().get(0);
 		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
-		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED));
+		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
 		Assert.assertEquals("java.lang.Integer", firstParam.getOldGenericTypes().get(0).getType());
 		Assert.assertEquals("java.lang.Long", firstParam.getNewGenericTypes().get(0).getType());
 		Assert.assertEquals("T", firstParam.getTemplateName());
@@ -218,7 +218,7 @@ public class GenericsTest {
 		Assert.assertEquals(1, jApiMethod.getParameters().size());
 		JApiParameter firstParam = jApiMethod.getParameters().get(0);
 		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
-		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED));
+		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
 		Assert.assertEquals("java.lang.Integer", firstParam.getOldGenericTypes().get(0).getType());
 		Assert.assertEquals("java.lang.Long", firstParam.getNewGenericTypes().get(0).getType());
 		Assert.assertEquals("TEST", firstParam.getTemplateName());

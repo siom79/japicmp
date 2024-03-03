@@ -42,19 +42,19 @@ public class CompatibilityChanges {
 			return; // class appears as "new" public class
 		}
 		if (jApiClass.getChangeStatus() == JApiChangeStatus.REMOVED) {
-			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_REMOVED);
+			addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_REMOVED);
 		} else if (jApiClass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			// section 13.4.1 of "Java Language Specification" SE7
 			if (jApiClass.getAbstractModifier().hasChangedFromTo(AbstractModifier.NON_ABSTRACT, AbstractModifier.ABSTRACT)) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NOW_ABSTRACT);
+				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NOW_ABSTRACT);
 			}
 			// section 13.4.2 of "Java Language Specification" SE7
 			if (jApiClass.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NOW_FINAL);
+				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NOW_FINAL);
 			}
 			// section 13.4.3 of "Java Language Specification" SE7
 			if (jApiClass.getAccessModifier().hasChangedFrom(AccessModifier.PUBLIC)) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NO_LONGER_PUBLIC);
+				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NO_LONGER_PUBLIC);
 			}
 		}
 		// section 13.4.4 of "Java Language Specification" SE7
@@ -63,11 +63,11 @@ public class CompatibilityChanges {
 		checkIfConstructorsHaveChangedIncompatible(jApiClass);
 		checkIfFieldsHaveChangedIncompatible(jApiClass, classMap);
 		if (jApiClass.getClassType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
-			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_TYPE_CHANGED);
+			addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_TYPE_CHANGED);
 		}
 		checkIfAnnotationDeprecatedAdded(jApiClass);
 		if (hasModifierLevelDecreased(jApiClass)) {
-			addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_LESS_ACCESSIBLE);
+			addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_LESS_ACCESSIBLE);
 		}
 		if (jApiClass.getChangeStatus().isNotNewOrRemoved()) {
 			checkIfGenericTemplatesHaveChanged(jApiClass);
@@ -77,7 +77,7 @@ public class CompatibilityChanges {
 	private void checkIfGenericTemplatesHaveChanged(JApiHasGenericTemplates jApiHasGenericTemplates) {
 		for (JApiGenericTemplate jApiGenericTemplate : jApiHasGenericTemplates.getGenericTemplates()) {
 			if (jApiGenericTemplate.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-				jApiHasGenericTemplates.getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_CHANGED);
+				addCompatibilityChange(jApiHasGenericTemplates, JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED);
 				break;
 			}
 		}
@@ -85,8 +85,8 @@ public class CompatibilityChanges {
 			JApiChangeStatus changeStatus = jApiGenericTemplate.getChangeStatus();
 			if (changeStatus == JApiChangeStatus.MODIFIED || changeStatus == JApiChangeStatus.UNCHANGED) {
 				if (!SignatureParser.equalGenericTypes(jApiGenericTemplate.getOldGenericTypes(), jApiGenericTemplate.getNewGenericTypes())) {
-					jApiGenericTemplate.getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
-					jApiHasGenericTemplates.getCompatibilityChanges().add(JApiCompatibilityChange.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
+					addCompatibilityChange(jApiGenericTemplate, JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
+					addCompatibilityChange(jApiHasGenericTemplates, JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED);
 					break;
 				}
 			}
@@ -97,10 +97,10 @@ public class CompatibilityChanges {
 		for (final JApiField field : jApiClass.getFields()) {
 			// section 8.3.1.4 of "Java Language Specification" SE7
 			if (field.getVolatileModifier().hasChangedFromTo(VolatileModifier.NON_VOLATILE, VolatileModifier.VOLATILE)) {
-				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NOW_VOLATILE);
+				addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_NOW_VOLATILE);
 			}
 			if (field.getVolatileModifier().hasChangedFromTo(VolatileModifier.VOLATILE, VolatileModifier.NON_VOLATILE)) {
-				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NO_LONGER_VOLATILE);
+				addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_NO_LONGER_VOLATILE);
 			}
 			// section 13.4.6 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.REMOVED) {
@@ -122,12 +122,12 @@ public class CompatibilityChanges {
                     }
 				}
 				if (!movedToSuperclass) {
-					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_REMOVED);
+					addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_REMOVED);
 				}
 			}
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(field)) {
-				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_LESS_ACCESSIBLE);
+				addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_LESS_ACCESSIBLE);
 			}
 			// section 13.4.8 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.NEW) {
@@ -164,34 +164,34 @@ public class CompatibilityChanges {
                 });
 				for (int returnValue : returnValues) {
 					if (returnValue == 1) {
-						addCompatibilityChange(field, JApiCompatibilityChange.FIELD_STATIC_AND_OVERRIDES_STATIC);
+						addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_STATIC_AND_OVERRIDES_STATIC);
 					} else if (returnValue == 2) {
-						addCompatibilityChange(field, JApiCompatibilityChange.FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS);
+						addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS);
 					}
 				}
 			}
 			// section 13.4.9 of "Java Language Specification" SE7
 			if (isNotPrivate(field) && field.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
-				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NOW_FINAL);
+				addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_NOW_FINAL);
 			}
 			// section 13.4.10 of "Java Language Specification" SE7
 			if (isNotPrivate(field)) {
 				if (field.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {
-					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NOW_STATIC);
+					addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_NOW_STATIC);
 				}
 				if (field.getStaticModifier().hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {
-					addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NO_LONGER_STATIC);
+					addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_NO_LONGER_STATIC);
 				}
 			}
 			// section 13.4.11 of "Java Language Specification" SE7
 			if (field.getTransientModifier().hasChangedFromTo(TransientModifier.NON_TRANSIENT, TransientModifier.TRANSIENT)) {
-				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NOW_TRANSIENT);
+				addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_NOW_TRANSIENT);
 			}
 			if (field.getTransientModifier().hasChangedFromTo(TransientModifier.TRANSIENT, TransientModifier.NON_TRANSIENT)) {
-				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_NO_LONGER_TRANSIENT);
+				addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_NO_LONGER_TRANSIENT);
 			}
 			if (isNotPrivate(field) && field.getType().hasChanged()) {
-				addCompatibilityChange(field, JApiCompatibilityChange.FIELD_TYPE_CHANGED);
+				addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_TYPE_CHANGED);
 			}
 			checkIfAnnotationDeprecatedAdded(field);
 			checkIfFieldGenericsChanged(field);
@@ -296,12 +296,12 @@ public class CompatibilityChanges {
 		for (JApiConstructor constructor : jApiClass.getConstructors()) {
 			// section 13.4.6 of "Java Language Specification" SE7
 			if (isNotPrivate(constructor) && constructor.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				addCompatibilityChange(constructor, JApiCompatibilityChange.CONSTRUCTOR_REMOVED);
+				addCompatibilityChange(constructor, JApiCompatibilityChangeType.CONSTRUCTOR_REMOVED);
 			}
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(constructor)) {
 				if (isNotFinal(jApiClass)  || constructor.getAccessModifier().hasChangedFrom(AccessModifier.PUBLIC)) {
-					addCompatibilityChange(constructor, JApiCompatibilityChange.CONSTRUCTOR_LESS_ACCESSIBLE);
+					addCompatibilityChange(constructor, JApiCompatibilityChangeType.CONSTRUCTOR_LESS_ACCESSIBLE);
 				}
 			}
 			checkIfExceptionIsNowChecked(constructor);
@@ -340,17 +340,17 @@ public class CompatibilityChanges {
                     }
 				}
 				if (!superclassHasSameMethod) {
-					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_REMOVED);
+					addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_REMOVED);
 				}
 			}
 
 			if (!isInterface(jApiClass) && method.getChangeStatus() == JApiChangeStatus.NEW && method.getAccessModifier().getNewModifier().get().getLevel() == AccessModifier.PUBLIC.getLevel()) {
-				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_PUBLIC_CLASS);
+				addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_ADDED_TO_PUBLIC_CLASS);
 			}
 
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(method)) {
-				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_LESS_ACCESSIBLE);
+				addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_LESS_ACCESSIBLE);
 			}
 			// section 13.4.12 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.NEW) {
@@ -375,22 +375,22 @@ public class CompatibilityChanges {
                 });
 				for (Integer returnValue : returnValues) {
 					if (returnValue == 1) {
-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS);
+						addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS);
 					} else if (returnValue == 2) {
-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC);
+						addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC);
 					}
 				}
 			}
 			checkIfReturnTypeChanged(method);
 			// section 13.4.16 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getAbstractModifier().hasChangedFromTo(AbstractModifier.NON_ABSTRACT, AbstractModifier.ABSTRACT)) {
-				addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_ABSTRACT);
+				addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NOW_ABSTRACT);
 			}
 			// section 13.4.17 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
 				if ((jApiClass.getFinalModifier().getOldModifier().isPresent() && jApiClass.getFinalModifier().getOldModifier().get() != FinalModifier.FINAL) &&
 					!(method.getStaticModifier().getOldModifier().isPresent() && method.getStaticModifier().getOldModifier().get() == StaticModifier.STATIC)) {
-					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);
+					addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NOW_FINAL);
 				}
 			}
 			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.REMOVED) {
@@ -402,7 +402,7 @@ public class CompatibilityChanges {
 									&& method.getFinalModifier().getOldModifier().get() == FinalModifier.NON_FINAL
 									&& superMethod.getFinalModifier().getNewModifier().isPresent()
 									&& superMethod.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL) {
-								addCompatibilityChange(superMethod, JApiCompatibilityChange.METHOD_NOW_FINAL);
+								addCompatibilityChange(superMethod, JApiCompatibilityChangeType.METHOD_NOW_FINAL);
 								return 1;
 							}
 						}
@@ -410,17 +410,17 @@ public class CompatibilityChanges {
 					return 0;
 				});
 				if (returnValues.stream().anyMatch(value -> value == 1)) {
-					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_FINAL);
-					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_MOVED_TO_SUPERCLASS);
+					addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NOW_FINAL);
+					addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_MOVED_TO_SUPERCLASS);
 				}
 			}
 			// section 13.4.18 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && !isInterface(method.getjApiClass())) {
 				if (method.getStaticModifier().hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {
-					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NOW_STATIC);
+					addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NOW_STATIC);
 				}
 				if (method.getStaticModifier().hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {
-					addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NO_LONGER_STATIC);
+					addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NO_LONGER_STATIC);
 				}
 			}
 			checkAbstractMethod(jApiClass, classMap, method);
@@ -437,12 +437,16 @@ public class CompatibilityChanges {
 	private void checkIfReturnTypeChanged(JApiMethod method) {
 		// section 13.4.15 of "Java Language Specification" SE7 (Method Result Type)
 		if (method.getReturnType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
-			addCompatibilityChange(method, JApiCompatibilityChange.METHOD_RETURN_TYPE_CHANGED);
+			JApiCompatibilityChange change = addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_RETURN_TYPE_CHANGED);
+			if (method.getAccessModifier().hasChangedToMoreVisible()) {
+				change.setSourceCompatible(true);
+				change.setBinaryCompatible(true);
+			}
 		}
 		if (method.getChangeStatus() == JApiChangeStatus.MODIFIED ||
 				method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 			if (!SignatureParser.equalGenericTypes(method.getReturnType().getOldGenericTypes(), method.getReturnType().getNewGenericTypes())) {
-				addCompatibilityChange(method.getReturnType(), JApiCompatibilityChange.METHOD_RETURN_TYPE_GENERICS_CHANGED);
+				addCompatibilityChange(method.getReturnType(), JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED);
 			}
 		}
 	}
@@ -452,7 +456,7 @@ public class CompatibilityChanges {
 				jApiBehavior.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 			for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {
 				if (!SignatureParser.equalGenericTypes(jApiParameter.getOldGenericTypes(), jApiParameter.getNewGenericTypes())) {
-					jApiParameter.getCompatibilityChanges().add(JApiCompatibilityChange.METHOD_PARAMETER_GENERICS_CHANGED);
+					addCompatibilityChange(jApiParameter, JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED);
 				}
 			}
 		}
@@ -462,7 +466,7 @@ public class CompatibilityChanges {
 		if (jApiField.getChangeStatus() == JApiChangeStatus.MODIFIED ||
 				jApiField.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 			if (!SignatureParser.equalGenericTypes(jApiField.getOldGenericTypes(), jApiField.getNewGenericTypes())) {
-				jApiField.getCompatibilityChanges().add(JApiCompatibilityChange.FIELD_GENERICS_CHANGED);
+				addCompatibilityChange(jApiField, JApiCompatibilityChangeType.FIELD_GENERICS_CHANGED);
 			}
 		}
 	}
@@ -471,7 +475,7 @@ public class CompatibilityChanges {
 		for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {
 			if (annotation.getChangeStatus() == JApiChangeStatus.NEW || annotation.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 				if (annotation.getFullyQualifiedName().equals(Deprecated.class.getName())) {
-					addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChange.ANNOTATION_DEPRECATED_ADDED);
+					addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED);
 				}
 			}
 		}
@@ -479,10 +483,10 @@ public class CompatibilityChanges {
 
 	private void checkIfVarargsChanged(JApiBehavior behavior) {
 		if (behavior.getVarargsModifier().hasChangedFromTo(VarargsModifier.VARARGS, VarargsModifier.NON_VARARGS)) {
-			addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NO_LONGER_VARARGS);
+			addCompatibilityChange(behavior, JApiCompatibilityChangeType.METHOD_NO_LONGER_VARARGS);
 		}
 		if (behavior.getVarargsModifier().hasChangedFromTo(VarargsModifier.NON_VARARGS, VarargsModifier.VARARGS)) {
-			addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NOW_VARARGS);
+			addCompatibilityChange(behavior, JApiCompatibilityChangeType.METHOD_NOW_VARARGS);
 		}
 	}
 
@@ -495,12 +499,12 @@ public class CompatibilityChanges {
 						// new default method in interface
 						if (method.getAbstractModifier().getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
 							if (method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
-								addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_STATIC_ADDED_TO_INTERFACE);
+								addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NEW_STATIC_ADDED_TO_INTERFACE);
 							} else {
-								addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NEW_DEFAULT);
+								addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NEW_DEFAULT);
 							}
 						} else {
-							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
+							addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_ADDED_TO_INTERFACE);
 						}
 					} else {
 						boolean allNew = true;
@@ -511,7 +515,7 @@ public class CompatibilityChanges {
 							}
 						}
 						if (allNew) {
-							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ADDED_TO_INTERFACE);
+							addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_ADDED_TO_INTERFACE);
 						}
 					}
 				} else if (method.getChangeStatus() == JApiChangeStatus.MODIFIED || method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
@@ -519,13 +523,13 @@ public class CompatibilityChanges {
 					if (abstractModifier.getOldModifier().isPresent() && abstractModifier.getOldModifier().get() == AbstractModifier.ABSTRACT &&
 						abstractModifier.getNewModifier().isPresent() && abstractModifier.getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
 						// method changed from abstract to default
-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_NOW_DEFAULT);
+						addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_ABSTRACT_NOW_DEFAULT);
 					}
 					JApiModifier<StaticModifier> staticModifier = method.getStaticModifier();
 					if (staticModifier.hasChangedFromTo(StaticModifier.NON_STATIC, StaticModifier.STATIC)) {
-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC);
+						addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC);
 					} else if (staticModifier.hasChangedFromTo(StaticModifier.STATIC, StaticModifier.NON_STATIC)) {
-						addCompatibilityChange(method, JApiCompatibilityChange.METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC);
+						addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC);
 					}
 				}
 			}
@@ -545,7 +549,7 @@ public class CompatibilityChanges {
 							overridesAbstract = true;
 						}
 						if (!overridesAbstract) {
-							addCompatibilityChange(method, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_TO_CLASS);
+							addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_TO_CLASS);
 						}
 					}
 				}
@@ -602,10 +606,10 @@ public class CompatibilityChanges {
 	private void checkIfExceptionIsNowChecked(JApiBehavior behavior) {
 		for (JApiException exception : behavior.getExceptions()) {
 			if (exception.getChangeStatus() == JApiChangeStatus.NEW && exception.isCheckedException() && behavior.getChangeStatus() != JApiChangeStatus.NEW) {
-				addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NOW_THROWS_CHECKED_EXCEPTION);
+				addCompatibilityChange(behavior, JApiCompatibilityChangeType.METHOD_NOW_THROWS_CHECKED_EXCEPTION);
 			}
 			if (exception.getChangeStatus() == JApiChangeStatus.REMOVED && exception.isCheckedException() && behavior.getChangeStatus() != JApiChangeStatus.REMOVED) {
-				addCompatibilityChange(behavior, JApiCompatibilityChange.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION);
+				addCompatibilityChange(behavior, JApiCompatibilityChangeType.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION);
 			}
 		}
 	}
@@ -744,10 +748,10 @@ public class CompatibilityChanges {
                 return 0;
             });
 			if (!removedAndNotOverriddenMethods.isEmpty()) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_REMOVED_IN_SUPERCLASS);
+				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS);
 			}
 			if (!removedAndNotOverriddenFields.isEmpty()) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.FIELD_REMOVED_IN_SUPERCLASS);
+				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.FIELD_REMOVED_IN_SUPERCLASS);
 			}
 			if (superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
 				if (!superclass.getOldSuperclassName().get().equals(superclass.getNewSuperclassName().get())) {
@@ -760,9 +764,9 @@ public class CompatibilityChanges {
 						superClassChangedFromObject = true;
 					}
 					if (superClassChangedToObject) {
-						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+						addCompatibilityChange(superclass, JApiCompatibilityChangeType.SUPERCLASS_REMOVED);
 					} else if (superClassChangedFromObject) {
-						addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+						addCompatibilityChange(superclass, JApiCompatibilityChangeType.SUPERCLASS_ADDED);
 					} else {
 						// check if the old superclass is still an ancestor of the new superclass
 						List<JApiSuperclass> ancestors = new ArrayList<>();
@@ -775,25 +779,25 @@ public class CompatibilityChanges {
                             return ancestor;
                         });
 						if (matchingAncestors.isEmpty()) {
-							addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+							addCompatibilityChange(superclass, JApiCompatibilityChangeType.SUPERCLASS_REMOVED);
 						} else {
 							// really, superclass(es) inserted - but the old superclass is still an ancestor
-							addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+							addCompatibilityChange(superclass, JApiCompatibilityChangeType.SUPERCLASS_ADDED);
 						}
 					}
 				}
 			} else {
 				if (superclass.getOldSuperclassName().isPresent()) {
-					addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_REMOVED);
+					addCompatibilityChange(superclass, JApiCompatibilityChangeType.SUPERCLASS_REMOVED);
 				} else if (superclass.getNewSuperclassName().isPresent()) {
-					addCompatibilityChange(superclass, JApiCompatibilityChange.SUPERCLASS_ADDED);
+					addCompatibilityChange(superclass, JApiCompatibilityChangeType.SUPERCLASS_ADDED);
 				}
 			}
 		}
 		// section 13.4.4 of "Java Language Specification" SE7
 		for (JApiImplementedInterface implementedInterface : jApiClass.getInterfaces()) {
 			if (implementedInterface.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				addCompatibilityChange(implementedInterface, JApiCompatibilityChange.INTERFACE_REMOVED);
+				addCompatibilityChange(implementedInterface, JApiCompatibilityChangeType.INTERFACE_REMOVED);
 			} else {
 				JApiClass interfaceClass = classMap.get(implementedInterface.getFullyQualifiedName());
 				if (interfaceClass == null) {
@@ -804,7 +808,7 @@ public class CompatibilityChanges {
 					checkIfMethodsHaveChangedIncompatible(interfaceClass, classMap);
 					checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
 				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
-					addCompatibilityChange(jApiClass, JApiCompatibilityChange.INTERFACE_ADDED);
+					addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.INTERFACE_ADDED);
 					// no marker interface, no abstract class, no interface and annotation
 					if (!interfaceClass.getMethods().isEmpty() && !isAbstract(jApiClass) && !isInterface(jApiClass) && !isAnnotation(jApiClass) && !isEnum(jApiClass)) {
 						boolean allInterfaceMethodsImplemented = true;
@@ -826,7 +830,7 @@ public class CompatibilityChanges {
 							}
 						}
 						if (!allInterfaceMethodsImplemented) {
-							addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
+							addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
 						}
 					}
 				}
@@ -902,7 +906,7 @@ public class CompatibilityChanges {
             });
 			implementedInterfaces.addAll(jApiClass.getInterfaces());
 			if (!abstractMethods.isEmpty()) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_SUPERCLASS);
+				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_SUPERCLASS);
 			}
 			abstractMethods.clear();
 			for (JApiImplementedInterface jApiImplementedInterface : implementedInterfaces) {
@@ -952,10 +956,10 @@ public class CompatibilityChanges {
 			abstractMethods.removeAll(abstractMethodsWithDefaultInInterface);
 
 			if (!abstractMethods.isEmpty()) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
+				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
 			if (!defaultMethods.isEmpty()) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChange.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE);
+				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
 		}
 	}
@@ -980,16 +984,22 @@ public class CompatibilityChanges {
 			if (jApiClassSuperclass.getNewSuperclassName().isPresent()) {
 				String fqn = jApiClassSuperclass.getNewSuperclassName().get();
 				if ("java.lang.Exception".equals(fqn)) {
-					addCompatibilityChange(jApiClass, JApiCompatibilityChange.CLASS_NOW_CHECKED_EXCEPTION);
+					addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NOW_CHECKED_EXCEPTION);
 				}
 			}
 		}
 	}
 
-	private void addCompatibilityChange(JApiCompatibility binaryCompatibility, JApiCompatibilityChange compatibilityChange) {
+	private JApiCompatibilityChange addCompatibilityChange(JApiCompatibility binaryCompatibility, JApiCompatibilityChangeType changeType) {
+		JApiCompatibilityChange change = new JApiCompatibilityChange(changeType);
 		List<JApiCompatibilityChange> compatibilityChanges = binaryCompatibility.getCompatibilityChanges();
-		if (!compatibilityChanges.contains(compatibilityChange)) {
-			compatibilityChanges.add(compatibilityChange);
+		java.util.Optional<JApiCompatibilityChange> first = compatibilityChanges.stream()
+			.filter(cc -> cc.equals(change))
+			.findFirst();
+		if (!first.isPresent()) {
+			compatibilityChanges.add(change);
+			return change;
 		}
+		return first.get();
 	}
 }

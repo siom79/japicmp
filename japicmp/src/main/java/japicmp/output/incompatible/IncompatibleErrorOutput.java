@@ -24,21 +24,7 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.filter.ClassFilter;
-import japicmp.model.JApiAnnotation;
-import japicmp.model.JApiBehavior;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibility;
-import japicmp.model.JApiCompatibilityChange;
-import japicmp.model.JApiConstructor;
-import japicmp.model.JApiField;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiParameter;
-import japicmp.model.JApiReturnType;
-import japicmp.model.JApiSemanticVersionLevel;
-import japicmp.model.JApiSuperclass;
-import japicmp.model.JApiType;
+import japicmp.model.*;
 import japicmp.output.Filter;
 import japicmp.output.OutputGenerator;
 import japicmp.output.semver.SemverOut;
@@ -117,29 +103,27 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 				if (changeTypeOptional.isPresent()) {
 					final SemanticVersion.ChangeType changeType = changeTypeOptional.get();
 
-					SemverOut semverOut = new SemverOut(options, jApiClasses, new SemverOut.Listener() {
-							public void onChange(JApiCompatibility change, JApiSemanticVersionLevel semanticVersionLevel) {
-								switch(semanticVersionLevel) {
-								case MAJOR:
-									if (changeType.ordinal() > SemanticVersion.ChangeType.MAJOR.ordinal()) {
-										warn("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change);
-									}
-									break;
-								case MINOR:
-									if (changeType.ordinal() > SemanticVersion.ChangeType.MINOR.ordinal()) {
-										warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
-									}
-									break;
-								case PATCH:
-									if (changeType.ordinal() > SemanticVersion.ChangeType.PATCH.ordinal()) {
-										warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
-									}
-									break;
-								default:
-									// Ignore
-								}
-							}
-						});
+					SemverOut semverOut = new SemverOut(options, jApiClasses, (change, semanticVersionLevel) -> {
+                        switch(semanticVersionLevel) {
+                        case MAJOR:
+                            if (changeType.ordinal() > SemanticVersion.ChangeType.MAJOR.ordinal()) {
+                                warn("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change);
+                            }
+                            break;
+                        case MINOR:
+                            if (changeType.ordinal() > SemanticVersion.ChangeType.MINOR.ordinal()) {
+                                warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
+                            }
+                            break;
+                        case PATCH:
+                            if (changeType.ordinal() > SemanticVersion.ChangeType.PATCH.ordinal()) {
+                                warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
+                            }
+                            break;
+                        default:
+                            // Ignore
+                        }
+                    });
 
 					String semver = semverOut.generate();
 					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals(SemverOut.SEMVER_MAJOR)) {
@@ -211,36 +195,38 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 		Filter.filter(jApiClasses, new Filter.FilterVisitor() {
 			@Override
 			public void visit(Iterator<JApiClass> iterator, JApiClass jApiClass) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiClass.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible()) {
+				for (JApiCompatibilityChange change : jApiClass.getCompatibilityChanges()) {
+					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
+						if (!change.isBinaryCompatible()) {
 							breakBuildResult.binaryIncompatibleChanges = true;
 						}
-						if (!jApiCompatibilityChange.isSourceCompatible()) {
+						if (!change.isSourceCompatible()) {
 							breakBuildResult.sourceIncompatibleChanges = true;
 						}
 						if (sb.length() > 1) {
 							sb.append(',');
 						}
-						sb.append(jApiClass.getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
+						sb.append(jApiClass.getFullyQualifiedName()).append(":").append(change.getType().name());
 					}
 				}
 			}
 
 			@Override
 			public void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiMethod.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
+				for (JApiCompatibilityChange change : jApiMethod.getCompatibilityChanges()) {
+					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
+						if (!change.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
 							breakBuildResult.binaryIncompatibleChanges = true;
 						}
-						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
+						if (!change.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
 							breakBuildResult.sourceIncompatibleChanges = true;
 						}
 						if (sb.length() > 1) {
 							sb.append(',');
 						}
-						sb.append(jApiMethod.getjApiClass().getFullyQualifiedName()).append(".").append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod)).append(")").append(":").append(jApiCompatibilityChange.name());
+						sb.append(jApiMethod.getjApiClass().getFullyQualifiedName()).append(".")
+							.append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod))
+							.append(")").append(":").append(change.getType().name());
 					}
 				}
 			}
@@ -276,36 +262,40 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 
 			@Override
 			public void visit(Iterator<JApiConstructor> iterator, JApiConstructor jApiConstructor) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiConstructor.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible()) {
+				for (JApiCompatibilityChange change : jApiConstructor.getCompatibilityChanges()) {
+					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
+						if (!change.isBinaryCompatible()) {
 							breakBuildResult.binaryIncompatibleChanges = true;
 						}
-						if (!jApiCompatibilityChange.isSourceCompatible()) {
+						if (!change.isSourceCompatible()) {
 							breakBuildResult.sourceIncompatibleChanges = true;
 						}
 						if (sb.length() > 1) {
 							sb.append(',');
 						}
-						sb.append(jApiConstructor.getjApiClass().getFullyQualifiedName()).append(".").append(jApiConstructor.getName()).append("(").append(methodParameterToList(jApiConstructor)).append(")").append(":").append(jApiCompatibilityChange.name());
+						sb.append(jApiConstructor.getjApiClass().getFullyQualifiedName()).append(".")
+							.append(jApiConstructor.getName()).append("(").append(methodParameterToList(jApiConstructor))
+							.append(")").append(":").append(change.getType().name());
 					}
 				}
 			}
 
 			@Override
 			public void visit(Iterator<JApiImplementedInterface> iterator, JApiImplementedInterface jApiImplementedInterface) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiImplementedInterface.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiImplementedInterface)) {
+				for (JApiCompatibilityChange change : jApiImplementedInterface.getCompatibilityChanges()) {
+					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
+						if (!change.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiImplementedInterface)) {
 							breakBuildResult.binaryIncompatibleChanges = true;
 						}
-						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiImplementedInterface)) {
+						if (!change.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiImplementedInterface)) {
 							breakBuildResult.sourceIncompatibleChanges = true;
 						}
 						if (sb.length() > 1) {
 							sb.append(',');
 						}
-						sb.append(jApiImplementedInterface.getFullyQualifiedName()).append("[").append(jApiImplementedInterface.getFullyQualifiedName()).append("]").append(":").append(jApiCompatibilityChange.name());
+						sb.append(jApiImplementedInterface.getFullyQualifiedName()).append("[")
+							.append(jApiImplementedInterface.getFullyQualifiedName()).append("]")
+							.append(":").append(change.getType().name());
 					}
 				}
 			}
@@ -313,27 +303,26 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 			private boolean breakBuildIfCausedByExclusion(JApiImplementedInterface jApiImplementedInterface) {
 				if (!breakBuildIfCausedByExclusion) {
 					CtClass ctClass = jApiImplementedInterface.getCtClass();
-					if (classExcluded(ctClass)) {
-						return false;
-					}
+                    return !classExcluded(ctClass);
 				}
 				return true;
 			}
 
 			@Override
 			public void visit(Iterator<JApiField> iterator, JApiField jApiField) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiField.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiField)) {
+				for (JApiCompatibilityChange change : jApiField.getCompatibilityChanges()) {
+					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
+						if (!change.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiField)) {
 							breakBuildResult.binaryIncompatibleChanges = true;
 						}
-						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiField)) {
+						if (!change.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiField)) {
 							breakBuildResult.sourceIncompatibleChanges = true;
 						}
 						if (sb.length() > 1) {
 							sb.append(',');
 						}
-						sb.append(jApiField.getjApiClass().getFullyQualifiedName()).append(".").append(jApiField.getName()).append(":").append(jApiCompatibilityChange.name());
+						sb.append(jApiField.getjApiClass().getFullyQualifiedName()).append(".")
+							.append(jApiField.getName()).append(":").append(change.getType().name());
 					}
 				}
 			}
@@ -380,18 +369,19 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 
 			@Override
 			public void visit(JApiSuperclass jApiSuperclass) {
-				for (JApiCompatibilityChange jApiCompatibilityChange : jApiSuperclass.getCompatibilityChanges()) {
-					if (!jApiCompatibilityChange.isBinaryCompatible() || !jApiCompatibilityChange.isSourceCompatible()) {
-						if (!jApiCompatibilityChange.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiSuperclass)) {
+				for (JApiCompatibilityChange change : jApiSuperclass.getCompatibilityChanges()) {
+					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
+						if (!change.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiSuperclass)) {
 							breakBuildResult.binaryIncompatibleChanges = true;
 						}
-						if (!jApiCompatibilityChange.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiSuperclass)) {
+						if (!change.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiSuperclass)) {
 							breakBuildResult.sourceIncompatibleChanges = true;
 						}
 						if (sb.length() > 1) {
 							sb.append(',');
 						}
-						sb.append(jApiSuperclass.getJApiClassOwning().getFullyQualifiedName()).append(":").append(jApiCompatibilityChange.name());
+						sb.append(jApiSuperclass.getJApiClassOwning().getFullyQualifiedName()).append(":")
+							.append(change.getType().name());
 					}
 				}
 			}
@@ -408,9 +398,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 					Optional<CtClass> newSuperclassOptional = jApiSuperclass.getNewSuperclass();
 					if (newSuperclassOptional.isPresent()) {
 						CtClass ctClass = newSuperclassOptional.get();
-						if (classExcluded(ctClass)) {
-							return false;
-						}
+                        return !classExcluded(ctClass);
 					}
 				}
 				return true;
@@ -430,7 +418,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 			}
 		});
 		if (breakBuildResult.breakTheBuild()) {
-			throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format("There is at least one incompatibility: %s", sb.toString()));
+			throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format("There is at least one incompatibility: %s", sb));
 		}
 	}
 }
