@@ -77,5 +77,17 @@ public class JApiModifier&lt;T&gt; implements JApiHasChangeStatus {
 		}
 <span class="fc" id="L78">		return hasChangedTo;</span>
 	}
+
+	public boolean hasChangedToMoreVisible() {
+<span class="fc" id="L82">		boolean hasChangedTo = false;</span>
+<span class="pc bpc" id="L83" title="2 of 4 branches missed.">		if (oldModifier.isPresent() &amp;&amp; newModifier.isPresent()) {</span>
+<span class="fc" id="L84">			T oldValue = oldModifier.get();</span>
+<span class="fc" id="L85">			T newValue = newModifier.get();</span>
+<span class="pc bpc" id="L86" title="2 of 4 branches missed.">			if (oldValue instanceof AccessModifier &amp;&amp; newValue instanceof AccessModifier) {</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">				return ((AccessModifier)newValue).getLevel() &gt; ((AccessModifier)oldValue).getLevel();</span>
+			}
+		}
+<span class="nc" id="L90">		return hasChangedTo;</span>
+	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

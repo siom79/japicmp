@@ -130,6 +130,12 @@
     <xs:attribute name="sourceCompatible" type="xs:boolean" use="required"/>
   </xs:complexType>
 
+  <xs:complexType name="jApiCompatibilityChange">
+    <xs:sequence/>
+    <xs:attribute name="binaryCompatible" type="xs:boolean" use="required"/>
+    <xs:attribute name="sourceCompatible" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
   <xs:complexType name="jApiAnnotationElement">
     <xs:sequence>
       <xs:element name="compatibilityChanges" minOccurs="0">
@@ -520,70 +526,6 @@
       <xs:enumeration value="REMOVED"/>
       <xs:enumeration value="UNCHANGED"/>
       <xs:enumeration value="MODIFIED"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="jApiCompatibilityChange">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="ANNOTATION_DEPRECATED_ADDED"/>
-      <xs:enumeration value="CLASS_REMOVED"/>
-      <xs:enumeration value="CLASS_NOW_ABSTRACT"/>
-      <xs:enumeration value="CLASS_NOW_FINAL"/>
-      <xs:enumeration value="CLASS_NO_LONGER_PUBLIC"/>
-      <xs:enumeration value="CLASS_TYPE_CHANGED"/>
-      <xs:enumeration value="CLASS_NOW_CHECKED_EXCEPTION"/>
-      <xs:enumeration value="CLASS_LESS_ACCESSIBLE"/>
-      <xs:enumeration value="CLASS_GENERIC_TEMPLATE_CHANGED"/>
-      <xs:enumeration value="CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED"/>
-      <xs:enumeration value="SUPERCLASS_REMOVED"/>
-      <xs:enumeration value="SUPERCLASS_ADDED"/>
-      <xs:enumeration value="SUPERCLASS_MODIFIED_INCOMPATIBLE"/>
-      <xs:enumeration value="INTERFACE_ADDED"/>
-      <xs:enumeration value="INTERFACE_REMOVED"/>
-      <xs:enumeration value="METHOD_REMOVED"/>
-      <xs:enumeration value="METHOD_REMOVED_IN_SUPERCLASS"/>
-      <xs:enumeration value="METHOD_LESS_ACCESSIBLE"/>
-      <xs:enumeration value="METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS"/>
-      <xs:enumeration value="METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC"/>
-      <xs:enumeration value="METHOD_RETURN_TYPE_CHANGED"/>
-      <xs:enumeration value="METHOD_RETURN_TYPE_GENERICS_CHANGED"/>
-      <xs:enumeration value="METHOD_PARAMETER_GENERICS_CHANGED"/>
-      <xs:enumeration value="METHOD_NOW_ABSTRACT"/>
-      <xs:enumeration value="METHOD_NOW_FINAL"/>
-      <xs:enumeration value="METHOD_NOW_STATIC"/>
-      <xs:enumeration value="METHOD_NO_LONGER_STATIC"/>
-      <xs:enumeration value="METHOD_NOW_VARARGS"/>
-      <xs:enumeration value="METHOD_NO_LONGER_VARARGS"/>
-      <xs:enumeration value="METHOD_ADDED_TO_INTERFACE"/>
-      <xs:enumeration value="METHOD_ADDED_TO_PUBLIC_CLASS"/>
-      <xs:enumeration value="METHOD_NOW_THROWS_CHECKED_EXCEPTION"/>
-      <xs:enumeration value="METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION"/>
-      <xs:enumeration value="METHOD_ABSTRACT_ADDED_TO_CLASS"/>
-      <xs:enumeration value="METHOD_ABSTRACT_ADDED_IN_SUPERCLASS"/>
-      <xs:enumeration value="METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE"/>
-      <xs:enumeration value="METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE"/>
-      <xs:enumeration value="METHOD_NEW_DEFAULT"/>
-      <xs:enumeration value="METHOD_NEW_STATIC_ADDED_TO_INTERFACE"/>
-      <xs:enumeration value="METHOD_MOVED_TO_SUPERCLASS"/>
-      <xs:enumeration value="METHOD_ABSTRACT_NOW_DEFAULT"/>
-      <xs:enumeration value="METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC"/>
-      <xs:enumeration value="METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC"/>
-      <xs:enumeration value="FIELD_STATIC_AND_OVERRIDES_STATIC"/>
-      <xs:enumeration value="FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS"/>
-      <xs:enumeration value="FIELD_NOW_FINAL"/>
-      <xs:enumeration value="FIELD_NOW_TRANSIENT"/>
-      <xs:enumeration value="FIELD_NOW_VOLATILE"/>
-      <xs:enumeration value="FIELD_NOW_STATIC"/>
-      <xs:enumeration value="FIELD_NO_LONGER_TRANSIENT"/>
-      <xs:enumeration value="FIELD_NO_LONGER_VOLATILE"/>
-      <xs:enumeration value="FIELD_NO_LONGER_STATIC"/>
-      <xs:enumeration value="FIELD_TYPE_CHANGED"/>
-      <xs:enumeration value="FIELD_REMOVED"/>
-      <xs:enumeration value="FIELD_REMOVED_IN_SUPERCLASS"/>
-      <xs:enumeration value="FIELD_LESS_ACCESSIBLE"/>
-      <xs:enumeration value="FIELD_GENERICS_CHANGED"/>
-      <xs:enumeration value="CONSTRUCTOR_REMOVED"/>
-      <xs:enumeration value="CONSTRUCTOR_LESS_ACCESSIBLE"/>
     </xs:restriction>
   </xs:simpleType>
 

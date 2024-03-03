@@ -130,9 +130,13 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 <span class="fc" id="L130">		return this.compatibilityChanges;</span>
 	}
 
-	void setJApiClass(JApiClass jApiClass) {
+	public void setJApiClass(JApiClass jApiClass) {
 <span class="fc" id="L134">		this.correspondingJApiClass = Optional.of(jApiClass);</span>
 <span class="fc" id="L135">	}</span>
+
+	public Optional&lt;JApiClass&gt; getCorrespondingJApiClass() {
+<span class="fc" id="L138">		return correspondingJApiClass;</span>
+	}
 
 	/**
 	 * Returns the {@link japicmp.model.JApiClass} this superclass belongs to.
@@ -140,21 +144,21 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
      */
 	@XmlTransient
 	public JApiClass getJApiClassOwning() {
-<span class="fc" id="L143">		return jApiClass;</span>
+<span class="fc" id="L147">		return jApiClass;</span>
 	}
 
 	public String toString()
 	{
-<span class="fc" id="L148">		String oldSuperClass = &quot;n.a.&quot;;</span>
-<span class="pc bpc" id="L149" title="1 of 2 branches missed.">		if(oldSuperclassOptional.isPresent()) {</span>
-<span class="fc" id="L150">			oldSuperClass = oldSuperclassOptional.get().getName();</span>
+<span class="fc" id="L152">		String oldSuperClass = &quot;n.a.&quot;;</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">		if(oldSuperclassOptional.isPresent()) {</span>
+<span class="fc" id="L154">			oldSuperClass = oldSuperclassOptional.get().getName();</span>
 		}
-<span class="fc" id="L152">		String newSuperClass = &quot;n.a.&quot;;</span>
-<span class="pc bpc" id="L153" title="1 of 2 branches missed.">		if(newSuperclassOptional.isPresent()) {</span>
-<span class="fc" id="L154">			newSuperClass = newSuperclassOptional.get().getName();</span>
+<span class="fc" id="L156">		String newSuperClass = &quot;n.a.&quot;;</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">		if(newSuperclassOptional.isPresent()) {</span>
+<span class="fc" id="L158">			newSuperClass = newSuperclassOptional.get().getName();</span>
 		}
 
-<span class="fc" id="L157">		return &quot;JApiSuperclass [jApiClass=&quot;</span>
+<span class="fc" id="L161">		return &quot;JApiSuperclass [jApiClass=&quot;</span>
 			+ jApiClass
 			+ &quot;, oldSuperclass=&quot;
 			+ oldSuperClass

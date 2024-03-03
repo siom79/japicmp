@@ -1,123 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiCompatibilityChange.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiCompatibilityChange.java</span></div><h1>JApiCompatibilityChange.java</h1><pre class="source lang-java linenums">package japicmp.model;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlEnum;
+import java.util.Objects;
 
-<span class="fc" id="L6">@XmlEnum</span>
-public enum JApiCompatibilityChange {
-<span class="fc" id="L8">	ANNOTATION_DEPRECATED_ADDED(true, true, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L9">	CLASS_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L10">	CLASS_NOW_ABSTRACT(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L11">	CLASS_NOW_FINAL(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L12">	CLASS_NO_LONGER_PUBLIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L13">	CLASS_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L14">	CLASS_NOW_CHECKED_EXCEPTION(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L15">	CLASS_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L16">	CLASS_GENERIC_TEMPLATE_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L17">	CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L18">	SUPERCLASS_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L19">	SUPERCLASS_ADDED(true, true, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L20">	SUPERCLASS_MODIFIED_INCOMPATIBLE(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L21">	INTERFACE_ADDED(true, true, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L22">	INTERFACE_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L23">	METHOD_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L24">	METHOD_REMOVED_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L25">	METHOD_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L26">	METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L27">	METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L28">	METHOD_RETURN_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L29">	METHOD_RETURN_TYPE_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L30">	METHOD_PARAMETER_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L31">	METHOD_NOW_ABSTRACT(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L32">	METHOD_NOW_FINAL(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L33">	METHOD_NOW_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L34">	METHOD_NO_LONGER_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L35">	METHOD_NOW_VARARGS(true, true, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L36">	METHOD_NO_LONGER_VARARGS(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L37">	METHOD_ADDED_TO_INTERFACE(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L38">	METHOD_ADDED_TO_PUBLIC_CLASS(true, true, JApiSemanticVersionLevel.PATCH),</span>
-<span class="fc" id="L39">	METHOD_NOW_THROWS_CHECKED_EXCEPTION(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L40">	METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L41">	METHOD_ABSTRACT_ADDED_TO_CLASS(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L42">	METHOD_ABSTRACT_ADDED_IN_SUPERCLASS(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L43">	METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L44">	METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE(true, true, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L45">	METHOD_NEW_DEFAULT(true, true, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L46">	METHOD_NEW_STATIC_ADDED_TO_INTERFACE(true, true, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L47">	METHOD_MOVED_TO_SUPERCLASS(true, true, JApiSemanticVersionLevel.PATCH),</span>
-<span class="fc" id="L48">	METHOD_ABSTRACT_NOW_DEFAULT(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L49">	METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L50">	METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L51">	FIELD_STATIC_AND_OVERRIDES_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L52">	FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L53">	FIELD_NOW_FINAL(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L54">	FIELD_NOW_TRANSIENT(true, true, JApiSemanticVersionLevel.PATCH),</span>
-<span class="fc" id="L55">	FIELD_NOW_VOLATILE(true, true, JApiSemanticVersionLevel.PATCH),</span>
-<span class="fc" id="L56">	FIELD_NOW_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L57">	FIELD_NO_LONGER_TRANSIENT(true, true, JApiSemanticVersionLevel.PATCH),</span>
-<span class="fc" id="L58">	FIELD_NO_LONGER_VOLATILE(true, true, JApiSemanticVersionLevel.PATCH),</span>
-<span class="fc" id="L59">	FIELD_NO_LONGER_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L60">	FIELD_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L61">	FIELD_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L62">	FIELD_REMOVED_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L63">	FIELD_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L64">	FIELD_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),</span>
-<span class="fc" id="L65">	CONSTRUCTOR_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),</span>
-<span class="fc" id="L66">	CONSTRUCTOR_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR);</span>
-
+public class JApiCompatibilityChange {
+	private final JApiCompatibilityChangeType type;
 	private boolean binaryCompatible;
 	private boolean sourceCompatible;
-	private JApiSemanticVersionLevel semanticVersionLevel;
-<span class="fc" id="L71">	private Boolean binaryCompatibleOverridden = null;</span>
-<span class="fc" id="L72">	private Boolean sourceCompatibleOverridden = null;</span>
-<span class="fc" id="L73">	private JApiSemanticVersionLevel semanticVersionLevelOverridden = null;</span>
 
-	JApiCompatibilityChange(boolean binaryCompatible, boolean sourceCompatible,
-<span class="fc" id="L76">							JApiSemanticVersionLevel jApiSemanticVersionLevel) {</span>
-<span class="fc" id="L77">		this.binaryCompatible = binaryCompatible;</span>
-<span class="fc" id="L78">		this.sourceCompatible = sourceCompatible;</span>
-<span class="fc" id="L79">		this.semanticVersionLevel = jApiSemanticVersionLevel;</span>
-<span class="fc" id="L80">	}</span>
+<span class="fc" id="L11">	public JApiCompatibilityChange(JApiCompatibilityChangeType type) {</span>
+<span class="fc" id="L12">		this.type = type;</span>
+<span class="fc" id="L13">		this.binaryCompatible = type.isBinaryCompatible();</span>
+<span class="fc" id="L14">		this.sourceCompatible = type.isSourceCompatible();</span>
+<span class="fc" id="L15">	}</span>
+
+	public JApiCompatibilityChangeType getType() {
+<span class="fc" id="L18">		return type;</span>
+	}
 
 	@XmlAttribute(name = &quot;binaryCompatible&quot;)
 	public boolean isBinaryCompatible() {
-<span class="fc bfc" id="L84" title="All 2 branches covered.">		if (binaryCompatibleOverridden != null) {</span>
-<span class="fc" id="L85">			return binaryCompatibleOverridden;</span>
-		}
-<span class="fc" id="L87">		return binaryCompatible;</span>
+<span class="fc" id="L23">		return binaryCompatible;</span>
 	}
 
 	@XmlAttribute(name = &quot;sourceCompatible&quot;)
 	public boolean isSourceCompatible() {
-<span class="fc bfc" id="L92" title="All 2 branches covered.">		if (sourceCompatibleOverridden != null) {</span>
-<span class="fc" id="L93">			return sourceCompatibleOverridden;</span>
-		}
-<span class="fc" id="L95">		return sourceCompatible;</span>
-	}
-
-	public JApiSemanticVersionLevel getSemanticVersionLevel() {
-<span class="pc bpc" id="L99" title="1 of 2 branches missed.">		if (semanticVersionLevelOverridden != null) {</span>
-<span class="nc" id="L100">			return semanticVersionLevelOverridden;</span>
-		}
-<span class="fc" id="L102">		return semanticVersionLevel;</span>
+<span class="fc" id="L28">		return sourceCompatible;</span>
 	}
 
 	public void setBinaryCompatible(boolean binaryCompatible) {
-<span class="fc" id="L106">		this.binaryCompatibleOverridden = binaryCompatible;</span>
-<span class="fc" id="L107">	}</span>
+<span class="fc" id="L32">		this.binaryCompatible = binaryCompatible;</span>
+<span class="fc" id="L33">	}</span>
 
 	public void setSourceCompatible(boolean sourceCompatible) {
-<span class="fc" id="L110">		this.sourceCompatibleOverridden = sourceCompatible;</span>
-<span class="fc" id="L111">	}</span>
+<span class="fc" id="L36">		this.sourceCompatible = sourceCompatible;</span>
+<span class="fc" id="L37">	}</span>
 
-	public void setSemanticVersionLevel(JApiSemanticVersionLevel semanticVersionLevel) {
-<span class="fc" id="L114">		this.semanticVersionLevelOverridden = semanticVersionLevel;</span>
-<span class="fc" id="L115">	}</span>
+	public JApiSemanticVersionLevel getSemanticVersionLevel() {
+<span class="fc" id="L40">		return type.getSemanticVersionLevel();</span>
+	}
 
-	public void resetOverrides() {
-<span class="fc" id="L118">		this.binaryCompatibleOverridden = null;</span>
-<span class="fc" id="L119">		this.sourceCompatibleOverridden = null;</span>
-<span class="fc" id="L120">		this.semanticVersionLevelOverridden = null;</span>
-<span class="fc" id="L121">	}</span>
+	@Override
+	public boolean equals(Object o) {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">		if (this == o) return true;</span>
+<span class="pc bpc" id="L46" title="2 of 4 branches missed.">		if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="fc" id="L47">		JApiCompatibilityChange that = (JApiCompatibilityChange) o;</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">		return type == that.type;</span>
+	}
+
+	@Override
+	public int hashCode() {
+<span class="fc" id="L53">		return Objects.hash(type);</span>
+	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -8,7 +8,7 @@ import japicmp.filter.Filter;
 import japicmp.filter.Filters;
 import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import japicmp.util.AnnotationHelper;
@@ -52,12 +52,12 @@ public class JarArchiveComparator {
 <span class="fc" id="L52">	}</span>
 
 	private void setupCompatibilityChanges(JarArchiveComparatorOptions options) {
-<span class="fc bfc" id="L55" title="All 2 branches covered.">		for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">		for (JApiCompatibilityChangeType jApiCompatibility : JApiCompatibilityChangeType.values()) {</span>
 <span class="fc" id="L56">			jApiCompatibility.resetOverrides();</span>
 		}
 <span class="fc bfc" id="L58" title="All 2 branches covered.">		for (JarArchiveComparatorOptions.OverrideCompatibilityChange change : options.getOverrideCompatibilityChanges()) {</span>
-<span class="fc" id="L59">			JApiCompatibilityChange compatibilityChange = change.getCompatibilityChange();</span>
-<span class="fc bfc" id="L60" title="All 2 branches covered.">			for (JApiCompatibilityChange jApiCompatibility : JApiCompatibilityChange.values()) {</span>
+<span class="fc" id="L59">			JApiCompatibilityChangeType compatibilityChange = change.getCompatibilityChange();</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">			for (JApiCompatibilityChangeType jApiCompatibility : JApiCompatibilityChangeType.values()) {</span>
 <span class="fc bfc" id="L61" title="All 2 branches covered.">				if (jApiCompatibility == compatibilityChange) {</span>
 <span class="fc" id="L62">					jApiCompatibility.setBinaryCompatible(change.isBinaryCompatible());</span>
 <span class="fc" id="L63">					jApiCompatibility.setSourceCompatible(change.isSourceCompatible());</span>
