@@ -3,6 +3,12 @@ Versions
 
 The following versions of japicmp are available:
 
+0.19.1 (2024-03-03)
+-------------------
+* The attribute type in JApiCompatibilityChange should have a @XmlAttribute annotation. [#387](https://github.com/siom79/japicmp/issues/387)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.19.1).
+
 0.19.0 (2024-03-03)
 -------------------
 * List of compatibilityChanges is no longer an enum but an instance of JApiCompatibilityChange to reflect that METHOD_RETURN_TYPE_CHANGED is not incompatible in case the method's visibility increased [#384](https://github.com/siom79/japicmp/issues/384)
