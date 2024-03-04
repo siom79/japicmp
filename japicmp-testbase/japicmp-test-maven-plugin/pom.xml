@@ -104,11 +104,9 @@
 								<onlyModified>true</onlyModified>
 								<accessModifier>public</accessModifier>
 								<breakBuildOnModifications>false</breakBuildOnModifications>
-								<breakBuildOnBinaryIncompatibleModifications>false
-								</breakBuildOnBinaryIncompatibleModifications>
+								<breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
 								<includeSynthetic>true</includeSynthetic>
-								<htmlStylesheet>${project.basedir}/src/main/resources/css/stylesheet.css
-								</htmlStylesheet>
+								<htmlStylesheet>${project.basedir}/src/main/resources/css/stylesheet.css</htmlStylesheet>
 								<htmlTitle>Test-Title</htmlTitle>
 							</parameter>
 							<dependencies>
