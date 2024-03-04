@@ -1,0 +1,57 @@
+<div>
+	<div class="class" id="${fullyQualifiedName}">
+		<div class="class_header">
+			<span class="label ${javaObjectSerializationCompatibleClass}">
+				<a name="${fullyQualifiedName}"></a>
+				${outputChangeStatus}
+				${javaObjectSerializationCompatible}
+				${modifiers}
+				${classType}&#160;${fullyQualifiedName}
+			</span>
+			<a href="#toc" class="toc_link">top</a>
+		</div>
+		${compatibilityChanges}
+		${classFileFormatVersion}
+		<div class="class_generictemplates">
+			${genericTemplates}
+		</div>
+		<div class="class_superclass">
+			${superclass}
+		</div>
+		<div class="class_interfaces">
+			${interfaces}
+		</div>
+		${serialVersionUid}
+		<div class="class_fields">
+			${fields}
+		</div>
+		<div class="class_constructors">
+			${constructors}
+		</div>
+		<div class="class_methods">
+			<xsl:if test="count(methods/method) > 0">
+				<span class="label_class_member">Methods:</span>
+				<table>
+					<thead>
+					<tr>
+						<td>Status</td>
+						<td>Modifier</td>
+						<td>Generic Templates</td>
+						<td>Type</td>
+						<td>Method</td>
+						<td>Exceptions</td>
+						<td>Compatibility Changes:</td>
+						<td>Line Number</td>
+					</tr>
+					</thead>
+					<tbody>
+					<xsl:apply-templates select="methods/method">
+						<xsl:sort select="@name"/>
+					</xsl:apply-templates>
+					</tbody>
+				</table>
+			</xsl:if>
+		</div>
+		<xsl:call-template name="annotations"/>
+	</div>
+</div>

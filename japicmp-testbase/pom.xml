@@ -39,15 +39,6 @@
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.15.3</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>

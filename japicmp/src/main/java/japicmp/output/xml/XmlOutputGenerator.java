@@ -1,38 +1,25 @@
 package japicmp.output.xml;
 
-import com.google.common.base.Joiner;
-import japicmp.util.Optional;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
-import japicmp.filter.Filter;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.OutputGenerator;
 import japicmp.output.extapi.jpa.JpaAnalyzer;
 import japicmp.output.extapi.jpa.model.JpaTable;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
+import japicmp.util.Optional;
 import japicmp.util.Streams;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.SchemaOutputResolver;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -43,6 +30,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import static japicmp.util.StringHelper.filtersAsString;
 
 public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 	private static final String XSD_FILENAME = "japicmp.xsd";
@@ -240,17 +229,5 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		return sb.toString();
 	}
 
-	private String filtersAsString(List<Filter> filters, boolean include) {
-		String join;
-		if (filters.size() == 0) {
-			if (include) {
-				join = "all";
-			} else {
-				join = "n.a.";
-			}
-		} else {
-			join = Joiner.on(";").skipNulls().join(filters);
-		}
-		return join;
-	}
+
 }
