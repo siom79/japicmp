@@ -1,7 +1,7 @@
 <div>
 	<div class="class" id="${fullyQualifiedName}">
 		<div class="class_header">
-			<span class="label ${javaObjectSerializationCompatibleClass}">
+			<span class="label">
 				<a name="${fullyQualifiedName}"></a>
 				${outputChangeStatus}
 				${javaObjectSerializationCompatible}
@@ -29,29 +29,8 @@
 			${constructors}
 		</div>
 		<div class="class_methods">
-			<xsl:if test="count(methods/method) > 0">
-				<span class="label_class_member">Methods:</span>
-				<table>
-					<thead>
-					<tr>
-						<td>Status</td>
-						<td>Modifier</td>
-						<td>Generic Templates</td>
-						<td>Type</td>
-						<td>Method</td>
-						<td>Exceptions</td>
-						<td>Compatibility Changes:</td>
-						<td>Line Number</td>
-					</tr>
-					</thead>
-					<tbody>
-					<xsl:apply-templates select="methods/method">
-						<xsl:sort select="@name"/>
-					</xsl:apply-templates>
-					</tbody>
-				</table>
-			</xsl:if>
+			${methods}
 		</div>
-		<xsl:call-template name="annotations"/>
+		${annotations}
 	</div>
 </div>

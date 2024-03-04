@@ -11,10 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static japicmp.util.StringHelper.filtersAsString;
@@ -57,20 +54,68 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			.map(jApiClass -> loadAndFillTemplate("/html/class-entry.html", mapOf(
 				"fullyQualifiedName", jApiClass.getFullyQualifiedName(),
 				"outputChangeStatus", outputChangeStatus(jApiClass),
-				"javaObjectSerializationCompatibleClass", javaObjectSerializationCompatibleClass(jApiClass),
 				"javaObjectSerializationCompatible", javaObjectSerializationCompatible(jApiClass),
 				"modifiers", modifiers(jApiClass),
 				"classType", classType(jApiClass),
-				"compatibilityChanges", compatibilityChanges(jApiClass),
+				"compatibilityChanges", compatibilityChanges(jApiClass, false),
 				"classFileFormatVersion", classFileFormatVersion(jApiClass),
 				"genericTemplates", genericTemplates(jApiClass),
 				"superclass", superclass(jApiClass),
 				"interfaces", interfaces(jApiClass),
 				"serialVersionUid", serialVersionUid(jApiClass),
 				"fields", fields(jApiClass),
-				"constructors", constructors(jApiClass)
+				"constructors", constructors(jApiClass),
+				"methods", methods(jApiClass),
+				"annotations", annotations(jApiClass.getAnnotations())
 			)))
 			.collect(Collectors.joining()));
+	}
+
+	private String methods(JApiClass jApiClass) {
+		if (!jApiClass.getMethods().isEmpty()) {
+			return loadAndFillTemplate("/html/methods.html", mapOf(
+				"tbody", methodsTBody(jApiClass.getMethods())
+			));
+		}
+		return "";
+	}
+
+	private String methodsTBody(List<JApiMethod> methods) {
+		return methods.stream()
+			.sorted(Comparator.comparing(JApiMethod::getName))
+			.map(method -> "<tr>\n" +
+				"<td>" + outputChangeStatus(method) + "</td>\n" +
+				"<td>" + modifiers(method) + "</td>\n" +
+				"<td>" + genericTemplates(method) + "</td>\n" +
+				"<td>" + returnType(method) + "</td>\n" +
+				"<td>" + method.getName() + "(" + parameters(method) + ")" + annotations(method.getAnnotations()) + "</td>\n" +
+				"<td>" + exceptions(method) + "</td>\n" +
+				"<td>" + compatibilityChanges(method, true) + "</td>\n" +
+				"<td>" +
+				loadAndFillTemplate("/html/line-numbers.html", mapOf(
+					"oldLineNumber", method.getOldLineNumberAsString(),
+					"newLineNumber", method.getNewLineNumberAsString())) + "</td>\n" +
+				"</tr>\n")
+			.collect(Collectors.joining());
+	}
+
+	private String returnType(JApiMethod method) {
+		return "<span class=\"method_return_type " + method.getReturnType().getChangeStatus().name().toLowerCase() + "\">" +
+			returnTypeValue(method.getReturnType()) +
+			"</span>";
+	}
+
+	private String returnTypeValue(JApiReturnType returnType) {
+		switch (returnType.getChangeStatus()) {
+			case NEW:
+			case UNCHANGED:
+				return returnType.getNewReturnType() + genericParameterTypes(returnType);
+			case REMOVED:
+				return returnType.getOldReturnType() + genericParameterTypes(returnType);
+			case MODIFIED:
+				return returnType.getNewReturnType() + "&#160;(&lt;-&#160;" + returnType.getOldReturnType() + genericParameterTypes(returnType);
+		}
+		return "";
 	}
 
 	private String constructors(JApiClass jApiClass) {
@@ -90,7 +135,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 				"<td>" + genericTemplates(constructor) + "</td>\n" +
 				"<td>" + constructor.getName() + "(" + parameters(constructor) + ")" + annotations(constructor.getAnnotations()) + "</td>\n" +
 				"<td>" + exceptions(constructor) + "</td>\n" +
-				"<td>" + compatibilityChanges(constructor) + "</td>\n" +
+				"<td>" + compatibilityChanges(constructor, true) + "</td>\n" +
 				"<td>" +
 				loadAndFillTemplate("/html/line-numbers.html", mapOf(
 					"oldLineNumber", constructor.getOldLineNumberAsString(),
@@ -99,10 +144,10 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			.collect(Collectors.joining());
 	}
 
-	private String exceptions(JApiConstructor constructor) {
-		if (!constructor.getExceptions().isEmpty()) {
+	private String exceptions(JApiBehavior jApiBehavior) {
+		if (!jApiBehavior.getExceptions().isEmpty()) {
 			return loadAndFillTemplate("/html/exceptions.html", mapOf(
-				"tbody", exceptionsTBody(constructor.getExceptions())
+				"tbody", exceptionsTBody(jApiBehavior.getExceptions())
 			));
 		}
 		return "";
@@ -117,8 +162,8 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			.collect(Collectors.joining());
 	}
 
-	private String parameters(JApiConstructor constructor) {
-		return constructor.getParameters().stream()
+	private String parameters(JApiBehavior jApiBehavior) {
+		return jApiBehavior.getParameters().stream()
 			.map(parameter -> "<span class=\"method_parameter " + parameter.getChangeStatus().name().toLowerCase() + "\">" +
 				parameter.getType() +
 				genericParameterTypes(parameter) +
@@ -138,12 +183,13 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String fields(List<JApiField> fields) {
 		return fields.stream()
+			.sorted(Comparator.comparing(JApiField::getName))
 			.map(field -> "<tr>\n" +
 				"<td>" + outputChangeStatus(field) + "</td>\n" +
 				"<td>" + modifiers(field) + "</td>\n" +
 				"<td>" + type(field) + "</td>\n" +
 				"<td>" + field.getName() + annotations(field.getAnnotations()) + "</td>\n" +
-				"<td>" + compatibilityChanges(field) + "</td>\n" +
+				"<td>" + compatibilityChanges(field, true) + "</td>\n" +
 				"</tr>\n")
 			.collect(Collectors.joining());
 	}
@@ -179,6 +225,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String annotationsTBody(List<JApiAnnotation> annotations) {
 		return annotations.stream()
+			.sorted(Comparator.comparing(JApiAnnotation::getFullyQualifiedName))
 			.map(annotation -> "<tr>\n" +
 				"<td>" + outputChangeStatus(annotation) + "</td>\n" +
 				"<td>" + annotation.getFullyQualifiedName() + "</td>\n" +
@@ -204,11 +251,11 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 				"<td>" + element.getName() + "</td>\n" +
 				"<td>" + element.getOldElementValues().stream()
 				.map(this::valueToString)
-				.collect(Collectors.joining()) +
+				.collect(Collectors.joining(",<wbr/>")) +
 				"</td>\n" +
 				"<td>" + element.getNewElementValues().stream()
 				.map(this::valueToString)
-				.collect(Collectors.joining()) +
+				.collect(Collectors.joining(",<wbr/>")) +
 				"</td>\n" +
 				"</tr>\n")
 			.collect(Collectors.joining());
@@ -271,7 +318,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			.map(interfaze -> "<tr>\n" +
 				"<td>" + outputChangeStatus(interfaze) + "</td>\n" +
 				"<td>" + interfaze.getFullyQualifiedName() + "</td>\n" +
-				"<td>" + compatibilityChanges(interfaze) + "</td>\n" +
+				"<td>" + compatibilityChanges(interfaze, true) + "</td>\n" +
 				"</tr>\n")
 			.collect(Collectors.joining());
 	}
@@ -296,7 +343,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 		return "<tr>\n" +
 			"<td>" + outputChangeStatus(superclass) + "</td>\n" +
 			"<td>" + superclassName(superclass) + "</td>\n" +
-			"<td>" + compatibilityChanges(superclass) + "</td>\n" +
+			"<td>" + compatibilityChanges(superclass, true) + "</td>\n" +
 			"</tr>\n";
 	}
 
@@ -424,7 +471,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 		return "n.a.";
 	}
 
-	private String compatibilityChanges(JApiCompatibility jApiClass) {
+	private String compatibilityChanges(JApiCompatibility jApiClass, boolean withNA) {
 		if (!jApiClass.getCompatibilityChanges().isEmpty()) {
 			return loadAndFillTemplate("/html/compatibility-changes.html", mapOf(
 				"tbody", jApiClass.getCompatibilityChanges().stream()
@@ -432,7 +479,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 					.collect(Collectors.joining())
 			));
 		}
-		return "";
+		return withNA ? "n.a." : "";
 	}
 
 	private String compatibilityChange(JApiCompatibilityChange jApiCompatibilityChange) {
@@ -483,23 +530,13 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 		return "";
 	}
 
-	private String javaObjectSerializationCompatibleClass(JApiClass jApiClass) {
-		if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE) {
-			return "";
-		} else if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE) {
-			return "new";
-		} else {
-			return "removed";
-		}
-	}
-
 	private String javaObjectSerializationCompatible(JApiClass jApiClass) {
 		if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE) {
 			return "";
 		} else if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE) {
-			return "&#160;(Serializable compatible)&#160;";
+			return "<span class=\"new\">&#160;(Serializable compatible)&#160;</span>";
 		} else {
-			return "&#160;(Serializable incompatible(!): " + jApiClass.getJavaObjectSerializationCompatibleAsString() + ")&#160;";
+			return "<span class=\"removed\">&#160;(Serializable incompatible(!): " + jApiClass.getJavaObjectSerializationCompatibleAsString() + ")&#160;</span>";
 		}
 	}
 
