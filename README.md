@@ -12,7 +12,7 @@ JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorO
 List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchives);
 ```
 japicmp is available in the Maven Central Repository:
-[![mvnrepository](https://img.shields.io/maven-central/v/com.github.siom79.japicmp/japicmp.svg)](https://mvnrepository.com/artifact/com.github.siom79.japicmp/japicmp)
+[![maven](https://img.shields.io/maven-central/v/com.github.siom79.japicmp/japicmp.svg)](https://central.sonatype.com/artifact/com.github.siom79.japicmp/japicmp)
 ``` xml
 <dependency>
 	<groupId>com.github.siom79.japicmp</groupId>
