@@ -20,10 +20,12 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private final HtmlOutputGeneratorOptions htmlOutputGeneratorOptions;
 	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	private final TemplateEngine templateEngine;
 
 	public HtmlOutputGenerator(List<JApiClass> jApiClasses, Options options, HtmlOutputGeneratorOptions htmlOutputGeneratorOptions) {
 		super(options, jApiClasses);
 		this.htmlOutputGeneratorOptions = htmlOutputGeneratorOptions;
+		this.templateEngine = new TemplateEngine();
 	}
 
 	@Override
@@ -34,11 +36,11 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 		sb.append("<html>\n");
 		sb.append("<head>\n");
 		sb.append("<title>").append(getTitle()).append("</title>\n");
-		sb.append("<style>").append(getStyle()).append("</style>\n");
+		sb.append("<style>\n").append(getStyle()).append("\n</style>\n");
 		sb.append("</head>\n");
 		sb.append("<body>\n");
 		sb.append("<span class=\"title\">").append(getTitle()).append("</span>\n");
-		sb.append("<br/>");
+		sb.append("<br/>\n");
 		metaInformation(sb);
 		warningMissingClasses(sb);
 		toc(sb);
@@ -51,7 +53,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private void classes(StringBuilder sb) {
 		sb.append(jApiClasses.stream()
-			.map(jApiClass -> loadAndFillTemplate("/html/class-entry.html", mapOf(
+			.map(jApiClass -> templateEngine.loadAndFillTemplate("/html/class-entry.html", mapOf(
 				"fullyQualifiedName", jApiClass.getFullyQualifiedName(),
 				"outputChangeStatus", outputChangeStatus(jApiClass),
 				"javaObjectSerializationCompatible", javaObjectSerializationCompatible(jApiClass),
@@ -59,7 +61,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 				"classType", classType(jApiClass),
 				"compatibilityChanges", compatibilityChanges(jApiClass, false),
 				"classFileFormatVersion", classFileFormatVersion(jApiClass),
-				"genericTemplates", genericTemplates(jApiClass),
+				"genericTemplates", genericTemplates(jApiClass, false),
 				"superclass", superclass(jApiClass),
 				"interfaces", interfaces(jApiClass),
 				"serialVersionUid", serialVersionUid(jApiClass),
@@ -73,7 +75,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String methods(JApiClass jApiClass) {
 		if (!jApiClass.getMethods().isEmpty()) {
-			return loadAndFillTemplate("/html/methods.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/methods.html", mapOf(
 				"tbody", methodsTBody(jApiClass.getMethods())
 			));
 		}
@@ -86,13 +88,13 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			.map(method -> "<tr>\n" +
 				"<td>" + outputChangeStatus(method) + "</td>\n" +
 				"<td>" + modifiers(method) + "</td>\n" +
-				"<td>" + genericTemplates(method) + "</td>\n" +
+				"<td>" + genericTemplates(method, true) + "</td>\n" +
 				"<td>" + returnType(method) + "</td>\n" +
 				"<td>" + method.getName() + "(" + parameters(method) + ")" + annotations(method.getAnnotations()) + "</td>\n" +
 				"<td>" + exceptions(method) + "</td>\n" +
 				"<td>" + compatibilityChanges(method, true) + "</td>\n" +
 				"<td>" +
-				loadAndFillTemplate("/html/line-numbers.html", mapOf(
+				templateEngine.loadAndFillTemplate("/html/line-numbers.html", mapOf(
 					"oldLineNumber", method.getOldLineNumberAsString(),
 					"newLineNumber", method.getNewLineNumberAsString())) + "</td>\n" +
 				"</tr>\n")
@@ -120,7 +122,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String constructors(JApiClass jApiClass) {
 		if (!jApiClass.getConstructors().isEmpty()) {
-			return loadAndFillTemplate("/html/constructors.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/constructors.html", mapOf(
 				"tbody", constructors(jApiClass.getConstructors())
 			));
 		}
@@ -132,12 +134,12 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			.map(constructor -> "<tr>\n" +
 				"<td>" + outputChangeStatus(constructor) + "</td>\n" +
 				"<td>" + modifiers(constructor) + "</td>\n" +
-				"<td>" + genericTemplates(constructor) + "</td>\n" +
+				"<td>" + genericTemplates(constructor, true) + "</td>\n" +
 				"<td>" + constructor.getName() + "(" + parameters(constructor) + ")" + annotations(constructor.getAnnotations()) + "</td>\n" +
 				"<td>" + exceptions(constructor) + "</td>\n" +
 				"<td>" + compatibilityChanges(constructor, true) + "</td>\n" +
 				"<td>" +
-				loadAndFillTemplate("/html/line-numbers.html", mapOf(
+				templateEngine.loadAndFillTemplate("/html/line-numbers.html", mapOf(
 					"oldLineNumber", constructor.getOldLineNumberAsString(),
 					"newLineNumber", constructor.getNewLineNumberAsString())) + "</td>\n" +
 				"</tr>\n")
@@ -146,7 +148,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String exceptions(JApiBehavior jApiBehavior) {
 		if (!jApiBehavior.getExceptions().isEmpty()) {
-			return loadAndFillTemplate("/html/exceptions.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/exceptions.html", mapOf(
 				"tbody", exceptionsTBody(jApiBehavior.getExceptions())
 			));
 		}
@@ -174,7 +176,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String fields(JApiClass jApiClass) {
 		if (!jApiClass.getFields().isEmpty()) {
-			return loadAndFillTemplate("/html/fields.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/fields.html", mapOf(
 				"tbody", fields(jApiClass.getFields())
 			));
 		}
@@ -216,7 +218,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String annotations(List<JApiAnnotation> annotations) {
 		if (!annotations.isEmpty()) {
-			return loadAndFillTemplate("/html/annotations.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/annotations.html", mapOf(
 				"tbody", annotationsTBody(annotations)
 			));
 		}
@@ -236,7 +238,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String elements(JApiAnnotation annotation) {
 		if (!annotation.getElements().isEmpty()) {
-			return loadAndFillTemplate("/html/annotation-elements.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/annotation-elements.html", mapOf(
 				"tbody", annotationElements(annotation.getElements())
 			));
 		} else {
@@ -282,7 +284,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String serialVersionUid(JApiClass jApiClass) {
 		if (jApiClass.getSerialVersionUid().isSerializableOld() || jApiClass.getSerialVersionUid().isSerializableNew()) {
-			return loadAndFillTemplate("/html/serial-version-uid.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/serial-version-uid.html", mapOf(
 				"tbody", serialVersionUidTBody(jApiClass.getSerialVersionUid())
 			));
 		}
@@ -306,7 +308,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String interfaces(JApiClass jApiClass) {
 		if (!jApiClass.getInterfaces().isEmpty()) {
-			return loadAndFillTemplate("/html/interfaces.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/interfaces.html", mapOf(
 				"tbody", interfacesTBody(jApiClass.getInterfaces())
 			));
 		}
@@ -332,7 +334,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 				(superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED && !superclass.getSuperclassOld().equalsIgnoreCase("java.lang.Object"))
 			)
 		) {
-			return loadAndFillTemplate("/html/superclass.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/superclass.html", mapOf(
 				"tbody", superclassTBody(jApiClass.getSuperclass())
 			));
 		}
@@ -360,15 +362,15 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 		return "";
 	}
 
-	private String genericTemplates(JApiHasGenericTemplates jApiHasGenericTemplates) {
+	private String genericTemplates(JApiHasGenericTemplates jApiHasGenericTemplates, boolean withNA) {
 		List<JApiGenericTemplate> genericTemplates = jApiHasGenericTemplates.getGenericTemplates();
 		if (!genericTemplates.isEmpty()) {
 			return "<span class=\"label_class_member\">Generic Templates:</span>\n" +
-				loadAndFillTemplate("/html/generic-templates.html", mapOf(
+				templateEngine.loadAndFillTemplate("/html/generic-templates.html", mapOf(
 					"tbody", genericTemplatesTBody(genericTemplates)
 				));
 		}
-		return "";
+		return withNA ? "n.a." : "";
 	}
 
 	private String genericTemplatesTBody(List<JApiGenericTemplate> genericTemplates) {
@@ -402,16 +404,16 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 		return "";
 	}
 
-	private String genericParameterWithWildcard(JApiGenericType jApiGenericType1) {
-		switch (jApiGenericType1.getGenericWildCard()) {
+	private String genericParameterWithWildcard(JApiGenericType jApiGenericType) {
+		switch (jApiGenericType.getGenericWildCard()) {
 			case NONE:
-				return jApiGenericType1.getType();
+				return jApiGenericType.getType();
 			case EXTENDS:
-				return "? extends " + jApiGenericType1.getType();
+				return "? extends " + jApiGenericType.getType();
 			case SUPER:
-				return "? super " + jApiGenericType1.getType();
+				return "? super " + jApiGenericType.getType();
 			case UNBOUNDED:
-				return "? " + jApiGenericType1.getType();
+				return "?";
 		}
 		return "";
 	}
@@ -448,7 +450,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String classFileFormatVersion(JApiClass jApiClass) {
 		if (jApiClass.getClassFileFormatVersion().getChangeStatus() == JApiChangeStatus.MODIFIED) {
-			return loadAndFillTemplate("/html/class-file-format-version.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/class-file-format-version.html", mapOf(
 				"tbody", classFileFormatVersionTBody(jApiClass)
 			));
 		}
@@ -473,7 +475,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String compatibilityChanges(JApiCompatibility jApiClass, boolean withNA) {
 		if (!jApiClass.getCompatibilityChanges().isEmpty()) {
-			return loadAndFillTemplate("/html/compatibility-changes.html", mapOf(
+			return templateEngine.loadAndFillTemplate("/html/compatibility-changes.html", mapOf(
 				"tbody", jApiClass.getCompatibilityChanges().stream()
 					.map(this::compatibilityChange)
 					.collect(Collectors.joining())
@@ -553,7 +555,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			sb.append("<a href=\"#toc\">Classes</a>\n");
 			sb.append("</li>\n");
 			sb.append("</ul>\n");
-			sb.append(loadAndFillTemplate("/html/toc.html", mapOf(
+			sb.append(templateEngine.loadAndFillTemplate("/html/toc.html", mapOf(
 				"tbody", tocEntries()
 			)));
 		}
@@ -561,7 +563,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 
 	private String tocEntries() {
 		return jApiClasses.stream()
-			.map(jApiClass -> loadAndFillTemplate("/html/toc-entry.html", mapOf(
+			.map(jApiClass -> templateEngine.loadAndFillTemplate("/html/toc-entry.html", mapOf(
 				"outputChangeStatus", outputChangeStatus(jApiClass),
 				"fullyQualifiedName", jApiClass.getFullyQualifiedName()
 			)))
@@ -607,13 +609,13 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 				throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to load stylesheet: " + e.getMessage(), e);
 			}
 		} else {
-			styleSheet = loadTemplate("/style.css");
+			styleSheet = templateEngine.loadTemplate("/style.css");
 		}
 		return styleSheet;
 	}
 
 	private void metaInformation(StringBuilder sb) {
-		sb.append(loadAndFillTemplate("/html/meta-information.html", mapOf(
+		sb.append(templateEngine.loadAndFillTemplate("/html/meta-information.html", mapOf(
 			"oldJar", options.joinOldArchives(),
 			"newJar", options.joinNewArchives(),
 			"newJar", options.joinNewArchives(),
@@ -635,22 +637,6 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			map.put(args[i * 2], args[(i * 2) + 1]);
 		}
 		return map;
-	}
-
-	private String loadAndFillTemplate(String path, Map<String, String> params) {
-		String template = loadTemplate(path);
-		for (Map.Entry<String, String> entry : params.entrySet()) {
-			template = template.replace("${" + entry.getKey() + "}", entry.getValue());
-		}
-		return template;
-	}
-
-	private String loadTemplate(String path) {
-		InputStream resourceAsStream = HtmlOutputGenerator.class.getResourceAsStream(path);
-		if (resourceAsStream == null) {
-			throw new JApiCmpException(JApiCmpException.Reason.ResourceNotFound, "Failed to load: " + path);
-		}
-		return Streams.asString(resourceAsStream);
 	}
 
 	private String getTitle() {

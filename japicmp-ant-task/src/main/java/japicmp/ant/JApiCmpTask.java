@@ -5,6 +5,9 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
+import japicmp.output.html.HtmlOutput;
+import japicmp.output.html.HtmlOutputGenerator;
+import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
@@ -18,6 +21,10 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -280,14 +287,28 @@ public class JApiCmpTask extends Task {
 		}
 
 		SemverOut semverOut = new SemverOut(options, jApiClasses);
-		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
-		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
-		xmlOutputGeneratorOptions.setSemanticVersioningInformation(semverOut.generate());
-		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
-		try (XmlOutput xmlOutput = xmlGenerator.generate()) {
-            XmlOutputGenerator.writeToFiles(options, xmlOutput);
-        } catch (Exception e) {
-            throw new BuildException("Could not close output streams: " + e.getMessage(), e);
+		String semanticVersioningInformation = semverOut.generate();
+		if (options.getXmlOutputFile().isPresent()) {
+			XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
+			xmlOutputGeneratorOptions.setCreateSchemaFile(true);
+			xmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
+			XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
+			try (XmlOutput xmlOutput = xmlGenerator.generate()) {
+				XmlOutputGenerator.writeToFiles(options, xmlOutput);
+			} catch (Exception e) {
+				throw new BuildException("Writing XML report failed: " + e.getMessage(), e);
+			}
+		}
+		if (options.getHtmlOutputFile().isPresent()) {
+			HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
+			htmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
+			HtmlOutputGenerator htmlOutputGenerator = new HtmlOutputGenerator(jApiClasses, options, htmlOutputGeneratorOptions);
+			HtmlOutput htmlOutput = htmlOutputGenerator.generate();
+            try {
+                Files.write(Paths.get(options.getHtmlOutputFile().get()), htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+				throw new BuildException("Writing HTML report failed: " + e.getMessage(), e);
+            }
         }
 	}
 }
