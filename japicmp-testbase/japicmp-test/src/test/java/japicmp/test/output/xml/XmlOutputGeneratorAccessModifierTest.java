@@ -12,14 +12,14 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import static japicmp.test.util.Helper.replaceLastDotWith$;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class XmlOutputGeneratorAccessModifierTest {
 	private static Document documentPublic;
@@ -27,18 +27,16 @@ public class XmlOutputGeneratorAccessModifierTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
-		Path diffPublicXmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.xml");
 		Path diffPublicHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html");
-		Path diffPrivateXmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_private.xml");
 		Path diffPrivateHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_private.html");
 		List<JApiClass> jApiClasses = Helper.compareTestV1WithTestV2(AccessModifier.PUBLIC);
-		Helper.generateHtmlOutput(jApiClasses, diffPublicXmlFilePath.toString(), diffPublicHtmlFilePath.toString(), true, AccessModifier.PUBLIC);
+		Helper.generateHtmlOutput(jApiClasses, diffPublicHtmlFilePath.toString(), true, AccessModifier.PUBLIC);
 		jApiClasses = Helper.compareTestV1WithTestV2(AccessModifier.PRIVATE);
-		Helper.generateHtmlOutput(jApiClasses, diffPrivateXmlFilePath.toString(), diffPrivateHtmlFilePath.toString(), true, AccessModifier.PRIVATE);
+		Helper.generateHtmlOutput(jApiClasses, diffPrivateHtmlFilePath.toString(), true, AccessModifier.PRIVATE);
 		File htmlFilePublic = diffPublicHtmlFilePath.toFile();
 		File htmlFilePrivate = diffPrivateHtmlFilePath.toFile();
-		documentPublic = Jsoup.parse(htmlFilePublic, Charset.forName("UTF-8").toString());
-		documentPrivate = Jsoup.parse(htmlFilePrivate, Charset.forName("UTF-8").toString());
+		documentPublic = Jsoup.parse(htmlFilePublic, StandardCharsets.UTF_8.toString());
+		documentPrivate = Jsoup.parse(htmlFilePrivate, StandardCharsets.UTF_8.toString());
 	}
 
 	@Test

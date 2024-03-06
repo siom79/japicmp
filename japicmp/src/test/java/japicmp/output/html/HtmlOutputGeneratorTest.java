@@ -1,4 +1,4 @@
-package japicmp.output.xml;
+package japicmp.output.html;
 
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -9,6 +9,8 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -18,10 +20,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class XmlOutputGeneratorTest {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.StringContains.containsString;
+
+public class HtmlOutputGeneratorTest {
 
 	@Test
-	public void testXmlReport() throws Exception {
+    public void testHtmlReport() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -45,11 +51,13 @@ public class XmlOutputGeneratorTest {
 		});
 		Options reportOptions = Options.newDefault();
 		reportOptions.setIgnoreMissingClasses(true);
-		reportOptions.setXmlOutputFile(Optional.of(Paths.get(System.getProperty("user.dir"), "target", "report.xml").toString()));
-		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, reportOptions, new XmlOutputGeneratorOptions());
+		HtmlOutputGenerator generator = new HtmlOutputGenerator(jApiClasses, reportOptions, new HtmlOutputGeneratorOptions());
 
-		XmlOutput xmlOutput = generator.generate();
+		HtmlOutput htmlOutput = generator.generate();
 
-		Files.write(Paths.get(System.getProperty("user.dir"), "target", "report.xml"), xmlOutput.getXmlOutputStream().get().toString().getBytes(StandardCharsets.UTF_8));
+		Files.write(Paths.get(System.getProperty("user.dir"), "target", "report.html"), htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
+		Document document = Jsoup.parse(htmlOutput.getHtml());
+		assertThat(document.select("#meta-accessmodifier-value").text(), is("PROTECTED"));
+		assertThat(document.select("#warning-missingclasses").text(), containsString("WARNING"));
 	}
 }

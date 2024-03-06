@@ -1,20 +1,14 @@
 package japicmp.test.util;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiAnnotation;
-import japicmp.model.JApiAnnotationElement;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiField;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
-import japicmp.output.xml.XmlOutput;
-import japicmp.output.xml.XmlOutputGenerator;
-import japicmp.output.xml.XmlOutputGeneratorOptions;
+import japicmp.model.*;
+import japicmp.output.html.HtmlOutput;
+import japicmp.output.html.HtmlOutputGenerator;
+import japicmp.output.html.HtmlOutputGeneratorOptions;
+import japicmp.util.Optional;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -22,6 +16,10 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Helper {
@@ -164,17 +162,15 @@ public class Helper {
 		return jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 	}
 
-	public static void generateHtmlOutput(List<JApiClass> jApiClasses, String xmlOutputFile, String htmlOutputFile, boolean outputOnlyModifications, AccessModifier accessModifier) {
+	public static void generateHtmlOutput(List<JApiClass> jApiClasses, String htmlOutputFile, boolean outputOnlyModifications, AccessModifier accessModifier) throws IOException {
 		Options options = Options.newDefault();
-		options.setXmlOutputFile(Optional.of(xmlOutputFile));
 		options.setHtmlOutputFile(Optional.of(htmlOutputFile));
 		options.setOutputOnlyModifications(outputOnlyModifications);
 		options.setAccessModifier(Optional.of(accessModifier));
-		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
-		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
-		XmlOutputGenerator generator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
-		XmlOutput xmlOutput = generator.generate();
-		XmlOutputGenerator.writeToFiles(options, xmlOutput);
+		HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
+		HtmlOutputGenerator generator = new HtmlOutputGenerator(jApiClasses, options, htmlOutputGeneratorOptions);
+		HtmlOutput htmlOutput = generator.generate();
+		Files.write(Paths.get(htmlOutputFile), htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
 	}
 
 	public interface SimpleExceptionVerifier {

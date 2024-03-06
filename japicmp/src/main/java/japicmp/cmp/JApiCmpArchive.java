@@ -8,16 +8,18 @@ public class JApiCmpArchive {
 	private File file;
 	private byte[] bytes;
 	private final Version version;
+	private String name;
 
 	public JApiCmpArchive(File file, String version) {
 		this.file = file;
 		this.version = new Version(version);
 	}
 
-	public JApiCmpArchive(byte[] bytes, String version) {
+	public JApiCmpArchive(byte[] bytes, String version, String name) {
 		this.bytes = bytes;
 		this.version = new Version(version);
-	}
+        this.name = name;
+    }
 
 	public File getFile() {
 		return file;
@@ -31,9 +33,13 @@ public class JApiCmpArchive {
 		return bytes;
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder("JApiCmpArchive{");
+		StringBuilder sb = new StringBuilder("JApiCmpArchive{");
 		sb.append("file=").append(file);
 		sb.append(", bytes=");
 		if (bytes == null) sb.append("null");
@@ -44,6 +50,7 @@ public class JApiCmpArchive {
 			sb.append(']');
 		}
 		sb.append(", version=").append(version);
+		sb.append(", name='").append(name).append('\'');
 		sb.append('}');
 		return sb.toString();
 	}

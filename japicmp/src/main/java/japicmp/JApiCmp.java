@@ -42,7 +42,7 @@ public class JApiCmp {
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.FINE, CAUGHT_EXCEPTION + e.getLocalizedMessage(), e);
-			System.err.println(String.format("Execution of %s failed: %s", JApiCmp.class.getSimpleName(), e.getMessage()));
+			System.err.printf("Execution of %s failed: %s%n", JApiCmp.class.getSimpleName(), e.getMessage());
 			e.printStackTrace();
 			systemExit.exit(1);
 		}

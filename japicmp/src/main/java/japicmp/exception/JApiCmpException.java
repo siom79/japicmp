@@ -16,7 +16,8 @@ public class JApiCmpException extends RuntimeException {
 		IllegalState,
 		IllegalArgument,
 		XsltError,
-		IncompatibleChange
+		IncompatibleChange,
+		ResourceNotFound
 	}
 
 	public JApiCmpException(Reason reason, String msg) {

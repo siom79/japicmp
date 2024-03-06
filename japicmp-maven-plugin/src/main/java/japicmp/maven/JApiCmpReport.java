@@ -1,7 +1,7 @@
 package japicmp.maven;
 
 import japicmp.config.Options;
-import japicmp.output.xml.XmlOutput;
+import japicmp.output.html.HtmlOutput;
 import japicmp.util.Optional;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.doxia.sink.Sink;
@@ -17,7 +17,6 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
@@ -72,29 +71,12 @@ public class JApiCmpReport extends AbstractMavenReport {
 				getLog().info("japicmp module set to skip");
 				return;
 			}
-			Optional<XmlOutput> xmlOutputOptional = mojo.executeWithParameters(this.pluginParameters, this.mavenParameters);
-			if (xmlOutputOptional.isPresent()) {
-				XmlOutput xmlOutput = xmlOutputOptional.get();
-				if (xmlOutput.getHtmlOutputStream().isPresent()) {
-					ByteArrayOutputStream htmlOutputStream = xmlOutput.getHtmlOutputStream().get();
-					String htmlString = htmlOutputStream.toString("UTF-8");
-					htmlString = htmlString.replaceAll("</?html>", "");
-					htmlString = htmlString.replaceAll("</?body>", "");
-					htmlString = htmlString.replaceAll("</?head>", "");
-					htmlString = htmlString.replaceAll("<title>[^<]*</title>", "");
-					htmlString = htmlString.replaceAll("<META[^>]*>", "");
-					Sink sink = getSink();
-					String htmlTitle = getHtmlTitle();
-					if (htmlTitle != null) {
-						sink.head();
-						sink.title();
-						sink.text(pluginParameters.getParameterParam().getHtmlTitle());
-						sink.title_();
-						sink.head_();
-					}
-					sink.rawText(htmlString);
-					sink.close();
-				}
+			Optional<HtmlOutput> htmlOutputOptional = mojo.executeWithParameters(this.pluginParameters, this.mavenParameters);
+			if (htmlOutputOptional.isPresent()) {
+				HtmlOutput htmlOutput = htmlOutputOptional.get();
+				String htmlString = htmlOutput.getHtml();
+				htmlString = replaceHtmlTags(htmlString);
+				writeToSink(htmlString);
 			}
 		} catch (Exception e) {
 			String msg = "Failed to generate report: " + e.getMessage();
@@ -105,16 +87,42 @@ public class JApiCmpReport extends AbstractMavenReport {
 		}
 	}
 
+	private void writeToSink(String htmlString) {
+		Sink sink = getSink();
+		try {
+			String htmlTitle = getHtmlTitle();
+			if (htmlTitle != null) {
+				sink.head();
+				sink.title();
+				sink.text(pluginParameters.getParameterParam().getHtmlTitle());
+				sink.title_();
+				sink.head_();
+			}
+			sink.rawText(htmlString);
+		} finally {
+			sink.close();
+		}
+	}
+
+	private static String replaceHtmlTags(String html) {
+		html = html.replaceAll("</?html>", "");
+		html = html.replaceAll("</?body>", "");
+		html = html.replaceAll("</?head>", "");
+		html = html.replaceAll("<title>[^<]*</title>", "");
+		html = html.replaceAll("<META[^>]*>", "");
+		return html;
+	}
+
 	private JApiCmpMojo getMojo() {
 		if (this.mojo != null) {
 			return this.mojo;
 		}
 		this.mojo = new JApiCmpMojo();
 		this.mavenParameters = new MavenParameters(this.artifactRepositories,
-				this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
-				this.remoteRepos);
+			this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
+			this.remoteRepos);
 		this.pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.<File>absent(), Optional.of(
-				this.outputDirectory), false, this.oldVersions, this.newVersions, this.oldClassPathDependencies, this.newClassPathDependencies);
+			this.outputDirectory), false, this.oldVersions, this.newVersions, this.oldClassPathDependencies, this.newClassPathDependencies);
 		return this.mojo;
 	}
 
@@ -165,6 +173,6 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	private boolean isPomModuleNeedingSkip() {
 		return this.pluginParameters.getParameterParam().getSkipPomModules()
-				&& "pom".equalsIgnoreCase(this.mavenProject.getArtifact().getType());
+			&& "pom".equalsIgnoreCase(this.mavenProject.getArtifact().getType());
 	}
 }

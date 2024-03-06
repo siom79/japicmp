@@ -11,6 +11,9 @@ import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JApiSemanticVersionLevel;
+import japicmp.output.html.HtmlOutput;
+import japicmp.output.html.HtmlOutputGenerator;
+import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
@@ -42,6 +45,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
@@ -112,7 +119,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
 
-	Optional<XmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
+	Optional<HtmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
 		if (pluginParameters.getSkipParam()) {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
 			return Optional.absent();
@@ -138,16 +145,30 @@ public class JApiCmpMojo extends AbstractMojo {
 			PostAnalysisScriptExecutor postAnalysisScriptExecutor = new PostAnalysisScriptExecutor();
 			jApiClasses = postAnalysisScriptExecutor.apply(pluginParameters.getParameterParam(), jApiClasses, getLog());
 			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
-			generateDiffOutput(mavenParameters, pluginParameters, options, jApiClasses, jApiCmpBuildDir);
-			XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters);
-			if (pluginParameters.isWriteToFiles()) {
-				List<File> filesWritten = XmlOutputGenerator.writeToFiles(options, xmlOutput);
-				for (File file : filesWritten) {
-					getLog().info("Written file '" + file.getAbsolutePath() + "'.");
+			SemverOut semverOut = new SemverOut(options, jApiClasses);
+			String semanticVersioningInformation = semverOut.generate();
+			generateDiffOutput(mavenParameters, pluginParameters, options, jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
+			if (!skipXmlReport(pluginParameters)) {
+				XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters, semanticVersioningInformation);
+				if (pluginParameters.isWriteToFiles()) {
+					List<File> filesWritten = XmlOutputGenerator.writeToFiles(options, xmlOutput);
+					for (File file : filesWritten) {
+						getLog().info("Written file '" + file.getAbsolutePath() + "'.");
+					}
+				}
+			}
+			Optional<HtmlOutput> retVal = Optional.absent();
+			if (!skipHtmlReport(pluginParameters)) {
+				HtmlOutput htmlOutput = generateHtmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters, semanticVersioningInformation);
+				retVal = Optional.of(htmlOutput);
+				if (pluginParameters.isWriteToFiles() && options.getHtmlOutputFile().isPresent()) {
+					Path path = Paths.get(options.getHtmlOutputFile().get());
+					Files.write(path, htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
+					getLog().info("Written file '" + path + "'.");
 				}
 			}
 			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), options, jarArchiveComparator);
-			return Optional.of(xmlOutput);
+			return retVal;
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
 		}
@@ -197,19 +218,19 @@ public class JApiCmpMojo extends AbstractMojo {
 	}
 
 	private static DefaultArtifact createDefaultArtifact(MavenProject mavenProject, String version) {
-        org.apache.maven.artifact.Artifact artifact = mavenProject.getArtifact();
-        return createDefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), artifact.getType(), version);
+		org.apache.maven.artifact.Artifact artifact = mavenProject.getArtifact();
+		return createDefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), artifact.getType(), version);
 	}
 
-    private static DefaultArtifact createDefaultArtifact(String groupId, String artifactId, String classifier, String type, String version) {
-        String mappedType = type;
-        if("bundle".equals(type) || "ejb".equals(type)) {
-            mappedType ="jar";
-        }
-        DefaultArtifact artifactVersion = new DefaultArtifact(groupId, artifactId, classifier, mappedType,
-            version);
-        return artifactVersion;
-    }
+	private static DefaultArtifact createDefaultArtifact(String groupId, String artifactId, String classifier, String type, String version) {
+		String mappedType = type;
+		if ("bundle".equals(type) || "ejb".equals(type)) {
+			mappedType = "jar";
+		}
+		DefaultArtifact artifactVersion = new DefaultArtifact(groupId, artifactId, classifier, mappedType,
+			version);
+		return artifactVersion;
+	}
 
 	private Artifact getComparisonArtifact(final MavenParameters mavenParameters, final PluginParameters pluginParameters,
 										   final ConfigurationVersion configurationVersion) throws MojoFailureException, MojoExecutionException {
@@ -223,7 +244,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			filterSnapshots(versions, pluginParameters);
 			filterVersionPattern(versions, pluginParameters);
 			if (!versions.isEmpty()) {
-				DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject, versions.get(versions.size()-1).toString());
+				DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject, versions.get(versions.size() - 1).toString());
 				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
 				ArtifactResult artifactResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), artifactRequest);
 				processArtifactResult(artifactVersion, artifactResult, pluginParameters, configurationVersion);
@@ -231,11 +252,11 @@ public class JApiCmpMojo extends AbstractMojo {
 			} else {
 				if (ignoreMissingOldVersion(pluginParameters, configurationVersion)) {
 					getLog().warn("Ignoring missing old artifact version: " +
-							artifactVersionRange.getGroupId() + ":" + artifactVersionRange.getArtifactId());
+						artifactVersionRange.getGroupId() + ":" + artifactVersionRange.getArtifactId());
 					return null;
 				} else {
 					throw new MojoFailureException("Could not find previous version for artifact: " + artifactVersionRange.getGroupId() + ":"
-							+ artifactVersionRange.getArtifactId());
+						+ artifactVersionRange.getArtifactId());
 				}
 			}
 		} catch (final VersionRangeResolutionException | ArtifactResolutionException e) {
@@ -252,7 +273,7 @@ public class JApiCmpMojo extends AbstractMojo {
 				getLog().debug(exception.getMessage(), exception);
 			}
 		}
-		if (artifactResult.isMissing()){
+		if (artifactResult.isMissing()) {
 			if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
 				getLog().warn("Ignoring missing artifact: " + artifactResult.getArtifact());
 			} else {
@@ -539,7 +560,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
-	private void generateDiffOutput(MavenParameters mavenParameters, PluginParameters pluginParameters, Options options, List<JApiClass> jApiClasses, File jApiCmpBuildDir) throws IOException, MojoFailureException {
+	private void generateDiffOutput(MavenParameters mavenParameters, PluginParameters pluginParameters, Options options,
+									List<JApiClass> jApiClasses, File jApiCmpBuildDir, String semanticVersioningInformation) throws IOException, MojoFailureException {
 		boolean skipDiffReport = false;
 		if (pluginParameters.getParameterParam() != null) {
 			skipDiffReport = pluginParameters.getParameterParam().isSkipDiffReport();
@@ -547,29 +569,39 @@ public class JApiCmpMojo extends AbstractMojo {
 		if (!skipDiffReport) {
 			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
 			String diffOutput = stdoutOutputGenerator.generate();
+			diffOutput += "\nSemantic versioning suggestion: " + semanticVersioningInformation;
 			File output = new File(jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename(mavenParameters) + ".diff");
 			writeToFile(diffOutput, output);
 		}
 	}
 
-	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters, PluginParameters pluginParameters) throws IOException {
+	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters,
+										PluginParameters pluginParameters, String semanticVersioningInformation) throws IOException {
 		String filename = createFilename(mavenParameters);
-		if (!skipXmlReport(pluginParameters)) {
-			options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
-		}
-		if (!skipHtmlReport(pluginParameters)) {
-			options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
-		}
-		SemverOut semverOut = new SemverOut(options, jApiClasses);
+		options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
 		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
 		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
-		xmlOutputGeneratorOptions.setSemanticVersioningInformation(semverOut.generate());
+		xmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
 		if (pluginParameters.getParameterParam() != null) {
 			String optionalTitle = pluginParameters.getParameterParam().getHtmlTitle();
-			xmlOutputGeneratorOptions.setTitle(optionalTitle!=null ?optionalTitle :options.getDifferenceDescription());
+			xmlOutputGeneratorOptions.setTitle(optionalTitle != null ? optionalTitle : options.getDifferenceDescription());
 		}
 		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
 		return xmlGenerator.generate();
+	}
+
+	private HtmlOutput generateHtmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters,
+										  PluginParameters pluginParameters, String semanticVersioningInformation) throws IOException {
+		String filename = createFilename(mavenParameters);
+		options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
+		HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
+		htmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
+		if (pluginParameters.getParameterParam() != null) {
+			String title = pluginParameters.getParameterParam().getHtmlTitle();
+			htmlOutputGeneratorOptions.setTitle(title != null ? title : options.getDifferenceDescription());
+		}
+		HtmlOutputGenerator htmlOutputGenerator = new HtmlOutputGenerator(jApiClasses, options, htmlOutputGeneratorOptions);
+		return htmlOutputGenerator.generate();
 	}
 
 	private boolean skipHtmlReport(PluginParameters pluginParameters) {
@@ -682,8 +714,8 @@ public class JApiCmpMojo extends AbstractMojo {
 		for (org.apache.maven.artifact.Artifact dep : projectDependencies) {
 			if (dep.getArtifactHandler().isAddedToClasspath()) {
 				if (org.apache.maven.artifact.Artifact.SCOPE_COMPILE.equals(dep.getScope())
-						|| org.apache.maven.artifact.Artifact.SCOPE_PROVIDED.equals(dep.getScope())
-						|| org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(dep.getScope())) {
+					|| org.apache.maven.artifact.Artifact.SCOPE_PROVIDED.equals(dep.getScope())
+					|| org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(dep.getScope())) {
 					result.add(RepositoryUtils.toArtifact(dep));
 				}
 			}

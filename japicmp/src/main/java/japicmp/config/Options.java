@@ -1,22 +1,15 @@
 package japicmp.config;
 
 import com.google.common.base.Joiner;
-import japicmp.util.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import japicmp.cli.CliParser;
 import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.exception.JApiCmpException;
-import japicmp.filter.AnnotationBehaviorFilter;
-import japicmp.filter.AnnotationClassFilter;
-import japicmp.filter.AnnotationFieldFilter;
-import japicmp.filter.Filter;
-import japicmp.filter.JavaDocLikeClassFilter;
-import japicmp.filter.JavadocLikeBehaviorFilter;
-import japicmp.filter.JavadocLikeFieldFilter;
-import japicmp.filter.JavadocLikePackageFilter;
+import japicmp.filter.*;
 import japicmp.model.AccessModifier;
+import japicmp.util.Optional;
 
 import java.io.File;
 import java.io.IOException;
@@ -329,9 +322,17 @@ public class Options {
 		List<String> paths = new ArrayList<>(archives.size());
 		for (JApiCmpArchive archive : archives) {
 			if (this.reportOnlyFilename) {
-				paths.add(archive.getFile().getName());
+				if (archive.getFile() != null) {
+					paths.add(archive.getFile().getName());
+				} else {
+					paths.add(archive.getName());
+				}
 			} else {
-				paths.add(archive.getFile().getAbsolutePath());
+				if (archive.getFile() != null) {
+					paths.add(archive.getFile().getAbsolutePath());
+				} else {
+					paths.add(archive.getName());
+				}
 			}
 		}
 		return paths;
@@ -349,36 +350,32 @@ public class Options {
 	}
 
 	public String joinOldArchives() {
-		Joiner joiner = Joiner.on(";");
-		String join = joiner.join(toPathList(oldArchives));
-		if (join.trim().length() == 0) {
+        String join = Joiner.on(";").join(toPathList(oldArchives));
+		if (join.trim().isEmpty()) {
 			return N_A;
 		}
 		return join;
 	}
 
 	public String joinNewArchives() {
-		Joiner joiner = Joiner.on(";");
-		String join = joiner.join(toPathList(newArchives));
-		if (join.trim().length() == 0) {
+        String join = Joiner.on(";").join(toPathList(newArchives));
+		if (join.trim().isEmpty()) {
 			return N_A;
 		}
 		return join;
 	}
 
 	public String joinOldVersions() {
-		Joiner joiner = Joiner.on(";");
-		String join = joiner.join(toVersionList(oldArchives));
-		if (join.trim().length() == 0) {
+        String join = Joiner.on(";").join(toVersionList(oldArchives));
+		if (join.trim().isEmpty()) {
 			return N_A;
 		}
 		return join;
 	}
 
 	public String joinNewVersions() {
-		Joiner joiner = Joiner.on(";");
-		String join = joiner.join(toVersionList(newArchives));
-		if (join.trim().length() == 0) {
+        String join = Joiner.on(";").join(toVersionList(newArchives));
+		if (join.trim().isEmpty()) {
 			return N_A;
 		}
 		return join;
