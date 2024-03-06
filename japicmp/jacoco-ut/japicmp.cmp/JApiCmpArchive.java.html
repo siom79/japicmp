@@ -8,44 +8,51 @@ public class JApiCmpArchive {
 	private File file;
 	private byte[] bytes;
 	private final Version version;
+	private String name;
 
-<span class="fc" id="L12">	public JApiCmpArchive(File file, String version) {</span>
-<span class="fc" id="L13">		this.file = file;</span>
-<span class="fc" id="L14">		this.version = new Version(version);</span>
-<span class="fc" id="L15">	}</span>
+<span class="fc" id="L13">	public JApiCmpArchive(File file, String version) {</span>
+<span class="fc" id="L14">		this.file = file;</span>
+<span class="fc" id="L15">		this.version = new Version(version);</span>
+<span class="fc" id="L16">	}</span>
 
-<span class="nc" id="L17">	public JApiCmpArchive(byte[] bytes, String version) {</span>
-<span class="nc" id="L18">		this.bytes = bytes;</span>
-<span class="nc" id="L19">		this.version = new Version(version);</span>
-<span class="nc" id="L20">	}</span>
+<span class="nc" id="L18">	public JApiCmpArchive(byte[] bytes, String version, String name) {</span>
+<span class="nc" id="L19">		this.bytes = bytes;</span>
+<span class="nc" id="L20">		this.version = new Version(version);</span>
+<span class="nc" id="L21">        this.name = name;</span>
+<span class="nc" id="L22">    }</span>
 
 	public File getFile() {
-<span class="fc" id="L23">		return file;</span>
+<span class="fc" id="L25">		return file;</span>
 	}
 
 	public Version getVersion() {
-<span class="fc" id="L27">		return version;</span>
+<span class="fc" id="L29">		return version;</span>
 	}
 
 	public byte[] getBytes() {
-<span class="nc" id="L31">		return bytes;</span>
+<span class="nc" id="L33">		return bytes;</span>
+	}
+
+	public String getName() {
+<span class="nc" id="L37">		return name;</span>
 	}
 
 	@Override
 	public String toString() {
-<span class="nc" id="L36">		final StringBuilder sb = new StringBuilder(&quot;JApiCmpArchive{&quot;);</span>
-<span class="nc" id="L37">		sb.append(&quot;file=&quot;).append(file);</span>
-<span class="nc" id="L38">		sb.append(&quot;, bytes=&quot;);</span>
-<span class="nc bnc" id="L39" title="All 2 branches missed.">		if (bytes == null) sb.append(&quot;null&quot;);</span>
+<span class="nc" id="L42">		StringBuilder sb = new StringBuilder(&quot;JApiCmpArchive{&quot;);</span>
+<span class="nc" id="L43">		sb.append(&quot;file=&quot;).append(file);</span>
+<span class="nc" id="L44">		sb.append(&quot;, bytes=&quot;);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">		if (bytes == null) sb.append(&quot;null&quot;);</span>
 		else {
-<span class="nc" id="L41">			sb.append('[');</span>
-<span class="nc bnc" id="L42" title="All 2 branches missed.">			for (int i = 0; i &lt; bytes.length; ++i)</span>
-<span class="nc bnc" id="L43" title="All 2 branches missed.">				sb.append(i == 0 ? &quot;&quot; : &quot;, &quot;).append(bytes[i]);</span>
-<span class="nc" id="L44">			sb.append(']');</span>
+<span class="nc" id="L47">			sb.append('[');</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">			for (int i = 0; i &lt; bytes.length; ++i)</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">				sb.append(i == 0 ? &quot;&quot; : &quot;, &quot;).append(bytes[i]);</span>
+<span class="nc" id="L50">			sb.append(']');</span>
 		}
-<span class="nc" id="L46">		sb.append(&quot;, version=&quot;).append(version);</span>
-<span class="nc" id="L47">		sb.append('}');</span>
-<span class="nc" id="L48">		return sb.toString();</span>
+<span class="nc" id="L52">		sb.append(&quot;, version=&quot;).append(version);</span>
+<span class="nc" id="L53">		sb.append(&quot;, name='&quot;).append(name).append('\'');</span>
+<span class="nc" id="L54">		sb.append('}');</span>
+<span class="nc" id="L55">		return sb.toString();</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

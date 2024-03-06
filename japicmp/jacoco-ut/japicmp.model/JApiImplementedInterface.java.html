@@ -36,35 +36,35 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-<span class="nc" id="L39">		boolean binaryCompatible = true;</span>
-<span class="nc bnc" id="L40" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc" id="L39">		boolean binaryCompatible = true;</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
 <span class="nc bnc" id="L41" title="All 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
 <span class="nc" id="L42">				binaryCompatible = false;</span>
 			}
 <span class="nc" id="L44">		}</span>
-<span class="nc bnc" id="L45" title="All 4 branches missed.">		if (binaryCompatible &amp;&amp; correspondingJApiClass.isPresent()) {</span>
+<span class="pc bpc" id="L45" title="2 of 4 branches missed.">		if (binaryCompatible &amp;&amp; correspondingJApiClass.isPresent()) {</span>
 <span class="nc bnc" id="L46" title="All 2 branches missed.">			if (!correspondingJApiClass.get().isBinaryCompatible()) {</span>
 <span class="nc" id="L47">				binaryCompatible = false;</span>
 			}
 		}
-<span class="nc" id="L50">		return binaryCompatible;</span>
+<span class="fc" id="L50">		return binaryCompatible;</span>
 	}
 
 	@Override
 	@XmlAttribute
 	public boolean isSourceCompatible() {
-<span class="nc" id="L56">		boolean sourceCompatible = true;</span>
-<span class="nc bnc" id="L57" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc" id="L56">		boolean sourceCompatible = true;</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
 <span class="nc bnc" id="L58" title="All 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
 <span class="nc" id="L59">				sourceCompatible = false;</span>
 			}
 <span class="nc" id="L61">		}</span>
-<span class="nc bnc" id="L62" title="All 4 branches missed.">		if (sourceCompatible &amp;&amp; correspondingJApiClass.isPresent()) {</span>
+<span class="pc bpc" id="L62" title="2 of 4 branches missed.">		if (sourceCompatible &amp;&amp; correspondingJApiClass.isPresent()) {</span>
 <span class="nc bnc" id="L63" title="All 2 branches missed.">			if (!correspondingJApiClass.get().isSourceCompatible()) {</span>
 <span class="nc" id="L64">				sourceCompatible = false;</span>
 			}
 		}
-<span class="nc" id="L67">		return sourceCompatible;</span>
+<span class="fc" id="L67">		return sourceCompatible;</span>
 	}
 
 	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)

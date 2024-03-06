@@ -65,14 +65,14 @@ public class JApiReturnType implements JApiHasGenericTypes, JApiHasChangeStatus,
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-<span class="nc" id="L68">		boolean binaryCompatible = true;</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc" id="L68">		boolean binaryCompatible = true;</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
 <span class="nc bnc" id="L70" title="All 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
 <span class="nc" id="L71">				binaryCompatible = false;</span>
 <span class="nc" id="L72">				break;</span>
 			}
 <span class="nc" id="L74">		}</span>
-<span class="nc" id="L75">		return binaryCompatible;</span>
+<span class="fc" id="L75">		return binaryCompatible;</span>
 	}
 
 	@Override

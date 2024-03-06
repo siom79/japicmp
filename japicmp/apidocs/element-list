@@ -9,6 +9,7 @@ japicmp.model
 japicmp.output
 japicmp.output.extapi.jpa
 japicmp.output.extapi.jpa.model
+japicmp.output.html
 japicmp.output.incompatible
 japicmp.output.semver
 japicmp.output.stdout

@@ -36,9 +36,9 @@ public class JApiClassFileFormatVersion implements JApiHasChangeStatus, JApiComp
 <span class="nc" id="L36">					changeStatus = JApiChangeStatus.MODIFIED;</span>
 				}
 			}
-<span class="fc bfc" id="L39" title="All 4 branches covered.">		} else if (this.majorVersionOld == -1 &amp;&amp; this.majorVersionNew != -1) {</span>
+<span class="pc bpc" id="L39" title="1 of 4 branches missed.">		} else if (this.majorVersionOld == -1 &amp;&amp; this.majorVersionNew != -1) {</span>
 <span class="fc" id="L40">			changeStatus = JApiChangeStatus.NEW;</span>
-<span class="pc bpc" id="L41" title="1 of 4 branches missed.">		} else if (this.majorVersionOld != -1 &amp;&amp; this.majorVersionNew == -1) {</span>
+<span class="pc bpc" id="L41" title="2 of 4 branches missed.">		} else if (this.majorVersionOld != -1 &amp;&amp; this.majorVersionNew == -1) {</span>
 <span class="fc" id="L42">			changeStatus = JApiChangeStatus.REMOVED;</span>
 		}
 <span class="fc" id="L44">		return changeStatus;</span>

@@ -35,12 +35,12 @@ public class JApiType implements JApiHasChangeStatus {
 
 	@XmlAttribute(name = &quot;oldValue&quot;)
 	public String getOldValue() {
-<span class="nc" id="L38">		return OptionalHelper.optionalToString(this.oldTypeOptional);</span>
+<span class="fc" id="L38">		return OptionalHelper.optionalToString(this.oldTypeOptional);</span>
 	}
 
 	@XmlAttribute(name = &quot;newValue&quot;)
 	public String getNewValue() {
-<span class="nc" id="L43">		return OptionalHelper.optionalToString(this.newTypeOptional);</span>
+<span class="fc" id="L43">		return OptionalHelper.optionalToString(this.newTypeOptional);</span>
 	}
 
 	public boolean hasChanged() {

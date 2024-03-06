@@ -84,7 +84,7 @@ public class ModifierHelper {
 <span class="fc" id="L84">				return true;</span>
 			}
 		}
-<span class="fc bfc" id="L87" title="All 2 branches covered.">		if (accessModifier.getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">		if (accessModifier.getNewModifier().isPresent()) {</span>
 <span class="fc" id="L88">			AccessModifier newModifier = accessModifier.getNewModifier().get();</span>
 <span class="fc bfc" id="L89" title="All 2 branches covered.">			if (matchesModifierLevel(newModifier, accessModifierParam)) {</span>
 <span class="fc" id="L90">				return true;</span>
@@ -116,13 +116,13 @@ public class ModifierHelper {
 <span class="fc" id="L116">				T oldClassModifier = callback.getModifierForOld(oldClass);</span>
 <span class="fc" id="L117">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.&lt;T&gt;absent(), JApiChangeStatus.REMOVED);</span>
 			}
-<span class="fc bfc" id="L119" title="All 2 branches covered.">			if (newClassOptional.isPresent()) {</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">			if (newClassOptional.isPresent()) {</span>
 <span class="fc" id="L120">				CtClass newClass = newClassOptional.get();</span>
 <span class="fc" id="L121">				T newClassModifier = callback.getModifierForNew(newClass);</span>
 <span class="fc" id="L122">				return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);</span>
 			}
 		}
-<span class="fc" id="L125">		return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.&lt;T&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
+<span class="nc" id="L125">		return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.&lt;T&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
 	}
 
 	public interface ExtractModifierFromBehaviorCallback&lt;T extends JApiModifierBase&gt; {
@@ -211,7 +211,7 @@ public class ModifierHelper {
 <span class="fc" id="L211">		JApiAttribute&lt;SyntheticAttribute&gt; syntheticAttribute = jApiClass.getSyntheticAttribute();</span>
 <span class="fc" id="L212">		boolean hasSyntheticModifier = hasSyntheticModifier(syntheticModifier);</span>
 <span class="fc" id="L213">		boolean hasSyntheticAttribute = hasSyntheticAttribute(syntheticAttribute);</span>
-<span class="fc bfc" id="L214" title="All 4 branches covered.">		if (hasSyntheticModifier || hasSyntheticAttribute) {</span>
+<span class="pc bpc" id="L214" title="1 of 4 branches missed.">		if (hasSyntheticModifier || hasSyntheticAttribute) {</span>
 <span class="fc" id="L215">			isSynthetic = true;</span>
 		}
 <span class="fc" id="L217">		return isSynthetic;</span>
@@ -222,8 +222,8 @@ public class ModifierHelper {
 <span class="fc bfc" id="L222" title="All 4 branches covered.">		if (syntheticAttribute.getOldAttribute().isPresent() &amp;&amp; syntheticAttribute.getNewAttribute().isPresent()) {</span>
 <span class="fc" id="L223">			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();</span>
 <span class="fc" id="L224">			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();</span>
-<span class="pc bpc" id="L225" title="1 of 4 branches missed.">			if (oldAttribute == SyntheticAttribute.SYNTHETIC &amp;&amp; newAttribute == SyntheticAttribute.SYNTHETIC) {</span>
-<span class="fc" id="L226">				hasSyntheticAttribute = true;</span>
+<span class="pc bpc" id="L225" title="3 of 4 branches missed.">			if (oldAttribute == SyntheticAttribute.SYNTHETIC &amp;&amp; newAttribute == SyntheticAttribute.SYNTHETIC) {</span>
+<span class="nc" id="L226">				hasSyntheticAttribute = true;</span>
 			}
 <span class="fc bfc" id="L228" title="All 2 branches covered.">		} else if (syntheticAttribute.getOldAttribute().isPresent()) {</span>
 <span class="fc" id="L229">			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();</span>
@@ -252,7 +252,7 @@ public class ModifierHelper {
 <span class="pc bpc" id="L252" title="1 of 2 branches missed.">			if (oldModifier == SyntheticModifier.SYNTHETIC) {</span>
 <span class="nc" id="L253">				hasSyntheticModifier = true;</span>
 			}
-<span class="fc bfc" id="L255" title="All 2 branches covered.">		} else if (syntheticModifier.getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">		} else if (syntheticModifier.getNewModifier().isPresent()) {</span>
 <span class="fc" id="L256">			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();</span>
 <span class="fc bfc" id="L257" title="All 2 branches covered.">			if (newModifier == SyntheticModifier.SYNTHETIC) {</span>
 <span class="fc" id="L258">				hasSyntheticModifier = true;</span>

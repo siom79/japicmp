@@ -32,12 +32,12 @@ public class JApiModifier&lt;T&gt; implements JApiHasChangeStatus {
 
 	@XmlAttribute(name = &quot;oldValue&quot;)
 	public String getValueOld() {
-<span class="nc" id="L35">		return OptionalHelper.optionalToString(this.oldModifier);</span>
+<span class="fc" id="L35">		return OptionalHelper.optionalToString(this.oldModifier);</span>
 	}
 
 	@XmlAttribute(name = &quot;newValue&quot;)
 	public String getValueNew() {
-<span class="nc" id="L40">		return OptionalHelper.optionalToString(this.newModifier);</span>
+<span class="fc" id="L40">		return OptionalHelper.optionalToString(this.newModifier);</span>
 	}
 
 	public boolean hasChangedFromTo(T oldValue, T newValue) {

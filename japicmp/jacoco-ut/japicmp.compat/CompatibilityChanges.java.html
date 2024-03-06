@@ -647,7 +647,7 @@ public class CompatibilityChanges {
 <span class="fc bfc" id="L647" title="All 2 branches covered.">		for (JApiImplementedInterface implementedInterface : interfaces) {</span>
 <span class="fc" id="L648">			String fullyQualifiedName = implementedInterface.getFullyQualifiedName();</span>
 <span class="fc" id="L649">			JApiClass foundClass = classMap.get(fullyQualifiedName);</span>
-<span class="pc bpc" id="L650" title="1 of 4 branches missed.">			if (foundClass != null &amp;&amp; visited.stream().noneMatch(v -&gt; v.getFullyQualifiedName().equals(implementedInterface.getFullyQualifiedName()))) {</span>
+<span class="fc bfc" id="L650" title="All 4 branches covered.">			if (foundClass != null &amp;&amp; visited.stream().noneMatch(v -&gt; v.getFullyQualifiedName().equals(implementedInterface.getFullyQualifiedName()))) {</span>
 <span class="fc" id="L651">				T returnValue = onImplementedInterfaceCallback.callback(foundClass, classMap);</span>
 <span class="fc" id="L652">				returnValues.add(returnValue);</span>
 <span class="fc" id="L653">				visited.add(implementedInterface);</span>

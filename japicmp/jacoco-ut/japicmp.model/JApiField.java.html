@@ -289,7 +289,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	@XmlElementWrapper(name = &quot;modifiers&quot;)
 	@XmlElement(name = &quot;modifier&quot;)
 	public List&lt;? extends JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt;&gt; getModifiers() {
-<span class="nc" id="L292">		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.transientModifier, this.volatileModifier, this.syntheticModifier);</span>
+<span class="fc" id="L292">		return Arrays.asList(this.accessModifier, this.staticModifier, this.finalModifier, this.transientModifier, this.volatileModifier, this.syntheticModifier);</span>
 	}
 
 	@XmlTransient
@@ -320,9 +320,9 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	@XmlElementWrapper(name = &quot;attributes&quot;)
 	@XmlElement(name = &quot;attribute&quot;)
 	public List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; getAttributes() {
-<span class="nc" id="L323">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L324">		list.add(this.syntheticAttribute);</span>
-<span class="nc" id="L325">		return list;</span>
+<span class="fc" id="L323">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L324">		list.add(this.syntheticAttribute);</span>
+<span class="fc" id="L325">		return list;</span>
 	}
 
 	@XmlTransient

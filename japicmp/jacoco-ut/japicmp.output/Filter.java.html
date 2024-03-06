@@ -42,11 +42,11 @@ import java.util.List;
 
 <span class="fc" id="L43">			}</span>
 <span class="fc" id="L44">			Iterator&lt;JApiConstructor&gt; itConstructors = jApiClass.getConstructors().iterator();</span>
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">			while (itConstructors.hasNext()) {</span>
-<span class="nc" id="L46">				JApiConstructor jApiConstructor = itConstructors.next();</span>
-<span class="nc" id="L47">				visitor.visit(itConstructors, jApiConstructor);</span>
-<span class="nc" id="L48">				visitAnnotations(visitor, jApiConstructor);</span>
-<span class="nc" id="L49">			}</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">			while (itConstructors.hasNext()) {</span>
+<span class="fc" id="L46">				JApiConstructor jApiConstructor = itConstructors.next();</span>
+<span class="fc" id="L47">				visitor.visit(itConstructors, jApiConstructor);</span>
+<span class="fc" id="L48">				visitAnnotations(visitor, jApiConstructor);</span>
+<span class="fc" id="L49">			}</span>
 <span class="fc" id="L50">			Iterator&lt;JApiImplementedInterface&gt; itInterfaces = jApiClass.getInterfaces().iterator();</span>
 <span class="fc bfc" id="L51" title="All 2 branches covered.">			while (itInterfaces.hasNext()) {</span>
 <span class="fc" id="L52">				JApiImplementedInterface jApiImplementedInterface = itInterfaces.next();</span>

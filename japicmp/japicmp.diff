@@ -1,175 +1,43 @@
-Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.19.2-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.18.5/japicmp-0.18.5.jar
-***! MODIFIED CLASS: PUBLIC STATIC japicmp.cmp.JarArchiveComparatorOptions$OverrideCompatibilityChange  (not serializable)
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.20.0.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.19.1/japicmp-0.19.1.jar
+***! MODIFIED CLASS: PUBLIC japicmp.cmp.JApiCmpArchive  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	---! REMOVED CONSTRUCTOR: PUBLIC(-) JarArchiveComparatorOptions$OverrideCompatibilityChange(japicmp.model.JApiCompatibilityChange, boolean, boolean, japicmp.model.JApiSemanticVersionLevel)
-	+++  NEW CONSTRUCTOR: PUBLIC(+) JarArchiveComparatorOptions$OverrideCompatibilityChange(japicmp.model.JApiCompatibilityChangeType, boolean, boolean, japicmp.model.JApiSemanticVersionLevel)
-	***! MODIFIED METHOD: PUBLIC japicmp.model.JApiCompatibilityChangeType (<-japicmp.model.JApiCompatibilityChange) getCompatibilityChange()
-***! MODIFIED CLASS (<- ENUM) : PUBLIC NON_FINAL (<- FINAL) japicmp.model.JApiCompatibilityChange  (class type modified)
+	---! REMOVED CONSTRUCTOR: PUBLIC(-) JApiCmpArchive(byte[], java.lang.String)
+	+++  NEW CONSTRUCTOR: PUBLIC(+) JApiCmpArchive(byte[], java.lang.String, java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String getName()
+***  MODIFIED ENUM: PUBLIC STATIC FINAL japicmp.exception.JApiCmpException$Reason  (compatible)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	---! REMOVED INTERFACE: java.lang.constant.Constable
-	---! REMOVED INTERFACE: java.lang.Comparable
-	---! REMOVED INTERFACE: java.io.Serializable
-	***! MODIFIED SUPERCLASS: java.lang.Object (<- java.lang.Enum)
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_STATIC_AND_OVERRIDES_STATIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_GENERICS_CHANGED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_LESS_ACCESSIBLE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_REMOVED_IN_SUPERCLASS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_REMOVED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NOW_VARARGS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NOW_FINAL
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_NOW_TRANSIENT
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_RETURN_TYPE_CHANGED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_NOW_FINAL
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NEW_DEFAULT
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_NOW_STATIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CONSTRUCTOR_REMOVED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_LESS_ACCESSIBLE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange SUPERCLASS_REMOVED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_NOW_CHECKED_EXCEPTION
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_NO_LONGER_TRANSIENT
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_GENERIC_TEMPLATE_CHANGED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NOW_THROWS_CHECKED_EXCEPTION
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NEW_STATIC_ADDED_TO_INTERFACE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange SUPERCLASS_MODIFIED_INCOMPATIBLE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange ANNOTATION_DEPRECATED_ADDED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NOW_STATIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_ABSTRACT_ADDED_IN_SUPERCLASS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_NOW_VOLATILE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NOW_ABSTRACT
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange INTERFACE_ADDED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_TYPE_CHANGED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_ADDED_TO_PUBLIC_CLASS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CONSTRUCTOR_LESS_ACCESSIBLE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NO_LONGER_STATIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_LESS_ACCESSIBLE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_NO_LONGER_STATIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange INTERFACE_REMOVED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_ABSTRACT_NOW_DEFAULT
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_NOW_FINAL
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_REMOVED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_REMOVED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_RETURN_TYPE_GENERICS_CHANGED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange SUPERCLASS_ADDED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_REMOVED_IN_SUPERCLASS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_NO_LONGER_VOLATILE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_NOW_ABSTRACT
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_ABSTRACT_ADDED_TO_CLASS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_PARAMETER_GENERICS_CHANGED
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_NO_LONGER_PUBLIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_NO_LONGER_VARARGS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_ADDED_TO_INTERFACE
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange METHOD_MOVED_TO_SUPERCLASS
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChange CLASS_TYPE_CHANGED
-	+++  NEW CONSTRUCTOR: PUBLIC(+) JApiCompatibilityChange(japicmp.model.JApiCompatibilityChangeType)
-	+++  NEW METHOD: PUBLIC(+) boolean equals(java.lang.Object)
-	+++  NEW METHOD: PUBLIC(+) japicmp.model.JApiCompatibilityChangeType getType()
-		+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			+++  NEW ELEMENT: name=type (+)
-	+++  NEW METHOD: PUBLIC(+) int hashCode()
-	---! REMOVED METHOD: PUBLIC(-) void resetOverrides()
-	---! REMOVED METHOD: PUBLIC(-) void setSemanticVersionLevel(japicmp.model.JApiSemanticVersionLevel)
-	---! REMOVED METHOD: PUBLIC(-) STATIC(-) japicmp.model.JApiCompatibilityChange valueOf(java.lang.String)
-	---! REMOVED METHOD: PUBLIC(-) STATIC(-) japicmp.model.JApiCompatibilityChange[] values()
-	---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlEnum
-+++  NEW ENUM: PUBLIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType  (compatible)
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.exception.JApiCmpException$Reason ResourceNotFound
++++  NEW CLASS: PUBLIC(+) japicmp.output.html.HtmlOutput  (not serializable)
 	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
-	+++  NEW INTERFACE: java.lang.constant.Constable
-	+++  NEW INTERFACE: java.lang.Comparable
-	+++  NEW INTERFACE: java.io.Serializable
-	+++  NEW SUPERCLASS: java.lang.Enum
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_STATIC_AND_OVERRIDES_STATIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_GENERICS_CHANGED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_LESS_ACCESSIBLE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_REMOVED_IN_SUPERCLASS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_REMOVED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NOW_VARARGS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NON_STATIC_IN_INTERFACE_NOW_STATIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NOW_FINAL
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_NOW_TRANSIENT
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_RETURN_TYPE_CHANGED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_NOW_FINAL
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NEW_DEFAULT
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_NOW_STATIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CONSTRUCTOR_REMOVED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_LESS_ACCESSIBLE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType SUPERCLASS_REMOVED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_NOW_CHECKED_EXCEPTION
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_NO_LONGER_TRANSIENT
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_GENERIC_TEMPLATE_CHANGED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NOW_THROWS_CHECKED_EXCEPTION
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NEW_STATIC_ADDED_TO_INTERFACE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType SUPERCLASS_MODIFIED_INCOMPATIBLE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType ANNOTATION_DEPRECATED_ADDED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NOW_STATIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_ABSTRACT_ADDED_IN_SUPERCLASS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_NOW_VOLATILE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NOW_ABSTRACT
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType INTERFACE_ADDED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_TYPE_CHANGED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_ADDED_TO_PUBLIC_CLASS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CONSTRUCTOR_LESS_ACCESSIBLE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NO_LONGER_STATIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_LESS_ACCESSIBLE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_NO_LONGER_STATIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType INTERFACE_REMOVED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_ABSTRACT_NOW_DEFAULT
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_NOW_FINAL
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_REMOVED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_REMOVED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_RETURN_TYPE_GENERICS_CHANGED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType SUPERCLASS_ADDED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_REMOVED_IN_SUPERCLASS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_NO_LONGER_VOLATILE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_NOW_ABSTRACT
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_ABSTRACT_ADDED_TO_CLASS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_PARAMETER_GENERICS_CHANGED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType FIELD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_NO_LONGER_PUBLIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_NO_LONGER_VARARGS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_ADDED_TO_INTERFACE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType METHOD_MOVED_TO_SUPERCLASS
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_TYPE_CHANGED
-	+++  NEW METHOD: PUBLIC(+) japicmp.model.JApiSemanticVersionLevel getSemanticVersionLevel()
-	+++  NEW METHOD: PUBLIC(+) boolean isBinaryCompatible()
-		+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			+++  NEW ELEMENT: name=binaryCompatible (+)
-	+++  NEW METHOD: PUBLIC(+) boolean isSourceCompatible()
-		+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			+++  NEW ELEMENT: name=sourceCompatible (+)
-	+++  NEW METHOD: PUBLIC(+) void resetOverrides()
-	+++  NEW METHOD: PUBLIC(+) void setBinaryCompatible(boolean)
-	+++  NEW METHOD: PUBLIC(+) void setSemanticVersionLevel(japicmp.model.JApiSemanticVersionLevel)
-	+++  NEW METHOD: PUBLIC(+) void setSourceCompatible(boolean)
-	+++  NEW METHOD: PUBLIC(+) STATIC(+) japicmp.model.JApiCompatibilityChangeType valueOf(java.lang.String)
-	+++  NEW METHOD: PUBLIC(+) STATIC(+) japicmp.model.JApiCompatibilityChangeType[] values()
-	+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlEnum
-***  MODIFIED INTERFACE: PUBLIC ABSTRACT japicmp.model.JApiHasAnnotations  (not serializable)
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW CONSTRUCTOR: PUBLIC(+) HtmlOutput(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String getHtml()
++++  NEW CLASS: PUBLIC(+) japicmp.output.html.HtmlOutputGenerator  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: japicmp.output.OutputGenerator
+	+++  NEW CONSTRUCTOR: PUBLIC(+) HtmlOutputGenerator(java.util.List<japicmp.model.JApiClass>, japicmp.config.Options, japicmp.output.html.HtmlOutputGeneratorOptions)
+	+++  NEW METHOD: PUBLIC(+) japicmp.output.html.HtmlOutput generate()
++++  NEW CLASS: PUBLIC(+) japicmp.output.html.HtmlOutputGeneratorOptions  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW CONSTRUCTOR: PUBLIC(+) HtmlOutputGeneratorOptions()
+	+++  NEW METHOD: PUBLIC(+) java.lang.String getSemanticVersioningInformation()
+	+++  NEW METHOD: PUBLIC(+) japicmp.util.Optional<java.lang.String> getTitle()
+	+++  NEW METHOD: PUBLIC(+) void setSemanticVersioningInformation(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) void setTitle(java.lang.String)
++++  NEW CLASS: PUBLIC(+) japicmp.output.html.TemplateEngine  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW CONSTRUCTOR: PUBLIC(+) TemplateEngine()
+	+++  NEW METHOD: PUBLIC(+) java.lang.String loadAndFillTemplate(java.lang.String, java.util.Map<java.lang.String,java.lang.String>)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String loadTemplate(java.lang.String)
+***! MODIFIED CLASS: PUBLIC japicmp.output.xml.XmlOutput  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW INTERFACE: japicmp.model.JApiCompatibility
-***  MODIFIED INTERFACE: PUBLIC ABSTRACT japicmp.model.JApiHasGenericTemplates  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW INTERFACE: japicmp.model.JApiCompatibility
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiModifier  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	GENERIC TEMPLATES: === T:java.lang.Object
-	+++  NEW METHOD: PUBLIC(+) boolean hasChangedToMoreVisible()
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiSuperclass  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW METHOD: PUBLIC(+) japicmp.util.Optional<japicmp.model.JApiClass> getCorrespondingJApiClass()
-	***  MODIFIED METHOD: PUBLIC (<- PACKAGE_PROTECTED) void setJApiClass(japicmp.model.JApiClass)
+	---! REMOVED METHOD: PUBLIC(-) japicmp.util.Optional<java.io.ByteArrayOutputStream> getHtmlOutputStream()
+	---! REMOVED METHOD: PUBLIC(-) void setHtmlOutputStream(japicmp.util.Optional<java.io.ByteArrayOutputStream>)
++++  NEW CLASS: PUBLIC(+) japicmp.util.StringHelper  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String filtersAsString(java.util.List<japicmp.filter.Filter>, boolean)
+
+Semantic versioning suggestion: 1.0.0

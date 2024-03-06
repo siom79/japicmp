@@ -65,7 +65,7 @@ import java.util.Map;
 <span class="fc" id="L65">				SignatureParser.copyGenericTypeInterfaces(newParsedTemplate, jApiGenericTemplate.getNewInterfaceTypes());</span>
 <span class="fc" id="L66">				genericTemplates.add(jApiGenericTemplate);</span>
 <span class="fc" id="L67">			}</span>
-<span class="fc bfc" id="L68" title="All 2 branches covered.">		} else if (callback.isOldPresent()) {</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">		} else if (callback.isOldPresent()) {</span>
 <span class="fc" id="L69">			SignatureParser oldSignatureParser = callback.oldSignatureParser();</span>
 <span class="fc bfc" id="L70" title="All 2 branches covered.">			for (SignatureParser.ParsedTemplate oldParsedTemplate : oldSignatureParser.getTemplates()) {</span>
 <span class="fc" id="L71">				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.REMOVED, oldParsedTemplate.getName(), japicmp.util.Optional.of(oldParsedTemplate.getType()), japicmp.util.Optional.absent());</span>

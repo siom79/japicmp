@@ -389,7 +389,7 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 	@XmlElementWrapper(name = &quot;modifiers&quot;)
 	@XmlElement(name = &quot;modifier&quot;)
 	public List&lt;? extends JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt;&gt; getModifiers() {
-<span class="nc" id="L392">		return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier, this.bridgeModifier, this.syntheticModifier);</span>
+<span class="fc" id="L392">		return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier, this.bridgeModifier, this.syntheticModifier);</span>
 	}
 
 	@XmlAttribute
@@ -439,9 +439,9 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 	@XmlElementWrapper(name = &quot;attributes&quot;)
 	@XmlElement(name = &quot;attribute&quot;)
 	public List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; getAttributes() {
-<span class="nc" id="L442">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L443">		list.add(this.syntheticAttribute);</span>
-<span class="nc" id="L444">		return list;</span>
+<span class="fc" id="L442">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L443">		list.add(this.syntheticAttribute);</span>
+<span class="fc" id="L444">		return list;</span>
 	}
 
 	@XmlTransient
@@ -527,12 +527,12 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 
 	@XmlAttribute(name = &quot;oldLineNumber&quot;)
 	public String getOldLineNumberAsString() {
-<span class="nc" id="L530">		return OptionalHelper.optionalToString(this.oldLineNumber);</span>
+<span class="fc" id="L530">		return OptionalHelper.optionalToString(this.oldLineNumber);</span>
 	}
 
 	@XmlAttribute(name = &quot;newLineNumber&quot;)
 	public String getNewLineNumberAsString() {
-<span class="nc" id="L535">		return OptionalHelper.optionalToString(this.newLineNumber);</span>
+<span class="fc" id="L535">		return OptionalHelper.optionalToString(this.newLineNumber);</span>
 	}
 
 	@XmlElementWrapper(name = &quot;exceptions&quot;)

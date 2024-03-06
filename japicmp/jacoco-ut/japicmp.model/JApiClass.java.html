@@ -116,12 +116,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 <span class="fc" id="L116">				ClassFile classFileOld = oldClass.getClassFile();</span>
 <span class="fc" id="L117">				return new JApiClassFileFormatVersion(classFileOld.getMajorVersion(), classFileOld.getMinorVersion(), -1, -1);</span>
 			}
-<span class="fc bfc" id="L119" title="All 2 branches covered.">			if (newClassOptional.isPresent()) {</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">			if (newClassOptional.isPresent()) {</span>
 <span class="fc" id="L120">				CtClass newClass = newClassOptional.get();</span>
 <span class="fc" id="L121">				ClassFile classFileNew = newClass.getClassFile();</span>
 <span class="fc" id="L122">				return new JApiClassFileFormatVersion(-1, -1, classFileNew.getMajorVersion(), classFileNew.getMinorVersion());</span>
 			}
-<span class="fc" id="L124">			return new JApiClassFileFormatVersion(-1, -1, -1, -1);</span>
+<span class="nc" id="L124">			return new JApiClassFileFormatVersion(-1, -1, -1, -1);</span>
 		}
 	}
 
@@ -284,7 +284,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				} else {
 <span class="nc" id="L285">					retVal = new JApiSuperclass(this, Optional.&lt;CtClass&gt;absent(), Optional.&lt;CtClass&gt;absent(), JApiChangeStatus.UNCHANGED, jarArchiveComparator);</span>
 				}
-<span class="fc bfc" id="L287" title="All 2 branches covered.">			} else if (newClassOptional.isPresent()) {</span>
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">			} else if (newClassOptional.isPresent()) {</span>
 <span class="fc" id="L288">				Optional&lt;CtClass&gt; superclassNewOptional = getSuperclass(newClassOptional.get());</span>
 <span class="fc bfc" id="L289" title="All 2 branches covered.">				if (superclassNewOptional.isPresent()) {</span>
 <span class="fc" id="L290">					retVal = new JApiSuperclass(this, Optional.&lt;CtClass&gt;absent(), superclassNewOptional, JApiChangeStatus.NEW, jarArchiveComparator);</span>
@@ -339,7 +339,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 <span class="fc" id="L339">					JApiImplementedInterface jApiClass = new JApiImplementedInterface(ctClass, ctClass.getName(), JApiChangeStatus.REMOVED);</span>
 <span class="fc" id="L340">					interfacesArg.add(jApiClass);</span>
 <span class="fc" id="L341">				}</span>
-<span class="fc bfc" id="L342" title="All 2 branches covered.">			} else if (newClassOptional.isPresent()) {</span>
+<span class="pc bpc" id="L342" title="1 of 2 branches missed.">			} else if (newClassOptional.isPresent()) {</span>
 <span class="fc" id="L343">				Map&lt;String, CtClass&gt; interfaceMap = buildInterfaceMap(newClassOptional.get(), JarArchiveComparator.ArchiveType.NEW);</span>
 <span class="fc bfc" id="L344" title="All 2 branches covered.">				for (CtClass ctClass : interfaceMap.values()) {</span>
 <span class="fc" id="L345">					JApiImplementedInterface jApiClass = new JApiImplementedInterface(ctClass, ctClass.getName(), JApiChangeStatus.NEW);</span>
@@ -722,7 +722,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 
 	@XmlAttribute
 	public String getJavaObjectSerializationCompatibleAsString() {
-<span class="nc" id="L725">		return jApiJavaObjectSerializationChangeStatus.getDescription();</span>
+<span class="fc" id="L725">		return jApiJavaObjectSerializationChangeStatus.getDescription();</span>
 	}
 
 	@XmlElement
@@ -758,7 +758,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	@XmlElementWrapper(name = &quot;modifiers&quot;)
 	@XmlElement(name = &quot;modifier&quot;)
 	public List&lt;? extends JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt;&gt; getModifiers() {
-<span class="nc" id="L761">		return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier, this.syntheticModifier);</span>
+<span class="fc" id="L761">		return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier, this.syntheticModifier);</span>
 	}
 
 	@XmlElement(name = &quot;superclass&quot;)
@@ -828,9 +828,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	@XmlElementWrapper(name = &quot;attributes&quot;)
 	@XmlElement(name = &quot;attribute&quot;)
 	public List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; getAttributes() {
-<span class="nc" id="L831">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L832">		list.add(this.syntheticAttribute);</span>
-<span class="nc" id="L833">		return list;</span>
+<span class="fc" id="L831">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L832">		list.add(this.syntheticAttribute);</span>
+<span class="fc" id="L833">		return list;</span>
 	}
 
 	@Override

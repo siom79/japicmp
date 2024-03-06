@@ -77,27 +77,27 @@ public class JApiParameter implements JApiHasGenericTypes, JApiHasChangeStatus, 
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-<span class="nc" id="L80">		boolean binaryCompatible = true;</span>
-<span class="nc bnc" id="L81" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc" id="L80">		boolean binaryCompatible = true;</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
 <span class="nc bnc" id="L82" title="All 2 branches missed.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
 <span class="nc" id="L83">				binaryCompatible = false;</span>
 <span class="nc" id="L84">				break;</span>
 			}
 <span class="nc" id="L86">		}</span>
-<span class="nc" id="L87">		return binaryCompatible;</span>
+<span class="fc" id="L87">		return binaryCompatible;</span>
 	}
 
 	@Override
 	@XmlAttribute
 	public boolean isSourceCompatible() {
-<span class="nc" id="L93">		boolean sourceCompatible = true;</span>
-<span class="nc bnc" id="L94" title="All 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc" id="L93">		boolean sourceCompatible = true;</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
 <span class="nc bnc" id="L95" title="All 2 branches missed.">			if (!compatibilityChange.isSourceCompatible()) {</span>
 <span class="nc" id="L96">				sourceCompatible = false;</span>
 <span class="nc" id="L97">				break;</span>
 			}
 <span class="nc" id="L99">		}</span>
-<span class="nc" id="L100">		return sourceCompatible;</span>
+<span class="fc" id="L100">		return sourceCompatible;</span>
 	}
 
 	@Override
