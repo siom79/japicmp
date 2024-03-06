@@ -39,7 +39,7 @@ public class JApiCmpArchive {
 
 	@Override
 	public String toString() {
-		final StringBuffer sb = new StringBuffer("JApiCmpArchive{");
+		StringBuilder sb = new StringBuilder("JApiCmpArchive{");
 		sb.append("file=").append(file);
 		sb.append(", bytes=");
 		if (bytes == null) sb.append("null");
