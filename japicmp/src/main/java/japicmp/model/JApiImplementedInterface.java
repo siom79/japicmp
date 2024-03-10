@@ -77,6 +77,10 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 		this.correspondingJApiClass = Optional.of(jApiClass);
 	}
 
+	public Optional<JApiClass> getCorrespondingJApiClass() {
+		return correspondingJApiClass;
+	}
+
 	@XmlTransient
 	public CtClass getCtClass() {
 		return ctClass;

@@ -15,6 +15,7 @@ import java.util.List;
 import static japicmp.util.Helper.*;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
@@ -2292,6 +2293,10 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "com.acme.japicmp.NewOperator");
 		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_ADDED)));
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE))));
+		JApiImplementedInterface implementedInterface = jApiClass.getInterfaces().stream().filter(i -> i.getFullyQualifiedName().equals("java.util.function.UnaryOperator")).findFirst().orElse(null);
+		assertThat(implementedInterface, notNullValue());
+		assertThat(implementedInterface.getCorrespondingJApiClass().isPresent(), is(true));
+		assertThat(implementedInterface.getCorrespondingJApiClass().get().getFullyQualifiedName(), is("java.util.function.UnaryOperator"));
 	}
 
 	@Test
