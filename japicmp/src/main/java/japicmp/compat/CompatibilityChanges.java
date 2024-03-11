@@ -60,12 +60,12 @@ public class CompatibilityChanges {
 		// section 13.4.4 of "Java Language Specification" SE7
 		checkIfSuperclassesOrInterfacesChangedIncompatible(jApiClass, classMap);
 		checkIfMethodsHaveChangedIncompatible(jApiClass, classMap);
-		checkIfConstructorsHaveChangedIncompatible(jApiClass);
+		checkIfConstructorsHaveChangedIncompatible(jApiClass, classMap);
 		checkIfFieldsHaveChangedIncompatible(jApiClass, classMap);
 		if (jApiClass.getClassType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_TYPE_CHANGED);
 		}
-		checkIfAnnotationDeprecatedAdded(jApiClass);
+		checkIfAnnotationsChanged(jApiClass, classMap);
 		if (hasModifierLevelDecreased(jApiClass)) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_LESS_ACCESSIBLE);
 		}
@@ -193,7 +193,7 @@ public class CompatibilityChanges {
 			if (isNotPrivate(field) && field.getType().hasChanged()) {
 				addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_TYPE_CHANGED);
 			}
-			checkIfAnnotationDeprecatedAdded(field);
+			checkIfAnnotationsChanged(field, classMap);
 			checkIfFieldGenericsChanged(field);
 		}
 	}
@@ -292,7 +292,7 @@ public class CompatibilityChanges {
 		return matches;
 	}
 
-	private void checkIfConstructorsHaveChangedIncompatible(JApiClass jApiClass) {
+	private void checkIfConstructorsHaveChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
 		for (JApiConstructor constructor : jApiClass.getConstructors()) {
 			// section 13.4.6 of "Java Language Specification" SE7
 			if (isNotPrivate(constructor) && constructor.getChangeStatus() == JApiChangeStatus.REMOVED) {
@@ -305,7 +305,7 @@ public class CompatibilityChanges {
 				}
 			}
 			checkIfExceptionIsNowChecked(constructor);
-			checkIfAnnotationDeprecatedAdded(constructor);
+			checkIfAnnotationsChanged(constructor, classMap);
 			checkIfVarargsChanged(constructor);
 			checkIfParametersGenericsChanged(constructor);
 			if (jApiClass.getChangeStatus().isNotNewOrRemoved()) {
@@ -425,7 +425,7 @@ public class CompatibilityChanges {
 			}
 			checkAbstractMethod(jApiClass, classMap, method);
 			checkIfExceptionIsNowChecked(method);
-			checkIfAnnotationDeprecatedAdded(method);
+			checkIfAnnotationsChanged(method, classMap);
 			checkIfVarargsChanged(method);
 			checkIfParametersGenericsChanged(method);
 			if (method.getChangeStatus().isNotNewOrRemoved()) {
@@ -471,11 +471,24 @@ public class CompatibilityChanges {
 		}
 	}
 
-	private void checkIfAnnotationDeprecatedAdded(JApiHasAnnotations jApiHasAnnotations) {
+	private void checkIfAnnotationsChanged(JApiHasAnnotations jApiHasAnnotations, Map<String, JApiClass> classMap) {
 		for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {
-			if (annotation.getChangeStatus() == JApiChangeStatus.NEW || annotation.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				if (annotation.getFullyQualifiedName().equals(Deprecated.class.getName())) {
-					addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED);
+			final JApiChangeStatus status = annotation.getChangeStatus();
+			if (status == JApiChangeStatus.REMOVED) {
+				addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_REMOVED);
+			} else {
+				final JApiClass annotationClass = classMap.computeIfAbsent(annotation.getFullyQualifiedName(),
+					fqn -> loadClass(fqn, EnumSet.allOf(Classpath.class)));
+				annotation.setJApiClass(annotationClass);
+				if (status == JApiChangeStatus.NEW || status == JApiChangeStatus.MODIFIED) {
+					final boolean isDeprecated = annotation.getFullyQualifiedName().equals(Deprecated.class.getName());
+					addCompatibilityChange(jApiHasAnnotations, isDeprecated ? JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED : JApiCompatibilityChangeType.ANNOTATION_ADDED);
+				} else {
+					checkIfMethodsHaveChangedIncompatible(annotationClass, classMap);
+					checkIfFieldsHaveChangedIncompatible(annotationClass, classMap);
+					if (!annotationClass.isSourceCompatible() || !annotationClass.isBinaryCompatible()) {
+						addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_MODIFIED_INCOMPATIBLE);
+					}
 				}
 			}
 		}

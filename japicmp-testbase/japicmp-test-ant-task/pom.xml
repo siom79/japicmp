@@ -59,6 +59,15 @@
 									<destFileName>guava-18.0.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
+									<groupId>com.google.code.findbugs</groupId>
+									<artifactId>jsr305</artifactId>
+									<version>1.3.9</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>jsr305-1.3.9.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
 									<groupId>com.google.guava</groupId>
 									<artifactId>guava</artifactId>
 									<version>19.0</version>
@@ -87,13 +96,15 @@
 								</path>
 								<path id="old.classpath">
 									<fileset file="${project.build.directory}/guava-18.0.jar" />
+									<fileset file="${project.build.directory}/jsr305-1.3.9.jar" />
 								</path>
 								<path id="new.classpath">
 									<fileset file="${project.build.directory}/guava-19.0.jar" />
+									<fileset file="${project.build.directory}/jsr305-1.3.9.jar" />
 								</path>
 
 								<taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath" />
-								<japicmp oldjar="${project.build.directory}/guava-18.0.jar" newjar="${project.build.directory}/guava-19.0.jar" oldclasspath="old.classpath" newclasspath="new.classpath" onlyBinaryIncompatible="false" onlyModified="true" />
+								<japicmp oldjar="${project.build.directory}/guava-18.0.jar;${project.build.directory}/jsr305-1.3.9.jar" newjar="${project.build.directory}/guava-19.0.jar;${project.build.directory}/jsr305-1.3.9.jar" oldclasspath="old.classpath" newclasspath="new.classpath" onlyBinaryIncompatible="false" onlyModified="true" />
 
 							</target>
 						</configuration>
