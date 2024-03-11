@@ -5,7 +5,10 @@ import javax.xml.bind.annotation.XmlEnum;
 
 @XmlEnum
 public enum JApiCompatibilityChangeType {
+	ANNOTATION_ADDED(true, true, JApiSemanticVersionLevel.PATCH),
 	ANNOTATION_DEPRECATED_ADDED(true, true, JApiSemanticVersionLevel.MINOR),
+	ANNOTATION_MODIFIED_INCOMPATIBLE(true, true, JApiSemanticVersionLevel.PATCH),
+	ANNOTATION_REMOVED(true, true, JApiSemanticVersionLevel.PATCH),
 	CLASS_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),
 	CLASS_NOW_ABSTRACT(false, false, JApiSemanticVersionLevel.MAJOR),
 	CLASS_NOW_FINAL(false, false, JApiSemanticVersionLevel.MAJOR),

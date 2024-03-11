@@ -93,7 +93,7 @@
 								</path>
 
 								<taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath" />
-								<japicmp oldjar="${project.build.directory}/guava-18.0.jar" newjar="${project.build.directory}/guava-19.0.jar" oldclasspath="old.classpath" newclasspath="new.classpath" onlyBinaryIncompatible="false" onlyModified="true" />
+								<japicmp oldjar="${project.build.directory}/guava-18.0.jar" newjar="${project.build.directory}/guava-19.0.jar" oldclasspath="old.classpath" newclasspath="new.classpath" onlyBinaryIncompatible="false" onlyModified="true" noAnnotations="true" />
 
 							</target>
 						</configuration>
