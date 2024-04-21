@@ -18,11 +18,9 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.getArchive;
-import static japicmp.test.util.Helper.getJApiClass;
-import static japicmp.test.util.Helper.getJApiMethod;
+import static japicmp.test.util.Helper.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Test to ensure that annotation-based includes and excludes are working.
@@ -46,6 +44,8 @@ public class AnnotationFilterTest {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		Assert.assertEquals(3, jApiClasses.size());
+        Assert.assertTrue(jApiClasses.stream().anyMatch(jApiClass -> jApiClass.getFullyQualifiedName().contains(AnnotatedClass.class.getSimpleName())));
+        Assert.assertTrue(jApiClasses.stream().anyMatch(jApiClass -> jApiClass.getFullyQualifiedName().contains(ClassWithInnerClass.class.getSimpleName())));
 		Assert.assertEquals(JApiChangeStatus.MODIFIED, jApiClasses.get(0).getChangeStatus());
 	}
 
