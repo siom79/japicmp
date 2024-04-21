@@ -803,8 +803,8 @@ public class CompatibilityChanges {
 				if (interfaceClass == null) {
 					interfaceClass = loadClass(implementedInterface.getFullyQualifiedName(), EnumSet.allOf(Classpath.class));
 				}
+				implementedInterface.setJApiClass(interfaceClass);
 				if (implementedInterface.getChangeStatus() == JApiChangeStatus.MODIFIED || implementedInterface.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
-					implementedInterface.setJApiClass(interfaceClass);
 					checkIfMethodsHaveChangedIncompatible(interfaceClass, classMap);
 					checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
 				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
