@@ -2511,4 +2511,51 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.getCompatibilityChanges().size(), is(1));
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED)));
 	}
+
+	@Test
+	public void testMethodWithByteArrayAndArrayOfByteArrays() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				CtMethodBuilder.create()
+					.returnType(CtClass.voidType)
+					.name("method")
+					.parameters(new CtClass[]{classPool.get("byte[]")})
+					.addToClass(ctClassC);
+				CtMethodBuilder.create()
+					.returnType(CtClass.voidType)
+					.name("method")
+					.parameters(new CtClass[]{classPool.get("byte[][]")})
+					.addToClass(ctClassC);
+				return Collections.singletonList(ctClassC);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				CtMethodBuilder.create()
+					.returnType(CtClass.voidType)
+					.name("method")
+					.parameters(new CtClass[]{classPool.get("byte[]")})
+					.addToClass(ctClassC);
+				CtMethodBuilder.create()
+					.returnType(CtClass.voidType)
+					.name("method")
+					.parameters(new CtClass[]{classPool.get("byte[][]")})
+					.addToClass(ctClassC);
+				return Collections.singletonList(ctClassC);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "C");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
+			assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+			assertThat(jApiMethod.isBinaryCompatible(), is(true));
+			assertThat(jApiMethod.isSourceCompatible(), is(true));
+			assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
+		}
+	}
 }

@@ -55,10 +55,6 @@ public class SignatureParser {
 			return template;
 		}
 
-		public void setTemplate(boolean template) {
-			this.template = template;
-		}
-
 		@Override
 		public boolean equals(Object o) {
 			if (this == o) return true;
@@ -111,7 +107,7 @@ public class SignatureParser {
 		if (parenthesisOpenIndex > 0 && signature.startsWith("<")) {
 			String templateDefWithBrackets = signature.substring(0, parenthesisOpenIndex);
 			if (templateDefWithBrackets.startsWith("<") && templateDefWithBrackets.endsWith(">") && templateDefWithBrackets.length() > 2) {
-				parseTemplateDefinition(templateDefWithBrackets.substring(1, templateDefWithBrackets.length()-1));
+				parseTemplateDefinition(templateDefWithBrackets.substring(1, templateDefWithBrackets.length() - 1));
 			}
 		}
 		if (parenthesisCloseIndex > -1) {
@@ -146,8 +142,8 @@ public class SignatureParser {
 		String genericSignature = ctClass.getGenericSignature();
 		if (genericSignature != null && genericSignature.startsWith("<")) {
 			int lastClosingBracket = genericSignature.lastIndexOf('>');
-			if (lastClosingBracket > 0 && genericSignature.length()-2 > 0) {
-				parseTemplateDefinition(genericSignature.substring(1, genericSignature.length()-1));
+			if (lastClosingBracket > 0 && genericSignature.length() - 2 > 0) {
+				parseTemplateDefinition(genericSignature.substring(1, genericSignature.length() - 1));
 				return this.templates;
 			}
 		}
@@ -157,41 +153,41 @@ public class SignatureParser {
 	public List<ParsedParameter> parseTypes(String paramPart) {
 		List<ParsedParameter> types = new ArrayList<>();
 		ParsedParameter parsedParameter = new ParsedParameter();
-		boolean arrayNotation = false;
+		int arrayNotation = 0;
 		int i = 0;
 		while (i < paramPart.length()) {
 			char c = paramPart.charAt(i);
-			String type;
+			StringBuilder type;
 			switch (c) {
 				case 'Z':
-					type = "boolean";
+					type = new StringBuilder("boolean");
 					break;
 				case 'B':
-					type = "byte";
+					type = new StringBuilder("byte");
 					break;
 				case 'C':
-					type = "char";
+					type = new StringBuilder("char");
 					break;
 				case 'S':
-					type = "short";
+					type = new StringBuilder("short");
 					break;
 				case 'I':
-					type = "int";
+					type = new StringBuilder("int");
 					break;
 				case 'J':
-					type = "long";
+					type = new StringBuilder("long");
 					break;
 				case 'F':
-					type = "float";
+					type = new StringBuilder("float");
 					break;
 				case 'D':
-					type = "double";
+					type = new StringBuilder("double");
 					break;
 				case 'V':
-					type = "void";
+					type = new StringBuilder("void");
 					break;
 				case '[':
-					arrayNotation = true;
+					arrayNotation++;
 					i++;
 					continue;
 				case 'L':
@@ -212,18 +208,20 @@ public class SignatureParser {
 						}
 						i++;
 					}
-					type = fqn.toString();
+					type = new StringBuilder(fqn.toString());
 					parsedParameter.template = template;
 					break;
 				default:
 					LOGGER.log(Level.FINE, "Unknown type signature: '" + c + "' in " + paramPart);
 					return Collections.emptyList();
 			}
-			if (arrayNotation) {
-				type += "[]";
-				arrayNotation = false;
+			if (arrayNotation > 0) {
+				for (int an = 0; an < arrayNotation; an++) {
+					type.append("[]");
+				}
+				arrayNotation = 0;
 			}
-			parsedParameter.type = type;
+			parsedParameter.type = type.toString();
 			types.add(parsedParameter);
 			parsedParameter = new ParsedParameter();
 			i++;
@@ -293,18 +291,18 @@ public class SignatureParser {
 		while (i < str.length()) {
 			char c = str.charAt(i);
 			if (c == ':') {
-				if (i+1 < str.length() && str.charAt(i+1) == ':') {
+				if (i + 1 < str.length() && str.charAt(i + 1) == ':') {
 					i++;
 				}
 				currentTemplate.name = name.toString();
 
 				ParsedParameter parsedParameter = new ParsedParameter();
-				i = parseGenerics(parsedParameter, str, i+1, true);
+				i = parseGenerics(parsedParameter, str, i + 1, true);
 				currentTemplate.type = parsedParameter.type;
 				currentTemplate.genericTypes = parsedParameter.genericTypes;
-				while (i+1 < str.length() && str.charAt(i+1) == ':') {
+				while (i + 1 < str.length() && str.charAt(i + 1) == ':') {
 					ParsedParameter parsedInterface = new ParsedParameter();
-					i = parseGenerics(parsedInterface, str, i+2, true);
+					i = parseGenerics(parsedInterface, str, i + 2, true);
 					currentTemplate.interfaces.add(parsedInterface);
 				}
 				this.templates.add(currentTemplate);
@@ -412,9 +410,9 @@ public class SignatureParser {
 		if (oldGenericTypes.size() != newGenericTypes.size()) {
 			return false;
 		}
-		for (int i=0; i< oldGenericTypes.size(); i++) {
+		for (int i = 0; i < oldGenericTypes.size(); i++) {
 			if (!oldGenericTypes.get(i).getType().equals(newGenericTypes.get(i).getType()) ||
-					!oldGenericTypes.get(i).getGenericWildCard().equals(newGenericTypes.get(i).getGenericWildCard())) {
+				!oldGenericTypes.get(i).getGenericWildCard().equals(newGenericTypes.get(i).getGenericWildCard())) {
 				return false;
 			}
 		}

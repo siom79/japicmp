@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SignatureParserTest {
 	private SignatureParser subject;
@@ -188,6 +188,15 @@ public class SignatureParserTest {
 		Assert.assertEquals(1, parsedParameters.get(0).getGenericTypes().size());
 		Assert.assertEquals("?", parsedParameters.get(0).getGenericTypes().get(0).getType());
 		Assert.assertEquals(JApiGenericType.JApiGenericWildCard.UNBOUNDED, parsedParameters.get(0).getGenericTypes().get(0).getGenericWildCard());
+	}
+
+	@Test
+	public void testMethodWithDoubleArray() {
+		subject.parse("([[B)V)");
+		List<SignatureParser.ParsedParameter> parsedParameters = subject.getParameters();
+		Assert.assertEquals(1, parsedParameters.size());
+		Assert.assertEquals("byte[][]", parsedParameters.get(0).getType());
+		Assert.assertEquals(0, parsedParameters.get(0).getGenericTypes().size());
 	}
 
 	@Test
