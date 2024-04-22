@@ -24,9 +24,6 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibi
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 	}
 
-
-
-
 	public String toString()
 	{
 		return "JApiAnnotationElement [name="
