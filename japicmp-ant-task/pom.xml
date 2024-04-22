@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp-base</artifactId>
-		<version>0.21.0-SNAPSHOT</version>
+		<version>0.21.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
