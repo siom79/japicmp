@@ -157,7 +157,7 @@ python3 release.py --release-version <release-version> --old-version <old-versio
 * Login to [Sonatype's Nexus repository](https://oss.sonatype.org/)
 	* Download released artifact from staging repository.
 	* Close and release staging repository if sanity checks are successful.
-* Update maven site report.
+* Update maven site report with [Action](https://github.com/siom79/japicmp/actions/workflows/mvn-site.yml)
 
 ## Contributions
 
