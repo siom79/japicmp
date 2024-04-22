@@ -477,22 +477,27 @@ public class CompatibilityChanges {
 			if (status == JApiChangeStatus.REMOVED) {
 				addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_REMOVED);
 			} else {
-				final boolean isNoAnnotations = this.jarArchiveComparator.getJarArchiveComparatorOptions().isNoAnnotations();
-				final boolean isDeprecated = annotation.getFullyQualifiedName().equals(Deprecated.class.getName());
-				final JApiClass annotationClass;
-				if (isNoAnnotations && !isDeprecated) {
-					annotationClass = null;
-				} else {
-					annotationClass = classMap.computeIfAbsent(annotation.getFullyQualifiedName(), fqn -> loadClass(fqn, EnumSet.allOf(Classpath.class)));
-					annotation.setJApiClass(annotationClass);
-				}
-				if (status == JApiChangeStatus.NEW || status == JApiChangeStatus.MODIFIED) {
-					addCompatibilityChange(jApiHasAnnotations, isDeprecated ? JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED : JApiCompatibilityChangeType.ANNOTATION_ADDED);
-				} else if (annotationClass != null) {
-					checkIfMethodsHaveChangedIncompatible(annotationClass, classMap);
-					checkIfFieldsHaveChangedIncompatible(annotationClass, classMap);
-					if (!annotationClass.isSourceCompatible() || !annotationClass.isBinaryCompatible()) {
-						addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_MODIFIED_INCOMPATIBLE);
+				boolean isNoAnnotations = this.jarArchiveComparator.getJarArchiveComparatorOptions().isNoAnnotations();
+				if (!isNoAnnotations) {
+					boolean isDeprecated = annotation.getFullyQualifiedName().equals(Deprecated.class.getName());
+					if (isDeprecated && status == JApiChangeStatus.NEW) {
+						addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED);
+					} else {
+						JApiClass annotationClass = classMap.computeIfAbsent(annotation.getFullyQualifiedName(), fqn -> loadClass(fqn, EnumSet.allOf(Classpath.class)));
+						if (annotationClass != null) {
+							annotation.setJApiClass(annotationClass);
+							if (status == JApiChangeStatus.NEW) {
+								addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_ADDED);
+							} else {
+								checkIfMethodsHaveChangedIncompatible(annotationClass, classMap);
+								checkIfFieldsHaveChangedIncompatible(annotationClass, classMap);
+								if (!annotationClass.isSourceCompatible() || !annotationClass.isBinaryCompatible()) {
+									addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_MODIFIED_INCOMPATIBLE);
+								} else {
+									addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_MODIFIED);
+								}
+							}
+						}
 					}
 				}
 			}
