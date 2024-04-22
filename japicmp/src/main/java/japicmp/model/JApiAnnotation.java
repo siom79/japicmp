@@ -8,12 +8,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	private final String fullyQualifiedName;
@@ -21,6 +16,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	private final Optional<Annotation> newAnnotation;
 	private final List<JApiAnnotationElement> elements = new LinkedList<>();
 	private final JApiChangeStatus changeStatus;
+	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
 
 	public JApiAnnotation(String fullyQualifiedName, Optional<Annotation> oldAnnotation, Optional<Annotation> newAnnotation, JApiChangeStatus changeStatus) {
 		this.fullyQualifiedName = fullyQualifiedName;
@@ -132,6 +128,14 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	@XmlAttribute(name = "fullyQualifiedName")
 	public String getFullyQualifiedName() {
 		return fullyQualifiedName;
+	}
+
+	public void setJApiClass(JApiClass jApiClass) {
+		this.correspondingJApiClass = Optional.of(jApiClass);
+	}
+
+	public Optional<JApiClass> getCorrespondingJApiClass() {
+		return correspondingJApiClass;
 	}
 
 	@XmlTransient

@@ -13,9 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static japicmp.util.Helper.*;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
@@ -1925,6 +1923,7 @@ public class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED)));
+		assertThat(jApiMethod.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_ADDED))));
 	}
 
 	@Test
@@ -1945,6 +1944,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED)));
+		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_ADDED))));
 	}
 
 	@Test
@@ -1965,6 +1965,7 @@ public class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED))));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_REMOVED)));
 	}
 
 	/**
@@ -2562,5 +2563,144 @@ public class CompatibilityChangesTest {
 			assertThat(jApiMethod.isSourceCompatible(), is(true));
 			assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
 		}
+	}
+
+	@Test
+	public void testAnnotationAddedToClass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) {
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(aClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass anAnnotation = CtAnnotationBuilder.create().name("japicmp.MyAnnotation").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withAnnotation("japicmp.MyAnnotation").addToClassPool(classPool);
+				return Arrays.asList(aClass, anAnnotation);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_ADDED)));
+	}
+
+	@Test
+	public void testAnnotationRemovedFromClass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) {
+				CtClass anAnnotation = CtAnnotationBuilder.create().name("japicmp.MyAnnotation").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withAnnotation("japicmp.MyAnnotation").addToClassPool(classPool);
+				return Arrays.asList(aClass, anAnnotation);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_REMOVED)));
+	}
+
+	@Test
+	public void testAnnotationOnClassModified() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass anAnnotation = CtAnnotationBuilder.create().name("japicmp.MyAnnotation").addToClassPool(classPool);
+				CtMethodBuilder.create().name("foo").returnType(CtClass.intType).publicAccess().addToClass(anAnnotation);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withAnnotation("japicmp.MyAnnotation").addToClassPool(classPool);
+				return Arrays.asList(aClass, anAnnotation);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass anAnnotation = CtAnnotationBuilder.create().name("japicmp.MyAnnotation").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withAnnotation("japicmp.MyAnnotation").addToClassPool(classPool);
+				return Arrays.asList(aClass, anAnnotation);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_MODIFIED_INCOMPATIBLE)));
+	}
+
+	@Test
+	public void testAnnotationAddedToMethod() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").addToClass(aClass);
+				return Collections.singletonList(aClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass anAnnotation = CtAnnotationBuilder.create().name("japicmp.MyAnnotation").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().withAnnotation("japicmp.MyAnnotation").name("method").addToClass(aClass);
+				return Arrays.asList(aClass, anAnnotation);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_ADDED)));
+	}
+
+	@Test
+	public void testAnnotationRemovedFromMethod() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass anAnnotation = CtAnnotationBuilder.create().name("japicmp.MyAnnotation").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").withAnnotation("japicmp.MyAnnotation").addToClass(aClass);
+				return Arrays.asList(aClass, anAnnotation);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").addToClass(aClass);
+				return Collections.singletonList(aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_REMOVED)));
+	}
+
+	@Test
+	public void testAnnotationOnMethodModified() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass anAnnotation = CtAnnotationBuilder.create().name("japicmp.MyAnnotation").addToClassPool(classPool);
+				CtMethodBuilder.create().name("foo").returnType(CtClass.intType).publicAccess().addToClass(anAnnotation);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").withAnnotation("japicmp.MyAnnotation").addToClass(aClass);
+				return Arrays.asList(aClass, anAnnotation);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass anAnnotation = CtAnnotationBuilder.create().name("japicmp.MyAnnotation").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").withAnnotation("japicmp.MyAnnotation").addToClass(aClass);
+				return Arrays.asList(aClass, anAnnotation);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_MODIFIED_INCOMPATIBLE)));
 	}
 }
