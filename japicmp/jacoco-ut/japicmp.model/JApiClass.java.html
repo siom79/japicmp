@@ -648,12 +648,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 <span class="fc" id="L648">		return ModifierHelper.extractModifierFromClass(oldClassOptional, newClassOptional, new ModifierHelper.ExtractModifierFromClassCallback&lt;StaticModifier&gt;() {</span>
 			@Override
 			public StaticModifier getModifierForOld(CtClass oldClass) {
-<span class="pc bpc" id="L651" title="1 of 2 branches missed.">				return Modifier.isStatic(oldClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
+<span class="fc bfc" id="L651" title="All 2 branches covered.">				return Modifier.isStatic(oldClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
 			}
 
 			@Override
 			public StaticModifier getModifierForNew(CtClass newClass) {
-<span class="pc bpc" id="L656" title="1 of 2 branches missed.">				return Modifier.isStatic(newClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
+<span class="fc bfc" id="L656" title="All 2 branches covered.">				return Modifier.isStatic(newClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
 			}
 		});
 	}

@@ -3,38 +3,35 @@
 import javassist.CtClass;
 import javassist.NotFoundException;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AnnotationClassFilter extends AnnotationFilterBase implements ClassFilter {
-<span class="fc" id="L11">	private static final Logger LOGGER = Logger.getLogger(AnnotationBehaviorFilter.class.getName());</span>
+<span class="fc" id="L10">	private static final Logger LOGGER = Logger.getLogger(AnnotationBehaviorFilter.class.getName());</span>
 
 	public AnnotationClassFilter(String filterString) {
-<span class="fc" id="L14">		super(filterString.substring(1));</span>
-<span class="fc" id="L15">	}</span>
+<span class="fc" id="L13">		super(filterString.substring(1));</span>
+<span class="fc" id="L14">	}</span>
 
 	@Override
 	public boolean matches(CtClass ctClass) {
-<span class="fc" id="L19">		List attributes = ctClass.getClassFile().getAttributes();</span>
-<span class="fc" id="L20">		boolean hasAnnotation = hasAnnotation(attributes);</span>
-<span class="fc bfc" id="L21" title="All 2 branches covered.">		if (!hasAnnotation) {</span>
-			try {
-<span class="fc" id="L23">				CtClass declaringClass = ctClass.getDeclaringClass();</span>
-<span class="pc bpc" id="L24" title="1 of 2 branches missed.">				if (declaringClass != null) {</span>
-<span class="nc" id="L25">					attributes = declaringClass.getClassFile().getAttributes();</span>
-<span class="nc" id="L26">					hasAnnotation = hasAnnotation(attributes);</span>
+<span class="fc" id="L18">		boolean matches = ctClass.hasAnnotation(annotationClassName);</span>
+<span class="fc bfc" id="L19" title="All 2 branches covered.">		if (!matches) {</span>
+            try {
+<span class="fc" id="L21">				CtClass declaringClass = ctClass.getDeclaringClass();</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">				if (declaringClass != null) {</span>
+<span class="nc" id="L23">					matches = declaringClass.hasAnnotation(annotationClassName);</span>
 				}
-<span class="nc" id="L28">			} catch (NotFoundException e) {</span>
-<span class="nc" id="L29">				LOGGER.log(Level.FINE, &quot;Failed to load class '&quot; + ctClass.getName() + &quot;': &quot; + e.getLocalizedMessage(), e);</span>
-<span class="fc" id="L30">			}</span>
-		}
-<span class="fc" id="L32">		return hasAnnotation;</span>
+<span class="nc" id="L25">            } catch (NotFoundException e) {</span>
+<span class="nc" id="L26">				LOGGER.log(Level.FINE, &quot;Failed to load class '&quot; + ctClass.getName() + &quot;': &quot; + e.getLocalizedMessage(), e);</span>
+<span class="fc" id="L27">            }</span>
+        }
+<span class="fc" id="L29">		return matches;</span>
 	}
 
 	@Override
 	public String toString() {
-<span class="nc" id="L37">		return &quot;@&quot; + annotationClassName;</span>
+<span class="nc" id="L34">		return &quot;@&quot; + annotationClassName;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

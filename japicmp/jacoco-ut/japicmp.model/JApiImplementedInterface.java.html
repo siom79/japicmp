@@ -43,7 +43,7 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 			}
 <span class="nc" id="L44">		}</span>
 <span class="pc bpc" id="L45" title="2 of 4 branches missed.">		if (binaryCompatible &amp;&amp; correspondingJApiClass.isPresent()) {</span>
-<span class="nc bnc" id="L46" title="All 2 branches missed.">			if (!correspondingJApiClass.get().isBinaryCompatible()) {</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">			if (!correspondingJApiClass.get().isBinaryCompatible()) {</span>
 <span class="nc" id="L47">				binaryCompatible = false;</span>
 			}
 		}
@@ -60,7 +60,7 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 			}
 <span class="nc" id="L61">		}</span>
 <span class="pc bpc" id="L62" title="2 of 4 branches missed.">		if (sourceCompatible &amp;&amp; correspondingJApiClass.isPresent()) {</span>
-<span class="nc bnc" id="L63" title="All 2 branches missed.">			if (!correspondingJApiClass.get().isSourceCompatible()) {</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">			if (!correspondingJApiClass.get().isSourceCompatible()) {</span>
 <span class="nc" id="L64">				sourceCompatible = false;</span>
 			}
 		}
@@ -77,14 +77,18 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 <span class="fc" id="L77">		this.correspondingJApiClass = Optional.of(jApiClass);</span>
 <span class="fc" id="L78">	}</span>
 
+	public Optional&lt;JApiClass&gt; getCorrespondingJApiClass() {
+<span class="fc" id="L81">		return correspondingJApiClass;</span>
+	}
+
 	@XmlTransient
 	public CtClass getCtClass() {
-<span class="fc" id="L82">		return ctClass;</span>
+<span class="fc" id="L86">		return ctClass;</span>
 	}
 
 	public String toString()
 	{
-<span class="nc" id="L87">		return &quot;JApiImplementedInterface [fullyQualifiedName=&quot;</span>
+<span class="nc" id="L91">		return &quot;JApiImplementedInterface [fullyQualifiedName=&quot;</span>
 			+ fullyQualifiedName
 			+ &quot;, changeStatus=&quot;
 			+ changeStatus
