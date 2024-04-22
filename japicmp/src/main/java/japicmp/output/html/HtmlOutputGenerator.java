@@ -272,7 +272,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			case Enum:
 				return value.getFullyQualifiedName() + "." + value.getValue();
 			default:
-				return String.valueOf(value);
+				return value.getValueString();
 		}
 	}
 
