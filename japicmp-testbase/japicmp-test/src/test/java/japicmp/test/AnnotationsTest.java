@@ -3,6 +3,8 @@ package japicmp.test;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.*;
+import japicmp.test.annotation.AnnotationChanged;
+import japicmp.test.annotation.TestAnnotation;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -95,5 +97,17 @@ public class AnnotationsTest {
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE))));
+	}
+
+	@Test
+	public void testAnnotationValuesChanged() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, AnnotationChanged.class.getName());
+		JApiAnnotation testAnnotation = getJApiAnnotation(jApiClass.getAnnotations(), TestAnnotation.class.getName());
+		assertThat(testAnnotation.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		JApiAnnotationElement nameElement = getJApiAnnotationElement(testAnnotation.getElements(), "name");
+		assertThat(nameElement.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(nameElement.getOldValue().get().toString(), is("\"test-name\""));
+		assertThat(nameElement.getNewValue().get().toString(), is("\"test-name-changed\""));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_MODIFIED)));
 	}
 }
