@@ -15,6 +15,7 @@ public @interface TestAnnotation {
 		String label();
 	}
 
+	@TestAnnotation(name = "recursion", list = {"r", "r2"}, type = @TestAnnotation.Type(label = "test-recursion"))
 	String name() default "default-name";
 	String[] list();
 	Type type();

@@ -39,9 +39,6 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibi
 			+ "]";
 	}
 
-
-
-
 	private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
 		if (changeStatus == JApiChangeStatus.UNCHANGED) {
 			if (oldValue.isPresent() && newValue.isPresent()) {

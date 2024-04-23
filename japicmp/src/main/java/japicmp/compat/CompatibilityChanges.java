@@ -116,10 +116,10 @@ public class CompatibilityChanges {
 				});
 				boolean movedToSuperclass = false;
 				for (Integer returnValue : returnValues) {
-                    if (returnValue == 1) {
-                        movedToSuperclass = true;
-                        break;
-                    }
+					if (returnValue == 1) {
+						movedToSuperclass = true;
+						break;
+					}
 				}
 				if (!movedToSuperclass) {
 					addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_REMOVED);
@@ -133,35 +133,35 @@ public class CompatibilityChanges {
 			if (isNotPrivate(field) && field.getChangeStatus() == JApiChangeStatus.NEW) {
 				ArrayList<Integer> returnValues = new ArrayList<>();
 				forAllSuperclasses(jApiClass, classMap, returnValues, (superclass, classMap12, changeStatusOfSuperclass) -> {
-                    int changedIncompatible = 0;
-                    for (JApiField superclassField : superclass.getFields()) {
-                        if (superclassField.getName().equals(field.getName()) && fieldTypeMatches(superclassField, field)) {
-                            boolean superclassFieldIsStatic = false;
-                            boolean subclassFieldIsStatic = false;
-                            boolean accessModifierSubclassLess = false;
-                            if (field.getStaticModifier().getNewModifier().isPresent() && field.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
-                                subclassFieldIsStatic = true;
-                            }
-                            if (superclassField.getStaticModifier().getNewModifier().isPresent() && superclassField.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC && superclassField.getChangeStatus() != JApiChangeStatus.NEW) {
-                                superclassFieldIsStatic = true;
-                            }
-                            if (field.getAccessModifier().getNewModifier().isPresent() && superclassField.getAccessModifier().getNewModifier().isPresent()) {
-                                if (field.getAccessModifier().getNewModifier().get().getLevel() < superclassField.getAccessModifier().getNewModifier().get().getLevel() && superclassField.getChangeStatus() != JApiChangeStatus.NEW) {
-                                    accessModifierSubclassLess = true;
-                                }
-                            }
-                            if (superclassFieldIsStatic) {
-                                if (subclassFieldIsStatic) {
-                                    changedIncompatible = 1;
-                                }
-                            }
-                            if (accessModifierSubclassLess) {
-                                changedIncompatible = 2;
-                            }
-                        }
-                    }
-                    return changedIncompatible;
-                });
+					int changedIncompatible = 0;
+					for (JApiField superclassField : superclass.getFields()) {
+						if (superclassField.getName().equals(field.getName()) && fieldTypeMatches(superclassField, field)) {
+							boolean superclassFieldIsStatic = false;
+							boolean subclassFieldIsStatic = false;
+							boolean accessModifierSubclassLess = false;
+							if (field.getStaticModifier().getNewModifier().isPresent() && field.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
+								subclassFieldIsStatic = true;
+							}
+							if (superclassField.getStaticModifier().getNewModifier().isPresent() && superclassField.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC && superclassField.getChangeStatus() != JApiChangeStatus.NEW) {
+								superclassFieldIsStatic = true;
+							}
+							if (field.getAccessModifier().getNewModifier().isPresent() && superclassField.getAccessModifier().getNewModifier().isPresent()) {
+								if (field.getAccessModifier().getNewModifier().get().getLevel() < superclassField.getAccessModifier().getNewModifier().get().getLevel() && superclassField.getChangeStatus() != JApiChangeStatus.NEW) {
+									accessModifierSubclassLess = true;
+								}
+							}
+							if (superclassFieldIsStatic) {
+								if (subclassFieldIsStatic) {
+									changedIncompatible = 1;
+								}
+							}
+							if (accessModifierSubclassLess) {
+								changedIncompatible = 2;
+							}
+						}
+					}
+					return changedIncompatible;
+				});
 				for (int returnValue : returnValues) {
 					if (returnValue == 1) {
 						addCompatibilityChange(field, JApiCompatibilityChangeType.FIELD_STATIC_AND_OVERRIDES_STATIC);
@@ -242,22 +242,26 @@ public class CompatibilityChanges {
 			ClassPool classPool = this.jarArchiveComparator.getCommonClassPool();
 			try {
 				oldClassOptional = Optional.of(classPool.get(newSuperclassName));
-			} catch (NotFoundException ignored) {}
+			} catch (NotFoundException ignored) {
+			}
 			try {
 				newClassOptional = Optional.of(classPool.get(newSuperclassName));
-			} catch (NotFoundException ignored) {}
+			} catch (NotFoundException ignored) {
+			}
 		} else {
 			if (classpaths.contains(Classpath.OLD_CLASSPATH)) {
 				ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();
 				try {
 					oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
-				} catch (NotFoundException ignored) {}
+				} catch (NotFoundException ignored) {
+				}
 			}
 			if (classpaths.contains(Classpath.NEW_CLASSPATH)) {
 				ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();
 				try {
 					newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
-				} catch (NotFoundException ignored) {}
+				} catch (NotFoundException ignored) {
+				}
 			}
 		}
 		if (!oldClassOptional.isPresent() && !newClassOptional.isPresent()) {
@@ -300,7 +304,7 @@ public class CompatibilityChanges {
 			}
 			// section 13.4.7 of "Java Language Specification" SE7
 			if (hasModifierLevelDecreased(constructor)) {
-				if (isNotFinal(jApiClass)  || constructor.getAccessModifier().hasChangedFrom(AccessModifier.PUBLIC)) {
+				if (isNotFinal(jApiClass) || constructor.getAccessModifier().hasChangedFrom(AccessModifier.PUBLIC)) {
 					addCompatibilityChange(constructor, JApiCompatibilityChangeType.CONSTRUCTOR_LESS_ACCESSIBLE);
 				}
 			}
@@ -324,20 +328,20 @@ public class CompatibilityChanges {
 			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.REMOVED) {
 				final List<Integer> returnValues = new ArrayList<>();
 				forAllSuperclasses(jApiClass, classMap, returnValues, (superclass, classMap12, changeStatusOfSuperclass) -> {
-                    for (JApiMethod superMethod : superclass.getMethods()) {
-                        if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
-                            return 1;
-                        }
-                    }
-                    return 0;
-                });
+					for (JApiMethod superMethod : superclass.getMethods()) {
+						if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
+							return 1;
+						}
+					}
+					return 0;
+				});
 				checkIfMethodHasBeenPulledUp(jApiClass, classMap, method, returnValues);
 				boolean superclassHasSameMethod = false;
 				for (Integer returnValue : returnValues) {
-                    if (returnValue == 1) {
-                        superclassHasSameMethod = true;
-                        break;
-                    }
+					if (returnValue == 1) {
+						superclassHasSameMethod = true;
+						break;
+					}
 				}
 				if (!superclassHasSameMethod) {
 					addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_REMOVED);
@@ -356,23 +360,23 @@ public class CompatibilityChanges {
 			if (isNotPrivate(method) && method.getChangeStatus() == JApiChangeStatus.NEW) {
 				List<Integer> returnValues = new ArrayList<>();
 				forAllSuperclasses(jApiClass, classMap, returnValues, (superclass, classMap13, changeStatusOfSuperclass) -> {
-                    for (JApiMethod superMethod : superclass.getMethods()) {
-                        if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
-                            if (superMethod.getAccessModifier().getNewModifier().isPresent() && method.getAccessModifier().getNewModifier().isPresent()) {
-                                if (superMethod.getAccessModifier().getNewModifier().get().getLevel() > method.getAccessModifier().getNewModifier().get().getLevel()) {
-                                    return 1;
-                                }
-                            }
-                            if (superMethod.getStaticModifier().getNewModifier().isPresent() && method.getStaticModifier().getNewModifier().isPresent()) {
-                                if (superMethod.getStaticModifier().getNewModifier().get() == StaticModifier.NON_STATIC
-                                    && method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
-                                    return 2;
-                                }
-                            }
-                        }
-                    }
-                    return 0;
-                });
+					for (JApiMethod superMethod : superclass.getMethods()) {
+						if (superMethod.getName().equals(method.getName()) && superMethod.hasSameSignature(method)) {
+							if (superMethod.getAccessModifier().getNewModifier().isPresent() && method.getAccessModifier().getNewModifier().isPresent()) {
+								if (superMethod.getAccessModifier().getNewModifier().get().getLevel() > method.getAccessModifier().getNewModifier().get().getLevel()) {
+									return 1;
+								}
+							}
+							if (superMethod.getStaticModifier().getNewModifier().isPresent() && method.getStaticModifier().getNewModifier().isPresent()) {
+								if (superMethod.getStaticModifier().getNewModifier().get() == StaticModifier.NON_STATIC
+									&& method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
+									return 2;
+								}
+							}
+						}
+					}
+					return 0;
+				});
 				for (Integer returnValue : returnValues) {
 					if (returnValue == 1) {
 						addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS);
@@ -399,9 +403,9 @@ public class CompatibilityChanges {
 					for (JApiMethod superMethod : superclass.getMethods()) {
 						if (areMatching(superMethod, method)) {
 							if (method.getFinalModifier().getOldModifier().isPresent()
-									&& method.getFinalModifier().getOldModifier().get() == FinalModifier.NON_FINAL
-									&& superMethod.getFinalModifier().getNewModifier().isPresent()
-									&& superMethod.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL) {
+								&& method.getFinalModifier().getOldModifier().get() == FinalModifier.NON_FINAL
+								&& superMethod.getFinalModifier().getNewModifier().isPresent()
+								&& superMethod.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL) {
 								addCompatibilityChange(superMethod, JApiCompatibilityChangeType.METHOD_NOW_FINAL);
 								return 1;
 							}
@@ -444,7 +448,7 @@ public class CompatibilityChanges {
 			}
 		}
 		if (method.getChangeStatus() == JApiChangeStatus.MODIFIED ||
-				method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+			method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 			if (!SignatureParser.equalGenericTypes(method.getReturnType().getOldGenericTypes(), method.getReturnType().getNewGenericTypes())) {
 				addCompatibilityChange(method.getReturnType(), JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED);
 			}
@@ -453,7 +457,7 @@ public class CompatibilityChanges {
 
 	private void checkIfParametersGenericsChanged(JApiBehavior jApiBehavior) {
 		if (jApiBehavior.getChangeStatus() == JApiChangeStatus.MODIFIED ||
-				jApiBehavior.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+			jApiBehavior.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 			for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {
 				if (!SignatureParser.equalGenericTypes(jApiParameter.getOldGenericTypes(), jApiParameter.getNewGenericTypes())) {
 					addCompatibilityChange(jApiParameter, JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED);
@@ -464,7 +468,7 @@ public class CompatibilityChanges {
 
 	private void checkIfFieldGenericsChanged(JApiField jApiField) {
 		if (jApiField.getChangeStatus() == JApiChangeStatus.MODIFIED ||
-				jApiField.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
+			jApiField.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 			if (!SignatureParser.equalGenericTypes(jApiField.getOldGenericTypes(), jApiField.getNewGenericTypes())) {
 				addCompatibilityChange(jApiField, JApiCompatibilityChangeType.FIELD_GENERICS_CHANGED);
 			}
@@ -472,28 +476,24 @@ public class CompatibilityChanges {
 	}
 
 	private void checkIfAnnotationsChanged(JApiHasAnnotations jApiHasAnnotations, Map<String, JApiClass> classMap) {
-		for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {
-			final JApiChangeStatus status = annotation.getChangeStatus();
-			if (status == JApiChangeStatus.REMOVED) {
-				addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_REMOVED);
-			} else {
-				boolean isNoAnnotations = this.jarArchiveComparator.getJarArchiveComparatorOptions().isNoAnnotations();
-				if (!isNoAnnotations) {
+		boolean isNoAnnotations = this.jarArchiveComparator.getJarArchiveComparatorOptions().isNoAnnotations();
+		if (!isNoAnnotations) {
+			for (JApiAnnotation annotation : jApiHasAnnotations.getAnnotations()) {
+				final JApiChangeStatus status = annotation.getChangeStatus();
+				if (status == JApiChangeStatus.REMOVED) {
+					addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_REMOVED);
+				} else {
 					boolean isDeprecated = annotation.getFullyQualifiedName().equals(Deprecated.class.getName());
 					if (isDeprecated && status == JApiChangeStatus.NEW) {
 						addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_DEPRECATED_ADDED);
 					} else {
 						JApiClass annotationClass = classMap.computeIfAbsent(annotation.getFullyQualifiedName(), fqn -> loadClass(fqn, EnumSet.allOf(Classpath.class)));
-						if (annotationClass != null) {
-							annotation.setJApiClass(annotationClass);
-							if (status == JApiChangeStatus.NEW) {
-								addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_ADDED);
-							} else {
-								checkIfMethodsHaveChangedIncompatible(annotationClass, classMap);
-								checkIfFieldsHaveChangedIncompatible(annotationClass, classMap);
-								if (!annotationClass.isSourceCompatible() || !annotationClass.isBinaryCompatible()) {
-									addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_MODIFIED_INCOMPATIBLE);
-								} else {
+						annotation.setJApiClass(annotationClass);
+						if (status == JApiChangeStatus.NEW) {
+							addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_ADDED);
+						} else {
+							for (JApiAnnotationElement annotationElement : annotation.getElements()) {
+								if (annotationElement.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 									addCompatibilityChange(jApiHasAnnotations, JApiCompatibilityChangeType.ANNOTATION_MODIFIED);
 								}
 							}
@@ -583,15 +583,15 @@ public class CompatibilityChanges {
 	private List<JApiMethod> getOverriddenMethods(final JApiClass jApiClass, final Map<String, JApiClass> classMap, final JApiMethod method) {
 		ArrayList<JApiMethod> jApiMethods = new ArrayList<>();
 		forAllSuperclasses(jApiClass, classMap, jApiMethods, (superclass, classMap1, changeStatusOfSuperclass) -> {
-            for (JApiMethod jApiMethod : superclass.getMethods()) {
-                if (isAbstract(jApiMethod)) {
-                    if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameSignature(method)) {
-                        return jApiMethod;
-                    }
-                }
-            }
-            return null;
-        });
+			for (JApiMethod jApiMethod : superclass.getMethods()) {
+				if (isAbstract(jApiMethod)) {
+					if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameSignature(method)) {
+						return jApiMethod;
+					}
+				}
+			}
+			return null;
+		});
 		return removeNullValues(jApiMethods);
 	}
 
@@ -608,13 +608,13 @@ public class CompatibilityChanges {
 	private List<JApiMethod> getMethodsInImplementedInterfacesWithSameSignature(final JApiClass jApiClass, final Map<String, JApiClass> classMap, final JApiMethod method) {
 		ArrayList<JApiMethod> jApiMethods = new ArrayList<>();
 		forAllImplementedInterfaces(jApiClass, classMap, jApiMethods, new ArrayList<>(), (implementedInterface, classMap1) -> {
-            for (JApiMethod jApiMethod : implementedInterface.getMethods()) {
-                if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameSignature(method)) {
-                    return jApiMethod;
-                }
-            }
-            return null;
-        });
+			for (JApiMethod jApiMethod : implementedInterface.getMethods()) {
+				if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameSignature(method)) {
+					return jApiMethod;
+				}
+			}
+			return null;
+		});
 		return removeNullValues(jApiMethods);
 	}
 
@@ -681,25 +681,26 @@ public class CompatibilityChanges {
 
 	/**
 	 * Is a method implemented in a super class
+	 *
 	 * @param jApiMethod the method
 	 * @return <code>true</code> if it is implemented in a super class
 	 */
 	private boolean isImplemented(JApiMethod jApiMethod, JApiClass aClass) {
-	    while(aClass != null) {
-            for (JApiMethod method : aClass.getMethods()) {
-                if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameParameter(method) &&
-                    !isAbstract(method) && method.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(method)) {
-                    return true;
-                }
-            }
+		while (aClass != null) {
+			for (JApiMethod method : aClass.getMethods()) {
+				if (jApiMethod.getName().equals(method.getName()) && jApiMethod.hasSameParameter(method) &&
+					!isAbstract(method) && method.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(method)) {
+					return true;
+				}
+			}
 
-            if(aClass.getSuperclass() != null && aClass.getSuperclass().getJApiClass().isPresent()) {
-                aClass = aClass.getSuperclass().getJApiClass().get();
-            } else {
-                aClass = null;
-            }
-	    }
-	    return false;
+			if (aClass.getSuperclass() != null && aClass.getSuperclass().getJApiClass().isPresent()) {
+				aClass = aClass.getSuperclass().getJApiClass().get();
+			} else {
+				aClass = null;
+			}
+		}
+		return false;
 	}
 
 	private void checkIfSuperclassesOrInterfacesChangedIncompatible(final JApiClass jApiClass, Map<String, JApiClass> classMap) {
@@ -723,53 +724,53 @@ public class CompatibilityChanges {
 				}
 			}
 			forAllSuperclasses(jApiClass, classMap, new ArrayList<>(), (superclass1, classMap1, changeStatusOfSuperclass) -> {
-                for (JApiMethod jApiMethod : superclass1.getMethods()) {
-                    if (!isAbstract(jApiMethod) && jApiMethod.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiMethod)) {
-                        implementedMethods.add(jApiMethod);
-                    }
-                    removedAndNotOverriddenMethods.removeIf(removedAndNotOverriddenMethod ->
+				for (JApiMethod jApiMethod : superclass1.getMethods()) {
+					if (!isAbstract(jApiMethod) && jApiMethod.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiMethod)) {
+						implementedMethods.add(jApiMethod);
+					}
+					removedAndNotOverriddenMethods.removeIf(removedAndNotOverriddenMethod ->
 						jApiMethod.getName().equals(removedAndNotOverriddenMethod.getName()) &&
 							jApiMethod.hasSameSignature(removedAndNotOverriddenMethod)
 					);
-                }
-                for (JApiField jApiField : superclass1.getFields()) {
-                    if (jApiField.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiField)) {
-                        fields.add(jApiField);
-                    }
-                    removedAndNotOverriddenFields.removeIf(removedAndNotOverriddenField ->
+				}
+				for (JApiField jApiField : superclass1.getFields()) {
+					if (jApiField.getChangeStatus() != JApiChangeStatus.REMOVED && isNotPrivate(jApiField)) {
+						fields.add(jApiField);
+					}
+					removedAndNotOverriddenFields.removeIf(removedAndNotOverriddenField ->
 						jApiField.getName().equals(removedAndNotOverriddenField.getName()) &&
 							hasSameType(jApiField, removedAndNotOverriddenField)
 					);
-                }
-                for (JApiMethod jApiMethod : superclass1.getMethods()) {
-                    if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED && !isImplemented(jApiMethod, jApiMethod.getjApiClass())) {
-                        boolean implemented = false;
-                        for (JApiMethod implementedMethod : implementedMethods) {
-                            if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
-                                implemented = true;
-                                break;
-                            }
-                        }
-                        if (!implemented) {
-                            removedAndNotOverriddenMethods.add(jApiMethod);
-                        }
-                    }
-                }
-                for (JApiField jApiField : superclass1.getFields()) {
-                    if (jApiField.getChangeStatus() == JApiChangeStatus.REMOVED) {
-                        boolean overridden = false;
-                        for (JApiField field : fields) {
-                            if (field.getName().equals(jApiField.getName()) && hasSameType(jApiField, field)) {
-                                overridden = true;
-                            }
-                        }
-                        if (!overridden) {
-                            removedAndNotOverriddenFields.add(jApiField);
-                        }
-                    }
-                }
-                return 0;
-            });
+				}
+				for (JApiMethod jApiMethod : superclass1.getMethods()) {
+					if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED && !isImplemented(jApiMethod, jApiMethod.getjApiClass())) {
+						boolean implemented = false;
+						for (JApiMethod implementedMethod : implementedMethods) {
+							if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
+								implemented = true;
+								break;
+							}
+						}
+						if (!implemented) {
+							removedAndNotOverriddenMethods.add(jApiMethod);
+						}
+					}
+				}
+				for (JApiField jApiField : superclass1.getFields()) {
+					if (jApiField.getChangeStatus() == JApiChangeStatus.REMOVED) {
+						boolean overridden = false;
+						for (JApiField field : fields) {
+							if (field.getName().equals(jApiField.getName()) && hasSameType(jApiField, field)) {
+								overridden = true;
+							}
+						}
+						if (!overridden) {
+							removedAndNotOverriddenFields.add(jApiField);
+						}
+					}
+				}
+				return 0;
+			});
 			if (!removedAndNotOverriddenMethods.isEmpty()) {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_REMOVED_IN_SUPERCLASS);
 			}
@@ -795,12 +796,12 @@ public class CompatibilityChanges {
 						List<JApiSuperclass> ancestors = new ArrayList<>();
 						final List<JApiSuperclass> matchingAncestors = new ArrayList<>();
 						forAllSuperclasses(jApiClass, classMap, ancestors, (clazz, classMap12, changeStatusOfSuperclass) -> {
-                            JApiSuperclass ancestor = clazz.getSuperclass();
-                            if (ancestor.getNewSuperclassName().isPresent() && ancestor.getNewSuperclassName().get().equals(superclass.getOldSuperclassName().get())) {
-                                matchingAncestors.add(ancestor);
-                            }
-                            return ancestor;
-                        });
+							JApiSuperclass ancestor = clazz.getSuperclass();
+							if (ancestor.getNewSuperclassName().isPresent() && ancestor.getNewSuperclassName().get().equals(superclass.getOldSuperclassName().get())) {
+								matchingAncestors.add(ancestor);
+							}
+							return ancestor;
+						});
 						if (matchingAncestors.isEmpty()) {
 							addCompatibilityChange(superclass, JApiCompatibilityChangeType.SUPERCLASS_REMOVED);
 						} else {
@@ -896,37 +897,37 @@ public class CompatibilityChanges {
 				}
 			}
 			forAllSuperclasses(jApiClass, classMap, new ArrayList<>(), (superclass, classMap1, changeStatusOfSuperclass) -> {
-                for (JApiMethod jApiMethod : superclass.getMethods()) {
-                    if (!isAbstract(jApiMethod)) {
-                        implementedMethods.add(jApiMethod);
-                    }
-                }
-                for (JApiMethod jApiMethod : superclass.getMethods()) {
-                    if (isAbstract(jApiMethod)) {
-                        boolean isImplemented = false;
-                        for (JApiMethod implementedMethod : implementedMethods) {
-                            if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
-                                isImplemented = true;
-                                break;
-                            }
-                        }
-                        if (!isImplemented) {
-                            if (jApiMethod.getChangeStatus() == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.MODIFIED) {
-                                if (jApiMethod.getAbstractModifier().getNewModifier().isPresent()) {
-                                    AbstractModifier abstractModifier = jApiMethod.getAbstractModifier().getNewModifier().get();
-                                    if (abstractModifier == AbstractModifier.ABSTRACT) {
-                                        abstractMethods.add(jApiMethod);
-                                    } else {
-                                        defaultMethods.add(jApiMethod);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                implementedInterfaces.addAll(superclass.getInterfaces());
-                return 0;
-            });
+				for (JApiMethod jApiMethod : superclass.getMethods()) {
+					if (!isAbstract(jApiMethod)) {
+						implementedMethods.add(jApiMethod);
+					}
+				}
+				for (JApiMethod jApiMethod : superclass.getMethods()) {
+					if (isAbstract(jApiMethod)) {
+						boolean isImplemented = false;
+						for (JApiMethod implementedMethod : implementedMethods) {
+							if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
+								isImplemented = true;
+								break;
+							}
+						}
+						if (!isImplemented) {
+							if (jApiMethod.getChangeStatus() == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.MODIFIED) {
+								if (jApiMethod.getAbstractModifier().getNewModifier().isPresent()) {
+									AbstractModifier abstractModifier = jApiMethod.getAbstractModifier().getNewModifier().get();
+									if (abstractModifier == AbstractModifier.ABSTRACT) {
+										abstractMethods.add(jApiMethod);
+									} else {
+										defaultMethods.add(jApiMethod);
+									}
+								}
+							}
+						}
+					}
+				}
+				implementedInterfaces.addAll(superclass.getInterfaces());
+				return 0;
+			});
 			implementedInterfaces.addAll(jApiClass.getInterfaces());
 			if (!abstractMethods.isEmpty()) {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_SUPERCLASS);
@@ -962,7 +963,7 @@ public class CompatibilityChanges {
 					final JApiClass interfaceClass = getJApiClass(implementedInterface, classMap);
 					for (JApiMethod defaultMethodCandidate : interfaceClass.getMethods()) {
 						if (!isAbstract(defaultMethodCandidate)
-								&& areMatching(abstractMethod, defaultMethodCandidate)) {
+							&& areMatching(abstractMethod, defaultMethodCandidate)) {
 							// we have a default implementation for this method
 							// double-check that we extend interface that the method comes from
 							for (JApiImplementedInterface extendedInterface : interfaceClass.getInterfaces()) {
@@ -989,7 +990,7 @@ public class CompatibilityChanges {
 
 	private static boolean areMatching(JApiMethod left, JApiMethod right) {
 		return left.getName().equals(right.getName())
-				&& left.hasSameSignature(right);
+			&& left.hasSameSignature(right);
 	}
 
 	private JApiClass getJApiClass(JApiImplementedInterface implementedInterface, Map<String, JApiClass> classMap) {

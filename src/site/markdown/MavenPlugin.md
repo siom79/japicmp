@@ -265,7 +265,6 @@ for each check. This allows you to customize the following verifications:
 | ANNOTATION_ADDED | true | true | PATCH |
 | ANNOTATION_DEPRECATED_ADDED | true | true | MINOR |
 | ANNOTATION_MODIFIED | true | true | PATCH |
-| ANNOTATION_MODIFIED_INCOMPATIBLE | true | true | PATCH |
 | ANNOTATION_REMOVED | true | true | PATCH |
 | CLASS_REMOVED | false | false | MAJOR |
 | CLASS_NOW_ABSTRACT | false | false | MAJOR |

@@ -53,4 +53,12 @@ public class JApiCompatibilityChange {
 	public int hashCode() {
 		return Objects.hash(type);
 	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("JApiCompatibilityChange{");
+		sb.append("type=").append(type);
+		sb.append('}');
+		return sb.toString();
+	}
 }
