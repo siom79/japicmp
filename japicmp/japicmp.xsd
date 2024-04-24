@@ -535,7 +535,6 @@
       <xs:enumeration value="ANNOTATION_ADDED"/>
       <xs:enumeration value="ANNOTATION_DEPRECATED_ADDED"/>
       <xs:enumeration value="ANNOTATION_MODIFIED"/>
-      <xs:enumeration value="ANNOTATION_MODIFIED_INCOMPATIBLE"/>
       <xs:enumeration value="ANNOTATION_REMOVED"/>
       <xs:enumeration value="CLASS_REMOVED"/>
       <xs:enumeration value="CLASS_NOW_ABSTRACT"/>

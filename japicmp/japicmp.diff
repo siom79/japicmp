@@ -1,63 +1,9 @@
-Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.21.0.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.20.0/japicmp-0.20.0.jar
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiAnnotation  (not serializable)
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.21.2-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.21.0/japicmp-0.21.0.jar
+***  MODIFIED CLASS: PUBLIC japicmp.model.JApiCompatibilityChange  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW METHOD: PUBLIC(+) japicmp.util.Optional<japicmp.model.JApiClass> getCorrespondingJApiClass()
-	+++  NEW METHOD: PUBLIC(+) void setJApiClass(japicmp.model.JApiClass)
-***  MODIFIED ENUM: PUBLIC FINAL japicmp.model.JApiCompatibilityChangeType  (compatible)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String toString()
+***! MODIFIED ENUM: PUBLIC FINAL japicmp.model.JApiCompatibilityChangeType  (field removed)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType ANNOTATION_ADDED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType ANNOTATION_MODIFIED_INCOMPATIBLE
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType ANNOTATION_REMOVED
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType ANNOTATION_MODIFIED
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiImplementedInterface  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW METHOD: PUBLIC(+) japicmp.util.Optional<japicmp.model.JApiClass> getCorrespondingJApiClass()
----! REMOVED CLASS: PUBLIC(-) japicmp.output.extapi.jpa.JpaAnalyzer  (not serializable)
-	---  CLASS FILE FORMAT VERSION: n.a. <- 52.0
-	---! REMOVED SUPERCLASS: java.lang.Object
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) java.lang.String JPA_ANNOTATION_ENTITY
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) java.lang.String JPA_ANNOTATION_TRANSIENT
-	---! REMOVED CONSTRUCTOR: PUBLIC(-) JpaAnalyzer()
-	---! REMOVED METHOD: PUBLIC(-) java.util.List<japicmp.output.extapi.jpa.model.JpaTable> analyze(java.util.List<japicmp.model.JApiClass>)
----! REMOVED CLASS: PUBLIC(-) japicmp.output.extapi.jpa.model.JpaAttribute  (not serializable)
-	---  CLASS FILE FORMAT VERSION: n.a. <- 52.0
-	---! REMOVED SUPERCLASS: java.lang.Object
-	---! REMOVED CONSTRUCTOR: PUBLIC(-) JpaAttribute(japicmp.model.JApiChangeStatus)
----! REMOVED CLASS: PUBLIC(-) japicmp.output.extapi.jpa.model.JpaName  (not serializable)
-	---  CLASS FILE FORMAT VERSION: n.a. <- 52.0
-	---! REMOVED INTERFACE: japicmp.model.JApiHasChangeStatus
-	---! REMOVED SUPERCLASS: java.lang.Object
-	---! REMOVED CONSTRUCTOR: PUBLIC(-) JpaName(japicmp.util.Optional<java.lang.String>, japicmp.util.Optional<java.lang.String>, japicmp.model.JApiChangeStatus)
-	---  REMOVED METHOD: PUBLIC(-) japicmp.model.JApiChangeStatus getChangeStatus()
-		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			---  REMOVED ELEMENT: name=changeStatus (-)
-	---! REMOVED METHOD: PUBLIC(-) java.lang.String getNewName()
-		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			---  REMOVED ELEMENT: name=newName (-)
-	---! REMOVED METHOD: PUBLIC(-) java.lang.String getOldName()
-		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			---  REMOVED ELEMENT: name=oldName (-)
----! REMOVED CLASS: PUBLIC(-) japicmp.output.extapi.jpa.model.JpaTable  (not serializable)
-	---  CLASS FILE FORMAT VERSION: n.a. <- 52.0
-	---! REMOVED SUPERCLASS: java.lang.Object
-	---! REMOVED CONSTRUCTOR: PUBLIC(-) JpaTable(japicmp.model.JApiClass, japicmp.model.JApiAnnotation)
-	---! REMOVED METHOD: PUBLIC(-) java.lang.String computeTablename()
-	---! REMOVED METHOD: PUBLIC(-) java.util.List<japicmp.output.extapi.jpa.model.JpaAttribute> getAttributes()
-		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlElementWrapper
-			---  REMOVED ELEMENT: name=attributes (-)
-		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlElement
-			---  REMOVED ELEMENT: name=attribute (-)
-	---! REMOVED METHOD: PUBLIC(-) java.lang.String getChangeStatus()
-		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			---  REMOVED ELEMENT: name=changeStatus (-)
-	---! REMOVED METHOD: PUBLIC(-) java.lang.String getFullyQualifiedName()
-		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			---  REMOVED ELEMENT: name=fullyQualifiedName (-)
-	---! REMOVED METHOD: PUBLIC(-) japicmp.output.extapi.jpa.model.JpaName getJpaName()
-		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlElement
-			---  REMOVED ELEMENT: name=name (-)
-***! MODIFIED CLASS: PUBLIC STATIC japicmp.util.SignatureParser$ParsedParameter  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	---! REMOVED METHOD: PUBLIC(-) void setTemplate(boolean)
+	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChangeType ANNOTATION_MODIFIED_INCOMPATIBLE
 
 Semantic versioning suggestion: 1.0.0

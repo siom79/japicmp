@@ -51,7 +51,15 @@ public class JApiCompatibilityChange {
 
 	@Override
 	public int hashCode() {
-<span class="fc" id="L54">		return Objects.hash(type);</span>
+<span class="nc" id="L54">		return Objects.hash(type);</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="fc" id="L59">		final StringBuffer sb = new StringBuffer(&quot;JApiCompatibilityChange{&quot;);</span>
+<span class="fc" id="L60">		sb.append(&quot;type=&quot;).append(type);</span>
+<span class="fc" id="L61">		sb.append('}');</span>
+<span class="fc" id="L62">		return sb.toString();</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
