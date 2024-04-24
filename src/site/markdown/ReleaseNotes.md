@@ -3,6 +3,12 @@ Versions
 
 The following versions of japicmp are available:
 
+0.21.1 (2024-04-24)
+-------------------
+* No StackOverflowException in case an annotation's element is annotated with the annotation itself. [#395](https://github.com/siom79/japicmp/issues/395)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.21.1).
+
 0.21.0 (2024-04-22)
 -------------------
 * New compatibility changes: ANNOTATION_ADDED, ANNOTATION_MODIFIED, ANNOTATION_MODIFIED_INCOMPATIBLE, ANNOTATION_REMOVED. [#385](https://github.com/siom79/japicmp/issues/385)
