@@ -9,15 +9,15 @@ import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CtFieldBuilder {
 	public static final String DEFAULT_FIELD_NAME = "field";
 	private CtClass type = CtClass.intType;
 	private String name = DEFAULT_FIELD_NAME;
 	private int modifier = Modifier.PUBLIC;
-	private final List<String> annotations = new ArrayList<>();
+	private final Map<String, CtElement[]> annotations = new HashMap<>();
 	private Object constantValue = null;
 
 	public CtFieldBuilder type(CtClass ctClass) {
@@ -53,11 +53,14 @@ public class CtFieldBuilder {
 		} else {
 			ctClass.addField(ctField);
 		}
-		for (String annotation : annotations) {
+		for (String annotation : annotations.keySet()) {
 			ClassFile classFile = ctClass.getClassFile();
 			ConstPool constPool = classFile.getConstPool();
 			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
 			Annotation annot = new Annotation(annotation, constPool);
+			for (CtElement element : annotations.get(annotation)) {
+				annot.addMemberValue(element.name, element.value.apply(constPool));
+			}
 			attr.setAnnotation(annot);
 			ctField.getFieldInfo().addAttribute(attr);
 		}
@@ -68,8 +71,8 @@ public class CtFieldBuilder {
 		return new CtFieldBuilder();
 	}
 
-	public CtFieldBuilder withAnnotation(String annotation) {
-		this.annotations.add(annotation);
+	public CtFieldBuilder withAnnotation(String annotation, CtElement... elements) {
+		this.annotations.put(annotation, elements);
 		return this;
 	}
 
