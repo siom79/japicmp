@@ -9,15 +9,15 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.SignatureAttribute;
 import javassist.bytecode.annotation.Annotation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CtMethodBuilder extends CtBehaviorBuilder {
 	private static final String DEFAULT_METHOD_NAME = "method";
 	private String body = "return null;";
 	private String name = DEFAULT_METHOD_NAME;
 	private CtClass returnType;
-	private final List<String> annotations = new ArrayList<>();
+	private final Map<String, CtElement[]> annotations = new HashMap<>();
 
 	public CtMethodBuilder name(String name) {
 		this.name = name;
@@ -80,8 +80,8 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return (CtMethodBuilder) super.finalMethod();
 	}
 
-	public CtMethodBuilder withAnnotation(String annotation) {
-		this.annotations.add(annotation);
+	public CtMethodBuilder withAnnotation(String annotation, CtElement... elements) {
+		this.annotations.put(annotation, elements);
 		return this;
 	}
 
@@ -97,10 +97,13 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		CtMethod ctMethod = CtNewMethod.make(this.modifier, this.returnType, this.name, this.parameters, this.exceptions, this.body, declaringClass);
 		ctMethod.setModifiers(this.modifier);
 		declaringClass.addMethod(ctMethod);
-		for (String annotation : annotations) {
+		for (String annotation : annotations.keySet()) {
             ConstPool constPool = declaringClass.getClassFile().getConstPool();
 			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
 			Annotation annot = new Annotation(annotation, constPool);
+			for (CtElement element : annotations.get(annotation)) {
+				annot.addMemberValue(element.name, element.value.apply(constPool));
+			}
 			attr.setAnnotation(annot);
 			ctMethod.getMethodInfo().addAttribute(attr);
 		}

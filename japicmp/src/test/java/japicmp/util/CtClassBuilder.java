@@ -10,13 +10,15 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CtClassBuilder {
 	public static final String DEFAULT_CLASS_NAME = "japicmp.Test";
 	private String name = DEFAULT_CLASS_NAME;
 	private int modifier = Modifier.PUBLIC;
-	private final List<String> annotations = new ArrayList<>();
+	private final Map<String, CtElement[]> annotations = new HashMap<>();
 	private Optional<CtClass> superclass = Optional.absent();
 	private final List<CtClass> interfaces = new ArrayList<>();
 
@@ -30,8 +32,8 @@ public class CtClassBuilder {
 		return this;
 	}
 
-	public CtClassBuilder withAnnotation(String annotation) {
-		this.annotations.add(annotation);
+	public CtClassBuilder withAnnotation(String annotation, CtElement... elements) {
+		this.annotations.put(annotation, elements);
 		return this;
 	}
 
@@ -69,11 +71,14 @@ public class CtClassBuilder {
 			ctClass = classPool.makeClass(this.name);
 		}
 		ctClass.setModifiers(this.modifier);
-		for (String annotation : annotations) {
+		for (String annotation : annotations.keySet()) {
 			ClassFile classFile = ctClass.getClassFile();
 			ConstPool constPool = classFile.getConstPool();
 			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
 			Annotation annot = new Annotation(annotation, constPool);
+			for (CtElement element : annotations.get(annotation)) {
+				annot.addMemberValue(element.name, element.value.apply(constPool));
+			}
 			attr.setAnnotation(annot);
 			ctClass.getClassFile2().addAttribute(attr);
 		}
