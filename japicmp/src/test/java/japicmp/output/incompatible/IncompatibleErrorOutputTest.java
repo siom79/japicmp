@@ -30,6 +30,7 @@ import japicmp.util.Helper;
 import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtMethod;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -240,6 +241,40 @@ public class IncompatibleErrorOutputTest {
 		options.setOldArchives(Collections.singletonList(oldFile));
 		JApiCmpArchive newFile = Helper.getArchive("japicmp-test-v"+newVersion+".jar", newVersion);
 		options.setNewArchives(Collections.singletonList(newFile));
+		new IncompatibleErrorOutput(options, result.getjApiClasses(), result.getJarArchiveComparator()).generate();
+	}
+
+	@Test(expected = JApiCmpException.class)
+	public void testBreakBuildIfGenericReturnTypeModifiedTrue() throws Exception {
+		testBreakBuildIfGenericReturnTypeModified(true);
+	}
+
+	@Test
+	public void testBreakBuildIfGenericReturnTypeModifiedFalse() throws Exception {
+		testBreakBuildIfGenericReturnTypeModified(false);
+	}
+
+	private void testBreakBuildIfGenericReturnTypeModified(boolean errorOnSourceIncompatibility) throws Exception {
+		Options options = Options.newDefault();
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
+		ClassesHelper.CompareClassesResult result = ClassesHelper.compareClassesWithResult(jarArchiveComparatorOptions,  new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethod method = CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.util.List")).name("method").body("return new java.util.ArrayList();").addToClass(ctClass);
+				method.setGenericSignature("()Ljava/util/List<Ljava/lang/Object;>;");
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethod method = CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.util.List")).name("method").body("return new java.util.ArrayList();").addToClass(ctClass);
+				method.setGenericSignature("()Ljava/util/List<Ljava/lang/Integer;>;");
+				return Collections.singletonList(ctClass);
+			}
+		});
+		options.setErrorOnSourceIncompatibility(errorOnSourceIncompatibility);
 		new IncompatibleErrorOutput(options, result.getjApiClasses(), result.getJarArchiveComparator()).generate();
 	}
 }

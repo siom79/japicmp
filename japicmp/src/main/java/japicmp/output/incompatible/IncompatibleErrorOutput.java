@@ -229,6 +229,23 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 							.append(")").append(":").append(change.getType().name());
 					}
 				}
+
+				for (JApiCompatibilityChange change : jApiMethod.getReturnType().getCompatibilityChanges()) {
+					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
+						if (!change.isBinaryCompatible() && options.isErrorOnBinaryIncompatibility()) {
+							breakBuildResult.binaryIncompatibleChanges = true;
+						}
+						if (!change.isSourceCompatible() &&  options.isErrorOnSourceIncompatibility()) {
+							breakBuildResult.sourceIncompatibleChanges = true;
+						}
+						if (sb.length() > 1) {
+							sb.append(',');
+						}
+						sb.append(jApiMethod.getjApiClass().getFullyQualifiedName()).append(".")
+							.append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod))
+							.append(")").append(":").append(change.getType().name());
+					}
+				}
 			}
 
 			private boolean breakBuildIfCausedByExclusion(JApiMethod jApiMethod) {
