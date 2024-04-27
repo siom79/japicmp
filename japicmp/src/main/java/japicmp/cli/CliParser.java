@@ -89,6 +89,8 @@ public class CliParser {
 				options.setNoAnnotations(true);
 			} else if ("--report-only-filename".equals(arg)) {
 				options.setReportOnlyFilename(true);
+			} else if ("--report-only-summary".equals(arg)) {
+				options.setReportOnlySummary(true);
 			} else if ("--error-on-binary-incompatibility".equals(arg)) {
 				options.setErrorOnBinaryIncompatibility(true);
 			} else if ("--error-on-source-incompatibility".equals(arg)) {
@@ -123,7 +125,8 @@ public class CliParser {
 			"                [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]\n" +
 			"                [--new-classpath <newClassPath>] [--no-annotations]\n" +
 			"                [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]\n" +
-			"                [--old-classpath <oldClassPath>] [--report-only-filename]\n" +
+			"                [--old-classpath <oldClassPath>]\n" +
+			"                [--report-only-filename] [--report-only-summary]\n" +
 			"                [(-s | --semantic-versioning)]\n" +
 			"                [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]\n" +
 			"                [--error-on-binary-incompatibility]\n" +
@@ -204,6 +207,10 @@ public class CliParser {
 			"\n" +
 			"        --report-only-filename\n" +
 			"            Reports just filenames (not full paths) in report description.\n" +
+			"\n" +
+			"        --report-only-summary\n" +
+			"            Reports only a breakdown of classes and their status\n" +
+			"            when generating plain text or html reports.\n" +
 			"\n" +
 			"        -s, --semantic-versioning\n" +
 			"            Tells you which part of the version to increment.\n" +
