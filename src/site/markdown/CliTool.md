@@ -15,7 +15,8 @@ SYNOPSIS
                 [(-n <pathToNewVersionJar> | --new <pathToNewVersionJar>)]
                 [--new-classpath <newClassPath>] [--no-annotations]
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
-                [--old-classpath <oldClassPath>] [--report-only-filename]
+                [--old-classpath <oldClassPath>]
+                [--report-only-filename] [--report-only-summary]
                 [(-s | --semantic-versioning)]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
                 [--error-on-binary-incompatibility]
@@ -96,6 +97,10 @@ OPTIONS
 
         --report-only-filename
             Reports just filenames (not full paths) in report description.
+
+        --report-only-summary
+            Reports only a breakdown of classes and their status
+            when generating plain text or html reports.
 
         -s, --semantic-versioning
             Tells you which part of the version to increment.
