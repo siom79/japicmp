@@ -55,6 +55,11 @@
              classpathref="compare.classpath" onlybinaryincompatible="true"/>
   </target>
 
+  <target name="summary" depends="init">
+    <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" reportOnlySummary="true"
+             classpathref="compare.classpath" onlybinaryincompatible="true"/>
+  </target>
+
   <target name="binary" depends="init">
     <japicmp oldjar="${japicmp.reference.jar}" newjar="${japicmp.current.jar}" ignoremissingclasses="true"
              classpathref="compare.classpath" erroronbinaryincompatibility="true"/>
