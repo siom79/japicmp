@@ -40,6 +40,9 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 		if (!jApiClasses.isEmpty()) {
 			for (JApiClass jApiClass : jApiClasses) {
 				processClass(sb, jApiClass);
+				if (options.isReportOnlySummary()) {
+					continue;
+				}
 				processConstructors(sb, jApiClass);
 				processMethods(sb, jApiClass);
 				processAnnotations(sb, jApiClass, 1);
@@ -319,6 +322,9 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 
 	private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
 		sb.append(signs).append(" ").append(jApiClass.getChangeStatus()).append(" ").append(processClassType(jApiClass)).append(": ").append(accessModifierAsString(jApiClass)).append(abstractModifierAsString(jApiClass)).append(staticModifierAsString(jApiClass)).append(finalModifierAsString(jApiClass)).append(syntheticModifierAsString(jApiClass)).append(jApiClass.getFullyQualifiedName()).append(" ").append(javaObjectSerializationStatus(jApiClass)).append("\n");
+		if (options.isReportOnlySummary()) {
+			return;
+		}
 		processClassFileFormatVersionChanges(sb, jApiClass);
 		processGenericTemplateChanges(sb, jApiClass, 1);
 		processInterfaceChanges(sb, jApiClass);
