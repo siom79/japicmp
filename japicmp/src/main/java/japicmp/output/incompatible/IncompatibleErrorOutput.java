@@ -38,6 +38,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 
@@ -104,26 +106,26 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 					final SemanticVersion.ChangeType changeType = changeTypeOptional.get();
 
 					SemverOut semverOut = new SemverOut(options, jApiClasses, (change, semanticVersionLevel) -> {
-                        switch(semanticVersionLevel) {
-                        case MAJOR:
-                            if (changeType.ordinal() > SemanticVersion.ChangeType.MAJOR.ordinal()) {
-                                warn("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change);
-                            }
-                            break;
-                        case MINOR:
-                            if (changeType.ordinal() > SemanticVersion.ChangeType.MINOR.ordinal()) {
-                                warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
-                            }
-                            break;
-                        case PATCH:
-                            if (changeType.ordinal() > SemanticVersion.ChangeType.PATCH.ordinal()) {
-                                warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
-                            }
-                            break;
-                        default:
-                            // Ignore
-                        }
-                    });
+						switch (semanticVersionLevel) {
+							case MAJOR:
+								if (changeType.ordinal() > SemanticVersion.ChangeType.MAJOR.ordinal()) {
+									warn("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change);
+								}
+								break;
+							case MINOR:
+								if (changeType.ordinal() > SemanticVersion.ChangeType.MINOR.ordinal()) {
+									warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
+								}
+								break;
+							case PATCH:
+								if (changeType.ordinal() > SemanticVersion.ChangeType.PATCH.ordinal()) {
+									warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
+								}
+								break;
+							default:
+								// Ignore
+						}
+					});
 
 					String semver = semverOut.generate();
 					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals(SemverOut.SEMVER_MAJOR)) {
@@ -213,29 +215,18 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 
 			@Override
 			public void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod) {
-				for (JApiCompatibilityChange change : jApiMethod.getCompatibilityChanges()) {
+				final List<JApiCompatibilityChange> changes = Stream.concat(
+						jApiMethod.getCompatibilityChanges().stream(),
+						jApiMethod.getReturnType().getCompatibilityChanges().stream()
+					)
+					.collect(Collectors.toList());
+
+				for (JApiCompatibilityChange change : changes) {
 					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
 						if (!change.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
 							breakBuildResult.binaryIncompatibleChanges = true;
 						}
 						if (!change.isSourceCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
-							breakBuildResult.sourceIncompatibleChanges = true;
-						}
-						if (sb.length() > 1) {
-							sb.append(',');
-						}
-						sb.append(jApiMethod.getjApiClass().getFullyQualifiedName()).append(".")
-							.append(jApiMethod.getName()).append("(").append(methodParameterToList(jApiMethod))
-							.append(")").append(":").append(change.getType().name());
-					}
-				}
-
-				for (JApiCompatibilityChange change : jApiMethod.getReturnType().getCompatibilityChanges()) {
-					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
-						if (!change.isBinaryCompatible() && options.isErrorOnBinaryIncompatibility()) {
-							breakBuildResult.binaryIncompatibleChanges = true;
-						}
-						if (!change.isSourceCompatible() &&  options.isErrorOnSourceIncompatibility()) {
 							breakBuildResult.sourceIncompatibleChanges = true;
 						}
 						if (sb.length() > 1) {
@@ -320,7 +311,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 			private boolean breakBuildIfCausedByExclusion(JApiImplementedInterface jApiImplementedInterface) {
 				if (!breakBuildIfCausedByExclusion) {
 					CtClass ctClass = jApiImplementedInterface.getCtClass();
-                    return !classExcluded(ctClass);
+					return !classExcluded(ctClass);
 				}
 				return true;
 			}
@@ -415,7 +406,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 					Optional<CtClass> newSuperclassOptional = jApiSuperclass.getNewSuperclass();
 					if (newSuperclassOptional.isPresent()) {
 						CtClass ctClass = newSuperclassOptional.get();
-                        return !classExcluded(ctClass);
+						return !classExcluded(ctClass);
 					}
 				}
 				return true;
