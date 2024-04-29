@@ -106,26 +106,26 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 					final SemanticVersion.ChangeType changeType = changeTypeOptional.get();
 
 					SemverOut semverOut = new SemverOut(options, jApiClasses, (change, semanticVersionLevel) -> {
-						switch (semanticVersionLevel) {
-							case MAJOR:
-								if (changeType.ordinal() > SemanticVersion.ChangeType.MAJOR.ordinal()) {
-									warn("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change);
-								}
-								break;
-							case MINOR:
-								if (changeType.ordinal() > SemanticVersion.ChangeType.MINOR.ordinal()) {
-									warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
-								}
-								break;
-							case PATCH:
-								if (changeType.ordinal() > SemanticVersion.ChangeType.PATCH.ordinal()) {
-									warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
-								}
-								break;
-							default:
-								// Ignore
-						}
-					});
+                        switch(semanticVersionLevel) {
+                        case MAJOR:
+                            if (changeType.ordinal() > SemanticVersion.ChangeType.MAJOR.ordinal()) {
+                                warn("Incompatibility detected: Requires semantic version level " + semanticVersionLevel + ": " + change);
+                            }
+                            break;
+                        case MINOR:
+                            if (changeType.ordinal() > SemanticVersion.ChangeType.MINOR.ordinal()) {
+                                warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
+                            }
+                            break;
+                        case PATCH:
+                            if (changeType.ordinal() > SemanticVersion.ChangeType.PATCH.ordinal()) {
+                                warn("Incompatibility detected: Requires semantic version level	 " + semanticVersionLevel + ": " + change);
+                            }
+                            break;
+                        default:
+                            // Ignore
+                        }
+                    });
 
 					String semver = semverOut.generate();
 					if (changeType == SemanticVersion.ChangeType.MINOR && semver.equals(SemverOut.SEMVER_MAJOR)) {
@@ -311,7 +311,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 			private boolean breakBuildIfCausedByExclusion(JApiImplementedInterface jApiImplementedInterface) {
 				if (!breakBuildIfCausedByExclusion) {
 					CtClass ctClass = jApiImplementedInterface.getCtClass();
-					return !classExcluded(ctClass);
+                    return !classExcluded(ctClass);
 				}
 				return true;
 			}
@@ -406,7 +406,7 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 					Optional<CtClass> newSuperclassOptional = jApiSuperclass.getNewSuperclass();
 					if (newSuperclassOptional.isPresent()) {
 						CtClass ctClass = newSuperclassOptional.get();
-						return !classExcluded(ctClass);
+                        return !classExcluded(ctClass);
 					}
 				}
 				return true;
