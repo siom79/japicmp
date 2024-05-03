@@ -3,6 +3,12 @@ Versions
 
 The following versions of japicmp are available:
 
+0.21.2 (2024-05-03)
+-------------------
+* Break build if return type of method changed incompatible. [#397](https://github.com/siom79/japicmp/issues/397)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.21.2).
+
 0.21.1 (2024-04-24)
 -------------------
 * No StackOverflowException in case an annotation's element is annotated with the annotation itself. [#395](https://github.com/siom79/japicmp/issues/395)
