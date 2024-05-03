@@ -38,388 +38,396 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IncompatibleErrorOutput extends OutputGenerator&lt;Void&gt; {
 
-<span class="fc" id="L44">	private static final Logger LOGGER = Logger.getLogger(JApiCmp.class.getName());</span>
+<span class="fc" id="L46">	private static final Logger LOGGER = Logger.getLogger(JApiCmp.class.getName());</span>
 
 	private final JarArchiveComparator jarArchiveComparator;
 
 	public IncompatibleErrorOutput(Options options, List&lt;JApiClass&gt; jApiClasses, JarArchiveComparator jarArchiveComparator) {
-<span class="fc" id="L49">		super(options, jApiClasses);</span>
-<span class="fc" id="L50">		this.jarArchiveComparator = jarArchiveComparator;</span>
-<span class="fc" id="L51">	}</span>
+<span class="fc" id="L51">		super(options, jApiClasses);</span>
+<span class="fc" id="L52">		this.jarArchiveComparator = jarArchiveComparator;</span>
+<span class="fc" id="L53">	}</span>
 
 	protected void warn(String msg, Throwable exception) {
-<span class="nc" id="L54">		LOGGER.log(Level.WARNING, msg, exception);</span>
-<span class="nc" id="L55">	}</span>
+<span class="nc" id="L56">		LOGGER.log(Level.WARNING, msg, exception);</span>
+<span class="nc" id="L57">	}</span>
 
 	protected void warn(String msg) {
-<span class="fc" id="L58">		LOGGER.log(Level.WARNING, msg);</span>
-<span class="fc" id="L59">	}</span>
+<span class="fc" id="L60">		LOGGER.log(Level.WARNING, msg);</span>
+<span class="fc" id="L61">	}</span>
 
 	protected void info(String msg) {
-<span class="nc" id="L62">		LOGGER.log(Level.INFO, msg);</span>
-<span class="nc" id="L63">	}</span>
+<span class="nc" id="L64">		LOGGER.log(Level.INFO, msg);</span>
+<span class="nc" id="L65">	}</span>
 
 	protected void debug(String msg) {
-<span class="nc" id="L66">		LOGGER.log(Level.FINE, msg);</span>
-<span class="nc" id="L67">	}</span>
+<span class="nc" id="L68">		LOGGER.log(Level.FINE, msg);</span>
+<span class="nc" id="L69">	}</span>
 
 	protected boolean isDebugEnabled() {
-<span class="nc" id="L70">		return LOGGER.isLoggable(Level.FINE);</span>
+<span class="nc" id="L72">		return LOGGER.isLoggable(Level.FINE);</span>
 	}
 
 	@Override
 	public Void generate() {
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">		if (options.isErrorOnModifications()) {</span>
-<span class="nc bnc" id="L76" title="All 2 branches missed.">			for (JApiClass jApiClass : jApiClasses) {</span>
-<span class="nc bnc" id="L77" title="All 2 branches missed.">				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
-<span class="nc" id="L78">					throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format(&quot;There is at least one modified class: %s&quot;, jApiClass.getFullyQualifiedName()));</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">		if (options.isErrorOnModifications()) {</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">			for (JApiClass jApiClass : jApiClasses) {</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">				if (jApiClass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L80">					throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format(&quot;There is at least one modified class: %s&quot;, jApiClass.getFullyQualifiedName()));</span>
 				}
-<span class="nc" id="L80">			}</span>
+<span class="nc" id="L82">			}</span>
 		}
-<span class="fc" id="L82">		breakBuildIfNecessaryByApplyingFilter(jApiClasses, options, jarArchiveComparator);</span>
-<span class="fc bfc" id="L83" title="All 2 branches covered.">		if (options.isErrorOnSemanticIncompatibility()) {</span>
-<span class="fc" id="L84">			boolean ignoreMissingOldVersion = options.isIgnoreMissingOldVersion();</span>
-<span class="fc" id="L85">			boolean ignoreMissingNewVersion = options.isIgnoreMissingNewVersion();</span>
-<span class="fc" id="L86">			List&lt;SemanticVersion&gt; oldVersions = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L87">			List&lt;SemanticVersion&gt; newVersions = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L88" title="All 2 branches covered.">			for (JApiCmpArchive file : options.getOldArchives()) {</span>
-<span class="fc" id="L89">				Optional&lt;SemanticVersion&gt; semanticVersion = file.getVersion().getSemanticVersion();</span>
-<span class="pc bpc" id="L90" title="1 of 2 branches missed.">				if (semanticVersion.isPresent()) {</span>
-<span class="fc" id="L91">					oldVersions.add(semanticVersion.get());</span>
+<span class="fc" id="L84">		breakBuildIfNecessaryByApplyingFilter(jApiClasses, options, jarArchiveComparator);</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">		if (options.isErrorOnSemanticIncompatibility()) {</span>
+<span class="fc" id="L86">			boolean ignoreMissingOldVersion = options.isIgnoreMissingOldVersion();</span>
+<span class="fc" id="L87">			boolean ignoreMissingNewVersion = options.isIgnoreMissingNewVersion();</span>
+<span class="fc" id="L88">			List&lt;SemanticVersion&gt; oldVersions = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L89">			List&lt;SemanticVersion&gt; newVersions = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">			for (JApiCmpArchive file : options.getOldArchives()) {</span>
+<span class="fc" id="L91">				Optional&lt;SemanticVersion&gt; semanticVersion = file.getVersion().getSemanticVersion();</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">				if (semanticVersion.isPresent()) {</span>
+<span class="fc" id="L93">					oldVersions.add(semanticVersion.get());</span>
 				}
-<span class="fc" id="L93">			}</span>
-<span class="fc bfc" id="L94" title="All 2 branches covered.">			for (JApiCmpArchive file : options.getNewArchives()) {</span>
-<span class="fc" id="L95">				Optional&lt;SemanticVersion&gt; semanticVersion = file.getVersion().getSemanticVersion();</span>
-<span class="pc bpc" id="L96" title="1 of 2 branches missed.">				if (semanticVersion.isPresent()) {</span>
-<span class="fc" id="L97">					newVersions.add(semanticVersion.get());</span>
+<span class="fc" id="L95">			}</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">			for (JApiCmpArchive file : options.getNewArchives()) {</span>
+<span class="fc" id="L97">				Optional&lt;SemanticVersion&gt; semanticVersion = file.getVersion().getSemanticVersion();</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">				if (semanticVersion.isPresent()) {</span>
+<span class="fc" id="L99">					newVersions.add(semanticVersion.get());</span>
 				}
-<span class="fc" id="L99">			}</span>
-<span class="fc" id="L100">			VersionChange versionChange = new VersionChange(oldVersions, newVersions, ignoreMissingOldVersion, ignoreMissingNewVersion);</span>
-<span class="pc bpc" id="L101" title="3 of 4 branches missed.">			if (!versionChange.isAllMajorVersionsZero() || options.isErrorOnSemanticIncompatibilityForMajorVersionZero()) {</span>
-<span class="fc" id="L102">				Optional&lt;SemanticVersion.ChangeType&gt; changeTypeOptional = versionChange.computeChangeType();</span>
-<span class="pc bpc" id="L103" title="1 of 2 branches missed.">				if (changeTypeOptional.isPresent()) {</span>
-<span class="fc" id="L104">					final SemanticVersion.ChangeType changeType = changeTypeOptional.get();</span>
+<span class="fc" id="L101">			}</span>
+<span class="fc" id="L102">			VersionChange versionChange = new VersionChange(oldVersions, newVersions, ignoreMissingOldVersion, ignoreMissingNewVersion);</span>
+<span class="pc bpc" id="L103" title="3 of 4 branches missed.">			if (!versionChange.isAllMajorVersionsZero() || options.isErrorOnSemanticIncompatibilityForMajorVersionZero()) {</span>
+<span class="fc" id="L104">				Optional&lt;SemanticVersion.ChangeType&gt; changeTypeOptional = versionChange.computeChangeType();</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">				if (changeTypeOptional.isPresent()) {</span>
+<span class="fc" id="L106">					final SemanticVersion.ChangeType changeType = changeTypeOptional.get();</span>
 
-<span class="fc" id="L106">					SemverOut semverOut = new SemverOut(options, jApiClasses, (change, semanticVersionLevel) -&gt; {</span>
-<span class="pc bpc" id="L107" title="1 of 4 branches missed.">                        switch(semanticVersionLevel) {</span>
+<span class="fc" id="L108">					SemverOut semverOut = new SemverOut(options, jApiClasses, (change, semanticVersionLevel) -&gt; {</span>
+<span class="pc bpc" id="L109" title="1 of 4 branches missed.">                        switch(semanticVersionLevel) {</span>
                         case MAJOR:
-<span class="fc bfc" id="L109" title="All 2 branches covered.">                            if (changeType.ordinal() &gt; SemanticVersion.ChangeType.MAJOR.ordinal()) {</span>
-<span class="fc" id="L110">                                warn(&quot;Incompatibility detected: Requires semantic version level &quot; + semanticVersionLevel + &quot;: &quot; + change);</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">                            if (changeType.ordinal() &gt; SemanticVersion.ChangeType.MAJOR.ordinal()) {</span>
+<span class="fc" id="L112">                                warn(&quot;Incompatibility detected: Requires semantic version level &quot; + semanticVersionLevel + &quot;: &quot; + change);</span>
                             }
                             break;
                         case MINOR:
-<span class="pc bpc" id="L114" title="1 of 2 branches missed.">                            if (changeType.ordinal() &gt; SemanticVersion.ChangeType.MINOR.ordinal()) {</span>
-<span class="nc" id="L115">                                warn(&quot;Incompatibility detected: Requires semantic version level	 &quot; + semanticVersionLevel + &quot;: &quot; + change);</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">                            if (changeType.ordinal() &gt; SemanticVersion.ChangeType.MINOR.ordinal()) {</span>
+<span class="nc" id="L117">                                warn(&quot;Incompatibility detected: Requires semantic version level	 &quot; + semanticVersionLevel + &quot;: &quot; + change);</span>
                             }
                             break;
                         case PATCH:
-<span class="pc bpc" id="L119" title="1 of 2 branches missed.">                            if (changeType.ordinal() &gt; SemanticVersion.ChangeType.PATCH.ordinal()) {</span>
-<span class="nc" id="L120">                                warn(&quot;Incompatibility detected: Requires semantic version level	 &quot; + semanticVersionLevel + &quot;: &quot; + change);</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                            if (changeType.ordinal() &gt; SemanticVersion.ChangeType.PATCH.ordinal()) {</span>
+<span class="nc" id="L122">                                warn(&quot;Incompatibility detected: Requires semantic version level	 &quot; + semanticVersionLevel + &quot;: &quot; + change);</span>
                             }
                             break;
                         default:
                             // Ignore
                         }
-<span class="fc" id="L126">                    });</span>
+<span class="fc" id="L128">                    });</span>
 
-<span class="fc" id="L128">					String semver = semverOut.generate();</span>
-<span class="pc bpc" id="L129" title="1 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.MINOR &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
-<span class="fc" id="L130">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a minor change but binary incompatible changes found.&quot;);</span>
+<span class="fc" id="L130">					String semver = semverOut.generate();</span>
+<span class="pc bpc" id="L131" title="1 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.MINOR &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
+<span class="fc" id="L132">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a minor change but binary incompatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L132" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.PATCH &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
-<span class="nc" id="L133">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a patch change but binary incompatible changes found.&quot;);</span>
+<span class="pc bpc" id="L134" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.PATCH &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
+<span class="nc" id="L135">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a patch change but binary incompatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L135" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.PATCH &amp;&amp; semver.equals(SemverOut.SEMVER_MINOR)) {</span>
-<span class="nc" id="L136">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a patch change but binary compatible changes found.&quot;);</span>
+<span class="pc bpc" id="L137" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.PATCH &amp;&amp; semver.equals(SemverOut.SEMVER_MINOR)) {</span>
+<span class="nc" id="L138">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate a patch change but binary compatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L138" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
-<span class="nc" id="L139">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but binary incompatible changes found.&quot;);</span>
+<span class="pc bpc" id="L140" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_MAJOR)) {</span>
+<span class="nc" id="L141">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but binary incompatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L141" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_MINOR)) {</span>
-<span class="nc" id="L142">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but binary compatible changes found.&quot;);</span>
+<span class="pc bpc" id="L143" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_MINOR)) {</span>
+<span class="nc" id="L144">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but binary compatible changes found.&quot;);</span>
 					}
-<span class="pc bpc" id="L144" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_PATCH)) {</span>
-<span class="nc" id="L145">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but found API changes.&quot;);</span>
+<span class="pc bpc" id="L146" title="3 of 4 branches missed.">					if (changeType == SemanticVersion.ChangeType.UNCHANGED &amp;&amp; semver.equals(SemverOut.SEMVER_PATCH)) {</span>
+<span class="nc" id="L147">						throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, &quot;Versions of archives indicate no API changes but found API changes.&quot;);</span>
 					}
-<span class="fc" id="L147">				} else {</span>
-<span class="nc bnc" id="L148" title="All 2 branches missed.">					if (isDebugEnabled()) {</span>
-<span class="nc" id="L149">						Joiner joiner = Joiner.on(';');</span>
-<span class="nc" id="L150">						debug(&quot;No change type available for old version(s) &quot; + joiner.join(oldVersions) + &quot; and new version(s) &quot; + joiner.join(newVersions) + &quot;.&quot;);</span>
+<span class="fc" id="L149">				} else {</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">					if (isDebugEnabled()) {</span>
+<span class="nc" id="L151">						Joiner joiner = Joiner.on(';');</span>
+<span class="nc" id="L152">						debug(&quot;No change type available for old version(s) &quot; + joiner.join(oldVersions) + &quot; and new version(s) &quot; + joiner.join(newVersions) + &quot;.&quot;);</span>
 					}
 				}
-<span class="fc" id="L153">			} else {</span>
-<span class="nc" id="L154">				info(&quot;Skipping semantic version check because all major versions are zero (see http://semver.org/#semantic-versioning-specification-semver, section 4).&quot;);</span>
+<span class="fc" id="L155">			} else {</span>
+<span class="nc" id="L156">				info(&quot;Skipping semantic version check because all major versions are zero (see http://semver.org/#semantic-versioning-specification-semver, section 4).&quot;);</span>
 			}
 		}
-<span class="fc" id="L157">		return null;</span>
+<span class="fc" id="L159">		return null;</span>
 	}
 
 
 	private static class BreakBuildResult {
 		private final boolean breakBuildOnBinaryIncompatibleModifications;
 		private final boolean breakBuildOnSourceIncompatibleModifications;
-<span class="fc" id="L164">		boolean binaryIncompatibleChanges = false;</span>
-<span class="fc" id="L165">		boolean sourceIncompatibleChanges = false;</span>
+<span class="fc" id="L166">		boolean binaryIncompatibleChanges = false;</span>
+<span class="fc" id="L167">		boolean sourceIncompatibleChanges = false;</span>
 
-<span class="fc" id="L167">		public BreakBuildResult(boolean breakBuildOnBinaryIncompatibleModifications, boolean breakBuildOnSourceIncompatibleModifications) {</span>
-<span class="fc" id="L168">			this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;</span>
-<span class="fc" id="L169">			this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;</span>
-<span class="fc" id="L170">		}</span>
+<span class="fc" id="L169">		public BreakBuildResult(boolean breakBuildOnBinaryIncompatibleModifications, boolean breakBuildOnSourceIncompatibleModifications) {</span>
+<span class="fc" id="L170">			this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;</span>
+<span class="fc" id="L171">			this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;</span>
+<span class="fc" id="L172">		}</span>
 
 		public boolean breakTheBuild() {
-<span class="pc bpc" id="L173" title="1 of 8 branches missed.">			return binaryIncompatibleChanges &amp;&amp; this.breakBuildOnBinaryIncompatibleModifications ||</span>
+<span class="fc bfc" id="L175" title="All 8 branches covered.">			return binaryIncompatibleChanges &amp;&amp; this.breakBuildOnBinaryIncompatibleModifications ||</span>
 				sourceIncompatibleChanges &amp;&amp; this.breakBuildOnSourceIncompatibleModifications;
 		}
 	}
 
 	private String methodParameterToList(JApiBehavior jApiMethod) {
-<span class="fc" id="L179">		StringBuilder sb = new StringBuilder();</span>
-<span class="pc bpc" id="L180" title="1 of 2 branches missed.">		for (JApiParameter jApiParameter : jApiMethod.getParameters()) {</span>
-<span class="nc bnc" id="L181" title="All 2 branches missed.">			if (sb.length() &gt; 0) {</span>
-<span class="nc" id="L182">				sb.append(',');</span>
+<span class="fc" id="L181">		StringBuilder sb = new StringBuilder();</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">		for (JApiParameter jApiParameter : jApiMethod.getParameters()) {</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">			if (sb.length() &gt; 0) {</span>
+<span class="nc" id="L184">				sb.append(',');</span>
 			}
-<span class="nc" id="L184">			sb.append(jApiParameter.getType());</span>
-<span class="nc" id="L185">		}</span>
-<span class="fc" id="L186">		return sb.toString();</span>
+<span class="nc" id="L186">			sb.append(jApiParameter.getType());</span>
+<span class="nc" id="L187">		}</span>
+<span class="fc" id="L188">		return sb.toString();</span>
 	}
 
 	void breakBuildIfNecessaryByApplyingFilter(List&lt;JApiClass&gt; jApiClasses, final Options options,
 											   final JarArchiveComparator jarArchiveComparator) {
-<span class="fc" id="L191">		final StringBuilder sb = new StringBuilder();</span>
-<span class="fc" id="L192">		final BreakBuildResult breakBuildResult = new BreakBuildResult(options.isErrorOnBinaryIncompatibility(),</span>
-<span class="fc" id="L193">			options.isErrorOnSourceIncompatibility());</span>
-<span class="fc" id="L194">		final boolean breakBuildIfCausedByExclusion = options.isErrorOnExclusionIncompatibility();</span>
-<span class="fc" id="L195">		Filter.filter(jApiClasses, new Filter.FilterVisitor() {</span>
+<span class="fc" id="L193">		final StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L194">		final BreakBuildResult breakBuildResult = new BreakBuildResult(options.isErrorOnBinaryIncompatibility(),</span>
+<span class="fc" id="L195">			options.isErrorOnSourceIncompatibility());</span>
+<span class="fc" id="L196">		final boolean breakBuildIfCausedByExclusion = options.isErrorOnExclusionIncompatibility();</span>
+<span class="fc" id="L197">		Filter.filter(jApiClasses, new Filter.FilterVisitor() {</span>
 			@Override
 			public void visit(Iterator&lt;JApiClass&gt; iterator, JApiClass jApiClass) {
-<span class="fc bfc" id="L198" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiClass.getCompatibilityChanges()) {</span>
-<span class="pc bpc" id="L199" title="1 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
-<span class="pc bpc" id="L200" title="1 of 2 branches missed.">						if (!change.isBinaryCompatible()) {</span>
-<span class="nc" id="L201">							breakBuildResult.binaryIncompatibleChanges = true;</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiClass.getCompatibilityChanges()) {</span>
+<span class="pc bpc" id="L201" title="1 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">						if (!change.isBinaryCompatible()) {</span>
+<span class="nc" id="L203">							breakBuildResult.binaryIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L203" title="1 of 2 branches missed.">						if (!change.isSourceCompatible()) {</span>
-<span class="fc" id="L204">							breakBuildResult.sourceIncompatibleChanges = true;</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">						if (!change.isSourceCompatible()) {</span>
+<span class="fc" id="L206">							breakBuildResult.sourceIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L206" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
-<span class="fc" id="L207">							sb.append(',');</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
+<span class="fc" id="L209">							sb.append(',');</span>
 						}
-<span class="fc" id="L209">						sb.append(jApiClass.getFullyQualifiedName()).append(&quot;:&quot;).append(change.getType().name());</span>
+<span class="fc" id="L211">						sb.append(jApiClass.getFullyQualifiedName()).append(&quot;:&quot;).append(change.getType().name());</span>
 					}
-<span class="fc" id="L211">				}</span>
-<span class="fc" id="L212">			}</span>
+<span class="fc" id="L213">				}</span>
+<span class="fc" id="L214">			}</span>
 
 			@Override
 			public void visit(Iterator&lt;JApiMethod&gt; iterator, JApiMethod jApiMethod) {
-<span class="fc bfc" id="L216" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiMethod.getCompatibilityChanges()) {</span>
-<span class="pc bpc" id="L217" title="3 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
-<span class="pc bpc" id="L218" title="1 of 4 branches missed.">						if (!change.isBinaryCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiMethod)) {</span>
-<span class="fc" id="L219">							breakBuildResult.binaryIncompatibleChanges = true;</span>
+<span class="fc" id="L218">				final List&lt;JApiCompatibilityChange&gt; changes = Stream.concat(</span>
+<span class="fc" id="L219">						jApiMethod.getCompatibilityChanges().stream(),</span>
+<span class="fc" id="L220">						jApiMethod.getReturnType().getCompatibilityChanges().stream()</span>
+					)
+<span class="fc" id="L222">					.collect(Collectors.toList());</span>
+
+<span class="fc bfc" id="L224" title="All 2 branches covered.">				for (JApiCompatibilityChange change : changes) {</span>
+<span class="pc bpc" id="L225" title="1 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
+<span class="fc bfc" id="L226" title="All 4 branches covered.">						if (!change.isBinaryCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiMethod)) {</span>
+<span class="fc" id="L227">							breakBuildResult.binaryIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L221" title="1 of 4 branches missed.">						if (!change.isSourceCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiMethod)) {</span>
-<span class="fc" id="L222">							breakBuildResult.sourceIncompatibleChanges = true;</span>
+<span class="pc bpc" id="L229" title="1 of 4 branches missed.">						if (!change.isSourceCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiMethod)) {</span>
+<span class="fc" id="L230">							breakBuildResult.sourceIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L224" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
-<span class="nc" id="L225">							sb.append(',');</span>
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
+<span class="nc" id="L233">							sb.append(',');</span>
 						}
-<span class="fc" id="L227">						sb.append(jApiMethod.getjApiClass().getFullyQualifiedName()).append(&quot;.&quot;)</span>
-<span class="fc" id="L228">							.append(jApiMethod.getName()).append(&quot;(&quot;).append(methodParameterToList(jApiMethod))</span>
-<span class="fc" id="L229">							.append(&quot;)&quot;).append(&quot;:&quot;).append(change.getType().name());</span>
+<span class="fc" id="L235">						sb.append(jApiMethod.getjApiClass().getFullyQualifiedName()).append(&quot;.&quot;)</span>
+<span class="fc" id="L236">							.append(jApiMethod.getName()).append(&quot;(&quot;).append(methodParameterToList(jApiMethod))</span>
+<span class="fc" id="L237">							.append(&quot;)&quot;).append(&quot;:&quot;).append(change.getType().name());</span>
 					}
-<span class="fc" id="L231">				}</span>
-<span class="fc" id="L232">			}</span>
+<span class="fc" id="L239">				}</span>
+<span class="fc" id="L240">			}</span>
 
 			private boolean breakBuildIfCausedByExclusion(JApiMethod jApiMethod) {
-<span class="fc bfc" id="L235" title="All 2 branches covered.">				if (!breakBuildIfCausedByExclusion) {</span>
-<span class="fc" id="L236">					JApiReturnType returnType = jApiMethod.getReturnType();</span>
-<span class="fc" id="L237">					String oldType = returnType.getOldReturnType();</span>
+<span class="fc bfc" id="L243" title="All 2 branches covered.">				if (!breakBuildIfCausedByExclusion) {</span>
+<span class="fc" id="L244">					JApiReturnType returnType = jApiMethod.getReturnType();</span>
+<span class="fc" id="L245">					String oldType = returnType.getOldReturnType();</span>
 					try {
-<span class="fc" id="L239">						Optional&lt;CtClass&gt; ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);</span>
-<span class="pc bpc" id="L240" title="1 of 2 branches missed.">						if (ctClassOptional.isPresent()) {</span>
-<span class="pc bpc" id="L241" title="1 of 2 branches missed.">							if (classExcluded(ctClassOptional.get())) {</span>
-<span class="fc" id="L242">								return false;</span>
+<span class="fc" id="L247">						Optional&lt;CtClass&gt; ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);</span>
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">						if (ctClassOptional.isPresent()) {</span>
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">							if (classExcluded(ctClassOptional.get())) {</span>
+<span class="fc" id="L250">								return false;</span>
 							}
 						}
-<span class="nc" id="L245">					} catch (Exception e) {</span>
-<span class="nc" id="L246">						warn(&quot;Failed to load class &quot; + oldType + &quot;: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L247">					}</span>
-<span class="nc" id="L248">					String newType = returnType.getNewReturnType();</span>
+<span class="nc" id="L253">					} catch (Exception e) {</span>
+<span class="nc" id="L254">						warn(&quot;Failed to load class &quot; + oldType + &quot;: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L255">					}</span>
+<span class="nc" id="L256">					String newType = returnType.getNewReturnType();</span>
 					try {
-<span class="nc" id="L250">						Optional&lt;CtClass&gt; ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);</span>
-<span class="nc bnc" id="L251" title="All 2 branches missed.">						if (ctClassOptional.isPresent()) {</span>
-<span class="nc bnc" id="L252" title="All 2 branches missed.">							if (classExcluded(ctClassOptional.get())) {</span>
-<span class="nc" id="L253">								return false;</span>
+<span class="nc" id="L258">						Optional&lt;CtClass&gt; ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">						if (ctClassOptional.isPresent()) {</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">							if (classExcluded(ctClassOptional.get())) {</span>
+<span class="nc" id="L261">								return false;</span>
 							}
 						}
-<span class="nc" id="L256">					} catch (Exception e) {</span>
-<span class="nc" id="L257">						warn(&quot;Failed to load class &quot; + newType + &quot;: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L258">					}</span>
+<span class="nc" id="L264">					} catch (Exception e) {</span>
+<span class="nc" id="L265">						warn(&quot;Failed to load class &quot; + newType + &quot;: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L266">					}</span>
 				}
-<span class="fc" id="L260">				return true;</span>
+<span class="fc" id="L268">				return true;</span>
 			}
 
 			@Override
 			public void visit(Iterator&lt;JApiConstructor&gt; iterator, JApiConstructor jApiConstructor) {
-<span class="nc bnc" id="L265" title="All 2 branches missed.">				for (JApiCompatibilityChange change : jApiConstructor.getCompatibilityChanges()) {</span>
-<span class="nc bnc" id="L266" title="All 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
-<span class="nc bnc" id="L267" title="All 2 branches missed.">						if (!change.isBinaryCompatible()) {</span>
-<span class="nc" id="L268">							breakBuildResult.binaryIncompatibleChanges = true;</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">				for (JApiCompatibilityChange change : jApiConstructor.getCompatibilityChanges()) {</span>
+<span class="nc bnc" id="L274" title="All 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">						if (!change.isBinaryCompatible()) {</span>
+<span class="nc" id="L276">							breakBuildResult.binaryIncompatibleChanges = true;</span>
 						}
-<span class="nc bnc" id="L270" title="All 2 branches missed.">						if (!change.isSourceCompatible()) {</span>
-<span class="nc" id="L271">							breakBuildResult.sourceIncompatibleChanges = true;</span>
+<span class="nc bnc" id="L278" title="All 2 branches missed.">						if (!change.isSourceCompatible()) {</span>
+<span class="nc" id="L279">							breakBuildResult.sourceIncompatibleChanges = true;</span>
 						}
-<span class="nc bnc" id="L273" title="All 2 branches missed.">						if (sb.length() &gt; 1) {</span>
-<span class="nc" id="L274">							sb.append(',');</span>
+<span class="nc bnc" id="L281" title="All 2 branches missed.">						if (sb.length() &gt; 1) {</span>
+<span class="nc" id="L282">							sb.append(',');</span>
 						}
-<span class="nc" id="L276">						sb.append(jApiConstructor.getjApiClass().getFullyQualifiedName()).append(&quot;.&quot;)</span>
-<span class="nc" id="L277">							.append(jApiConstructor.getName()).append(&quot;(&quot;).append(methodParameterToList(jApiConstructor))</span>
-<span class="nc" id="L278">							.append(&quot;)&quot;).append(&quot;:&quot;).append(change.getType().name());</span>
+<span class="nc" id="L284">						sb.append(jApiConstructor.getjApiClass().getFullyQualifiedName()).append(&quot;.&quot;)</span>
+<span class="nc" id="L285">							.append(jApiConstructor.getName()).append(&quot;(&quot;).append(methodParameterToList(jApiConstructor))</span>
+<span class="nc" id="L286">							.append(&quot;)&quot;).append(&quot;:&quot;).append(change.getType().name());</span>
 					}
-<span class="nc" id="L280">				}</span>
-<span class="nc" id="L281">			}</span>
+<span class="nc" id="L288">				}</span>
+<span class="nc" id="L289">			}</span>
 
 			@Override
 			public void visit(Iterator&lt;JApiImplementedInterface&gt; iterator, JApiImplementedInterface jApiImplementedInterface) {
-<span class="fc bfc" id="L285" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiImplementedInterface.getCompatibilityChanges()) {</span>
-<span class="pc bpc" id="L286" title="3 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
-<span class="pc bpc" id="L287" title="1 of 4 branches missed.">						if (!change.isBinaryCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiImplementedInterface)) {</span>
-<span class="fc" id="L288">							breakBuildResult.binaryIncompatibleChanges = true;</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiImplementedInterface.getCompatibilityChanges()) {</span>
+<span class="pc bpc" id="L294" title="3 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
+<span class="pc bpc" id="L295" title="1 of 4 branches missed.">						if (!change.isBinaryCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiImplementedInterface)) {</span>
+<span class="fc" id="L296">							breakBuildResult.binaryIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L290" title="1 of 4 branches missed.">						if (!change.isSourceCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiImplementedInterface)) {</span>
-<span class="fc" id="L291">							breakBuildResult.sourceIncompatibleChanges = true;</span>
+<span class="pc bpc" id="L298" title="1 of 4 branches missed.">						if (!change.isSourceCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiImplementedInterface)) {</span>
+<span class="fc" id="L299">							breakBuildResult.sourceIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L293" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
-<span class="nc" id="L294">							sb.append(',');</span>
+<span class="pc bpc" id="L301" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
+<span class="nc" id="L302">							sb.append(',');</span>
 						}
-<span class="fc" id="L296">						sb.append(jApiImplementedInterface.getFullyQualifiedName()).append(&quot;[&quot;)</span>
-<span class="fc" id="L297">							.append(jApiImplementedInterface.getFullyQualifiedName()).append(&quot;]&quot;)</span>
-<span class="fc" id="L298">							.append(&quot;:&quot;).append(change.getType().name());</span>
+<span class="fc" id="L304">						sb.append(jApiImplementedInterface.getFullyQualifiedName()).append(&quot;[&quot;)</span>
+<span class="fc" id="L305">							.append(jApiImplementedInterface.getFullyQualifiedName()).append(&quot;]&quot;)</span>
+<span class="fc" id="L306">							.append(&quot;:&quot;).append(change.getType().name());</span>
 					}
-<span class="fc" id="L300">				}</span>
-<span class="fc" id="L301">			}</span>
+<span class="fc" id="L308">				}</span>
+<span class="fc" id="L309">			}</span>
 
 			private boolean breakBuildIfCausedByExclusion(JApiImplementedInterface jApiImplementedInterface) {
-<span class="fc bfc" id="L304" title="All 2 branches covered.">				if (!breakBuildIfCausedByExclusion) {</span>
-<span class="fc" id="L305">					CtClass ctClass = jApiImplementedInterface.getCtClass();</span>
-<span class="pc bpc" id="L306" title="1 of 2 branches missed.">                    return !classExcluded(ctClass);</span>
+<span class="fc bfc" id="L312" title="All 2 branches covered.">				if (!breakBuildIfCausedByExclusion) {</span>
+<span class="fc" id="L313">					CtClass ctClass = jApiImplementedInterface.getCtClass();</span>
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">                    return !classExcluded(ctClass);</span>
 				}
-<span class="fc" id="L308">				return true;</span>
+<span class="fc" id="L316">				return true;</span>
 			}
 
 			@Override
 			public void visit(Iterator&lt;JApiField&gt; iterator, JApiField jApiField) {
-<span class="fc bfc" id="L313" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiField.getCompatibilityChanges()) {</span>
-<span class="pc bpc" id="L314" title="3 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
-<span class="pc bpc" id="L315" title="1 of 4 branches missed.">						if (!change.isBinaryCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiField)) {</span>
-<span class="fc" id="L316">							breakBuildResult.binaryIncompatibleChanges = true;</span>
+<span class="fc bfc" id="L321" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiField.getCompatibilityChanges()) {</span>
+<span class="pc bpc" id="L322" title="3 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
+<span class="pc bpc" id="L323" title="1 of 4 branches missed.">						if (!change.isBinaryCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiField)) {</span>
+<span class="fc" id="L324">							breakBuildResult.binaryIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L318" title="1 of 4 branches missed.">						if (!change.isSourceCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiField)) {</span>
-<span class="fc" id="L319">							breakBuildResult.sourceIncompatibleChanges = true;</span>
+<span class="pc bpc" id="L326" title="1 of 4 branches missed.">						if (!change.isSourceCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiField)) {</span>
+<span class="fc" id="L327">							breakBuildResult.sourceIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L321" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
-<span class="nc" id="L322">							sb.append(',');</span>
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
+<span class="nc" id="L330">							sb.append(',');</span>
 						}
-<span class="fc" id="L324">						sb.append(jApiField.getjApiClass().getFullyQualifiedName()).append(&quot;.&quot;)</span>
-<span class="fc" id="L325">							.append(jApiField.getName()).append(&quot;:&quot;).append(change.getType().name());</span>
+<span class="fc" id="L332">						sb.append(jApiField.getjApiClass().getFullyQualifiedName()).append(&quot;.&quot;)</span>
+<span class="fc" id="L333">							.append(jApiField.getName()).append(&quot;:&quot;).append(change.getType().name());</span>
 					}
-<span class="fc" id="L327">				}</span>
-<span class="fc" id="L328">			}</span>
+<span class="fc" id="L335">				}</span>
+<span class="fc" id="L336">			}</span>
 
 			private boolean breakBuildIfCausedByExclusion(JApiField jApiField) {
-<span class="fc bfc" id="L331" title="All 2 branches covered.">				if (!breakBuildIfCausedByExclusion) {</span>
-<span class="fc" id="L332">					JApiType type = jApiField.getType();</span>
-<span class="fc" id="L333">					Optional&lt;String&gt; oldTypeOptional = type.getOldTypeOptional();</span>
-<span class="pc bpc" id="L334" title="1 of 2 branches missed.">					if (oldTypeOptional.isPresent()) {</span>
-<span class="fc" id="L335">						String oldType = oldTypeOptional.get();</span>
+<span class="fc bfc" id="L339" title="All 2 branches covered.">				if (!breakBuildIfCausedByExclusion) {</span>
+<span class="fc" id="L340">					JApiType type = jApiField.getType();</span>
+<span class="fc" id="L341">					Optional&lt;String&gt; oldTypeOptional = type.getOldTypeOptional();</span>
+<span class="pc bpc" id="L342" title="1 of 2 branches missed.">					if (oldTypeOptional.isPresent()) {</span>
+<span class="fc" id="L343">						String oldType = oldTypeOptional.get();</span>
 						try {
-<span class="fc" id="L337">							Optional&lt;CtClass&gt; ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);</span>
-<span class="pc bpc" id="L338" title="1 of 2 branches missed.">							if (ctClassOptional.isPresent()) {</span>
-<span class="pc bpc" id="L339" title="1 of 2 branches missed.">								if (classExcluded(ctClassOptional.get())) {</span>
-<span class="fc" id="L340">									return false;</span>
+<span class="fc" id="L345">							Optional&lt;CtClass&gt; ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);</span>
+<span class="pc bpc" id="L346" title="1 of 2 branches missed.">							if (ctClassOptional.isPresent()) {</span>
+<span class="pc bpc" id="L347" title="1 of 2 branches missed.">								if (classExcluded(ctClassOptional.get())) {</span>
+<span class="fc" id="L348">									return false;</span>
 								}
 							}
-<span class="nc" id="L343">						} catch (Exception e) {</span>
-<span class="nc" id="L344">							warn(&quot;Failed to load class &quot; + oldType + &quot;: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L345">						}</span>
+<span class="nc" id="L351">						} catch (Exception e) {</span>
+<span class="nc" id="L352">							warn(&quot;Failed to load class &quot; + oldType + &quot;: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L353">						}</span>
 					}
-<span class="nc" id="L347">					Optional&lt;String&gt; newTypeOptional = type.getNewTypeOptional();</span>
-<span class="nc bnc" id="L348" title="All 2 branches missed.">					if (newTypeOptional.isPresent()) {</span>
-<span class="nc" id="L349">						String newType = newTypeOptional.get();</span>
+<span class="nc" id="L355">					Optional&lt;String&gt; newTypeOptional = type.getNewTypeOptional();</span>
+<span class="nc bnc" id="L356" title="All 2 branches missed.">					if (newTypeOptional.isPresent()) {</span>
+<span class="nc" id="L357">						String newType = newTypeOptional.get();</span>
 						try {
-<span class="nc" id="L351">							Optional&lt;CtClass&gt; ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);</span>
-<span class="nc bnc" id="L352" title="All 2 branches missed.">							if (ctClassOptional.isPresent()) {</span>
-<span class="nc bnc" id="L353" title="All 2 branches missed.">								if (classExcluded(ctClassOptional.get())) {</span>
-<span class="nc" id="L354">									return false;</span>
+<span class="nc" id="L359">							Optional&lt;CtClass&gt; ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);</span>
+<span class="nc bnc" id="L360" title="All 2 branches missed.">							if (ctClassOptional.isPresent()) {</span>
+<span class="nc bnc" id="L361" title="All 2 branches missed.">								if (classExcluded(ctClassOptional.get())) {</span>
+<span class="nc" id="L362">									return false;</span>
 								}
 							}
-<span class="nc" id="L357">						} catch (Exception e) {</span>
-<span class="nc" id="L358">							warn(&quot;Failed to load class &quot; + newType + &quot;: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L359">						}</span>
+<span class="nc" id="L365">						} catch (Exception e) {</span>
+<span class="nc" id="L366">							warn(&quot;Failed to load class &quot; + newType + &quot;: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L367">						}</span>
 					}
 				}
-<span class="fc" id="L362">				return true;</span>
+<span class="fc" id="L370">				return true;</span>
 			}
 
 			@Override
 			public void visit(Iterator&lt;JApiAnnotation&gt; iterator, JApiAnnotation jApiAnnotation) {
 				//no incompatible changes
-<span class="nc" id="L368">			}</span>
+<span class="nc" id="L376">			}</span>
 
 			@Override
 			public void visit(JApiSuperclass jApiSuperclass) {
-<span class="fc bfc" id="L372" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiSuperclass.getCompatibilityChanges()) {</span>
-<span class="pc bpc" id="L373" title="3 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
-<span class="pc bpc" id="L374" title="1 of 4 branches missed.">						if (!change.isBinaryCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiSuperclass)) {</span>
-<span class="fc" id="L375">							breakBuildResult.binaryIncompatibleChanges = true;</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">				for (JApiCompatibilityChange change : jApiSuperclass.getCompatibilityChanges()) {</span>
+<span class="pc bpc" id="L381" title="3 of 4 branches missed.">					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {</span>
+<span class="pc bpc" id="L382" title="1 of 4 branches missed.">						if (!change.isBinaryCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiSuperclass)) {</span>
+<span class="fc" id="L383">							breakBuildResult.binaryIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L377" title="1 of 4 branches missed.">						if (!change.isSourceCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiSuperclass)) {</span>
-<span class="fc" id="L378">							breakBuildResult.sourceIncompatibleChanges = true;</span>
+<span class="pc bpc" id="L385" title="1 of 4 branches missed.">						if (!change.isSourceCompatible() &amp;&amp; breakBuildIfCausedByExclusion(jApiSuperclass)) {</span>
+<span class="fc" id="L386">							breakBuildResult.sourceIncompatibleChanges = true;</span>
 						}
-<span class="pc bpc" id="L380" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
-<span class="nc" id="L381">							sb.append(',');</span>
+<span class="pc bpc" id="L388" title="1 of 2 branches missed.">						if (sb.length() &gt; 1) {</span>
+<span class="nc" id="L389">							sb.append(',');</span>
 						}
-<span class="fc" id="L383">						sb.append(jApiSuperclass.getJApiClassOwning().getFullyQualifiedName()).append(&quot;:&quot;)</span>
-<span class="fc" id="L384">							.append(change.getType().name());</span>
+<span class="fc" id="L391">						sb.append(jApiSuperclass.getJApiClassOwning().getFullyQualifiedName()).append(&quot;:&quot;)</span>
+<span class="fc" id="L392">							.append(change.getType().name());</span>
 					}
-<span class="fc" id="L386">				}</span>
-<span class="fc" id="L387">			}</span>
+<span class="fc" id="L394">				}</span>
+<span class="fc" id="L395">			}</span>
 
 			private boolean breakBuildIfCausedByExclusion(JApiSuperclass jApiSuperclass) {
-<span class="fc bfc" id="L390" title="All 2 branches covered.">				if (!breakBuildIfCausedByExclusion) {</span>
-<span class="fc" id="L391">					Optional&lt;CtClass&gt; oldSuperclassOptional = jApiSuperclass.getOldSuperclass();</span>
-<span class="pc bpc" id="L392" title="1 of 2 branches missed.">					if (oldSuperclassOptional.isPresent()) {</span>
-<span class="fc" id="L393">						CtClass ctClass = oldSuperclassOptional.get();</span>
-<span class="pc bpc" id="L394" title="1 of 2 branches missed.">						if (classExcluded(ctClass)) {</span>
-<span class="fc" id="L395">							return false;</span>
+<span class="fc bfc" id="L398" title="All 2 branches covered.">				if (!breakBuildIfCausedByExclusion) {</span>
+<span class="fc" id="L399">					Optional&lt;CtClass&gt; oldSuperclassOptional = jApiSuperclass.getOldSuperclass();</span>
+<span class="pc bpc" id="L400" title="1 of 2 branches missed.">					if (oldSuperclassOptional.isPresent()) {</span>
+<span class="fc" id="L401">						CtClass ctClass = oldSuperclassOptional.get();</span>
+<span class="pc bpc" id="L402" title="1 of 2 branches missed.">						if (classExcluded(ctClass)) {</span>
+<span class="fc" id="L403">							return false;</span>
 						}
 					}
-<span class="nc" id="L398">					Optional&lt;CtClass&gt; newSuperclassOptional = jApiSuperclass.getNewSuperclass();</span>
-<span class="nc bnc" id="L399" title="All 2 branches missed.">					if (newSuperclassOptional.isPresent()) {</span>
-<span class="nc" id="L400">						CtClass ctClass = newSuperclassOptional.get();</span>
-<span class="nc bnc" id="L401" title="All 2 branches missed.">                        return !classExcluded(ctClass);</span>
+<span class="nc" id="L406">					Optional&lt;CtClass&gt; newSuperclassOptional = jApiSuperclass.getNewSuperclass();</span>
+<span class="nc bnc" id="L407" title="All 2 branches missed.">					if (newSuperclassOptional.isPresent()) {</span>
+<span class="nc" id="L408">						CtClass ctClass = newSuperclassOptional.get();</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">                        return !classExcluded(ctClass);</span>
 					}
 				}
-<span class="fc" id="L404">				return true;</span>
+<span class="fc" id="L412">				return true;</span>
 			}
 
 			private boolean classExcluded(CtClass ctClass) {
-<span class="fc" id="L408">				List&lt;japicmp.filter.Filter&gt; excludes = options.getExcludes();</span>
-<span class="pc bpc" id="L409" title="1 of 2 branches missed.">				for (japicmp.filter.Filter exclude : excludes) {</span>
-<span class="pc bpc" id="L410" title="1 of 2 branches missed.">					if (exclude instanceof ClassFilter) {</span>
-<span class="fc" id="L411">						ClassFilter classFilter = (ClassFilter) exclude;</span>
-<span class="pc bpc" id="L412" title="1 of 2 branches missed.">						if (classFilter.matches(ctClass)) {</span>
-<span class="fc" id="L413">							return true;</span>
+<span class="fc" id="L416">				List&lt;japicmp.filter.Filter&gt; excludes = options.getExcludes();</span>
+<span class="pc bpc" id="L417" title="1 of 2 branches missed.">				for (japicmp.filter.Filter exclude : excludes) {</span>
+<span class="pc bpc" id="L418" title="1 of 2 branches missed.">					if (exclude instanceof ClassFilter) {</span>
+<span class="fc" id="L419">						ClassFilter classFilter = (ClassFilter) exclude;</span>
+<span class="pc bpc" id="L420" title="1 of 2 branches missed.">						if (classFilter.matches(ctClass)) {</span>
+<span class="fc" id="L421">							return true;</span>
 						}
 					}
-<span class="nc" id="L416">				}</span>
-<span class="nc" id="L417">				return false;</span>
+<span class="nc" id="L424">				}</span>
+<span class="nc" id="L425">				return false;</span>
 			}
 		});
-<span class="fc bfc" id="L420" title="All 2 branches covered.">		if (breakBuildResult.breakTheBuild()) {</span>
-<span class="fc" id="L421">			throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format(&quot;There is at least one incompatibility: %s&quot;, sb));</span>
+<span class="fc bfc" id="L428" title="All 2 branches covered.">		if (breakBuildResult.breakTheBuild()) {</span>
+<span class="fc" id="L429">			throw new JApiCmpException(JApiCmpException.Reason.IncompatibleChange, String.format(&quot;There is at least one incompatibility: %s&quot;, sb));</span>
 		}
-<span class="fc" id="L423">	}</span>
+<span class="fc" id="L431">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

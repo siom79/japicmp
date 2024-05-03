@@ -108,9 +108,9 @@ japicmp,japicmp.util,SignatureParser.DiffType,0,15,0,0,0,3,0,1,0,1
 japicmp,japicmp.util,Optional.Absent,18,9,2,0,5,3,6,3,5,3
 japicmp,japicmp.util,FileHelper,49,43,4,2,10,7,4,2,2,1
 japicmp,japicmp.util,SignatureParser.ParsedTemplate,0,31,0,0,0,9,0,5,0,5
-japicmp,japicmp.output.incompatible,IncompatibleErrorOutput.new Filter.FilterVisitor() {...},253,445,65,67,49,92,50,29,2,11
+japicmp,japicmp.output.incompatible,IncompatibleErrorOutput.new Filter.FilterVisitor() {...},250,459,62,70,49,96,48,31,2,11
 japicmp,japicmp.output.incompatible,IncompatibleErrorOutput,180,262,35,29,26,57,29,15,4,7
-japicmp,japicmp.output.incompatible,IncompatibleErrorOutput.BreakBuildResult,0,31,1,7,0,7,1,5,0,2
+japicmp,japicmp.output.incompatible,IncompatibleErrorOutput.BreakBuildResult,0,31,0,8,0,7,0,6,0,2
 japicmp,japicmp.exception,JApiCmpException,70,75,3,1,5,13,3,6,1,6
 japicmp,japicmp.exception,JApiCmpException.Reason,0,63,0,0,0,11,0,1,0,1
 japicmp,japicmp.cmp,ReducibleClassPool,0,9,0,0,0,3,0,2,0,2
