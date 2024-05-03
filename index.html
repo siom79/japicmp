@@ -64,7 +64,7 @@
 <h1>japicmp</h1>
 <p>japicmp is a tool to compare two versions of a jar archive:</p>
 
-<div class="source"><pre class="prettyprint"><code>java -jar japicmp-0.21.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+<div class="source"><pre class="prettyprint"><code>java -jar japicmp-0.21.2-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 </code></pre></div>
 <p>It can also be used as a library:</p>
 
@@ -77,7 +77,7 @@ List&lt;JApiClass&gt; jApiClasses = jarArchiveComparator.compare(oldArchives, ne
 <div class="source"><pre class="prettyprint"><code>&lt;dependency&gt;
 	&lt;groupId&gt;com.github.siom79.japicmp&lt;/groupId&gt;
 	&lt;artifactId&gt;japicmp&lt;/artifactId&gt;
-	&lt;version&gt;0.21.1&lt;/version&gt;
+	&lt;version&gt;0.21.2&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre></div>
 <p>A maven plugin allows you to integrate the checks into your build:</p>
@@ -85,7 +85,7 @@ List&lt;JApiClass&gt; jApiClasses = jarArchiveComparator.compare(oldArchives, ne
 <div class="source"><pre class="prettyprint"><code>&lt;plugin&gt;
 	&lt;groupId&gt;com.github.siom79.japicmp&lt;/groupId&gt;
 	&lt;artifactId&gt;japicmp-maven-plugin&lt;/artifactId&gt;
-	&lt;version&gt;0.21.1&lt;/version&gt;
+	&lt;version&gt;0.21.2&lt;/version&gt;
 	&lt;configuration&gt;
 		&lt;oldVersion&gt;
 			&lt;dependency&gt;
