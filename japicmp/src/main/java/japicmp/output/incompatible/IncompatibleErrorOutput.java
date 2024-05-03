@@ -38,6 +38,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 
@@ -213,7 +215,13 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 
 			@Override
 			public void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod) {
-				for (JApiCompatibilityChange change : jApiMethod.getCompatibilityChanges()) {
+				final List<JApiCompatibilityChange> changes = Stream.concat(
+						jApiMethod.getCompatibilityChanges().stream(),
+						jApiMethod.getReturnType().getCompatibilityChanges().stream()
+					)
+					.collect(Collectors.toList());
+
+				for (JApiCompatibilityChange change : changes) {
 					if (!change.isBinaryCompatible() || !change.isSourceCompatible()) {
 						if (!change.isBinaryCompatible() && breakBuildIfCausedByExclusion(jApiMethod)) {
 							breakBuildResult.binaryIncompatibleChanges = true;
