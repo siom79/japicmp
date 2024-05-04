@@ -143,8 +143,8 @@
 		<maven-api.version>3.6.3</maven-api.version>
 		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven api version -->
 		<reporting.version>3.1.0</reporting.version>
-		<plugin-annotation.version>3.6.4</plugin-annotation.version>
-		<surefireVersion>3.0.0-M7</surefireVersion>
+		<plugin-annotation.version>3.7.1</plugin-annotation.version>
+		<surefireVersion>3.2.5</surefireVersion>
 		<javassist.version>3.30.2-GA</javassist.version>
 		<guava.version>33.0.0-jre</guava.version>
 		<jaxb.version>2.3.2</jaxb.version>
@@ -158,14 +158,14 @@
 		<module>japicmp-ant-task</module>
 	</modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>4.3.1</version>
@@ -222,7 +222,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>3.4.1</version>
 				<executions>
 					<execution>
 						<id>enforce-versions</id>
@@ -247,14 +247,12 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>3.13.0</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>3.0.0-M6</version>
+					<version>3.0.1</version>
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<useReleaseProfile>false</useReleaseProfile>
@@ -265,9 +263,8 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.4.1</version>
+					<version>3.6.3</version>
 					<configuration>
 						<quiet>true</quiet>
 					</configuration>
@@ -281,9 +278,8 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.2.1</version>
+					<version>3.3.1</version>
 					<executions>
 						<execution>
 							<id>attach-sources</id>
@@ -295,9 +291,8 @@
 				</plugin>
 				<plugin>
 					<!-- explicitly define maven-deploy-plugin after other to force exec order -->
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.1.2</version>
 					<executions>
 						<execution>
 							<id>deploy</id>
@@ -309,69 +304,59 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>${surefireVersion}</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>${surefireVersion}</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>3.4.2</version>
+					<version>3.7.1</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.4.1</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>3.3.2</version>
+					<version>3.4.0</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>3.12.0</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
-					<version>3.0.1</version>
+					<version>3.2.4</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.felix</groupId>
 					<artifactId>maven-bundle-plugin</artifactId>
-					<version>5.1.8</version>
+					<version>5.1.9</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.6.1</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>3.2.0</version>
+					<version>3.3.1</version>
 				</plugin>
 				<plugin>
 					<groupId>com.github.spotbugs</groupId>
 					<artifactId>spotbugs-maven-plugin</artifactId>
-					<version>4.7.2.0</version>
+					<version>4.8.4.0</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>3.4.1</version>
+					<version>3.5.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.8</version>
+					<version>0.8.12</version>
 					<executions>
 						<execution>
 							<id>default-prepare-agent</id>
@@ -398,7 +383,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-scm-publish-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.2.1</version>
 					<configuration>
 						<scmBranch>gh-pages</scmBranch>
 					</configuration>
@@ -440,7 +425,6 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<configuration>
 							<source>8</source>
@@ -457,7 +441,6 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
 							<argLine>
@@ -466,7 +449,6 @@
 						</configuration>
 					</plugin>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<argLine>
@@ -475,7 +457,6 @@
 						</configuration>
 					</plugin>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<configuration>
 							<additionalJOption>
@@ -490,7 +471,6 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
@@ -502,7 +482,6 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<executions>
 							<execution>
@@ -514,7 +493,6 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<executions>
 							<execution>

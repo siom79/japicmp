@@ -690,9 +690,7 @@
 			<!-- run site plugin to build reports during 'pre-integration-test' phase
 			this allows integrations tests to verify site report generation -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.7</version>
 				<executions>
 					<execution>
 						<id>build-site-to-test</id>
@@ -707,7 +705,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<executions>
 					<execution>
