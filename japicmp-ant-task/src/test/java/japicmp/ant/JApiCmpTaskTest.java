@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -26,6 +27,16 @@ public class JApiCmpTaskTest {
 			containsString("***! MODIFIED CLASS: PUBLIC japicmp.cmp.JarArchiveComparator  (not serializable)"));
 		assertThat("Incorrect log message (expected removed method)", logContents,
 			containsString("---! REMOVED METHOD: PUBLIC(-) java.util.List<japicmp.model.JApiClass> compare(java.io.File, java.io.File)"));
+	}
+
+	@Test
+	public void testReportOnlySummary() {
+		rule.executeTarget("summary");
+		String logContents = rule.getLog();
+		assertThat("Incorrect log message (expected modified class)", logContents,
+			containsString("***! MODIFIED CLASS: PUBLIC japicmp.cmp.JarArchiveComparator  (not serializable)"));
+		assertThat("Incorrect log message (expected removed method)", logContents,
+			not(containsString("---! REMOVED METHOD: PUBLIC(-) java.util.List<japicmp.model.JApiClass> compare(java.io.File, java.io.File)")));
 	}
 
 	@Test(expected = BuildException.class)

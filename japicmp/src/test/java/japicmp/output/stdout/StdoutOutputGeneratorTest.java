@@ -7,6 +7,7 @@ import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
+import japicmp.util.CtConstructorBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
@@ -143,5 +144,45 @@ public class StdoutOutputGeneratorTest {
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String generated = generator.generate();
 		Assert.assertTrue(generated.contains("===* UNCHANGED FIELD: PUBLIC java.util.List<java.lang.Short>(<- <java.lang.Byte>) list"));
+	}
+
+	@Test
+	public void testSummaryOnly() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withAnnotation("japicmp.Annotation").addToClassPool(classPool);
+				CtFieldBuilder.create().type(CtClass.intType).name("foo").addToClass(ctClass);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.intType).name("bar").addToClass(ctClass);
+				CtConstructorBuilder.create().publicAccess().addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		Options options = Options.newDefault();
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
+		String generated = generator.generate();
+		Assert.assertTrue(generated.contains("***! MODIFIED CLASS: PUBLIC japicmp.Test"));
+		Assert.assertTrue(generated.contains("===  CLASS FILE FORMAT VERSION"));
+		Assert.assertTrue(generated.contains("===  UNCHANGED SUPERCLASS"));
+		Assert.assertTrue(generated.contains("---! REMOVED FIELD"));
+		Assert.assertTrue(generated.contains("---! REMOVED CONSTRUCTOR"));
+		Assert.assertTrue(generated.contains("---! REMOVED METHOD"));
+		Assert.assertTrue(generated.contains("---  REMOVED ANNOTATION"));
+		options.setReportOnlySummary(true);
+		generated = generator.generate();
+		Assert.assertTrue(generated.contains("***! MODIFIED CLASS: PUBLIC japicmp.Test"));
+		Assert.assertFalse(generated.contains("===  CLASS FILE FORMAT VERSION"));
+		Assert.assertFalse(generated.contains("===  UNCHANGED SUPERCLASS"));
+		Assert.assertFalse(generated.contains("---! REMOVED FIELD"));
+		Assert.assertFalse(generated.contains("---! REMOVED CONSTRUCTOR"));
+		Assert.assertFalse(generated.contains("---! REMOVED METHOD"));
+		Assert.assertFalse(generated.contains("---  REMOVED ANNOTATION"));
 	}
 }
