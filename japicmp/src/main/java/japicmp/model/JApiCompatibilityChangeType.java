@@ -2,6 +2,8 @@ package japicmp.model;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlEnum;
+import java.util.Arrays;
+import java.util.Comparator;
 
 @XmlEnum
 public enum JApiCompatibilityChangeType {
@@ -68,9 +70,9 @@ public enum JApiCompatibilityChangeType {
 	CONSTRUCTOR_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),
 	CONSTRUCTOR_LESS_ACCESSIBLE(false, false, JApiSemanticVersionLevel.MAJOR);
 
-	private boolean binaryCompatible;
-	private boolean sourceCompatible;
-	private JApiSemanticVersionLevel semanticVersionLevel;
+	private final boolean binaryCompatible;
+	private final boolean sourceCompatible;
+	private final JApiSemanticVersionLevel semanticVersionLevel;
 	private Boolean binaryCompatibleOverridden = null;
 	private Boolean sourceCompatibleOverridden = null;
 	private JApiSemanticVersionLevel semanticVersionLevelOverridden = null;
@@ -121,5 +123,21 @@ public enum JApiCompatibilityChangeType {
 		this.binaryCompatibleOverridden = null;
 		this.sourceCompatibleOverridden = null;
 		this.semanticVersionLevelOverridden = null;
+	}
+
+	public static void main(String[] args) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("| Check | Default binary compatible | Default source compatible | Default semantic version level |\n");
+		sb.append("|-------|---------------------------|---------------------------|--------------------------------|\n");
+		JApiCompatibilityChangeType[] values = Arrays.copyOf(JApiCompatibilityChangeType.values(), JApiCompatibilityChangeType.values().length);
+		Arrays.sort(values, Comparator.comparing(Enum::name));
+		for (JApiCompatibilityChangeType type : values) {
+			sb.append("| ").append(type.name())
+				.append(" | ").append(type.binaryCompatible)
+				.append(" | ").append(type.sourceCompatible)
+				.append(" | ").append(type.semanticVersionLevel.name())
+				.append(" |\n");
+		}
+		System.out.println(sb);
 	}
 }
