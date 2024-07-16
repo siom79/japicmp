@@ -488,6 +488,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			}
 			this.options.setNoAnnotations(parameterParam.getNoAnnotations());
 			this.options.setReportOnlyFilename(parameterParam.isReportOnlyFilename());
+			this.options.setReportOnlySummary(parameterParam.isReportOnlySummary());
 		}
 		return this.options;
 	}
