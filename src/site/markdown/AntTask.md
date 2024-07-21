@@ -54,6 +54,7 @@ The following table gives an overview of all available parameters of the Ant tas
 | includeSynthetic 							| true  | false | If true, track changes for synthetic classes and class members.|
 | noAnnotations 							| true  | false | If true, disable the evaluation of annotations completely.|
 | reportOnlyFilename 						| true  | false | If true, report only filenames (not full paths). |
+| reportOnlySummary 						| true  | false | If true, report only a breakdown of classes and their status when generating plain text or html reports. |
 | ignoreMissingClasses 						| true  | n.a.  | Ignore all superclasses/interfaces missing on the classpath. |
 | ignoreMissingClassesbyRegularExpressions	| true  | n.a.  | Ignore only those superclasses/interface missing on the classpath that are selected by a regular expression. |
 | accessModifier 							| true  | protected | Ignore changes below the access modifier level (public, package, protected, private).|

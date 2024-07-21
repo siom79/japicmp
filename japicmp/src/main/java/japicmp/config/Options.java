@@ -40,6 +40,7 @@ public class Options {
 	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
 	private boolean noAnnotations = false;
 	private boolean reportOnlyFilename;
+	private boolean reportOnlySummary;
 	private boolean semanticVersioning;
 	private boolean errorOnBinaryIncompatibility;
 	private boolean errorOnSourceIncompatibility;
@@ -304,6 +305,14 @@ public class Options {
 
 	public void setReportOnlyFilename(boolean reportOnlyFilename) {
 		this.reportOnlyFilename = reportOnlyFilename;
+	}
+
+	public boolean isReportOnlySummary() {
+		return reportOnlySummary;
+	}
+
+	public void setReportOnlySummary(boolean reportOnlySummary) {
+		this.reportOnlySummary = reportOnlySummary;
 	}
 
 	public String getDifferenceDescription() {

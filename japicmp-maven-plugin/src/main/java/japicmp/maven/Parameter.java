@@ -48,6 +48,8 @@ public class Parameter {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean reportOnlyFilename;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean reportOnlySummary;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<String> includeModules;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private List<String> excludeModules;
@@ -321,6 +323,14 @@ public class Parameter {
 
 	public void setReportOnlyFilename(boolean reportOnlyFileName) {
 		this.reportOnlyFilename = reportOnlyFileName;
+	}
+
+	public boolean isReportOnlySummary() {
+		return reportOnlySummary;
+	}
+
+	public void setReportOnlySummary(boolean reportOnlySummary) {
+		this.reportOnlySummary = reportOnlySummary;
 	}
 
 	public boolean getIgnoreMissingNewVersion() {

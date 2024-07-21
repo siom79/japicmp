@@ -52,6 +52,9 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 	}
 
 	private void classes(StringBuilder sb) {
+		if (options.isReportOnlySummary()) {
+			return;
+		}
 		sb.append(jApiClasses.stream()
 			.map(jApiClass -> templateEngine.loadAndFillTemplate("/html/class-entry.html", mapOf(
 				"fullyQualifiedName", jApiClass.getFullyQualifiedName(),

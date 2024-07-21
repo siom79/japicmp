@@ -39,6 +39,7 @@ public class JApiCmpTask extends Task {
 	private boolean noAnnotations = false;
 	private boolean semanticVersioning = false;
 	private boolean reportOnlyFilename = false;
+	private boolean reportOnlySummary = false;
 	private boolean ignoreMissingClasses = false;
 	private boolean includeExclusively = false;
 	private boolean excludeExclusively = false;
@@ -89,6 +90,10 @@ public class JApiCmpTask extends Task {
 
 	public void setReportOnlyFilename(String reportOnlyFilename) {
 		this.reportOnlyFilename = Project.toBoolean(reportOnlyFilename);
+	}
+
+	public void setReportOnlySummary(String reportOnlySummary) {
+		this.reportOnlySummary = Project.toBoolean(reportOnlySummary);
 	}
 
 	public void setIgnoreMissingClasses(String ignoreMissingClasses) {
@@ -242,6 +247,7 @@ public class JApiCmpTask extends Task {
 			options.addIgnoreMissingClassRegularExpression(missingClassRegEx);
 		}
 		options.setReportOnlyFilename(reportOnlyFilename);
+		options.setReportOnlySummary(reportOnlySummary);
 		options.setErrorOnSemanticIncompatibility(errorOnSemanticIncompatibility);
 		options.setErrorOnExclusionIncompatibility(errorOnExclusionIncompatibility);
 		options.setErrorOnSourceIncompatibility(errorOnSourceIncompatibility);
