@@ -3,6 +3,12 @@ Versions
 
 The following versions of japicmp are available:
 
+0.22.0 (2024-07-21)
+-------------------
+* New option --report-only-summary to make reports less verbose. [#398](https://github.com/siom79/japicmp/issues/398)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.22.0).
+
 0.21.2 (2024-05-03)
 -------------------
 * Break build if return type of method changed incompatible. [#397](https://github.com/siom79/japicmp/issues/397)
