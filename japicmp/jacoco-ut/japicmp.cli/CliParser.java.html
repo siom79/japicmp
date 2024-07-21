@@ -89,30 +89,32 @@ import static japicmp.util.FileHelper.createFileList;
 <span class="nc" id="L89">				options.setNoAnnotations(true);</span>
 <span class="nc bnc" id="L90" title="All 2 branches missed.">			} else if (&quot;--report-only-filename&quot;.equals(arg)) {</span>
 <span class="nc" id="L91">				options.setReportOnlyFilename(true);</span>
-<span class="nc bnc" id="L92" title="All 2 branches missed.">			} else if (&quot;--error-on-binary-incompatibility&quot;.equals(arg)) {</span>
-<span class="nc" id="L93">				options.setErrorOnBinaryIncompatibility(true);</span>
-<span class="nc bnc" id="L94" title="All 2 branches missed.">			} else if (&quot;--error-on-source-incompatibility&quot;.equals(arg)) {</span>
-<span class="nc" id="L95">				options.setErrorOnSourceIncompatibility(true);</span>
-<span class="nc bnc" id="L96" title="All 2 branches missed.">			} else if (&quot;--no-error-on-exclusion-incompatibility&quot;.equals(arg)) {</span>
-<span class="nc" id="L97">				options.setErrorOnExclusionIncompatibility(false);</span>
-<span class="nc bnc" id="L98" title="All 2 branches missed.">			} else if (&quot;--error-on-modifications&quot;.equals(arg)) {</span>
-<span class="nc" id="L99">				options.setErrorOnModifications(true);</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">			} else if (&quot;--error-on-semantic-incompatibility&quot;.equals(arg)) {</span>
-<span class="nc" id="L101">				options.setErrorOnSemanticIncompatibility(true);</span>
-<span class="nc bnc" id="L102" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-old-version&quot;.equals(arg)) {</span>
-<span class="nc" id="L103">				options.setIgnoreMissingOldVersion(true);</span>
-<span class="nc bnc" id="L104" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-new-version&quot;.equals(arg)) {</span>
-<span class="nc" id="L105">				options.setIgnoreMissingNewVersion(true);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">			} else if (&quot;--report-only-summary&quot;.equals(arg)) {</span>
+<span class="nc" id="L93">				options.setReportOnlySummary(true);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">			} else if (&quot;--error-on-binary-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L95">				options.setErrorOnBinaryIncompatibility(true);</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">			} else if (&quot;--error-on-source-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L97">				options.setErrorOnSourceIncompatibility(true);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">			} else if (&quot;--no-error-on-exclusion-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L99">				options.setErrorOnExclusionIncompatibility(false);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">			} else if (&quot;--error-on-modifications&quot;.equals(arg)) {</span>
+<span class="nc" id="L101">				options.setErrorOnModifications(true);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">			} else if (&quot;--error-on-semantic-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L103">				options.setErrorOnSemanticIncompatibility(true);</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-old-version&quot;.equals(arg)) {</span>
+<span class="nc" id="L105">				options.setIgnoreMissingOldVersion(true);</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-new-version&quot;.equals(arg)) {</span>
+<span class="nc" id="L107">				options.setIgnoreMissingNewVersion(true);</span>
 			} else {
-<span class="nc" id="L107">				throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Unknown argument: &quot; + arg);</span>
+<span class="nc" id="L109">				throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Unknown argument: &quot; + arg);</span>
 			}
-<span class="fc" id="L109">		}</span>
-<span class="fc" id="L110">		options.verify();</span>
-<span class="fc" id="L111">		return options;</span>
+<span class="fc" id="L111">		}</span>
+<span class="fc" id="L112">		options.verify();</span>
+<span class="fc" id="L113">		return options;</span>
 	}
 
 	public static void printHelp() {
-<span class="fc" id="L115">		System.out.println(&quot;SYNOPSIS\n&quot; +</span>
+<span class="fc" id="L117">		System.out.println(&quot;SYNOPSIS\n&quot; +</span>
 			&quot;        java -jar japicmp.jar [-a &lt;accessModifier&gt;] [(-b | --only-incompatible)]\n&quot; +
 			&quot;                [(-e &lt;excludes&gt; | --exclude &lt;excludes&gt;)] [--exclude-exclusively]\n&quot; +
 			&quot;                [(-h | --help)] [--html-file &lt;pathToHtmlOutputFile&gt;]\n&quot; +
@@ -123,7 +125,8 @@ import static japicmp.util.FileHelper.createFileList;
 			&quot;                [(-n &lt;pathToNewVersionJar&gt; | --new &lt;pathToNewVersionJar&gt;)]\n&quot; +
 			&quot;                [--new-classpath &lt;newClassPath&gt;] [--no-annotations]\n&quot; +
 			&quot;                [(-o &lt;pathToOldVersionJar&gt; | --old &lt;pathToOldVersionJar&gt;)]\n&quot; +
-			&quot;                [--old-classpath &lt;oldClassPath&gt;] [--report-only-filename]\n&quot; +
+			&quot;                [--old-classpath &lt;oldClassPath&gt;]\n&quot; +
+			&quot;                [--report-only-filename] [--report-only-summary]\n&quot; +
 			&quot;                [(-s | --semantic-versioning)]\n&quot; +
 			&quot;                [(-x &lt;pathToXmlOutputFile&gt; | --xml-file &lt;pathToXmlOutputFile&gt;)]\n&quot; +
 			&quot;                [--error-on-binary-incompatibility]\n&quot; +
@@ -205,6 +208,10 @@ import static japicmp.util.FileHelper.createFileList;
 			&quot;        --report-only-filename\n&quot; +
 			&quot;            Reports just filenames (not full paths) in report description.\n&quot; +
 			&quot;\n&quot; +
+			&quot;        --report-only-summary\n&quot; +
+			&quot;            Reports only a breakdown of classes and their status\n&quot; +
+			&quot;            when generating plain text or html reports.\n&quot; +
+			&quot;\n&quot; +
 			&quot;        -s, --semantic-versioning\n&quot; +
 			&quot;            Tells you which part of the version to increment.\n&quot; +
 			&quot;\n&quot; +
@@ -239,25 +246,25 @@ import static japicmp.util.FileHelper.createFileList;
 			&quot;        --ignore-missing-new-version\n&quot; +
 			&quot;            When --error-on-semantic-incompatibility is passed, ignore\n&quot; +
 			&quot;            non-resolvable artifacts for the new version.\n&quot;);
-<span class="fc" id="L242">	}</span>
+<span class="fc" id="L249">	}</span>
 
 	private String getOptionWithArgument(String option, StringArrayEnumeration sae) {
-<span class="fc bfc" id="L245" title="All 2 branches covered.">		if (sae.hasMoreElements()) {</span>
-<span class="fc" id="L246">			String value = sae.nextElement();</span>
-<span class="pc bpc" id="L247" title="1 of 2 branches missed.">			if (value.startsWith(&quot;-&quot;)) {</span>
-<span class="nc" id="L248">				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
+<span class="fc bfc" id="L252" title="All 2 branches covered.">		if (sae.hasMoreElements()) {</span>
+<span class="fc" id="L253">			String value = sae.nextElement();</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">			if (value.startsWith(&quot;-&quot;)) {</span>
+<span class="nc" id="L255">				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
 			}
-<span class="fc" id="L250">			return value;</span>
+<span class="fc" id="L257">			return value;</span>
 		} else {
-<span class="fc" id="L252">			throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
+<span class="fc" id="L259">			throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
 		}
 	}
 
 	private &lt;T&gt; T checkNonNull(T in, String errorMessage) {
-<span class="pc bpc" id="L257" title="1 of 2 branches missed.">		if (in == null) {</span>
-<span class="nc" id="L258">			throw new JApiCmpException(JApiCmpException.Reason.CliError, errorMessage);</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">		if (in == null) {</span>
+<span class="nc" id="L265">			throw new JApiCmpException(JApiCmpException.Reason.CliError, errorMessage);</span>
 		} else {
-<span class="fc" id="L260">			return in;</span>
+<span class="fc" id="L267">			return in;</span>
 		}
 	}
 }

@@ -52,543 +52,546 @@ public class HtmlOutputGenerator extends OutputGenerator&lt;HtmlOutput&gt; {
 	}
 
 	private void classes(StringBuilder sb) {
-<span class="fc" id="L55">		sb.append(jApiClasses.stream()</span>
-<span class="fc" id="L56">			.map(jApiClass -&gt; templateEngine.loadAndFillTemplate(&quot;/html/class-entry.html&quot;, mapOf(</span>
-<span class="fc" id="L57">				&quot;fullyQualifiedName&quot;, jApiClass.getFullyQualifiedName(),</span>
-<span class="fc" id="L58">				&quot;outputChangeStatus&quot;, outputChangeStatus(jApiClass),</span>
-<span class="fc" id="L59">				&quot;javaObjectSerializationCompatible&quot;, javaObjectSerializationCompatible(jApiClass),</span>
-<span class="fc" id="L60">				&quot;modifiers&quot;, modifiers(jApiClass),</span>
-<span class="fc" id="L61">				&quot;classType&quot;, classType(jApiClass),</span>
-<span class="fc" id="L62">				&quot;compatibilityChanges&quot;, compatibilityChanges(jApiClass, false),</span>
-<span class="fc" id="L63">				&quot;classFileFormatVersion&quot;, classFileFormatVersion(jApiClass),</span>
-<span class="fc" id="L64">				&quot;genericTemplates&quot;, genericTemplates(jApiClass, false),</span>
-<span class="fc" id="L65">				&quot;superclass&quot;, superclass(jApiClass),</span>
-<span class="fc" id="L66">				&quot;interfaces&quot;, interfaces(jApiClass),</span>
-<span class="fc" id="L67">				&quot;serialVersionUid&quot;, serialVersionUid(jApiClass),</span>
-<span class="fc" id="L68">				&quot;fields&quot;, fields(jApiClass),</span>
-<span class="fc" id="L69">				&quot;constructors&quot;, constructors(jApiClass),</span>
-<span class="fc" id="L70">				&quot;methods&quot;, methods(jApiClass),</span>
-<span class="fc" id="L71">				&quot;annotations&quot;, annotations(jApiClass.getAnnotations())</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">		if (options.isReportOnlySummary()) {</span>
+<span class="fc" id="L56">			return;</span>
+		}
+<span class="fc" id="L58">		sb.append(jApiClasses.stream()</span>
+<span class="fc" id="L59">			.map(jApiClass -&gt; templateEngine.loadAndFillTemplate(&quot;/html/class-entry.html&quot;, mapOf(</span>
+<span class="fc" id="L60">				&quot;fullyQualifiedName&quot;, jApiClass.getFullyQualifiedName(),</span>
+<span class="fc" id="L61">				&quot;outputChangeStatus&quot;, outputChangeStatus(jApiClass),</span>
+<span class="fc" id="L62">				&quot;javaObjectSerializationCompatible&quot;, javaObjectSerializationCompatible(jApiClass),</span>
+<span class="fc" id="L63">				&quot;modifiers&quot;, modifiers(jApiClass),</span>
+<span class="fc" id="L64">				&quot;classType&quot;, classType(jApiClass),</span>
+<span class="fc" id="L65">				&quot;compatibilityChanges&quot;, compatibilityChanges(jApiClass, false),</span>
+<span class="fc" id="L66">				&quot;classFileFormatVersion&quot;, classFileFormatVersion(jApiClass),</span>
+<span class="fc" id="L67">				&quot;genericTemplates&quot;, genericTemplates(jApiClass, false),</span>
+<span class="fc" id="L68">				&quot;superclass&quot;, superclass(jApiClass),</span>
+<span class="fc" id="L69">				&quot;interfaces&quot;, interfaces(jApiClass),</span>
+<span class="fc" id="L70">				&quot;serialVersionUid&quot;, serialVersionUid(jApiClass),</span>
+<span class="fc" id="L71">				&quot;fields&quot;, fields(jApiClass),</span>
+<span class="fc" id="L72">				&quot;constructors&quot;, constructors(jApiClass),</span>
+<span class="fc" id="L73">				&quot;methods&quot;, methods(jApiClass),</span>
+<span class="fc" id="L74">				&quot;annotations&quot;, annotations(jApiClass.getAnnotations())</span>
 			)))
-<span class="fc" id="L73">			.collect(Collectors.joining()));</span>
-<span class="fc" id="L74">	}</span>
+<span class="fc" id="L76">			.collect(Collectors.joining()));</span>
+<span class="fc" id="L77">	}</span>
 
 	private String methods(JApiClass jApiClass) {
-<span class="fc bfc" id="L77" title="All 2 branches covered.">		if (!jApiClass.getMethods().isEmpty()) {</span>
-<span class="fc" id="L78">			return templateEngine.loadAndFillTemplate(&quot;/html/methods.html&quot;, mapOf(</span>
-<span class="fc" id="L79">				&quot;tbody&quot;, methodsTBody(jApiClass.getMethods())</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">		if (!jApiClass.getMethods().isEmpty()) {</span>
+<span class="fc" id="L81">			return templateEngine.loadAndFillTemplate(&quot;/html/methods.html&quot;, mapOf(</span>
+<span class="fc" id="L82">				&quot;tbody&quot;, methodsTBody(jApiClass.getMethods())</span>
 			));
 		}
-<span class="fc" id="L82">		return &quot;&quot;;</span>
+<span class="fc" id="L85">		return &quot;&quot;;</span>
 	}
 
 	private String methodsTBody(List&lt;JApiMethod&gt; methods) {
-<span class="fc" id="L86">		return methods.stream()</span>
-<span class="fc" id="L87">			.sorted(Comparator.comparing(JApiMethod::getName))</span>
-<span class="fc" id="L88">			.map(method -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="fc" id="L89">				&quot;&lt;td&gt;&quot; + outputChangeStatus(method) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L90">				&quot;&lt;td&gt;&quot; + modifiers(method) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L91">				&quot;&lt;td&gt;&quot; + genericTemplates(method, true) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L92">				&quot;&lt;td&gt;&quot; + returnType(method) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L93">				&quot;&lt;td&gt;&quot; + method.getName() + &quot;(&quot; + parameters(method) + &quot;)&quot; + annotations(method.getAnnotations()) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L94">				&quot;&lt;td&gt;&quot; + exceptions(method) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L95">				&quot;&lt;td&gt;&quot; + compatibilityChanges(method, true) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L89">		return methods.stream()</span>
+<span class="fc" id="L90">			.sorted(Comparator.comparing(JApiMethod::getName))</span>
+<span class="fc" id="L91">			.map(method -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="fc" id="L92">				&quot;&lt;td&gt;&quot; + outputChangeStatus(method) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L93">				&quot;&lt;td&gt;&quot; + modifiers(method) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L94">				&quot;&lt;td&gt;&quot; + genericTemplates(method, true) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L95">				&quot;&lt;td&gt;&quot; + returnType(method) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L96">				&quot;&lt;td&gt;&quot; + method.getName() + &quot;(&quot; + parameters(method) + &quot;)&quot; + annotations(method.getAnnotations()) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L97">				&quot;&lt;td&gt;&quot; + exceptions(method) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L98">				&quot;&lt;td&gt;&quot; + compatibilityChanges(method, true) + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;td&gt;&quot; +
-<span class="fc" id="L97">				templateEngine.loadAndFillTemplate(&quot;/html/line-numbers.html&quot;, mapOf(</span>
-<span class="fc" id="L98">					&quot;oldLineNumber&quot;, method.getOldLineNumberAsString(),</span>
-<span class="fc" id="L99">					&quot;newLineNumber&quot;, method.getNewLineNumberAsString())) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L100">				templateEngine.loadAndFillTemplate(&quot;/html/line-numbers.html&quot;, mapOf(</span>
+<span class="fc" id="L101">					&quot;oldLineNumber&quot;, method.getOldLineNumberAsString(),</span>
+<span class="fc" id="L102">					&quot;newLineNumber&quot;, method.getNewLineNumberAsString())) + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;/tr&gt;\n&quot;)
-<span class="fc" id="L101">			.collect(Collectors.joining());</span>
+<span class="fc" id="L104">			.collect(Collectors.joining());</span>
 	}
 
 	private String returnType(JApiMethod method) {
-<span class="fc" id="L105">		return &quot;&lt;span class=\&quot;method_return_type &quot; + method.getReturnType().getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
-<span class="fc" id="L106">			returnTypeValue(method.getReturnType()) +</span>
+<span class="fc" id="L108">		return &quot;&lt;span class=\&quot;method_return_type &quot; + method.getReturnType().getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
+<span class="fc" id="L109">			returnTypeValue(method.getReturnType()) +</span>
 			&quot;&lt;/span&gt;&quot;;
 	}
 
 	private String returnTypeValue(JApiReturnType returnType) {
-<span class="pc bpc" id="L111" title="2 of 4 branches missed.">		switch (returnType.getChangeStatus()) {</span>
+<span class="pc bpc" id="L114" title="2 of 4 branches missed.">		switch (returnType.getChangeStatus()) {</span>
 			case NEW:
 			case UNCHANGED:
-<span class="fc" id="L114">				return returnType.getNewReturnType() + genericParameterTypes(returnType);</span>
+<span class="fc" id="L117">				return returnType.getNewReturnType() + genericParameterTypes(returnType);</span>
 			case REMOVED:
-<span class="fc" id="L116">				return returnType.getOldReturnType() + genericParameterTypes(returnType);</span>
+<span class="fc" id="L119">				return returnType.getOldReturnType() + genericParameterTypes(returnType);</span>
 			case MODIFIED:
-<span class="nc" id="L118">				return returnType.getNewReturnType() + &quot;&amp;#160;(&amp;lt;-&amp;#160;&quot; + returnType.getOldReturnType() + genericParameterTypes(returnType);</span>
+<span class="nc" id="L121">				return returnType.getNewReturnType() + &quot;&amp;#160;(&amp;lt;-&amp;#160;&quot; + returnType.getOldReturnType() + genericParameterTypes(returnType);</span>
 		}
-<span class="nc" id="L120">		return &quot;&quot;;</span>
+<span class="nc" id="L123">		return &quot;&quot;;</span>
 	}
 
 	private String constructors(JApiClass jApiClass) {
-<span class="fc bfc" id="L124" title="All 2 branches covered.">		if (!jApiClass.getConstructors().isEmpty()) {</span>
-<span class="fc" id="L125">			return templateEngine.loadAndFillTemplate(&quot;/html/constructors.html&quot;, mapOf(</span>
-<span class="fc" id="L126">				&quot;tbody&quot;, constructors(jApiClass.getConstructors())</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">		if (!jApiClass.getConstructors().isEmpty()) {</span>
+<span class="fc" id="L128">			return templateEngine.loadAndFillTemplate(&quot;/html/constructors.html&quot;, mapOf(</span>
+<span class="fc" id="L129">				&quot;tbody&quot;, constructors(jApiClass.getConstructors())</span>
 			));
 		}
-<span class="fc" id="L129">		return &quot;&quot;;</span>
+<span class="fc" id="L132">		return &quot;&quot;;</span>
 	}
 
 	private String constructors(List&lt;JApiConstructor&gt; constructors) {
-<span class="fc" id="L133">		return constructors.stream()</span>
-<span class="fc" id="L134">			.map(constructor -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="fc" id="L135">				&quot;&lt;td&gt;&quot; + outputChangeStatus(constructor) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L136">				&quot;&lt;td&gt;&quot; + modifiers(constructor) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L137">				&quot;&lt;td&gt;&quot; + genericTemplates(constructor, true) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L138">				&quot;&lt;td&gt;&quot; + constructor.getName() + &quot;(&quot; + parameters(constructor) + &quot;)&quot; + annotations(constructor.getAnnotations()) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L139">				&quot;&lt;td&gt;&quot; + exceptions(constructor) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L140">				&quot;&lt;td&gt;&quot; + compatibilityChanges(constructor, true) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L136">		return constructors.stream()</span>
+<span class="fc" id="L137">			.map(constructor -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="fc" id="L138">				&quot;&lt;td&gt;&quot; + outputChangeStatus(constructor) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L139">				&quot;&lt;td&gt;&quot; + modifiers(constructor) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L140">				&quot;&lt;td&gt;&quot; + genericTemplates(constructor, true) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L141">				&quot;&lt;td&gt;&quot; + constructor.getName() + &quot;(&quot; + parameters(constructor) + &quot;)&quot; + annotations(constructor.getAnnotations()) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L142">				&quot;&lt;td&gt;&quot; + exceptions(constructor) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L143">				&quot;&lt;td&gt;&quot; + compatibilityChanges(constructor, true) + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;td&gt;&quot; +
-<span class="fc" id="L142">				templateEngine.loadAndFillTemplate(&quot;/html/line-numbers.html&quot;, mapOf(</span>
-<span class="fc" id="L143">					&quot;oldLineNumber&quot;, constructor.getOldLineNumberAsString(),</span>
-<span class="fc" id="L144">					&quot;newLineNumber&quot;, constructor.getNewLineNumberAsString())) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L145">				templateEngine.loadAndFillTemplate(&quot;/html/line-numbers.html&quot;, mapOf(</span>
+<span class="fc" id="L146">					&quot;oldLineNumber&quot;, constructor.getOldLineNumberAsString(),</span>
+<span class="fc" id="L147">					&quot;newLineNumber&quot;, constructor.getNewLineNumberAsString())) + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;/tr&gt;\n&quot;)
-<span class="fc" id="L146">			.collect(Collectors.joining());</span>
+<span class="fc" id="L149">			.collect(Collectors.joining());</span>
 	}
 
 	private String exceptions(JApiBehavior jApiBehavior) {
-<span class="fc bfc" id="L150" title="All 2 branches covered.">		if (!jApiBehavior.getExceptions().isEmpty()) {</span>
-<span class="fc" id="L151">			return templateEngine.loadAndFillTemplate(&quot;/html/exceptions.html&quot;, mapOf(</span>
-<span class="fc" id="L152">				&quot;tbody&quot;, exceptionsTBody(jApiBehavior.getExceptions())</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">		if (!jApiBehavior.getExceptions().isEmpty()) {</span>
+<span class="fc" id="L154">			return templateEngine.loadAndFillTemplate(&quot;/html/exceptions.html&quot;, mapOf(</span>
+<span class="fc" id="L155">				&quot;tbody&quot;, exceptionsTBody(jApiBehavior.getExceptions())</span>
 			));
 		}
-<span class="fc" id="L155">		return &quot;&quot;;</span>
+<span class="fc" id="L158">		return &quot;&quot;;</span>
 	}
 
 	private String exceptionsTBody(List&lt;JApiException&gt; exceptions) {
-<span class="fc" id="L159">		return exceptions.stream()</span>
-<span class="fc" id="L160">			.map(exc -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="fc" id="L161">				&quot;&lt;td&gt;&quot; + outputChangeStatus(exc) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L162">				&quot;&lt;td&gt;&quot; + exc.getName() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L162">		return exceptions.stream()</span>
+<span class="fc" id="L163">			.map(exc -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="fc" id="L164">				&quot;&lt;td&gt;&quot; + outputChangeStatus(exc) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L165">				&quot;&lt;td&gt;&quot; + exc.getName() + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;/tr&gt;\n&quot;)
-<span class="fc" id="L164">			.collect(Collectors.joining());</span>
+<span class="fc" id="L167">			.collect(Collectors.joining());</span>
 	}
 
 	private String parameters(JApiBehavior jApiBehavior) {
-<span class="fc" id="L168">		return jApiBehavior.getParameters().stream()</span>
-<span class="fc" id="L169">			.map(parameter -&gt; &quot;&lt;span class=\&quot;method_parameter &quot; + parameter.getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
-<span class="fc" id="L170">				parameter.getType() +</span>
-<span class="fc" id="L171">				genericParameterTypes(parameter) +</span>
-<span class="fc" id="L172">				binaryAndSourceCompatibility(parameter) +</span>
+<span class="fc" id="L171">		return jApiBehavior.getParameters().stream()</span>
+<span class="fc" id="L172">			.map(parameter -&gt; &quot;&lt;span class=\&quot;method_parameter &quot; + parameter.getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
+<span class="fc" id="L173">				parameter.getType() +</span>
+<span class="fc" id="L174">				genericParameterTypes(parameter) +</span>
+<span class="fc" id="L175">				binaryAndSourceCompatibility(parameter) +</span>
 				&quot;&lt;/span&gt;&quot;)
-<span class="fc" id="L174">			.collect(Collectors.joining(&quot;, &quot;));</span>
+<span class="fc" id="L177">			.collect(Collectors.joining(&quot;, &quot;));</span>
 	}
 
 	private String fields(JApiClass jApiClass) {
-<span class="fc bfc" id="L178" title="All 2 branches covered.">		if (!jApiClass.getFields().isEmpty()) {</span>
-<span class="fc" id="L179">			return templateEngine.loadAndFillTemplate(&quot;/html/fields.html&quot;, mapOf(</span>
-<span class="fc" id="L180">				&quot;tbody&quot;, fields(jApiClass.getFields())</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">		if (!jApiClass.getFields().isEmpty()) {</span>
+<span class="fc" id="L182">			return templateEngine.loadAndFillTemplate(&quot;/html/fields.html&quot;, mapOf(</span>
+<span class="fc" id="L183">				&quot;tbody&quot;, fields(jApiClass.getFields())</span>
 			));
 		}
-<span class="fc" id="L183">		return &quot;&quot;;</span>
+<span class="fc" id="L186">		return &quot;&quot;;</span>
 	}
 
 	private String fields(List&lt;JApiField&gt; fields) {
-<span class="fc" id="L187">		return fields.stream()</span>
-<span class="fc" id="L188">			.sorted(Comparator.comparing(JApiField::getName))</span>
-<span class="fc" id="L189">			.map(field -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="fc" id="L190">				&quot;&lt;td&gt;&quot; + outputChangeStatus(field) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L191">				&quot;&lt;td&gt;&quot; + modifiers(field) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L192">				&quot;&lt;td&gt;&quot; + type(field) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L193">				&quot;&lt;td&gt;&quot; + field.getName() + annotations(field.getAnnotations()) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L194">				&quot;&lt;td&gt;&quot; + compatibilityChanges(field, true) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L190">		return fields.stream()</span>
+<span class="fc" id="L191">			.sorted(Comparator.comparing(JApiField::getName))</span>
+<span class="fc" id="L192">			.map(field -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="fc" id="L193">				&quot;&lt;td&gt;&quot; + outputChangeStatus(field) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L194">				&quot;&lt;td&gt;&quot; + modifiers(field) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L195">				&quot;&lt;td&gt;&quot; + type(field) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L196">				&quot;&lt;td&gt;&quot; + field.getName() + annotations(field.getAnnotations()) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L197">				&quot;&lt;td&gt;&quot; + compatibilityChanges(field, true) + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;/tr&gt;\n&quot;)
-<span class="fc" id="L196">			.collect(Collectors.joining());</span>
+<span class="fc" id="L199">			.collect(Collectors.joining());</span>
 	}
 
 	private String type(JApiField field) {
-<span class="fc" id="L200">		return &quot;&lt;span class=\&quot;modifier &quot; + field.getType().getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
-<span class="fc" id="L201">			typeValue(field) +</span>
+<span class="fc" id="L203">		return &quot;&lt;span class=\&quot;modifier &quot; + field.getType().getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
+<span class="fc" id="L204">			typeValue(field) +</span>
 			&quot;&lt;/span&gt;&quot;;
 	}
 
 	private String typeValue(JApiField field) {
-<span class="fc" id="L206">		JApiType type = field.getType();</span>
-<span class="pc bpc" id="L207" title="3 of 4 branches missed.">		switch (type.getChangeStatus()) {</span>
+<span class="fc" id="L209">		JApiType type = field.getType();</span>
+<span class="pc bpc" id="L210" title="2 of 4 branches missed.">		switch (type.getChangeStatus()) {</span>
 			case NEW:
 			case UNCHANGED:
-<span class="fc" id="L210">				return type.getNewValue() + genericParameterTypes(field);</span>
+<span class="fc" id="L213">				return type.getNewValue() + genericParameterTypes(field);</span>
 			case REMOVED:
-<span class="nc" id="L212">				return type.getOldValue() + genericParameterTypes(field);</span>
+<span class="fc" id="L215">				return type.getOldValue() + genericParameterTypes(field);</span>
 			case MODIFIED:
-<span class="nc" id="L214">				return type.getNewValue() + &quot;&amp;#160;(&amp;lt;-&amp;#160;&quot; + type.getOldValue() + genericParameterTypes(field);</span>
+<span class="nc" id="L217">				return type.getNewValue() + &quot;&amp;#160;(&amp;lt;-&amp;#160;&quot; + type.getOldValue() + genericParameterTypes(field);</span>
 		}
-<span class="nc" id="L216">		return &quot;&quot;;</span>
+<span class="nc" id="L219">		return &quot;&quot;;</span>
 	}
 
 	private String annotations(List&lt;JApiAnnotation&gt; annotations) {
-<span class="pc bpc" id="L220" title="1 of 2 branches missed.">		if (!annotations.isEmpty()) {</span>
-<span class="nc" id="L221">			return templateEngine.loadAndFillTemplate(&quot;/html/annotations.html&quot;, mapOf(</span>
-<span class="nc" id="L222">				&quot;tbody&quot;, annotationsTBody(annotations)</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">		if (!annotations.isEmpty()) {</span>
+<span class="fc" id="L224">			return templateEngine.loadAndFillTemplate(&quot;/html/annotations.html&quot;, mapOf(</span>
+<span class="fc" id="L225">				&quot;tbody&quot;, annotationsTBody(annotations)</span>
 			));
 		}
-<span class="fc" id="L225">		return &quot;&quot;;</span>
+<span class="fc" id="L228">		return &quot;&quot;;</span>
 	}
 
 	private String annotationsTBody(List&lt;JApiAnnotation&gt; annotations) {
-<span class="nc" id="L229">		return annotations.stream()</span>
-<span class="nc" id="L230">			.sorted(Comparator.comparing(JApiAnnotation::getFullyQualifiedName))</span>
-<span class="nc" id="L231">			.map(annotation -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="nc" id="L232">				&quot;&lt;td&gt;&quot; + outputChangeStatus(annotation) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L233">				&quot;&lt;td&gt;&quot; + annotation.getFullyQualifiedName() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L234">				&quot;&lt;td&gt;&quot; + elements(annotation) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L232">		return annotations.stream()</span>
+<span class="fc" id="L233">			.sorted(Comparator.comparing(JApiAnnotation::getFullyQualifiedName))</span>
+<span class="fc" id="L234">			.map(annotation -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="fc" id="L235">				&quot;&lt;td&gt;&quot; + outputChangeStatus(annotation) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L236">				&quot;&lt;td&gt;&quot; + annotation.getFullyQualifiedName() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L237">				&quot;&lt;td&gt;&quot; + elements(annotation) + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;/tr&gt;\n&quot;)
-<span class="nc" id="L236">			.collect(Collectors.joining());</span>
+<span class="fc" id="L239">			.collect(Collectors.joining());</span>
 	}
 
 	private String elements(JApiAnnotation annotation) {
-<span class="nc bnc" id="L240" title="All 2 branches missed.">		if (!annotation.getElements().isEmpty()) {</span>
-<span class="nc" id="L241">			return templateEngine.loadAndFillTemplate(&quot;/html/annotation-elements.html&quot;, mapOf(</span>
-<span class="nc" id="L242">				&quot;tbody&quot;, annotationElements(annotation.getElements())</span>
+<span class="pc bpc" id="L243" title="1 of 2 branches missed.">		if (!annotation.getElements().isEmpty()) {</span>
+<span class="nc" id="L244">			return templateEngine.loadAndFillTemplate(&quot;/html/annotation-elements.html&quot;, mapOf(</span>
+<span class="nc" id="L245">				&quot;tbody&quot;, annotationElements(annotation.getElements())</span>
 			));
 		} else {
-<span class="nc" id="L245">			return &quot;n.a.&quot;;</span>
+<span class="fc" id="L248">			return &quot;n.a.&quot;;</span>
 		}
 	}
 
 	private String annotationElements(List&lt;JApiAnnotationElement&gt; elements) {
-<span class="nc" id="L250">		return elements.stream()</span>
-<span class="nc" id="L251">			.map(element -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="nc" id="L252">				&quot;&lt;td&gt;&quot; + outputChangeStatus(element) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L253">				&quot;&lt;td&gt;&quot; + element.getName() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L254">				&quot;&lt;td&gt;&quot; + element.getOldElementValues().stream()</span>
-<span class="nc" id="L255">				.map(this::valueToString)</span>
-<span class="nc" id="L256">				.collect(Collectors.joining(&quot;,&lt;wbr/&gt;&quot;)) +</span>
+<span class="nc" id="L253">		return elements.stream()</span>
+<span class="nc" id="L254">			.map(element -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="nc" id="L255">				&quot;&lt;td&gt;&quot; + outputChangeStatus(element) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L256">				&quot;&lt;td&gt;&quot; + element.getName() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L257">				&quot;&lt;td&gt;&quot; + element.getOldElementValues().stream()</span>
+<span class="nc" id="L258">				.map(this::valueToString)</span>
+<span class="nc" id="L259">				.collect(Collectors.joining(&quot;,&lt;wbr/&gt;&quot;)) +</span>
 				&quot;&lt;/td&gt;\n&quot; +
-<span class="nc" id="L258">				&quot;&lt;td&gt;&quot; + element.getNewElementValues().stream()</span>
-<span class="nc" id="L259">				.map(this::valueToString)</span>
-<span class="nc" id="L260">				.collect(Collectors.joining(&quot;,&lt;wbr/&gt;&quot;)) +</span>
+<span class="nc" id="L261">				&quot;&lt;td&gt;&quot; + element.getNewElementValues().stream()</span>
+<span class="nc" id="L262">				.map(this::valueToString)</span>
+<span class="nc" id="L263">				.collect(Collectors.joining(&quot;,&lt;wbr/&gt;&quot;)) +</span>
 				&quot;&lt;/td&gt;\n&quot; +
 				&quot;&lt;/tr&gt;\n&quot;)
-<span class="nc" id="L263">			.collect(Collectors.joining());</span>
+<span class="nc" id="L266">			.collect(Collectors.joining());</span>
 	}
 
 	private String valueToString(JApiAnnotationElementValue value) {
-<span class="nc bnc" id="L267" title="All 4 branches missed.">		switch (value.getType()) {</span>
+<span class="nc bnc" id="L270" title="All 4 branches missed.">		switch (value.getType()) {</span>
 			case Annotation:
-<span class="nc" id="L269">				return &quot;@&quot; + value.getFullyQualifiedName() + &quot;(&quot; + values(value) + &quot;)&quot;;</span>
+<span class="nc" id="L272">				return &quot;@&quot; + value.getFullyQualifiedName() + &quot;(&quot; + values(value) + &quot;)&quot;;</span>
 			case Array:
-<span class="nc" id="L271">				return &quot;{&quot; + values(value) + &quot;}&quot;;</span>
+<span class="nc" id="L274">				return &quot;{&quot; + values(value) + &quot;}&quot;;</span>
 			case Enum:
-<span class="nc" id="L273">				return value.getFullyQualifiedName() + &quot;.&quot; + value.getValue();</span>
+<span class="nc" id="L276">				return value.getFullyQualifiedName() + &quot;.&quot; + value.getValue();</span>
 			default:
-<span class="nc" id="L275">				return value.getValueString();</span>
+<span class="nc" id="L278">				return value.getValueString();</span>
 		}
 	}
 
 	private String values(JApiAnnotationElementValue value) {
-<span class="nc" id="L280">		return value.getValues().stream()</span>
-<span class="nc" id="L281">			.map(this::valueToString)</span>
-<span class="nc" id="L282">			.collect(Collectors.joining());</span>
+<span class="nc" id="L283">		return value.getValues().stream()</span>
+<span class="nc" id="L284">			.map(this::valueToString)</span>
+<span class="nc" id="L285">			.collect(Collectors.joining());</span>
 	}
 
 	private String serialVersionUid(JApiClass jApiClass) {
-<span class="pc bpc" id="L286" title="2 of 4 branches missed.">		if (jApiClass.getSerialVersionUid().isSerializableOld() || jApiClass.getSerialVersionUid().isSerializableNew()) {</span>
-<span class="nc" id="L287">			return templateEngine.loadAndFillTemplate(&quot;/html/serial-version-uid.html&quot;, mapOf(</span>
-<span class="nc" id="L288">				&quot;tbody&quot;, serialVersionUidTBody(jApiClass.getSerialVersionUid())</span>
+<span class="pc bpc" id="L289" title="2 of 4 branches missed.">		if (jApiClass.getSerialVersionUid().isSerializableOld() || jApiClass.getSerialVersionUid().isSerializableNew()) {</span>
+<span class="nc" id="L290">			return templateEngine.loadAndFillTemplate(&quot;/html/serial-version-uid.html&quot;, mapOf(</span>
+<span class="nc" id="L291">				&quot;tbody&quot;, serialVersionUidTBody(jApiClass.getSerialVersionUid())</span>
 			));
 		}
-<span class="fc" id="L291">		return &quot;&quot;;</span>
+<span class="fc" id="L294">		return &quot;&quot;;</span>
 	}
 
 	private String serialVersionUidTBody(JApiSerialVersionUid serialVersionUid) {
-<span class="nc" id="L295">		return &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="nc" id="L298">		return &quot;&lt;tr&gt;\n&quot; +</span>
 			&quot;&lt;td class=\&quot;matrix_layout\&quot;&gt;Old&lt;/td&gt;&quot; +
-<span class="nc bnc" id="L297" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (serialVersionUid.isSerializableOld() != serialVersionUid.isSerializableNew() ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.isSerializableOld() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc bnc" id="L298" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (!serialVersionUid.getSerialVersionUidDefaultOldAsString().equals(serialVersionUid.getSerialVersionUidDefaultNewAsString()) ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.getSerialVersionUidDefaultOldAsString() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc bnc" id="L299" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (!serialVersionUid.getSerialVersionUidInClassOldAsString().equals(serialVersionUid.getSerialVersionUidInClassNewAsString()) ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.getSerialVersionUidInClassOldAsString() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (serialVersionUid.isSerializableOld() != serialVersionUid.isSerializableNew() ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.isSerializableOld() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (!serialVersionUid.getSerialVersionUidDefaultOldAsString().equals(serialVersionUid.getSerialVersionUidDefaultNewAsString()) ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.getSerialVersionUidDefaultOldAsString() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (!serialVersionUid.getSerialVersionUidInClassOldAsString().equals(serialVersionUid.getSerialVersionUidInClassNewAsString()) ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.getSerialVersionUidInClassOldAsString() + &quot;&lt;/td&gt;\n&quot; +</span>
 			&quot;&lt;/tr&gt;\n&quot; +
 			&quot;&lt;tr&gt;\n&quot; +
 			&quot;&lt;td class=\&quot;matrix_layout\&quot;&gt;New&lt;/td&gt;&quot; +
-<span class="nc bnc" id="L303" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (serialVersionUid.isSerializableOld() != serialVersionUid.isSerializableNew() ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.isSerializableNew() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc bnc" id="L304" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (!serialVersionUid.getSerialVersionUidDefaultOldAsString().equals(serialVersionUid.getSerialVersionUidDefaultNewAsString()) ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.getSerialVersionUidDefaultNewAsString() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc bnc" id="L305" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (!serialVersionUid.getSerialVersionUidInClassOldAsString().equals(serialVersionUid.getSerialVersionUidInClassNewAsString()) ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.getSerialVersionUidInClassNewAsString() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (serialVersionUid.isSerializableOld() != serialVersionUid.isSerializableNew() ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.isSerializableNew() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (!serialVersionUid.getSerialVersionUidDefaultOldAsString().equals(serialVersionUid.getSerialVersionUidDefaultNewAsString()) ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.getSerialVersionUidDefaultNewAsString() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">			&quot;&lt;td class=\&quot;&quot; + (!serialVersionUid.getSerialVersionUidInClassOldAsString().equals(serialVersionUid.getSerialVersionUidInClassNewAsString()) ? &quot;modified&quot; : &quot;&quot;) + &quot;\&quot;&gt;&quot; + serialVersionUid.getSerialVersionUidInClassNewAsString() + &quot;&lt;/td&gt;\n&quot; +</span>
 			&quot;&lt;/tr&gt;\n&quot;;
 	}
 
 	private String interfaces(JApiClass jApiClass) {
-<span class="fc bfc" id="L310" title="All 2 branches covered.">		if (!jApiClass.getInterfaces().isEmpty()) {</span>
-<span class="fc" id="L311">			return templateEngine.loadAndFillTemplate(&quot;/html/interfaces.html&quot;, mapOf(</span>
-<span class="fc" id="L312">				&quot;tbody&quot;, interfacesTBody(jApiClass.getInterfaces())</span>
+<span class="fc bfc" id="L313" title="All 2 branches covered.">		if (!jApiClass.getInterfaces().isEmpty()) {</span>
+<span class="fc" id="L314">			return templateEngine.loadAndFillTemplate(&quot;/html/interfaces.html&quot;, mapOf(</span>
+<span class="fc" id="L315">				&quot;tbody&quot;, interfacesTBody(jApiClass.getInterfaces())</span>
 			));
 		}
-<span class="fc" id="L315">		return &quot;&quot;;</span>
+<span class="fc" id="L318">		return &quot;&quot;;</span>
 	}
 
 	private String interfacesTBody(List&lt;JApiImplementedInterface&gt; interfaces) {
-<span class="fc" id="L319">		return interfaces.stream()</span>
-<span class="fc" id="L320">			.map(interfaze -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="fc" id="L321">				&quot;&lt;td&gt;&quot; + outputChangeStatus(interfaze) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L322">				&quot;&lt;td&gt;&quot; + interfaze.getFullyQualifiedName() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L323">				&quot;&lt;td&gt;&quot; + compatibilityChanges(interfaze, true) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L322">		return interfaces.stream()</span>
+<span class="fc" id="L323">			.map(interfaze -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="fc" id="L324">				&quot;&lt;td&gt;&quot; + outputChangeStatus(interfaze) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L325">				&quot;&lt;td&gt;&quot; + interfaze.getFullyQualifiedName() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L326">				&quot;&lt;td&gt;&quot; + compatibilityChanges(interfaze, true) + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;/tr&gt;\n&quot;)
-<span class="fc" id="L325">			.collect(Collectors.joining());</span>
+<span class="fc" id="L328">			.collect(Collectors.joining());</span>
 	}
 
 	private String superclass(JApiClass jApiClass) {
-<span class="fc" id="L329">		JApiSuperclass superclass = jApiClass.getSuperclass();</span>
-<span class="pc bpc" id="L330" title="1 of 4 branches missed.">		if ((superclass.getOldSuperclass().isPresent() || superclass.getNewSuperclass().isPresent()) &amp;&amp;</span>
-<span class="pc bpc" id="L331" title="1 of 4 branches missed.">			((superclass.getChangeStatus() == JApiChangeStatus.NEW &amp;&amp; !superclass.getSuperclassNew().equalsIgnoreCase(&quot;java.lang.Object&quot;)) ||</span>
-<span class="pc bpc" id="L332" title="3 of 4 branches missed.">				(superclass.getChangeStatus() == JApiChangeStatus.REMOVED &amp;&amp; !superclass.getSuperclassOld().equalsIgnoreCase(&quot;java.lang.Object&quot;)) ||</span>
-<span class="fc bfc" id="L333" title="All 2 branches covered.">				(superclass.getChangeStatus() == JApiChangeStatus.MODIFIED) ||</span>
-<span class="pc bpc" id="L334" title="3 of 4 branches missed.">				(superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED &amp;&amp; !superclass.getSuperclassOld().equalsIgnoreCase(&quot;java.lang.Object&quot;))</span>
+<span class="fc" id="L332">		JApiSuperclass superclass = jApiClass.getSuperclass();</span>
+<span class="pc bpc" id="L333" title="1 of 4 branches missed.">		if ((superclass.getOldSuperclass().isPresent() || superclass.getNewSuperclass().isPresent()) &amp;&amp;</span>
+<span class="pc bpc" id="L334" title="1 of 4 branches missed.">			((superclass.getChangeStatus() == JApiChangeStatus.NEW &amp;&amp; !superclass.getSuperclassNew().equalsIgnoreCase(&quot;java.lang.Object&quot;)) ||</span>
+<span class="pc bpc" id="L335" title="3 of 4 branches missed.">				(superclass.getChangeStatus() == JApiChangeStatus.REMOVED &amp;&amp; !superclass.getSuperclassOld().equalsIgnoreCase(&quot;java.lang.Object&quot;)) ||</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">				(superclass.getChangeStatus() == JApiChangeStatus.MODIFIED) ||</span>
+<span class="pc bpc" id="L337" title="1 of 4 branches missed.">				(superclass.getChangeStatus() == JApiChangeStatus.UNCHANGED &amp;&amp; !superclass.getSuperclassOld().equalsIgnoreCase(&quot;java.lang.Object&quot;))</span>
 			)
 		) {
-<span class="fc" id="L337">			return templateEngine.loadAndFillTemplate(&quot;/html/superclass.html&quot;, mapOf(</span>
-<span class="fc" id="L338">				&quot;tbody&quot;, superclassTBody(jApiClass.getSuperclass())</span>
+<span class="fc" id="L340">			return templateEngine.loadAndFillTemplate(&quot;/html/superclass.html&quot;, mapOf(</span>
+<span class="fc" id="L341">				&quot;tbody&quot;, superclassTBody(jApiClass.getSuperclass())</span>
 			));
 		}
-<span class="fc" id="L341">		return &quot;&quot;;</span>
+<span class="fc" id="L344">		return &quot;&quot;;</span>
 	}
 
 	private String superclassTBody(JApiSuperclass superclass) {
-<span class="fc" id="L345">		return &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="fc" id="L346">			&quot;&lt;td&gt;&quot; + outputChangeStatus(superclass) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L347">			&quot;&lt;td&gt;&quot; + superclassName(superclass) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="fc" id="L348">			&quot;&lt;td&gt;&quot; + compatibilityChanges(superclass, true) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L348">		return &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="fc" id="L349">			&quot;&lt;td&gt;&quot; + outputChangeStatus(superclass) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L350">			&quot;&lt;td&gt;&quot; + superclassName(superclass) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="fc" id="L351">			&quot;&lt;td&gt;&quot; + compatibilityChanges(superclass, true) + &quot;&lt;/td&gt;\n&quot; +</span>
 			&quot;&lt;/tr&gt;\n&quot;;
 	}
 
 	private String superclassName(JApiSuperclass superclass) {
-<span class="pc bpc" id="L353" title="3 of 4 branches missed.">		switch (superclass.getChangeStatus()) {</span>
+<span class="pc bpc" id="L356" title="3 of 4 branches missed.">		switch (superclass.getChangeStatus()) {</span>
 			case NEW:
 			case UNCHANGED:
-<span class="nc" id="L356">				return superclass.getSuperclassNew();</span>
+<span class="nc" id="L359">				return superclass.getSuperclassNew();</span>
 			case REMOVED:
-<span class="nc" id="L358">				return superclass.getSuperclassOld();</span>
+<span class="nc" id="L361">				return superclass.getSuperclassOld();</span>
 			case MODIFIED:
-<span class="fc" id="L360">				return superclass.getSuperclassNew() + &quot;(&amp;lt;-&amp;#160;&quot; + superclass.getSuperclassOld() + &quot;)&quot;;</span>
+<span class="fc" id="L363">				return superclass.getSuperclassNew() + &quot;(&amp;lt;-&amp;#160;&quot; + superclass.getSuperclassOld() + &quot;)&quot;;</span>
 		}
-<span class="nc" id="L362">		return &quot;&quot;;</span>
+<span class="nc" id="L365">		return &quot;&quot;;</span>
 	}
 
 	private String genericTemplates(JApiHasGenericTemplates jApiHasGenericTemplates, boolean withNA) {
-<span class="fc" id="L366">		List&lt;JApiGenericTemplate&gt; genericTemplates = jApiHasGenericTemplates.getGenericTemplates();</span>
-<span class="pc bpc" id="L367" title="1 of 2 branches missed.">		if (!genericTemplates.isEmpty()) {</span>
-<span class="nc" id="L368">			return &quot;&lt;span class=\&quot;label_class_member\&quot;&gt;Generic Templates:&lt;/span&gt;\n&quot; +</span>
-<span class="nc" id="L369">				templateEngine.loadAndFillTemplate(&quot;/html/generic-templates.html&quot;, mapOf(</span>
-<span class="nc" id="L370">					&quot;tbody&quot;, genericTemplatesTBody(genericTemplates)</span>
+<span class="fc" id="L369">		List&lt;JApiGenericTemplate&gt; genericTemplates = jApiHasGenericTemplates.getGenericTemplates();</span>
+<span class="pc bpc" id="L370" title="1 of 2 branches missed.">		if (!genericTemplates.isEmpty()) {</span>
+<span class="nc" id="L371">			return &quot;&lt;span class=\&quot;label_class_member\&quot;&gt;Generic Templates:&lt;/span&gt;\n&quot; +</span>
+<span class="nc" id="L372">				templateEngine.loadAndFillTemplate(&quot;/html/generic-templates.html&quot;, mapOf(</span>
+<span class="nc" id="L373">					&quot;tbody&quot;, genericTemplatesTBody(genericTemplates)</span>
 				));
 		}
-<span class="fc bfc" id="L373" title="All 2 branches covered.">		return withNA ? &quot;n.a.&quot; : &quot;&quot;;</span>
+<span class="fc bfc" id="L376" title="All 2 branches covered.">		return withNA ? &quot;n.a.&quot; : &quot;&quot;;</span>
 	}
 
 	private String genericTemplatesTBody(List&lt;JApiGenericTemplate&gt; genericTemplates) {
-<span class="nc" id="L377">		return genericTemplates.stream()</span>
-<span class="nc" id="L378">			.map(jApiGenericTemplate -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="nc" id="L379">				&quot;&lt;td&gt;&quot; + outputChangeStatus(jApiGenericTemplate) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L380">				&quot;&lt;td&gt;&quot; + jApiGenericTemplate.getName() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L381">				&quot;&lt;td&gt;&quot; + jApiGenericTemplate.getOldType() + interfaceTypes(jApiGenericTemplate.getOldInterfaceTypes()) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L382">				&quot;&lt;td&gt;&quot; + jApiGenericTemplate.getNewType() + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L383">				&quot;&lt;td&gt;&quot; + genericParameterTypes(jApiGenericTemplate) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L380">		return genericTemplates.stream()</span>
+<span class="nc" id="L381">			.map(jApiGenericTemplate -&gt; &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="nc" id="L382">				&quot;&lt;td&gt;&quot; + outputChangeStatus(jApiGenericTemplate) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L383">				&quot;&lt;td&gt;&quot; + jApiGenericTemplate.getName() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L384">				&quot;&lt;td&gt;&quot; + jApiGenericTemplate.getOldType() + interfaceTypes(jApiGenericTemplate.getOldInterfaceTypes()) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L385">				&quot;&lt;td&gt;&quot; + jApiGenericTemplate.getNewType() + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L386">				&quot;&lt;td&gt;&quot; + genericParameterTypes(jApiGenericTemplate) + &quot;&lt;/td&gt;\n&quot; +</span>
 				&quot;&lt;/tr&gt;\n&quot;)
-<span class="nc" id="L385">			.collect(Collectors.joining());</span>
+<span class="nc" id="L388">			.collect(Collectors.joining());</span>
 	}
 
 	private String interfaceTypes(List&lt;JApiGenericType&gt; interfaceTypes) {
-<span class="nc bnc" id="L389" title="All 2 branches missed.">		if (!interfaceTypes.isEmpty()) {</span>
-<span class="nc" id="L390">			return interfaceTypes.stream()</span>
-<span class="nc" id="L391">				.map(interfaceType -&gt; &quot;&amp;#038; &quot; + interfaceType.getType() + genericParameterTypesRecursive(interfaceType))</span>
-<span class="nc" id="L392">				.collect(Collectors.joining());</span>
+<span class="nc bnc" id="L392" title="All 2 branches missed.">		if (!interfaceTypes.isEmpty()) {</span>
+<span class="nc" id="L393">			return interfaceTypes.stream()</span>
+<span class="nc" id="L394">				.map(interfaceType -&gt; &quot;&amp;#038; &quot; + interfaceType.getType() + genericParameterTypesRecursive(interfaceType))</span>
+<span class="nc" id="L395">				.collect(Collectors.joining());</span>
 		}
-<span class="nc" id="L394">		return &quot;&quot;;</span>
+<span class="nc" id="L397">		return &quot;&quot;;</span>
 	}
 
 	private String genericParameterTypesRecursive(JApiGenericType jApiGenericType) {
-<span class="nc bnc" id="L398" title="All 2 branches missed.">		if (!jApiGenericType.getGenericTypes().isEmpty()) {</span>
-<span class="nc" id="L399">			return &quot;&amp;#60;&quot; + jApiGenericType.getGenericTypes().stream()</span>
-<span class="nc" id="L400">				.map(jApiGenericType1 -&gt; genericParameterWithWildcard(jApiGenericType1) + genericParameterTypesRecursive(jApiGenericType1))</span>
-<span class="nc" id="L401">				.collect(Collectors.joining(&quot;,&quot;)) +</span>
+<span class="nc bnc" id="L401" title="All 2 branches missed.">		if (!jApiGenericType.getGenericTypes().isEmpty()) {</span>
+<span class="nc" id="L402">			return &quot;&amp;#60;&quot; + jApiGenericType.getGenericTypes().stream()</span>
+<span class="nc" id="L403">				.map(jApiGenericType1 -&gt; genericParameterWithWildcard(jApiGenericType1) + genericParameterTypesRecursive(jApiGenericType1))</span>
+<span class="nc" id="L404">				.collect(Collectors.joining(&quot;,&quot;)) +</span>
 				&quot;&amp;#62;&quot;;
 		}
-<span class="nc" id="L404">		return &quot;&quot;;</span>
+<span class="nc" id="L407">		return &quot;&quot;;</span>
 	}
 
 	private String genericParameterWithWildcard(JApiGenericType jApiGenericType) {
-<span class="nc bnc" id="L408" title="All 5 branches missed.">		switch (jApiGenericType.getGenericWildCard()) {</span>
+<span class="nc bnc" id="L411" title="All 5 branches missed.">		switch (jApiGenericType.getGenericWildCard()) {</span>
 			case NONE:
-<span class="nc" id="L410">				return jApiGenericType.getType();</span>
+<span class="nc" id="L413">				return jApiGenericType.getType();</span>
 			case EXTENDS:
-<span class="nc" id="L412">				return &quot;? extends &quot; + jApiGenericType.getType();</span>
+<span class="nc" id="L415">				return &quot;? extends &quot; + jApiGenericType.getType();</span>
 			case SUPER:
-<span class="nc" id="L414">				return &quot;? super &quot; + jApiGenericType.getType();</span>
+<span class="nc" id="L417">				return &quot;? super &quot; + jApiGenericType.getType();</span>
 			case UNBOUNDED:
-<span class="nc" id="L416">				return &quot;?&quot;;</span>
+<span class="nc" id="L419">				return &quot;?&quot;;</span>
 		}
-<span class="nc" id="L418">		return &quot;&quot;;</span>
+<span class="nc" id="L421">		return &quot;&quot;;</span>
 	}
 
 	private String genericParameterTypes(JApiHasGenericTypes jApiHasGenericTypes) {
-<span class="pc bpc" id="L422" title="2 of 4 branches missed.">		if (!jApiHasGenericTypes.getNewGenericTypes().isEmpty() || !jApiHasGenericTypes.getOldGenericTypes().isEmpty()) {</span>
-<span class="nc" id="L423">			return &quot;&lt;div class=\&quot;tooltip\&quot;&gt;&quot; +</span>
-<span class="nc bnc" id="L424" title="All 2 branches missed.">				&quot;&lt;span class=\&quot;&quot; + (!((JApiCompatibility) jApiHasGenericTypes).isSourceCompatible() ? &quot;modified method_parameter&quot; : &quot;unchanged method_parameter&quot;) + &quot;\&quot;&gt;&amp;#60;..&amp;#62;&lt;/span&gt;&quot; +</span>
+<span class="pc bpc" id="L425" title="2 of 4 branches missed.">		if (!jApiHasGenericTypes.getNewGenericTypes().isEmpty() || !jApiHasGenericTypes.getOldGenericTypes().isEmpty()) {</span>
+<span class="nc" id="L426">			return &quot;&lt;div class=\&quot;tooltip\&quot;&gt;&quot; +</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">				&quot;&lt;span class=\&quot;&quot; + (!((JApiCompatibility) jApiHasGenericTypes).isSourceCompatible() ? &quot;modified method_parameter&quot; : &quot;unchanged method_parameter&quot;) + &quot;\&quot;&gt;&amp;#60;..&amp;#62;&lt;/span&gt;&quot; +</span>
 				&quot;&lt;div class=\&quot;tooltiptext\&quot;&gt;&quot; +
 				&quot;&lt;table&gt;&quot; +
-<span class="nc" id="L427">				genericTypes(&quot;New&quot;, jApiHasGenericTypes.getNewGenericTypes()) +</span>
-<span class="nc" id="L428">				genericTypes(&quot;Old&quot;, jApiHasGenericTypes.getOldGenericTypes()) +</span>
+<span class="nc" id="L430">				genericTypes(&quot;New&quot;, jApiHasGenericTypes.getNewGenericTypes()) +</span>
+<span class="nc" id="L431">				genericTypes(&quot;Old&quot;, jApiHasGenericTypes.getOldGenericTypes()) +</span>
 				&quot;&lt;/table&gt;&quot; +
 				&quot;&lt;/div&gt;&quot; +
 				&quot;&lt;/div&gt;&quot;;
 		}
-<span class="fc" id="L433">		return &quot;&quot;;</span>
+<span class="fc" id="L436">		return &quot;&quot;;</span>
 	}
 
 	private String genericTypes(String header, List&lt;JApiGenericType&gt; genericTypes) {
-<span class="nc bnc" id="L437" title="All 2 branches missed.">		if (!genericTypes.isEmpty()) {</span>
-<span class="nc" id="L438">			return &quot;&lt;tr&gt;&quot; +</span>
+<span class="nc bnc" id="L440" title="All 2 branches missed.">		if (!genericTypes.isEmpty()) {</span>
+<span class="nc" id="L441">			return &quot;&lt;tr&gt;&quot; +</span>
 				&quot;&lt;td class=\&quot;table_head_td\&quot;&gt;&quot; + header + &quot;:&lt;/td&gt;&quot; +
-<span class="nc" id="L440">				genericTypes.stream()</span>
-<span class="nc" id="L441">					.map(genericType -&gt; &quot;&lt;td&gt;&quot; +</span>
-<span class="nc" id="L442">						genericParameterWithWildcard(genericType) +</span>
-<span class="nc" id="L443">						genericParameterTypesRecursive(genericType) +</span>
+<span class="nc" id="L443">				genericTypes.stream()</span>
+<span class="nc" id="L444">					.map(genericType -&gt; &quot;&lt;td&gt;&quot; +</span>
+<span class="nc" id="L445">						genericParameterWithWildcard(genericType) +</span>
+<span class="nc" id="L446">						genericParameterTypesRecursive(genericType) +</span>
 						&quot;&lt;/td&gt;&quot;)
-<span class="nc" id="L445">					.collect(Collectors.joining()) +</span>
+<span class="nc" id="L448">					.collect(Collectors.joining()) +</span>
 				&quot;&lt;/tr&gt;&quot;;
 		}
-<span class="nc" id="L448">		return &quot;&quot;;</span>
+<span class="nc" id="L451">		return &quot;&quot;;</span>
 	}
 
 	private String classFileFormatVersion(JApiClass jApiClass) {
-<span class="pc bpc" id="L452" title="1 of 2 branches missed.">		if (jApiClass.getClassFileFormatVersion().getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L453">			return templateEngine.loadAndFillTemplate(&quot;/html/class-file-format-version.html&quot;, mapOf(</span>
-<span class="nc" id="L454">				&quot;tbody&quot;, classFileFormatVersionTBody(jApiClass)</span>
+<span class="pc bpc" id="L455" title="1 of 2 branches missed.">		if (jApiClass.getClassFileFormatVersion().getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L456">			return templateEngine.loadAndFillTemplate(&quot;/html/class-file-format-version.html&quot;, mapOf(</span>
+<span class="nc" id="L457">				&quot;tbody&quot;, classFileFormatVersionTBody(jApiClass)</span>
 			));
 		}
-<span class="fc" id="L457">		return &quot;&quot;;</span>
+<span class="fc" id="L460">		return &quot;&quot;;</span>
 	}
 
 	private String classFileFormatVersionTBody(JApiClass jApiClass) {
-<span class="nc" id="L461">		JApiClassFileFormatVersion classFileFormatVersion = jApiClass.getClassFileFormatVersion();</span>
-<span class="nc" id="L462">		return &quot;&lt;tr&gt;\n&quot; +</span>
-<span class="nc" id="L463">			&quot;&lt;td&gt;&quot; + outputChangeStatus(classFileFormatVersion) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L464">			&quot;&lt;td&gt;&quot; + classFileFormatVersionString(classFileFormatVersion.getMajorVersionOld(), classFileFormatVersion.getMinorVersionOld()) + &quot;&lt;/td&gt;\n&quot; +</span>
-<span class="nc" id="L465">			&quot;&lt;td&gt;&quot; + classFileFormatVersionString(classFileFormatVersion.getMajorVersionNew(), classFileFormatVersion.getMinorVersionNew()) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L464">		JApiClassFileFormatVersion classFileFormatVersion = jApiClass.getClassFileFormatVersion();</span>
+<span class="nc" id="L465">		return &quot;&lt;tr&gt;\n&quot; +</span>
+<span class="nc" id="L466">			&quot;&lt;td&gt;&quot; + outputChangeStatus(classFileFormatVersion) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L467">			&quot;&lt;td&gt;&quot; + classFileFormatVersionString(classFileFormatVersion.getMajorVersionOld(), classFileFormatVersion.getMinorVersionOld()) + &quot;&lt;/td&gt;\n&quot; +</span>
+<span class="nc" id="L468">			&quot;&lt;td&gt;&quot; + classFileFormatVersionString(classFileFormatVersion.getMajorVersionNew(), classFileFormatVersion.getMinorVersionNew()) + &quot;&lt;/td&gt;\n&quot; +</span>
 			&quot;&lt;/tr&gt;\n&quot;;
 	}
 
 	private String classFileFormatVersionString(int majorVersion, int minorVersion) {
-<span class="nc bnc" id="L470" title="All 4 branches missed.">		if (majorVersion &gt;= 0 &amp;&amp; minorVersion &gt;= 0) {</span>
-<span class="nc" id="L471">			return majorVersion + &quot;.&quot; + minorVersion;</span>
+<span class="nc bnc" id="L473" title="All 4 branches missed.">		if (majorVersion &gt;= 0 &amp;&amp; minorVersion &gt;= 0) {</span>
+<span class="nc" id="L474">			return majorVersion + &quot;.&quot; + minorVersion;</span>
 		}
-<span class="nc" id="L473">		return &quot;n.a.&quot;;</span>
+<span class="nc" id="L476">		return &quot;n.a.&quot;;</span>
 	}
 
 	private String compatibilityChanges(JApiCompatibility jApiClass, boolean withNA) {
-<span class="fc bfc" id="L477" title="All 2 branches covered.">		if (!jApiClass.getCompatibilityChanges().isEmpty()) {</span>
-<span class="fc" id="L478">			return templateEngine.loadAndFillTemplate(&quot;/html/compatibility-changes.html&quot;, mapOf(</span>
-<span class="fc" id="L479">				&quot;tbody&quot;, jApiClass.getCompatibilityChanges().stream()</span>
-<span class="fc" id="L480">					.map(this::compatibilityChange)</span>
-<span class="fc" id="L481">					.collect(Collectors.joining())</span>
+<span class="fc bfc" id="L480" title="All 2 branches covered.">		if (!jApiClass.getCompatibilityChanges().isEmpty()) {</span>
+<span class="fc" id="L481">			return templateEngine.loadAndFillTemplate(&quot;/html/compatibility-changes.html&quot;, mapOf(</span>
+<span class="fc" id="L482">				&quot;tbody&quot;, jApiClass.getCompatibilityChanges().stream()</span>
+<span class="fc" id="L483">					.map(this::compatibilityChange)</span>
+<span class="fc" id="L484">					.collect(Collectors.joining())</span>
 			));
 		}
-<span class="fc bfc" id="L484" title="All 2 branches covered.">		return withNA ? &quot;n.a.&quot; : &quot;&quot;;</span>
+<span class="fc bfc" id="L487" title="All 2 branches covered.">		return withNA ? &quot;n.a.&quot; : &quot;&quot;;</span>
 	}
 
 	private String compatibilityChange(JApiCompatibilityChange jApiCompatibilityChange) {
-<span class="fc" id="L488">		return &quot;&lt;tr&gt;&lt;td&gt;&quot; + jApiCompatibilityChange.getType() + &quot;&lt;/td&gt;&lt;/tr&gt;\n&quot;;</span>
+<span class="fc" id="L491">		return &quot;&lt;tr&gt;&lt;td&gt;&quot; + jApiCompatibilityChange.getType() + &quot;&lt;/td&gt;&lt;/tr&gt;\n&quot;;</span>
 	}
 
 	private String classType(JApiClass jApiClass) {
-<span class="fc" id="L492">		return &quot;&lt;span class=\&quot;&quot; + jApiClass.getClassType().getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
-<span class="fc" id="L493">			classTypeValue(jApiClass.getClassType()) +</span>
+<span class="fc" id="L495">		return &quot;&lt;span class=\&quot;&quot; + jApiClass.getClassType().getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
+<span class="fc" id="L496">			classTypeValue(jApiClass.getClassType()) +</span>
 			&quot;&lt;/span&gt;\n&quot;;
 	}
 
 	private String classTypeValue(JApiClassType classType) {
-<span class="pc bpc" id="L498" title="1 of 2 branches missed.">		if (classType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L499">			return classType.getNewType().toLowerCase() + &quot;&amp;#160;(&amp;lt;-&amp;#160;&quot; + classType.getOldType().toLowerCase() + &quot;)&quot;;</span>
-<span class="pc bpc" id="L500" title="1 of 4 branches missed.">		} else if (classType.getChangeStatus() == JApiChangeStatus.NEW || classType.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
-<span class="fc" id="L501">			return classType.getNewType().toLowerCase();</span>
-<span class="nc bnc" id="L502" title="All 2 branches missed.">		} else if (classType.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
-<span class="nc" id="L503">			return classType.getOldType().toLowerCase();</span>
+<span class="pc bpc" id="L501" title="1 of 2 branches missed.">		if (classType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L502">			return classType.getNewType().toLowerCase() + &quot;&amp;#160;(&amp;lt;-&amp;#160;&quot; + classType.getOldType().toLowerCase() + &quot;)&quot;;</span>
+<span class="pc bpc" id="L503" title="1 of 4 branches missed.">		} else if (classType.getChangeStatus() == JApiChangeStatus.NEW || classType.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L504">			return classType.getNewType().toLowerCase();</span>
+<span class="nc bnc" id="L505" title="All 2 branches missed.">		} else if (classType.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc" id="L506">			return classType.getOldType().toLowerCase();</span>
 		}
-<span class="nc" id="L505">		return &quot;&quot;;</span>
+<span class="nc" id="L508">		return &quot;&quot;;</span>
 	}
 
 	private String modifiers(JApiHasModifiers jApiHasModifiers) {
-<span class="fc" id="L509">		return jApiHasModifiers.getModifiers().stream()</span>
-<span class="fc" id="L510">			.map(jApiModifier -&gt; {</span>
-<span class="fc" id="L511">				String modifier = modifier(jApiModifier);</span>
-<span class="fc bfc" id="L512" title="All 2 branches covered.">				if (!modifier.trim().isEmpty()) {</span>
-<span class="fc" id="L513">					return &quot;&lt;span class=\&quot;modifier &quot; + jApiModifier.getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
+<span class="fc" id="L512">		return jApiHasModifiers.getModifiers().stream()</span>
+<span class="fc" id="L513">			.map(jApiModifier -&gt; {</span>
+<span class="fc" id="L514">				String modifier = modifier(jApiModifier);</span>
+<span class="fc bfc" id="L515" title="All 2 branches covered.">				if (!modifier.trim().isEmpty()) {</span>
+<span class="fc" id="L516">					return &quot;&lt;span class=\&quot;modifier &quot; + jApiModifier.getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
 						modifier +
 						&quot;&lt;/span&gt;\n&quot;;
 				}
-<span class="fc" id="L517">				return &quot;&quot;;</span>
+<span class="fc" id="L520">				return &quot;&quot;;</span>
 			})
-<span class="fc" id="L519">			.collect(Collectors.joining());</span>
+<span class="fc" id="L522">			.collect(Collectors.joining());</span>
 	}
 
 	private String modifier(JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt; jApiModifier) {
-<span class="pc bpc" id="L523" title="1 of 2 branches missed.">		if (jApiModifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L524">			return jApiModifier.getValueNew() + &quot;&amp;#160;(&amp;lt;-&amp;#160;&quot; + jApiModifier.getValueOld() + &quot;)&amp;#160;&quot;;</span>
-<span class="fc bfc" id="L525" title="All 2 branches covered.">		} else if (jApiModifier.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
-<span class="pc bpc" id="L526" title="1 of 4 branches missed.">			return jApiModifier.getValueNew().toLowerCase().startsWith(&quot;non&quot;) || jApiModifier.getValueNew().equalsIgnoreCase(&quot;package_protected&quot;) ? &quot;&quot; : jApiModifier.getValueNew().toLowerCase();</span>
-<span class="fc bfc" id="L527" title="All 2 branches covered.">		} else if (jApiModifier.getChangeStatus() == JApiChangeStatus.NEW) {</span>
-<span class="pc bpc" id="L528" title="1 of 4 branches missed.">			return jApiModifier.getValueNew().toLowerCase().startsWith(&quot;non&quot;) || jApiModifier.getValueNew().equalsIgnoreCase(&quot;package_protected&quot;) ? &quot;&quot; : jApiModifier.getValueNew().toLowerCase();</span>
-<span class="pc bpc" id="L529" title="1 of 2 branches missed.">		} else if (jApiModifier.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
-<span class="pc bpc" id="L530" title="1 of 4 branches missed.">			return jApiModifier.getValueOld().toLowerCase().startsWith(&quot;non&quot;) || jApiModifier.getValueOld().equalsIgnoreCase(&quot;package_protected&quot;) ? &quot;&quot; : jApiModifier.getValueOld().toLowerCase();</span>
+<span class="pc bpc" id="L526" title="1 of 2 branches missed.">		if (jApiModifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L527">			return jApiModifier.getValueNew() + &quot;&amp;#160;(&amp;lt;-&amp;#160;&quot; + jApiModifier.getValueOld() + &quot;)&amp;#160;&quot;;</span>
+<span class="fc bfc" id="L528" title="All 2 branches covered.">		} else if (jApiModifier.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="pc bpc" id="L529" title="1 of 4 branches missed.">			return jApiModifier.getValueNew().toLowerCase().startsWith(&quot;non&quot;) || jApiModifier.getValueNew().equalsIgnoreCase(&quot;package_protected&quot;) ? &quot;&quot; : jApiModifier.getValueNew().toLowerCase();</span>
+<span class="fc bfc" id="L530" title="All 2 branches covered.">		} else if (jApiModifier.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="pc bpc" id="L531" title="1 of 4 branches missed.">			return jApiModifier.getValueNew().toLowerCase().startsWith(&quot;non&quot;) || jApiModifier.getValueNew().equalsIgnoreCase(&quot;package_protected&quot;) ? &quot;&quot; : jApiModifier.getValueNew().toLowerCase();</span>
+<span class="pc bpc" id="L532" title="1 of 2 branches missed.">		} else if (jApiModifier.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="pc bpc" id="L533" title="1 of 4 branches missed.">			return jApiModifier.getValueOld().toLowerCase().startsWith(&quot;non&quot;) || jApiModifier.getValueOld().equalsIgnoreCase(&quot;package_protected&quot;) ? &quot;&quot; : jApiModifier.getValueOld().toLowerCase();</span>
 		}
-<span class="nc" id="L532">		return &quot;&quot;;</span>
+<span class="nc" id="L535">		return &quot;&quot;;</span>
 	}
 
 	private String javaObjectSerializationCompatible(JApiClass jApiClass) {
-<span class="pc bpc" id="L536" title="1 of 2 branches missed.">		if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE) {</span>
-<span class="fc" id="L537">			return &quot;&quot;;</span>
-<span class="nc bnc" id="L538" title="All 2 branches missed.">		} else if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE) {</span>
-<span class="nc" id="L539">			return &quot;&lt;span class=\&quot;new\&quot;&gt;&amp;#160;(Serializable compatible)&amp;#160;&lt;/span&gt;&quot;;</span>
+<span class="pc bpc" id="L539" title="1 of 2 branches missed.">		if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE) {</span>
+<span class="fc" id="L540">			return &quot;&quot;;</span>
+<span class="nc bnc" id="L541" title="All 2 branches missed.">		} else if (jApiClass.getJavaObjectSerializationCompatible() == JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE) {</span>
+<span class="nc" id="L542">			return &quot;&lt;span class=\&quot;new\&quot;&gt;&amp;#160;(Serializable compatible)&amp;#160;&lt;/span&gt;&quot;;</span>
 		} else {
-<span class="nc" id="L541">			return &quot;&lt;span class=\&quot;removed\&quot;&gt;&amp;#160;(Serializable incompatible(!): &quot; + jApiClass.getJavaObjectSerializationCompatibleAsString() + &quot;)&amp;#160;&lt;/span&gt;&quot;;</span>
+<span class="nc" id="L544">			return &quot;&lt;span class=\&quot;removed\&quot;&gt;&amp;#160;(Serializable incompatible(!): &quot; + jApiClass.getJavaObjectSerializationCompatibleAsString() + &quot;)&amp;#160;&lt;/span&gt;&quot;;</span>
 		}
 	}
 
 	private void explanations(StringBuilder sb) {
-<span class="fc" id="L546">		sb.append(&quot;&lt;div class=\&quot;explanations\&quot;&gt;\n&quot; +</span>
+<span class="fc" id="L549">		sb.append(&quot;&lt;div class=\&quot;explanations\&quot;&gt;\n&quot; +</span>
 			&quot;&lt;span&gt;Binary incompatible changes are marked with (!) while source incompatible changes are marked with (*).&lt;/span&gt;\n&quot; +
 			&quot;&lt;/div&gt;\n&quot;);
-<span class="fc" id="L549">	}</span>
+<span class="fc" id="L552">	}</span>
 
 	private void toc(StringBuilder sb) {
-<span class="pc bpc" id="L552" title="1 of 2 branches missed.">		if (!jApiClasses.isEmpty()) {</span>
-<span class="fc" id="L553">			sb.append(&quot;&lt;ul&gt;\n&quot;);</span>
-<span class="fc" id="L554">			sb.append(&quot;&lt;li&gt;\n&quot;);</span>
-<span class="fc" id="L555">			sb.append(&quot;&lt;a href=\&quot;#toc\&quot;&gt;Classes&lt;/a&gt;\n&quot;);</span>
-<span class="fc" id="L556">			sb.append(&quot;&lt;/li&gt;\n&quot;);</span>
-<span class="fc" id="L557">			sb.append(&quot;&lt;/ul&gt;\n&quot;);</span>
-<span class="fc" id="L558">			sb.append(templateEngine.loadAndFillTemplate(&quot;/html/toc.html&quot;, mapOf(</span>
-<span class="fc" id="L559">				&quot;tbody&quot;, tocEntries()</span>
+<span class="pc bpc" id="L555" title="1 of 2 branches missed.">		if (!jApiClasses.isEmpty()) {</span>
+<span class="fc" id="L556">			sb.append(&quot;&lt;ul&gt;\n&quot;);</span>
+<span class="fc" id="L557">			sb.append(&quot;&lt;li&gt;\n&quot;);</span>
+<span class="fc" id="L558">			sb.append(&quot;&lt;a href=\&quot;#toc\&quot;&gt;Classes&lt;/a&gt;\n&quot;);</span>
+<span class="fc" id="L559">			sb.append(&quot;&lt;/li&gt;\n&quot;);</span>
+<span class="fc" id="L560">			sb.append(&quot;&lt;/ul&gt;\n&quot;);</span>
+<span class="fc" id="L561">			sb.append(templateEngine.loadAndFillTemplate(&quot;/html/toc.html&quot;, mapOf(</span>
+<span class="fc" id="L562">				&quot;tbody&quot;, tocEntries()</span>
 			)));
 		}
-<span class="fc" id="L562">	}</span>
+<span class="fc" id="L565">	}</span>
 
 	private String tocEntries() {
-<span class="fc" id="L565">		return jApiClasses.stream()</span>
-<span class="fc" id="L566">			.map(jApiClass -&gt; templateEngine.loadAndFillTemplate(&quot;/html/toc-entry.html&quot;, mapOf(</span>
-<span class="fc" id="L567">				&quot;outputChangeStatus&quot;, outputChangeStatus(jApiClass),</span>
-<span class="fc" id="L568">				&quot;fullyQualifiedName&quot;, jApiClass.getFullyQualifiedName()</span>
+<span class="fc" id="L568">		return jApiClasses.stream()</span>
+<span class="fc" id="L569">			.map(jApiClass -&gt; templateEngine.loadAndFillTemplate(&quot;/html/toc-entry.html&quot;, mapOf(</span>
+<span class="fc" id="L570">				&quot;outputChangeStatus&quot;, outputChangeStatus(jApiClass),</span>
+<span class="fc" id="L571">				&quot;fullyQualifiedName&quot;, jApiClass.getFullyQualifiedName()</span>
 			)))
-<span class="fc" id="L570">			.collect(Collectors.joining());</span>
+<span class="fc" id="L573">			.collect(Collectors.joining());</span>
 	}
 
 	private String outputChangeStatus(JApiHasChangeStatus jApiHasChangeStatus) {
-<span class="fc" id="L574">		return &quot;&lt;span class=\&quot;&quot; + jApiHasChangeStatus.getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
-<span class="fc" id="L575">			jApiHasChangeStatus.getChangeStatus().name() +</span>
-<span class="fc bfc" id="L576" title="All 2 branches covered.">			(jApiHasChangeStatus instanceof JApiCompatibility ? binaryAndSourceCompatibility((JApiCompatibility) jApiHasChangeStatus) : &quot;&quot;) +</span>
+<span class="fc" id="L577">		return &quot;&lt;span class=\&quot;&quot; + jApiHasChangeStatus.getChangeStatus().name().toLowerCase() + &quot;\&quot;&gt;&quot; +</span>
+<span class="fc" id="L578">			jApiHasChangeStatus.getChangeStatus().name() +</span>
+<span class="fc bfc" id="L579" title="All 2 branches covered.">			(jApiHasChangeStatus instanceof JApiCompatibility ? binaryAndSourceCompatibility((JApiCompatibility) jApiHasChangeStatus) : &quot;&quot;) +</span>
 			&quot;&lt;/span&gt;&quot;;
 	}
 
 	private String binaryAndSourceCompatibility(JApiCompatibility jApiCompatibility) {
-<span class="fc bfc" id="L581" title="All 2 branches covered.">		if (!jApiCompatibility.isBinaryCompatible()) {</span>
-<span class="fc" id="L582">			return &quot;&amp;#160;(!)&quot;;</span>
-<span class="pc bpc" id="L583" title="2 of 4 branches missed.">		} else if (jApiCompatibility.isBinaryCompatible() &amp;&amp; !jApiCompatibility.isSourceCompatible()) {</span>
-<span class="nc" id="L584">			return &quot;&amp;#160;(*)&quot;;</span>
+<span class="fc bfc" id="L584" title="All 2 branches covered.">		if (!jApiCompatibility.isBinaryCompatible()) {</span>
+<span class="fc" id="L585">			return &quot;&amp;#160;(!)&quot;;</span>
+<span class="pc bpc" id="L586" title="2 of 4 branches missed.">		} else if (jApiCompatibility.isBinaryCompatible() &amp;&amp; !jApiCompatibility.isSourceCompatible()) {</span>
+<span class="nc" id="L587">			return &quot;&amp;#160;(*)&quot;;</span>
 		}
-<span class="fc" id="L586">		return &quot;&quot;;</span>
+<span class="fc" id="L589">		return &quot;&quot;;</span>
 	}
 
 	private void warningMissingClasses(StringBuilder sb) {
-<span class="pc bpc" id="L590" title="1 of 2 branches missed.">		if (options.getIgnoreMissingClasses().isIgnoreAllMissingClasses()) {</span>
-<span class="fc" id="L591">			sb.append(&quot;&lt;div class=\&quot;warnings\&quot;&gt;\n&quot; +</span>
+<span class="pc bpc" id="L593" title="1 of 2 branches missed.">		if (options.getIgnoreMissingClasses().isIgnoreAllMissingClasses()) {</span>
+<span class="fc" id="L594">			sb.append(&quot;&lt;div class=\&quot;warnings\&quot;&gt;\n&quot; +</span>
 				&quot;&lt;span id=\&quot;warning-missingclasses\&quot;&gt;\n&quot; +
 				&quot;WARNING: You are using the option '--ignore-missing-classes', i.e. superclasses and\n&quot; +
 				&quot;interfaces that could not be found on the classpath are ignored. Hence changes\n&quot; +
@@ -597,53 +600,53 @@ public class HtmlOutputGenerator extends OutputGenerator&lt;HtmlOutput&gt; {
 				&quot;&lt;/div&gt;&quot;
 			);
 		}
-<span class="fc" id="L600">	}</span>
+<span class="fc" id="L603">	}</span>
 
 	private String getStyle() {
 		String styleSheet;
-<span class="pc bpc" id="L604" title="1 of 2 branches missed.">		if (options.getHtmlStylesheet().isPresent()) {</span>
+<span class="pc bpc" id="L607" title="1 of 2 branches missed.">		if (options.getHtmlStylesheet().isPresent()) {</span>
 			try {
-<span class="nc" id="L606">				InputStream inputStream = new FileInputStream(options.getHtmlStylesheet().get());</span>
-<span class="nc" id="L607">				styleSheet = Streams.asString(inputStream);</span>
-<span class="nc" id="L608">			} catch (FileNotFoundException e) {</span>
-<span class="nc" id="L609">				throw new JApiCmpException(JApiCmpException.Reason.IoException, &quot;Failed to load stylesheet: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L610">			}</span>
+<span class="nc" id="L609">				InputStream inputStream = new FileInputStream(options.getHtmlStylesheet().get());</span>
+<span class="nc" id="L610">				styleSheet = Streams.asString(inputStream);</span>
+<span class="nc" id="L611">			} catch (FileNotFoundException e) {</span>
+<span class="nc" id="L612">				throw new JApiCmpException(JApiCmpException.Reason.IoException, &quot;Failed to load stylesheet: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L613">			}</span>
 		} else {
-<span class="fc" id="L612">			styleSheet = templateEngine.loadTemplate(&quot;/style.css&quot;);</span>
+<span class="fc" id="L615">			styleSheet = templateEngine.loadTemplate(&quot;/style.css&quot;);</span>
 		}
-<span class="fc" id="L614">		return styleSheet;</span>
+<span class="fc" id="L617">		return styleSheet;</span>
 	}
 
 	private void metaInformation(StringBuilder sb) {
-<span class="fc" id="L618">		sb.append(templateEngine.loadAndFillTemplate(&quot;/html/meta-information.html&quot;, mapOf(</span>
-<span class="fc" id="L619">			&quot;oldJar&quot;, options.joinOldArchives(),</span>
-<span class="fc" id="L620">			&quot;newJar&quot;, options.joinNewArchives(),</span>
-<span class="fc" id="L621">			&quot;newJar&quot;, options.joinNewArchives(),</span>
-<span class="fc" id="L622">			&quot;creationTimestamp&quot;, DATE_FORMAT.format(new Date()),</span>
-<span class="fc" id="L623">			&quot;accessModifier&quot;, options.getAccessModifier().name(),</span>
-<span class="fc" id="L624">			&quot;onlyModifications&quot;, String.valueOf(options.isOutputOnlyModifications()),</span>
-<span class="fc" id="L625">			&quot;onlyBinaryIncompatibleModifications&quot;, String.valueOf(options.isOutputOnlyBinaryIncompatibleModifications()),</span>
-<span class="fc" id="L626">			&quot;ignoreMissingClasses&quot;, String.valueOf(options.getIgnoreMissingClasses().isIgnoreAllMissingClasses()),</span>
-<span class="fc" id="L627">			&quot;packagesInclude&quot;, filtersAsString(options.getIncludes(), true),</span>
-<span class="fc" id="L628">			&quot;packagesExclude&quot;, filtersAsString(options.getExcludes(), false),</span>
-<span class="fc" id="L629">			&quot;semanticVersioning&quot;, htmlOutputGeneratorOptions.getSemanticVersioningInformation()</span>
-<span class="fc" id="L630">		))).append(&quot;\n&quot;);</span>
-<span class="fc" id="L631">	}</span>
+<span class="fc" id="L621">		sb.append(templateEngine.loadAndFillTemplate(&quot;/html/meta-information.html&quot;, mapOf(</span>
+<span class="fc" id="L622">			&quot;oldJar&quot;, options.joinOldArchives(),</span>
+<span class="fc" id="L623">			&quot;newJar&quot;, options.joinNewArchives(),</span>
+<span class="fc" id="L624">			&quot;newJar&quot;, options.joinNewArchives(),</span>
+<span class="fc" id="L625">			&quot;creationTimestamp&quot;, DATE_FORMAT.format(new Date()),</span>
+<span class="fc" id="L626">			&quot;accessModifier&quot;, options.getAccessModifier().name(),</span>
+<span class="fc" id="L627">			&quot;onlyModifications&quot;, String.valueOf(options.isOutputOnlyModifications()),</span>
+<span class="fc" id="L628">			&quot;onlyBinaryIncompatibleModifications&quot;, String.valueOf(options.isOutputOnlyBinaryIncompatibleModifications()),</span>
+<span class="fc" id="L629">			&quot;ignoreMissingClasses&quot;, String.valueOf(options.getIgnoreMissingClasses().isIgnoreAllMissingClasses()),</span>
+<span class="fc" id="L630">			&quot;packagesInclude&quot;, filtersAsString(options.getIncludes(), true),</span>
+<span class="fc" id="L631">			&quot;packagesExclude&quot;, filtersAsString(options.getExcludes(), false),</span>
+<span class="fc" id="L632">			&quot;semanticVersioning&quot;, htmlOutputGeneratorOptions.getSemanticVersioningInformation()</span>
+<span class="fc" id="L633">		))).append(&quot;\n&quot;);</span>
+<span class="fc" id="L634">	}</span>
 
 	private Map&lt;String, String&gt; mapOf(String... args) {
-<span class="fc" id="L634">		Map&lt;String, String&gt; map = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L635">		int count = args.length / 2;</span>
-<span class="fc bfc" id="L636" title="All 2 branches covered.">		for (int i = 0; i &lt; count; i++) {</span>
-<span class="fc" id="L637">			map.put(args[i * 2], args[(i * 2) + 1]);</span>
+<span class="fc" id="L637">		Map&lt;String, String&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L638">		int count = args.length / 2;</span>
+<span class="fc bfc" id="L639" title="All 2 branches covered.">		for (int i = 0; i &lt; count; i++) {</span>
+<span class="fc" id="L640">			map.put(args[i * 2], args[(i * 2) + 1]);</span>
 		}
-<span class="fc" id="L639">		return map;</span>
+<span class="fc" id="L642">		return map;</span>
 	}
 
 	private String getTitle() {
-<span class="pc bpc" id="L643" title="1 of 2 branches missed.">		if (this.htmlOutputGeneratorOptions.getTitle().isPresent()) {</span>
-<span class="nc" id="L644">			return this.htmlOutputGeneratorOptions.getTitle().get();</span>
+<span class="pc bpc" id="L646" title="1 of 2 branches missed.">		if (this.htmlOutputGeneratorOptions.getTitle().isPresent()) {</span>
+<span class="nc" id="L647">			return this.htmlOutputGeneratorOptions.getTitle().get();</span>
 		}
-<span class="fc" id="L646">		return &quot;japicmp-Report&quot;;</span>
+<span class="fc" id="L649">		return &quot;japicmp-Report&quot;;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

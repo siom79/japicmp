@@ -67,21 +67,21 @@ public class OutputFilter extends Filter {
 
 			@Override
 			public void visit(Iterator&lt;JApiAnnotation&gt; iterator, JApiAnnotation element) {
-<span class="nc" id="L70">				boolean remove = false;</span>
-<span class="nc bnc" id="L71" title="All 2 branches missed.">				if (options.isOutputOnlyModifications()) {</span>
+<span class="fc" id="L70">				boolean remove = false;</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">				if (options.isOutputOnlyModifications()) {</span>
 <span class="nc bnc" id="L72" title="All 2 branches missed.">					if (element.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
 <span class="nc" id="L73">						remove = true;</span>
 					}
 				}
-<span class="nc bnc" id="L76" title="All 2 branches missed.">				if (options.isOutputOnlyBinaryIncompatibleModifications()) {</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">				if (options.isOutputOnlyBinaryIncompatibleModifications()) {</span>
 <span class="nc bnc" id="L77" title="All 2 branches missed.">					if (element.isBinaryCompatible()) {</span>
 <span class="nc" id="L78">						remove = true;</span>
 					}
 				}
-<span class="nc bnc" id="L81" title="All 2 branches missed.">				if (remove) {</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">				if (remove) {</span>
 <span class="nc" id="L82">					iterator.remove();</span>
 				}
-<span class="nc" id="L84">			}</span>
+<span class="fc" id="L84">			}</span>
 
 			@Override
 			public void visit(JApiSuperclass jApiSuperclass) {

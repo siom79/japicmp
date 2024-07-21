@@ -67,10 +67,10 @@ import java.util.List;
 
 	private static void visitAnnotations(FilterVisitor visitor, JApiHasAnnotations jApiHasAnnotations) {
 <span class="fc" id="L69">		Iterator&lt;JApiAnnotation&gt; itAnnotations = jApiHasAnnotations.getAnnotations().iterator();</span>
-<span class="pc bpc" id="L70" title="1 of 2 branches missed.">		while (itAnnotations.hasNext()) {</span>
-<span class="nc" id="L71">			JApiAnnotation jApiAnnotation = itAnnotations.next();</span>
-<span class="nc" id="L72">			visitor.visit(itAnnotations, jApiAnnotation);</span>
-<span class="nc" id="L73">		}</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">		while (itAnnotations.hasNext()) {</span>
+<span class="fc" id="L71">			JApiAnnotation jApiAnnotation = itAnnotations.next();</span>
+<span class="fc" id="L72">			visitor.visit(itAnnotations, jApiAnnotation);</span>
+<span class="fc" id="L73">		}</span>
 <span class="fc" id="L74">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

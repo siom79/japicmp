@@ -40,522 +40,528 @@ public class StdoutOutputGenerator extends OutputGenerator&lt;String&gt; {
 <span class="fc bfc" id="L40" title="All 2 branches covered.">		if (!jApiClasses.isEmpty()) {</span>
 <span class="fc bfc" id="L41" title="All 2 branches covered.">			for (JApiClass jApiClass : jApiClasses) {</span>
 <span class="fc" id="L42">				processClass(sb, jApiClass);</span>
-<span class="fc" id="L43">				processConstructors(sb, jApiClass);</span>
-<span class="fc" id="L44">				processMethods(sb, jApiClass);</span>
-<span class="fc" id="L45">				processAnnotations(sb, jApiClass, 1);</span>
-<span class="fc" id="L46">			}</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">				if (options.isReportOnlySummary()) {</span>
+<span class="fc" id="L44">					continue;</span>
+				}
+<span class="fc" id="L46">				processConstructors(sb, jApiClass);</span>
+<span class="fc" id="L47">				processMethods(sb, jApiClass);</span>
+<span class="fc" id="L48">				processAnnotations(sb, jApiClass, 1);</span>
+<span class="fc" id="L49">			}</span>
 		} else {
-<span class="fc" id="L48">			sb.append(NO_CHANGES);</span>
+<span class="fc" id="L51">			sb.append(NO_CHANGES);</span>
 		}
-<span class="fc" id="L50">		return sb.toString();</span>
+<span class="fc" id="L53">		return sb.toString();</span>
 	}
 
 	private void processAnnotations(StringBuilder sb, JApiHasAnnotations jApiClass, int numberofTabs) {
-<span class="fc" id="L54">		List&lt;JApiAnnotation&gt; annotations = jApiClass.getAnnotations();</span>
-<span class="pc bpc" id="L55" title="1 of 2 branches missed.">		for (JApiAnnotation jApiAnnotation : annotations) {</span>
-<span class="nc" id="L56">			appendAnnotation(sb, signs(jApiAnnotation), jApiAnnotation, numberofTabs);</span>
-<span class="nc" id="L57">			List&lt;JApiAnnotationElement&gt; elements = jApiAnnotation.getElements();</span>
-<span class="nc bnc" id="L58" title="All 2 branches missed.">			for (JApiAnnotationElement jApiAnnotationElement : elements) {</span>
-<span class="nc" id="L59">				appendAnnotationElement(sb, signs(jApiAnnotationElement), jApiAnnotationElement, numberofTabs + 1);</span>
-<span class="nc" id="L60">			}</span>
-<span class="nc" id="L61">		}</span>
-<span class="fc" id="L62">	}</span>
+<span class="fc" id="L57">		List&lt;JApiAnnotation&gt; annotations = jApiClass.getAnnotations();</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">		for (JApiAnnotation jApiAnnotation : annotations) {</span>
+<span class="fc" id="L59">			appendAnnotation(sb, signs(jApiAnnotation), jApiAnnotation, numberofTabs);</span>
+<span class="fc" id="L60">			List&lt;JApiAnnotationElement&gt; elements = jApiAnnotation.getElements();</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">			for (JApiAnnotationElement jApiAnnotationElement : elements) {</span>
+<span class="nc" id="L62">				appendAnnotationElement(sb, signs(jApiAnnotationElement), jApiAnnotationElement, numberofTabs + 1);</span>
+<span class="nc" id="L63">			}</span>
+<span class="fc" id="L64">		}</span>
+<span class="fc" id="L65">	}</span>
 
 	private void processConstructors(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L65">		List&lt;JApiConstructor&gt; constructors = jApiClass.getConstructors();</span>
-<span class="pc bpc" id="L66" title="1 of 2 branches missed.">		for (JApiConstructor jApiConstructor : constructors) {</span>
-<span class="nc" id="L67">			appendBehavior(sb, signs(jApiConstructor), jApiConstructor, &quot;CONSTRUCTOR:&quot;);</span>
-<span class="nc" id="L68">			processAnnotations(sb, jApiConstructor, 2);</span>
-<span class="nc" id="L69">			processExceptions(sb, jApiConstructor, 2);</span>
-<span class="nc" id="L70">			processGenericTemplateChanges(sb, jApiConstructor, 2);</span>
-<span class="nc" id="L71">		}</span>
-<span class="fc" id="L72">	}</span>
+<span class="fc" id="L68">		List&lt;JApiConstructor&gt; constructors = jApiClass.getConstructors();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">		for (JApiConstructor jApiConstructor : constructors) {</span>
+<span class="fc" id="L70">			appendBehavior(sb, signs(jApiConstructor), jApiConstructor, &quot;CONSTRUCTOR:&quot;);</span>
+<span class="fc" id="L71">			processAnnotations(sb, jApiConstructor, 2);</span>
+<span class="fc" id="L72">			processExceptions(sb, jApiConstructor, 2);</span>
+<span class="fc" id="L73">			processGenericTemplateChanges(sb, jApiConstructor, 2);</span>
+<span class="fc" id="L74">		}</span>
+<span class="fc" id="L75">	}</span>
 
 	private void processMethods(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L75">		List&lt;JApiMethod&gt; methods = jApiClass.getMethods();</span>
-<span class="fc bfc" id="L76" title="All 2 branches covered.">		for (JApiMethod jApiMethod : methods) {</span>
-<span class="fc" id="L77">			appendBehavior(sb, signs(jApiMethod), jApiMethod, &quot;METHOD:&quot;);</span>
-<span class="fc" id="L78">			processAnnotations(sb, jApiMethod, 2);</span>
-<span class="fc" id="L79">			processExceptions(sb, jApiMethod, 2);</span>
-<span class="fc" id="L80">			processGenericTemplateChanges(sb, jApiMethod, 2);</span>
-<span class="fc" id="L81">		}</span>
-<span class="fc" id="L82">	}</span>
+<span class="fc" id="L78">		List&lt;JApiMethod&gt; methods = jApiClass.getMethods();</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">		for (JApiMethod jApiMethod : methods) {</span>
+<span class="fc" id="L80">			appendBehavior(sb, signs(jApiMethod), jApiMethod, &quot;METHOD:&quot;);</span>
+<span class="fc" id="L81">			processAnnotations(sb, jApiMethod, 2);</span>
+<span class="fc" id="L82">			processExceptions(sb, jApiMethod, 2);</span>
+<span class="fc" id="L83">			processGenericTemplateChanges(sb, jApiMethod, 2);</span>
+<span class="fc" id="L84">		}</span>
+<span class="fc" id="L85">	}</span>
 
 	private void processExceptions(StringBuilder sb, JApiBehavior jApiBehavior, int indent) {
-<span class="pc bpc" id="L85" title="1 of 2 branches missed.">		for (JApiException exception : jApiBehavior.getExceptions()) {</span>
-<span class="nc" id="L86">			appendException(sb, signs(exception), exception, indent);</span>
-<span class="nc" id="L87">		}</span>
-<span class="fc" id="L88">	}</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">		for (JApiException exception : jApiBehavior.getExceptions()) {</span>
+<span class="nc" id="L89">			appendException(sb, signs(exception), exception, indent);</span>
+<span class="nc" id="L90">		}</span>
+<span class="fc" id="L91">	}</span>
 
 	private void appendException(StringBuilder sb, String signs, JApiException jApiException, int indent) {
-<span class="nc" id="L91">		sb.append(tabs(indent)).append(signs).append(&quot; &quot;).append(jApiException.getChangeStatus()).append(&quot; EXCEPTION: &quot;).append(jApiException.getName()).append(&quot;\n&quot;);</span>
-<span class="nc" id="L92">	}</span>
+<span class="nc" id="L94">		sb.append(tabs(indent)).append(signs).append(&quot; &quot;).append(jApiException.getChangeStatus()).append(&quot; EXCEPTION: &quot;).append(jApiException.getName()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L95">	}</span>
 
 	private void processClass(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L95">		appendClass(sb, signs(jApiClass), jApiClass);</span>
-<span class="fc" id="L96">	}</span>
+<span class="fc" id="L98">		appendClass(sb, signs(jApiClass), jApiClass);</span>
+<span class="fc" id="L99">	}</span>
 
 	private String signs(JApiHasChangeStatus hasChangeStatus) {
-<span class="fc" id="L99">		JApiChangeStatus changeStatus = hasChangeStatus.getChangeStatus();</span>
-<span class="fc" id="L100">		String retVal = &quot;???&quot;;</span>
-<span class="pc bpc" id="L101" title="1 of 5 branches missed.">		switch (changeStatus) {</span>
+<span class="fc" id="L102">		JApiChangeStatus changeStatus = hasChangeStatus.getChangeStatus();</span>
+<span class="fc" id="L103">		String retVal = &quot;???&quot;;</span>
+<span class="pc bpc" id="L104" title="1 of 5 branches missed.">		switch (changeStatus) {</span>
 			case UNCHANGED:
-<span class="fc" id="L103">				retVal = &quot;===&quot;;</span>
-<span class="fc" id="L104">				break;</span>
-			case NEW:
-<span class="fc" id="L106">				retVal = &quot;+++&quot;;</span>
+<span class="fc" id="L106">				retVal = &quot;===&quot;;</span>
 <span class="fc" id="L107">				break;</span>
-			case REMOVED:
-<span class="fc" id="L109">				retVal = &quot;---&quot;;</span>
+			case NEW:
+<span class="fc" id="L109">				retVal = &quot;+++&quot;;</span>
 <span class="fc" id="L110">				break;</span>
+			case REMOVED:
+<span class="fc" id="L112">				retVal = &quot;---&quot;;</span>
+<span class="fc" id="L113">				break;</span>
 			case MODIFIED:
-<span class="fc" id="L112">				retVal = &quot;***&quot;;</span>
+<span class="fc" id="L115">				retVal = &quot;***&quot;;</span>
 				break;
 		}
-<span class="fc" id="L115">		boolean binaryCompatible = true;</span>
-<span class="fc" id="L116">		boolean sourceCompatible = true;</span>
-<span class="pc bpc" id="L117" title="1 of 2 branches missed.">		if (hasChangeStatus instanceof JApiCompatibility) {</span>
-<span class="fc" id="L118">			JApiCompatibility jApiCompatibility = (JApiCompatibility) hasChangeStatus;</span>
-<span class="fc" id="L119">			binaryCompatible = jApiCompatibility.isBinaryCompatible();</span>
-<span class="fc" id="L120">			sourceCompatible = jApiCompatibility.isSourceCompatible();</span>
+<span class="fc" id="L118">		boolean binaryCompatible = true;</span>
+<span class="fc" id="L119">		boolean sourceCompatible = true;</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">		if (hasChangeStatus instanceof JApiCompatibility) {</span>
+<span class="fc" id="L121">			JApiCompatibility jApiCompatibility = (JApiCompatibility) hasChangeStatus;</span>
+<span class="fc" id="L122">			binaryCompatible = jApiCompatibility.isBinaryCompatible();</span>
+<span class="fc" id="L123">			sourceCompatible = jApiCompatibility.isSourceCompatible();</span>
 		}
-<span class="fc bfc" id="L122" title="All 2 branches covered.">		if (binaryCompatible) {</span>
-<span class="fc bfc" id="L123" title="All 2 branches covered.">			if (sourceCompatible) {</span>
-<span class="fc" id="L124">				retVal += &quot; &quot;;</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">		if (binaryCompatible) {</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">			if (sourceCompatible) {</span>
+<span class="fc" id="L127">				retVal += &quot; &quot;;</span>
 			} else {
-<span class="fc" id="L126">				retVal += &quot;*&quot;;</span>
+<span class="fc" id="L129">				retVal += &quot;*&quot;;</span>
 			}
 		} else {
-<span class="fc" id="L129">			retVal += &quot;!&quot;;</span>
+<span class="fc" id="L132">			retVal += &quot;!&quot;;</span>
 		}
-<span class="fc" id="L131">		return retVal;</span>
+<span class="fc" id="L134">		return retVal;</span>
 	}
 
 	private void appendBehavior(StringBuilder sb, String signs, JApiBehavior jApiBehavior, String classMemberType) {
-<span class="fc" id="L135">		sb.append(&quot;\t&quot;).append(signs).append(&quot; &quot;).append(jApiBehavior.getChangeStatus()).append(&quot; &quot;).append(classMemberType).append(&quot; &quot;)</span>
-<span class="fc" id="L136">			.append(accessModifierAsString(jApiBehavior)).append(abstractModifierAsString(jApiBehavior)).append(staticModifierAsString(jApiBehavior))</span>
-<span class="fc" id="L137">			.append(finalModifierAsString(jApiBehavior)).append(syntheticModifierAsString(jApiBehavior)).append(bridgeModifierAsString(jApiBehavior))</span>
-<span class="fc" id="L138">			.append(returnType(jApiBehavior)).append(jApiBehavior.getName()).append(&quot;(&quot;);</span>
-<span class="fc" id="L139">		int paramCount = 0;</span>
-<span class="fc bfc" id="L140" title="All 2 branches covered.">		for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {</span>
-<span class="pc bpc" id="L141" title="1 of 2 branches missed.">			if (paramCount &gt; 0) {</span>
-<span class="nc" id="L142">				sb.append(&quot;, &quot;);</span>
+<span class="fc" id="L138">		sb.append(&quot;\t&quot;).append(signs).append(&quot; &quot;).append(jApiBehavior.getChangeStatus()).append(&quot; &quot;).append(classMemberType).append(&quot; &quot;)</span>
+<span class="fc" id="L139">			.append(accessModifierAsString(jApiBehavior)).append(abstractModifierAsString(jApiBehavior)).append(staticModifierAsString(jApiBehavior))</span>
+<span class="fc" id="L140">			.append(finalModifierAsString(jApiBehavior)).append(syntheticModifierAsString(jApiBehavior)).append(bridgeModifierAsString(jApiBehavior))</span>
+<span class="fc" id="L141">			.append(returnType(jApiBehavior)).append(jApiBehavior.getName()).append(&quot;(&quot;);</span>
+<span class="fc" id="L142">		int paramCount = 0;</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">		for (JApiParameter jApiParameter : jApiBehavior.getParameters()) {</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">			if (paramCount &gt; 0) {</span>
+<span class="nc" id="L145">				sb.append(&quot;, &quot;);</span>
 			}
-<span class="fc" id="L144">			sb.append(jApiParameter.getType());</span>
-<span class="fc" id="L145">			appendGenericTypes(sb, jApiParameter);</span>
-<span class="fc" id="L146">			paramCount++;</span>
-<span class="fc" id="L147">		}</span>
-<span class="fc" id="L148">		sb.append(&quot;)\n&quot;);</span>
-<span class="fc" id="L149">	}</span>
+<span class="fc" id="L147">			sb.append(jApiParameter.getType());</span>
+<span class="fc" id="L148">			appendGenericTypes(sb, jApiParameter);</span>
+<span class="fc" id="L149">			paramCount++;</span>
+<span class="fc" id="L150">		}</span>
+<span class="fc" id="L151">		sb.append(&quot;)\n&quot;);</span>
+<span class="fc" id="L152">	}</span>
 
 	private void appendGenericTypes(StringBuilder sb, JApiHasGenericTypes jApiHasGenericTypes) {
-<span class="fc bfc" id="L152" title="All 4 branches covered.">		if (!jApiHasGenericTypes.getNewGenericTypes().isEmpty() || !jApiHasGenericTypes.getOldGenericTypes().isEmpty()) {</span>
-<span class="pc bpc" id="L153" title="1 of 2 branches missed.">			if (jApiHasGenericTypes instanceof JApiCompatibility) {</span>
-<span class="fc" id="L154">				List&lt;JApiCompatibilityChange&gt; compatibilityChanges = ((JApiCompatibility) jApiHasGenericTypes).getCompatibilityChanges();</span>
-<span class="fc" id="L155">				appendGenericTypesForCompatibilityChanges(sb, jApiHasGenericTypes, compatibilityChanges);</span>
+<span class="fc bfc" id="L155" title="All 4 branches covered.">		if (!jApiHasGenericTypes.getNewGenericTypes().isEmpty() || !jApiHasGenericTypes.getOldGenericTypes().isEmpty()) {</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">			if (jApiHasGenericTypes instanceof JApiCompatibility) {</span>
+<span class="fc" id="L157">				List&lt;JApiCompatibilityChange&gt; compatibilityChanges = ((JApiCompatibility) jApiHasGenericTypes).getCompatibilityChanges();</span>
+<span class="fc" id="L158">				appendGenericTypesForCompatibilityChanges(sb, jApiHasGenericTypes, compatibilityChanges);</span>
 			}
 		}
-<span class="fc" id="L158">	}</span>
+<span class="fc" id="L161">	}</span>
 
 	private void appendGenericTypesForCompatibilityChanges(StringBuilder sb, JApiHasGenericTypes jApiHasGenericTypes, List&lt;JApiCompatibilityChange&gt; compatibilityChanges) {
-<span class="fc bfc" id="L161" title="All 2 branches covered.">		if (compatibilityChangesContains(compatibilityChanges,</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">		if (compatibilityChangesContains(compatibilityChanges,</span>
 				JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED,
 				JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED,
 				JApiCompatibilityChangeType.FIELD_GENERICS_CHANGED,
 				JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED)) {
-<span class="fc" id="L166">			appendGenericTypes(sb, false, jApiHasGenericTypes.getNewGenericTypes());</span>
-<span class="fc" id="L167">			appendGenericTypes(sb, true, jApiHasGenericTypes.getOldGenericTypes());</span>
+<span class="fc" id="L169">			appendGenericTypes(sb, false, jApiHasGenericTypes.getNewGenericTypes());</span>
+<span class="fc" id="L170">			appendGenericTypes(sb, true, jApiHasGenericTypes.getOldGenericTypes());</span>
 		} else {
-<span class="pc bpc" id="L169" title="1 of 2 branches missed.">			if (!jApiHasGenericTypes.getNewGenericTypes().isEmpty()) {</span>
-<span class="nc" id="L170">				appendGenericTypes(sb, false, jApiHasGenericTypes.getNewGenericTypes());</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">			if (!jApiHasGenericTypes.getNewGenericTypes().isEmpty()) {</span>
+<span class="nc" id="L173">				appendGenericTypes(sb, false, jApiHasGenericTypes.getNewGenericTypes());</span>
 			}
-<span class="fc bfc" id="L172" title="All 2 branches covered.">			if (!jApiHasGenericTypes.getOldGenericTypes().isEmpty()) {</span>
-<span class="fc" id="L173">				appendGenericTypes(sb, false, jApiHasGenericTypes.getOldGenericTypes());</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">			if (!jApiHasGenericTypes.getOldGenericTypes().isEmpty()) {</span>
+<span class="fc" id="L176">				appendGenericTypes(sb, false, jApiHasGenericTypes.getOldGenericTypes());</span>
 			}
 		}
-<span class="fc" id="L176">	}</span>
+<span class="fc" id="L179">	}</span>
 
 	private boolean compatibilityChangesContains(List&lt;JApiCompatibilityChange&gt; compatibilityChanges,
 												 JApiCompatibilityChangeType... types) {
-<span class="fc" id="L180">		return compatibilityChanges.stream()</span>
-<span class="fc" id="L181">			.anyMatch(cc -&gt; Arrays.stream(types)</span>
-<span class="fc bfc" id="L182" title="All 2 branches covered.">				.anyMatch(type -&gt; cc.getType() == type));</span>
+<span class="fc" id="L183">		return compatibilityChanges.stream()</span>
+<span class="fc" id="L184">			.anyMatch(cc -&gt; Arrays.stream(types)</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">				.anyMatch(type -&gt; cc.getType() == type));</span>
 	}
 
 	private void appendGenericTypes(StringBuilder sb, boolean withChangeInParenthesis, List&lt;JApiGenericType&gt; genericTypes) {
-<span class="fc bfc" id="L186" title="All 2 branches covered.">		if (!genericTypes.isEmpty()) {</span>
-<span class="fc bfc" id="L187" title="All 2 branches covered.">			if (withChangeInParenthesis) {</span>
-<span class="fc" id="L188">				sb.append(&quot;(&lt;- &quot;);</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">		if (!genericTypes.isEmpty()) {</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">			if (withChangeInParenthesis) {</span>
+<span class="fc" id="L191">				sb.append(&quot;(&lt;- &quot;);</span>
 			}
-<span class="fc" id="L190">			sb.append(&quot;&lt;&quot;);</span>
-<span class="fc" id="L191">			int count = 0;</span>
-<span class="fc bfc" id="L192" title="All 2 branches covered.">			for (JApiGenericType genericType : genericTypes) {</span>
-<span class="pc bpc" id="L193" title="1 of 2 branches missed.">				if (count &gt; 0) {</span>
-<span class="nc" id="L194">					sb.append(&quot;,&quot;);</span>
+<span class="fc" id="L193">			sb.append(&quot;&lt;&quot;);</span>
+<span class="fc" id="L194">			int count = 0;</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">			for (JApiGenericType genericType : genericTypes) {</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">				if (count &gt; 0) {</span>
+<span class="nc" id="L197">					sb.append(&quot;,&quot;);</span>
 				}
-<span class="fc" id="L196">				appendGenericType(sb, genericType);</span>
-<span class="pc bpc" id="L197" title="1 of 2 branches missed.">				if (!genericType.getGenericTypes().isEmpty()) {</span>
-<span class="nc" id="L198">					appendGenericTypes(sb, false, genericType.getGenericTypes());</span>
+<span class="fc" id="L199">				appendGenericType(sb, genericType);</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">				if (!genericType.getGenericTypes().isEmpty()) {</span>
+<span class="nc" id="L201">					appendGenericTypes(sb, false, genericType.getGenericTypes());</span>
 				}
-<span class="fc" id="L200">				count++;</span>
-<span class="fc" id="L201">			}</span>
-<span class="fc" id="L202">			sb.append(&quot;&gt;&quot;);</span>
-<span class="fc bfc" id="L203" title="All 2 branches covered.">			if (withChangeInParenthesis) {</span>
-<span class="fc" id="L204">				sb.append(&quot;)&quot;);</span>
+<span class="fc" id="L203">				count++;</span>
+<span class="fc" id="L204">			}</span>
+<span class="fc" id="L205">			sb.append(&quot;&gt;&quot;);</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">			if (withChangeInParenthesis) {</span>
+<span class="fc" id="L207">				sb.append(&quot;)&quot;);</span>
 			}
 		}
-<span class="fc" id="L207">	}</span>
+<span class="fc" id="L210">	}</span>
 
 	private void appendGenericType(StringBuilder sb, JApiGenericType jApiGenericType) {
-<span class="pc bpc" id="L210" title="1 of 2 branches missed.">		if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.NONE) {</span>
-<span class="fc" id="L211">			sb.append(jApiGenericType.getType());</span>
-<span class="nc bnc" id="L212" title="All 2 branches missed.">		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.UNBOUNDED) {</span>
-<span class="nc" id="L213">			sb.append(&quot;?&quot;);</span>
-<span class="nc bnc" id="L214" title="All 2 branches missed.">		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.EXTENDS) {</span>
-<span class="nc" id="L215">			sb.append(&quot;? extends &quot;).append(jApiGenericType.getType());</span>
-<span class="nc bnc" id="L216" title="All 2 branches missed.">		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.SUPER) {</span>
-<span class="nc" id="L217">			sb.append(&quot;? super &quot;).append(jApiGenericType.getType());</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">		if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.NONE) {</span>
+<span class="fc" id="L214">			sb.append(jApiGenericType.getType());</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.UNBOUNDED) {</span>
+<span class="nc" id="L216">			sb.append(&quot;?&quot;);</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.EXTENDS) {</span>
+<span class="nc" id="L218">			sb.append(&quot;? extends &quot;).append(jApiGenericType.getType());</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">		} else if (jApiGenericType.getGenericWildCard() == JApiGenericType.JApiGenericWildCard.SUPER) {</span>
+<span class="nc" id="L220">			sb.append(&quot;? super &quot;).append(jApiGenericType.getType());</span>
 		}
-<span class="fc" id="L219">	}</span>
+<span class="fc" id="L222">	}</span>
 
 	private String returnType(JApiBehavior jApiBehavior) {
-<span class="fc" id="L222">		StringBuilder sb = new StringBuilder();</span>
-<span class="pc bpc" id="L223" title="1 of 2 branches missed.">		if (jApiBehavior instanceof JApiMethod) {</span>
-<span class="fc" id="L224">			JApiMethod method = (JApiMethod) jApiBehavior;</span>
-<span class="fc" id="L225">			JApiReturnType jApiReturnType = method.getReturnType();</span>
-<span class="fc bfc" id="L226" title="All 2 branches covered.">			if (jApiReturnType.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
-<span class="fc" id="L227">				sb.append(jApiReturnType.getNewReturnType());</span>
-<span class="fc" id="L228">				appendGenericTypes(sb, jApiReturnType);</span>
-<span class="fc" id="L229">				sb.append(&quot; &quot;);</span>
-<span class="pc bpc" id="L230" title="1 of 2 branches missed.">			} else if (jApiReturnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L231">				sb.append(jApiReturnType.getNewReturnType());</span>
-<span class="nc" id="L232">				appendGenericTypes(sb, jApiReturnType);</span>
-<span class="nc" id="L233">				sb.append(&quot; (&lt;-&quot;);</span>
-<span class="nc" id="L234">				sb.append(jApiReturnType.getOldReturnType());</span>
+<span class="fc" id="L225">		StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L226" title="All 2 branches covered.">		if (jApiBehavior instanceof JApiMethod) {</span>
+<span class="fc" id="L227">			JApiMethod method = (JApiMethod) jApiBehavior;</span>
+<span class="fc" id="L228">			JApiReturnType jApiReturnType = method.getReturnType();</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">			if (jApiReturnType.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L230">				sb.append(jApiReturnType.getNewReturnType());</span>
+<span class="fc" id="L231">				appendGenericTypes(sb, jApiReturnType);</span>
+<span class="fc" id="L232">				sb.append(&quot; &quot;);</span>
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">			} else if (jApiReturnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L234">				sb.append(jApiReturnType.getNewReturnType());</span>
 <span class="nc" id="L235">				appendGenericTypes(sb, jApiReturnType);</span>
-<span class="nc" id="L236">				sb.append(&quot;) &quot;);</span>
-<span class="fc bfc" id="L237" title="All 2 branches covered.">			} else if (jApiReturnType.getChangeStatus() == JApiChangeStatus.NEW) {</span>
-<span class="fc" id="L238">				sb.append(jApiReturnType.getNewReturnType());</span>
-<span class="fc" id="L239">				appendGenericTypes(sb, jApiReturnType);</span>
-<span class="fc" id="L240">				sb.append(&quot; &quot;);</span>
+<span class="nc" id="L236">				sb.append(&quot; (&lt;-&quot;);</span>
+<span class="nc" id="L237">				sb.append(jApiReturnType.getOldReturnType());</span>
+<span class="nc" id="L238">				appendGenericTypes(sb, jApiReturnType);</span>
+<span class="nc" id="L239">				sb.append(&quot;) &quot;);</span>
+<span class="fc bfc" id="L240" title="All 2 branches covered.">			} else if (jApiReturnType.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="fc" id="L241">				sb.append(jApiReturnType.getNewReturnType());</span>
+<span class="fc" id="L242">				appendGenericTypes(sb, jApiReturnType);</span>
+<span class="fc" id="L243">				sb.append(&quot; &quot;);</span>
 			} else {
-<span class="fc" id="L242">				sb.append(jApiReturnType.getOldReturnType());</span>
-<span class="fc" id="L243">				appendGenericTypes(sb, jApiReturnType);</span>
-<span class="fc" id="L244">				sb.append(&quot; &quot;);</span>
+<span class="fc" id="L245">				sb.append(jApiReturnType.getOldReturnType());</span>
+<span class="fc" id="L246">				appendGenericTypes(sb, jApiReturnType);</span>
+<span class="fc" id="L247">				sb.append(&quot; &quot;);</span>
 			}
 		}
-<span class="fc" id="L247">		return sb.toString();</span>
+<span class="fc" id="L250">		return sb.toString();</span>
 	}
 
 	private void appendAnnotation(StringBuilder sb, String signs, JApiAnnotation jApiAnnotation, int numberOfTabs) {
-<span class="nc" id="L251">		sb.append(String.format(&quot;%s%s %s ANNOTATION: %s\n&quot;, tabs(numberOfTabs), signs, jApiAnnotation.getChangeStatus(), jApiAnnotation.getFullyQualifiedName()));</span>
-<span class="nc" id="L252">	}</span>
+<span class="fc" id="L254">		sb.append(String.format(&quot;%s%s %s ANNOTATION: %s\n&quot;, tabs(numberOfTabs), signs, jApiAnnotation.getChangeStatus(), jApiAnnotation.getFullyQualifiedName()));</span>
+<span class="fc" id="L255">	}</span>
 
 	private void appendAnnotationElement(StringBuilder sb, String signs, JApiAnnotationElement jApiAnnotationElement, int numberOfTabs) {
-<span class="nc" id="L255">		sb.append(String.format(&quot;%s%s %s ELEMENT: %s=&quot;, tabs(numberOfTabs), signs, jApiAnnotationElement.getChangeStatus(), jApiAnnotationElement.getName()));</span>
-<span class="nc" id="L256">		Optional&lt;MemberValue&gt; oldValue = jApiAnnotationElement.getOldValue();</span>
-<span class="nc" id="L257">		Optional&lt;MemberValue&gt; newValue = jApiAnnotationElement.getNewValue();</span>
-<span class="nc bnc" id="L258" title="All 4 branches missed.">		if (oldValue.isPresent() &amp;&amp; newValue.isPresent()) {</span>
-<span class="nc bnc" id="L259" title="All 2 branches missed.">			if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
-<span class="nc" id="L260">				sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()));</span>
-<span class="nc bnc" id="L261" title="All 2 branches missed.">			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
-<span class="nc" id="L262">				sb.append(String.format(&quot;%s (-)&quot;, elementValueList2String(jApiAnnotationElement.getOldElementValues())));</span>
-<span class="nc bnc" id="L263" title="All 2 branches missed.">			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.NEW) {</span>
-<span class="nc" id="L264">				sb.append(String.format(&quot;%s (+)&quot;, elementValueList2String(jApiAnnotationElement.getNewElementValues())));</span>
-<span class="nc bnc" id="L265" title="All 2 branches missed.">			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L266">				sb.append(String.format(&quot;%s (&lt;- %s)&quot;, elementValueList2String(jApiAnnotationElement.getNewElementValues()), elementValueList2String(jApiAnnotationElement.getOldElementValues())));</span>
+<span class="nc" id="L258">		sb.append(String.format(&quot;%s%s %s ELEMENT: %s=&quot;, tabs(numberOfTabs), signs, jApiAnnotationElement.getChangeStatus(), jApiAnnotationElement.getName()));</span>
+<span class="nc" id="L259">		Optional&lt;MemberValue&gt; oldValue = jApiAnnotationElement.getOldValue();</span>
+<span class="nc" id="L260">		Optional&lt;MemberValue&gt; newValue = jApiAnnotationElement.getNewValue();</span>
+<span class="nc bnc" id="L261" title="All 4 branches missed.">		if (oldValue.isPresent() &amp;&amp; newValue.isPresent()) {</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">			if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.UNCHANGED) {</span>
+<span class="nc" id="L263">				sb.append(elementValueList2String(jApiAnnotationElement.getNewElementValues()));</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc" id="L265">				sb.append(String.format(&quot;%s (-)&quot;, elementValueList2String(jApiAnnotationElement.getOldElementValues())));</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="nc" id="L267">				sb.append(String.format(&quot;%s (+)&quot;, elementValueList2String(jApiAnnotationElement.getNewElementValues())));</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">			} else if (jApiAnnotationElement.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L269">				sb.append(String.format(&quot;%s (&lt;- %s)&quot;, elementValueList2String(jApiAnnotationElement.getNewElementValues()), elementValueList2String(jApiAnnotationElement.getOldElementValues())));</span>
 			}
-<span class="nc bnc" id="L268" title="All 4 branches missed.">		} else if (!oldValue.isPresent() &amp;&amp; newValue.isPresent()) {</span>
-<span class="nc" id="L269">			sb.append(String.format(&quot;%s (+)&quot;, elementValueList2String(jApiAnnotationElement.getNewElementValues())));</span>
-<span class="nc bnc" id="L270" title="All 4 branches missed.">		} else if (oldValue.isPresent() &amp;&amp; !newValue.isPresent()) {</span>
-<span class="nc" id="L271">			sb.append(String.format(&quot;%s (-)&quot;, elementValueList2String(jApiAnnotationElement.getOldElementValues())));</span>
+<span class="nc bnc" id="L271" title="All 4 branches missed.">		} else if (!oldValue.isPresent() &amp;&amp; newValue.isPresent()) {</span>
+<span class="nc" id="L272">			sb.append(String.format(&quot;%s (+)&quot;, elementValueList2String(jApiAnnotationElement.getNewElementValues())));</span>
+<span class="nc bnc" id="L273" title="All 4 branches missed.">		} else if (oldValue.isPresent() &amp;&amp; !newValue.isPresent()) {</span>
+<span class="nc" id="L274">			sb.append(String.format(&quot;%s (-)&quot;, elementValueList2String(jApiAnnotationElement.getOldElementValues())));</span>
 		} else {
-<span class="nc" id="L273">			sb.append(&quot; n.a.&quot;);</span>
+<span class="nc" id="L276">			sb.append(&quot; n.a.&quot;);</span>
 		}
-<span class="nc" id="L275">		sb.append(&quot;\n&quot;);</span>
-<span class="nc" id="L276">	}</span>
+<span class="nc" id="L278">		sb.append(&quot;\n&quot;);</span>
+<span class="nc" id="L279">	}</span>
 
 	private String elementValueList2String(List&lt;JApiAnnotationElementValue&gt; values) {
-<span class="nc" id="L279">		StringBuilder sb = new StringBuilder();</span>
-<span class="nc bnc" id="L280" title="All 2 branches missed.">		for (JApiAnnotationElementValue value : values) {</span>
-<span class="nc bnc" id="L281" title="All 2 branches missed.">			if (sb.length() &gt; 0) {</span>
-<span class="nc" id="L282">				sb.append(&quot;,&quot;);</span>
+<span class="nc" id="L282">		StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">		for (JApiAnnotationElementValue value : values) {</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">			if (sb.length() &gt; 0) {</span>
+<span class="nc" id="L285">				sb.append(&quot;,&quot;);</span>
 			}
-<span class="nc bnc" id="L284" title="All 2 branches missed.">			if (value.getName().isPresent()) {</span>
-<span class="nc" id="L285">				sb.append(value.getName().get()).append(&quot;=&quot;);</span>
+<span class="nc bnc" id="L287" title="All 2 branches missed.">			if (value.getName().isPresent()) {</span>
+<span class="nc" id="L288">				sb.append(value.getName().get()).append(&quot;=&quot;);</span>
 			}
-<span class="nc bnc" id="L287" title="All 4 branches missed.">			if (value.getType() != Type.Array &amp;&amp; value.getType() != Type.Annotation) {</span>
-<span class="nc bnc" id="L288" title="All 2 branches missed.">				if (value.getType() == Type.Enum) {</span>
-<span class="nc" id="L289">					sb.append(value.getFullyQualifiedName()).append(&quot;.&quot;).append(value.getValueString());</span>
+<span class="nc bnc" id="L290" title="All 4 branches missed.">			if (value.getType() != Type.Array &amp;&amp; value.getType() != Type.Annotation) {</span>
+<span class="nc bnc" id="L291" title="All 2 branches missed.">				if (value.getType() == Type.Enum) {</span>
+<span class="nc" id="L292">					sb.append(value.getFullyQualifiedName()).append(&quot;.&quot;).append(value.getValueString());</span>
 				} else {
-<span class="nc" id="L291">					sb.append(value.getValueString());</span>
+<span class="nc" id="L294">					sb.append(value.getValueString());</span>
 				}
 			} else {
-<span class="nc bnc" id="L294" title="All 2 branches missed.">				if (value.getType() == Type.Array) {</span>
-<span class="nc" id="L295">					sb.append(&quot;{&quot;).append(elementValueList2String(value.getValues())).append(&quot;}&quot;);</span>
-<span class="nc bnc" id="L296" title="All 2 branches missed.">				} else if (value.getType() == Type.Annotation) {</span>
-<span class="nc" id="L297">					sb.append(&quot;@&quot;).append(value.getFullyQualifiedName()).append(&quot;(&quot;).append(elementValueList2String(value.getValues())).append(&quot;)&quot;);</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">				if (value.getType() == Type.Array) {</span>
+<span class="nc" id="L298">					sb.append(&quot;{&quot;).append(elementValueList2String(value.getValues())).append(&quot;}&quot;);</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">				} else if (value.getType() == Type.Annotation) {</span>
+<span class="nc" id="L300">					sb.append(&quot;@&quot;).append(value.getFullyQualifiedName()).append(&quot;(&quot;).append(elementValueList2String(value.getValues())).append(&quot;)&quot;);</span>
 				}
 			}
-<span class="nc" id="L300">		}</span>
-<span class="nc" id="L301">		return sb.toString();</span>
+<span class="nc" id="L303">		}</span>
+<span class="nc" id="L304">		return sb.toString();</span>
 	}
 
 	private String tabs(int numberOfTabs) {
-<span class="pc bpc" id="L305" title="1 of 2 branches missed.">		if (numberOfTabs &lt;= 0) {</span>
-<span class="nc" id="L306">			return &quot;&quot;;</span>
-<span class="fc bfc" id="L307" title="All 2 branches covered.">		} else if (numberOfTabs == 1) {</span>
-<span class="fc" id="L308">			return &quot;\t&quot;;</span>
-<span class="pc bpc" id="L309" title="1 of 2 branches missed.">		} else if (numberOfTabs == 2) {</span>
-<span class="fc" id="L310">			return &quot;\t\t&quot;;</span>
+<span class="pc bpc" id="L308" title="1 of 2 branches missed.">		if (numberOfTabs &lt;= 0) {</span>
+<span class="nc" id="L309">			return &quot;&quot;;</span>
+<span class="fc bfc" id="L310" title="All 2 branches covered.">		} else if (numberOfTabs == 1) {</span>
+<span class="fc" id="L311">			return &quot;\t&quot;;</span>
+<span class="pc bpc" id="L312" title="1 of 2 branches missed.">		} else if (numberOfTabs == 2) {</span>
+<span class="fc" id="L313">			return &quot;\t\t&quot;;</span>
 		} else {
-<span class="nc" id="L312">			StringBuilder sb = new StringBuilder();</span>
-<span class="nc bnc" id="L313" title="All 2 branches missed.">			for (int i = 0; i &lt; numberOfTabs; i++) {</span>
-<span class="nc" id="L314">				sb.append(&quot;\t&quot;);</span>
+<span class="nc" id="L315">			StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">			for (int i = 0; i &lt; numberOfTabs; i++) {</span>
+<span class="nc" id="L317">				sb.append(&quot;\t&quot;);</span>
 			}
-<span class="nc" id="L316">			return sb.toString();</span>
+<span class="nc" id="L319">			return sb.toString();</span>
 		}
 	}
 
 	private void appendClass(StringBuilder sb, String signs, JApiClass jApiClass) {
-<span class="fc" id="L321">		sb.append(signs).append(&quot; &quot;).append(jApiClass.getChangeStatus()).append(&quot; &quot;).append(processClassType(jApiClass)).append(&quot;: &quot;).append(accessModifierAsString(jApiClass)).append(abstractModifierAsString(jApiClass)).append(staticModifierAsString(jApiClass)).append(finalModifierAsString(jApiClass)).append(syntheticModifierAsString(jApiClass)).append(jApiClass.getFullyQualifiedName()).append(&quot; &quot;).append(javaObjectSerializationStatus(jApiClass)).append(&quot;\n&quot;);</span>
-<span class="fc" id="L322">		processClassFileFormatVersionChanges(sb, jApiClass);</span>
-<span class="fc" id="L323">		processGenericTemplateChanges(sb, jApiClass, 1);</span>
-<span class="fc" id="L324">		processInterfaceChanges(sb, jApiClass);</span>
-<span class="fc" id="L325">		processSuperclassChanges(sb, jApiClass);</span>
-<span class="fc" id="L326">		processFieldChanges(sb, jApiClass);</span>
-<span class="fc" id="L327">	}</span>
+<span class="fc" id="L324">		sb.append(signs).append(&quot; &quot;).append(jApiClass.getChangeStatus()).append(&quot; &quot;).append(processClassType(jApiClass)).append(&quot;: &quot;).append(accessModifierAsString(jApiClass)).append(abstractModifierAsString(jApiClass)).append(staticModifierAsString(jApiClass)).append(finalModifierAsString(jApiClass)).append(syntheticModifierAsString(jApiClass)).append(jApiClass.getFullyQualifiedName()).append(&quot; &quot;).append(javaObjectSerializationStatus(jApiClass)).append(&quot;\n&quot;);</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">		if (options.isReportOnlySummary()) {</span>
+<span class="fc" id="L326">			return;</span>
+		}
+<span class="fc" id="L328">		processClassFileFormatVersionChanges(sb, jApiClass);</span>
+<span class="fc" id="L329">		processGenericTemplateChanges(sb, jApiClass, 1);</span>
+<span class="fc" id="L330">		processInterfaceChanges(sb, jApiClass);</span>
+<span class="fc" id="L331">		processSuperclassChanges(sb, jApiClass);</span>
+<span class="fc" id="L332">		processFieldChanges(sb, jApiClass);</span>
+<span class="fc" id="L333">	}</span>
 
 	private void processGenericTemplateChanges(StringBuilder sb, JApiHasGenericTemplates jApiHasGenericTemplates, int numberOfTabs) {
-<span class="fc" id="L330">		List&lt;JApiGenericTemplate&gt; genericTemplates = jApiHasGenericTemplates.getGenericTemplates();</span>
-<span class="fc bfc" id="L331" title="All 2 branches covered.">		if (!genericTemplates.isEmpty()) {</span>
-<span class="fc" id="L332">			sb.append(tabs(numberOfTabs)).append(&quot;GENERIC TEMPLATES: &quot;);</span>
-<span class="fc" id="L333">			genericTemplates.sort(Comparator.comparing(JApiGenericTemplate::getName));</span>
-<span class="fc" id="L334">			int count = 0;</span>
-<span class="fc bfc" id="L335" title="All 2 branches covered.">			for (JApiGenericTemplate jApiGenericTemplate : genericTemplates) {</span>
-<span class="fc bfc" id="L336" title="All 2 branches covered.">				if (count &gt; 0) {</span>
-<span class="fc" id="L337">					sb.append(&quot;, &quot;);</span>
+<span class="fc" id="L336">		List&lt;JApiGenericTemplate&gt; genericTemplates = jApiHasGenericTemplates.getGenericTemplates();</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">		if (!genericTemplates.isEmpty()) {</span>
+<span class="fc" id="L338">			sb.append(tabs(numberOfTabs)).append(&quot;GENERIC TEMPLATES: &quot;);</span>
+<span class="fc" id="L339">			genericTemplates.sort(Comparator.comparing(JApiGenericTemplate::getName));</span>
+<span class="fc" id="L340">			int count = 0;</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">			for (JApiGenericTemplate jApiGenericTemplate : genericTemplates) {</span>
+<span class="fc bfc" id="L342" title="All 2 branches covered.">				if (count &gt; 0) {</span>
+<span class="fc" id="L343">					sb.append(&quot;, &quot;);</span>
 				}
-<span class="fc" id="L339">				count++;</span>
-<span class="fc" id="L340">				sb.append(signs(jApiGenericTemplate));</span>
-<span class="fc bfc" id="L341" title="All 2 branches covered.">				if (sb.charAt(sb.length() - 1) != ' ') {</span>
-<span class="fc" id="L342">					sb.append(&quot; &quot;);</span>
+<span class="fc" id="L345">				count++;</span>
+<span class="fc" id="L346">				sb.append(signs(jApiGenericTemplate));</span>
+<span class="fc bfc" id="L347" title="All 2 branches covered.">				if (sb.charAt(sb.length() - 1) != ' ') {</span>
+<span class="fc" id="L348">					sb.append(&quot; &quot;);</span>
 				}
-<span class="fc" id="L344">				sb.append(jApiGenericTemplate.getName()).append(&quot;:&quot;);</span>
-<span class="fc" id="L345">				JApiChangeStatus changeStatus = jApiGenericTemplate.getChangeStatus();</span>
-<span class="fc bfc" id="L346" title="All 4 branches covered.">				if (changeStatus == JApiChangeStatus.NEW || changeStatus == JApiChangeStatus.UNCHANGED) {</span>
-<span class="fc" id="L347">					sb.append(jApiGenericTemplate.getNewType());</span>
-<span class="pc bpc" id="L348" title="1 of 2 branches missed.">					if (jApiGenericTemplate instanceof JApiCompatibility) {</span>
-<span class="fc" id="L349">						appendGenericTypesForCompatibilityChanges(sb, jApiGenericTemplate, ((JApiCompatibility) jApiHasGenericTemplates).getCompatibilityChanges());</span>
+<span class="fc" id="L350">				sb.append(jApiGenericTemplate.getName()).append(&quot;:&quot;);</span>
+<span class="fc" id="L351">				JApiChangeStatus changeStatus = jApiGenericTemplate.getChangeStatus();</span>
+<span class="fc bfc" id="L352" title="All 4 branches covered.">				if (changeStatus == JApiChangeStatus.NEW || changeStatus == JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L353">					sb.append(jApiGenericTemplate.getNewType());</span>
+<span class="pc bpc" id="L354" title="1 of 2 branches missed.">					if (jApiGenericTemplate instanceof JApiCompatibility) {</span>
+<span class="fc" id="L355">						appendGenericTypesForCompatibilityChanges(sb, jApiGenericTemplate, ((JApiCompatibility) jApiHasGenericTemplates).getCompatibilityChanges());</span>
 					}
-<span class="fc bfc" id="L351" title="All 2 branches covered.">				} else if (changeStatus == JApiChangeStatus.REMOVED) {</span>
-<span class="fc" id="L352">					sb.append(jApiGenericTemplate.getOldType());</span>
-<span class="pc bpc" id="L353" title="1 of 2 branches missed.">					if (jApiGenericTemplate instanceof JApiCompatibility) {</span>
-<span class="fc" id="L354">						appendGenericTypesForCompatibilityChanges(sb, jApiGenericTemplate, ((JApiCompatibility) jApiHasGenericTemplates).getCompatibilityChanges());</span>
+<span class="fc bfc" id="L357" title="All 2 branches covered.">				} else if (changeStatus == JApiChangeStatus.REMOVED) {</span>
+<span class="fc" id="L358">					sb.append(jApiGenericTemplate.getOldType());</span>
+<span class="pc bpc" id="L359" title="1 of 2 branches missed.">					if (jApiGenericTemplate instanceof JApiCompatibility) {</span>
+<span class="fc" id="L360">						appendGenericTypesForCompatibilityChanges(sb, jApiGenericTemplate, ((JApiCompatibility) jApiHasGenericTemplates).getCompatibilityChanges());</span>
 					}
 				} else {
-<span class="fc" id="L357">					sb.append(jApiGenericTemplate.getNewType());</span>
-<span class="fc" id="L358">					appendGenericTypes(sb, false, jApiGenericTemplate.getNewGenericTypes());</span>
-<span class="fc" id="L359">					sb.append(&quot; (&lt;-&quot;).append(jApiGenericTemplate.getOldType());</span>
-<span class="fc" id="L360">					appendGenericTypes(sb, false, jApiGenericTemplate.getOldGenericTypes());</span>
-<span class="fc" id="L361">					sb.append(&quot;)&quot;);</span>
+<span class="fc" id="L363">					sb.append(jApiGenericTemplate.getNewType());</span>
+<span class="fc" id="L364">					appendGenericTypes(sb, false, jApiGenericTemplate.getNewGenericTypes());</span>
+<span class="fc" id="L365">					sb.append(&quot; (&lt;-&quot;).append(jApiGenericTemplate.getOldType());</span>
+<span class="fc" id="L366">					appendGenericTypes(sb, false, jApiGenericTemplate.getOldGenericTypes());</span>
+<span class="fc" id="L367">					sb.append(&quot;)&quot;);</span>
 				}
-<span class="pc bpc" id="L363" title="1 of 4 branches missed.">				if (!jApiGenericTemplate.getOldInterfaceTypes().isEmpty() || !jApiGenericTemplate.getNewInterfaceTypes().isEmpty()) {</span>
-<span class="pc bpc" id="L364" title="1 of 2 branches missed.">					if (haveGenericTemplateInterfacesChanges(jApiGenericTemplate.getOldInterfaceTypes(), jApiGenericTemplate.getNewInterfaceTypes())) {</span>
-<span class="fc" id="L365">						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, false, true);</span>
-<span class="fc" id="L366">						sb.append(&quot; (&lt;-&quot;);</span>
-<span class="fc" id="L367">						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, true, false);</span>
-<span class="fc" id="L368">						sb.append(&quot;)&quot;);</span>
+<span class="pc bpc" id="L369" title="1 of 4 branches missed.">				if (!jApiGenericTemplate.getOldInterfaceTypes().isEmpty() || !jApiGenericTemplate.getNewInterfaceTypes().isEmpty()) {</span>
+<span class="pc bpc" id="L370" title="1 of 2 branches missed.">					if (haveGenericTemplateInterfacesChanges(jApiGenericTemplate.getOldInterfaceTypes(), jApiGenericTemplate.getNewInterfaceTypes())) {</span>
+<span class="fc" id="L371">						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, false, true);</span>
+<span class="fc" id="L372">						sb.append(&quot; (&lt;-&quot;);</span>
+<span class="fc" id="L373">						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, true, false);</span>
+<span class="fc" id="L374">						sb.append(&quot;)&quot;);</span>
 					} else {
-<span class="nc" id="L370">						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, false, true);</span>
+<span class="nc" id="L376">						appendGenericTemplatesInterfaces(sb, jApiGenericTemplate, false, true);</span>
 					}
 				}
-<span class="fc" id="L373">			}</span>
-<span class="fc" id="L374">			sb.append(&quot;\n&quot;);</span>
+<span class="fc" id="L379">			}</span>
+<span class="fc" id="L380">			sb.append(&quot;\n&quot;);</span>
 		}
-<span class="fc" id="L376">	}</span>
+<span class="fc" id="L382">	}</span>
 
 	private void appendGenericTemplatesInterfaces(StringBuilder sb, JApiGenericTemplate jApiGenericTemplate, boolean printOld, boolean printNew) {
-<span class="fc bfc" id="L379" title="All 2 branches covered.">		if (printOld) {</span>
-<span class="fc bfc" id="L380" title="All 2 branches covered.">			for (JApiGenericType jApiGenericType : jApiGenericTemplate.getOldInterfaceTypes()) {</span>
-<span class="fc" id="L381">				sb.append(&quot; &amp; &quot;);</span>
-<span class="fc" id="L382">				sb.append(jApiGenericType.getType());</span>
-<span class="fc" id="L383">				appendGenericTypes(sb, false, jApiGenericType.getGenericTypes());</span>
-<span class="fc" id="L384">			}</span>
+<span class="fc bfc" id="L385" title="All 2 branches covered.">		if (printOld) {</span>
+<span class="fc bfc" id="L386" title="All 2 branches covered.">			for (JApiGenericType jApiGenericType : jApiGenericTemplate.getOldInterfaceTypes()) {</span>
+<span class="fc" id="L387">				sb.append(&quot; &amp; &quot;);</span>
+<span class="fc" id="L388">				sb.append(jApiGenericType.getType());</span>
+<span class="fc" id="L389">				appendGenericTypes(sb, false, jApiGenericType.getGenericTypes());</span>
+<span class="fc" id="L390">			}</span>
 		}
-<span class="fc bfc" id="L386" title="All 2 branches covered.">		if (printNew) {</span>
-<span class="fc bfc" id="L387" title="All 2 branches covered.">			for (JApiGenericType jApiGenericType : jApiGenericTemplate.getNewInterfaceTypes()) {</span>
-<span class="fc" id="L388">				sb.append(&quot; &amp; &quot;);</span>
-<span class="fc" id="L389">				sb.append(jApiGenericType.getType());</span>
-<span class="fc" id="L390">				appendGenericTypes(sb, false, jApiGenericType.getGenericTypes());</span>
-<span class="fc" id="L391">			}</span>
+<span class="fc bfc" id="L392" title="All 2 branches covered.">		if (printNew) {</span>
+<span class="fc bfc" id="L393" title="All 2 branches covered.">			for (JApiGenericType jApiGenericType : jApiGenericTemplate.getNewInterfaceTypes()) {</span>
+<span class="fc" id="L394">				sb.append(&quot; &amp; &quot;);</span>
+<span class="fc" id="L395">				sb.append(jApiGenericType.getType());</span>
+<span class="fc" id="L396">				appendGenericTypes(sb, false, jApiGenericType.getGenericTypes());</span>
+<span class="fc" id="L397">			}</span>
 		}
-<span class="fc" id="L393">	}</span>
+<span class="fc" id="L399">	}</span>
 
 	private void processClassFileFormatVersionChanges(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L396">		JApiClassFileFormatVersion classFileFormatVersion = jApiClass.getClassFileFormatVersion();</span>
-<span class="fc" id="L397">		sb.append(tabs(1))</span>
-<span class="fc" id="L398">			.append(signs(classFileFormatVersion))</span>
-<span class="fc" id="L399">			.append(&quot; CLASS FILE FORMAT VERSION: &quot;);</span>
-<span class="pc bpc" id="L400" title="1 of 4 branches missed.">		if (classFileFormatVersion.getMajorVersionNew() != -1 &amp;&amp; classFileFormatVersion.getMinorVersionNew() != -1) {</span>
-<span class="fc" id="L401">			sb.append(classFileFormatVersion.getMajorVersionNew()).append(&quot;.&quot;).append(classFileFormatVersion.getMinorVersionNew());</span>
-		} else {
-<span class="fc" id="L403">			sb.append(&quot;n.a.&quot;);</span>
-		}
-<span class="fc" id="L405">		sb.append(&quot; &lt;- &quot;);</span>
-<span class="pc bpc" id="L406" title="1 of 4 branches missed.">		if (classFileFormatVersion.getMajorVersionOld() != -1 &amp;&amp; classFileFormatVersion.getMinorVersionOld() != -1) {</span>
-<span class="fc" id="L407">			sb.append(classFileFormatVersion.getMajorVersionOld()).append(&quot;.&quot;).append(classFileFormatVersion.getMinorVersionOld());</span>
+<span class="fc" id="L402">		JApiClassFileFormatVersion classFileFormatVersion = jApiClass.getClassFileFormatVersion();</span>
+<span class="fc" id="L403">		sb.append(tabs(1))</span>
+<span class="fc" id="L404">			.append(signs(classFileFormatVersion))</span>
+<span class="fc" id="L405">			.append(&quot; CLASS FILE FORMAT VERSION: &quot;);</span>
+<span class="pc bpc" id="L406" title="1 of 4 branches missed.">		if (classFileFormatVersion.getMajorVersionNew() != -1 &amp;&amp; classFileFormatVersion.getMinorVersionNew() != -1) {</span>
+<span class="fc" id="L407">			sb.append(classFileFormatVersion.getMajorVersionNew()).append(&quot;.&quot;).append(classFileFormatVersion.getMinorVersionNew());</span>
 		} else {
 <span class="fc" id="L409">			sb.append(&quot;n.a.&quot;);</span>
 		}
-<span class="fc" id="L411">		sb.append(&quot;\n&quot;);</span>
-<span class="fc" id="L412">	}</span>
+<span class="fc" id="L411">		sb.append(&quot; &lt;- &quot;);</span>
+<span class="pc bpc" id="L412" title="1 of 4 branches missed.">		if (classFileFormatVersion.getMajorVersionOld() != -1 &amp;&amp; classFileFormatVersion.getMinorVersionOld() != -1) {</span>
+<span class="fc" id="L413">			sb.append(classFileFormatVersion.getMajorVersionOld()).append(&quot;.&quot;).append(classFileFormatVersion.getMinorVersionOld());</span>
+		} else {
+<span class="fc" id="L415">			sb.append(&quot;n.a.&quot;);</span>
+		}
+<span class="fc" id="L417">		sb.append(&quot;\n&quot;);</span>
+<span class="fc" id="L418">	}</span>
 
 	private String processClassType(JApiClass jApiClass) {
-<span class="fc" id="L415">		JApiClassType classType = jApiClass.getClassType();</span>
-<span class="pc bpc" id="L416" title="2 of 5 branches missed.">		switch (classType.getChangeStatus()) {</span>
+<span class="fc" id="L421">		JApiClassType classType = jApiClass.getClassType();</span>
+<span class="pc bpc" id="L422" title="2 of 5 branches missed.">		switch (classType.getChangeStatus()) {</span>
 			case NEW:
-<span class="fc" id="L418">				return classType.getNewType();</span>
+<span class="fc" id="L424">				return classType.getNewType();</span>
 			case REMOVED:
-<span class="fc" id="L420">				return classType.getOldType();</span>
+<span class="fc" id="L426">				return classType.getOldType();</span>
 			case MODIFIED:
-<span class="nc" id="L422">				return classType.getNewType() + &quot; (&lt;- &quot; + classType.getOldType() + &quot;) &quot;;</span>
+<span class="nc" id="L428">				return classType.getNewType() + &quot; (&lt;- &quot; + classType.getOldType() + &quot;) &quot;;</span>
 			case UNCHANGED:
-<span class="fc" id="L424">				return classType.getOldType();</span>
+<span class="fc" id="L430">				return classType.getOldType();</span>
 		}
-<span class="nc" id="L426">		return &quot;n.a.&quot;;</span>
+<span class="nc" id="L432">		return &quot;n.a.&quot;;</span>
 	}
 
 	private String javaObjectSerializationStatus(JApiClass jApiClass) {
-<span class="fc" id="L430">		return &quot; (&quot; + jApiClass.getJavaObjectSerializationCompatible().getDescription() + &quot;)&quot;;</span>
+<span class="fc" id="L436">		return &quot; (&quot; + jApiClass.getJavaObjectSerializationCompatible().getDescription() + &quot;)&quot;;</span>
 	}
 
 	private void processFieldChanges(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L434">		List&lt;JApiField&gt; jApiFields = jApiClass.getFields();</span>
-<span class="fc bfc" id="L435" title="All 2 branches covered.">		for (JApiField jApiField : jApiFields) {</span>
-<span class="fc" id="L436">			sb.append(tabs(1)).append(signs(jApiField)).append(&quot; &quot;).append(jApiField.getChangeStatus()).append(&quot; FIELD: &quot;)</span>
-<span class="fc" id="L437">				.append(accessModifierAsString(jApiField)).append(staticModifierAsString(jApiField))</span>
-<span class="fc" id="L438">				.append(finalModifierAsString(jApiField)).append(transientModifierAsString(jApiField))</span>
-<span class="fc" id="L439">				.append(volatileModifierAsString(jApiField)).append(syntheticModifierAsString(jApiField))</span>
-<span class="fc" id="L440">				.append(fieldTypeChangeAsString(jApiField));</span>
-<span class="fc" id="L441">			appendGenericTypes(sb, jApiField);</span>
-<span class="fc" id="L442">			sb.append(&quot; &quot;).append(jApiField.getName()).append('\n');</span>
-<span class="fc" id="L443">			processAnnotations(sb, jApiField, 2);</span>
-<span class="fc" id="L444">		}</span>
-<span class="fc" id="L445">	}</span>
+<span class="fc" id="L440">		List&lt;JApiField&gt; jApiFields = jApiClass.getFields();</span>
+<span class="fc bfc" id="L441" title="All 2 branches covered.">		for (JApiField jApiField : jApiFields) {</span>
+<span class="fc" id="L442">			sb.append(tabs(1)).append(signs(jApiField)).append(&quot; &quot;).append(jApiField.getChangeStatus()).append(&quot; FIELD: &quot;)</span>
+<span class="fc" id="L443">				.append(accessModifierAsString(jApiField)).append(staticModifierAsString(jApiField))</span>
+<span class="fc" id="L444">				.append(finalModifierAsString(jApiField)).append(transientModifierAsString(jApiField))</span>
+<span class="fc" id="L445">				.append(volatileModifierAsString(jApiField)).append(syntheticModifierAsString(jApiField))</span>
+<span class="fc" id="L446">				.append(fieldTypeChangeAsString(jApiField));</span>
+<span class="fc" id="L447">			appendGenericTypes(sb, jApiField);</span>
+<span class="fc" id="L448">			sb.append(&quot; &quot;).append(jApiField.getName()).append('\n');</span>
+<span class="fc" id="L449">			processAnnotations(sb, jApiField, 2);</span>
+<span class="fc" id="L450">		}</span>
+<span class="fc" id="L451">	}</span>
 
 	private String abstractModifierAsString(JApiHasAbstractModifier hasAbstractModifier) {
-<span class="fc" id="L448">		JApiModifier&lt;AbstractModifier&gt; modifier = hasAbstractModifier.getAbstractModifier();</span>
-<span class="fc" id="L449">		return modifierAsString(modifier, AbstractModifier.NON_ABSTRACT);</span>
+<span class="fc" id="L454">		JApiModifier&lt;AbstractModifier&gt; modifier = hasAbstractModifier.getAbstractModifier();</span>
+<span class="fc" id="L455">		return modifierAsString(modifier, AbstractModifier.NON_ABSTRACT);</span>
 	}
 
 	private String finalModifierAsString(JApiHasFinalModifier hasFinalModifier) {
-<span class="fc" id="L453">		JApiModifier&lt;FinalModifier&gt; modifier = hasFinalModifier.getFinalModifier();</span>
-<span class="fc" id="L454">		return modifierAsString(modifier, FinalModifier.NON_FINAL);</span>
+<span class="fc" id="L459">		JApiModifier&lt;FinalModifier&gt; modifier = hasFinalModifier.getFinalModifier();</span>
+<span class="fc" id="L460">		return modifierAsString(modifier, FinalModifier.NON_FINAL);</span>
 	}
 
 	private String transientModifierAsString(JApiHasTransientModifier hasTransientModifier) {
-<span class="fc" id="L458">		JApiModifier&lt;TransientModifier&gt; modifier = hasTransientModifier.getTransientModifier();</span>
-<span class="fc" id="L459">		return modifierAsString(modifier, TransientModifier.NON_TRANSIENT);</span>
+<span class="fc" id="L464">		JApiModifier&lt;TransientModifier&gt; modifier = hasTransientModifier.getTransientModifier();</span>
+<span class="fc" id="L465">		return modifierAsString(modifier, TransientModifier.NON_TRANSIENT);</span>
 	}
 
 	private String volatileModifierAsString(JApiHasVolatileModifier hasTransientModifier) {
-<span class="fc" id="L463">		JApiModifier&lt;VolatileModifier&gt; modifier = hasTransientModifier.getVolatileModifier();</span>
-<span class="fc" id="L464">		return modifierAsString(modifier, VolatileModifier.NON_VOLATILE);</span>
+<span class="fc" id="L469">		JApiModifier&lt;VolatileModifier&gt; modifier = hasTransientModifier.getVolatileModifier();</span>
+<span class="fc" id="L470">		return modifierAsString(modifier, VolatileModifier.NON_VOLATILE);</span>
 	}
 
 	private String staticModifierAsString(JApiHasStaticModifier hasStaticModifier) {
-<span class="fc" id="L468">		JApiModifier&lt;StaticModifier&gt; modifier = hasStaticModifier.getStaticModifier();</span>
-<span class="fc" id="L469">		return modifierAsString(modifier, StaticModifier.NON_STATIC);</span>
+<span class="fc" id="L474">		JApiModifier&lt;StaticModifier&gt; modifier = hasStaticModifier.getStaticModifier();</span>
+<span class="fc" id="L475">		return modifierAsString(modifier, StaticModifier.NON_STATIC);</span>
 	}
 
 	private String accessModifierAsString(JApiHasAccessModifier modifier) {
-<span class="fc" id="L473">		JApiModifier&lt;AccessModifier&gt; accessModifier = modifier.getAccessModifier();</span>
-<span class="fc" id="L474">		return modifierAsString(accessModifier, AccessModifier.PACKAGE_PROTECTED);</span>
+<span class="fc" id="L479">		JApiModifier&lt;AccessModifier&gt; accessModifier = modifier.getAccessModifier();</span>
+<span class="fc" id="L480">		return modifierAsString(accessModifier, AccessModifier.PACKAGE_PROTECTED);</span>
 	}
 
 	private String syntheticModifierAsString(JApiHasSyntheticModifier modifier) {
-<span class="fc" id="L478">		JApiModifier&lt;SyntheticModifier&gt; syntheticModifier = modifier.getSyntheticModifier();</span>
-<span class="fc" id="L479">		return modifierAsString(syntheticModifier, SyntheticModifier.NON_SYNTHETIC);</span>
+<span class="fc" id="L484">		JApiModifier&lt;SyntheticModifier&gt; syntheticModifier = modifier.getSyntheticModifier();</span>
+<span class="fc" id="L485">		return modifierAsString(syntheticModifier, SyntheticModifier.NON_SYNTHETIC);</span>
 	}
 
 	private String bridgeModifierAsString(JApiHasBridgeModifier modifier) {
-<span class="fc" id="L483">		JApiModifier&lt;BridgeModifier&gt; bridgeModifier = modifier.getBridgeModifier();</span>
-<span class="fc" id="L484">		return modifierAsString(bridgeModifier, BridgeModifier.NON_BRIDGE);</span>
+<span class="fc" id="L489">		JApiModifier&lt;BridgeModifier&gt; bridgeModifier = modifier.getBridgeModifier();</span>
+<span class="fc" id="L490">		return modifierAsString(bridgeModifier, BridgeModifier.NON_BRIDGE);</span>
 	}
 
 	private &lt;T&gt; String modifierAsString(JApiModifier&lt;T&gt; modifier, T notPrintValue) {
-<span class="fc bfc" id="L488" title="All 4 branches covered.">		if (modifier.getOldModifier().isPresent() &amp;&amp; modifier.getNewModifier().isPresent()) {</span>
-<span class="pc bpc" id="L489" title="1 of 2 branches missed.">			if (modifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L490">				return modifier.getNewModifier().get() + &quot; (&lt;- &quot; + modifier.getOldModifier().get() + &quot;) &quot;;</span>
-<span class="pc bpc" id="L491" title="1 of 2 branches missed.">			} else if (modifier.getChangeStatus() == JApiChangeStatus.NEW) {</span>
-<span class="nc bnc" id="L492" title="All 2 branches missed.">				if (modifier.getNewModifier().get() != notPrintValue) {</span>
-<span class="nc" id="L493">					return modifier.getNewModifier().get() + &quot;(+) &quot;;</span>
+<span class="fc bfc" id="L494" title="All 4 branches covered.">		if (modifier.getOldModifier().isPresent() &amp;&amp; modifier.getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L495" title="1 of 2 branches missed.">			if (modifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L496">				return modifier.getNewModifier().get() + &quot; (&lt;- &quot; + modifier.getOldModifier().get() + &quot;) &quot;;</span>
+<span class="pc bpc" id="L497" title="1 of 2 branches missed.">			} else if (modifier.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="nc bnc" id="L498" title="All 2 branches missed.">				if (modifier.getNewModifier().get() != notPrintValue) {</span>
+<span class="nc" id="L499">					return modifier.getNewModifier().get() + &quot;(+) &quot;;</span>
 				}
-<span class="pc bpc" id="L495" title="1 of 2 branches missed.">			} else if (modifier.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
-<span class="nc bnc" id="L496" title="All 2 branches missed.">				if (modifier.getOldModifier().get() != notPrintValue) {</span>
-<span class="nc" id="L497">					return modifier.getOldModifier().get() + &quot;(-) &quot;;</span>
+<span class="pc bpc" id="L501" title="1 of 2 branches missed.">			} else if (modifier.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc bnc" id="L502" title="All 2 branches missed.">				if (modifier.getOldModifier().get() != notPrintValue) {</span>
+<span class="nc" id="L503">					return modifier.getOldModifier().get() + &quot;(-) &quot;;</span>
 				}
 			} else {
-<span class="fc bfc" id="L500" title="All 2 branches covered.">				if (modifier.getNewModifier().get() != notPrintValue) {</span>
-<span class="fc" id="L501">					return modifier.getNewModifier().get() + &quot; &quot;;</span>
+<span class="fc bfc" id="L506" title="All 2 branches covered.">				if (modifier.getNewModifier().get() != notPrintValue) {</span>
+<span class="fc" id="L507">					return modifier.getNewModifier().get() + &quot; &quot;;</span>
 				}
 			}
-<span class="fc bfc" id="L504" title="All 2 branches covered.">		} else if (modifier.getOldModifier().isPresent()) {</span>
-<span class="fc bfc" id="L505" title="All 2 branches covered.">			if (modifier.getOldModifier().get() != notPrintValue) {</span>
-<span class="fc" id="L506">				return modifier.getOldModifier().get() + &quot;(-) &quot;;</span>
+<span class="fc bfc" id="L510" title="All 2 branches covered.">		} else if (modifier.getOldModifier().isPresent()) {</span>
+<span class="fc bfc" id="L511" title="All 2 branches covered.">			if (modifier.getOldModifier().get() != notPrintValue) {</span>
+<span class="fc" id="L512">				return modifier.getOldModifier().get() + &quot;(-) &quot;;</span>
 			}
-<span class="pc bpc" id="L508" title="1 of 2 branches missed.">		} else if (modifier.getNewModifier().isPresent()) {</span>
-<span class="fc bfc" id="L509" title="All 2 branches covered.">			if (modifier.getNewModifier().get() != notPrintValue) {</span>
-<span class="fc" id="L510">				return modifier.getNewModifier().get() + &quot;(+) &quot;;</span>
+<span class="pc bpc" id="L514" title="1 of 2 branches missed.">		} else if (modifier.getNewModifier().isPresent()) {</span>
+<span class="fc bfc" id="L515" title="All 2 branches covered.">			if (modifier.getNewModifier().get() != notPrintValue) {</span>
+<span class="fc" id="L516">				return modifier.getNewModifier().get() + &quot;(+) &quot;;</span>
 			}
 		}
-<span class="fc" id="L513">		return &quot;&quot;;</span>
+<span class="fc" id="L519">		return &quot;&quot;;</span>
 	}
 
 	private String fieldTypeChangeAsString(JApiField field) {
-<span class="fc" id="L517">		JApiType type = field.getType();</span>
-<span class="pc bpc" id="L518" title="1 of 4 branches missed.">		if (type.getOldTypeOptional().isPresent() &amp;&amp; type.getNewTypeOptional().isPresent()) {</span>
-<span class="pc bpc" id="L519" title="1 of 2 branches missed.">			if (type.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
-<span class="nc" id="L520">				return type.getNewTypeOptional().get() + &quot; (&lt;- &quot; + type.getOldTypeOptional().get() + &quot;)&quot;;</span>
-<span class="pc bpc" id="L521" title="1 of 2 branches missed.">			} else if (type.getChangeStatus() == JApiChangeStatus.NEW) {</span>
-<span class="nc" id="L522">				return type.getNewTypeOptional().get() + &quot;(+)&quot;;</span>
-<span class="pc bpc" id="L523" title="1 of 2 branches missed.">			} else if (type.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
-<span class="nc" id="L524">				return type.getOldTypeOptional().get() + &quot;(-)&quot;;</span>
+<span class="fc" id="L523">		JApiType type = field.getType();</span>
+<span class="fc bfc" id="L524" title="All 4 branches covered.">		if (type.getOldTypeOptional().isPresent() &amp;&amp; type.getNewTypeOptional().isPresent()) {</span>
+<span class="pc bpc" id="L525" title="1 of 2 branches missed.">			if (type.getChangeStatus() == JApiChangeStatus.MODIFIED) {</span>
+<span class="nc" id="L526">				return type.getNewTypeOptional().get() + &quot; (&lt;- &quot; + type.getOldTypeOptional().get() + &quot;)&quot;;</span>
+<span class="pc bpc" id="L527" title="1 of 2 branches missed.">			} else if (type.getChangeStatus() == JApiChangeStatus.NEW) {</span>
+<span class="nc" id="L528">				return type.getNewTypeOptional().get() + &quot;(+)&quot;;</span>
+<span class="pc bpc" id="L529" title="1 of 2 branches missed.">			} else if (type.getChangeStatus() == JApiChangeStatus.REMOVED) {</span>
+<span class="nc" id="L530">				return type.getOldTypeOptional().get() + &quot;(-)&quot;;</span>
 			} else {
-<span class="fc" id="L526">				return type.getNewTypeOptional().get();</span>
+<span class="fc" id="L532">				return type.getNewTypeOptional().get();</span>
 			}
-<span class="pc bpc" id="L528" title="3 of 4 branches missed.">		} else if (type.getOldTypeOptional().isPresent() &amp;&amp; !type.getNewTypeOptional().isPresent()) {</span>
-<span class="nc" id="L529">			return type.getOldTypeOptional().get();</span>
-<span class="pc bpc" id="L530" title="2 of 4 branches missed.">		} else if (!type.getOldTypeOptional().isPresent() &amp;&amp; type.getNewTypeOptional().isPresent()) {</span>
-<span class="fc" id="L531">			return type.getNewTypeOptional().get();</span>
+<span class="pc bpc" id="L534" title="1 of 4 branches missed.">		} else if (type.getOldTypeOptional().isPresent() &amp;&amp; !type.getNewTypeOptional().isPresent()) {</span>
+<span class="fc" id="L535">			return type.getOldTypeOptional().get();</span>
+<span class="pc bpc" id="L536" title="2 of 4 branches missed.">		} else if (!type.getOldTypeOptional().isPresent() &amp;&amp; type.getNewTypeOptional().isPresent()) {</span>
+<span class="fc" id="L537">			return type.getNewTypeOptional().get();</span>
 		}
-<span class="nc" id="L533">		return &quot;n.a.&quot;;</span>
+<span class="nc" id="L539">		return &quot;n.a.&quot;;</span>
 	}
 
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L537">		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();</span>
-<span class="pc bpc" id="L538" title="3 of 4 branches missed.">		if (!options.isOutputOnlyModifications() || jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
-<span class="fc" id="L539">			sb.append(tabs(1)).append(signs(jApiSuperclass)).append(&quot; &quot;).append(jApiSuperclass.getChangeStatus()).append(&quot; SUPERCLASS: &quot;).append(superclassChangeAsString(jApiSuperclass)).append(&quot;\n&quot;);</span>
+<span class="fc" id="L543">		JApiSuperclass jApiSuperclass = jApiClass.getSuperclass();</span>
+<span class="pc bpc" id="L544" title="3 of 4 branches missed.">		if (!options.isOutputOnlyModifications() || jApiSuperclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {</span>
+<span class="fc" id="L545">			sb.append(tabs(1)).append(signs(jApiSuperclass)).append(&quot; &quot;).append(jApiSuperclass.getChangeStatus()).append(&quot; SUPERCLASS: &quot;).append(superclassChangeAsString(jApiSuperclass)).append(&quot;\n&quot;);</span>
 		}
-<span class="fc" id="L541">	}</span>
+<span class="fc" id="L547">	}</span>
 
 	private String superclassChangeAsString(JApiSuperclass jApiSuperclass) {
-<span class="fc bfc" id="L544" title="All 4 branches covered.">		if (jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
-<span class="fc" id="L545">			return jApiSuperclass.getNewSuperclassName().get() + &quot; (&lt;- &quot; + jApiSuperclass.getOldSuperclassName().get() + &quot;)&quot;;</span>
-<span class="pc bpc" id="L546" title="1 of 4 branches missed.">		} else if (jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; !jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
-<span class="fc" id="L547">			return jApiSuperclass.getOldSuperclassName().get();</span>
-<span class="pc bpc" id="L548" title="2 of 4 branches missed.">		} else if (!jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
-<span class="fc" id="L549">			return jApiSuperclass.getNewSuperclassName().get();</span>
+<span class="fc bfc" id="L550" title="All 4 branches covered.">		if (jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc" id="L551">			return jApiSuperclass.getNewSuperclassName().get() + &quot; (&lt;- &quot; + jApiSuperclass.getOldSuperclassName().get() + &quot;)&quot;;</span>
+<span class="pc bpc" id="L552" title="1 of 4 branches missed.">		} else if (jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; !jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc" id="L553">			return jApiSuperclass.getOldSuperclassName().get();</span>
+<span class="pc bpc" id="L554" title="2 of 4 branches missed.">		} else if (!jApiSuperclass.getOldSuperclassName().isPresent() &amp;&amp; jApiSuperclass.getNewSuperclassName().isPresent()) {</span>
+<span class="fc" id="L555">			return jApiSuperclass.getNewSuperclassName().get();</span>
 		}
-<span class="nc" id="L551">		return &quot;n.a.&quot;;</span>
+<span class="nc" id="L557">		return &quot;n.a.&quot;;</span>
 	}
 
 	private void processInterfaceChanges(StringBuilder sb, JApiClass jApiClass) {
-<span class="fc" id="L555">		List&lt;JApiImplementedInterface&gt; interfaces = jApiClass.getInterfaces();</span>
-<span class="pc bpc" id="L556" title="1 of 2 branches missed.">		for (JApiImplementedInterface implementedInterface : interfaces) {</span>
-<span class="nc" id="L557">			sb.append(tabs(1)).append(signs(implementedInterface)).append(&quot; &quot;).append(implementedInterface.getChangeStatus()).append(&quot; INTERFACE: &quot;).append(implementedInterface.getFullyQualifiedName()).append(&quot;\n&quot;);</span>
-<span class="nc" id="L558">		}</span>
-<span class="fc" id="L559">	}</span>
+<span class="fc" id="L561">		List&lt;JApiImplementedInterface&gt; interfaces = jApiClass.getInterfaces();</span>
+<span class="pc bpc" id="L562" title="1 of 2 branches missed.">		for (JApiImplementedInterface implementedInterface : interfaces) {</span>
+<span class="nc" id="L563">			sb.append(tabs(1)).append(signs(implementedInterface)).append(&quot; &quot;).append(implementedInterface.getChangeStatus()).append(&quot; INTERFACE: &quot;).append(implementedInterface.getFullyQualifiedName()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L564">		}</span>
+<span class="fc" id="L565">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
