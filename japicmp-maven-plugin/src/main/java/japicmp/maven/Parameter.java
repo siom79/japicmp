@@ -23,6 +23,8 @@ public class Parameter {
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String htmlTitle;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private String markdownTitle;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean noAnnotations;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private String ignoreNonResolvableArtifacts;
@@ -34,6 +36,8 @@ public class Parameter {
 	private boolean skipHtmlReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean skipXmlReport;
+	@org.apache.maven.plugins.annotations.Parameter(required = false)
+	private boolean skipMarkdownReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
 	private boolean skipDiffReport;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
@@ -221,6 +225,14 @@ public class Parameter {
 		this.htmlTitle = htmlTitle;
 	}
 
+	public String getMarkdownTitle() {
+		return markdownTitle;
+	}
+
+	public void setMarkdownTitle(String markdownTitle) {
+		this.markdownTitle = markdownTitle;
+	}
+
 	public String getIgnoreNonResolvableArtifacts() {
 		return ignoreNonResolvableArtifacts;
 	}
@@ -275,6 +287,14 @@ public class Parameter {
 
 	public void setSkipXmlReport(boolean skipXmlReport) {
 		this.skipXmlReport = skipXmlReport;
+	}
+
+	public boolean getSkipMarkdownReport() {
+		return skipMarkdownReport;
+	}
+
+	public void setSkipMarkdownReport(boolean skipMarkdownReport) {
+		this.skipMarkdownReport = skipMarkdownReport;
 	}
 
 	public boolean isSkipDiffReport() {
