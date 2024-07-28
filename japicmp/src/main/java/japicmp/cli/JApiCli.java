@@ -9,6 +9,7 @@ import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
+import japicmp.output.markdown.MarkdownOutputGenerator;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -43,6 +44,12 @@ public class JApiCli {
 		if (options.isSemanticVersioning()) {
 			SemverOut semverOut = new SemverOut(options, jApiClasses);
 			String output = semverOut.generate();
+			System.out.println(output);
+			return;
+		}
+		if (options.isMarkdown()) {
+			MarkdownOutputGenerator markdownOutputGenerator = new MarkdownOutputGenerator(options, jApiClasses);
+			String output = markdownOutputGenerator.generate();
 			System.out.println(output);
 			return;
 		}
