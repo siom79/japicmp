@@ -22,6 +22,11 @@ public class ITModuleExcluded {
 	}
 
 	@Test
+	public void testMarkdownReportGenerated() throws IOException {
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "japicmp", "ignore-module.md")), is(false));
+	}
+
+	@Test
 	public void testDiffReportGenerated() throws IOException {
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "japicmp", "ignore-module.diff")), is(false));
 	}
