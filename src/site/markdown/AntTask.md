@@ -49,6 +49,7 @@ The following table gives an overview of all available parameters of the Ant tas
 | classpath 								| true  | n.a.  | Classpath for the dependencies used to compare old and new versions. |
 | classpathref 								| true  | n.a.  | Classpath reference for the dependencies used to compare old and new versions. |
 | semanticVersioning 						| true  | false | Indicate which part of the version to increment according to semantic versioning rules. |
+| markdown									| true  | false | Generates output in Markdown format. |
 | onlyBinaryIncompatible 					| true  | false | If true, output only binary incompatible changes. |
 | onlyModified 								| true  | false | If true, output only modified classes/methods, else print all classes and methods.|
 | includeSynthetic 							| true  | false | If true, track changes for synthetic classes and class members.|
