@@ -42,6 +42,7 @@ public class MarkdownMessageOptions {
 	public String newClasspath                        = "**New classpath**:\n```\n%s\n```";
 	public String accessModifierFilter                = "**Access modifier filter**: `%s`";
 	public String evaluateAnnotations                 = "**Evaluate annotations**: %s";
+	public String reportOnlySummary                   = "**Report only summary**: %s";
 	public String reportOnlyChanges                   = "**Report only changes**: %s";
 	public String reportOnlyBinaryIncompatibleChanges = "**Report only binary-incompatible changes**: %s";
 	public String includeSpecificElements             = "**Include specific elements**: %s";

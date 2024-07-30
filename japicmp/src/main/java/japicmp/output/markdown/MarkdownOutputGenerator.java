@@ -80,6 +80,7 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 	private String renderReportOptions(Options options) {
 		final List<Pattern> patterns = options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression();
 		return new MarkdownList(
+			format(md.message.reportOnlySummary, md.message.yesNo(options.isReportOnlySummary())),
 			format(md.message.reportOnlyChanges, md.message.yesNo(options.isOutputOnlyModifications())),
 			format(md.message.reportOnlyBinaryIncompatibleChanges, md.message.yesNo(options.isOutputOnlyBinaryIncompatibleModifications())),
 			format(md.message.accessModifierFilter, options.getAccessModifier()),
