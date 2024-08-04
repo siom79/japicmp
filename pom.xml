@@ -128,6 +128,11 @@
 			<name>Stefano Cordio</name>
 			<url>https://github.com/scordio</url>
 		</contributor>
+		<contributor>
+			<name>Guillermo Calvo</name>
+			<url>https://github.com/guillermocalvo</url>
+			<email>guillermo@guillermo.dev</email>
+		</contributor>
 	</contributors>
 
 	<properties>

@@ -64,6 +64,8 @@ public class CliParser {
 				options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
 			} else if ("-s".equals(arg) || "--semantic-versioning".equals(arg)) {
 				options.setSemanticVersioning(true);
+			} else if ("--markdown".equals(arg)) {
+				options.setMarkdown(true);
 			} else if ("--include-synthetic".equals(arg)) {
 				options.setIncludeSynthetic(true);
 			} else if (IGNORE_MISSING_CLASSES.equals(arg)) {
@@ -128,6 +130,7 @@ public class CliParser {
 			"                [--old-classpath <oldClassPath>]\n" +
 			"                [--report-only-filename] [--report-only-summary]\n" +
 			"                [(-s | --semantic-versioning)]\n" +
+			"                [--markdown]\n" +
 			"                [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]\n" +
 			"                [--error-on-binary-incompatibility]\n" +
 			"                [--error-on-source-incompatibility]\n" +
@@ -214,6 +217,9 @@ public class CliParser {
 			"\n" +
 			"        -s, --semantic-versioning\n" +
 			"            Tells you which part of the version to increment.\n" +
+			"\n" +
+			"        --markdown\n" +
+			"            Generates output in Markdown format.\n" +
 			"\n" +
 			"        -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>\n" +
 			"            Provides the path to the xml output file.\n" +

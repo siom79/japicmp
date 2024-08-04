@@ -108,6 +108,7 @@
 								<includeSynthetic>true</includeSynthetic>
 								<htmlStylesheet>${project.basedir}/src/main/resources/css/stylesheet.css</htmlStylesheet>
 								<htmlTitle>Test-Title</htmlTitle>
+								<markdownTitle>Test-Markdown-Title</markdownTitle>
 							</parameter>
 							<dependencies>
 								<dependency>
@@ -190,6 +191,7 @@
 								<onlyModified>true</onlyModified>
 								<skipXmlReport>true</skipXmlReport>
 								<skipHtmlReport>true</skipHtmlReport>
+								<skipMarkdownReport>true</skipMarkdownReport>
 							</parameter>
 							<dependencies>
 								<dependency>

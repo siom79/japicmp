@@ -39,6 +39,24 @@ public class ITClassFileFormatVersion {
 	}
 
 	@Test
+	public void testMarkdownReportDiffClassFileFormatVersionIsPresent() throws IOException {
+		Path path = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "class-file-format-version.md");
+		if (!Files.exists(path)) {
+			return; //in JDK 1.7 case
+		}
+		assertThat(Files.exists(path), is(true));
+		List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+		boolean found = false;
+		for (String line : lines) {
+			if (line.contains("~~JDK 6~~ &rarr; **JDK 8**")) {
+				found = true;
+				break;
+			}
+		}
+		assertThat(found, is(true));
+	}
+
+	@Test
 	public void testStoutDiffClassFileFormatVersionIsPresent() throws IOException {
 		Path path = Paths.get(System.getProperty("user.dir"), "target", "japicmp", "class-file-format-version.diff");
 		if (!Files.exists(path)) {

@@ -22,6 +22,11 @@ public class ITSkip {
 	}
 
 	@Test
+	public void testMarkdownReportGenerated() throws IOException {
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "japicmp", "skip.md")), is(false));
+	}
+
+	@Test
 	public void testDiffReportGenerated() throws IOException {
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "japicmp", "skip.diff")), is(false));
 	}

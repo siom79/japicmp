@@ -15,6 +15,8 @@ import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
+import japicmp.output.markdown.MarkdownOutputGenerator;
+import japicmp.output.markdown.config.MarkdownOptions;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -77,6 +79,8 @@ public class JApiCmpMojo extends AbstractMojo {
 	private boolean skip;
 	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skip", defaultValue = "false")
 	private boolean skipExec;
+	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipMarkdownReport", required = false)
+	private boolean skipMarkdownReport;
 	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipXmlReport", required = false)
 	private boolean skipXmlReport;
 	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipHtmlReport", required = false)
@@ -148,6 +152,9 @@ public class JApiCmpMojo extends AbstractMojo {
 			SemverOut semverOut = new SemverOut(options, jApiClasses);
 			String semanticVersioningInformation = semverOut.generate();
 			generateDiffOutput(mavenParameters, pluginParameters, options, jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
+			if (!skipMarkdownReport(pluginParameters)) {
+				generateMarkdownOutput(mavenParameters, pluginParameters, options, jApiClasses, jApiCmpBuildDir);
+			}
 			if (!skipXmlReport(pluginParameters)) {
 				XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters, semanticVersioningInformation);
 				if (pluginParameters.isWriteToFiles()) {
@@ -576,6 +583,18 @@ public class JApiCmpMojo extends AbstractMojo {
 		}
 	}
 
+	private void generateMarkdownOutput(MavenParameters mavenParameters, PluginParameters pluginParameters, Options options,
+										List<JApiClass> jApiClasses, File jApiCmpBuildDir) throws IOException, MojoFailureException {
+		MarkdownOptions mdOptions = MarkdownOptions.newDefault(options);
+		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getMarkdownTitle() != null) {
+			mdOptions.title.report = pluginParameters.getParameterParam().getMarkdownTitle();
+		}
+		MarkdownOutputGenerator mdOut = new MarkdownOutputGenerator(mdOptions, jApiClasses);
+		String markdown = mdOut.generate();
+		File output = new File(jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename(mavenParameters) + ".md");
+		writeToFile(markdown, output);
+	}
+
 	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters,
 										PluginParameters pluginParameters, String semanticVersioningInformation) throws IOException {
 		String filename = createFilename(mavenParameters);
@@ -619,6 +638,14 @@ public class JApiCmpMojo extends AbstractMojo {
 			skipReport = pluginParameters.getParameterParam().getSkipXmlReport();
 		}
 		return skipReport || this.skipXmlReport;
+	}
+
+	private boolean skipMarkdownReport(PluginParameters pluginParameters) {
+		boolean skipReport = false;
+		if (pluginParameters.getParameterParam() != null) {
+			skipReport = pluginParameters.getParameterParam().getSkipMarkdownReport();
+		}
+		return skipReport || this.skipMarkdownReport;
 	}
 
 	private String createFilename(MavenParameters mavenParameters) {

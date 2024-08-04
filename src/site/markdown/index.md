@@ -107,7 +107,7 @@ Features
 
 * Comparison of two jar archives without the need to add all of their dependencies to the classpath.
 * Differences are printed on the command line in a simple diff format.
-* Differences can optionally be printed as XML or HTML file.
+* Differences can optionally be printed as [Markdown](https://www.markdownguide.org/), XML or HTML file.
 * Per default private and package protected classes and class members are not compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to public, protected, package or private.
 * Per default all classes are tracked. If necessary, certain packages, classes, methods or fields can be excluded or explicitly included. Inclusion and exclusion is also possible based on annotations.
@@ -115,6 +115,7 @@ Features
 * All changes between annotations are compared, hence japicmp can be used to track annotation-based APIs like JAXB, JPA, JAX-RS, etc.
 * A maven plugin is available that allows you to compare the current artifact version with some older version from the repository.
 * The option `--semantic-versioning` tells you which part of the version you have to increment in order to follow [semantic versioning](http://semver.org/).
+* The option `--markdown` generates output in [Markdown](https://www.markdownguide.org/) format.
 * If a class is serializable, changes are evaluated regarding the [Java Object Serialization Specification](http://docs.oracle.com/javase/7/docs/platform/serialization/spec/serialTOC.html).
 * Per default synthetic classes and class members (e.g. [bridge methods](https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html)) are hidden. They can be listed by using the option `--include-synthetic`.
 * The maven plugin allows project-specific filtering and reports using a custom [Groovy](groovy-lang.org) script.

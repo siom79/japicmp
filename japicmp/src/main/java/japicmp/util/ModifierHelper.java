@@ -2,15 +2,23 @@ package japicmp.util;
 
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
+import japicmp.model.AbstractModifier;
 import japicmp.model.AccessModifier;
+import japicmp.model.BridgeModifier;
+import japicmp.model.FinalModifier;
 import japicmp.model.JApiAttribute;
 import japicmp.model.JApiCanBeSynthetic;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiHasAccessModifier;
 import japicmp.model.JApiModifier;
 import japicmp.model.JApiModifierBase;
+import japicmp.model.StaticModifier;
 import japicmp.model.SyntheticAttribute;
 import japicmp.model.SyntheticModifier;
+import japicmp.model.TransientModifier;
+import japicmp.model.VolatileModifier;
+import java.util.Arrays;
+import java.util.List;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
@@ -20,6 +28,17 @@ import java.lang.reflect.Modifier;
 public class ModifierHelper {
 	public static final int ACC_BRIDGE = 0x00000040;
 	public static final int ACC_SYNTHETIC = 0x00001000;
+
+	private static final List<? extends JApiModifierBase> IGNORED_MODIFIERS = Arrays.asList(
+		AbstractModifier.NON_ABSTRACT,
+		AccessModifier.PACKAGE_PROTECTED,
+		BridgeModifier.NON_BRIDGE,
+		FinalModifier.NON_FINAL,
+		StaticModifier.NON_STATIC,
+		SyntheticModifier.NON_SYNTHETIC,
+		TransientModifier.NON_TRANSIENT,
+		VolatileModifier.NON_VOLATILE
+	);
 
 	private ModifierHelper() {
 
@@ -215,6 +234,19 @@ public class ModifierHelper {
 			isSynthetic = true;
 		}
 		return isSynthetic;
+	}
+
+	public static Optional<String> getOldModifierName(JApiModifier<? extends Enum<? extends Enum<?>>> modifier) {
+		return getModifierName(modifier.getOldModifier());
+	}
+
+	public static Optional<String> getNewModifierName(JApiModifier<? extends Enum<? extends Enum<?>>> modifier) {
+		return getModifierName(modifier.getNewModifier());
+	}
+
+	private static Optional<String> getModifierName(Optional<? extends Enum<?>> modifier) {
+		return !modifier.isPresent() || IGNORED_MODIFIERS.contains(modifier.get()) ? Optional.absent() :
+			Optional.of(modifier.get().name().toLowerCase());
 	}
 
 	private static boolean hasSyntheticAttribute(JApiAttribute<SyntheticAttribute> syntheticAttribute) {

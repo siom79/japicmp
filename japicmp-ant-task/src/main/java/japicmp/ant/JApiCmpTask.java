@@ -9,6 +9,7 @@ import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
+import japicmp.output.markdown.MarkdownOutputGenerator;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -38,6 +39,7 @@ public class JApiCmpTask extends Task {
 	private boolean includeSynthetic = false;
 	private boolean noAnnotations = false;
 	private boolean semanticVersioning = false;
+	private boolean markdown = false;
 	private boolean reportOnlyFilename = false;
 	private boolean reportOnlySummary = false;
 	private boolean ignoreMissingClasses = false;
@@ -46,6 +48,7 @@ public class JApiCmpTask extends Task {
 	private final List<String> ignoreMissingClassesByRegularExpressions = new ArrayList<>();
 	private String accessModifier = "protected";
 	private String semanticVersionProperty;
+	private String markdownProperty;
 	private String oldJar;
 	private String newJar;
 	private Path oldClassPath;
@@ -86,6 +89,15 @@ public class JApiCmpTask extends Task {
 	public void setSemVerProperty(String semverProperty) {
 		semanticVersioning = Boolean.TRUE;
 		semanticVersionProperty = semverProperty;
+	}
+
+	public void setMarkdown(String markdown) {
+		this.markdown = Project.toBoolean(markdown);
+	}
+
+	public void setMarkdownProperty(String mdProperty) {
+		markdown = Boolean.TRUE;
+		markdownProperty = mdProperty;
 	}
 
 	public void setReportOnlyFilename(String reportOnlyFilename) {
@@ -283,6 +295,14 @@ public class JApiCmpTask extends Task {
 				getProject().setProperty(semanticVersionProperty, semver);
 			}
 			log(semver);
+			return;
+		} else if (markdown) {
+			MarkdownOutputGenerator markdownOutputGenerator = new MarkdownOutputGenerator(options, jApiClasses);
+			String md = markdownOutputGenerator.generate();
+			if (markdownProperty != null) {
+				getProject().setProperty(markdownProperty, md);
+			}
+			log(md);
 			return;
 		}
 
