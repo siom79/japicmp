@@ -107,7 +107,7 @@ Features
 
 * Comparison of two jar archives without the need to add all of their dependencies to the classpath.
 * Differences are printed on the command line in a simple diff format.
-* Differences can optionally be printed as XML or HTML file.
+* Differences can optionally be printed as [Markdown](https://www.markdownguide.org/), XML or HTML file.
 * Per default private and package protected classes and class members are not compared. If necessary, the access modifier of the classes and class members to be
   compared can be set to public, protected, package or private.
 * Per default all classes are tracked. If necessary, certain packages, classes, methods or fields can be excluded or explicitly included. Inclusion and exclusion is also possible based on annotations.
