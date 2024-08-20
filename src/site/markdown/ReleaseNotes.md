@@ -3,6 +3,12 @@ Versions
 
 The following versions of japicmp are available:
 
+0.23.0 (2024-08-20)
+-------------------
+* New option --markdown to generate a Markdown report. [#404](https://github.com/siom79/japicmp/issues/404)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.23.0).
+
 0.22.0 (2024-07-21)
 -------------------
 * New option --report-only-summary to make reports less verbose. [#398](https://github.com/siom79/japicmp/issues/398)
