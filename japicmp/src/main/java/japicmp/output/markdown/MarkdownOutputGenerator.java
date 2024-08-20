@@ -41,11 +41,6 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 
 	@Override
 	public String generate() {
-		return toString();
-	}
-
-	@Override
-	public String toString() {
 		final String semver = new SemverOut(options, jApiClasses).generate();
 		return renderHeading(0, md.title.report) +
 			md.message.getSemverBadge(semver) + EOL +
