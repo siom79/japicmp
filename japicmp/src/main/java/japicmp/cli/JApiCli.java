@@ -47,12 +47,6 @@ public class JApiCli {
 			System.out.println(output);
 			return;
 		}
-		if (options.isMarkdown()) {
-			MarkdownOutputGenerator markdownOutputGenerator = new MarkdownOutputGenerator(options, jApiClasses);
-			String output = markdownOutputGenerator.generate();
-			System.out.println(output);
-			return;
-		}
 		SemverOut semverOut = new SemverOut(options, jApiClasses);
 		if (options.getXmlOutputFile().isPresent()) {
 			XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
@@ -76,6 +70,12 @@ public class JApiCli {
 				throw new JApiCmpException(JApiCmpException.Reason.IoException, "Could not write HTML file: " + e.getMessage(), e);
             }
         }
+		if (options.isMarkdown()) {
+			MarkdownOutputGenerator markdownOutputGenerator = new MarkdownOutputGenerator(options, jApiClasses);
+			String output = markdownOutputGenerator.generate();
+			System.out.println(output);
+			return;
+		}
 		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
 		String output = stdoutOutputGenerator.generate();
 		System.out.println(output);
