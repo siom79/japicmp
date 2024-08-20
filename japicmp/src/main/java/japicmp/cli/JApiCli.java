@@ -74,12 +74,11 @@ public class JApiCli {
 			MarkdownOutputGenerator markdownOutputGenerator = new MarkdownOutputGenerator(options, jApiClasses);
 			String output = markdownOutputGenerator.generate();
 			System.out.println(output);
-			return;
+		} else {
+			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
+			String output = stdoutOutputGenerator.generate();
+			System.out.println(output);
 		}
-		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
-		String output = stdoutOutputGenerator.generate();
-		System.out.println(output);
-
 		if (options.isErrorOnBinaryIncompatibility()
 			|| options.isErrorOnSourceIncompatibility()
 			|| options.isErrorOnExclusionIncompatibility()
