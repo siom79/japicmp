@@ -9,6 +9,7 @@ import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
+import japicmp.output.markdown.MarkdownOutputGenerator;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
@@ -69,10 +70,15 @@ public class JApiCli {
 				throw new JApiCmpException(JApiCmpException.Reason.IoException, "Could not write HTML file: " + e.getMessage(), e);
             }
         }
-		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
-		String output = stdoutOutputGenerator.generate();
-		System.out.println(output);
-
+		if (options.isMarkdown()) {
+			MarkdownOutputGenerator markdownOutputGenerator = new MarkdownOutputGenerator(options, jApiClasses);
+			String output = markdownOutputGenerator.generate();
+			System.out.println(output);
+		} else {
+			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
+			String output = stdoutOutputGenerator.generate();
+			System.out.println(output);
+		}
 		if (options.isErrorOnBinaryIncompatibility()
 			|| options.isErrorOnSourceIncompatibility()
 			|| options.isErrorOnExclusionIncompatibility()

@@ -22,6 +22,11 @@ public class ITNoReports {
 	}
 
 	@Test
+	public void testMarkdownReportNotGenerated() throws IOException {
+		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "japicmp", "no-reports.md")), is(false));
+	}
+
+	@Test
 	public void testDiffReportGenerated() throws IOException {
 		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "japicmp", "no-reports.diff")), is(true));
 	}

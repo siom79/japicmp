@@ -42,6 +42,7 @@ public class Options {
 	private boolean reportOnlyFilename;
 	private boolean reportOnlySummary;
 	private boolean semanticVersioning;
+	private boolean markdown;
 	private boolean errorOnBinaryIncompatibility;
 	private boolean errorOnSourceIncompatibility;
 	private boolean errorOnExclusionIncompatibility = true;
@@ -396,6 +397,14 @@ public class Options {
 
 	public boolean isSemanticVersioning() {
 		return semanticVersioning;
+	}
+
+	public void setMarkdown(boolean markdown) {
+		this.markdown = markdown;
+	}
+
+	public boolean isMarkdown() {
+		return markdown;
 	}
 
 	public boolean isErrorOnBinaryIncompatibility() {

@@ -18,6 +18,7 @@ SYNOPSIS
                 [--old-classpath <oldClassPath>]
                 [--report-only-filename] [--report-only-summary]
                 [(-s | --semantic-versioning)]
+                [--markdown]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
                 [--error-on-binary-incompatibility]
                 [--error-on-source-incompatibility]
@@ -104,6 +105,9 @@ OPTIONS
 
         -s, --semantic-versioning
             Tells you which part of the version to increment.
+
+        --markdown
+            Generates output in Markdown format.
 
         -x <pathToXmlOutputFile>, --xml-file <pathToXmlOutputFile>
             Provides the path to the xml output file.

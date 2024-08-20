@@ -97,6 +97,7 @@ The following properties can be set:
 | japicmp.skip | Skip the execution of this plugin. |
 | japicmp.skipXmlReport | Skip the generation of the XML report. |
 | japicmp.skipHtmlReport | Skip the generation of the HTML report. |
+| japicmp.skipMarkdownReport | Skip the generation of the Markdown report. |
 | japicmp.breakBuildOnModifications | Break the build in case of any modifications. |
 | japicmp.breakBuildOnBinaryIncompatibleModifications | Break the build in case of any binary incompatible modifications. |
 | japicmp.breakBuildOnSourceIncompatibleModifications | Break the build in case of any source incompatible modifications. |
@@ -172,6 +173,7 @@ An advanced configuration can utilize the following parameters:
 					<skipPomModules>true</skipPomModules>
 					<htmlStylesheet>path/to/stylesheet.css</htmlStylesheet>
 					<htmlTitle>Title of report</htmlTitle>
+					<markdownTitle>Title of report</markdownTitle>
 					<noAnnotations>false</noAnnotations>
 					<ignoreNonResolvableArtifacts>false</ignoreNonResolvableArtifacts>
 					<ignoreMissingOptionalDependency>false</ignoreMissingOptionalDependency>
@@ -182,6 +184,7 @@ An advanced configuration can utilize the following parameters:
 					<reportOnlyFilename>false</reportOnlyFilename>
 					<skipXmlReport>false</skipXmlReport>
 					<skipHtmlReport>false</skipHtmlReport>
+					<skipMarkdownReport>false</skipMarkdownReport>
 					<skipDiffReport>false</skipDiffReport>
 					<includeModules>
 						<includeModule>.*incl.*</includeModule>
@@ -241,6 +244,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | excludeExclusively								     | true  | false		| Exclude only packages specified in the "excludes" parameter, include their sub-packages.                                                                                                                                                                                     |
 | htmlStylesheet								         | true  | n.a.		    | Path to an individual CSS stylesheet for the HTML report.                                                                                                                                                                                                                    |
 | htmlTitle										         | true  | n.a.		    | A title for the HTML report (optional).                                                                                                                                                                                                                                      |
+| markdownTitle									         | true  | n.a.		    | A title for the Markdown report (optional).                                                                                                                                                                                                                                  |
 | skipPomModules								         | true  | true		    | Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.                                                                                                                                                                  |
 | skip											         | true  | false		| Setting this parameter to true will skip execution of the plugin.                                                                                                                                                                                                            |
 | ignoreNonResolvableArtifacts					         | true  | false		| Set this to true in order to ignore artifacts that cannot be resolved, i.e. the build does not break in case a dependency cannot be resolved to a file.                                                                                                                      |
@@ -251,6 +255,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | postAnalysisScript							         | true  | n.a.			| A [Groovy](https://www.groovy-lang.org/) script that gets invoked after analysis is completed and before the output is written. This way it can be used to filter the output or break the build on specific conditions. It can be an absolute path or a relative path of a file within the classpath.|
 | skipXmlReport									         | true  | false		| If set to true, no XML report will be generated.                                                                                                                                                                                                                             |
 | skipHtmlReport								         | true  | false		| If set to true, no HTML report will be generated.                                                                                                                                                                                                                            |
+| skipMarkdownReport							         | true  | false		| If set to true, no Markdown report will be generated.                                                                                                                                                                                                                        |
 | skipDiffReport								         | true  | false		| If set to true, no diff report will be generated.                                                                                                                                                                                                                            |
 | oldVersionPattern								         | true  | n.a.			| If &lt;oldVersion&gt; is not used, the old version compared against must match this regular expression.                                                                                                                                                                      |
 | includeModules								         | true  | n.a.			| List of regular expression that specify if an artifact should be excluded based on its artifact id.                                                                                                                                                                          |
