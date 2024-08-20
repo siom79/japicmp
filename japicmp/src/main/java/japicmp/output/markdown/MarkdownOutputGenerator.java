@@ -384,7 +384,7 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 	}
 
 	private String renderAllCompatibilityChanges(JApiClass clazz) {
-		return renderCompatibilityChanges(Stream.of(
+		final Stream<List<? extends JApiCompatibility>> allCompatibilityChanges = Stream.of(
 				singletonList(clazz),
 				singletonList(clazz.getClassFileFormatVersion()),
 				singletonList(clazz.getSuperclass()),
@@ -397,7 +397,8 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 				clazz.getMethods(),
 				clazz.getMethods().stream().map(JApiMethod::getReturnType).collect(toList()),
 				clazz.getMethods().stream().map(JApiMethod::getParameters).flatMap(List::stream).collect(toList()),
-				clazz.getFields())
+				clazz.getFields());
+		return renderCompatibilityChanges(allCompatibilityChanges
 			.flatMap(List::stream)
 			.map(JApiCompatibility::getCompatibilityChanges)
 			.flatMap(List::stream)
