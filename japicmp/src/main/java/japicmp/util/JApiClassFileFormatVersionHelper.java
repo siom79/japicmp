@@ -27,8 +27,8 @@ public class JApiClassFileFormatVersionHelper {
 			return "JDK 1.3";
 		} else if (major == 48) {
 			return "JDK 1.4";
-		} else if (major >= 49 && major <= 70) {
-			// JDK 5 to 26, according to: https://andbin.github.io/java-versions-cheat-sheet/
+		} else if (major >= 49) {
+			// according to: https://andbin.github.io/java-versions-cheat-sheet/
 			return "JDK " + (major - 44);
 		}
 		return "Version " + major + "." + minor;
