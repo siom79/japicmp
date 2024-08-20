@@ -30,15 +30,15 @@ are marked with a trailing star (*).
 ...
 ```
 
-At your preference, japicmp can generate a [Markdown](https://www.markdownguide.org/) report.
-You can see an example [here](https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.md).
-
-![Markdown Report](https://raw.github.com/siom79/japicmp/master/doc/japicmp_guava_markdown.png)
-
 Optionally japicmp can also create an HTML report.
 An example for such a report can be found [here](http://htmlpreview.github.io/?https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.html):
 
 <img src="https://raw.github.com/siom79/japicmp/master/doc/japicmp_guava.png" alt="HTML Report"></img>
+
+At your preference, japicmp can generate a [Markdown](https://www.markdownguide.org/) report.
+You can see an example [here](https://github.com/siom79/japicmp/blob/master/doc/japicmp_guava.md).
+
+![Markdown Report](https://raw.github.com/siom79/japicmp/master/doc/japicmp_guava_markdown.png)
 
 You can also let japicmp create an XML report like the following one:
 
