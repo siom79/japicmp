@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MarkdownOptions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.markdown.config</a> &gt; <span class="el_source">MarkdownOptions.java</span></div><h1>MarkdownOptions.java</h1><pre class="source lang-java linenums">package japicmp.output.markdown.config;
+
+import japicmp.config.Options;
+import japicmp.util.Optional;
+
+public class MarkdownOptions {
+
+	public Options options;
+
+<span class="fc" id="L10">	public Optional&lt;String&gt; targetOldVersion = Optional.absent();</span>
+<span class="fc" id="L11">	public Optional&lt;String&gt; targetNewVersion = Optional.absent();</span>
+
+<span class="fc" id="L13">	public MarkdownTitleOptions title = new MarkdownTitleOptions();</span>
+<span class="fc" id="L14">	public MarkdownHeaderOptions header = new MarkdownHeaderOptions();</span>
+<span class="fc" id="L15">	public MarkdownSortOptions sort = new MarkdownSortOptions();</span>
+<span class="fc" id="L16">	public MarkdownMessageOptions message = new MarkdownMessageOptions();</span>
+
+<span class="fc" id="L18">	MarkdownOptions(Options options) {</span>
+<span class="fc bfc" id="L19" title="All 2 branches covered.">		this.options = options != null ? options : Options.newDefault();</span>
+<span class="fc" id="L20">	}</span>
+
+	public static MarkdownOptions newDefault() {
+<span class="fc" id="L23">		return new MarkdownOptions(null);</span>
+	}
+
+	public static MarkdownOptions newDefault(Options options) {
+<span class="fc" id="L27">		return new MarkdownOptions(options);</span>
+	}
+
+	public void setTargetOldVersion(String targetOldVersion) {
+<span class="fc" id="L31">		this.targetOldVersion = Optional.fromNullable(targetOldVersion);</span>
+<span class="fc" id="L32">	}</span>
+
+	public void setTargetNewVersion(String targetNewVersion) {
+<span class="fc" id="L35">		this.targetNewVersion = Optional.fromNullable(targetNewVersion);</span>
+<span class="fc" id="L36">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

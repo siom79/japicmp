@@ -64,57 +64,59 @@ import static japicmp.util.FileHelper.createFileList;
 <span class="nc" id="L64">				options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));</span>
 <span class="nc bnc" id="L65" title="All 4 branches missed.">			} else if (&quot;-s&quot;.equals(arg) || &quot;--semantic-versioning&quot;.equals(arg)) {</span>
 <span class="nc" id="L66">				options.setSemanticVersioning(true);</span>
-<span class="nc bnc" id="L67" title="All 2 branches missed.">			} else if (&quot;--include-synthetic&quot;.equals(arg)) {</span>
-<span class="nc" id="L68">				options.setIncludeSynthetic(true);</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">			} else if (IGNORE_MISSING_CLASSES.equals(arg)) {</span>
-<span class="nc" id="L70">				options.setIgnoreMissingClasses(true);</span>
-<span class="nc bnc" id="L71" title="All 2 branches missed.">			} else if (IGNORE_MISSING_CLASSES_BY_REGEX.equals(arg)) {</span>
-<span class="nc bnc" id="L72" title="All 2 branches missed.">				while (sae.hasMoreElements()) {</span>
-<span class="nc" id="L73">					String nextElement = sae.inspectNextElement();</span>
-<span class="nc bnc" id="L74" title="All 2 branches missed.">					if (!nextElement.startsWith(&quot;-&quot;)) {</span>
-<span class="nc" id="L75">						nextElement = sae.nextElement();</span>
-<span class="nc" id="L76">						options.addIgnoreMissingClassRegularExpression(nextElement);</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">			} else if (&quot;--markdown&quot;.equals(arg)) {</span>
+<span class="nc" id="L68">				options.setMarkdown(true);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">			} else if (&quot;--include-synthetic&quot;.equals(arg)) {</span>
+<span class="nc" id="L70">				options.setIncludeSynthetic(true);</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">			} else if (IGNORE_MISSING_CLASSES.equals(arg)) {</span>
+<span class="nc" id="L72">				options.setIgnoreMissingClasses(true);</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">			} else if (IGNORE_MISSING_CLASSES_BY_REGEX.equals(arg)) {</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">				while (sae.hasMoreElements()) {</span>
+<span class="nc" id="L75">					String nextElement = sae.inspectNextElement();</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">					if (!nextElement.startsWith(&quot;-&quot;)) {</span>
+<span class="nc" id="L77">						nextElement = sae.nextElement();</span>
+<span class="nc" id="L78">						options.addIgnoreMissingClassRegularExpression(nextElement);</span>
 					}
-<span class="nc" id="L78">				}</span>
-<span class="nc bnc" id="L79" title="All 2 branches missed.">			} else if (&quot;--html-stylesheet&quot;.equals(arg)) {</span>
-<span class="nc" id="L80">				String htmlStylesheet = getOptionWithArgument(&quot;--html-stylesheet&quot;, sae);</span>
-<span class="nc" id="L81">				options.setHtmlStylesheet(Optional.fromNullable(htmlStylesheet));</span>
-<span class="nc bnc" id="L82" title="All 2 branches missed.">			} else if (OLD_CLASSPATH.equals(arg)) {</span>
-<span class="nc" id="L83">				String oldClassPath = getOptionWithArgument(OLD_CLASSPATH, sae);</span>
-<span class="nc" id="L84">				options.setOldClassPath(Optional.fromNullable(oldClassPath));</span>
-<span class="nc bnc" id="L85" title="All 2 branches missed.">			} else if (NEW_CLASSPATH.equals(arg)) {</span>
-<span class="nc" id="L86">				String newClassPath = getOptionWithArgument(NEW_CLASSPATH, sae);</span>
-<span class="nc" id="L87">				options.setNewClassPath(Optional.fromNullable(newClassPath));</span>
-<span class="nc bnc" id="L88" title="All 2 branches missed.">			} else if (&quot;--no-annotations&quot;.equals(arg)) {</span>
-<span class="nc" id="L89">				options.setNoAnnotations(true);</span>
-<span class="nc bnc" id="L90" title="All 2 branches missed.">			} else if (&quot;--report-only-filename&quot;.equals(arg)) {</span>
-<span class="nc" id="L91">				options.setReportOnlyFilename(true);</span>
-<span class="nc bnc" id="L92" title="All 2 branches missed.">			} else if (&quot;--report-only-summary&quot;.equals(arg)) {</span>
-<span class="nc" id="L93">				options.setReportOnlySummary(true);</span>
-<span class="nc bnc" id="L94" title="All 2 branches missed.">			} else if (&quot;--error-on-binary-incompatibility&quot;.equals(arg)) {</span>
-<span class="nc" id="L95">				options.setErrorOnBinaryIncompatibility(true);</span>
-<span class="nc bnc" id="L96" title="All 2 branches missed.">			} else if (&quot;--error-on-source-incompatibility&quot;.equals(arg)) {</span>
-<span class="nc" id="L97">				options.setErrorOnSourceIncompatibility(true);</span>
-<span class="nc bnc" id="L98" title="All 2 branches missed.">			} else if (&quot;--no-error-on-exclusion-incompatibility&quot;.equals(arg)) {</span>
-<span class="nc" id="L99">				options.setErrorOnExclusionIncompatibility(false);</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">			} else if (&quot;--error-on-modifications&quot;.equals(arg)) {</span>
-<span class="nc" id="L101">				options.setErrorOnModifications(true);</span>
-<span class="nc bnc" id="L102" title="All 2 branches missed.">			} else if (&quot;--error-on-semantic-incompatibility&quot;.equals(arg)) {</span>
-<span class="nc" id="L103">				options.setErrorOnSemanticIncompatibility(true);</span>
-<span class="nc bnc" id="L104" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-old-version&quot;.equals(arg)) {</span>
-<span class="nc" id="L105">				options.setIgnoreMissingOldVersion(true);</span>
-<span class="nc bnc" id="L106" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-new-version&quot;.equals(arg)) {</span>
-<span class="nc" id="L107">				options.setIgnoreMissingNewVersion(true);</span>
+<span class="nc" id="L80">				}</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">			} else if (&quot;--html-stylesheet&quot;.equals(arg)) {</span>
+<span class="nc" id="L82">				String htmlStylesheet = getOptionWithArgument(&quot;--html-stylesheet&quot;, sae);</span>
+<span class="nc" id="L83">				options.setHtmlStylesheet(Optional.fromNullable(htmlStylesheet));</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">			} else if (OLD_CLASSPATH.equals(arg)) {</span>
+<span class="nc" id="L85">				String oldClassPath = getOptionWithArgument(OLD_CLASSPATH, sae);</span>
+<span class="nc" id="L86">				options.setOldClassPath(Optional.fromNullable(oldClassPath));</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">			} else if (NEW_CLASSPATH.equals(arg)) {</span>
+<span class="nc" id="L88">				String newClassPath = getOptionWithArgument(NEW_CLASSPATH, sae);</span>
+<span class="nc" id="L89">				options.setNewClassPath(Optional.fromNullable(newClassPath));</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">			} else if (&quot;--no-annotations&quot;.equals(arg)) {</span>
+<span class="nc" id="L91">				options.setNoAnnotations(true);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">			} else if (&quot;--report-only-filename&quot;.equals(arg)) {</span>
+<span class="nc" id="L93">				options.setReportOnlyFilename(true);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">			} else if (&quot;--report-only-summary&quot;.equals(arg)) {</span>
+<span class="nc" id="L95">				options.setReportOnlySummary(true);</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">			} else if (&quot;--error-on-binary-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L97">				options.setErrorOnBinaryIncompatibility(true);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">			} else if (&quot;--error-on-source-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L99">				options.setErrorOnSourceIncompatibility(true);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">			} else if (&quot;--no-error-on-exclusion-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L101">				options.setErrorOnExclusionIncompatibility(false);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">			} else if (&quot;--error-on-modifications&quot;.equals(arg)) {</span>
+<span class="nc" id="L103">				options.setErrorOnModifications(true);</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">			} else if (&quot;--error-on-semantic-incompatibility&quot;.equals(arg)) {</span>
+<span class="nc" id="L105">				options.setErrorOnSemanticIncompatibility(true);</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-old-version&quot;.equals(arg)) {</span>
+<span class="nc" id="L107">				options.setIgnoreMissingOldVersion(true);</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">			} else if (&quot;--ignore-missing-new-version&quot;.equals(arg)) {</span>
+<span class="nc" id="L109">				options.setIgnoreMissingNewVersion(true);</span>
 			} else {
-<span class="nc" id="L109">				throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Unknown argument: &quot; + arg);</span>
+<span class="nc" id="L111">				throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Unknown argument: &quot; + arg);</span>
 			}
-<span class="fc" id="L111">		}</span>
-<span class="fc" id="L112">		options.verify();</span>
-<span class="fc" id="L113">		return options;</span>
+<span class="fc" id="L113">		}</span>
+<span class="fc" id="L114">		options.verify();</span>
+<span class="fc" id="L115">		return options;</span>
 	}
 
 	public static void printHelp() {
-<span class="fc" id="L117">		System.out.println(&quot;SYNOPSIS\n&quot; +</span>
+<span class="fc" id="L119">		System.out.println(&quot;SYNOPSIS\n&quot; +</span>
 			&quot;        java -jar japicmp.jar [-a &lt;accessModifier&gt;] [(-b | --only-incompatible)]\n&quot; +
 			&quot;                [(-e &lt;excludes&gt; | --exclude &lt;excludes&gt;)] [--exclude-exclusively]\n&quot; +
 			&quot;                [(-h | --help)] [--html-file &lt;pathToHtmlOutputFile&gt;]\n&quot; +
@@ -128,6 +130,7 @@ import static japicmp.util.FileHelper.createFileList;
 			&quot;                [--old-classpath &lt;oldClassPath&gt;]\n&quot; +
 			&quot;                [--report-only-filename] [--report-only-summary]\n&quot; +
 			&quot;                [(-s | --semantic-versioning)]\n&quot; +
+			&quot;                [--markdown]\n&quot; +
 			&quot;                [(-x &lt;pathToXmlOutputFile&gt; | --xml-file &lt;pathToXmlOutputFile&gt;)]\n&quot; +
 			&quot;                [--error-on-binary-incompatibility]\n&quot; +
 			&quot;                [--error-on-source-incompatibility]\n&quot; +
@@ -215,6 +218,9 @@ import static japicmp.util.FileHelper.createFileList;
 			&quot;        -s, --semantic-versioning\n&quot; +
 			&quot;            Tells you which part of the version to increment.\n&quot; +
 			&quot;\n&quot; +
+			&quot;        --markdown\n&quot; +
+			&quot;            Generates output in Markdown format.\n&quot; +
+			&quot;\n&quot; +
 			&quot;        -x &lt;pathToXmlOutputFile&gt;, --xml-file &lt;pathToXmlOutputFile&gt;\n&quot; +
 			&quot;            Provides the path to the xml output file.\n&quot; +
 			&quot;\n&quot; +
@@ -246,25 +252,25 @@ import static japicmp.util.FileHelper.createFileList;
 			&quot;        --ignore-missing-new-version\n&quot; +
 			&quot;            When --error-on-semantic-incompatibility is passed, ignore\n&quot; +
 			&quot;            non-resolvable artifacts for the new version.\n&quot;);
-<span class="fc" id="L249">	}</span>
+<span class="fc" id="L255">	}</span>
 
 	private String getOptionWithArgument(String option, StringArrayEnumeration sae) {
-<span class="fc bfc" id="L252" title="All 2 branches covered.">		if (sae.hasMoreElements()) {</span>
-<span class="fc" id="L253">			String value = sae.nextElement();</span>
-<span class="pc bpc" id="L254" title="1 of 2 branches missed.">			if (value.startsWith(&quot;-&quot;)) {</span>
-<span class="nc" id="L255">				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">		if (sae.hasMoreElements()) {</span>
+<span class="fc" id="L259">			String value = sae.nextElement();</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">			if (value.startsWith(&quot;-&quot;)) {</span>
+<span class="nc" id="L261">				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
 			}
-<span class="fc" id="L257">			return value;</span>
+<span class="fc" id="L263">			return value;</span>
 		} else {
-<span class="fc" id="L259">			throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
+<span class="fc" id="L265">			throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(&quot;Missing argument for option '%s'.&quot;, option));</span>
 		}
 	}
 
 	private &lt;T&gt; T checkNonNull(T in, String errorMessage) {
-<span class="pc bpc" id="L264" title="1 of 2 branches missed.">		if (in == null) {</span>
-<span class="nc" id="L265">			throw new JApiCmpException(JApiCmpException.Reason.CliError, errorMessage);</span>
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">		if (in == null) {</span>
+<span class="nc" id="L271">			throw new JApiCmpException(JApiCmpException.Reason.CliError, errorMessage);</span>
 		} else {
-<span class="fc" id="L267">			return in;</span>
+<span class="fc" id="L273">			return in;</span>
 		}
 	}
 }

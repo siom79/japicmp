@@ -1,10 +1,226 @@
-Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.22.0.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.21.2/japicmp-0.21.2.jar
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.23.1-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.22.0/japicmp-0.22.0.jar
 ***  MODIFIED CLASS: PUBLIC japicmp.config.Options  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW METHOD: PUBLIC(+) boolean isReportOnlySummary()
-	+++  NEW METHOD: PUBLIC(+) void setReportOnlySummary(boolean)
-***  MODIFIED ENUM: PUBLIC FINAL japicmp.model.JApiCompatibilityChangeType  (compatible)
+	+++  NEW METHOD: PUBLIC(+) boolean isMarkdown()
+	+++  NEW METHOD: PUBLIC(+) void setMarkdown(boolean)
++++  NEW CLASS: PUBLIC(+) japicmp.output.markdown.config.MarkdownHeaderOptions  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW FIELD: PUBLIC(+) java.lang.String fieldName
+	+++  NEW FIELD: PUBLIC(+) java.lang.String methodReturnType
+	+++  NEW FIELD: PUBLIC(+) java.lang.String constructorNameAndParameters
+	+++  NEW FIELD: PUBLIC(+) java.lang.String genericTemplateName
+	+++  NEW FIELD: PUBLIC(+) java.lang.String annotationName
+	+++  NEW FIELD: PUBLIC(+) java.lang.String annotations
+	+++  NEW FIELD: PUBLIC(+) java.lang.String className
+	+++  NEW FIELD: PUBLIC(+) java.lang.String modifiers
+	+++  NEW FIELD: PUBLIC(+) java.lang.String type
+	+++  NEW FIELD: PUBLIC(+) java.lang.String methodNameAndParameters
+	+++  NEW FIELD: PUBLIC(+) java.lang.String exceptions
+	+++  NEW FIELD: PUBLIC(+) java.lang.String serialization
+	+++  NEW FIELD: PUBLIC(+) java.lang.String compatibilityChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String generics
+	+++  NEW FIELD: PUBLIC(+) java.lang.String genericTemplateType
+	+++  NEW FIELD: PUBLIC(+) java.lang.String superclass
+	+++  NEW FIELD: PUBLIC(+) java.lang.String interfaceName
+	+++  NEW FIELD: PUBLIC(+) java.lang.String classJdk
+	+++  NEW FIELD: PUBLIC(+) java.lang.String fieldType
+	+++  NEW FIELD: PUBLIC(+) java.lang.String classType
+	+++  NEW FIELD: PUBLIC(+) java.lang.String status
+	+++  NEW CONSTRUCTOR: PUBLIC(+) MarkdownHeaderOptions()
++++  NEW CLASS: PUBLIC(+) japicmp.output.markdown.config.MarkdownMessageOptions  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW FIELD: PUBLIC(+) java.lang.String summaryPatchChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String semanticallyIncompatibleChangesIncludingDevelopmentVersions
+	+++  NEW FIELD: PUBLIC(+) java.lang.String added
+	+++  NEW FIELD: PUBLIC(+) java.lang.String statusSerializationIncompatible
+	+++  NEW FIELD: PUBLIC(+) java.lang.String oneNewVersion
+	+++  NEW FIELD: PUBLIC(+) java.lang.String badgePatchChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String statusRemoved
+	+++  NEW FIELD: PUBLIC(+) java.lang.String typeAnnotation
+	+++  NEW FIELD: PUBLIC(+) java.util.Map<japicmp.model.JApiJavaObjectSerializationCompatibility$JApiJavaObjectSerializationChangeStatus,java.lang.String> serializationCompatibility
+	+++  NEW FIELD: PUBLIC(+) java.lang.String generatedOn
+	+++  NEW FIELD: PUBLIC(+) java.lang.String statusUnchanged
+	+++  NEW FIELD: PUBLIC(+) java.lang.String summaryNoChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String modified
+	+++  NEW FIELD: PUBLIC(+) java.lang.String checked
+	+++  NEW FIELD: PUBLIC(+) java.lang.String accessModifierFilter
+	+++  NEW FIELD: PUBLIC(+) java.lang.String statusSourceIncompatible
+	+++  NEW FIELD: PUBLIC(+) java.lang.String expandResults
+	+++  NEW FIELD: PUBLIC(+) java.lang.String reportOnlySummary
+	+++  NEW FIELD: PUBLIC(+) java.lang.String unchecked
+	+++  NEW FIELD: PUBLIC(+) java.lang.String badgeMajorChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String newArchives
+	+++  NEW FIELD: PUBLIC(+) java.lang.String oldClasspath
+	+++  NEW FIELD: PUBLIC(+) java.lang.String statusModified
+	+++  NEW FIELD: PUBLIC(+) java.lang.String excludeSpecificElements
+	+++  NEW FIELD: PUBLIC(+) java.lang.String typeClass
+	+++  NEW FIELD: PUBLIC(+) java.lang.String colorNoChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String oneOldVersion
+	+++  NEW FIELD: PUBLIC(+) java.lang.String semanticallyIncompatibleChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String summaryMajorChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String newClasspath
+	+++  NEW FIELD: PUBLIC(+) java.lang.String no
+	+++  NEW FIELD: PUBLIC(+) java.lang.String compatibilitySerialization
+	+++  NEW FIELD: PUBLIC(+) java.lang.String ignoreAllMissingClasses
+	+++  NEW FIELD: PUBLIC(+) java.lang.String reportOnlyChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String manyOldArchives
+	+++  NEW FIELD: PUBLIC(+) java.lang.String statusBinaryIncompatible
+	+++  NEW FIELD: PUBLIC(+) java.lang.String colorVersionNumber
+	+++  NEW FIELD: PUBLIC(+) java.lang.String expandOptions
+	+++  NEW FIELD: PUBLIC(+) java.lang.String dateTimeFormat
+	+++  NEW FIELD: PUBLIC(+) java.lang.String statusIncompatible
+	+++  NEW FIELD: PUBLIC(+) java.lang.String colorMinorChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String statusNew
+	+++  NEW FIELD: PUBLIC(+) java.lang.String oldArchives
+	+++  NEW FIELD: PUBLIC(+) java.lang.String incompatibleChangesCausedByExcludedClasses
+	+++  NEW FIELD: PUBLIC(+) java.lang.String warningSomeMissingClassesIgnored
+	+++  NEW FIELD: PUBLIC(+) java.lang.String anyChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String typeInterface
+	+++  NEW FIELD: PUBLIC(+) java.lang.String badgeMinorChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String binaryIncompatibleChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String noCompatibilityChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String sourceIncompatibleChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String yes
+	+++  NEW FIELD: PUBLIC(+) java.lang.String unchanged
+	+++  NEW FIELD: PUBLIC(+) java.lang.String unknownVersion
+	+++  NEW FIELD: PUBLIC(+) java.lang.String compatibilityBinary
+	+++  NEW FIELD: PUBLIC(+) java.lang.String manyNewArchives
+	+++  NEW FIELD: PUBLIC(+) java.lang.String reportOnlyBinaryIncompatibleChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String treatChangesAsErrors
+	+++  NEW FIELD: PUBLIC(+) java.lang.String summaryMinorChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String includeSpecificElements
+	+++  NEW FIELD: PUBLIC(+) java.lang.String badgeNoChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String classpathMode
+	+++  NEW FIELD: PUBLIC(+) java.lang.String evaluateAnnotations
+	+++  NEW FIELD: PUBLIC(+) java.lang.String colorPatchChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String typeEnum
+	+++  NEW FIELD: PUBLIC(+) java.lang.String includeSynthetic
+	+++  NEW FIELD: PUBLIC(+) java.util.Map<japicmp.model.JApiCompatibilityChangeType,java.lang.String> compatibilityChangeType
+	+++  NEW FIELD: PUBLIC(+) java.lang.String removed
+	+++  NEW FIELD: PUBLIC(+) java.lang.String colorMajorChanges
+	+++  NEW FIELD: PUBLIC(+) java.lang.String warningAllMissingClassesIgnored
+	+++  NEW FIELD: PUBLIC(+) java.lang.String ignoreSpecificMissingClasses
+	+++  NEW FIELD: PUBLIC(+) java.lang.String compatibilitySource
+	+++  NEW CONSTRUCTOR: PUBLIC(+) MarkdownMessageOptions()
+	+++  NEW METHOD: PUBLIC(+) java.lang.String checkbox(boolean)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String getClassType(japicmp.util.Optional<japicmp.model.JApiClassType$ClassType>)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String getCurrentTimestamp()
+	+++  NEW METHOD: PUBLIC(+) java.lang.String getSemanticColor(japicmp.model.JApiSemanticVersionLevel)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String getSemverBadge(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String getSummaryMessage(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String yesNo(boolean)
++++  NEW CLASS: PUBLIC(+) japicmp.output.markdown.config.MarkdownOptions  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW FIELD: PUBLIC(+) japicmp.util.Optional<java.lang.String> targetNewVersion
+	+++  NEW FIELD: PUBLIC(+) japicmp.config.Options options
+	+++  NEW FIELD: PUBLIC(+) japicmp.util.Optional<java.lang.String> targetOldVersion
+	+++  NEW FIELD: PUBLIC(+) japicmp.output.markdown.config.MarkdownHeaderOptions header
+	+++  NEW FIELD: PUBLIC(+) japicmp.output.markdown.config.MarkdownSortOptions sort
+	+++  NEW FIELD: PUBLIC(+) japicmp.output.markdown.config.MarkdownTitleOptions title
+	+++  NEW FIELD: PUBLIC(+) japicmp.output.markdown.config.MarkdownMessageOptions message
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) japicmp.output.markdown.config.MarkdownOptions newDefault()
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) japicmp.output.markdown.config.MarkdownOptions newDefault(japicmp.config.Options)
+	+++  NEW METHOD: PUBLIC(+) void setTargetNewVersion(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) void setTargetOldVersion(java.lang.String)
++++  NEW CLASS: PUBLIC(+) japicmp.output.markdown.config.MarkdownSortOptions  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW FIELD: PUBLIC(+) java.util.Comparator<japicmp.model.JApiConstructor> constructors
+	+++  NEW FIELD: PUBLIC(+) java.util.Comparator<japicmp.model.JApiImplementedInterface> interfaces
+	+++  NEW FIELD: PUBLIC(+) java.util.Comparator<japicmp.model.JApiGenericTemplate> generics
+	+++  NEW FIELD: PUBLIC(+) java.util.Comparator<japicmp.model.JApiMethod> methods
+	+++  NEW FIELD: PUBLIC(+) java.util.Comparator<japicmp.model.JApiClass> classes
+	+++  NEW FIELD: PUBLIC(+) java.util.Comparator<japicmp.model.JApiAnnotation> annotations
+	+++  NEW FIELD: PUBLIC(+) java.util.Comparator<japicmp.model.JApiField> fields
+	+++  NEW CONSTRUCTOR: PUBLIC(+) MarkdownSortOptions()
++++  NEW CLASS: PUBLIC(+) japicmp.output.markdown.config.MarkdownTitleOptions  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW FIELD: PUBLIC(+) java.lang.String summary
+	+++  NEW FIELD: PUBLIC(+) java.lang.String constructors
+	+++  NEW FIELD: PUBLIC(+) java.lang.String interfaces
+	+++  NEW FIELD: PUBLIC(+) int topHeadingLevel
+	+++  NEW FIELD: PUBLIC(+) java.lang.String generics
+	+++  NEW FIELD: PUBLIC(+) java.lang.String methods
+	+++  NEW FIELD: PUBLIC(+) java.lang.String report
+	+++  NEW FIELD: PUBLIC(+) java.lang.String annotations
+	+++  NEW FIELD: PUBLIC(+) java.lang.String fields
+	+++  NEW FIELD: PUBLIC(+) java.lang.String results
+	+++  NEW CONSTRUCTOR: PUBLIC(+) MarkdownTitleOptions()
++++  NEW CLASS: PUBLIC(+) ABSTRACT(+) japicmp.output.markdown.Markdown  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String QUOTE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String UNDERSCORE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.util.stream.Collector<java.lang.CharSequence,?,java.lang.String> SPACES
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String ANGLE_CLOSE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String PARAGRAPH
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) char PIPE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String DASH
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.util.stream.Collector<java.lang.CharSequence,?,java.lang.String> LINES
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String SPACE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String BRACKET_CLOSE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.util.stream.Collector<java.lang.CharSequence,?,java.lang.String> BR
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String BACKSLASH
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String BACKTICK
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String EMPTY
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String EOL
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String PARENTHESIS_OPEN
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String BANG
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String EQUAL
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.util.stream.Collector<java.lang.CharSequence,?,java.lang.String> CSV
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String DOT
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String COLON
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String HASH
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String PARENTHESIS_CLOSE
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String BRACKET_OPEN
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String ANGLE_OPEN
+	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) java.lang.String MARKDOWN_HORIZONTAL_RULE
+	+++  NEW CONSTRUCTOR: PUBLIC(+) Markdown()
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String angles(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String backticks(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String brackets(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String parenthesis(java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String quotes(java.lang.String)
++++  NEW CLASS: PUBLIC(+) japicmp.output.markdown.MarkdownBadge  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: japicmp.output.markdown.Markdown
+	+++  NEW CONSTRUCTOR: PUBLIC(+) MarkdownBadge(java.lang.String, java.lang.String, java.lang.String)
+	+++  NEW CONSTRUCTOR: PUBLIC(+) MarkdownBadge(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) japicmp.output.markdown.MarkdownRefImage toRefImage(japicmp.output.markdown.MarkdownReferences, java.lang.String, java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) japicmp.output.markdown.MarkdownRefImage toRefImage(japicmp.output.markdown.MarkdownReferences, java.lang.String)
+	+++  NEW METHOD: PUBLIC(+) japicmp.output.markdown.MarkdownRefImage toRefImage(japicmp.output.markdown.MarkdownReferences)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String toString()
++++  NEW CLASS: PUBLIC(+) japicmp.output.markdown.MarkdownOutputGenerator  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: japicmp.output.OutputGenerator
+	+++  NEW CONSTRUCTOR: PUBLIC(+) MarkdownOutputGenerator(japicmp.output.markdown.config.MarkdownOptions, java.util.List<japicmp.model.JApiClass>)
+	+++  NEW CONSTRUCTOR: PUBLIC(+) MarkdownOutputGenerator(japicmp.config.Options, java.util.List<japicmp.model.JApiClass>)
+	+++  NEW METHOD: PUBLIC(+) java.lang.String generate()
++++  NEW CLASS: PUBLIC(+) japicmp.util.JApiClassFileFormatVersionHelper  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String getNewJdkVersion(japicmp.model.JApiClassFileFormatVersion)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String getOldJdkVersion(japicmp.model.JApiClassFileFormatVersion)
++++  NEW CLASS: PUBLIC(+) japicmp.util.MemberValueHelper  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String formatMemberValue(javassist.bytecode.annotation.MemberValue, boolean)
+***  MODIFIED CLASS: PUBLIC japicmp.util.ModifierHelper  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW METHOD: PUBLIC(+) STATIC(+) void main(java.lang.String[])
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) japicmp.util.Optional<java.lang.String> getNewModifierName(japicmp.model.JApiModifier<? extends java.lang.Enum<? extends java.lang.Enum<? extends ?>>>)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) japicmp.util.Optional<java.lang.String> getOldModifierName(japicmp.model.JApiModifier<? extends java.lang.Enum<? extends java.lang.Enum<? extends ?>>>)
++++  NEW CLASS: PUBLIC(+) japicmp.util.TypeNameHelper  (not serializable)
+	+++  CLASS FILE FORMAT VERSION: 52.0 <- n.a.
+	+++  NEW SUPERCLASS: java.lang.Object
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String formatGenericTemplate(java.lang.String, java.lang.String, java.util.List<japicmp.model.JApiGenericType>, boolean)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String formatParameterTypeName(japicmp.model.JApiBehavior, japicmp.model.JApiParameter, japicmp.util.Optional<japicmp.model.VarargsModifier>, java.util.List<japicmp.model.JApiGenericType>, boolean)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String formatTypeName(java.lang.String, java.util.List<japicmp.model.JApiGenericType>, int)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String formatTypeName(java.lang.String, japicmp.model.JApiHasChangeStatus, japicmp.model.JApiHasGenericTemplates, int)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String formatTypeName(java.lang.String, java.util.List<japicmp.model.JApiGenericType>, boolean)
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String formatTypeName(java.lang.String, japicmp.model.JApiHasChangeStatus, japicmp.model.JApiHasGenericTemplates, boolean)
 
 Semantic versioning suggestion: 0.0.1

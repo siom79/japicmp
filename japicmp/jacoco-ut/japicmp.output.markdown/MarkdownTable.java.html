@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MarkdownTable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.markdown</a> &gt; <span class="el_source">MarkdownTable.java</span></div><h1>MarkdownTable.java</h1><pre class="source lang-java linenums">package japicmp.output.markdown;
+
+import static java.util.stream.Collectors.joining;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.*;
+
+final class MarkdownTable extends Markdown {
+
+	final int columns;
+<span class="fc" id="L12">	final List&lt;List&lt;String&gt;&gt; rows = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L14">	MarkdownTable(List&lt;String&gt; headers) {</span>
+<span class="fc" id="L15">		columns = headers.size();</span>
+<span class="fc" id="L16">		rows.add(headers);</span>
+<span class="fc" id="L17">	}</span>
+
+	static String getColumnFormat(int width) {
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">		return width &lt; 1 ? &quot;%s&quot; : &quot;%-&quot; + width + &quot;s&quot;;</span>
+	}
+
+	void addRow(List&lt;String&gt; row) {
+<span class="fc" id="L24">		rows.add(row);</span>
+<span class="fc" id="L25">	}</span>
+
+	@Override
+	public String toString() {
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">		if (rows.size() == 1) {</span>
+<span class="nc" id="L30">			return EMPTY;</span>
+		}
+<span class="fc" id="L32">		final Map&lt;Integer, Integer&gt; colWidths = calculateColumnWidths();</span>
+<span class="fc" id="L33">		return IntStream.range(0, rows.size()).mapToObj(r -&gt; {</span>
+<span class="fc" id="L34">			final List&lt;String&gt; row = rows.get(r);</span>
+<span class="fc" id="L35">			final StringBuilder tmp = new StringBuilder();</span>
+<span class="fc" id="L36">			tmp.append(new Row(row, colWidths));</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">			if (r == 0) {</span>
+<span class="fc" id="L38">				tmp.append(PIPE);</span>
+<span class="fc" id="L39">				IntStream.range(0, columns).forEach(index -&gt; tmp</span>
+<span class="fc" id="L40">					.append(DASH)</span>
+<span class="fc" id="L41">					.append(String.format(getColumnFormat(colWidths.get(index)), EMPTY).replace(SPACE, DASH))</span>
+<span class="fc" id="L42">					.append(DASH)</span>
+<span class="fc" id="L43">					.append(PIPE));</span>
+<span class="fc" id="L44">				tmp.append(EOL);</span>
+			}
+<span class="fc" id="L46">			return tmp.toString();</span>
+<span class="fc" id="L47">		}).collect(joining()) + EOL;</span>
+	}
+
+	private Map&lt;Integer, Integer&gt; calculateColumnWidths() {
+<span class="fc" id="L51">		return IntStream.range(0, columns).mapToObj(Integer.class::cast)</span>
+<span class="fc" id="L52">			.collect(Collectors.toMap(Function.identity(), this::calculateMaxWidth));</span>
+	}
+
+	private int calculateMaxWidth(int index) {
+<span class="fc bfc" id="L56" title="All 2 branches covered.">		if (index + 1 &lt; columns) {</span>
+			// Columns adjust dynamically up to a fixed limit
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">			return rows.stream().map(x -&gt; x.get(index)).mapToInt(String::length).filter(x -&gt; x &lt;= 64).max().orElse(0);</span>
+		}
+		// Last column adjusts to heading size
+<span class="fc" id="L61">		return rows.get(0).get(index).length();</span>
+	}
+
+	private class Row {
+
+		final List&lt;String&gt; data;
+		final Map&lt;Integer, Integer&gt; widths;
+<span class="fc" id="L68">		int offset = 0;</span>
+
+<span class="fc" id="L70">		Row(List&lt;String&gt; data, Map&lt;Integer, Integer&gt; widths) {</span>
+<span class="fc" id="L71">			this.data = data;</span>
+<span class="fc" id="L72">			this.widths = widths;</span>
+<span class="fc" id="L73">		}</span>
+
+		String formatColumn(int index) {
+<span class="fc" id="L76">			final int width = widths.get(index);</span>
+<span class="fc" id="L77">			final int maxWidth = Math.max(0, width - offset);</span>
+<span class="fc" id="L78">			final String formatted = String.format(getColumnFormat(maxWidth), data.get(index));</span>
+<span class="fc" id="L79">			final int length = formatted.length();</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">			if (length &lt;= width) {</span>
+<span class="fc" id="L81">				offset -= width - length;</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">			} else if (length &gt; maxWidth) {</span>
+<span class="fc" id="L83">				offset += length - maxWidth;</span>
+			}
+<span class="fc" id="L85">			offset = Math.max(0, offset);</span>
+<span class="fc" id="L86">			return formatted;</span>
+		}
+
+		@Override
+		public String toString() {
+<span class="fc" id="L91">			return PIPE + IntStream.range(0, columns)</span>
+<span class="fc" id="L92">				.mapToObj(index -&gt; SPACE + formatColumn(index) + SPACE + PIPE)</span>
+<span class="fc" id="L93">				.collect(joining()) +</span>
+				EOL;
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

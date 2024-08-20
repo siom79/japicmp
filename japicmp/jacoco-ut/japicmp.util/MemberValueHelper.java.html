@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MemberValueHelper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.util</a> &gt; <span class="el_source">MemberValueHelper.java</span></div><h1>MemberValueHelper.java</h1><pre class="source lang-java linenums">package japicmp.util;
+
+import static japicmp.util.TypeNameHelper.formatTypeName;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
+import static java.util.Arrays.stream;
+
+import java.util.Set;
+import javassist.bytecode.annotation.*;
+
+public class MemberValueHelper {
+
+	private MemberValueHelper() {
+	}
+
+	/**
+	 * Formats an annotation's member value.
+	 *
+	 * @param value   The member value.
+	 * @param shorten Whether to truncate types to 32 characters or not.
+	 * @return        The formatted member value.
+	 */
+	public static String formatMemberValue(MemberValue value, boolean shorten) {
+<span class="nc bnc" id="L24" title="All 2 branches missed.">		if (value instanceof AnnotationMemberValue) {</span>
+<span class="nc" id="L25">			final Annotation annotation = ((AnnotationMemberValue) value).getValue();</span>
+<span class="nc" id="L26">			final Set&lt;String&gt; names = annotation.getMemberNames();</span>
+<span class="nc" id="L27">			final String typeName = formatTypeName(annotation.getTypeName(), emptyList(), shorten);</span>
+<span class="nc bnc" id="L28" title="All 2 branches missed.">			if (names.isEmpty()) {</span>
+<span class="nc" id="L29">				return typeName;</span>
+			}
+<span class="nc" id="L31">			return typeName + &quot;(&quot; + names.stream().map(annotation::getMemberValue).map(MemberValue::toString).collect(joining(&quot;, &quot;)) + &quot;)&quot;;</span>
+<span class="nc bnc" id="L32" title="All 2 branches missed.">		} else if (value instanceof ArrayMemberValue) {</span>
+<span class="nc" id="L33">			return &quot;{&quot; + stream(((ArrayMemberValue) value).getValue()).map(x -&gt; formatMemberValue(x, shorten)).collect(joining(&quot;, &quot;)) + &quot;}&quot;;</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">		} else if (value instanceof BooleanMemberValue) {</span>
+<span class="nc" id="L35">			return Boolean.toString(((BooleanMemberValue) value).getValue());</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">		} else if (value instanceof ByteMemberValue) {</span>
+<span class="nc" id="L37">			return Byte.toString(((ByteMemberValue) value).getValue());</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">		} else if (value instanceof CharMemberValue) {</span>
+<span class="nc" id="L39">			return Character.toString(((CharMemberValue) value).getValue());</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">		} else if (value instanceof FloatMemberValue) {</span>
+<span class="nc" id="L41">			return Float.toString(((FloatMemberValue) value).getValue());</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">		} else if (value instanceof DoubleMemberValue) {</span>
+<span class="nc" id="L43">			return Double.toString(((DoubleMemberValue) value).getValue());</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">		} else if (value instanceof ShortMemberValue) {</span>
+<span class="nc" id="L45">			return Short.toString(((ShortMemberValue) value).getValue());</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">		} else if (value instanceof IntegerMemberValue) {</span>
+<span class="nc" id="L47">			return Integer.toString(((IntegerMemberValue) value).getValue());</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">		} else if (value instanceof LongMemberValue) {</span>
+<span class="nc" id="L49">			return Long.toString(((LongMemberValue) value).getValue());</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">		} else if (value instanceof EnumMemberValue) {</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">			return shorten ? ((EnumMemberValue) value).getValue() : value.toString();</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">		} else if (value instanceof StringMemberValue) {</span>
+<span class="nc" id="L53">			return &quot;\&quot;&quot; + ((StringMemberValue) value).getValue() + &quot;\&quot;&quot;;</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">		} else if (value instanceof ClassMemberValue) {</span>
+<span class="nc" id="L55">			return TypeNameHelper.formatTypeName(((ClassMemberValue) value).getValue(), emptyList(), shorten);</span>
+		}
+<span class="nc" id="L57">		return value.toString();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MarkdownSection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.markdown</a> &gt; <span class="el_source">MarkdownSection.java</span></div><h1>MarkdownSection.java</h1><pre class="source lang-java linenums">package japicmp.output.markdown;
+
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+final class MarkdownSection&lt;T&gt; extends Markdown {
+
+	private final String title;
+	private final List&lt;T&gt; list;
+	private final Comparator&lt;? super T&gt; comparator;
+<span class="fc" id="L17">	private final List&lt;Column&lt;T&gt;&gt; columns = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L19">	MarkdownSection(String title, List&lt;T&gt; list, Comparator&lt;? super T&gt; comparator) {</span>
+<span class="fc" id="L20">		this.title = title;</span>
+<span class="fc" id="L21">		this.list = list;</span>
+<span class="fc" id="L22">		this.comparator = comparator;</span>
+<span class="fc" id="L23">	}</span>
+
+	MarkdownSection(String title, T one) {
+<span class="fc" id="L26">		this(title, singletonList(one), null);</span>
+<span class="fc" id="L27">	}</span>
+
+	MarkdownSection&lt;T&gt; column(String header, Function&lt;T, String&gt; mapper) {
+<span class="fc" id="L30">		this.columns.add(new Column&lt;&gt;(header, mapper));</span>
+<span class="fc" id="L31">		return this;</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="fc bfc" id="L36" title="All 2 branches covered.">		if (list.isEmpty()) {</span>
+<span class="fc" id="L37">			return EMPTY;</span>
+		}
+<span class="fc bfc" id="L39" title="All 2 branches covered.">		final Stream&lt;T&gt; stream = comparator == null ? list.stream() : list.stream().sorted(comparator);</span>
+<span class="fc" id="L40">		final MarkdownTable table = new MarkdownTable(columns.stream().map(column -&gt; column.header).collect(toList()));</span>
+<span class="fc" id="L41">		stream.forEach(x -&gt; table.addRow(columns.stream().map(column -&gt; column.mapper.apply(x)).collect(toList())));</span>
+<span class="fc" id="L42">		return title + table;</span>
+	}
+
+	private static final class Column&lt;T&gt; {
+		final String header;
+		final Function&lt;T, String&gt; mapper;
+
+<span class="fc" id="L49">		Column(String header, Function&lt;T, String&gt; mapper) {</span>
+<span class="fc" id="L50">			this.header = header;</span>
+<span class="fc" id="L51">			this.mapper = mapper;</span>
+<span class="fc" id="L52">		}</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

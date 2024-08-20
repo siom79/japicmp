@@ -9,6 +9,8 @@ japicmp.model
 japicmp.output
 japicmp.output.html
 japicmp.output.incompatible
+japicmp.output.markdown
+japicmp.output.markdown.config
 japicmp.output.semver
 japicmp.output.stdout
 japicmp.output.xml

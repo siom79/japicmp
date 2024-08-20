@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MarkdownMessageOptions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.markdown.config</a> &gt; <span class="el_source">MarkdownMessageOptions.java</span></div><h1>MarkdownMessageOptions.java</h1><pre class="source lang-java linenums">package japicmp.output.markdown.config;
+
+import static japicmp.output.markdown.Markdown.*;
+import static japicmp.output.semver.SemverOut.*;
+import static java.util.Arrays.stream;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
+import japicmp.model.*;
+import japicmp.model.JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus;
+import japicmp.output.markdown.MarkdownBadge;
+import japicmp.util.Optional;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+
+<span class="fc" id="L17">public class MarkdownMessageOptions {</span>
+
+<span class="fc" id="L19">	public String summaryMajorChanges = &quot;&gt; [!CAUTION]\n&gt;\n&gt; Incompatible changes found while checking backward compatibility of %s with %s.&quot;;</span>
+<span class="fc" id="L20">	public String summaryMinorChanges = &quot;&gt; [!WARNING]\n&gt;\n&gt; Compatible changes found while checking backward compatibility of %s with %s.&quot;;</span>
+<span class="fc" id="L21">	public String summaryPatchChanges = &quot;&gt; [!IMPORTANT]\n&gt;\n&gt; Compatible bug fixes found while checking backward compatibility of %s with %s.&quot;;</span>
+<span class="fc" id="L22">	public String summaryNoChanges    = &quot;&gt; [!NOTE]\n&gt;\n&gt; No incompatible changes found while checking backward compatibility of %s with %s.&quot;;</span>
+
+<span class="fc" id="L24">	public String oneNewVersion   = &quot;version `%s`&quot;;</span>
+<span class="fc" id="L25">	public String oneOldVersion   = &quot;the previous version `%s`&quot;;</span>
+<span class="fc" id="L26">	public String manyNewArchives = &quot;several archives&quot;;</span>
+<span class="fc" id="L27">	public String manyOldArchives = &quot;their previous versions&quot;;</span>
+<span class="fc" id="L28">	public String unknownVersion  = &quot;unknown&quot;;</span>
+<span class="fc" id="L29">	public String expandResults   = &quot;Expand for details.&quot;;</span>
+<span class="fc" id="L30">	public String expandOptions   = &quot;Expand to see options used.&quot;;</span>
+
+<span class="fc" id="L32">	public String warningAllMissingClassesIgnored  = &quot;&gt; [!WARNING]\n&gt;\n&gt; All missing classes, i.e. superclasses and interfaces that could not be found on the classpath were ignored.\n&gt;\n&gt; Hence changes caused by these superclasses and interfaces are not reflected in the output.\n\n&quot;;</span>
+<span class="fc" id="L33">	public String warningSomeMissingClassesIgnored = &quot;&gt; [!WARNING]\n&gt;\n&gt; Certain classes, i.e. superclasses and interfaces that could not be found on the classpath were ignored.\n&gt;\n&gt; Hence changes caused by these superclasses and interfaces are not reflected in the output.\n\n&quot;;</span>
+
+<span class="fc" id="L35">	public String generatedOn    = &quot;*Generated on: %s*.&quot;;</span>
+<span class="fc" id="L36">	public String dateTimeFormat = &quot;yyyy-MM-dd HH:mm:ss.SSSZ&quot;;</span>
+
+<span class="fc" id="L38">	public String classpathMode                       = &quot;**Classpath mode**: `%s`&quot;;</span>
+<span class="fc" id="L39">	public String oldArchives                         = &quot;**Old archives**:%s&quot;;</span>
+<span class="fc" id="L40">	public String newArchives                         = &quot;**New archives**:%s&quot;;</span>
+<span class="fc" id="L41">	public String oldClasspath                        = &quot;**Old classpath**:\n```\n%s\n```&quot;;</span>
+<span class="fc" id="L42">	public String newClasspath                        = &quot;**New classpath**:\n```\n%s\n```&quot;;</span>
+<span class="fc" id="L43">	public String accessModifierFilter                = &quot;**Access modifier filter**: `%s`&quot;;</span>
+<span class="fc" id="L44">	public String evaluateAnnotations                 = &quot;**Evaluate annotations**: %s&quot;;</span>
+<span class="fc" id="L45">	public String reportOnlySummary                   = &quot;**Report only summary**: %s&quot;;</span>
+<span class="fc" id="L46">	public String reportOnlyChanges                   = &quot;**Report only changes**: %s&quot;;</span>
+<span class="fc" id="L47">	public String reportOnlyBinaryIncompatibleChanges = &quot;**Report only binary-incompatible changes**: %s&quot;;</span>
+<span class="fc" id="L48">	public String includeSpecificElements             = &quot;**Include specific elements**: %s&quot;;</span>
+<span class="fc" id="L49">	public String includeSynthetic                    = &quot;**Include synthetic classes and class members**: %s&quot;;</span>
+<span class="fc" id="L50">	public String excludeSpecificElements             = &quot;**Exclude specific elements**: %s&quot;;</span>
+<span class="fc" id="L51">	public String ignoreAllMissingClasses             = &quot;**Ignore all missing classes**: %s&quot;;</span>
+<span class="fc" id="L52">	public String ignoreSpecificMissingClasses        = &quot;**Ignore specific missing classes**: %s&quot;;</span>
+<span class="fc" id="L53">	public String treatChangesAsErrors                = &quot;**Treat changes as errors**:%s&quot;;</span>
+
+<span class="fc" id="L55">	public String anyChanges                                                  = &quot;Any changes: %s&quot;;</span>
+<span class="fc" id="L56">	public String binaryIncompatibleChanges                                   = &quot;Binary incompatible changes: %s&quot;;</span>
+<span class="fc" id="L57">	public String sourceIncompatibleChanges                                   = &quot;Source incompatible changes: %s&quot;;</span>
+<span class="fc" id="L58">	public String incompatibleChangesCausedByExcludedClasses                  = &quot;Incompatible changes caused by excluded classes: %s&quot;;</span>
+<span class="fc" id="L59">	public String semanticallyIncompatibleChanges                             = &quot;Semantically incompatible changes: %s&quot;;</span>
+<span class="fc" id="L60">	public String semanticallyIncompatibleChangesIncludingDevelopmentVersions = &quot;Semantically incompatible changes, including development versions: %s&quot;;</span>
+
+<span class="fc" id="L62">	public String added     = &quot;**%s**&quot;;</span>
+<span class="fc" id="L63">	public String removed   = &quot;~~%s~~&quot;;</span>
+<span class="fc" id="L64">	public String modified  = &quot;~~%s~~ &amp;rarr; **%s**&quot;;</span>
+<span class="fc" id="L65">	public String unchanged = &quot;%s&quot;;</span>
+
+<span class="fc" id="L67">	public String yes = &quot;Yes&quot;;</span>
+<span class="fc" id="L68">	public String no  = &quot;No&quot;;</span>
+
+<span class="fc" id="L70">	public String checked   = &quot;[X]&quot;;</span>
+<span class="fc" id="L71">	public String unchecked = &quot;[ ]&quot;;</span>
+
+<span class="fc" id="L73">	public String compatibilityBinary        = &quot;%s Binary-compatible&quot;;</span>
+<span class="fc" id="L74">	public String compatibilitySource        = &quot;%s Source-compatible&quot;;</span>
+<span class="fc" id="L75">	public String compatibilitySerialization = &quot;%s Serialization-compatible&quot;;</span>
+
+<span class="fc" id="L77">	public String noCompatibilityChanges = &quot;No changes&quot;;</span>
+
+<span class="fc" id="L79">	public String colorMajorChanges  = &quot;red&quot;;</span>
+<span class="fc" id="L80">	public String colorMinorChanges  = &quot;orange&quot;;</span>
+<span class="fc" id="L81">	public String colorPatchChanges  = &quot;yellow&quot;;</span>
+<span class="fc" id="L82">	public String colorNoChanges     = &quot;green&quot;;</span>
+<span class="fc" id="L83">	public String colorVersionNumber = &quot;blue&quot;;</span>
+
+<span class="fc" id="L85">	public String badgeMajorChanges = new MarkdownBadge(&quot;semver&quot;, &quot;MAJOR&quot;, colorMajorChanges, &quot;semver&quot;).toString();</span>
+<span class="fc" id="L86">	public String badgeMinorChanges = new MarkdownBadge(&quot;semver&quot;, &quot;MINOR&quot;, colorMinorChanges, &quot;semver&quot;).toString();</span>
+<span class="fc" id="L87">	public String badgePatchChanges = new MarkdownBadge(&quot;semver&quot;, &quot;PATCH&quot;, colorPatchChanges, &quot;semver&quot;).toString();</span>
+<span class="fc" id="L88">	public String badgeNoChanges    = new MarkdownBadge(&quot;semver&quot;, &quot;OK&quot;, colorNoChanges, &quot;semver&quot;).toString();</span>
+
+<span class="fc" id="L90">	public String typeAnnotation = &quot;Annotation&quot;;</span>
+<span class="fc" id="L91">	public String typeInterface  = &quot;Interface&quot;;</span>
+<span class="fc" id="L92">	public String typeClass      = &quot;Class&quot;;</span>
+<span class="fc" id="L93">	public String typeEnum       = &quot;Enum&quot;;</span>
+
+<span class="fc" id="L95">	public String statusNew                       = &quot;Added&quot;;</span>
+<span class="fc" id="L96">	public String statusRemoved                   = &quot;Removed&quot;;</span>
+<span class="fc" id="L97">	public String statusModified                  = &quot;Modified&quot;;</span>
+<span class="fc" id="L98">	public String statusUnchanged                 = &quot;Unchanged&quot;;</span>
+<span class="fc" id="L99">	public String statusIncompatible              = &quot;Incompatible&quot;;</span>
+<span class="fc" id="L100">	public String statusSourceIncompatible        = &quot;Source-incompatible&quot;;</span>
+<span class="fc" id="L101">	public String statusBinaryIncompatible        = &quot;Binary-incompatible&quot;;</span>
+<span class="fc" id="L102">	public String statusSerializationIncompatible = &quot;Serialization-incompatible&quot;;</span>
+
+<span class="fc" id="L104">	public Map&lt;JApiJavaObjectSerializationChangeStatus, String&gt; serializationCompatibility =</span>
+<span class="fc" id="L105">		stream(JApiJavaObjectSerializationChangeStatus.values()).collect(toMap(identity(), e -&gt; capitalize(e.getDescription())));</span>
+
+<span class="fc" id="L107">	public Map&lt;JApiCompatibilityChangeType, String&gt; compatibilityChangeType =</span>
+<span class="fc" id="L108">		stream(JApiCompatibilityChangeType.values()).collect(toMap(identity(), e -&gt; capitalize(e.name())));</span>
+
+	private static String capitalize(String text) {
+<span class="fc" id="L111">		return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase().replace(UNDERSCORE, SPACE);</span>
+	}
+
+	public String getSemanticColor(JApiSemanticVersionLevel level) {
+<span class="pc bpc" id="L115" title="1 of 3 branches missed.">		switch (level) {</span>
+			default:
+			case MAJOR:
+<span class="fc" id="L118">				return colorMajorChanges;</span>
+			case MINOR:
+<span class="fc" id="L120">				return colorMinorChanges;</span>
+			case PATCH:
+<span class="nc" id="L122">				return colorPatchChanges;</span>
+		}
+	}
+
+	public String getSemverBadge(String semver) {
+<span class="fc bfc" id="L127" title="All 4 branches covered.">		switch (semver) {</span>
+			case SEMVER_MAJOR:
+<span class="fc" id="L129">				return badgeMajorChanges;</span>
+			case SEMVER_MINOR:
+<span class="fc" id="L131">				return badgeMinorChanges;</span>
+			case SEMVER_PATCH:
+<span class="fc" id="L133">				return badgePatchChanges;</span>
+			case SEMVER_COMPATIBLE:
+			default:
+<span class="fc" id="L136">				return badgeNoChanges;</span>
+		}
+	}
+
+	public String getSummaryMessage(String semver) {
+<span class="fc bfc" id="L141" title="All 4 branches covered.">		switch (semver) {</span>
+			case SEMVER_MAJOR:
+<span class="fc" id="L143">				return summaryMajorChanges;</span>
+			case SEMVER_MINOR:
+<span class="fc" id="L145">				return summaryMinorChanges;</span>
+			case SEMVER_PATCH:
+<span class="fc" id="L147">				return summaryPatchChanges;</span>
+			case SEMVER_COMPATIBLE:
+			default:
+<span class="fc" id="L150">				return summaryNoChanges;</span>
+		}
+	}
+
+	public String getClassType(Optional&lt;JApiClassType.ClassType&gt; classType) {
+<span class="fc bfc" id="L155" title="All 2 branches covered.">		if (!classType.isPresent()) {</span>
+<span class="fc" id="L156">			return EMPTY;</span>
+		}
+<span class="pc bpc" id="L158" title="2 of 4 branches missed.">		switch (classType.get()) {</span>
+			case ANNOTATION:
+<span class="nc" id="L160">				return typeAnnotation;</span>
+			case INTERFACE:
+<span class="fc" id="L162">				return typeInterface;</span>
+			default:
+			case CLASS:
+<span class="fc" id="L165">				return typeClass;</span>
+			case ENUM:
+<span class="nc" id="L167">				return typeEnum;</span>
+		}
+	}
+
+	public String getCurrentTimestamp() {
+<span class="fc" id="L172">		final ZonedDateTime now = ZonedDateTime.now();</span>
+		try {
+<span class="fc" id="L174">			return DateTimeFormatter.ofPattern(dateTimeFormat).format(now);</span>
+<span class="nc" id="L175">		} catch (Exception e) {</span>
+<span class="nc" id="L176">			return now.toString();</span>
+		}
+	}
+
+	public String yesNo(boolean value) {
+<span class="fc bfc" id="L181" title="All 2 branches covered.">		return value ? yes : no;</span>
+	}
+
+	public String checkbox(boolean value) {
+<span class="fc bfc" id="L185" title="All 2 branches covered.">		return value ? checked : unchecked;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

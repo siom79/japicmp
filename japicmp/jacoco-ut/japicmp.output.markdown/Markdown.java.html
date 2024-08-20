@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Markdown.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.output.markdown</a> &gt; <span class="el_source">Markdown.java</span></div><h1>Markdown.java</h1><pre class="source lang-java linenums">package japicmp.output.markdown;
+
+import static java.util.stream.Collectors.joining;
+
+import java.util.stream.Collector;
+
+<span class="fc" id="L7">public abstract class Markdown {</span>
+
+	public static final String EOL = &quot;\n&quot;;
+	public static final String PARAGRAPH = &quot;\n\n&quot;;
+	public static final String SPACE = &quot; &quot;;
+	public static final String EMPTY = &quot;&quot;;
+	public static final String DASH = &quot;-&quot;;
+	public static final String UNDERSCORE = &quot;_&quot;;
+	public static final String QUOTE = &quot;\&quot;&quot;;
+	public static final String BACKSLASH = &quot;\\&quot;;
+	public static final String PARENTHESIS_OPEN = &quot;(&quot;;
+	public static final String PARENTHESIS_CLOSE = &quot;)&quot;;
+	public static final String ANGLE_OPEN = &quot;&lt;&quot;;
+	public static final String ANGLE_CLOSE = &quot;&gt;&quot;;
+	public static final String BRACKET_OPEN = &quot;[&quot;;
+	public static final String BRACKET_CLOSE = &quot;]&quot;;
+	public static final String BANG = &quot;!&quot;;
+	public static final String HASH = &quot;#&quot;;
+	public static final String COLON = &quot;:&quot;;
+	public static final String EQUAL = &quot;=&quot;;
+	public static final String DOT = &quot;.&quot;;
+	public static final char PIPE = '|';
+	public static final String BACKTICK = &quot;`&quot;;
+	public static final String MARKDOWN_HORIZONTAL_RULE = &quot;___&quot;;
+<span class="fc" id="L31">	public static final Collector&lt;CharSequence, ?, String&gt; LINES = joining(EOL);</span>
+<span class="fc" id="L32">	public static final Collector&lt;CharSequence, ?, String&gt; SPACES = joining(SPACE);</span>
+<span class="fc" id="L33">	public static final Collector&lt;CharSequence, ?, String&gt; CSV = joining(&quot;, &quot;);</span>
+<span class="fc" id="L34">	public static final Collector&lt;CharSequence, ?, String&gt; BR = joining(&quot;&lt;br&gt;&quot;);</span>
+
+	public static String quotes(String text) {
+<span class="fc" id="L37">		return QUOTE + text + QUOTE;</span>
+	}
+
+	public static String backticks(String text) {
+<span class="fc" id="L41">		return BACKTICK + text + BACKTICK;</span>
+	}
+
+	public static String angles(String text) {
+<span class="fc" id="L45">		return ANGLE_OPEN + text + ANGLE_CLOSE;</span>
+	}
+
+	public static String brackets(String text) {
+<span class="fc" id="L49">		return BRACKET_OPEN + text + BRACKET_CLOSE;</span>
+	}
+
+	public static String parenthesis(String text) {
+<span class="fc" id="L53">		return PARENTHESIS_OPEN + text + PARENTHESIS_CLOSE;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

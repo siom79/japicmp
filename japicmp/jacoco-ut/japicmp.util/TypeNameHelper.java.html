@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TypeNameHelper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.util</a> &gt; <span class="el_source">TypeNameHelper.java</span></div><h1>TypeNameHelper.java</h1><pre class="source lang-java linenums">package japicmp.util;
+
+import static japicmp.model.VarargsModifier.*;
+import static java.util.stream.Collectors.joining;
+
+import japicmp.model.*;
+import java.util.List;
+
+public class TypeNameHelper {
+
+	private static final String STR_ARRAY = &quot;[]&quot;;
+	private static final String STR_VARARGS = &quot;...&quot;;
+
+	private TypeNameHelper() {
+	}
+
+	/**
+	 * Formats a generic template.
+	 *
+	 * @param name            The generic template name.
+	 * @param type            The type extended by the generic template.
+	 * @param genericTypes    The generic types of the generic template.
+	 * @param shorten         Whether to truncate types to 32 characters or not.
+	 * @return                A string with the format {@code &quot;NAME extends TYPE&lt;GENERIC TYPES&gt;&quot;}.
+	 */
+	public static String formatGenericTemplate(String name, String type, List&lt;JApiGenericType&gt; genericTypes, boolean shorten) {
+<span class="nc bnc" id="L27" title="All 2 branches missed.">		return type == null ? name : name + &quot; extends &quot; + formatTypeName(type, genericTypes, shorten);</span>
+	}
+
+	/**
+	 * Formats a Java type in FQN form plus generic types.
+	 *
+	 * @param typeName     The fully qualified type name to format.
+	 * @param genericTypes The possibly empty list of generic types.
+	 * @param maxLength	   The maximum number of characters that will be produced.
+	 *                     If greater or equal to 3, the FQN will be truncated to its simple name,
+	 *                     and surplus characters will be replaced with the ellipsis character.
+	 * @return             The formatted type.
+	 */
+	public static String formatTypeName(String typeName, List&lt;JApiGenericType&gt; genericTypes, int maxLength) {
+<span class="pc bpc" id="L41" title="2 of 6 branches missed.">		if (typeName == null || typeName.isEmpty() || typeName.equals(OptionalHelper.N_A)) {</span>
+<span class="fc" id="L42">			return typeName;</span>
+		}
+<span class="fc" id="L44">		return truncateTypeName(typeName, maxLength) + formatGenericTypes(genericTypes, maxLength);</span>
+	}
+
+	/**
+	 * Formats a Java type in FQN form plus generic templates.
+	 *
+	 * @param typeName            The fully qualified type name to format.
+	 * @param hasChangeStatus     The element that has a change status.
+	 * @param hasGenericTemplates The element that has generic templates.
+	 * @param maxLength           The maximum number of characters that will be produced.
+	 *                            If greater or equal to 3, the FQN will be truncated to its simple name,
+	 *                            and surplus characters will be replaced with the ellipsis character.
+	 * @return                    The formatted type.
+	 */
+	public static String formatTypeName(String typeName, JApiHasChangeStatus hasChangeStatus, JApiHasGenericTemplates hasGenericTemplates, int maxLength) {
+<span class="pc bpc" id="L59" title="3 of 6 branches missed.">		if (typeName == null || typeName.isEmpty() || typeName.equals(OptionalHelper.N_A)) {</span>
+<span class="nc" id="L60">			return typeName;</span>
+		}
+<span class="fc bfc" id="L62" title="All 2 branches covered.">		return truncateTypeName(typeName, maxLength) + (hasGenericTemplates == null ? &quot;&quot;</span>
+<span class="fc" id="L63">			: formatGenericTemplates(hasChangeStatus, hasGenericTemplates.getGenericTemplates(), maxLength));</span>
+	}
+
+	/**
+	 * Formats a Java type in FQN form plus generic types.
+	 *
+	 * @param type         The fully qualified name to format.
+	 * @param genericTypes The possibly empty list of generic types.
+	 * @param shorten      Whether to truncate the type to 32 characters or not.
+	 * @return             The formatted type.
+	 */
+	public static String formatTypeName(String type, List&lt;JApiGenericType&gt; genericTypes, boolean shorten) {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">		return formatTypeName(type, genericTypes, shorten ? 32 : -1);</span>
+	}
+
+	/**
+	 * Formats a Java type in FQN form plus generic templates.
+	 *
+	 * @param typeName            The fully qualified type name to format.
+	 * @param hasChangeStatus     The element that has a change status.
+	 * @param hasGenericTemplates The element that has generic templates.
+	 * @param shorten             Whether to truncate the type to 32 characters or not.
+	 * @return                    The formatted type.
+	 */
+	public static String formatTypeName(String typeName, JApiHasChangeStatus hasChangeStatus, JApiHasGenericTemplates hasGenericTemplates, boolean shorten) {
+<span class="fc bfc" id="L88" title="All 2 branches covered.">		return formatTypeName(typeName, hasChangeStatus, hasGenericTemplates, shorten ? 32 : -1);</span>
+	}
+
+	/**
+	 * Formats a parameter type plus generic types.
+	 *
+	 * @param method       The method this parameter belongs to.
+	 * @param parameter    The parameter whose type will be formatted.
+	 * @param varargs      The varargs modifier of the method.
+	 * @param genericTypes The possibly empty list of generic types.
+	 * @param shorten      Whether to truncate the type to 32 characters or not.
+	 * @return             The formatted type.
+	 */
+	public static String formatParameterTypeName(JApiBehavior method, JApiParameter parameter, Optional&lt;VarargsModifier&gt; varargs, List&lt;JApiGenericType&gt; genericTypes, boolean shorten) {
+<span class="fc" id="L102">		final String type = parameter.getType();</span>
+<span class="fc" id="L103">		final List&lt;JApiParameter&gt; params = method.getParameters();</span>
+<span class="pc bpc" id="L104" title="5 of 6 branches missed.">		if (type.endsWith(STR_ARRAY) &amp;&amp; parameter == params.get(params.size() - 1) &amp;&amp; varargs.or(NON_VARARGS) == VARARGS) {</span>
+<span class="nc" id="L105">			return formatTypeName(type.substring(0, type.length() - 2) + STR_VARARGS, genericTypes, shorten);</span>
+		}
+<span class="fc" id="L107">		return formatTypeName(type, genericTypes, shorten);</span>
+	}
+
+	private static String formatGenericTypes(List&lt;JApiGenericType&gt; genericTypes, int maxLength) {
+<span class="pc bpc" id="L111" title="1 of 4 branches missed.">		if (genericTypes == null || genericTypes.isEmpty()) {</span>
+<span class="fc" id="L112">			return &quot;&quot;;</span>
+		}
+<span class="fc" id="L114">		return &quot;&lt;&quot; + genericTypes.stream().map(x -&gt; formatGenericType(x, maxLength)).collect(joining(&quot;, &quot;)) + &quot;&gt;&quot;;</span>
+	}
+
+	private static String formatGenericTemplates(JApiHasChangeStatus hasChangeStatus, List&lt;JApiGenericTemplate&gt; genericTemplates, int maxLength) {
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">		if (genericTemplates == null || genericTemplates.isEmpty()) {</span>
+<span class="fc" id="L119">			return &quot;&quot;;</span>
+		}
+<span class="nc" id="L121">		return &quot;&lt;&quot; + genericTemplates.stream().map(x -&gt; formatGenericTemplate(hasChangeStatus, x, maxLength)).collect(joining(&quot;, &quot;)) + &quot;&gt;&quot;;</span>
+	}
+
+	private static String formatGenericType(JApiGenericType genericType, int maxLength) {
+<span class="pc bpc" id="L125" title="3 of 4 branches missed.">		switch (genericType.getGenericWildCard()) {</span>
+			case NONE:
+<span class="fc" id="L127">				return formatTypeName(genericType.getType(), genericType.getGenericTypes(), maxLength);</span>
+			default:
+			case UNBOUNDED:
+<span class="nc" id="L130">				return &quot;?&quot;;</span>
+			case EXTENDS:
+<span class="nc" id="L132">				return &quot;? extends &quot; + formatTypeName(genericType.getType(), genericType.getGenericTypes(), maxLength);</span>
+			case SUPER:
+<span class="nc" id="L134">				return &quot;? super &quot; + formatTypeName(genericType.getType(), genericType.getGenericTypes(), maxLength);</span>
+		}
+	}
+
+	private static String formatGenericTemplate(JApiHasChangeStatus hasChangeStatus, JApiGenericTemplate genericTemplate, int maxLength) {
+<span class="nc" id="L139">		final String name = genericTemplate.getName();</span>
+<span class="nc" id="L140">		String type = null;</span>
+<span class="nc" id="L141">		List&lt;JApiGenericType&gt; genericTypes = null;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">		if (maxLength &lt;= 0) {</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">			switch (hasChangeStatus.getChangeStatus()) {</span>
+				default:
+				case MODIFIED:
+				case NEW:
+<span class="nc bnc" id="L147" title="All 2 branches missed.">					if (genericTemplate.getNewTypeOptional().isPresent()) {</span>
+<span class="nc" id="L148">						type = genericTemplate.getNewType();</span>
+<span class="nc" id="L149">						genericTypes = genericTemplate.getNewGenericTypes();</span>
+<span class="nc" id="L150">						break;</span>
+					}
+				case UNCHANGED:
+				case REMOVED:
+<span class="nc bnc" id="L154" title="All 2 branches missed.">					if (genericTemplate.getOldTypeOptional().isPresent()) {</span>
+<span class="nc" id="L155">						type = genericTemplate.getOldType();</span>
+<span class="nc" id="L156">						genericTypes = genericTemplate.getOldGenericTypes();</span>
+					}
+			}
+		}
+<span class="nc bnc" id="L160" title="All 2 branches missed.">		if (type == null) {</span>
+<span class="nc" id="L161">			return name;</span>
+		}
+<span class="nc" id="L163">		return name + &quot; extends &quot; + formatTypeName(type, genericTypes, maxLength);</span>
+	}
+
+	private static String truncateTypeName(String typeName, int maxLength) {
+<span class="fc bfc" id="L167" title="All 2 branches covered.">		if (maxLength &lt; 3) {</span>
+<span class="fc" id="L168">			return typeName;</span>
+		}
+		// Enforcing max length implies sticking to simple name only
+<span class="fc" id="L171">		final int dollar = typeName.lastIndexOf('$');</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">		final int dot = (typeName.endsWith(STR_VARARGS) ? typeName.substring(0, typeName.length() - 3) : typeName).lastIndexOf('.');</span>
+<span class="fc" id="L173">		final int pos = Integer.max(dollar, dot);</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">		final String name = pos &gt; 0 ? typeName.substring(pos + 1) : typeName;</span>
+<span class="fc" id="L175">		final int length = name.length();</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">		if (length &gt; maxLength) {</span>
+			// Cut in half and replace surplus characters with ellipsis
+<span class="nc" id="L178">			final int half = maxLength / 2;</span>
+<span class="nc" id="L179">			return name.substring(0, maxLength - half - 1) + '\u2026' + name.substring(length - half);</span>
+		}
+<span class="fc" id="L181">		return name;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

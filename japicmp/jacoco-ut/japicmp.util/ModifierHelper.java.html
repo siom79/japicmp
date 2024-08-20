@@ -2,15 +2,23 @@
 
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
+import japicmp.model.AbstractModifier;
 import japicmp.model.AccessModifier;
+import japicmp.model.BridgeModifier;
+import japicmp.model.FinalModifier;
 import japicmp.model.JApiAttribute;
 import japicmp.model.JApiCanBeSynthetic;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiHasAccessModifier;
 import japicmp.model.JApiModifier;
 import japicmp.model.JApiModifierBase;
+import japicmp.model.StaticModifier;
 import japicmp.model.SyntheticAttribute;
 import japicmp.model.SyntheticModifier;
+import japicmp.model.TransientModifier;
+import japicmp.model.VolatileModifier;
+import java.util.Arrays;
+import java.util.List;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
@@ -21,76 +29,87 @@ public class ModifierHelper {
 	public static final int ACC_BRIDGE = 0x00000040;
 	public static final int ACC_SYNTHETIC = 0x00001000;
 
+<span class="fc" id="L32">	private static final List&lt;? extends JApiModifierBase&gt; IGNORED_MODIFIERS = Arrays.asList(</span>
+		AbstractModifier.NON_ABSTRACT,
+		AccessModifier.PACKAGE_PROTECTED,
+		BridgeModifier.NON_BRIDGE,
+		FinalModifier.NON_FINAL,
+		StaticModifier.NON_STATIC,
+		SyntheticModifier.NON_SYNTHETIC,
+		TransientModifier.NON_TRANSIENT,
+		VolatileModifier.NON_VOLATILE
+	);
+
 	private ModifierHelper() {
 
 	}
 
 	public static boolean matchesModifierLevel(AccessModifier modifierLevelOfElement, AccessModifier modifierLevel) {
-<span class="fc bfc" id="L29" title="All 2 branches covered.">		return (modifierLevelOfElement.getLevel() &gt;= modifierLevel.getLevel());</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">		return (modifierLevelOfElement.getLevel() &gt;= modifierLevel.getLevel());</span>
 	}
 
 	public static boolean matchesModifierLevel(int modifierOfElement, AccessModifier modifierLevel) {
-<span class="fc" id="L33">		AccessModifier modifierLevelOfElement = translateToModifierLevel(modifierOfElement);</span>
-<span class="fc" id="L34">		return matchesModifierLevel(modifierLevelOfElement, modifierLevel);</span>
+<span class="fc" id="L52">		AccessModifier modifierLevelOfElement = translateToModifierLevel(modifierOfElement);</span>
+<span class="fc" id="L53">		return matchesModifierLevel(modifierLevelOfElement, modifierLevel);</span>
 	}
 
 	public static AccessModifier translateToModifierLevel(int modifier) {
-<span class="fc bfc" id="L38" title="All 2 branches covered.">		if (Modifier.isPublic(modifier)) {</span>
-<span class="fc" id="L39">			return AccessModifier.PUBLIC;</span>
-<span class="fc bfc" id="L40" title="All 2 branches covered.">		} else if (Modifier.isProtected(modifier)) {</span>
-<span class="fc" id="L41">			return AccessModifier.PROTECTED;</span>
-<span class="fc bfc" id="L42" title="All 2 branches covered.">		} else if (Modifier.isPrivate(modifier)) {</span>
-<span class="fc" id="L43">			return AccessModifier.PRIVATE;</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">		if (Modifier.isPublic(modifier)) {</span>
+<span class="fc" id="L58">			return AccessModifier.PUBLIC;</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">		} else if (Modifier.isProtected(modifier)) {</span>
+<span class="fc" id="L60">			return AccessModifier.PROTECTED;</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">		} else if (Modifier.isPrivate(modifier)) {</span>
+<span class="fc" id="L62">			return AccessModifier.PRIVATE;</span>
 		} else {
-<span class="fc" id="L45">			return AccessModifier.PACKAGE_PROTECTED;</span>
+<span class="fc" id="L64">			return AccessModifier.PACKAGE_PROTECTED;</span>
 		}
 	}
 
 	public static boolean isNotPrivate(JApiHasAccessModifier jApiHasAccessModifier) {
-<span class="fc" id="L50">		JApiModifier&lt;AccessModifier&gt; accessModifier = jApiHasAccessModifier.getAccessModifier();</span>
-<span class="fc bfc" id="L51" title="All 4 branches covered.">		if (accessModifier.getOldModifier().isPresent() &amp;&amp; accessModifier.getNewModifier().isPresent()) {</span>
-<span class="fc bfc" id="L52" title="All 4 branches covered.">			if (accessModifier.getNewModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel() || accessModifier.getOldModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel()) {</span>
-<span class="fc" id="L53">				return true;</span>
+<span class="fc" id="L69">		JApiModifier&lt;AccessModifier&gt; accessModifier = jApiHasAccessModifier.getAccessModifier();</span>
+<span class="fc bfc" id="L70" title="All 4 branches covered.">		if (accessModifier.getOldModifier().isPresent() &amp;&amp; accessModifier.getNewModifier().isPresent()) {</span>
+<span class="fc bfc" id="L71" title="All 4 branches covered.">			if (accessModifier.getNewModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel() || accessModifier.getOldModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel()) {</span>
+<span class="fc" id="L72">				return true;</span>
 			}
-<span class="pc bpc" id="L55" title="1 of 4 branches missed.">		} else if (!accessModifier.getOldModifier().isPresent() &amp;&amp; accessModifier.getNewModifier().isPresent()) {</span>
-<span class="pc bpc" id="L56" title="1 of 2 branches missed.">			if (accessModifier.getNewModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel()) {</span>
-<span class="fc" id="L57">				return true;</span>
+<span class="pc bpc" id="L74" title="1 of 4 branches missed.">		} else if (!accessModifier.getOldModifier().isPresent() &amp;&amp; accessModifier.getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">			if (accessModifier.getNewModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel()) {</span>
+<span class="fc" id="L76">				return true;</span>
 			}
-<span class="pc bpc" id="L59" title="2 of 4 branches missed.">		} else if (accessModifier.getOldModifier().isPresent() &amp;&amp; !accessModifier.getNewModifier().isPresent()) {</span>
-<span class="pc bpc" id="L60" title="1 of 2 branches missed.">			if (accessModifier.getOldModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel()) {</span>
-<span class="fc" id="L61">				return true;</span>
+<span class="pc bpc" id="L78" title="2 of 4 branches missed.">		} else if (accessModifier.getOldModifier().isPresent() &amp;&amp; !accessModifier.getNewModifier().isPresent()) {</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">			if (accessModifier.getOldModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel()) {</span>
+<span class="fc" id="L80">				return true;</span>
 			}
 		}
-<span class="fc" id="L64">		return false;</span>
+<span class="fc" id="L83">		return false;</span>
 	}
 
 	public static boolean hasModifierLevelDecreased(JApiHasAccessModifier hasAccessModifier) {
-<span class="fc" id="L68">		JApiModifier&lt;AccessModifier&gt; accessModifier = hasAccessModifier.getAccessModifier();</span>
-<span class="fc bfc" id="L69" title="All 4 branches covered.">		if (accessModifier.getOldModifier().isPresent() &amp;&amp; accessModifier.getNewModifier().isPresent()) {</span>
-<span class="fc" id="L70">			AccessModifier oldModifier = accessModifier.getOldModifier().get();</span>
-<span class="fc" id="L71">			AccessModifier newModifier = accessModifier.getNewModifier().get();</span>
-<span class="fc bfc" id="L72" title="All 2 branches covered.">			if (newModifier.getLevel() &lt; oldModifier.getLevel()) {</span>
-<span class="fc" id="L73">				return true;</span>
+<span class="fc" id="L87">		JApiModifier&lt;AccessModifier&gt; accessModifier = hasAccessModifier.getAccessModifier();</span>
+<span class="fc bfc" id="L88" title="All 4 branches covered.">		if (accessModifier.getOldModifier().isPresent() &amp;&amp; accessModifier.getNewModifier().isPresent()) {</span>
+<span class="fc" id="L89">			AccessModifier oldModifier = accessModifier.getOldModifier().get();</span>
+<span class="fc" id="L90">			AccessModifier newModifier = accessModifier.getNewModifier().get();</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">			if (newModifier.getLevel() &lt; oldModifier.getLevel()) {</span>
+<span class="fc" id="L92">				return true;</span>
 			}
 		}
-<span class="fc" id="L76">		return false;</span>
+<span class="fc" id="L95">		return false;</span>
 	}
 
 	public static boolean matchesModifierLevel(JApiHasAccessModifier hasAccessModifier, AccessModifier accessModifierParam) {
-<span class="fc" id="L80">		JApiModifier&lt;AccessModifier&gt; accessModifier = hasAccessModifier.getAccessModifier();</span>
-<span class="fc bfc" id="L81" title="All 2 branches covered.">		if (accessModifier.getOldModifier().isPresent()) {</span>
-<span class="fc" id="L82">			AccessModifier oldModifier = accessModifier.getOldModifier().get();</span>
-<span class="fc bfc" id="L83" title="All 2 branches covered.">			if (matchesModifierLevel(oldModifier, accessModifierParam)) {</span>
-<span class="fc" id="L84">				return true;</span>
+<span class="fc" id="L99">		JApiModifier&lt;AccessModifier&gt; accessModifier = hasAccessModifier.getAccessModifier();</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">		if (accessModifier.getOldModifier().isPresent()) {</span>
+<span class="fc" id="L101">			AccessModifier oldModifier = accessModifier.getOldModifier().get();</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">			if (matchesModifierLevel(oldModifier, accessModifierParam)) {</span>
+<span class="fc" id="L103">				return true;</span>
 			}
 		}
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">		if (accessModifier.getNewModifier().isPresent()) {</span>
-<span class="fc" id="L88">			AccessModifier newModifier = accessModifier.getNewModifier().get();</span>
-<span class="fc bfc" id="L89" title="All 2 branches covered.">			if (matchesModifierLevel(newModifier, accessModifierParam)) {</span>
-<span class="fc" id="L90">				return true;</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">		if (accessModifier.getNewModifier().isPresent()) {</span>
+<span class="fc" id="L107">			AccessModifier newModifier = accessModifier.getNewModifier().get();</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">			if (matchesModifierLevel(newModifier, accessModifierParam)) {</span>
+<span class="fc" id="L109">				return true;</span>
 			}
 		}
-<span class="fc" id="L93">		return false;</span>
+<span class="fc" id="L112">		return false;</span>
 	}
 
 	public interface ExtractModifierFromClassCallback&lt;T extends JApiModifierBase&gt; {
@@ -100,29 +119,29 @@ public class ModifierHelper {
 	}
 
 	public static &lt;T extends JApiModifierBase&gt; JApiModifier&lt;T&gt; extractModifierFromClass(Optional&lt;CtClass&gt; oldClassOptional, Optional&lt;CtClass&gt; newClassOptional, ExtractModifierFromClassCallback&lt;T&gt; callback) {
-<span class="fc bfc" id="L103" title="All 4 branches covered.">		if (oldClassOptional.isPresent() &amp;&amp; newClassOptional.isPresent()) {</span>
-<span class="fc" id="L104">			CtClass oldClass = oldClassOptional.get();</span>
-<span class="fc" id="L105">			CtClass newClass = newClassOptional.get();</span>
-<span class="fc" id="L106">			T oldClassModifier = callback.getModifierForOld(oldClass);</span>
-<span class="fc" id="L107">			T newClassModifier = callback.getModifierForNew(newClass);</span>
-<span class="fc bfc" id="L108" title="All 2 branches covered.">			if (oldClassModifier != newClassModifier) {</span>
-<span class="fc" id="L109">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.of(newClassModifier), JApiChangeStatus.MODIFIED);</span>
+<span class="fc bfc" id="L122" title="All 4 branches covered.">		if (oldClassOptional.isPresent() &amp;&amp; newClassOptional.isPresent()) {</span>
+<span class="fc" id="L123">			CtClass oldClass = oldClassOptional.get();</span>
+<span class="fc" id="L124">			CtClass newClass = newClassOptional.get();</span>
+<span class="fc" id="L125">			T oldClassModifier = callback.getModifierForOld(oldClass);</span>
+<span class="fc" id="L126">			T newClassModifier = callback.getModifierForNew(newClass);</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">			if (oldClassModifier != newClassModifier) {</span>
+<span class="fc" id="L128">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.of(newClassModifier), JApiChangeStatus.MODIFIED);</span>
 			} else {
-<span class="fc" id="L111">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.of(newClassModifier), JApiChangeStatus.UNCHANGED);</span>
+<span class="fc" id="L130">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.of(newClassModifier), JApiChangeStatus.UNCHANGED);</span>
 			}
 		} else {
-<span class="fc bfc" id="L114" title="All 2 branches covered.">			if (oldClassOptional.isPresent()) {</span>
-<span class="fc" id="L115">				CtClass oldClass = oldClassOptional.get();</span>
-<span class="fc" id="L116">				T oldClassModifier = callback.getModifierForOld(oldClass);</span>
-<span class="fc" id="L117">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.&lt;T&gt;absent(), JApiChangeStatus.REMOVED);</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">			if (oldClassOptional.isPresent()) {</span>
+<span class="fc" id="L134">				CtClass oldClass = oldClassOptional.get();</span>
+<span class="fc" id="L135">				T oldClassModifier = callback.getModifierForOld(oldClass);</span>
+<span class="fc" id="L136">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.&lt;T&gt;absent(), JApiChangeStatus.REMOVED);</span>
 			}
-<span class="pc bpc" id="L119" title="1 of 2 branches missed.">			if (newClassOptional.isPresent()) {</span>
-<span class="fc" id="L120">				CtClass newClass = newClassOptional.get();</span>
-<span class="fc" id="L121">				T newClassModifier = callback.getModifierForNew(newClass);</span>
-<span class="fc" id="L122">				return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">			if (newClassOptional.isPresent()) {</span>
+<span class="fc" id="L139">				CtClass newClass = newClassOptional.get();</span>
+<span class="fc" id="L140">				T newClassModifier = callback.getModifierForNew(newClass);</span>
+<span class="fc" id="L141">				return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);</span>
 			}
 		}
-<span class="nc" id="L125">		return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.&lt;T&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
+<span class="nc" id="L144">		return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.&lt;T&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
 	}
 
 	public interface ExtractModifierFromBehaviorCallback&lt;T extends JApiModifierBase&gt; {
@@ -132,29 +151,29 @@ public class ModifierHelper {
 	}
 
 	public static &lt;T extends JApiModifierBase&gt; JApiModifier&lt;T&gt; extractModifierFromBehavior(Optional&lt;? extends CtBehavior&gt; oldClassOptional, Optional&lt;? extends CtBehavior&gt; newClassOptional, ExtractModifierFromBehaviorCallback&lt;T&gt; callback) {
-<span class="fc bfc" id="L135" title="All 4 branches covered.">		if (oldClassOptional.isPresent() &amp;&amp; newClassOptional.isPresent()) {</span>
-<span class="fc" id="L136">			CtBehavior oldClass = oldClassOptional.get();</span>
-<span class="fc" id="L137">			CtBehavior newClass = newClassOptional.get();</span>
-<span class="fc" id="L138">			T oldClassModifier = callback.getModifierForOld(oldClass);</span>
-<span class="fc" id="L139">			T newClassModifier = callback.getModifierForNew(newClass);</span>
-<span class="fc bfc" id="L140" title="All 2 branches covered.">			if (oldClassModifier != newClassModifier) {</span>
-<span class="fc" id="L141">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.of(newClassModifier), JApiChangeStatus.MODIFIED);</span>
+<span class="fc bfc" id="L154" title="All 4 branches covered.">		if (oldClassOptional.isPresent() &amp;&amp; newClassOptional.isPresent()) {</span>
+<span class="fc" id="L155">			CtBehavior oldClass = oldClassOptional.get();</span>
+<span class="fc" id="L156">			CtBehavior newClass = newClassOptional.get();</span>
+<span class="fc" id="L157">			T oldClassModifier = callback.getModifierForOld(oldClass);</span>
+<span class="fc" id="L158">			T newClassModifier = callback.getModifierForNew(newClass);</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">			if (oldClassModifier != newClassModifier) {</span>
+<span class="fc" id="L160">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.of(newClassModifier), JApiChangeStatus.MODIFIED);</span>
 			} else {
-<span class="fc" id="L143">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.of(newClassModifier), JApiChangeStatus.UNCHANGED);</span>
+<span class="fc" id="L162">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.of(newClassModifier), JApiChangeStatus.UNCHANGED);</span>
 			}
 		} else {
-<span class="fc bfc" id="L146" title="All 2 branches covered.">			if (oldClassOptional.isPresent()) {</span>
-<span class="fc" id="L147">				CtBehavior oldClass = oldClassOptional.get();</span>
-<span class="fc" id="L148">				T oldClassModifier = callback.getModifierForOld(oldClass);</span>
-<span class="fc" id="L149">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.&lt;T&gt;absent(), JApiChangeStatus.REMOVED);</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">			if (oldClassOptional.isPresent()) {</span>
+<span class="fc" id="L166">				CtBehavior oldClass = oldClassOptional.get();</span>
+<span class="fc" id="L167">				T oldClassModifier = callback.getModifierForOld(oldClass);</span>
+<span class="fc" id="L168">				return new JApiModifier&lt;&gt;(Optional.of(oldClassModifier), Optional.&lt;T&gt;absent(), JApiChangeStatus.REMOVED);</span>
 			}
-<span class="pc bpc" id="L151" title="1 of 2 branches missed.">			if (newClassOptional.isPresent()) {</span>
-<span class="fc" id="L152">				CtBehavior newClass = newClassOptional.get();</span>
-<span class="fc" id="L153">				T newClassModifier = callback.getModifierForNew(newClass);</span>
-<span class="fc" id="L154">				return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">			if (newClassOptional.isPresent()) {</span>
+<span class="fc" id="L171">				CtBehavior newClass = newClassOptional.get();</span>
+<span class="fc" id="L172">				T newClassModifier = callback.getModifierForNew(newClass);</span>
+<span class="fc" id="L173">				return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);</span>
 			}
 		}
-<span class="nc" id="L157">		return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.&lt;T&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
+<span class="nc" id="L176">		return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.&lt;T&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
 	}
 
 	public interface ExtractModifierFromFieldCallback&lt;T extends JApiModifierBase&gt; {
@@ -164,101 +183,114 @@ public class ModifierHelper {
 	}
 
 	public static &lt;T extends JApiModifierBase&gt; JApiModifier&lt;T&gt; extractModifierFromField(Optional&lt;CtField&gt; oldFieldOptional, Optional&lt;CtField&gt; newFieldOptional, ExtractModifierFromFieldCallback&lt;T&gt; callback) {
-<span class="fc bfc" id="L167" title="All 4 branches covered.">		if (oldFieldOptional.isPresent() &amp;&amp; newFieldOptional.isPresent()) {</span>
-<span class="fc" id="L168">			CtField oldField = oldFieldOptional.get();</span>
-<span class="fc" id="L169">			CtField newField = newFieldOptional.get();</span>
-<span class="fc" id="L170">			T oldFieldModifier = callback.getModifierForOld(oldField);</span>
-<span class="fc" id="L171">			T newFieldModifier = callback.getModifierForNew(newField);</span>
-<span class="fc bfc" id="L172" title="All 2 branches covered.">			if (oldFieldModifier != newFieldModifier) {</span>
-<span class="fc" id="L173">				return new JApiModifier&lt;&gt;(Optional.of(oldFieldModifier), Optional.of(newFieldModifier), JApiChangeStatus.MODIFIED);</span>
+<span class="fc bfc" id="L186" title="All 4 branches covered.">		if (oldFieldOptional.isPresent() &amp;&amp; newFieldOptional.isPresent()) {</span>
+<span class="fc" id="L187">			CtField oldField = oldFieldOptional.get();</span>
+<span class="fc" id="L188">			CtField newField = newFieldOptional.get();</span>
+<span class="fc" id="L189">			T oldFieldModifier = callback.getModifierForOld(oldField);</span>
+<span class="fc" id="L190">			T newFieldModifier = callback.getModifierForNew(newField);</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">			if (oldFieldModifier != newFieldModifier) {</span>
+<span class="fc" id="L192">				return new JApiModifier&lt;&gt;(Optional.of(oldFieldModifier), Optional.of(newFieldModifier), JApiChangeStatus.MODIFIED);</span>
 			} else {
-<span class="fc" id="L175">				return new JApiModifier&lt;&gt;(Optional.of(oldFieldModifier), Optional.of(newFieldModifier), JApiChangeStatus.UNCHANGED);</span>
+<span class="fc" id="L194">				return new JApiModifier&lt;&gt;(Optional.of(oldFieldModifier), Optional.of(newFieldModifier), JApiChangeStatus.UNCHANGED);</span>
 			}
 		} else {
-<span class="fc bfc" id="L178" title="All 2 branches covered.">			if (oldFieldOptional.isPresent()) {</span>
-<span class="fc" id="L179">				CtField oldField = oldFieldOptional.get();</span>
-<span class="fc" id="L180">				T oldFieldModifier = callback.getModifierForOld(oldField);</span>
-<span class="fc" id="L181">				return new JApiModifier&lt;&gt;(Optional.of(oldFieldModifier), Optional.&lt;T&gt;absent(), JApiChangeStatus.REMOVED);</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">			if (oldFieldOptional.isPresent()) {</span>
+<span class="fc" id="L198">				CtField oldField = oldFieldOptional.get();</span>
+<span class="fc" id="L199">				T oldFieldModifier = callback.getModifierForOld(oldField);</span>
+<span class="fc" id="L200">				return new JApiModifier&lt;&gt;(Optional.of(oldFieldModifier), Optional.&lt;T&gt;absent(), JApiChangeStatus.REMOVED);</span>
 			}
-<span class="pc bpc" id="L183" title="1 of 2 branches missed.">			if (newFieldOptional.isPresent()) {</span>
-<span class="fc" id="L184">				CtField newField = newFieldOptional.get();</span>
-<span class="fc" id="L185">				T newFieldModifier = callback.getModifierForNew(newField);</span>
-<span class="fc" id="L186">				return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.of(newFieldModifier), JApiChangeStatus.NEW);</span>
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">			if (newFieldOptional.isPresent()) {</span>
+<span class="fc" id="L203">				CtField newField = newFieldOptional.get();</span>
+<span class="fc" id="L204">				T newFieldModifier = callback.getModifierForNew(newField);</span>
+<span class="fc" id="L205">				return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.of(newFieldModifier), JApiChangeStatus.NEW);</span>
 			}
 		}
-<span class="nc" id="L189">		return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.&lt;T&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
+<span class="nc" id="L208">		return new JApiModifier&lt;&gt;(Optional.&lt;T&gt;absent(), Optional.&lt;T&gt;absent(), JApiChangeStatus.UNCHANGED);</span>
 	}
 
 	public static boolean isBridge(int modifier) {
-<span class="fc bfc" id="L193" title="All 2 branches covered.">		return (modifier &amp; ACC_BRIDGE) != 0;</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">		return (modifier &amp; ACC_BRIDGE) != 0;</span>
 	}
 
 	public static boolean isSynthetic(int modifier) {
-<span class="fc bfc" id="L197" title="All 2 branches covered.">		return (modifier &amp; ACC_SYNTHETIC) != 0;</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">		return (modifier &amp; ACC_SYNTHETIC) != 0;</span>
 	}
 
 	public static boolean includeSynthetic(JApiCanBeSynthetic jApiCanBeSynthetic, JarArchiveComparatorOptions options) {
-<span class="nc bnc" id="L201" title="All 4 branches missed.">		return options.isIncludeSynthetic() || !isSynthetic(jApiCanBeSynthetic);</span>
+<span class="nc bnc" id="L220" title="All 4 branches missed.">		return options.isIncludeSynthetic() || !isSynthetic(jApiCanBeSynthetic);</span>
 	}
 
 	public static boolean includeSynthetic(JApiCanBeSynthetic jApiCanBeSynthetic, Options options) {
-<span class="fc bfc" id="L205" title="All 4 branches covered.">		return !isSynthetic(jApiCanBeSynthetic) || options.isIncludeSynthetic();</span>
+<span class="fc bfc" id="L224" title="All 4 branches covered.">		return !isSynthetic(jApiCanBeSynthetic) || options.isIncludeSynthetic();</span>
 	}
 
 	public static boolean isSynthetic(JApiCanBeSynthetic jApiClass) {
-<span class="fc" id="L209">		boolean isSynthetic = false;</span>
-<span class="fc" id="L210">		JApiModifier&lt;SyntheticModifier&gt; syntheticModifier = jApiClass.getSyntheticModifier();</span>
-<span class="fc" id="L211">		JApiAttribute&lt;SyntheticAttribute&gt; syntheticAttribute = jApiClass.getSyntheticAttribute();</span>
-<span class="fc" id="L212">		boolean hasSyntheticModifier = hasSyntheticModifier(syntheticModifier);</span>
-<span class="fc" id="L213">		boolean hasSyntheticAttribute = hasSyntheticAttribute(syntheticAttribute);</span>
-<span class="pc bpc" id="L214" title="1 of 4 branches missed.">		if (hasSyntheticModifier || hasSyntheticAttribute) {</span>
-<span class="fc" id="L215">			isSynthetic = true;</span>
+<span class="fc" id="L228">		boolean isSynthetic = false;</span>
+<span class="fc" id="L229">		JApiModifier&lt;SyntheticModifier&gt; syntheticModifier = jApiClass.getSyntheticModifier();</span>
+<span class="fc" id="L230">		JApiAttribute&lt;SyntheticAttribute&gt; syntheticAttribute = jApiClass.getSyntheticAttribute();</span>
+<span class="fc" id="L231">		boolean hasSyntheticModifier = hasSyntheticModifier(syntheticModifier);</span>
+<span class="fc" id="L232">		boolean hasSyntheticAttribute = hasSyntheticAttribute(syntheticAttribute);</span>
+<span class="pc bpc" id="L233" title="1 of 4 branches missed.">		if (hasSyntheticModifier || hasSyntheticAttribute) {</span>
+<span class="fc" id="L234">			isSynthetic = true;</span>
 		}
-<span class="fc" id="L217">		return isSynthetic;</span>
+<span class="fc" id="L236">		return isSynthetic;</span>
+	}
+
+	public static Optional&lt;String&gt; getOldModifierName(JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt; modifier) {
+<span class="fc" id="L240">		return getModifierName(modifier.getOldModifier());</span>
+	}
+
+	public static Optional&lt;String&gt; getNewModifierName(JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt; modifier) {
+<span class="fc" id="L244">		return getModifierName(modifier.getNewModifier());</span>
+	}
+
+	private static Optional&lt;String&gt; getModifierName(Optional&lt;? extends Enum&lt;?&gt;&gt; modifier) {
+<span class="fc bfc" id="L248" title="All 4 branches covered.">		return !modifier.isPresent() || IGNORED_MODIFIERS.contains(modifier.get()) ? Optional.absent() :</span>
+<span class="fc" id="L249">			Optional.of(modifier.get().name().toLowerCase());</span>
 	}
 
 	private static boolean hasSyntheticAttribute(JApiAttribute&lt;SyntheticAttribute&gt; syntheticAttribute) {
-<span class="fc" id="L221">		boolean hasSyntheticAttribute = false;</span>
-<span class="fc bfc" id="L222" title="All 4 branches covered.">		if (syntheticAttribute.getOldAttribute().isPresent() &amp;&amp; syntheticAttribute.getNewAttribute().isPresent()) {</span>
-<span class="fc" id="L223">			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();</span>
-<span class="fc" id="L224">			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();</span>
-<span class="pc bpc" id="L225" title="3 of 4 branches missed.">			if (oldAttribute == SyntheticAttribute.SYNTHETIC &amp;&amp; newAttribute == SyntheticAttribute.SYNTHETIC) {</span>
-<span class="nc" id="L226">				hasSyntheticAttribute = true;</span>
+<span class="fc" id="L253">		boolean hasSyntheticAttribute = false;</span>
+<span class="fc bfc" id="L254" title="All 4 branches covered.">		if (syntheticAttribute.getOldAttribute().isPresent() &amp;&amp; syntheticAttribute.getNewAttribute().isPresent()) {</span>
+<span class="fc" id="L255">			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();</span>
+<span class="fc" id="L256">			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();</span>
+<span class="pc bpc" id="L257" title="3 of 4 branches missed.">			if (oldAttribute == SyntheticAttribute.SYNTHETIC &amp;&amp; newAttribute == SyntheticAttribute.SYNTHETIC) {</span>
+<span class="nc" id="L258">				hasSyntheticAttribute = true;</span>
 			}
-<span class="fc bfc" id="L228" title="All 2 branches covered.">		} else if (syntheticAttribute.getOldAttribute().isPresent()) {</span>
-<span class="fc" id="L229">			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();</span>
-<span class="pc bpc" id="L230" title="1 of 2 branches missed.">			if (oldAttribute == SyntheticAttribute.SYNTHETIC) {</span>
-<span class="nc" id="L231">				hasSyntheticAttribute = true;</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">		} else if (syntheticAttribute.getOldAttribute().isPresent()) {</span>
+<span class="fc" id="L261">			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();</span>
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">			if (oldAttribute == SyntheticAttribute.SYNTHETIC) {</span>
+<span class="nc" id="L263">				hasSyntheticAttribute = true;</span>
 			}
-<span class="pc bpc" id="L233" title="1 of 2 branches missed.">		} else if (syntheticAttribute.getNewAttribute().isPresent()) {</span>
-<span class="fc" id="L234">			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();</span>
-<span class="pc bpc" id="L235" title="1 of 2 branches missed.">			if (newAttribute == SyntheticAttribute.SYNTHETIC) {</span>
-<span class="nc" id="L236">				hasSyntheticAttribute = true;</span>
+<span class="pc bpc" id="L265" title="1 of 2 branches missed.">		} else if (syntheticAttribute.getNewAttribute().isPresent()) {</span>
+<span class="fc" id="L266">			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">			if (newAttribute == SyntheticAttribute.SYNTHETIC) {</span>
+<span class="nc" id="L268">				hasSyntheticAttribute = true;</span>
 			}
 		}
-<span class="fc" id="L239">		return hasSyntheticAttribute;</span>
+<span class="fc" id="L271">		return hasSyntheticAttribute;</span>
 	}
 
 	private static boolean hasSyntheticModifier(JApiModifier&lt;SyntheticModifier&gt; syntheticModifier) {
-<span class="fc" id="L243">		boolean hasSyntheticModifier = false;</span>
-<span class="fc bfc" id="L244" title="All 4 branches covered.">		if (syntheticModifier.getOldModifier().isPresent() &amp;&amp; syntheticModifier.getNewModifier().isPresent()) {</span>
-<span class="fc" id="L245">			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();</span>
-<span class="fc" id="L246">			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();</span>
-<span class="pc bpc" id="L247" title="1 of 4 branches missed.">			if (oldModifier == SyntheticModifier.SYNTHETIC &amp;&amp; newModifier == SyntheticModifier.SYNTHETIC) {</span>
-<span class="fc" id="L248">				hasSyntheticModifier = true;</span>
+<span class="fc" id="L275">		boolean hasSyntheticModifier = false;</span>
+<span class="fc bfc" id="L276" title="All 4 branches covered.">		if (syntheticModifier.getOldModifier().isPresent() &amp;&amp; syntheticModifier.getNewModifier().isPresent()) {</span>
+<span class="fc" id="L277">			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();</span>
+<span class="fc" id="L278">			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();</span>
+<span class="pc bpc" id="L279" title="1 of 4 branches missed.">			if (oldModifier == SyntheticModifier.SYNTHETIC &amp;&amp; newModifier == SyntheticModifier.SYNTHETIC) {</span>
+<span class="fc" id="L280">				hasSyntheticModifier = true;</span>
 			}
-<span class="fc bfc" id="L250" title="All 2 branches covered.">		} else if (syntheticModifier.getOldModifier().isPresent()) {</span>
-<span class="fc" id="L251">			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();</span>
-<span class="pc bpc" id="L252" title="1 of 2 branches missed.">			if (oldModifier == SyntheticModifier.SYNTHETIC) {</span>
-<span class="nc" id="L253">				hasSyntheticModifier = true;</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">		} else if (syntheticModifier.getOldModifier().isPresent()) {</span>
+<span class="fc" id="L283">			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();</span>
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">			if (oldModifier == SyntheticModifier.SYNTHETIC) {</span>
+<span class="nc" id="L285">				hasSyntheticModifier = true;</span>
 			}
-<span class="pc bpc" id="L255" title="1 of 2 branches missed.">		} else if (syntheticModifier.getNewModifier().isPresent()) {</span>
-<span class="fc" id="L256">			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();</span>
-<span class="fc bfc" id="L257" title="All 2 branches covered.">			if (newModifier == SyntheticModifier.SYNTHETIC) {</span>
-<span class="fc" id="L258">				hasSyntheticModifier = true;</span>
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">		} else if (syntheticModifier.getNewModifier().isPresent()) {</span>
+<span class="fc" id="L288">			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();</span>
+<span class="fc bfc" id="L289" title="All 2 branches covered.">			if (newModifier == SyntheticModifier.SYNTHETIC) {</span>
+<span class="fc" id="L290">				hasSyntheticModifier = true;</span>
 			}
 		}
-<span class="fc" id="L261">		return hasSyntheticModifier;</span>
+<span class="fc" id="L293">		return hasSyntheticModifier;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

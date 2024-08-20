@@ -42,9 +42,10 @@ public class Options {
 	private boolean reportOnlyFilename;
 	private boolean reportOnlySummary;
 	private boolean semanticVersioning;
+	private boolean markdown;
 	private boolean errorOnBinaryIncompatibility;
 	private boolean errorOnSourceIncompatibility;
-<span class="fc" id="L47">	private boolean errorOnExclusionIncompatibility = true;</span>
+<span class="fc" id="L48">	private boolean errorOnExclusionIncompatibility = true;</span>
 	private boolean errorOnModifications;
 	private boolean errorOnSemanticIncompatibility;
 	private boolean ignoreMissingOldVersion;
@@ -52,422 +53,430 @@ public class Options {
 	private boolean helpRequested;
 	private boolean errorOnSemanticIncompatibilityForMajorVersionZero;
 
-<span class="fc" id="L55">	Options() {</span>
+<span class="fc" id="L56">	Options() {</span>
 		// intentionally left empty
-<span class="fc" id="L57">	}</span>
+<span class="fc" id="L58">	}</span>
 
 	public static Options newDefault() {
-<span class="fc" id="L60">		return new Options();</span>
+<span class="fc" id="L61">		return new Options();</span>
 	}
 
 	public void verify() {
-<span class="fc bfc" id="L64" title="All 2 branches covered.">		if (oldArchives.isEmpty()) {</span>
-<span class="fc" id="L65">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Required option -o, --old is missing.&quot;);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">		if (oldArchives.isEmpty()) {</span>
+<span class="fc" id="L66">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Required option -o, --old is missing.&quot;);</span>
 		}
-<span class="pc bpc" id="L67" title="1 of 2 branches missed.">		if (newArchives.isEmpty()) {</span>
-<span class="nc" id="L68">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Required option -n, --new is missing.&quot;);</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">		if (newArchives.isEmpty()) {</span>
+<span class="nc" id="L69">			throw new JApiCmpException(JApiCmpException.Reason.CliError, &quot;Required option -n, --new is missing.&quot;);</span>
 		}
-<span class="fc bfc" id="L70" title="All 2 branches covered.">		for (JApiCmpArchive archive : getOldArchives()) {</span>
-<span class="fc" id="L71">			verifyExistsCanReadAndJar(archive);</span>
-<span class="fc" id="L72">		}</span>
-<span class="fc bfc" id="L73" title="All 2 branches covered.">		for (JApiCmpArchive archive : getNewArchives()) {</span>
-<span class="fc" id="L74">			verifyExistsCanReadAndJar(archive);</span>
-<span class="fc" id="L75">		}</span>
-<span class="fc bfc" id="L76" title="All 2 branches covered.">		if (getHtmlOutputFile().isPresent()) {</span>
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">			if (getHtmlStylesheet().isPresent()) {</span>
-<span class="fc" id="L78">				String pathname = getHtmlStylesheet().get();</span>
-<span class="fc" id="L79">				File stylesheetFile = new File(pathname);</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">				if (!stylesheetFile.exists()) {</span>
-<span class="fc" id="L81">					throw JApiCmpException.cliError(&quot;HTML stylesheet '%s' does not exist.&quot;, pathname);</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">		for (JApiCmpArchive archive : getOldArchives()) {</span>
+<span class="fc" id="L72">			verifyExistsCanReadAndJar(archive);</span>
+<span class="fc" id="L73">		}</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">		for (JApiCmpArchive archive : getNewArchives()) {</span>
+<span class="fc" id="L75">			verifyExistsCanReadAndJar(archive);</span>
+<span class="fc" id="L76">		}</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">		if (getHtmlOutputFile().isPresent()) {</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">			if (getHtmlStylesheet().isPresent()) {</span>
+<span class="fc" id="L79">				String pathname = getHtmlStylesheet().get();</span>
+<span class="fc" id="L80">				File stylesheetFile = new File(pathname);</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">				if (!stylesheetFile.exists()) {</span>
+<span class="fc" id="L82">					throw JApiCmpException.cliError(&quot;HTML stylesheet '%s' does not exist.&quot;, pathname);</span>
 				}
-<span class="nc" id="L83">			}</span>
+<span class="nc" id="L84">			}</span>
 		} else {
-<span class="fc bfc" id="L85" title="All 2 branches covered.">			if (getHtmlStylesheet().isPresent()) {</span>
-<span class="fc" id="L86">				throw JApiCmpException.cliError(&quot;Define a HTML output file, if you want to apply a stylesheet.&quot;);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">			if (getHtmlStylesheet().isPresent()) {</span>
+<span class="fc" id="L87">				throw JApiCmpException.cliError(&quot;Define a HTML output file, if you want to apply a stylesheet.&quot;);</span>
 			}
 		}
-<span class="pc bpc" id="L89" title="3 of 4 branches missed.">		if (getOldClassPath().isPresent() &amp;&amp; getNewClassPath().isPresent()) {</span>
-<span class="nc" id="L90">			setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);</span>
+<span class="pc bpc" id="L90" title="3 of 4 branches missed.">		if (getOldClassPath().isPresent() &amp;&amp; getNewClassPath().isPresent()) {</span>
+<span class="nc" id="L91">			setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);</span>
 		} else {
-<span class="pc bpc" id="L92" title="2 of 4 branches missed.">			if (getOldClassPath().isPresent() || getNewClassPath().isPresent()) {</span>
-<span class="nc" id="L93">				throw JApiCmpException.cliError(&quot;Please provide both options: &quot; + CliParser.OLD_CLASSPATH + &quot; and &quot; + CliParser.NEW_CLASSPATH);</span>
+<span class="pc bpc" id="L93" title="2 of 4 branches missed.">			if (getOldClassPath().isPresent() || getNewClassPath().isPresent()) {</span>
+<span class="nc" id="L94">				throw JApiCmpException.cliError(&quot;Please provide both options: &quot; + CliParser.OLD_CLASSPATH + &quot; and &quot; + CliParser.NEW_CLASSPATH);</span>
 			} else {
-<span class="fc" id="L95">				setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);</span>
+<span class="fc" id="L96">				setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);</span>
 			}
 		}
-<span class="fc" id="L98">	}</span>
+<span class="fc" id="L99">	}</span>
 
 	private static void verifyExistsCanReadAndJar(JApiCmpArchive jApiCmpArchive) {
-<span class="fc" id="L101">		verifyExisting(jApiCmpArchive);</span>
-<span class="fc" id="L102">		verifyCanRead(jApiCmpArchive);</span>
-<span class="fc" id="L103">		verifyJarArchive(jApiCmpArchive);</span>
-<span class="fc" id="L104">	}</span>
+<span class="fc" id="L102">		verifyExisting(jApiCmpArchive);</span>
+<span class="fc" id="L103">		verifyCanRead(jApiCmpArchive);</span>
+<span class="fc" id="L104">		verifyJarArchive(jApiCmpArchive);</span>
+<span class="fc" id="L105">	}</span>
 
 	private static void verifyExisting(JApiCmpArchive jApiCmpArchive) {
-<span class="fc bfc" id="L107" title="All 2 branches covered.">		if (!jApiCmpArchive.getFile().exists()) {</span>
-<span class="fc" id="L108">			throw JApiCmpException.cliError(&quot;File '%s' does not exist.&quot;, jApiCmpArchive.getFile().getAbsolutePath());</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">		if (!jApiCmpArchive.getFile().exists()) {</span>
+<span class="fc" id="L109">			throw JApiCmpException.cliError(&quot;File '%s' does not exist.&quot;, jApiCmpArchive.getFile().getAbsolutePath());</span>
 		}
-<span class="fc" id="L110">	}</span>
+<span class="fc" id="L111">	}</span>
 
 	private static void verifyCanRead(JApiCmpArchive jApiCmpArchive) {
-<span class="pc bpc" id="L113" title="1 of 2 branches missed.">		if (!jApiCmpArchive.getFile().canRead()) {</span>
-<span class="nc" id="L114">			throw JApiCmpException.cliError(&quot;Cannot read file '%s'.&quot;, jApiCmpArchive.getFile().getAbsolutePath());</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">		if (!jApiCmpArchive.getFile().canRead()) {</span>
+<span class="nc" id="L115">			throw JApiCmpException.cliError(&quot;Cannot read file '%s'.&quot;, jApiCmpArchive.getFile().getAbsolutePath());</span>
 		}
-<span class="fc" id="L116">	}</span>
+<span class="fc" id="L117">	}</span>
 
 	private static void verifyJarArchive(JApiCmpArchive jApiCmpArchive) {
-<span class="fc" id="L119">		JarFile jarFile = null;</span>
+<span class="fc" id="L120">		JarFile jarFile = null;</span>
 		try {
-<span class="fc" id="L121">			jarFile = new JarFile(jApiCmpArchive.getFile());</span>
-<span class="nc" id="L122">		} catch (IOException e) {</span>
-<span class="nc" id="L123">			throw JApiCmpException.cliError(&quot;File '%s' could not be opened as a jar file: %s&quot;, jApiCmpArchive.getFile().getAbsolutePath(), e.getMessage(), e);</span>
+<span class="fc" id="L122">			jarFile = new JarFile(jApiCmpArchive.getFile());</span>
+<span class="nc" id="L123">		} catch (IOException e) {</span>
+<span class="nc" id="L124">			throw JApiCmpException.cliError(&quot;File '%s' could not be opened as a jar file: %s&quot;, jApiCmpArchive.getFile().getAbsolutePath(), e.getMessage(), e);</span>
 		} finally {
-<span class="pc bpc" id="L125" title="1 of 2 branches missed.">			if (jarFile != null) {</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">			if (jarFile != null) {</span>
 				try {
-<span class="fc" id="L127">					jarFile.close();</span>
-<span class="nc" id="L128">				} catch (IOException e) {</span>
-<span class="nc" id="L129">					LOGGER.log(Level.FINE, &quot;Failed to close file: &quot; + e.getLocalizedMessage(), e);</span>
-<span class="fc" id="L130">				}</span>
+<span class="fc" id="L128">					jarFile.close();</span>
+<span class="nc" id="L129">				} catch (IOException e) {</span>
+<span class="nc" id="L130">					LOGGER.log(Level.FINE, &quot;Failed to close file: &quot; + e.getLocalizedMessage(), e);</span>
+<span class="fc" id="L131">				}</span>
 			}
 		}
-<span class="fc" id="L133">	}</span>
+<span class="fc" id="L134">	}</span>
 
 	public List&lt;JApiCmpArchive&gt; getNewArchives() {
-<span class="fc" id="L136">		return newArchives;</span>
+<span class="fc" id="L137">		return newArchives;</span>
 	}
 
 	public void setNewArchives(List&lt;JApiCmpArchive&gt; newArchives) {
-<span class="fc" id="L140">		this.newArchives = newArchives;</span>
-<span class="fc" id="L141">	}</span>
+<span class="fc" id="L141">		this.newArchives = newArchives;</span>
+<span class="fc" id="L142">	}</span>
 
 	public List&lt;JApiCmpArchive&gt; getOldArchives() {
-<span class="fc" id="L144">		return oldArchives;</span>
+<span class="fc" id="L145">		return oldArchives;</span>
 	}
 
 	public void setOldArchives(List&lt;JApiCmpArchive&gt; oldArchives) {
-<span class="fc" id="L148">		this.oldArchives = oldArchives;</span>
-<span class="fc" id="L149">	}</span>
+<span class="fc" id="L149">		this.oldArchives = oldArchives;</span>
+<span class="fc" id="L150">	}</span>
 
 	public boolean isOutputOnlyModifications() {
-<span class="fc" id="L152">		return outputOnlyModifications;</span>
+<span class="fc" id="L153">		return outputOnlyModifications;</span>
 	}
 
 	public void setOutputOnlyModifications(boolean outputOnlyModifications) {
-<span class="nc" id="L156">		this.outputOnlyModifications = outputOnlyModifications;</span>
-<span class="nc" id="L157">	}</span>
+<span class="nc" id="L157">		this.outputOnlyModifications = outputOnlyModifications;</span>
+<span class="nc" id="L158">	}</span>
 
 	public Optional&lt;String&gt; getXmlOutputFile() {
-<span class="fc" id="L160">		return xmlOutputFile;</span>
+<span class="fc" id="L161">		return xmlOutputFile;</span>
 	}
 
 	public void setXmlOutputFile(Optional&lt;String&gt; xmlOutputFile) {
-<span class="fc" id="L164">		this.xmlOutputFile = xmlOutputFile;</span>
-<span class="fc" id="L165">	}</span>
+<span class="fc" id="L165">		this.xmlOutputFile = xmlOutputFile;</span>
+<span class="fc" id="L166">	}</span>
 
 	public void setAccessModifier(Optional&lt;AccessModifier&gt; accessModifier) {
-<span class="nc" id="L168">		this.accessModifier = accessModifier;</span>
-<span class="nc" id="L169">	}</span>
+<span class="nc" id="L169">		this.accessModifier = accessModifier;</span>
+<span class="nc" id="L170">	}</span>
 
 	public AccessModifier getAccessModifier() {
-<span class="fc" id="L172">		return accessModifier.get();</span>
+<span class="fc" id="L173">		return accessModifier.get();</span>
 	}
 
 	public void setAccessModifier(AccessModifier accessModifier) {
-<span class="nc" id="L176">		this.accessModifier = Optional.of(accessModifier);</span>
-<span class="nc" id="L177">	}</span>
+<span class="nc" id="L177">		this.accessModifier = Optional.of(accessModifier);</span>
+<span class="nc" id="L178">	}</span>
 
 	public List&lt;Filter&gt; getIncludes() {
-<span class="fc" id="L180">		return ImmutableList.copyOf(includes);</span>
+<span class="fc" id="L181">		return ImmutableList.copyOf(includes);</span>
 	}
 
 	public List&lt;Filter&gt; getExcludes() {
-<span class="fc" id="L184">		return ImmutableList.copyOf(excludes);</span>
+<span class="fc" id="L185">		return ImmutableList.copyOf(excludes);</span>
 	}
 
 	public void addExcludeFromArgument(Optional&lt;String&gt; packagesExcludeArg, boolean excludeExclusively) {
-<span class="fc" id="L188">		excludes = createFilterList(packagesExcludeArg, excludes, &quot;Wrong syntax for exclude option '%s': %s&quot;, excludeExclusively);</span>
-<span class="fc" id="L189">	}</span>
+<span class="fc" id="L189">		excludes = createFilterList(packagesExcludeArg, excludes, &quot;Wrong syntax for exclude option '%s': %s&quot;, excludeExclusively);</span>
+<span class="fc" id="L190">	}</span>
 
 	public void addIncludeFromArgument(Optional&lt;String&gt; packagesIncludeArg, boolean includeExclusively) {
-<span class="nc" id="L192">		includes = createFilterList(packagesIncludeArg, includes, &quot;Wrong syntax for include option '%s': %s&quot;, includeExclusively);</span>
-<span class="nc" id="L193">	}</span>
+<span class="nc" id="L193">		includes = createFilterList(packagesIncludeArg, includes, &quot;Wrong syntax for include option '%s': %s&quot;, includeExclusively);</span>
+<span class="nc" id="L194">	}</span>
 
 	public List&lt;Filter&gt; createFilterList(Optional&lt;String&gt; argumentString, List&lt;Filter&gt; filters, String errorMessage, boolean exclusive) {
-<span class="fc bfc" id="L196" title="All 2 branches covered.">		for (String filterString : Splitter.on(&quot;;&quot;).trimResults().omitEmptyStrings().split(argumentString.or(&quot;&quot;))) {</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">		for (String filterString : Splitter.on(&quot;;&quot;).trimResults().omitEmptyStrings().split(argumentString.or(&quot;&quot;))) {</span>
 			try {
 				// filter based on annotations
-<span class="pc bpc" id="L199" title="1 of 2 branches missed.">				if (filterString.startsWith(&quot;@&quot;)) {</span>
-<span class="nc" id="L200">					filters.add(new AnnotationClassFilter(filterString));</span>
-<span class="nc" id="L201">					filters.add(new AnnotationFieldFilter(filterString));</span>
-<span class="nc" id="L202">					filters.add(new AnnotationBehaviorFilter(filterString));</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">				if (filterString.startsWith(&quot;@&quot;)) {</span>
+<span class="nc" id="L201">					filters.add(new AnnotationClassFilter(filterString));</span>
+<span class="nc" id="L202">					filters.add(new AnnotationFieldFilter(filterString));</span>
+<span class="nc" id="L203">					filters.add(new AnnotationBehaviorFilter(filterString));</span>
 				}
-<span class="pc bpc" id="L204" title="1 of 2 branches missed.">				if (filterString.contains(&quot;#&quot;)) {</span>
-<span class="nc bnc" id="L205" title="All 2 branches missed.">					if (filterString.contains(&quot;(&quot;)) {</span>
-<span class="nc" id="L206">						JavadocLikeBehaviorFilter behaviorFilter = new JavadocLikeBehaviorFilter(filterString);</span>
-<span class="nc" id="L207">						filters.add(behaviorFilter);</span>
-<span class="nc" id="L208">					} else {</span>
-<span class="nc" id="L209">						JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter(filterString);</span>
-<span class="nc" id="L210">						filters.add(fieldFilter);</span>
-<span class="nc" id="L211">					}</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">				if (filterString.contains(&quot;#&quot;)) {</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">					if (filterString.contains(&quot;(&quot;)) {</span>
+<span class="nc" id="L207">						JavadocLikeBehaviorFilter behaviorFilter = new JavadocLikeBehaviorFilter(filterString);</span>
+<span class="nc" id="L208">						filters.add(behaviorFilter);</span>
+<span class="nc" id="L209">					} else {</span>
+<span class="nc" id="L210">						JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter(filterString);</span>
+<span class="nc" id="L211">						filters.add(fieldFilter);</span>
+<span class="nc" id="L212">					}</span>
 				} else {
-<span class="fc" id="L213">					JavaDocLikeClassFilter classFilter = new JavaDocLikeClassFilter(filterString);</span>
-<span class="fc" id="L214">					filters.add(classFilter);</span>
-<span class="fc" id="L215">					JavadocLikePackageFilter packageFilter = new JavadocLikePackageFilter(filterString, exclusive);</span>
-<span class="fc" id="L216">					filters.add(packageFilter);</span>
+<span class="fc" id="L214">					JavaDocLikeClassFilter classFilter = new JavaDocLikeClassFilter(filterString);</span>
+<span class="fc" id="L215">					filters.add(classFilter);</span>
+<span class="fc" id="L216">					JavadocLikePackageFilter packageFilter = new JavadocLikePackageFilter(filterString, exclusive);</span>
+<span class="fc" id="L217">					filters.add(packageFilter);</span>
 				}
-<span class="nc" id="L218">			} catch (Exception e) {</span>
-<span class="nc" id="L219">				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(errorMessage, filterString, e.getMessage()), e);</span>
-<span class="fc" id="L220">			}</span>
-<span class="fc" id="L221">		}</span>
-<span class="fc" id="L222">		return filters;</span>
+<span class="nc" id="L219">			} catch (Exception e) {</span>
+<span class="nc" id="L220">				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format(errorMessage, filterString, e.getMessage()), e);</span>
+<span class="fc" id="L221">			}</span>
+<span class="fc" id="L222">		}</span>
+<span class="fc" id="L223">		return filters;</span>
 	}
 
 	public boolean isOutputOnlyBinaryIncompatibleModifications() {
-<span class="fc" id="L226">		return outputOnlyBinaryIncompatibleModifications;</span>
+<span class="fc" id="L227">		return outputOnlyBinaryIncompatibleModifications;</span>
 	}
 
 	public void setOutputOnlyBinaryIncompatibleModifications(boolean outputOnlyBinaryIncompatibleModifications) {
-<span class="nc" id="L230">		this.outputOnlyBinaryIncompatibleModifications = outputOnlyBinaryIncompatibleModifications;</span>
-<span class="nc" id="L231">	}</span>
+<span class="nc" id="L231">		this.outputOnlyBinaryIncompatibleModifications = outputOnlyBinaryIncompatibleModifications;</span>
+<span class="nc" id="L232">	}</span>
 
 	public Optional&lt;String&gt; getHtmlOutputFile() {
-<span class="fc" id="L234">		return htmlOutputFile;</span>
+<span class="fc" id="L235">		return htmlOutputFile;</span>
 	}
 
 	public void setHtmlOutputFile(Optional&lt;String&gt; htmlOutputFile) {
-<span class="fc" id="L238">		this.htmlOutputFile = htmlOutputFile;</span>
-<span class="fc" id="L239">	}</span>
+<span class="fc" id="L239">		this.htmlOutputFile = htmlOutputFile;</span>
+<span class="fc" id="L240">	}</span>
 
 	public boolean isIncludeSynthetic() {
-<span class="fc" id="L242">		return includeSynthetic;</span>
+<span class="fc" id="L243">		return includeSynthetic;</span>
 	}
 
 	public void setIncludeSynthetic(boolean showSynthetic) {
-<span class="fc" id="L246">		this.includeSynthetic = showSynthetic;</span>
-<span class="fc" id="L247">	}</span>
+<span class="fc" id="L247">		this.includeSynthetic = showSynthetic;</span>
+<span class="fc" id="L248">	}</span>
 
 	public void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
-<span class="fc" id="L250">		this.ignoreMissingClasses.setIgnoreAllMissingClasses(ignoreMissingClasses);</span>
-<span class="fc" id="L251">	}</span>
+<span class="fc" id="L251">		this.ignoreMissingClasses.setIgnoreAllMissingClasses(ignoreMissingClasses);</span>
+<span class="fc" id="L252">	}</span>
 
 	public Optional&lt;String&gt; getHtmlStylesheet() {
-<span class="fc" id="L254">		return htmlStylesheet;</span>
+<span class="fc" id="L255">		return htmlStylesheet;</span>
 	}
 
 	public void setHtmlStylesheet(Optional&lt;String&gt; htmlStylesheet) {
-<span class="fc" id="L258">		this.htmlStylesheet = htmlStylesheet;</span>
-<span class="fc" id="L259">	}</span>
+<span class="fc" id="L259">		this.htmlStylesheet = htmlStylesheet;</span>
+<span class="fc" id="L260">	}</span>
 
 	public Optional&lt;String&gt; getOldClassPath() {
-<span class="fc" id="L262">		return oldClassPath;</span>
+<span class="fc" id="L263">		return oldClassPath;</span>
 	}
 
 	public void setOldClassPath(Optional&lt;String&gt; oldClassPath) {
-<span class="nc" id="L266">		this.oldClassPath = oldClassPath;</span>
-<span class="nc" id="L267">	}</span>
+<span class="nc" id="L267">		this.oldClassPath = oldClassPath;</span>
+<span class="nc" id="L268">	}</span>
 
 	public Optional&lt;String&gt; getNewClassPath() {
-<span class="fc" id="L270">		return newClassPath;</span>
+<span class="fc" id="L271">		return newClassPath;</span>
 	}
 
 	public void setNewClassPath(Optional&lt;String&gt; newClassPath) {
-<span class="nc" id="L274">		this.newClassPath = newClassPath;</span>
-<span class="nc" id="L275">	}</span>
+<span class="nc" id="L275">		this.newClassPath = newClassPath;</span>
+<span class="nc" id="L276">	}</span>
 
 	public JApiCli.ClassPathMode getClassPathMode() {
-<span class="fc" id="L278">		return classPathMode;</span>
+<span class="fc" id="L279">		return classPathMode;</span>
 	}
 
 	public void setClassPathMode(JApiCli.ClassPathMode classPathMode) {
-<span class="fc" id="L282">		this.classPathMode = classPathMode;</span>
-<span class="fc" id="L283">	}</span>
+<span class="fc" id="L283">		this.classPathMode = classPathMode;</span>
+<span class="fc" id="L284">	}</span>
 
 	public boolean isNoAnnotations() {
-<span class="fc" id="L286">		return noAnnotations;</span>
+<span class="fc" id="L287">		return noAnnotations;</span>
 	}
 
 	public void setNoAnnotations(boolean noAnnotations) {
-<span class="nc" id="L290">		this.noAnnotations = noAnnotations;</span>
-<span class="nc" id="L291">	}</span>
+<span class="nc" id="L291">		this.noAnnotations = noAnnotations;</span>
+<span class="nc" id="L292">	}</span>
 
 	public void addIgnoreMissingClassRegularExpression(String missingClassRegEx) {
 		try {
-<span class="nc" id="L295">			Pattern pattern = Pattern.compile(missingClassRegEx);</span>
-<span class="nc" id="L296">			this.ignoreMissingClasses.getIgnoreMissingClassRegularExpression().add(pattern);</span>
-<span class="nc" id="L297">		} catch (Exception e) {</span>
-<span class="nc" id="L298">			throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, &quot;Could not compile provided regular expression: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L299">		}</span>
-<span class="nc" id="L300">	}</span>
+<span class="nc" id="L296">			Pattern pattern = Pattern.compile(missingClassRegEx);</span>
+<span class="nc" id="L297">			this.ignoreMissingClasses.getIgnoreMissingClassRegularExpression().add(pattern);</span>
+<span class="nc" id="L298">		} catch (Exception e) {</span>
+<span class="nc" id="L299">			throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, &quot;Could not compile provided regular expression: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L300">		}</span>
+<span class="nc" id="L301">	}</span>
 
 	public IgnoreMissingClasses getIgnoreMissingClasses() {
-<span class="fc" id="L303">		return ignoreMissingClasses;</span>
+<span class="fc" id="L304">		return ignoreMissingClasses;</span>
 	}
 
 	public void setReportOnlyFilename(boolean reportOnlyFilename) {
-<span class="nc" id="L307">		this.reportOnlyFilename = reportOnlyFilename;</span>
-<span class="nc" id="L308">	}</span>
+<span class="nc" id="L308">		this.reportOnlyFilename = reportOnlyFilename;</span>
+<span class="nc" id="L309">	}</span>
 
 	public boolean isReportOnlySummary() {
-<span class="fc" id="L311">		return reportOnlySummary;</span>
+<span class="fc" id="L312">		return reportOnlySummary;</span>
 	}
 
 	public void setReportOnlySummary(boolean reportOnlySummary) {
-<span class="fc" id="L315">		this.reportOnlySummary = reportOnlySummary;</span>
-<span class="fc" id="L316">	}</span>
+<span class="fc" id="L316">		this.reportOnlySummary = reportOnlySummary;</span>
+<span class="fc" id="L317">	}</span>
 
 	public String getDifferenceDescription() {
-<span class="fc" id="L319">		Joiner joiner = Joiner.on(&quot;;&quot;);</span>
-<span class="fc" id="L320">		StringBuilder sb = new StringBuilder()</span>
-<span class="fc" id="L321">				.append(&quot;Comparing &quot;)</span>
-<span class="pc bpc" id="L322" title="1 of 2 branches missed.">				.append(isOutputOnlyBinaryIncompatibleModifications() ? &quot;binary&quot; :&quot;source&quot;)</span>
-<span class="fc" id="L323">				.append(&quot; compatibility of &quot;);</span>
-<span class="fc" id="L324">		sb.append(joiner.join(toPathList(newArchives)));</span>
-<span class="fc" id="L325">		sb.append(&quot; against &quot;);</span>
-<span class="fc" id="L326">		sb.append(joiner.join(toPathList(oldArchives)));</span>
-<span class="fc" id="L327">		return sb.toString();</span>
+<span class="fc" id="L320">		Joiner joiner = Joiner.on(&quot;;&quot;);</span>
+<span class="fc" id="L321">		StringBuilder sb = new StringBuilder()</span>
+<span class="fc" id="L322">				.append(&quot;Comparing &quot;)</span>
+<span class="pc bpc" id="L323" title="1 of 2 branches missed.">				.append(isOutputOnlyBinaryIncompatibleModifications() ? &quot;binary&quot; :&quot;source&quot;)</span>
+<span class="fc" id="L324">				.append(&quot; compatibility of &quot;);</span>
+<span class="fc" id="L325">		sb.append(joiner.join(toPathList(newArchives)));</span>
+<span class="fc" id="L326">		sb.append(&quot; against &quot;);</span>
+<span class="fc" id="L327">		sb.append(joiner.join(toPathList(oldArchives)));</span>
+<span class="fc" id="L328">		return sb.toString();</span>
 	}
 
 	private List&lt;String&gt; toPathList(List&lt;JApiCmpArchive&gt; archives) {
-<span class="fc" id="L331">		List&lt;String&gt; paths = new ArrayList&lt;&gt;(archives.size());</span>
-<span class="fc bfc" id="L332" title="All 2 branches covered.">		for (JApiCmpArchive archive : archives) {</span>
-<span class="pc bpc" id="L333" title="1 of 2 branches missed.">			if (this.reportOnlyFilename) {</span>
-<span class="nc bnc" id="L334" title="All 2 branches missed.">				if (archive.getFile() != null) {</span>
-<span class="nc" id="L335">					paths.add(archive.getFile().getName());</span>
+<span class="fc" id="L332">		List&lt;String&gt; paths = new ArrayList&lt;&gt;(archives.size());</span>
+<span class="fc bfc" id="L333" title="All 2 branches covered.">		for (JApiCmpArchive archive : archives) {</span>
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">			if (this.reportOnlyFilename) {</span>
+<span class="nc bnc" id="L335" title="All 2 branches missed.">				if (archive.getFile() != null) {</span>
+<span class="nc" id="L336">					paths.add(archive.getFile().getName());</span>
 				} else {
-<span class="nc" id="L337">					paths.add(archive.getName());</span>
+<span class="nc" id="L338">					paths.add(archive.getName());</span>
 				}
 			} else {
-<span class="pc bpc" id="L340" title="1 of 2 branches missed.">				if (archive.getFile() != null) {</span>
-<span class="fc" id="L341">					paths.add(archive.getFile().getAbsolutePath());</span>
+<span class="pc bpc" id="L341" title="1 of 2 branches missed.">				if (archive.getFile() != null) {</span>
+<span class="fc" id="L342">					paths.add(archive.getFile().getAbsolutePath());</span>
 				} else {
-<span class="nc" id="L343">					paths.add(archive.getName());</span>
+<span class="nc" id="L344">					paths.add(archive.getName());</span>
 				}
 			}
-<span class="fc" id="L346">		}</span>
-<span class="fc" id="L347">		return paths;</span>
+<span class="fc" id="L347">		}</span>
+<span class="fc" id="L348">		return paths;</span>
 	}
 
 	private List&lt;String&gt; toVersionList(List&lt;JApiCmpArchive&gt; archives) {
-<span class="fc" id="L351">		List&lt;String&gt; versions = new ArrayList&lt;&gt;(archives.size());</span>
-<span class="pc bpc" id="L352" title="1 of 2 branches missed.">		for (JApiCmpArchive archive : archives) {</span>
-<span class="nc" id="L353">			String stringVersion = archive.getVersion().getStringVersion();</span>
-<span class="nc bnc" id="L354" title="All 2 branches missed.">			if (stringVersion != null) {</span>
-<span class="nc" id="L355">				versions.add(stringVersion);</span>
+<span class="fc" id="L352">		List&lt;String&gt; versions = new ArrayList&lt;&gt;(archives.size());</span>
+<span class="pc bpc" id="L353" title="1 of 2 branches missed.">		for (JApiCmpArchive archive : archives) {</span>
+<span class="nc" id="L354">			String stringVersion = archive.getVersion().getStringVersion();</span>
+<span class="nc bnc" id="L355" title="All 2 branches missed.">			if (stringVersion != null) {</span>
+<span class="nc" id="L356">				versions.add(stringVersion);</span>
 			}
-<span class="nc" id="L357">		}</span>
-<span class="fc" id="L358">		return versions;</span>
+<span class="nc" id="L358">		}</span>
+<span class="fc" id="L359">		return versions;</span>
 	}
 
 	public String joinOldArchives() {
-<span class="fc" id="L362">        String join = Joiner.on(&quot;;&quot;).join(toPathList(oldArchives));</span>
-<span class="pc bpc" id="L363" title="1 of 2 branches missed.">		if (join.trim().isEmpty()) {</span>
-<span class="fc" id="L364">			return N_A;</span>
+<span class="fc" id="L363">        String join = Joiner.on(&quot;;&quot;).join(toPathList(oldArchives));</span>
+<span class="pc bpc" id="L364" title="1 of 2 branches missed.">		if (join.trim().isEmpty()) {</span>
+<span class="fc" id="L365">			return N_A;</span>
 		}
-<span class="nc" id="L366">		return join;</span>
+<span class="nc" id="L367">		return join;</span>
 	}
 
 	public String joinNewArchives() {
-<span class="fc" id="L370">        String join = Joiner.on(&quot;;&quot;).join(toPathList(newArchives));</span>
-<span class="pc bpc" id="L371" title="1 of 2 branches missed.">		if (join.trim().isEmpty()) {</span>
-<span class="fc" id="L372">			return N_A;</span>
+<span class="fc" id="L371">        String join = Joiner.on(&quot;;&quot;).join(toPathList(newArchives));</span>
+<span class="pc bpc" id="L372" title="1 of 2 branches missed.">		if (join.trim().isEmpty()) {</span>
+<span class="fc" id="L373">			return N_A;</span>
 		}
-<span class="nc" id="L374">		return join;</span>
+<span class="nc" id="L375">		return join;</span>
 	}
 
 	public String joinOldVersions() {
-<span class="fc" id="L378">        String join = Joiner.on(&quot;;&quot;).join(toVersionList(oldArchives));</span>
-<span class="pc bpc" id="L379" title="1 of 2 branches missed.">		if (join.trim().isEmpty()) {</span>
-<span class="fc" id="L380">			return N_A;</span>
+<span class="fc" id="L379">        String join = Joiner.on(&quot;;&quot;).join(toVersionList(oldArchives));</span>
+<span class="pc bpc" id="L380" title="1 of 2 branches missed.">		if (join.trim().isEmpty()) {</span>
+<span class="fc" id="L381">			return N_A;</span>
 		}
-<span class="nc" id="L382">		return join;</span>
+<span class="nc" id="L383">		return join;</span>
 	}
 
 	public String joinNewVersions() {
-<span class="fc" id="L386">        String join = Joiner.on(&quot;;&quot;).join(toVersionList(newArchives));</span>
-<span class="pc bpc" id="L387" title="1 of 2 branches missed.">		if (join.trim().isEmpty()) {</span>
-<span class="fc" id="L388">			return N_A;</span>
+<span class="fc" id="L387">        String join = Joiner.on(&quot;;&quot;).join(toVersionList(newArchives));</span>
+<span class="pc bpc" id="L388" title="1 of 2 branches missed.">		if (join.trim().isEmpty()) {</span>
+<span class="fc" id="L389">			return N_A;</span>
 		}
-<span class="nc" id="L390">		return join;</span>
+<span class="nc" id="L391">		return join;</span>
 	}
 
 	public void setSemanticVersioning(boolean semanticVersioning) {
-<span class="nc" id="L394">		this.semanticVersioning = semanticVersioning;</span>
-<span class="nc" id="L395">	}</span>
+<span class="nc" id="L395">		this.semanticVersioning = semanticVersioning;</span>
+<span class="nc" id="L396">	}</span>
 
 	public boolean isSemanticVersioning() {
-<span class="fc" id="L398">		return semanticVersioning;</span>
+<span class="fc" id="L399">		return semanticVersioning;</span>
+	}
+
+	public void setMarkdown(boolean markdown) {
+<span class="nc" id="L403">		this.markdown = markdown;</span>
+<span class="nc" id="L404">	}</span>
+
+	public boolean isMarkdown() {
+<span class="fc" id="L407">		return markdown;</span>
 	}
 
 	public boolean isErrorOnBinaryIncompatibility() {
-<span class="fc" id="L402">		return errorOnBinaryIncompatibility;</span>
+<span class="fc" id="L411">		return errorOnBinaryIncompatibility;</span>
 	}
 
 	public void setErrorOnBinaryIncompatibility(boolean errorOnBinaryIncompatibility) {
-<span class="fc" id="L406">		this.errorOnBinaryIncompatibility = errorOnBinaryIncompatibility;</span>
-<span class="fc" id="L407">	}</span>
+<span class="fc" id="L415">		this.errorOnBinaryIncompatibility = errorOnBinaryIncompatibility;</span>
+<span class="fc" id="L416">	}</span>
 
 	public boolean isErrorOnSourceIncompatibility() {
-<span class="fc" id="L410">		return errorOnSourceIncompatibility;</span>
+<span class="fc" id="L419">		return errorOnSourceIncompatibility;</span>
 	}
 
 	public void setErrorOnSourceIncompatibility(boolean errorOnSourceIncompatibility) {
-<span class="fc" id="L414">		this.errorOnSourceIncompatibility = errorOnSourceIncompatibility;</span>
-<span class="fc" id="L415">	}</span>
+<span class="fc" id="L423">		this.errorOnSourceIncompatibility = errorOnSourceIncompatibility;</span>
+<span class="fc" id="L424">	}</span>
 
 	public boolean isErrorOnExclusionIncompatibility() {
-<span class="fc" id="L418">		return errorOnExclusionIncompatibility;</span>
+<span class="fc" id="L427">		return errorOnExclusionIncompatibility;</span>
 	}
 
 	public void setErrorOnExclusionIncompatibility(boolean errorOnExclusionIncompatibility) {
-<span class="fc" id="L422">		this.errorOnExclusionIncompatibility = errorOnExclusionIncompatibility;</span>
-<span class="fc" id="L423">	}</span>
+<span class="fc" id="L431">		this.errorOnExclusionIncompatibility = errorOnExclusionIncompatibility;</span>
+<span class="fc" id="L432">	}</span>
 
 	public boolean isErrorOnModifications() {
-<span class="fc" id="L426">		return errorOnModifications;</span>
+<span class="fc" id="L435">		return errorOnModifications;</span>
 	}
 
 	public void setErrorOnModifications(boolean errorOnModifications) {
-<span class="nc" id="L430">		this.errorOnModifications = errorOnModifications;</span>
-<span class="nc" id="L431">	}</span>
+<span class="nc" id="L439">		this.errorOnModifications = errorOnModifications;</span>
+<span class="nc" id="L440">	}</span>
 
 	public boolean isErrorOnSemanticIncompatibility() {
-<span class="fc" id="L434">		return errorOnSemanticIncompatibility;</span>
+<span class="fc" id="L443">		return errorOnSemanticIncompatibility;</span>
 	}
 
 	public void setErrorOnSemanticIncompatibility(boolean errorOnSemanticIncompatibility) {
-<span class="fc" id="L438">		this.errorOnSemanticIncompatibility = errorOnSemanticIncompatibility;</span>
-<span class="fc" id="L439">	}</span>
+<span class="fc" id="L447">		this.errorOnSemanticIncompatibility = errorOnSemanticIncompatibility;</span>
+<span class="fc" id="L448">	}</span>
 
 	public boolean isIgnoreMissingOldVersion() {
-<span class="fc" id="L442">		return ignoreMissingOldVersion;</span>
+<span class="fc" id="L451">		return ignoreMissingOldVersion;</span>
 	}
 
 	public void setIgnoreMissingOldVersion(boolean ignoreMissingOldVersion) {
-<span class="fc" id="L446">		this.ignoreMissingOldVersion = ignoreMissingOldVersion;</span>
-<span class="fc" id="L447">	}</span>
+<span class="fc" id="L455">		this.ignoreMissingOldVersion = ignoreMissingOldVersion;</span>
+<span class="fc" id="L456">	}</span>
 
 	public boolean isIgnoreMissingNewVersion() {
-<span class="fc" id="L450">		return ignoreMissingNewVersion;</span>
+<span class="fc" id="L459">		return ignoreMissingNewVersion;</span>
 	}
 
 	public void setIgnoreMissingNewVersion(boolean ignoreMissingNewVersion) {
-<span class="fc" id="L454">		this.ignoreMissingNewVersion = ignoreMissingNewVersion;</span>
-<span class="fc" id="L455">	}</span>
+<span class="fc" id="L463">		this.ignoreMissingNewVersion = ignoreMissingNewVersion;</span>
+<span class="fc" id="L464">	}</span>
 
 	public boolean isHelpRequested() {
-<span class="fc" id="L458">		return helpRequested;</span>
+<span class="fc" id="L467">		return helpRequested;</span>
 	}
 
 	public void setHelpRequested(boolean helpRequested) {
-<span class="fc" id="L462">		this.helpRequested = helpRequested;</span>
-<span class="fc" id="L463">	}</span>
+<span class="fc" id="L471">		this.helpRequested = helpRequested;</span>
+<span class="fc" id="L472">	}</span>
 
 	public boolean isErrorOnSemanticIncompatibilityForMajorVersionZero() {
-<span class="nc" id="L466">		return errorOnSemanticIncompatibilityForMajorVersionZero;</span>
+<span class="fc" id="L475">		return errorOnSemanticIncompatibilityForMajorVersionZero;</span>
 	}
 
 	public void setErrorOnSemanticIncompatibilityForMajorVersionZero(boolean errorOnSemanticIncompatibilityForMajorVersionZero) {
-<span class="nc" id="L470">		this.errorOnSemanticIncompatibilityForMajorVersionZero = errorOnSemanticIncompatibilityForMajorVersionZero;</span>
-<span class="nc" id="L471">	}</span>
+<span class="nc" id="L479">		this.errorOnSemanticIncompatibilityForMajorVersionZero = errorOnSemanticIncompatibilityForMajorVersionZero;</span>
+<span class="nc" id="L480">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

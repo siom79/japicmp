@@ -5,6 +5,7 @@ japicmp.config
 japicmp.filter
 japicmp.output.html
 japicmp.output.incompatible
+japicmp.output.markdown
 japicmp.output.semver
 japicmp.output.stdout
 japicmp.output.xml

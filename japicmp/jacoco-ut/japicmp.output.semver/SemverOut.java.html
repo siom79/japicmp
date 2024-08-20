@@ -39,8 +39,8 @@ public class SemverOut extends OutputGenerator&lt;String&gt; {
 
 			@Override
 			public void visit(Iterator&lt;JApiMethod&gt; iterator, JApiMethod jApiMethod) {
-<span class="nc" id="L42">				builder.add(signs(jApiMethod));</span>
-<span class="nc" id="L43">			}</span>
+<span class="fc" id="L42">				builder.add(signs(jApiMethod));</span>
+<span class="fc" id="L43">			}</span>
 
 			@Override
 			public void visit(Iterator&lt;JApiConstructor&gt; iterator, JApiConstructor jApiConstructor) {
@@ -54,8 +54,8 @@ public class SemverOut extends OutputGenerator&lt;String&gt; {
 
 			@Override
 			public void visit(Iterator&lt;JApiField&gt; iterator, JApiField jApiField) {
-<span class="nc" id="L57">				builder.add(signs(jApiField));</span>
-<span class="nc" id="L58">			}</span>
+<span class="fc" id="L57">				builder.add(signs(jApiField));</span>
+<span class="fc" id="L58">			}</span>
 
 			@Override
 			public void visit(Iterator&lt;JApiAnnotation&gt; iterator, JApiAnnotation jApiAnnotation) {
@@ -70,10 +70,10 @@ public class SemverOut extends OutputGenerator&lt;String&gt; {
 <span class="fc" id="L70">		ImmutableSet&lt;JApiSemanticVersionLevel&gt; build = builder.build();</span>
 <span class="fc bfc" id="L71" title="All 2 branches covered.">		if (build.contains(JApiSemanticVersionLevel.MAJOR)) {</span>
 <span class="fc" id="L72">			return SEMVER_MAJOR;</span>
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">		} else if (build.contains(JApiSemanticVersionLevel.MINOR)) {</span>
-<span class="nc" id="L74">			return SEMVER_MINOR;</span>
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">		} else if (build.contains(JApiSemanticVersionLevel.PATCH)) {</span>
-<span class="nc" id="L76">			return SEMVER_PATCH;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">		} else if (build.contains(JApiSemanticVersionLevel.MINOR)) {</span>
+<span class="fc" id="L74">			return SEMVER_MINOR;</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">		} else if (build.contains(JApiSemanticVersionLevel.PATCH)) {</span>
+<span class="fc" id="L76">			return SEMVER_PATCH;</span>
 <span class="pc bpc" id="L77" title="1 of 2 branches missed.">		} else if (build.isEmpty()) {</span>
 <span class="fc" id="L78">			return SEMVER_COMPATIBLE;</span>
 		} else {
@@ -118,7 +118,7 @@ public class SemverOut extends OutputGenerator&lt;String&gt; {
 			public void onChange(JApiCompatibility change, JApiSemanticVersionLevel semanticVersionLevel)
 			{
 				// Empty
-<span class="nc" id="L121">			}</span>
+<span class="fc" id="L121">			}</span>
 		};
 	}
 

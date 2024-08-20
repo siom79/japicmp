@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiClassFileFormatVersionHelper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.util</a> &gt; <span class="el_source">JApiClassFileFormatVersionHelper.java</span></div><h1>JApiClassFileFormatVersionHelper.java</h1><pre class="source lang-java linenums">package japicmp.util;
+
+import japicmp.model.JApiClassFileFormatVersion;
+
+public class JApiClassFileFormatVersionHelper {
+
+	private JApiClassFileFormatVersionHelper() {
+	}
+
+	public static String getOldJdkVersion(JApiClassFileFormatVersion x) {
+<span class="fc" id="L11">		return getJdkVersion(x.getMajorVersionOld(), x.getMinorVersionOld());</span>
+	}
+
+	public static String getNewJdkVersion(JApiClassFileFormatVersion x) {
+<span class="fc" id="L15">		return getJdkVersion(x.getMajorVersionNew(), x.getMinorVersionNew());</span>
+	}
+
+	private static String getJdkVersion(int major, int minor) {
+<span class="pc bpc" id="L19" title="1 of 4 branches missed.">		if (major == -1 || minor == -1) {</span>
+<span class="fc" id="L20">			return &quot;&quot;;</span>
+		}
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">		if (major == 45) {</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">			return minor &lt; 3 ? &quot;JDK 1.0&quot; : &quot;JDK 1.1&quot;;</span>
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">		} else if (major == 46) {</span>
+<span class="nc" id="L25">			return &quot;JDK 1.2&quot;;</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">		} else if (major == 47) {</span>
+<span class="nc" id="L27">			return &quot;JDK 1.3&quot;;</span>
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">		} else if (major == 48) {</span>
+<span class="nc" id="L29">			return &quot;JDK 1.4&quot;;</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">		} else if (major &gt;= 49) {</span>
+			// according to: https://andbin.github.io/java-versions-cheat-sheet/
+<span class="fc" id="L32">			return &quot;JDK &quot; + (major - 44);</span>
+		}
+<span class="nc" id="L34">		return &quot;Version &quot; + major + &quot;.&quot; + minor;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
