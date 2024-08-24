@@ -1,6 +1,5 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -8,6 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class JApiReturnType implements JApiHasGenericTypes, JApiHasChangeStatus, JApiCompatibility {
 	private final Optional<String> oldReturnTypeOptional;

@@ -1,6 +1,5 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import javassist.bytecode.annotation.*;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -10,6 +9,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibility {
 	private final String name;

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class GenericTemplateHelper {
 
@@ -37,7 +38,7 @@ public class GenericTemplateHelper {
 					if (!newParsedTemplate.getType().equals(oldParsedTemplate.getType())) {
 						changeStatus = JApiChangeStatus.MODIFIED;
 					}
-					JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(changeStatus, newParsedTemplate.getName(), japicmp.util.Optional.of(oldParsedTemplate.getType()), japicmp.util.Optional.of(newParsedTemplate.getType()));
+					JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(changeStatus, newParsedTemplate.getName(), Optional.of(oldParsedTemplate.getType()), Optional.of(newParsedTemplate.getType()));
 					SignatureParser.copyGenericParameters(oldParsedTemplate, jApiGenericTemplate.getOldGenericTypes());
 					SignatureParser.copyGenericParameters(newParsedTemplate, jApiGenericTemplate.getNewGenericTypes());
 					SignatureParser.copyGenericTypeInterfaces(oldParsedTemplate, jApiGenericTemplate.getOldInterfaceTypes());
@@ -45,14 +46,14 @@ public class GenericTemplateHelper {
 					genericTemplates.add(jApiGenericTemplate);
 					oldGenericTemplatesMap.remove(newParsedTemplate.getName());
 				} else {
-					JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.NEW, newParsedTemplate.getName(), japicmp.util.Optional.absent(), japicmp.util.Optional.of(newParsedTemplate.getType()));
+					JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.NEW, newParsedTemplate.getName(), Optional.empty(), Optional.of(newParsedTemplate.getType()));
 					SignatureParser.copyGenericParameters(newParsedTemplate, jApiGenericTemplate.getNewGenericTypes());
 					SignatureParser.copyGenericTypeInterfaces(newParsedTemplate, jApiGenericTemplate.getNewInterfaceTypes());
 					genericTemplates.add(jApiGenericTemplate);
 				}
 			}
 			for (SignatureParser.ParsedTemplate oldParsedTemplate : oldGenericTemplatesMap.values()) {
-				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.REMOVED, oldParsedTemplate.getName(), japicmp.util.Optional.of(oldParsedTemplate.getType()), japicmp.util.Optional.absent());
+				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.REMOVED, oldParsedTemplate.getName(), Optional.of(oldParsedTemplate.getType()), Optional.empty());
 				SignatureParser.copyGenericParameters(oldParsedTemplate, jApiGenericTemplate.getOldGenericTypes());
 				SignatureParser.copyGenericTypeInterfaces(oldParsedTemplate, jApiGenericTemplate.getOldInterfaceTypes());
 				genericTemplates.add(jApiGenericTemplate);
@@ -60,7 +61,7 @@ public class GenericTemplateHelper {
 		} else if (callback.isNewPresent()) {
 			SignatureParser newSignatureParser = callback.newSignatureParser();
 			for (SignatureParser.ParsedTemplate newParsedTemplate : newSignatureParser.getTemplates()) {
-				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.NEW, newParsedTemplate.getName(), japicmp.util.Optional.absent(), japicmp.util.Optional.of(newParsedTemplate.getType()));
+				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.NEW, newParsedTemplate.getName(), Optional.empty(), Optional.of(newParsedTemplate.getType()));
 				SignatureParser.copyGenericParameters(newParsedTemplate, jApiGenericTemplate.getNewGenericTypes());
 				SignatureParser.copyGenericTypeInterfaces(newParsedTemplate, jApiGenericTemplate.getNewInterfaceTypes());
 				genericTemplates.add(jApiGenericTemplate);
@@ -68,7 +69,7 @@ public class GenericTemplateHelper {
 		} else if (callback.isOldPresent()) {
 			SignatureParser oldSignatureParser = callback.oldSignatureParser();
 			for (SignatureParser.ParsedTemplate oldParsedTemplate : oldSignatureParser.getTemplates()) {
-				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.REMOVED, oldParsedTemplate.getName(), japicmp.util.Optional.of(oldParsedTemplate.getType()), japicmp.util.Optional.absent());
+				JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(JApiChangeStatus.REMOVED, oldParsedTemplate.getName(), Optional.of(oldParsedTemplate.getType()), Optional.empty());
 				SignatureParser.copyGenericParameters(oldParsedTemplate, jApiGenericTemplate.getOldGenericTypes());
 				SignatureParser.copyGenericTypeInterfaces(oldParsedTemplate, jApiGenericTemplate.getOldInterfaceTypes());
 				genericTemplates.add(jApiGenericTemplate);

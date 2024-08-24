@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.joining;
 
 import japicmp.model.*;
 import java.util.List;
+import java.util.Optional;
 
 public class TypeNameHelper {
 
@@ -101,7 +102,7 @@ public class TypeNameHelper {
 	public static String formatParameterTypeName(JApiBehavior method, JApiParameter parameter, Optional<VarargsModifier> varargs, List<JApiGenericType> genericTypes, boolean shorten) {
 		final String type = parameter.getType();
 		final List<JApiParameter> params = method.getParameters();
-		if (type.endsWith(STR_ARRAY) && parameter == params.get(params.size() - 1) && varargs.or(NON_VARARGS) == VARARGS) {
+		if (type.endsWith(STR_ARRAY) && parameter == params.get(params.size() - 1) && varargs.orElse(NON_VARARGS) == VARARGS) {
 			return formatTypeName(type.substring(0, type.length() - 2) + STR_VARARGS, genericTypes, shorten);
 		}
 		return formatTypeName(type, genericTypes, shorten);

@@ -14,7 +14,6 @@ import japicmp.model.JApiMethod;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
-import japicmp.util.Optional;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -25,6 +24,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Helper {
 

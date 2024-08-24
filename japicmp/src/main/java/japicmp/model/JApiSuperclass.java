@@ -1,6 +1,5 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.util.ClassHelper;
 import japicmp.util.OptionalHelper;
@@ -12,6 +11,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 	private final JApiClass jApiClass;
@@ -20,7 +20,7 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 	private final JApiChangeStatus changeStatus;
 	private final JarArchiveComparator jarArchiveComparator;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new LinkedList<>();
-	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
+	private Optional<JApiClass> correspondingJApiClass = Optional.empty();
 
 	public JApiSuperclass(JApiClass jApiClass, Optional<CtClass> oldSuperclassOptional, Optional<CtClass> newSuperclassOptional, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
 		this.jApiClass = jApiClass;
@@ -32,9 +32,9 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 
 	/**
 	 * Returns the {@link japicmp.model.JApiClass} representation of this superclass.
-	 * The return value is Optional.absent() in case the superclass for the old and new version is absent.
+	 * The return value is Optional.empty() in case the superclass for the old and new version is absent.
 	 *
-	 * @return the {@link japicmp.model.JApiClass} representation of this superclass as {@link com.google.common.base.Optional}
+	 * @return the {@link japicmp.model.JApiClass} representation of this superclass as {@link java.util.Optional}
 	 */
 	public Optional<JApiClass> getJApiClass() {
 		if (oldSuperclassOptional.isPresent() && newSuperclassOptional.isPresent()) {
@@ -47,22 +47,22 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 				JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.of(newSuperclass), JApiChangeStatus.UNCHANGED, classType);
 				return Optional.of(jApiClass);
 			} else {
-				return Optional.absent();
+				return Optional.empty();
 			}
 		} else if (oldSuperclassOptional.isPresent()) {
 			CtClass oldSuperclass = oldSuperclassOptional.get();
 			String oldSuperclassName = oldSuperclass.getName();
-			JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType);
+			JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.<JApiClassType.ClassType>empty(), JApiChangeStatus.REMOVED);
+			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.<CtClass>empty(), JApiChangeStatus.REMOVED, classType);
 			return Optional.of(jApiClass);
 		} else if (newSuperclassOptional.isPresent()) {
 			CtClass newSuperclass = newSuperclassOptional.get();
 			String newSuperclassName = newSuperclass.getName();
-			JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.NEW);
-			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.<CtClass>absent(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType);
+			JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>empty(), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.NEW);
+			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.<CtClass>empty(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType);
 			return Optional.of(jApiClass);
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	@XmlTransient
@@ -77,12 +77,12 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 
 	@XmlTransient
 	public Optional<String> getOldSuperclassName() {
-		return oldSuperclassOptional.isPresent() ? Optional.of(oldSuperclassOptional.get().getName()) : Optional.<String>absent();
+		return oldSuperclassOptional.isPresent() ? Optional.of(oldSuperclassOptional.get().getName()) : Optional.<String>empty();
 	}
 
 	@XmlTransient
 	public Optional<String> getNewSuperclassName() {
-		return newSuperclassOptional.isPresent() ? Optional.of(newSuperclassOptional.get().getName()) : Optional.<String>absent();
+		return newSuperclassOptional.isPresent() ? Optional.of(newSuperclassOptional.get().getName()) : Optional.<String>empty();
 	}
 
 	@XmlAttribute(name = "changeStatus")

@@ -22,6 +22,7 @@ import org.hamcrest.TypeSafeMatcher;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

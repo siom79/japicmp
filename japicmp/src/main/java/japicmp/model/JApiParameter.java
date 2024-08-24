@@ -1,13 +1,12 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class JApiParameter implements JApiHasGenericTypes, JApiHasChangeStatus, JApiCompatibility {
 	private String type;
@@ -42,7 +41,7 @@ public class JApiParameter implements JApiHasGenericTypes, JApiHasChangeStatus, 
 
 	@XmlAttribute(name = "templateName")
 	public String getTemplateName() {
-		return templateName.or("N/A");
+		return templateName.orElse("N/A");
 	}
 
 	public Optional<String> getTemplateNameOptional() {

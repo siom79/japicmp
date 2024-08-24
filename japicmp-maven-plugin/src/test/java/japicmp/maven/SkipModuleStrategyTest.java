@@ -1,6 +1,5 @@
 package japicmp.maven;
 
-import japicmp.util.Optional;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.logging.Log;
@@ -13,6 +12,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -101,7 +101,7 @@ public class SkipModuleStrategyTest {
 		Version newVersion = JApiCmpMojoTest.createVersion("groupId", "artifactId", "0.1.1");
 		Parameter parameter = new Parameter();
 		return new PluginParameters(false, newVersion, oldVersion, parameter, new ArrayList<Dependency>(),
-			Optional.<File>absent(), Optional.<String>absent(), false, new ArrayList<DependencyDescriptor>(),
+			Optional.<File>empty(), Optional.<String>empty(), false, new ArrayList<DependencyDescriptor>(),
 			new ArrayList<DependencyDescriptor>(), new ArrayList<Dependency>(), new ArrayList<Dependency>());
 	}
 }

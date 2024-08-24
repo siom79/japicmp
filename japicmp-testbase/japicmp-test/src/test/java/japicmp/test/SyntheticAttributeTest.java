@@ -1,6 +1,5 @@
 package japicmp.test;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -24,6 +23,7 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -53,10 +53,10 @@ public class SyntheticAttributeTest {
 		assertThat(syntheticClass.getSyntheticAttribute().getNewAttribute(), is(Optional.of(SyntheticAttribute.SYNTHETIC)));
 		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getChangeStatus(), is(JApiChangeStatus.NEW));
 		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getSyntheticAttribute().getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getSyntheticAttribute().getOldAttribute(), is(Optional.<SyntheticAttribute>absent()));
+		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getSyntheticAttribute().getOldAttribute(), is(Optional.<SyntheticAttribute>empty()));
 		assertThat(getJApiMethod(syntheticClass.getMethods(), "newMethod").getSyntheticAttribute().getNewAttribute(), is(Optional.of(SyntheticAttribute.SYNTHETIC)));
 		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getOldAttribute(), is(Optional.<SyntheticAttribute>absent()));
+		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getOldAttribute(), is(Optional.<SyntheticAttribute>empty()));
 		assertThat(getJApiField(syntheticClass.getFields(), "newField").getSyntheticAttribute().getNewAttribute(), is(Optional.of(SyntheticAttribute.SYNTHETIC)));
 	}
 

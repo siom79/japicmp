@@ -1,9 +1,9 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import java.util.Optional;
 
 public class JApiModifier<T> implements JApiHasChangeStatus {
 	private final Optional<T> oldModifier;

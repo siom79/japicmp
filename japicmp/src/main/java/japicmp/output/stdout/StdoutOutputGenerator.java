@@ -6,12 +6,12 @@ import japicmp.model.*;
 import japicmp.model.JApiAnnotationElementValue.Type;
 import japicmp.output.OutputFilter;
 import japicmp.output.OutputGenerator;
-import japicmp.util.Optional;
 import javassist.bytecode.annotation.MemberValue;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static japicmp.util.GenericTemplateHelper.haveGenericTemplateInterfacesChanges;
 

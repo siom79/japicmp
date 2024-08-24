@@ -1,7 +1,6 @@
 package japicmp.versioning;
 
-import japicmp.util.Optional;
-
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -21,7 +20,7 @@ public class Version {
 	}
 
 	public static Optional<SemanticVersion> getSemanticVersion(String version)  {
-		Optional<SemanticVersion> semanticVersion = Optional.absent();
+		Optional<SemanticVersion> semanticVersion = Optional.empty();
 		Matcher matcher = VERSION_PATTERN_THREE_DIGITS.matcher(version);
 		if (matcher.matches()) {
 			if (matcher.groupCount() >= 3) {

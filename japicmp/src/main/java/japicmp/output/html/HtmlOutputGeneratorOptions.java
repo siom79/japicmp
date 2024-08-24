@@ -1,9 +1,9 @@
 package japicmp.output.html;
 
-import japicmp.util.Optional;
+import java.util.Optional;
 
 public class HtmlOutputGeneratorOptions {
-	private Optional<String> title = Optional.absent();
+	private Optional<String> title = Optional.empty();
 	private String semanticVersioningInformation = "n.a.";
 
 	public Optional<String> getTitle() {
@@ -11,7 +11,7 @@ public class HtmlOutputGeneratorOptions {
 	}
 
 	public void setTitle(String title) {
-		this.title = Optional.fromNullable(title);
+		this.title = Optional.ofNullable(title);
 	}
 
 	public String getSemanticVersioningInformation() {

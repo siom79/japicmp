@@ -12,7 +12,6 @@ import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import japicmp.util.AnnotationHelper;
-import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
@@ -402,7 +401,7 @@ public class JarArchiveComparator {
 	 * @throws japicmp.exception.JApiCmpException if loading the class fails
 	 */
 	public Optional<CtClass> loadClass(ArchiveType archiveType, String name) {
-		Optional<CtClass> loadedClass = Optional.absent();
+		Optional<CtClass> loadedClass = Optional.empty();
 		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
 			try {
 				loadedClass = Optional.of(commonClassPool.get(name));

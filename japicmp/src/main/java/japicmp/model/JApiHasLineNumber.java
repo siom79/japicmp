@@ -1,6 +1,6 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
+import java.util.Optional;
 
 /**
  * This interface is implemented by all elements that can have line number

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier,
 	JApiHasFinalModifier, JApiHasTransientModifier, JApiHasVolatileModifier, JApiCompatibility, JApiHasAnnotations, JApiCanBeSynthetic,
@@ -61,7 +62,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	}
 
 	private JApiType extractType(Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
-		JApiType jApiType = new JApiType(Optional.<String>absent(), Optional.<String>absent(), JApiChangeStatus.UNCHANGED);
+		JApiType jApiType = new JApiType(Optional.<String>empty(), Optional.<String>empty(), JApiChangeStatus.UNCHANGED);
 		if (oldFieldOptional.isPresent() && newFieldOptional.isPresent()) {
 			CtField oldField = oldFieldOptional.get();
 			CtField newField = newFieldOptional.get();
@@ -76,11 +77,11 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 			if (oldFieldOptional.isPresent()) {
 				CtField oldField = oldFieldOptional.get();
 				String oldType = signatureToType(oldField.getSignature());
-				jApiType = new JApiType(Optional.of(oldType), Optional.<String>absent(), JApiChangeStatus.REMOVED);
+				jApiType = new JApiType(Optional.of(oldType), Optional.<String>empty(), JApiChangeStatus.REMOVED);
 			} else if (newFieldOptional.isPresent()) {
 				CtField newField = newFieldOptional.get();
 				String newType = signatureToType(newField.getSignature());
-				jApiType = new JApiType(Optional.<String>absent(), Optional.of(newType), JApiChangeStatus.NEW);
+				jApiType = new JApiType(Optional.<String>empty(), Optional.of(newType), JApiChangeStatus.NEW);
 			}
 		}
 		return jApiType;
@@ -143,18 +144,18 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 				CtField ctField = oldFieldOptional.get();
 				byte[] attribute = ctField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 				if (attribute != null) {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>absent());
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>empty());
 				} else {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>absent());
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>empty());
 				}
 			}
 			if (newFieldOptional.isPresent()) {
 				CtField ctField = newFieldOptional.get();
 				byte[] attribute = ctField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 				if (attribute != null) {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>empty(), Optional.of(SyntheticAttribute.SYNTHETIC));
 				} else {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>empty(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
 				}
 			}
 		}

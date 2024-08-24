@@ -1,10 +1,10 @@
 package japicmp.versioning;
 
-import japicmp.util.Optional;
 import japicmp.exception.JApiCmpException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class VersionChange {
 	private final List<SemanticVersion> oldVersions;
@@ -26,7 +26,7 @@ public class VersionChange {
 				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, "Could not extract semantic version for at least one old version. Please " +
 					"follow the rules for semantic versioning.");
 			} else {
-				return Optional.absent();
+				return Optional.empty();
 			}
 		}
 		if (this.newVersions.isEmpty()) {
@@ -34,7 +34,7 @@ public class VersionChange {
 				throw new JApiCmpException(JApiCmpException.Reason.IllegalArgument, "Could not extract semantic version for at least one new version. Please " +
 					"follow the rules for semantic versioning.");
 			} else {
-				return Optional.absent();
+				return Optional.empty();
 			}
 		}
 		if (allVersionsTheSame(oldVersions) && allVersionsTheSame(newVersions)) {
@@ -60,7 +60,7 @@ public class VersionChange {
 						maxRank = changeType;
 					}
 				}
-				return Optional.fromNullable(maxRank);
+				return Optional.ofNullable(maxRank);
 			}
 		}
 	}

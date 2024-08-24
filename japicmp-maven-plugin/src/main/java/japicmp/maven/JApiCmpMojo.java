@@ -22,7 +22,6 @@ import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
-import japicmp.util.Optional;
 import japicmp.versioning.SemanticVersion;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -118,7 +117,7 @@ public class JApiCmpMojo extends AbstractMojo {
 			this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
 			this.remoteRepos);
 		PluginParameters pluginParameters = new PluginParameters(this.skipExec || this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.of(
-			this.projectBuildDir), Optional.<String>absent(), true, this.oldVersions, this.newVersions, this.oldClassPathDependencies,
+			this.projectBuildDir), Optional.<String>empty(), true, this.oldVersions, this.newVersions, this.oldClassPathDependencies,
 			this.newClassPathDependencies);
 		executeWithParameters(pluginParameters, mavenParameters);
 	}
@@ -126,14 +125,14 @@ public class JApiCmpMojo extends AbstractMojo {
 	Optional<HtmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
 		if (pluginParameters.getSkipParam()) {
 			getLog().info("Skipping execution because parameter 'skip' was set to true.");
-			return Optional.absent();
+			return Optional.empty();
 		}
 		if (isPomModuleNeedingSkip(pluginParameters, mavenParameters)) {
 			getLog().info("Skipping execution because parameter 'skipPomModules' was set to true and this is artifact is of type pom.");
-			return Optional.absent();
+			return Optional.empty();
 		}
 		if (skipModule(pluginParameters, mavenParameters)) {
-			return Optional.absent();
+			return Optional.empty();
 		}
 		Options options = getOptions(pluginParameters, mavenParameters);
 		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
@@ -142,7 +141,7 @@ public class JApiCmpMojo extends AbstractMojo {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 		if (options.getNewArchives().isEmpty()) {
 			getLog().warn("Skipping execution because no new version could be resolved/found.");
-			return Optional.absent();
+			return Optional.empty();
 		}
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
 		try {
@@ -164,7 +163,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					}
 				}
 			}
-			Optional<HtmlOutput> retVal = Optional.absent();
+			Optional<HtmlOutput> retVal = Optional.empty();
 			if (!skipHtmlReport(pluginParameters)) {
 				HtmlOutput htmlOutput = generateHtmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters, semanticVersioningInformation);
 				retVal = Optional.of(htmlOutput);
@@ -470,13 +469,13 @@ public class JApiCmpMojo extends AbstractMojo {
 			List<String> excludes = parameterParam.getExcludes();
 			if (excludes != null) {
 				for (String exclude : excludes) {
-					this.options.addExcludeFromArgument(Optional.fromNullable(exclude), parameterParam.isExcludeExclusively());
+					this.options.addExcludeFromArgument(Optional.ofNullable(exclude), parameterParam.isExcludeExclusively());
 				}
 			}
 			List<String> includes = parameterParam.getIncludes();
 			if (includes != null) {
 				for (String include : includes) {
-					this.options.addIncludeFromArgument(Optional.fromNullable(include), parameterParam.isIncludeExlusively());
+					this.options.addIncludeFromArgument(Optional.ofNullable(include), parameterParam.isIncludeExlusively());
 				}
 			}
 

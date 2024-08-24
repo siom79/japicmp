@@ -1,12 +1,13 @@
 package japicmp.output.xml;
 
 import japicmp.output.xml.model.JApiCmpXmlRoot;
-import japicmp.util.Optional;
+
+import java.util.Optional;
 
 import java.io.ByteArrayOutputStream;
 
 public class XmlOutput implements AutoCloseable {
-	private Optional<ByteArrayOutputStream> xmlOutputStream = Optional.absent();
+	private Optional<ByteArrayOutputStream> xmlOutputStream = Optional.empty();
 	private japicmp.output.xml.model.JApiCmpXmlRoot JApiCmpXmlRoot;
 
 	public Optional<ByteArrayOutputStream> getXmlOutputStream() {

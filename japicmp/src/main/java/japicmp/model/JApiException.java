@@ -1,10 +1,10 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import java.util.Optional;
 
 public class JApiException implements JApiHasChangeStatus {
 	private final String name;

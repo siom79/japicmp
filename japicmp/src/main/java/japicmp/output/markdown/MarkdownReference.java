@@ -1,7 +1,7 @@
 package japicmp.output.markdown;
 
-import japicmp.util.Optional;
 import java.util.Objects;
+import java.util.Optional;
 
 class MarkdownReference extends Markdown {
 
@@ -9,7 +9,7 @@ class MarkdownReference extends Markdown {
 	final String title;
 
 	MarkdownReference(String href, String title) {
-		this.href = Optional.fromNullable(href).or(HASH);
+		this.href = Optional.ofNullable(href).orElse(HASH);
 		this.title = title;
 	}
 

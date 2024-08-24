@@ -19,7 +19,6 @@ import japicmp.model.JApiJavaObjectSerializationCompatibility.JApiJavaObjectSeri
 import japicmp.output.*;
 import japicmp.output.markdown.config.MarkdownOptions;
 import japicmp.output.semver.SemverOut;
-import japicmp.util.Optional;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -96,8 +95,8 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 				format(md.message.semanticallyIncompatibleChangesIncludingDevelopmentVersions, md.message.yesNo(options.isErrorOnSemanticIncompatibilityForMajorVersionZero())))
 			),
 			format(md.message.classpathMode, options.getClassPathMode()),
-			format(md.message.oldClasspath, options.getOldClassPath().or(EMPTY)),
-			format(md.message.newClasspath, options.getNewClassPath().or(EMPTY))
+			format(md.message.oldClasspath, options.getOldClassPath().orElse(EMPTY)),
+			format(md.message.newClasspath, options.getNewClassPath().orElse(EMPTY))
 		) + EOL;
 	}
 
@@ -295,10 +294,10 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 
 	private String renderClassSuperclass(JApiClass clazz) {
 		final JApiSuperclass superclass = clazz.getSuperclass();
-		final JApiClass correspondingClass = superclass.getCorrespondingJApiClass().or((JApiClass) null);
+		final JApiClass correspondingClass = superclass.getCorrespondingJApiClass().orElse(null);
 		return renderChange(superclass,
-			renderTypeWithGenericTemplates(superclass.getOldSuperclassName().or((String) null), superclass, correspondingClass),
-			renderTypeWithGenericTemplates(superclass.getNewSuperclassName().or((String) null), superclass, correspondingClass));
+			renderTypeWithGenericTemplates(superclass.getOldSuperclassName().orElse(null), superclass, correspondingClass),
+			renderTypeWithGenericTemplates(superclass.getNewSuperclassName().orElse(null), superclass, correspondingClass));
 	}
 
 	private String renderClassJdk(JApiClass clazz) {
@@ -318,7 +317,7 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 
 	private String renderImplementedInterfaceName(JApiImplementedInterface implInterface) {
 		return renderChange(implInterface, renderTypeWithGenericTemplates(
-			implInterface.getFullyQualifiedName(), implInterface, implInterface.getCorrespondingJApiClass().or((JApiClass) null)));
+			implInterface.getFullyQualifiedName(), implInterface, implInterface.getCorrespondingJApiClass().orElse(null)));
 	}
 
 	private String renderNameAndParameters(JApiBehavior behavior) {
@@ -355,8 +354,8 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 
 	private String renderGenericTemplate(JApiGenericTemplate genericTemplate) {
 		final String name = genericTemplate.getName();
-		final String oldTemplate = renderGenericTemplate(name, genericTemplate.getOldTypeOptional().or((String) null), genericTemplate.getOldGenericTypes());
-		final String newTemplate = renderGenericTemplate(name, genericTemplate.getNewTypeOptional().or((String) null), genericTemplate.getNewGenericTypes());
+		final String oldTemplate = renderGenericTemplate(name, genericTemplate.getOldTypeOptional().orElse(null), genericTemplate.getOldGenericTypes());
+		final String newTemplate = renderGenericTemplate(name, genericTemplate.getNewTypeOptional().orElse(null), genericTemplate.getNewGenericTypes());
 		return renderChange(genericTemplate, oldTemplate, newTemplate);
 	}
 
@@ -480,8 +479,8 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 	}
 
 	private String renderModifier(JApiModifier<? extends Enum<? extends Enum<?>>> modifier) {
-		final String oldName = getOldModifierName(modifier).or((String) null);
-		final String newName = getNewModifierName(modifier).or((String) null);
+		final String oldName = getOldModifierName(modifier).orElse(null);
+		final String newName = getNewModifierName(modifier).orElse(null);
 		return renderChange(modifier, renderCode(oldName), renderCode(newName));
 	}
 
@@ -552,7 +551,7 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 	}
 
 	private String renderAnnotation(JApiAnnotation annotation) {
-		final String typeName = renderTypeWithGenericTemplates(annotation.getFullyQualifiedName(), annotation, annotation.getCorrespondingJApiClass().or((JApiClass) null));
+		final String typeName = renderTypeWithGenericTemplates(annotation.getFullyQualifiedName(), annotation, annotation.getCorrespondingJApiClass().orElse(null));
 		return renderChange(annotation, typeName) +
 			(annotation.getElements().isEmpty() ? EMPTY : COLON + SPACE) +
 			annotation.getElements().stream().map(this::renderAnnotationElement).collect(CSV);

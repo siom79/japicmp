@@ -8,7 +8,6 @@ import japicmp.model.*;
 import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
-import japicmp.util.Optional;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -21,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 public class Helper {
 
