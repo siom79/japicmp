@@ -1,13 +1,14 @@
 package japicmp.util;
 
-import com.google.common.base.Optional;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 
+import java.util.Optional;
+
 public class CtInterfaceBuilder {
 	private String name = "japicmp.Test";
-	private Optional<CtClass> superInterfaceOptional = Optional.absent();
+	private Optional<CtClass> superInterfaceOptional = Optional.empty();
 
 	public CtInterfaceBuilder name(String name) {
 		this.name = name;
@@ -29,7 +30,7 @@ public class CtInterfaceBuilder {
 	}
 
 	public CtInterfaceBuilder withSuperInterface(CtClass superInterface) {
-		this.superInterfaceOptional = Optional.fromNullable(superInterface);
+		this.superInterfaceOptional = Optional.ofNullable(superInterface);
 		return this;
 	}
 }
