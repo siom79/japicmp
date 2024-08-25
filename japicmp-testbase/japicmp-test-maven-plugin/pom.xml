@@ -94,6 +94,7 @@
 								</dependency>
 							</newVersion>
 							<parameter>
+								<oldVersionPattern>\d+\.\d+\.\d+</oldVersionPattern>
 								<onlyModified>false</onlyModified>
 							</parameter>
 						</configuration>
