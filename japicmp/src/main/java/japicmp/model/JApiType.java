@@ -1,10 +1,10 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.util.OptionalHelper;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Optional;
 
 public class JApiType implements JApiHasChangeStatus {
 	private final Optional<String> oldTypeOptional;

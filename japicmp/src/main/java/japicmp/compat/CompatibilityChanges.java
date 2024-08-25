@@ -5,7 +5,6 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.*;
 import japicmp.util.ClassHelper;
-import japicmp.util.Optional;
 import japicmp.util.SignatureParser;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -235,8 +234,8 @@ public class CompatibilityChanges {
 
 	private JApiClass loadClass(String newSuperclassName, EnumSet<Classpath> classpaths) {
 		JApiClass foundClass;
-		Optional<CtClass> oldClassOptional = Optional.absent();
-		Optional<CtClass> newClassOptional = Optional.absent();
+		Optional<CtClass> oldClassOptional = Optional.empty();
+		Optional<CtClass> newClassOptional = Optional.empty();
 		JarArchiveComparatorOptions.ClassPathMode classPathMode = this.jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode();
 		if (classPathMode == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
 			ClassPool classPool = this.jarArchiveComparator.getCommonClassPool();
@@ -274,11 +273,11 @@ public class CompatibilityChanges {
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
 			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.UNCHANGED);
 		} else if (oldClassOptional.isPresent() && !newClassOptional.isPresent()) {
-			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.absent(), JApiChangeStatus.REMOVED);
+			classType = new JApiClassType(Optional.of(ClassHelper.getType(oldClassOptional.get())), Optional.empty(), JApiChangeStatus.REMOVED);
 		} else if (!oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			classType = new JApiClassType(Optional.absent(), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.NEW);
+			classType = new JApiClassType(Optional.empty(), Optional.of(ClassHelper.getType(newClassOptional.get())), JApiChangeStatus.NEW);
 		} else {
-			classType = new JApiClassType(Optional.absent(), Optional.absent(), JApiChangeStatus.UNCHANGED);
+			classType = new JApiClassType(Optional.empty(), Optional.empty(), JApiChangeStatus.UNCHANGED);
 		}
 		foundClass = new JApiClass(this.jarArchiveComparator, newSuperclassName, oldClassOptional, newClassOptional, changeStatus, classType);
 		return foundClass;

@@ -1,6 +1,5 @@
 package japicmp.output.xml.model;
 
-import japicmp.util.Optional;
 import japicmp.model.JApiClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -12,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @XmlRootElement(name = "japicmp")
 public class JApiCmpXmlRoot {
@@ -27,7 +27,7 @@ public class JApiCmpXmlRoot {
 	private String packagesExclude;
 	private boolean ignoreMissingClasses;
 	private String ignoreMissingClassesByRegularExpressions;
-	private Optional<String> titleOptional = Optional.absent();
+	private Optional<String> titleOptional = Optional.empty();
 	private String semanticVersioning = "n.a.";
 
 	@XmlElementWrapper(name = "classes")
@@ -130,7 +130,7 @@ public class JApiCmpXmlRoot {
 	}
 
 	public void setTitle(String title) {
-		this.titleOptional = Optional.fromNullable(title);
+		this.titleOptional = Optional.ofNullable(title);
 	}
 
 	@XmlAttribute

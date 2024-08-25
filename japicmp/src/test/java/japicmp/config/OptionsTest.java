@@ -4,7 +4,6 @@ import japicmp.cmp.JApiCmpArchive;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
-import japicmp.util.Optional;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -14,6 +13,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import static japicmp.util.JarUtil.createJarFile;
 import static org.junit.Assert.assertEquals;

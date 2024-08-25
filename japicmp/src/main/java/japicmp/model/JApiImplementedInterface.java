@@ -1,6 +1,5 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -9,13 +8,14 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompatibility {
 	private final CtClass ctClass;
 	private final String fullyQualifiedName;
 	private final JApiChangeStatus changeStatus;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
-	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
+	private Optional<JApiClass> correspondingJApiClass = Optional.empty();
 
 	public JApiImplementedInterface(CtClass ctClass, String fullyQualifiedName, JApiChangeStatus changeStatus) {
 		this.ctClass = ctClass;

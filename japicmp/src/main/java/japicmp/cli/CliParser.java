@@ -2,8 +2,9 @@ package japicmp.cli;
 
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
-import japicmp.util.Optional;
 import japicmp.util.StringArrayEnumeration;
+
+import java.util.Optional;
 
 import static japicmp.model.AccessModifier.toModifier;
 import static japicmp.util.FileHelper.createFileList;
@@ -52,16 +53,16 @@ public class CliParser {
 				options.setAccessModifier(toModifier(accessModifier));
 			} else if ("-i".equals(arg) || "--include".equals(arg)) {
 				String includes = getOptionWithArgument("-i, --include", sae);
-				options.addIncludeFromArgument(Optional.fromNullable(includes), includeExclusively);
+				options.addIncludeFromArgument(Optional.ofNullable(includes), includeExclusively);
 			} else if ("-e".equals(arg) || "--exclude".equals(arg)) {
 				String excludes = getOptionWithArgument("-e, --exclude", sae);
-				options.addExcludeFromArgument(Optional.fromNullable(excludes), excludeExclusively);
+				options.addExcludeFromArgument(Optional.ofNullable(excludes), excludeExclusively);
 			} else if ("-x".equals(arg) || "--xml-file".equals(arg)) {
 				String pathToXmlOutputFile = getOptionWithArgument("-x, --xml-file", sae);
-				options.setXmlOutputFile(Optional.fromNullable(pathToXmlOutputFile));
+				options.setXmlOutputFile(Optional.ofNullable(pathToXmlOutputFile));
 			} else if ("--html-file".equals(arg)) {
 				String pathToHtmlOutputFile = getOptionWithArgument("--html-file", sae);
-				options.setHtmlOutputFile(Optional.fromNullable(pathToHtmlOutputFile));
+				options.setHtmlOutputFile(Optional.ofNullable(pathToHtmlOutputFile));
 			} else if ("-s".equals(arg) || "--semantic-versioning".equals(arg)) {
 				options.setSemanticVersioning(true);
 			} else if ("--markdown".equals(arg)) {
@@ -80,13 +81,13 @@ public class CliParser {
 				}
 			} else if ("--html-stylesheet".equals(arg)) {
 				String htmlStylesheet = getOptionWithArgument("--html-stylesheet", sae);
-				options.setHtmlStylesheet(Optional.fromNullable(htmlStylesheet));
+				options.setHtmlStylesheet(Optional.ofNullable(htmlStylesheet));
 			} else if (OLD_CLASSPATH.equals(arg)) {
 				String oldClassPath = getOptionWithArgument(OLD_CLASSPATH, sae);
-				options.setOldClassPath(Optional.fromNullable(oldClassPath));
+				options.setOldClassPath(Optional.ofNullable(oldClassPath));
 			} else if (NEW_CLASSPATH.equals(arg)) {
 				String newClassPath = getOptionWithArgument(NEW_CLASSPATH, sae);
-				options.setNewClassPath(Optional.fromNullable(newClassPath));
+				options.setNewClassPath(Optional.ofNullable(newClassPath));
 			} else if ("--no-annotations".equals(arg)) {
 				options.setNoAnnotations(true);
 			} else if ("--report-only-filename".equals(arg)) {

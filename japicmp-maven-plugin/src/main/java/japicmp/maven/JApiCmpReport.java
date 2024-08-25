@@ -2,7 +2,6 @@ package japicmp.maven;
 
 import japicmp.config.Options;
 import japicmp.output.html.HtmlOutput;
-import japicmp.util.Optional;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.MojoExecution;
@@ -20,6 +19,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Mojo(name = "cmp-report", defaultPhase = LifecyclePhase.SITE)
 public class JApiCmpReport extends AbstractMavenReport {
@@ -121,7 +121,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 		this.mavenParameters = new MavenParameters(this.artifactRepositories,
 			this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
 			this.remoteRepos);
-		this.pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.<File>absent(), Optional.of(
+		this.pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.<File>empty(), Optional.of(
 			this.outputDirectory), false, this.oldVersions, this.newVersions, this.oldClassPathDependencies, this.newClassPathDependencies);
 		return this.mojo;
 	}

@@ -8,7 +8,6 @@ import japicmp.model.JApiClass;
 import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
-import japicmp.util.Optional;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -22,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 import static japicmp.test.output.xml.XmlHelper.getDivForClass;
 import static japicmp.test.util.Helper.getArchive;

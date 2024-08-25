@@ -1,14 +1,15 @@
 package japicmp.output.markdown.config;
 
 import japicmp.config.Options;
-import japicmp.util.Optional;
+
+import java.util.Optional;
 
 public class MarkdownOptions {
 
 	public Options options;
 
-	public Optional<String> targetOldVersion = Optional.absent();
-	public Optional<String> targetNewVersion = Optional.absent();
+	public Optional<String> targetOldVersion = Optional.empty();
+	public Optional<String> targetNewVersion = Optional.empty();
 
 	public MarkdownTitleOptions title = new MarkdownTitleOptions();
 	public MarkdownHeaderOptions header = new MarkdownHeaderOptions();
@@ -28,10 +29,10 @@ public class MarkdownOptions {
 	}
 
 	public void setTargetOldVersion(String targetOldVersion) {
-		this.targetOldVersion = Optional.fromNullable(targetOldVersion);
+		this.targetOldVersion = Optional.ofNullable(targetOldVersion);
 	}
 
 	public void setTargetNewVersion(String targetNewVersion) {
-		this.targetNewVersion = Optional.fromNullable(targetNewVersion);
+		this.targetNewVersion = Optional.ofNullable(targetNewVersion);
 	}
 }

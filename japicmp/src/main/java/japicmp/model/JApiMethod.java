@@ -1,13 +1,13 @@
 package japicmp.model;
 
 import japicmp.cmp.JarArchiveComparator;
-import japicmp.util.Optional;
 import japicmp.util.OptionalHelper;
 import japicmp.util.SignatureParser;
 import javassist.CtMethod;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Optional;
 
 public class JApiMethod extends JApiBehavior {
 	private final Optional<CtMethod> oldMethod;
@@ -37,7 +37,7 @@ public class JApiMethod extends JApiBehavior {
 	}
 
 	private JApiReturnType computeReturnTypeChanges(Optional<CtMethod> oldMethodOptional, Optional<CtMethod> newMethodOptional) {
-		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.absent(), Optional.absent());
+		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.empty(), Optional.empty());
 		if (oldMethodOptional.isPresent() && newMethodOptional.isPresent()) {
 			SignatureParser.ParsedParameter oldReturnType = computeReturnType(oldMethodOptional.get());
 			SignatureParser.ParsedParameter newReturnType = computeReturnType(newMethodOptional.get());
@@ -51,12 +51,12 @@ public class JApiMethod extends JApiBehavior {
 		} else {
 			if (oldMethodOptional.isPresent()) {
 				SignatureParser.ParsedParameter oldReturnType = computeReturnType(oldMethodOptional.get());
-				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType.getType()), Optional.absent());
+				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType.getType()), Optional.empty());
 				SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(oldMethodOptional.get(), oldReturnType), jApiReturnType.getOldGenericTypes());
 			}
 			if (newMethodOptional.isPresent()) {
 				SignatureParser.ParsedParameter newReturnType = computeReturnType(newMethodOptional.get());
-				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.absent(), Optional.of(newReturnType.getType()));
+				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.empty(), Optional.of(newReturnType.getType()));
 				SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(newMethodOptional.get(), newReturnType), jApiReturnType.getNewGenericTypes());
 			}
 		}

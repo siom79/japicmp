@@ -1,6 +1,5 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
 
@@ -16,7 +15,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	private final Optional<Annotation> newAnnotation;
 	private final List<JApiAnnotationElement> elements = new LinkedList<>();
 	private final JApiChangeStatus changeStatus;
-	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
+	private Optional<JApiClass> correspondingJApiClass = Optional.empty();
 
 	public JApiAnnotation(String fullyQualifiedName, Optional<Annotation> oldAnnotation, Optional<Annotation> newAnnotation, JApiChangeStatus changeStatus) {
 		this.fullyQualifiedName = fullyQualifiedName;
@@ -52,7 +51,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 			for (String memberName : oldMemberValueMap.keySet()) {
 				Optional<MemberValue> foundOptional = newMemberValueMap.get(memberName);
 				if (foundOptional == null) {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue>absent(),
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue>empty(),
 						JApiChangeStatus.REMOVED);
 					elements.add(jApiAnnotationElement);
 				} else {
@@ -64,7 +63,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 			for (String memberName : newMemberValueMap.keySet()) {
 				Optional<MemberValue> foundOptional = oldMemberValueMap.get(memberName);
 				if (foundOptional == null) {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue>absent(), newMemberValueMap.get(memberName),
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue>empty(), newMemberValueMap.get(memberName),
 						JApiChangeStatus.NEW);
 					elements.add(jApiAnnotationElement);
 				}
@@ -74,7 +73,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 				Annotation oldAnnotation = oldAnnotationOptional.get();
 				Map<String, Optional<MemberValue>> oldMemberValueMap = buildMemberValueMap(oldAnnotation);
 				for (String memberName : oldMemberValueMap.keySet()) {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue>absent(),
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue>empty(),
 						JApiChangeStatus.REMOVED);
 					elements.add(jApiAnnotationElement);
 				}
@@ -83,7 +82,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 				Annotation newAnnotation = newAnnotationOptional.get();
 				Map<String, Optional<MemberValue>> newMemberValueMap = buildMemberValueMap(newAnnotation);
 				for (String memberName : newMemberValueMap.keySet()) {
-					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue>absent(), newMemberValueMap.get(memberName),
+					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue>empty(), newMemberValueMap.get(memberName),
 						JApiChangeStatus.NEW);
 					elements.add(jApiAnnotationElement);
 				}
@@ -99,7 +98,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 			for (String memberName : memberNames) {
 				MemberValue memberValue = annotation.getMemberValue(memberName);
 				if (memberValue == null) {
-					map.put(memberName, Optional.<MemberValue>absent());
+					map.put(memberName, Optional.<MemberValue>empty());
 				} else {
 					map.put(memberName, Optional.of(memberValue));
 				}

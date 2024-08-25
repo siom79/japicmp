@@ -1,6 +1,5 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import com.google.common.xml.XmlEscapers;
 import japicmp.util.OptionalHelper;
 import javassist.bytecode.annotation.Annotation;
@@ -12,13 +11,14 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class JApiAnnotationElementValue {
 	private final String fullyQualifiedName;
 	private final Type type;
 	private final Object value;
-	private Optional<String> name = Optional.absent();
+	private Optional<String> name = Optional.empty();
 
 	public enum Type {
 		Double, Char, Long, Integer, Float, Byte, Enum, Annotation, Class, Short, Boolean, UnsupportedType, Array, String

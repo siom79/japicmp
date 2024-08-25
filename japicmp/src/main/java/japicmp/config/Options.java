@@ -9,12 +9,12 @@ import japicmp.cmp.JApiCmpArchive;
 import japicmp.exception.JApiCmpException;
 import japicmp.filter.*;
 import japicmp.model.AccessModifier;
-import japicmp.util.Optional;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,16 +27,16 @@ public class Options {
 	private List<JApiCmpArchive> newArchives = new ArrayList<>();
 	private boolean outputOnlyModifications = false;
 	private boolean outputOnlyBinaryIncompatibleModifications = false;
-	private Optional<String> xmlOutputFile = Optional.absent();
-	private Optional<String> htmlOutputFile = Optional.absent();
+	private Optional<String> xmlOutputFile = Optional.empty();
+	private Optional<String> htmlOutputFile = Optional.empty();
 	private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PROTECTED);
 	private List<Filter> includes = new ArrayList<>();
 	private List<Filter> excludes = new ArrayList<>();
 	private boolean includeSynthetic = false;
 	private final IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();
-	private Optional<String> htmlStylesheet = Optional.absent();
-	private Optional<String> oldClassPath = Optional.absent();
-	private Optional<String> newClassPath = Optional.absent();
+	private Optional<String> htmlStylesheet = Optional.empty();
+	private Optional<String> oldClassPath = Optional.empty();
+	private Optional<String> newClassPath = Optional.empty();
 	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;
 	private boolean noAnnotations = false;
 	private boolean reportOnlyFilename;
@@ -194,7 +194,7 @@ public class Options {
 	}
 
 	public List<Filter> createFilterList(Optional<String> argumentString, List<Filter> filters, String errorMessage, boolean exclusive) {
-		for (String filterString : Splitter.on(";").trimResults().omitEmptyStrings().split(argumentString.or(""))) {
+		for (String filterString : Splitter.on(";").trimResults().omitEmptyStrings().split(argumentString.orElse(""))) {
 			try {
 				// filter based on annotations
 				if (filterString.startsWith("@")) {

@@ -1,7 +1,8 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.exception.JApiCmpException;
+
+import java.util.Optional;
 
 /**
  * Represents the access modifiers as defined in the Java Language Specification.
@@ -33,7 +34,7 @@ public enum AccessModifier implements JApiModifierBase {
 	}
 
 	public static Optional<AccessModifier> toModifier(String accessModifierArg) {
-		Optional<String> stringOptional = Optional.fromNullable(accessModifierArg);
+		Optional<String> stringOptional = Optional.ofNullable(accessModifierArg);
 		if (stringOptional.isPresent()) {
 			try {
 				return Optional.of(valueOf(stringOptional.get().toUpperCase()));

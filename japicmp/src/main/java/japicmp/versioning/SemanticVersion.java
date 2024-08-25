@@ -1,6 +1,6 @@
 package japicmp.versioning;
 
-import japicmp.util.Optional;
+import java.util.Optional;
 
 public class SemanticVersion {
 	private final int major;

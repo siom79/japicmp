@@ -1,9 +1,8 @@
 package japicmp.maven;
 
-import japicmp.util.Optional;
-
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 public class PluginParameters {
 	private final boolean skipParam;

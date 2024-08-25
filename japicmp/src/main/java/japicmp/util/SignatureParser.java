@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -329,7 +330,7 @@ public class SignatureParser {
 		List<JApiParameter> jApiParameters = new ArrayList<>(this.parameters.size());
 		for (ParsedParameter parsedParameter : this.parameters) {
 			String type = parsedParameter.getType();
-			Optional<String> templateName = Optional.absent();
+			Optional<String> templateName = Optional.empty();
 			JApiParameter jApiParameter = null;
 			if (parsedParameter.isTemplate()) {
 				jApiParameter = resolveTemplate(jApiClass, type, diffType);

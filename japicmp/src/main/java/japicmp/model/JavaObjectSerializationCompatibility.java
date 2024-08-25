@@ -1,6 +1,5 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
@@ -13,6 +12,7 @@ import javassist.SerialVersionUID;
 import java.io.Externalizable;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,8 +35,8 @@ public class JavaObjectSerializationCompatibility {
 
 	private static class SerialVersionUidResult {
 		boolean serializable = false;
-		Optional<Long> serialVersionUid = Optional.absent();
-		Optional<Long> serialVersionUidDefault = Optional.absent();
+		Optional<Long> serialVersionUid = Optional.empty();
+		Optional<Long> serialVersionUidDefault = Optional.empty();
 	}
 
 	private static SerialVersionUidResult computeSerialVersionUid(JarArchiveComparatorOptions options, Optional<CtClass> ctClassOptional, JarArchiveComparator jarArchiveComparator) {

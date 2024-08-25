@@ -2,7 +2,6 @@ package japicmp.model;
 
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.util.Optional;
 import japicmp.util.*;
 import javassist.CtBehavior;
 import javassist.CtConstructor;
@@ -150,7 +149,7 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 	}
 
 	private Optional<Integer> getLineNumber(Optional<? extends CtBehavior> methodOptional) {
-		Optional<Integer> lineNumberOptional = Optional.absent();
+		Optional<Integer> lineNumberOptional = Optional.empty();
 		if (methodOptional.isPresent()) {
 			CtBehavior ctMethod = methodOptional.get();
 			int lineNumber = ctMethod.getMethodInfo().getLineNumber(0);
@@ -248,18 +247,18 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 				CtBehavior ctBehavior = oldBehaviorOptional.get();
 				byte[] attribute = ctBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 				if (attribute != null) {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>absent());
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>empty());
 				} else {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>absent());
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>empty());
 				}
 			}
 			if (newBehaviorOptional.isPresent()) {
 				CtBehavior ctBehavior = newBehaviorOptional.get();
 				byte[] attribute = ctBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 				if (attribute != null) {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>empty(), Optional.of(SyntheticAttribute.SYNTHETIC));
 				} else {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>empty(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
 				}
 			}
 		}

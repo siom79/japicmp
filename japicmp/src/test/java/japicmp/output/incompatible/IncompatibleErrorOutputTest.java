@@ -27,7 +27,6 @@ import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
 import japicmp.util.Helper;
-import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -36,6 +35,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class IncompatibleErrorOutputTest {
 

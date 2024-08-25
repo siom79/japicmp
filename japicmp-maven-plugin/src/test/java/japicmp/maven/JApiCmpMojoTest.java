@@ -8,7 +8,6 @@ import japicmp.maven.util.CtClassBuilder;
 import japicmp.maven.util.CtFieldBuilder;
 import japicmp.maven.util.CtInterfaceBuilder;
 import japicmp.maven.util.CtMethodBuilder;
-import japicmp.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;

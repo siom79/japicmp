@@ -1,6 +1,5 @@
 package japicmp.test.service;
 
-import com.google.common.base.Optional;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -9,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -30,6 +30,6 @@ public class MavenPluginTestIT {
 				return Optional.of(line);
 			}
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 }

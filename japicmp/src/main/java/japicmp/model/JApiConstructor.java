@@ -1,10 +1,10 @@
 package japicmp.model;
 
 import japicmp.cmp.JarArchiveComparator;
-import japicmp.util.Optional;
 import javassist.CtConstructor;
 
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Optional;
 
 public class JApiConstructor extends JApiBehavior {
 	private final Optional<CtConstructor> oldConstructor;

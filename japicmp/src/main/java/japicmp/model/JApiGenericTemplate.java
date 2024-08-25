@@ -1,13 +1,12 @@
 package japicmp.model;
 
-import japicmp.util.Optional;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class JApiGenericTemplate implements JApiHasChangeStatus, JApiHasGenericTypes, JApiCompatibility {
 	private final String name;
@@ -49,12 +48,12 @@ public class JApiGenericTemplate implements JApiHasChangeStatus, JApiHasGenericT
 
 	@XmlAttribute(name = "oldType")
 	public String getOldType() {
-		return this.oldType.or("n.a.");
+		return this.oldType.orElse("n.a.");
 	}
 
 	@XmlAttribute(name = "newType")
 	public String getNewType() {
-		return this.newType.or("n.a.");
+		return this.newType.orElse("n.a.");
 	}
 
 	@XmlElementWrapper(name = "oldGenericTypes")

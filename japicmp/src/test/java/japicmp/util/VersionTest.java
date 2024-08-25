@@ -8,6 +8,8 @@ import org.junit.Test;
 import japicmp.versioning.SemanticVersion;
 import japicmp.versioning.Version;
 
+import java.util.Optional;
+
 public class VersionTest {
 
 	@Test
