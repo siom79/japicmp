@@ -23,4 +23,4 @@ jobs:
       shell: bash
       run: |
         mvn -B package
-        cat ./japicmp-testbase/japicmp-test-maven-plugin/target/japicmp/github-job-summary.md >> GITHUB_STEP_SUMMARY
+        cat pom.xml
