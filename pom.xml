@@ -451,13 +451,6 @@
 							<source>8</source>
 						</configuration>
 					</plugin>
-					<plugin>
-						<groupId>com.github.spotbugs</groupId>
-						<artifactId>spotbugs-maven-plugin</artifactId>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
 				</plugins>
 			</build>
 		</profile>
