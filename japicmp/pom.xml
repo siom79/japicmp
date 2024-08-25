@@ -209,37 +209,5 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>japicmp</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.github.siom79.japicmp</groupId>
-						<artifactId>japicmp-maven-plugin</artifactId>
-						<version>${project.version}</version>
-						<configuration>
-							<newVersion>
-								<file>
-									<path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
-								</file>
-							</newVersion>
-							<parameter>
-								<oldVersionPattern>\d+\.\d+\.\d+</oldVersionPattern>
-								<onlyModified>true</onlyModified>
-							</parameter>
-							<skip>false</skip>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>cmp</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
 </project>

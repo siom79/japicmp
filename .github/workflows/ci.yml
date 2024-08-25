@@ -22,6 +22,4 @@ jobs:
     - name: Build with Maven
       run: mvn -B package
     - name: japicmp report in Job Summary
-      run:  cd japicmp && \
-        mvn -Pjapicmp com.github.siom79.japicmp:japicmp-maven-plugin:cmp && \
-        cat ./japicmp/target/japicmp/japicmp.md >> GITHUB_STEP_SUMMARY
+      run:  cat ./japicmp-testbase/japicmp-test-maven-plugin/target/japicmp/github-job-summary.md >> GITHUB_STEP_SUMMARY
