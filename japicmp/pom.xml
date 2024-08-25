@@ -189,17 +189,6 @@
 					</plugin>
 				</plugins>
 			</build>
-			<reporting>
-				<plugins>
-					<plugin>
-						<groupId>com.github.spotbugs</groupId>
-						<artifactId>spotbugs-maven-plugin</artifactId>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</reporting>
 		</profile>
 		<profile>
 			<id>java-9</id>

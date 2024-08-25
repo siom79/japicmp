@@ -23,5 +23,5 @@ jobs:
       shell: bash
       run: |
         mvn -B install
-        mvn -pl japicmp site:site
+        mvn -pl japicmp site:site -Dspotbugs.skip=true
         cat japicmp/target/site/japicmp.md  >$GITHUB_STEP_SUMMARY
