@@ -21,3 +21,5 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package
+    - name: japicmp report in Job Summary
+      run: cat ./japicmp/target/japicmp/japicmp.md >> GITHUB_STEP_SUMMARY
