@@ -23,4 +23,5 @@ jobs:
       shell: bash
       run: |
         mvn -B verify
-        cat ./japicmp-testbase/japicmp-test-maven-plugin/target/japicmp/github-job-summary.md >$GITHUB_STEP_SUMMARY
+        mvn -pl japicmp site:site
+        cat japicmp/target/site/japicmp.md  >$GITHUB_STEP_SUMMARY

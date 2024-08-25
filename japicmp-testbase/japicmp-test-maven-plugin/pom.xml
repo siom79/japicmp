@@ -80,26 +80,6 @@
 				<version>${project.version}</version>
 				<executions>
 					<execution>
-						<id>github-job-summary</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>cmp</goal>
-						</goals>
-						<configuration>
-							<newVersion>
-								<dependency>
-									<groupId>com.github.siom79.japicmp</groupId>
-									<artifactId>japicmp</artifactId>
-									<version>${project.version}</version>
-								</dependency>
-							</newVersion>
-							<parameter>
-								<oldVersionPattern>\d+\.\d+\.\d+</oldVersionPattern>
-								<onlyModified>false</onlyModified>
-							</parameter>
-						</configuration>
-					</execution>
-					<execution>
 						<id>single-version</id>
 						<phase>pre-integration-test</phase>
 						<goals>
