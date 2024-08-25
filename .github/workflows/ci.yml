@@ -22,5 +22,5 @@ jobs:
     - name: Build with Maven
       shell: bash
       run: |
-        mvn -B package
-        cat pom.xml
+        mvn -B verify
+        cat ./japicmp-testbase/japicmp-test-maven-plugin/target/japicmp/github-job-summary.md >$GITHUB_STEP_SUMMARY
