@@ -113,6 +113,31 @@
 					</argLine>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.github.siom79.japicmp</groupId>
+				<artifactId>japicmp-maven-plugin</artifactId>
+				<version>0.23.0</version> <!-- hard code old version due to cyclic dependencies -->
+				<executions>
+					<execution>
+						<id>github-job-summary</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<newVersion>
+								<file>
+									<path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+								</file>
+							</newVersion>
+							<parameter>
+								<oldVersionPattern>\d+\.\d+\.\d+</oldVersionPattern>
+								<onlyModified>true</onlyModified>
+							</parameter>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
