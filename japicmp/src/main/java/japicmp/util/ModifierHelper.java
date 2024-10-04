@@ -68,20 +68,12 @@ public class ModifierHelper {
 
 	public static boolean isNotPrivate(JApiHasAccessModifier jApiHasAccessModifier) {
 		JApiModifier<AccessModifier> accessModifier = jApiHasAccessModifier.getAccessModifier();
-		if (accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
-			if (accessModifier.getNewModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel() || accessModifier.getOldModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
-				return true;
-			}
-		} else if (!accessModifier.getOldModifier().isPresent() && accessModifier.getNewModifier().isPresent()) {
-			if (accessModifier.getNewModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
-				return true;
-			}
-		} else if (accessModifier.getOldModifier().isPresent() && !accessModifier.getNewModifier().isPresent()) {
-			if (accessModifier.getOldModifier().get().getLevel() > AccessModifier.PRIVATE.getLevel()) {
-				return true;
-			}
-		}
-		return false;
+		return accessModifier.getOldModifier().map(ModifierHelper::isNotPrivate).orElse(false)
+			|| accessModifier.getNewModifier().map(ModifierHelper::isNotPrivate).orElse(false);
+	}
+
+	private static boolean isNotPrivate(AccessModifier accessModifier) {
+		return accessModifier != AccessModifier.PRIVATE;
 	}
 
 	public static boolean hasModifierLevelDecreased(JApiHasAccessModifier hasAccessModifier) {
@@ -246,51 +238,26 @@ public class ModifierHelper {
 	}
 
 	private static Optional<String> getModifierName(Optional<? extends Enum<?>> modifier) {
-		return !modifier.isPresent() || IGNORED_MODIFIERS.contains(modifier.get()) ? Optional.empty() :
-			Optional.of(modifier.get().name().toLowerCase());
+		return modifier.filter(x -> !IGNORED_MODIFIERS.contains(x))
+			.map(Enum::name)
+			.map(String::toLowerCase);
 	}
 
 	private static boolean hasSyntheticAttribute(JApiAttribute<SyntheticAttribute> syntheticAttribute) {
-		boolean hasSyntheticAttribute = false;
+		final boolean oldIsSynthetic = syntheticAttribute.getOldAttribute().map(SyntheticAttribute.SYNTHETIC::equals).orElse(false);
+		final boolean newIsSynthetic = syntheticAttribute.getNewAttribute().map(SyntheticAttribute.SYNTHETIC::equals).orElse(false);
 		if (syntheticAttribute.getOldAttribute().isPresent() && syntheticAttribute.getNewAttribute().isPresent()) {
-			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();
-			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();
-			if (oldAttribute == SyntheticAttribute.SYNTHETIC && newAttribute == SyntheticAttribute.SYNTHETIC) {
-				hasSyntheticAttribute = true;
-			}
-		} else if (syntheticAttribute.getOldAttribute().isPresent()) {
-			SyntheticAttribute oldAttribute = syntheticAttribute.getOldAttribute().get();
-			if (oldAttribute == SyntheticAttribute.SYNTHETIC) {
-				hasSyntheticAttribute = true;
-			}
-		} else if (syntheticAttribute.getNewAttribute().isPresent()) {
-			SyntheticAttribute newAttribute = syntheticAttribute.getNewAttribute().get();
-			if (newAttribute == SyntheticAttribute.SYNTHETIC) {
-				hasSyntheticAttribute = true;
-			}
+			return oldIsSynthetic && newIsSynthetic;
 		}
-		return hasSyntheticAttribute;
+		return oldIsSynthetic || newIsSynthetic;
 	}
 
 	private static boolean hasSyntheticModifier(JApiModifier<SyntheticModifier> syntheticModifier) {
-		boolean hasSyntheticModifier = false;
+		final boolean oldIsSynthetic = syntheticModifier.getOldModifier().map(SyntheticModifier.SYNTHETIC::equals).orElse(false);
+		final boolean newIsSynthetic = syntheticModifier.getNewModifier().map(SyntheticModifier.SYNTHETIC::equals).orElse(false);
 		if (syntheticModifier.getOldModifier().isPresent() && syntheticModifier.getNewModifier().isPresent()) {
-			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();
-			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();
-			if (oldModifier == SyntheticModifier.SYNTHETIC && newModifier == SyntheticModifier.SYNTHETIC) {
-				hasSyntheticModifier = true;
-			}
-		} else if (syntheticModifier.getOldModifier().isPresent()) {
-			SyntheticModifier oldModifier = syntheticModifier.getOldModifier().get();
-			if (oldModifier == SyntheticModifier.SYNTHETIC) {
-				hasSyntheticModifier = true;
-			}
-		} else if (syntheticModifier.getNewModifier().isPresent()) {
-			SyntheticModifier newModifier = syntheticModifier.getNewModifier().get();
-			if (newModifier == SyntheticModifier.SYNTHETIC) {
-				hasSyntheticModifier = true;
-			}
+			return oldIsSynthetic && newIsSynthetic;
 		}
-		return hasSyntheticModifier;
+		return oldIsSynthetic || newIsSynthetic;
 	}
 }

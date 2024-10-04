@@ -10,9 +10,6 @@ public class OptionalHelper {
 	}
 
 	public static <T> String optionalToString(Optional<T> optional) {
-		if (optional.isPresent()) {
-			return optional.get().toString();
-		}
-		return N_A;
+		return optional.map(Object::toString).orElse(N_A);
 	}
 }

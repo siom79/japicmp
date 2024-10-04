@@ -10,7 +10,7 @@ import japicmp.model.JApiSemanticVersionLevel;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -103,10 +103,8 @@ public class JarArchiveComparatorOptions {
 	}
 
 	private static void toJarArchiveComparatorClassPath(Optional<String> classPathOptional, List<String> comparatorClassPath) {
-		if (classPathOptional.isPresent()) {
-			String classPathAsString = classPathOptional.get();
-			Collections.addAll(comparatorClassPath, classPathAsString.split(File.pathSeparator));
-		}
+		classPathOptional.map(classPathAsString -> Arrays.asList(classPathAsString.split(File.pathSeparator)))
+			.ifPresent(comparatorClassPath::addAll);
 	}
 
 	public Filters getFilters() {
