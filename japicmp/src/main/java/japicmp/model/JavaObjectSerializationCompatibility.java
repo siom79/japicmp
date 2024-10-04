@@ -106,9 +106,7 @@ public class JavaObjectSerializationCompatibility {
 			state = checkChanges(jApiClass);
 			if (!state.isIncompatible()) {
 				if (jApiSerialVersionUid.getSerialVersionUidInClassOld().isPresent() && jApiSerialVersionUid.getSerialVersionUidInClassNew().isPresent()) {
-					Long suidOld = jApiSerialVersionUid.getSerialVersionUidInClassOld().get();
-					Long suidNew = jApiSerialVersionUid.getSerialVersionUidInClassNew().get();
-					if (suidOld.equals(suidNew)) {
+					if (jApiSerialVersionUid.getSerialVersionUidInClassOld().equals(jApiSerialVersionUid.getSerialVersionUidInClassNew())) {
 						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
 					} else {
 						state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_MODIFIED;
@@ -159,9 +157,7 @@ public class JavaObjectSerializationCompatibility {
 					} else {
 						if (!isEnum(jApiClass)) { //default serialVersionUID is ignored for enums (section 1.12 "Serialization of Enum Constants")
 							if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().isPresent() && jApiSerialVersionUid.getSerialVersionUidDefaultNew().isPresent()) {
-								Long defaultOld = jApiSerialVersionUid.getSerialVersionUidDefaultOld().get();
-								Long defaultNew = jApiSerialVersionUid.getSerialVersionUidDefaultNew().get();
-								if (defaultOld.equals(defaultNew)) {
+								if (jApiSerialVersionUid.getSerialVersionUidDefaultOld().equals(jApiSerialVersionUid.getSerialVersionUidDefaultNew())) {
 									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE;
 								} else {
 									state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_DEFAULT_SERIALVERSIONUID_CHANGED;
@@ -180,7 +176,7 @@ public class JavaObjectSerializationCompatibility {
 	}
 
 	private boolean isEnum(JApiClass jApiClass) {
-		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ENUM;
+		return jApiClass.getClassType().getNewTypeOptional().map(JApiClassType.ClassType.ENUM::equals).orElse(false);
 	}
 
 	/**
@@ -220,12 +216,8 @@ public class JavaObjectSerializationCompatibility {
 
 	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForClassType(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
 		JApiClassType classType = jApiClass.getClassType();
-		if (classType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-			JApiClassType.ClassType oldClassType = classType.getOldTypeOptional().get();
-			JApiClassType.ClassType newClassType = classType.getNewTypeOptional().get();
-			if (oldClassType != newClassType) {
-				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_TYPE_MODIFIED;
-			}
+		if (classType.getChangeStatus() == JApiChangeStatus.MODIFIED && !classType.getOldTypeOptional().equals(classType.getNewTypeOptional())) {
+			state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_CLASS_TYPE_MODIFIED;
 		}
 		return state;
 	}
@@ -271,22 +263,16 @@ public class JavaObjectSerializationCompatibility {
 
 	private JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus checkChangesForFields(JApiClass jApiClass, JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus state) {
 		for (JApiField field : jApiClass.getFields()) {
-			if (field.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				if (!"serialVersionUID".equals(field.getName())) {
-					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED;
-				}
+			if (field.getChangeStatus() == JApiChangeStatus.REMOVED && !SERIAL_VERSION_UID.equals(field.getName())) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED;
 			}
 			JApiModifier<StaticModifier> staticModifier = field.getStaticModifier();
-			if (staticModifier.getOldModifier().isPresent() && staticModifier.getNewModifier().isPresent()) {
-				if (staticModifier.getOldModifier().get() == StaticModifier.NON_STATIC && staticModifier.getNewModifier().get() == StaticModifier.STATIC) {
-					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_CHANGED_FROM_NONSTATIC_TO_STATIC;
-				}
+			if (staticModifier.getOldModifier().map(StaticModifier.NON_STATIC::equals).orElse(false) && staticModifier.getNewModifier().map(StaticModifier.STATIC::equals).orElse(false)) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_CHANGED_FROM_NONSTATIC_TO_STATIC;
 			}
 			JApiModifier<TransientModifier> transientModifier = field.getTransientModifier();
-			if (transientModifier.getOldModifier().isPresent() && transientModifier.getNewModifier().isPresent()) {
-				if (transientModifier.getOldModifier().get() == TransientModifier.NON_TRANSIENT && transientModifier.getNewModifier().get() == TransientModifier.TRANSIENT) {
-					state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_CHANGED_FROM_NONTRANSIENT_TO_TRANSIENT;
-				}
+			if (transientModifier.getOldModifier().map(TransientModifier.NON_TRANSIENT::equals).orElse(false) && transientModifier.getNewModifier().map(TransientModifier.TRANSIENT::equals).orElse(false)) {
+				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_CHANGED_FROM_NONTRANSIENT_TO_TRANSIENT;
 			}
 			if (field.getType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
 				state = JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_TYPE_MODIFIED;

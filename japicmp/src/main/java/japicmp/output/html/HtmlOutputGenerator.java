@@ -643,9 +643,6 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 	}
 
 	private String getTitle() {
-		if (this.htmlOutputGeneratorOptions.getTitle().isPresent()) {
-			return this.htmlOutputGeneratorOptions.getTitle().get();
-		}
-		return "japicmp-Report";
+		return this.htmlOutputGeneratorOptions.getTitle().orElse("japicmp-Report");
 	}
 }

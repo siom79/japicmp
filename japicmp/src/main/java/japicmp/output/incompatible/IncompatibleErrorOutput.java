@@ -89,15 +89,11 @@ public class IncompatibleErrorOutput extends OutputGenerator<Void> {
 			List<SemanticVersion> newVersions = new ArrayList<>();
 			for (JApiCmpArchive file : options.getOldArchives()) {
 				Optional<SemanticVersion> semanticVersion = file.getVersion().getSemanticVersion();
-				if (semanticVersion.isPresent()) {
-					oldVersions.add(semanticVersion.get());
-				}
+				semanticVersion.ifPresent(oldVersions::add);
 			}
 			for (JApiCmpArchive file : options.getNewArchives()) {
 				Optional<SemanticVersion> semanticVersion = file.getVersion().getSemanticVersion();
-				if (semanticVersion.isPresent()) {
-					newVersions.add(semanticVersion.get());
-				}
+				semanticVersion.ifPresent(newVersions::add);
 			}
 			VersionChange versionChange = new VersionChange(oldVersions, newVersions, ignoreMissingOldVersion, ignoreMissingNewVersion);
 			if (!versionChange.isAllMajorVersionsZero() || options.isErrorOnSemanticIncompatibilityForMajorVersionZero()) {

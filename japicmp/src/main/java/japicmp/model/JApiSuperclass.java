@@ -77,12 +77,12 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 
 	@XmlTransient
 	public Optional<String> getOldSuperclassName() {
-		return oldSuperclassOptional.isPresent() ? Optional.of(oldSuperclassOptional.get().getName()) : Optional.<String>empty();
+		return oldSuperclassOptional.map(CtClass::getName);
 	}
 
 	@XmlTransient
 	public Optional<String> getNewSuperclassName() {
-		return newSuperclassOptional.isPresent() ? Optional.of(newSuperclassOptional.get().getName()) : Optional.<String>empty();
+		return newSuperclassOptional.map(CtClass::getName);
 	}
 
 	@XmlAttribute(name = "changeStatus")
@@ -149,21 +149,12 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 
 	public String toString()
 	{
-		String oldSuperClass = "n.a.";
-		if(oldSuperclassOptional.isPresent()) {
-			oldSuperClass = oldSuperclassOptional.get().getName();
-		}
-		String newSuperClass = "n.a.";
-		if(newSuperclassOptional.isPresent()) {
-			newSuperClass = newSuperclassOptional.get().getName();
-		}
-
 		return "JApiSuperclass [jApiClass="
 			+ jApiClass
 			+ ", oldSuperclass="
-			+ oldSuperClass
+			+ oldSuperclassOptional.map(CtClass::getName).orElse("n.a.")
 			+ ", newSuperclass="
-			+ newSuperClass
+			+ newSuperclassOptional.map(CtClass::getName).orElse("n.a.")
 			+ ", changeStatus="
 			+ changeStatus
 			+ ", compatibilityChanges="

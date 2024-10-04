@@ -4,6 +4,7 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.*;
+import java.util.stream.Stream;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
@@ -103,25 +104,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private JApiClassFileFormatVersion extractClassFileFormatVersion(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
-		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			CtClass oldClass = oldClassOptional.get();
-			CtClass newClass = newClassOptional.get();
-			ClassFile classFileOld = oldClass.getClassFile();
-			ClassFile classFileNew = newClass.getClassFile();
-			return new JApiClassFileFormatVersion(classFileOld.getMajorVersion(), classFileOld.getMinorVersion(), classFileNew.getMajorVersion(), classFileNew.getMinorVersion());
-		} else {
-			if (oldClassOptional.isPresent()) {
-				CtClass oldClass = oldClassOptional.get();
-				ClassFile classFileOld = oldClass.getClassFile();
-				return new JApiClassFileFormatVersion(classFileOld.getMajorVersion(), classFileOld.getMinorVersion(), -1, -1);
-			}
-			if (newClassOptional.isPresent()) {
-				CtClass newClass = newClassOptional.get();
-				ClassFile classFileNew = newClass.getClassFile();
-				return new JApiClassFileFormatVersion(-1, -1, classFileNew.getMajorVersion(), classFileNew.getMinorVersion());
-			}
-			return new JApiClassFileFormatVersion(-1, -1, -1, -1);
-		}
+		Optional<ClassFile> oldClassFile = oldClassOptional.map(CtClass::getClassFile);
+		Optional<ClassFile> newClassFile = newClassOptional.map(CtClass::getClassFile);
+		int majorVersionOld = oldClassFile.map(ClassFile::getMajorVersion).orElse(-1);
+		int minorVersionOld = oldClassFile.map(ClassFile::getMinorVersion).orElse(-1);
+		int majorVersionNew = newClassFile.map(ClassFile::getMajorVersion).orElse(-1);
+		int minorVersionNew = newClassFile.map(ClassFile::getMinorVersion).orElse(-1);
+		return new JApiClassFileFormatVersion(majorVersionOld, minorVersionOld, majorVersionNew, minorVersionNew);
 	}
 
 	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
@@ -231,14 +220,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private void enhanceGenericTypeToField(CtField field, List<JApiGenericType> genericTypes) {
-		if (field.getGenericSignature() != null) {
-			SignatureParser signatureParser = new SignatureParser();
-			List<SignatureParser.ParsedParameter> parsedParameters = signatureParser.parseTypes(field.getGenericSignature());
-			if (!parsedParameters.isEmpty()) {
-				SignatureParser.ParsedParameter parsedParameter = parsedParameters.get(0);
-				SignatureParser.copyGenericParameters(parsedParameter, genericTypes);
-			}
-		}
+		Optional.ofNullable(field.getGenericSignature())
+			.map(new SignatureParser()::parseTypes).map(List::stream).flatMap(Stream::findFirst)
+			.ifPresent(parsedParameter -> SignatureParser.copyGenericParameters(parsedParameter, genericTypes));
 	}
 
 	private boolean includeField(JApiField jApiField) {
@@ -309,41 +293,18 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private void computeInterfaceChanges(List<JApiImplementedInterface> interfacesArg, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
-		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			CtClass oldClass = oldClassOptional.get();
-			CtClass newClass = newClassOptional.get();
-			Map<String, CtClass> interfaceMapOldClass = buildInterfaceMap(oldClass, JarArchiveComparator.ArchiveType.OLD);
-			Map<String, CtClass> interfaceMapNewClass = buildInterfaceMap(newClass, JarArchiveComparator.ArchiveType.NEW);
-			for (CtClass oldInterface : interfaceMapOldClass.values()) {
-				CtClass ctClassFound = interfaceMapNewClass.get(oldInterface.getName());
-				if (ctClassFound != null) {
-					JApiImplementedInterface jApiClass = new JApiImplementedInterface(oldInterface, oldInterface.getName(), JApiChangeStatus.UNCHANGED);
-					interfacesArg.add(jApiClass);
-				} else {
-					JApiImplementedInterface jApiClass = new JApiImplementedInterface(oldInterface, oldInterface.getName(), JApiChangeStatus.REMOVED);
-					interfacesArg.add(jApiClass);
-				}
-			}
-			for (CtClass newInterface : interfaceMapNewClass.values()) {
-				CtClass ctClassFound = interfaceMapOldClass.get(newInterface.getName());
-				if (ctClassFound == null) {
-					JApiImplementedInterface jApiClass = new JApiImplementedInterface(newInterface, newInterface.getName(), JApiChangeStatus.NEW);
-					interfacesArg.add(jApiClass);
-				}
-			}
-		} else {
-			if (oldClassOptional.isPresent()) {
-				Map<String, CtClass> interfaceMap = buildInterfaceMap(oldClassOptional.get(), JarArchiveComparator.ArchiveType.OLD);
-				for (CtClass ctClass : interfaceMap.values()) {
-					JApiImplementedInterface jApiClass = new JApiImplementedInterface(ctClass, ctClass.getName(), JApiChangeStatus.REMOVED);
-					interfacesArg.add(jApiClass);
-				}
-			} else if (newClassOptional.isPresent()) {
-				Map<String, CtClass> interfaceMap = buildInterfaceMap(newClassOptional.get(), JarArchiveComparator.ArchiveType.NEW);
-				for (CtClass ctClass : interfaceMap.values()) {
-					JApiImplementedInterface jApiClass = new JApiImplementedInterface(ctClass, ctClass.getName(), JApiChangeStatus.NEW);
-					interfacesArg.add(jApiClass);
-				}
+		Map<String, CtClass> interfaceMapOldClass = oldClassOptional.map(oldClass -> buildInterfaceMap(oldClass, JarArchiveComparator.ArchiveType.OLD)).orElseGet(Collections::emptyMap);
+		Map<String, CtClass> interfaceMapNewClass = newClassOptional.map(newClass -> buildInterfaceMap(newClass, JarArchiveComparator.ArchiveType.NEW)).orElseGet(Collections::emptyMap);
+		for (CtClass oldInterface : interfaceMapOldClass.values()) {
+			CtClass ctClassFound = interfaceMapNewClass.get(oldInterface.getName());
+			JApiChangeStatus interfaceStatus = ctClassFound != null ? JApiChangeStatus.UNCHANGED : JApiChangeStatus.REMOVED;
+			JApiImplementedInterface jApiClass = new JApiImplementedInterface(oldInterface, oldInterface.getName(), interfaceStatus);
+			interfacesArg.add(jApiClass);
+		}
+		for (CtClass newInterface : interfaceMapNewClass.values()) {
+			if (interfaceMapOldClass.get(newInterface.getName()) == null) {
+				JApiImplementedInterface jApiClass = new JApiImplementedInterface(newInterface, newInterface.getName(), JApiChangeStatus.NEW);
+				interfacesArg.add(jApiClass);
 			}
 		}
 	}
@@ -361,10 +322,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				map.put(ctInterface.getName(), ctInterface);
 				buildInterfaceMap(archiveType, map, ctInterface);
 			}
-			Optional<CtClass> superClassOptional = getSuperclass(ctClass);
-			if (superClassOptional.isPresent()) {
-				buildInterfaceMap(superClassOptional.get(), archiveType, map);
-			}
+			getSuperclass(ctClass).ifPresent(superClass -> buildInterfaceMap(superClass, archiveType, map));
 		} catch (NotFoundException e) {
 			if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 				throw JApiCmpException.forClassLoading(e, "Class not found: " + e.getMessage(), jarArchiveComparator);
@@ -373,11 +331,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private void buildInterfaceMap(JarArchiveComparator.ArchiveType archiveType, Map<String, CtClass> map, CtClass ctInterface) throws NotFoundException {
-		Optional<CtClass> loadedInterfaceOptional = this.jarArchiveComparator.loadClass(archiveType, ctInterface.getName());
-		if (loadedInterfaceOptional.isPresent()) {
-			CtClass loadedInterface = loadedInterfaceOptional.get();
-			CtClass[] loadedInterfaceInterfaces = loadedInterface.getInterfaces();
-			for (CtClass additionalInterface : loadedInterfaceInterfaces) {
+		CtClass loadedInterface = this.jarArchiveComparator.loadClass(archiveType, ctInterface.getName()).orElse(null);
+		if (loadedInterface != null) {
+			for (CtClass additionalInterface : loadedInterface.getInterfaces()) {
 				map.put(additionalInterface.getName(), additionalInterface);
 				buildInterfaceMap(archiveType, map, additionalInterface);
 			}
@@ -526,18 +482,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			String longName = ctMethod.getLongName();
 			methodDescriptorParser.parse(ctMethod);
 			CtConstructor foundMethod = newConstructorsMap.get(longName);
-			if (foundMethod == null) {
-				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>empty(), jarArchiveComparator);
-				addParametersToMethod(methodDescriptorParser, jApiConstructor);
-				if (includeConstructor(jApiConstructor)) {
-					constructors.add(jApiConstructor);
-				}
-			} else {
-				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod), jarArchiveComparator);
-				addParametersToMethod(methodDescriptorParser, jApiConstructor);
-				if (includeConstructor(jApiConstructor)) {
-					constructors.add(jApiConstructor);
-				}
+			JApiChangeStatus constructorStatus = foundMethod == null ? JApiChangeStatus.REMOVED : JApiChangeStatus.UNCHANGED;
+			JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), constructorStatus, Optional.of(ctMethod), Optional.ofNullable(foundMethod), jarArchiveComparator);
+			addParametersToMethod(methodDescriptorParser, jApiConstructor);
+			if (includeConstructor(jApiConstructor)) {
+				constructors.add(jApiConstructor);
 			}
 		}
 		for (CtConstructor ctMethod : newConstructorsMap.values()) {
@@ -545,7 +494,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			methodDescriptorParser.parse(ctMethod);
 			CtConstructor foundMethod = oldConstructorsMap.get(longName);
 			if (foundMethod == null) {
-				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>empty(), Optional.of(ctMethod), jarArchiveComparator);
+				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.empty(), Optional.of(ctMethod), jarArchiveComparator);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
