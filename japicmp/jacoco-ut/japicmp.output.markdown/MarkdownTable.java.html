@@ -55,7 +55,7 @@ final class MarkdownTable extends Markdown {
 	private int calculateMaxWidth(int index) {
 <span class="fc bfc" id="L56" title="All 2 branches covered.">		if (index + 1 &lt; columns) {</span>
 			// Columns adjust dynamically up to a fixed limit
-<span class="pc bpc" id="L58" title="1 of 2 branches missed.">			return rows.stream().map(x -&gt; x.get(index)).mapToInt(String::length).filter(x -&gt; x &lt;= 64).max().orElse(0);</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">			return rows.stream().map(x -&gt; x.get(index)).filter(Objects::nonNull).mapToInt(String::length).filter(x -&gt; x &lt;= 64).max().orElse(0);</span>
 		}
 		// Last column adjusts to heading size
 <span class="fc" id="L61">		return rows.get(0).get(index).length();</span>

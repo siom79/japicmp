@@ -7,13 +7,13 @@ import japicmp.filter.Filters;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JApiSemanticVersionLevel;
-import japicmp.util.Optional;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class represents all options for the comparison.

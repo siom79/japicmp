@@ -19,7 +19,6 @@ import japicmp.model.JApiJavaObjectSerializationCompatibility.JApiJavaObjectSeri
 import japicmp.output.*;
 import japicmp.output.markdown.config.MarkdownOptions;
 import japicmp.output.semver.SemverOut;
-import japicmp.util.Optional;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -28,576 +27,576 @@ import javassist.bytecode.annotation.MemberValue;
 public class MarkdownOutputGenerator extends OutputGenerator&lt;String&gt; {
 
 	final MarkdownOptions md;
-<span class="fc" id="L31">	final MarkdownReferences references = new MarkdownReferences();</span>
+<span class="fc" id="L30">	final MarkdownReferences references = new MarkdownReferences();</span>
 
 	public MarkdownOutputGenerator(MarkdownOptions mdOptions, List&lt;JApiClass&gt; jApiClasses) {
-<span class="fc" id="L34">		super(mdOptions.options, jApiClasses);</span>
-<span class="fc" id="L35">		md = mdOptions;</span>
-<span class="fc" id="L36">	}</span>
+<span class="fc" id="L33">		super(mdOptions.options, jApiClasses);</span>
+<span class="fc" id="L34">		md = mdOptions;</span>
+<span class="fc" id="L35">	}</span>
 
 	public MarkdownOutputGenerator(Options options, List&lt;JApiClass&gt; jApiClasses) {
-<span class="fc" id="L39">		this(MarkdownOptions.newDefault(options), jApiClasses);</span>
-<span class="fc" id="L40">	}</span>
+<span class="fc" id="L38">		this(MarkdownOptions.newDefault(options), jApiClasses);</span>
+<span class="fc" id="L39">	}</span>
 
 	@Override
 	public String generate() {
-<span class="fc" id="L44">		final String semver = new SemverOut(options, jApiClasses).generate();</span>
-<span class="fc" id="L45">		return renderHeading(0, md.title.report) +</span>
-<span class="fc" id="L46">			md.message.getSemverBadge(semver) + EOL +</span>
-<span class="fc" id="L47">			renderHeading(1, md.title.summary) +</span>
-<span class="fc" id="L48">			renderReportSummary(md.message.getSummaryMessage(semver), options) + PARAGRAPH +</span>
-<span class="fc" id="L49">			renderHtmlDetails(md.message.expandOptions, renderReportOptions(options)) +</span>
-<span class="fc" id="L50">			renderReportResults(options) + EOL +</span>
-<span class="fc" id="L51">			renderMissingClassesWarning(options.getIgnoreMissingClasses()) +</span>
+<span class="fc" id="L43">		final String semver = new SemverOut(options, jApiClasses).generate();</span>
+<span class="fc" id="L44">		return renderHeading(0, md.title.report) +</span>
+<span class="fc" id="L45">			md.message.getSemverBadge(semver) + EOL +</span>
+<span class="fc" id="L46">			renderHeading(1, md.title.summary) +</span>
+<span class="fc" id="L47">			renderReportSummary(md.message.getSummaryMessage(semver), options) + PARAGRAPH +</span>
+<span class="fc" id="L48">			renderHtmlDetails(md.message.expandOptions, renderReportOptions(options)) +</span>
+<span class="fc" id="L49">			renderReportResults(options) + EOL +</span>
+<span class="fc" id="L50">			renderMissingClassesWarning(options.getIgnoreMissingClasses()) +</span>
 			MARKDOWN_HORIZONTAL_RULE + PARAGRAPH +
-<span class="fc" id="L53">			format(md.message.generatedOn, md.message.getCurrentTimestamp()) + PARAGRAPH +</span>
+<span class="fc" id="L52">			format(md.message.generatedOn, md.message.getCurrentTimestamp()) + PARAGRAPH +</span>
 			references + EOL;
 	}
 
 	private String renderHeading(int level, String text) {
-<span class="fc" id="L58">		final StringBuilder tmp = new StringBuilder();</span>
-<span class="fc" id="L59">		tmp.append(EOL);</span>
-<span class="pc bpc" id="L60" title="1 of 4 branches missed.">		for (int repeat = 0; repeat &lt; md.title.topHeadingLevel + level &amp;&amp; repeat &lt; 6; repeat++) {</span>
-<span class="fc" id="L61">			tmp.append(HASH);</span>
+<span class="fc" id="L57">		final StringBuilder tmp = new StringBuilder();</span>
+<span class="fc" id="L58">		tmp.append(EOL);</span>
+<span class="pc bpc" id="L59" title="1 of 4 branches missed.">		for (int repeat = 0; repeat &lt; md.title.topHeadingLevel + level &amp;&amp; repeat &lt; 6; repeat++) {</span>
+<span class="fc" id="L60">			tmp.append(HASH);</span>
 		}
-<span class="fc" id="L63">		tmp.append(&quot; &quot;);</span>
-<span class="fc" id="L64">		tmp.append(text);</span>
-<span class="fc" id="L65">		tmp.append(PARAGRAPH);</span>
-<span class="fc" id="L66">		return tmp.toString();</span>
+<span class="fc" id="L62">		tmp.append(&quot; &quot;);</span>
+<span class="fc" id="L63">		tmp.append(text);</span>
+<span class="fc" id="L64">		tmp.append(PARAGRAPH);</span>
+<span class="fc" id="L65">		return tmp.toString();</span>
 	}
 
 	private String renderReportSummary(String summary, Options options) {
-<span class="fc" id="L70">		final String newVersion = renderArchivesVersion(md.targetNewVersion, options.getNewArchives(), md.message.oneNewVersion, md.message.manyNewArchives);</span>
-<span class="fc" id="L71">		final String oldVersion = renderArchivesVersion(md.targetOldVersion, options.getOldArchives(), md.message.oneOldVersion, md.message.manyOldArchives);</span>
-<span class="fc" id="L72">		return format(summary, newVersion, oldVersion);</span>
+<span class="fc" id="L69">		final String newVersion = renderArchivesVersion(md.targetNewVersion, options.getNewArchives(), md.message.oneNewVersion, md.message.manyNewArchives);</span>
+<span class="fc" id="L70">		final String oldVersion = renderArchivesVersion(md.targetOldVersion, options.getOldArchives(), md.message.oneOldVersion, md.message.manyOldArchives);</span>
+<span class="fc" id="L71">		return format(summary, newVersion, oldVersion);</span>
 	}
 
 	private String renderReportOptions(Options options) {
-<span class="fc" id="L76">		final List&lt;Pattern&gt; patterns = options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression();</span>
-<span class="fc" id="L77">		return new MarkdownList(</span>
-<span class="fc" id="L78">			format(md.message.reportOnlySummary, md.message.yesNo(options.isReportOnlySummary())),</span>
-<span class="fc" id="L79">			format(md.message.reportOnlyChanges, md.message.yesNo(options.isOutputOnlyModifications())),</span>
-<span class="fc" id="L80">			format(md.message.reportOnlyBinaryIncompatibleChanges, md.message.yesNo(options.isOutputOnlyBinaryIncompatibleModifications())),</span>
-<span class="fc" id="L81">			format(md.message.accessModifierFilter, options.getAccessModifier()),</span>
-<span class="fc" id="L82">			format(md.message.oldArchives, new MarkdownList(1, options.getOldArchives().stream().map(this::renderArchive))),</span>
-<span class="fc" id="L83">			format(md.message.newArchives, new MarkdownList(1, options.getNewArchives().stream().map(this::renderArchive))),</span>
-<span class="pc bpc" id="L84" title="1 of 2 branches missed.">			format(md.message.evaluateAnnotations, md.message.yesNo(!options.isNoAnnotations())),</span>
-<span class="fc" id="L85">			format(md.message.includeSynthetic, md.message.yesNo(options.isIncludeSynthetic())),</span>
-<span class="pc bpc" id="L86" title="1 of 2 branches missed.">			format(md.message.includeSpecificElements, md.message.yesNo(!options.getIncludes().isEmpty()) + new MarkdownList(1, options.getIncludes().stream().filter(Objects::nonNull).map(Filter::toString).distinct().map(this::renderCode))),</span>
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">			format(md.message.excludeSpecificElements, md.message.yesNo(!options.getExcludes().isEmpty()) + new MarkdownList(1, options.getExcludes().stream().filter(Objects::nonNull).map(Filter::toString).distinct().map(this::renderCode))),</span>
-<span class="fc" id="L88">			format(md.message.ignoreAllMissingClasses, md.message.yesNo(options.getIgnoreMissingClasses().isIgnoreAllMissingClasses())),</span>
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">			format(md.message.ignoreSpecificMissingClasses, md.message.yesNo(!patterns.isEmpty()) + new MarkdownList(1, patterns.stream().map(Pattern::pattern).map(this::renderCode))),</span>
-<span class="fc" id="L90">			format(md.message.treatChangesAsErrors, new MarkdownList(1,</span>
-<span class="fc" id="L91">				format(md.message.anyChanges, md.message.yesNo(options.isErrorOnModifications())),</span>
-<span class="fc" id="L92">				format(md.message.binaryIncompatibleChanges, md.message.yesNo(options.isErrorOnBinaryIncompatibility())),</span>
-<span class="fc" id="L93">				format(md.message.sourceIncompatibleChanges, md.message.yesNo(options.isErrorOnSourceIncompatibility())),</span>
-<span class="fc" id="L94">				format(md.message.incompatibleChangesCausedByExcludedClasses, md.message.yesNo(options.isErrorOnExclusionIncompatibility())),</span>
-<span class="fc" id="L95">				format(md.message.semanticallyIncompatibleChanges, md.message.yesNo(options.isErrorOnSemanticIncompatibility())),</span>
-<span class="fc" id="L96">				format(md.message.semanticallyIncompatibleChangesIncludingDevelopmentVersions, md.message.yesNo(options.isErrorOnSemanticIncompatibilityForMajorVersionZero())))</span>
+<span class="fc" id="L75">		final List&lt;Pattern&gt; patterns = options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression();</span>
+<span class="fc" id="L76">		return new MarkdownList(</span>
+<span class="fc" id="L77">			format(md.message.reportOnlySummary, md.message.yesNo(options.isReportOnlySummary())),</span>
+<span class="fc" id="L78">			format(md.message.reportOnlyChanges, md.message.yesNo(options.isOutputOnlyModifications())),</span>
+<span class="fc" id="L79">			format(md.message.reportOnlyBinaryIncompatibleChanges, md.message.yesNo(options.isOutputOnlyBinaryIncompatibleModifications())),</span>
+<span class="fc" id="L80">			format(md.message.accessModifierFilter, options.getAccessModifier()),</span>
+<span class="fc" id="L81">			format(md.message.oldArchives, new MarkdownList(1, options.getOldArchives().stream().map(this::renderArchive))),</span>
+<span class="fc" id="L82">			format(md.message.newArchives, new MarkdownList(1, options.getNewArchives().stream().map(this::renderArchive))),</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">			format(md.message.evaluateAnnotations, md.message.yesNo(!options.isNoAnnotations())),</span>
+<span class="fc" id="L84">			format(md.message.includeSynthetic, md.message.yesNo(options.isIncludeSynthetic())),</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">			format(md.message.includeSpecificElements, md.message.yesNo(!options.getIncludes().isEmpty()) + new MarkdownList(1, options.getIncludes().stream().filter(Objects::nonNull).map(Filter::toString).distinct().map(this::renderCode))),</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">			format(md.message.excludeSpecificElements, md.message.yesNo(!options.getExcludes().isEmpty()) + new MarkdownList(1, options.getExcludes().stream().filter(Objects::nonNull).map(Filter::toString).distinct().map(this::renderCode))),</span>
+<span class="fc" id="L87">			format(md.message.ignoreAllMissingClasses, md.message.yesNo(options.getIgnoreMissingClasses().isIgnoreAllMissingClasses())),</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">			format(md.message.ignoreSpecificMissingClasses, md.message.yesNo(!patterns.isEmpty()) + new MarkdownList(1, patterns.stream().map(Pattern::pattern).map(this::renderCode))),</span>
+<span class="fc" id="L89">			format(md.message.treatChangesAsErrors, new MarkdownList(1,</span>
+<span class="fc" id="L90">				format(md.message.anyChanges, md.message.yesNo(options.isErrorOnModifications())),</span>
+<span class="fc" id="L91">				format(md.message.binaryIncompatibleChanges, md.message.yesNo(options.isErrorOnBinaryIncompatibility())),</span>
+<span class="fc" id="L92">				format(md.message.sourceIncompatibleChanges, md.message.yesNo(options.isErrorOnSourceIncompatibility())),</span>
+<span class="fc" id="L93">				format(md.message.incompatibleChangesCausedByExcludedClasses, md.message.yesNo(options.isErrorOnExclusionIncompatibility())),</span>
+<span class="fc" id="L94">				format(md.message.semanticallyIncompatibleChanges, md.message.yesNo(options.isErrorOnSemanticIncompatibility())),</span>
+<span class="fc" id="L95">				format(md.message.semanticallyIncompatibleChangesIncludingDevelopmentVersions, md.message.yesNo(options.isErrorOnSemanticIncompatibilityForMajorVersionZero())))</span>
 			),
-<span class="fc" id="L98">			format(md.message.classpathMode, options.getClassPathMode()),</span>
-<span class="fc" id="L99">			format(md.message.oldClasspath, options.getOldClassPath().or(EMPTY)),</span>
-<span class="fc" id="L100">			format(md.message.newClasspath, options.getNewClassPath().or(EMPTY))</span>
+<span class="fc" id="L97">			format(md.message.classpathMode, options.getClassPathMode()),</span>
+<span class="fc" id="L98">			format(md.message.oldClasspath, options.getOldClassPath().orElse(EMPTY)),</span>
+<span class="fc" id="L99">			format(md.message.newClasspath, options.getNewClassPath().orElse(EMPTY))</span>
 		) + EOL;
 	}
 
 	private String renderArchivesVersion(Optional&lt;String&gt; version, List&lt;JApiCmpArchive&gt; archives, String one, String many) {
-<span class="fc bfc" id="L105" title="All 2 branches covered.">		if (version.isPresent()) {</span>
-<span class="fc" id="L106">			return format(one, version.get());</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">		if (version.isPresent()) {</span>
+<span class="fc" id="L105">			return format(one, version.get());</span>
 		}
-<span class="fc bfc" id="L108" title="All 2 branches covered.">		if (archives.isEmpty()) {</span>
-<span class="fc" id="L109">			return format(one, md.message.unknownVersion);</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">		if (archives.isEmpty()) {</span>
+<span class="fc" id="L108">			return format(one, md.message.unknownVersion);</span>
 		}
-<span class="fc bfc" id="L111" title="All 2 branches covered.">		if (archives.size() == 1) {</span>
-<span class="fc" id="L112">			final JApiCmpArchive archive = archives.get(0);</span>
-<span class="fc" id="L113">			final String archiveVersion = archive.getVersion().getStringVersion();</span>
-<span class="pc bpc" id="L114" title="2 of 4 branches missed.">			if (archiveVersion != null &amp;&amp; !archiveVersion.equals(N_A)) {</span>
-<span class="fc" id="L115">				return format(one, archiveVersion);</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">		if (archives.size() == 1) {</span>
+<span class="fc" id="L111">			final JApiCmpArchive archive = archives.get(0);</span>
+<span class="fc" id="L112">			final String archiveVersion = archive.getVersion().getStringVersion();</span>
+<span class="pc bpc" id="L113" title="2 of 4 branches missed.">			if (archiveVersion != null &amp;&amp; !archiveVersion.equals(N_A)) {</span>
+<span class="fc" id="L114">				return format(one, archiveVersion);</span>
 			}
-<span class="nc" id="L117">			return format(one, renderSimpleArchiveName(archive));</span>
+<span class="nc" id="L116">			return format(one, renderSimpleArchiveName(archive));</span>
 		}
-<span class="fc" id="L119">		return many;</span>
+<span class="fc" id="L118">		return many;</span>
 	}
 
 	private String renderReportResults(Options options) {
-<span class="fc" id="L123">		new OutputFilter(options).filter(jApiClasses);</span>
-<span class="fc bfc" id="L124" title="All 2 branches covered.">		if (jApiClasses.isEmpty()) {</span>
-<span class="fc" id="L125">			return EMPTY;</span>
+<span class="fc" id="L122">		new OutputFilter(options).filter(jApiClasses);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">		if (jApiClasses.isEmpty()) {</span>
+<span class="fc" id="L124">			return EMPTY;</span>
 		}
-<span class="fc" id="L127">		return new MarkdownSection&lt;&gt;(renderHeading(1, md.title.results), jApiClasses, md.sort.classes)</span>
-<span class="fc" id="L128">			.column(md.header.status, this::renderStatus)</span>
-<span class="fc" id="L129">			.column(md.header.type, this::renderClassLink)</span>
-<span class="fc" id="L130">			.column(md.header.serialization, this::renderSerializationChange)</span>
-<span class="fc" id="L131">			.column(md.header.compatibilityChanges, this::renderAllCompatibilityChanges) +</span>
-<span class="fc bfc" id="L132" title="All 2 branches covered.">			(md.options.isReportOnlySummary() ? &quot;&quot; : renderHtmlDetails(md.message.expandResults, jApiClasses.stream().sorted(md.sort.classes).map(this::renderClass).collect(joining())));</span>
+<span class="fc" id="L126">		return new MarkdownSection&lt;&gt;(renderHeading(1, md.title.results), jApiClasses, md.sort.classes)</span>
+<span class="fc" id="L127">			.column(md.header.status, this::renderStatus)</span>
+<span class="fc" id="L128">			.column(md.header.type, this::renderClassLink)</span>
+<span class="fc" id="L129">			.column(md.header.serialization, this::renderSerializationChange)</span>
+<span class="fc" id="L130">			.column(md.header.compatibilityChanges, this::renderAllCompatibilityChanges) +</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">			(md.options.isReportOnlySummary() ? &quot;&quot; : renderHtmlDetails(md.message.expandResults, jApiClasses.stream().sorted(md.sort.classes).map(this::renderClass).collect(joining())));</span>
 	}
 
 	private String renderMissingClassesWarning(IgnoreMissingClasses missing) {
-<span class="fc bfc" id="L136" title="All 2 branches covered.">		if (missing.isIgnoreAllMissingClasses()) {</span>
-<span class="fc" id="L137">			return md.message.warningAllMissingClassesIgnored;</span>
-<span class="pc bpc" id="L138" title="1 of 2 branches missed.">		} else if (!missing.getIgnoreMissingClassRegularExpression().isEmpty()) {</span>
-<span class="nc" id="L139">			return md.message.warningSomeMissingClassesIgnored;</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">		if (missing.isIgnoreAllMissingClasses()) {</span>
+<span class="fc" id="L136">			return md.message.warningAllMissingClassesIgnored;</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">		} else if (!missing.getIgnoreMissingClassRegularExpression().isEmpty()) {</span>
+<span class="nc" id="L138">			return md.message.warningSomeMissingClassesIgnored;</span>
 		}
-<span class="fc" id="L141">		return EMPTY;</span>
+<span class="fc" id="L140">		return EMPTY;</span>
 	}
 
 	private String renderClass(JApiClass clazz) {
-<span class="fc" id="L145">		final String name = clazz.getFullyQualifiedName();</span>
-<span class="fc" id="L146">		return MARKDOWN_HORIZONTAL_RULE + PARAGRAPH +</span>
-<span class="fc" id="L147">			renderHtmlAnchor(name) +</span>
-<span class="fc" id="L148">			renderHeading(2, renderCode(name)) +</span>
-<span class="fc" id="L149">			renderCompatibilityList(clazz) + PARAGRAPH +</span>
-<span class="fc" id="L150">			renderClassInfo(clazz) +</span>
-<span class="fc" id="L151">			renderGenericTemplates(clazz) +</span>
-<span class="fc" id="L152">			renderImplementedInterfaces(clazz) +</span>
-<span class="fc" id="L153">			renderAnnotations(clazz) +</span>
-<span class="fc" id="L154">			renderConstructors(clazz) +</span>
-<span class="fc" id="L155">			renderMethods(clazz) +</span>
-<span class="fc" id="L156">			renderFields(clazz);</span>
+<span class="fc" id="L144">		final String name = clazz.getFullyQualifiedName();</span>
+<span class="fc" id="L145">		return MARKDOWN_HORIZONTAL_RULE + PARAGRAPH +</span>
+<span class="fc" id="L146">			renderHtmlAnchor(name) +</span>
+<span class="fc" id="L147">			renderHeading(2, renderCode(name)) +</span>
+<span class="fc" id="L148">			renderCompatibilityList(clazz) + PARAGRAPH +</span>
+<span class="fc" id="L149">			renderClassInfo(clazz) +</span>
+<span class="fc" id="L150">			renderGenericTemplates(clazz) +</span>
+<span class="fc" id="L151">			renderImplementedInterfaces(clazz) +</span>
+<span class="fc" id="L152">			renderAnnotations(clazz) +</span>
+<span class="fc" id="L153">			renderConstructors(clazz) +</span>
+<span class="fc" id="L154">			renderMethods(clazz) +</span>
+<span class="fc" id="L155">			renderFields(clazz);</span>
 	}
 
 	private String renderHtmlAnchor(String id) {
-<span class="fc" id="L160">		return angles(&quot;a&quot; + SPACE + &quot;id&quot; + EQUAL + quotes(renderSlug(id))) + angles(&quot;/a&quot;);</span>
+<span class="fc" id="L159">		return angles(&quot;a&quot; + SPACE + &quot;id&quot; + EQUAL + quotes(renderSlug(id))) + angles(&quot;/a&quot;);</span>
 	}
 
 	private String renderHtmlDetails(String summary, String details) {
-<span class="fc" id="L164">		return angles(&quot;details&quot; + SPACE + &quot;markdown&quot; + EQUAL + quotes(&quot;1&quot;)) + EOL +</span>
-<span class="fc" id="L165">			angles(&quot;summary&quot;) + summary + angles(&quot;/summary&quot;) + PARAGRAPH +</span>
+<span class="fc" id="L163">		return angles(&quot;details&quot; + SPACE + &quot;markdown&quot; + EQUAL + quotes(&quot;1&quot;)) + EOL +</span>
+<span class="fc" id="L164">			angles(&quot;summary&quot;) + summary + angles(&quot;/summary&quot;) + PARAGRAPH +</span>
 			details + EOL +
-<span class="fc" id="L167">			angles(&quot;/details&quot;) + PARAGRAPH;</span>
+<span class="fc" id="L166">			angles(&quot;/details&quot;) + PARAGRAPH;</span>
 	}
 
 	private String renderSlug(String id) {
-<span class="fc" id="L171">		return &quot;user-content-&quot; + id.toLowerCase();</span>
+<span class="fc" id="L170">		return &quot;user-content-&quot; + id.toLowerCase();</span>
 	}
 
 	private Markdown renderCompatibilityList(JApiClass clazz) {
-<span class="fc" id="L175">		return new MarkdownList(</span>
-<span class="fc" id="L176">			format(md.message.compatibilityBinary, md.message.checkbox(clazz.isBinaryCompatible())),</span>
-<span class="fc" id="L177">			format(md.message.compatibilitySource, md.message.checkbox(clazz.isSourceCompatible())),</span>
-<span class="fc" id="L178">			format(md.message.compatibilitySerialization, md.message.checkbox(</span>
-<span class="pc bpc" id="L179" title="1 of 2 branches missed.">				!clazz.getJavaObjectSerializationCompatible().isIncompatible())));</span>
+<span class="fc" id="L174">		return new MarkdownList(</span>
+<span class="fc" id="L175">			format(md.message.compatibilityBinary, md.message.checkbox(clazz.isBinaryCompatible())),</span>
+<span class="fc" id="L176">			format(md.message.compatibilitySource, md.message.checkbox(clazz.isSourceCompatible())),</span>
+<span class="fc" id="L177">			format(md.message.compatibilitySerialization, md.message.checkbox(</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">				!clazz.getJavaObjectSerializationCompatible().isIncompatible())));</span>
 	}
 
 	private Markdown renderClassInfo(JApiClass clazz) {
-<span class="fc" id="L183">		return new MarkdownSection&lt;&gt;(EMPTY, clazz)</span>
-<span class="fc" id="L184">			.column(md.header.status, this::renderStatus)</span>
-<span class="fc" id="L185">			.column(md.header.modifiers, this::renderModifiers)</span>
-<span class="fc" id="L186">			.column(md.header.classType, this::renderClassType)</span>
-<span class="fc" id="L187">			.column(md.header.className, this::renderClassSimpleName)</span>
-<span class="fc" id="L188">			.column(md.header.superclass, this::renderClassSuperclass)</span>
-<span class="fc" id="L189">			.column(md.header.classJdk, this::renderClassJdk)</span>
-<span class="fc" id="L190">			.column(md.header.serialization, this::renderSerializationChange)</span>
-<span class="fc" id="L191">			.column(md.header.compatibilityChanges, this::renderClassLevelCompatibilityChanges);</span>
+<span class="fc" id="L182">		return new MarkdownSection&lt;&gt;(EMPTY, clazz)</span>
+<span class="fc" id="L183">			.column(md.header.status, this::renderStatus)</span>
+<span class="fc" id="L184">			.column(md.header.modifiers, this::renderModifiers)</span>
+<span class="fc" id="L185">			.column(md.header.classType, this::renderClassType)</span>
+<span class="fc" id="L186">			.column(md.header.className, this::renderClassSimpleName)</span>
+<span class="fc" id="L187">			.column(md.header.superclass, this::renderClassSuperclass)</span>
+<span class="fc" id="L188">			.column(md.header.classJdk, this::renderClassJdk)</span>
+<span class="fc" id="L189">			.column(md.header.serialization, this::renderSerializationChange)</span>
+<span class="fc" id="L190">			.column(md.header.compatibilityChanges, this::renderClassLevelCompatibilityChanges);</span>
 	}
 
 	private Markdown renderGenericTemplates(JApiClass clazz) {
-<span class="fc" id="L195">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.generics), clazz.getGenericTemplates(), md.sort.generics)</span>
-<span class="fc" id="L196">			.column(md.header.status, this::renderStatus)</span>
-<span class="fc" id="L197">			.column(md.header.genericTemplateName, this::renderGenericTemplateName)</span>
-<span class="fc" id="L198">			.column(md.header.genericTemplateType, this::renderGenericTemplateType)</span>
-<span class="fc" id="L199">			.column(md.header.compatibilityChanges, this::renderCompatibilityChanges);</span>
+<span class="fc" id="L194">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.generics), clazz.getGenericTemplates(), md.sort.generics)</span>
+<span class="fc" id="L195">			.column(md.header.status, this::renderStatus)</span>
+<span class="fc" id="L196">			.column(md.header.genericTemplateName, this::renderGenericTemplateName)</span>
+<span class="fc" id="L197">			.column(md.header.genericTemplateType, this::renderGenericTemplateType)</span>
+<span class="fc" id="L198">			.column(md.header.compatibilityChanges, this::renderCompatibilityChanges);</span>
 	}
 
 	private Markdown renderImplementedInterfaces(JApiClass clazz) {
-<span class="fc" id="L203">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.interfaces), clazz.getInterfaces(), md.sort.interfaces)</span>
-<span class="fc" id="L204">			.column(md.header.status, this::renderStatus)</span>
-<span class="fc" id="L205">			.column(md.header.interfaceName, this::renderImplementedInterfaceName)</span>
-<span class="fc" id="L206">			.column(md.header.compatibilityChanges, this::renderCompatibilityChanges);</span>
+<span class="fc" id="L202">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.interfaces), clazz.getInterfaces(), md.sort.interfaces)</span>
+<span class="fc" id="L203">			.column(md.header.status, this::renderStatus)</span>
+<span class="fc" id="L204">			.column(md.header.interfaceName, this::renderImplementedInterfaceName)</span>
+<span class="fc" id="L205">			.column(md.header.compatibilityChanges, this::renderCompatibilityChanges);</span>
 	}
 
 	private Markdown renderAnnotations(JApiClass clazz) {
-<span class="fc" id="L210">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.annotations), clazz.getAnnotations(), md.sort.annotations)</span>
-<span class="fc" id="L211">			.column(md.header.status, this::renderStatus)</span>
-<span class="fc" id="L212">			.column(md.header.annotationName, this::renderAnnotation)</span>
-<span class="fc" id="L213">			.column(md.header.compatibilityChanges, this::renderAllCompatibilityChanges);</span>
+<span class="fc" id="L209">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.annotations), clazz.getAnnotations(), md.sort.annotations)</span>
+<span class="fc" id="L210">			.column(md.header.status, this::renderStatus)</span>
+<span class="fc" id="L211">			.column(md.header.annotationName, this::renderAnnotation)</span>
+<span class="fc" id="L212">			.column(md.header.compatibilityChanges, this::renderAllCompatibilityChanges);</span>
 	}
 
 	private Markdown renderConstructors(JApiClass clazz) {
-<span class="fc" id="L217">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.constructors), clazz.getConstructors(), md.sort.constructors)</span>
-<span class="fc" id="L218">			.column(md.header.status, this::renderStatus)</span>
-<span class="fc" id="L219">			.column(md.header.modifiers, this::renderModifiers)</span>
-<span class="fc" id="L220">			.column(md.header.generics, this::renderGenericTemplates)</span>
-<span class="fc" id="L221">			.column(md.header.constructorNameAndParameters, this::renderNameAndParameters)</span>
-<span class="fc" id="L222">			.column(md.header.annotations, this::renderInlineAnnotations)</span>
-<span class="fc" id="L223">			.column(md.header.exceptions, this::renderExceptions)</span>
-<span class="fc" id="L224">			.column(md.header.compatibilityChanges, this::renderAllCompatibilityChanges);</span>
+<span class="fc" id="L216">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.constructors), clazz.getConstructors(), md.sort.constructors)</span>
+<span class="fc" id="L217">			.column(md.header.status, this::renderStatus)</span>
+<span class="fc" id="L218">			.column(md.header.modifiers, this::renderModifiers)</span>
+<span class="fc" id="L219">			.column(md.header.generics, this::renderGenericTemplates)</span>
+<span class="fc" id="L220">			.column(md.header.constructorNameAndParameters, this::renderNameAndParameters)</span>
+<span class="fc" id="L221">			.column(md.header.annotations, this::renderInlineAnnotations)</span>
+<span class="fc" id="L222">			.column(md.header.exceptions, this::renderExceptions)</span>
+<span class="fc" id="L223">			.column(md.header.compatibilityChanges, this::renderAllCompatibilityChanges);</span>
 	}
 
 	private Markdown renderMethods(JApiClass clazz) {
-<span class="fc" id="L228">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.methods), clazz.getMethods(), md.sort.methods)</span>
-<span class="fc" id="L229">			.column(md.header.status, this::renderStatus)</span>
-<span class="fc" id="L230">			.column(md.header.modifiers, this::renderModifiers)</span>
-<span class="fc" id="L231">			.column(md.header.generics, this::renderGenericTemplates)</span>
-<span class="fc" id="L232">			.column(md.header.methodReturnType, this::renderReturnType)</span>
-<span class="fc" id="L233">			.column(md.header.methodNameAndParameters, this::renderNameAndParameters)</span>
-<span class="fc" id="L234">			.column(md.header.annotations, this::renderInlineAnnotations)</span>
-<span class="fc" id="L235">			.column(md.header.exceptions, this::renderExceptions)</span>
-<span class="fc" id="L236">			.column(md.header.compatibilityChanges, this::renderAllCompatibilityChanges);</span>
+<span class="fc" id="L227">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.methods), clazz.getMethods(), md.sort.methods)</span>
+<span class="fc" id="L228">			.column(md.header.status, this::renderStatus)</span>
+<span class="fc" id="L229">			.column(md.header.modifiers, this::renderModifiers)</span>
+<span class="fc" id="L230">			.column(md.header.generics, this::renderGenericTemplates)</span>
+<span class="fc" id="L231">			.column(md.header.methodReturnType, this::renderReturnType)</span>
+<span class="fc" id="L232">			.column(md.header.methodNameAndParameters, this::renderNameAndParameters)</span>
+<span class="fc" id="L233">			.column(md.header.annotations, this::renderInlineAnnotations)</span>
+<span class="fc" id="L234">			.column(md.header.exceptions, this::renderExceptions)</span>
+<span class="fc" id="L235">			.column(md.header.compatibilityChanges, this::renderAllCompatibilityChanges);</span>
 	}
 
 	private Markdown renderFields(JApiClass clazz) {
-<span class="fc" id="L240">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.fields), clazz.getFields(), md.sort.fields)</span>
-<span class="fc" id="L241">			.column(md.header.status, this::renderStatus)</span>
-<span class="fc" id="L242">			.column(md.header.modifiers, this::renderModifiers)</span>
-<span class="fc" id="L243">			.column(md.header.fieldType, this::renderFieldType)</span>
-<span class="fc" id="L244">			.column(md.header.fieldName, this::renderFieldName)</span>
-<span class="fc" id="L245">			.column(md.header.annotations, this::renderInlineAnnotations)</span>
-<span class="fc" id="L246">			.column(md.header.compatibilityChanges, this::renderCompatibilityChanges);</span>
+<span class="fc" id="L239">		return new MarkdownSection&lt;&gt;(renderHeading(3, md.title.fields), clazz.getFields(), md.sort.fields)</span>
+<span class="fc" id="L240">			.column(md.header.status, this::renderStatus)</span>
+<span class="fc" id="L241">			.column(md.header.modifiers, this::renderModifiers)</span>
+<span class="fc" id="L242">			.column(md.header.fieldType, this::renderFieldType)</span>
+<span class="fc" id="L243">			.column(md.header.fieldName, this::renderFieldName)</span>
+<span class="fc" id="L244">			.column(md.header.annotations, this::renderInlineAnnotations)</span>
+<span class="fc" id="L245">			.column(md.header.compatibilityChanges, this::renderCompatibilityChanges);</span>
 	}
 
 	private String renderStatus(JApiHasChangeStatus element) {
-<span class="fc" id="L250">		final boolean isBinaryCompatible = ((JApiCompatibility) element).isBinaryCompatible();</span>
-<span class="fc" id="L251">		final boolean isSourceCompatible = ((JApiCompatibility) element).isSourceCompatible();</span>
-<span class="fc bfc" id="L252" title="All 2 branches covered.">		final boolean isSerializationCompatible = !(element instanceof JApiJavaObjectSerializationCompatibility)</span>
-<span class="pc bpc" id="L253" title="1 of 2 branches missed.">			|| !((JApiJavaObjectSerializationCompatibility) element).getJavaObjectSerializationCompatible().isIncompatible();</span>
-<span class="pc bpc" id="L254" title="3 of 6 branches missed.">		final boolean isFullyCompatible = isBinaryCompatible &amp;&amp; isSourceCompatible &amp;&amp; isSerializationCompatible;</span>
-<span class="pc bpc" id="L255" title="1 of 4 branches missed.">		if (element.getChangeStatus() != UNCHANGED || isFullyCompatible) {</span>
-<span class="fc" id="L256">			return renderLiteralStatus(element);</span>
-<span class="pc bpc" id="L257" title="3 of 4 branches missed.">		} else if (!isBinaryCompatible &amp;&amp; !isSourceCompatible) {</span>
-<span class="nc" id="L258">			return md.message.statusIncompatible;</span>
-<span class="pc bpc" id="L259" title="1 of 2 branches missed.">		} else if (!isBinaryCompatible) {</span>
-<span class="nc" id="L260">			return md.message.statusBinaryIncompatible;</span>
-<span class="pc bpc" id="L261" title="1 of 2 branches missed.">		} else if (!isSourceCompatible) {</span>
-<span class="fc" id="L262">			return md.message.statusSourceIncompatible;</span>
+<span class="fc" id="L249">		final boolean isBinaryCompatible = ((JApiCompatibility) element).isBinaryCompatible();</span>
+<span class="fc" id="L250">		final boolean isSourceCompatible = ((JApiCompatibility) element).isSourceCompatible();</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">		final boolean isSerializationCompatible = !(element instanceof JApiJavaObjectSerializationCompatibility)</span>
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">			|| !((JApiJavaObjectSerializationCompatibility) element).getJavaObjectSerializationCompatible().isIncompatible();</span>
+<span class="pc bpc" id="L253" title="3 of 6 branches missed.">		final boolean isFullyCompatible = isBinaryCompatible &amp;&amp; isSourceCompatible &amp;&amp; isSerializationCompatible;</span>
+<span class="pc bpc" id="L254" title="1 of 4 branches missed.">		if (element.getChangeStatus() != UNCHANGED || isFullyCompatible) {</span>
+<span class="fc" id="L255">			return renderLiteralStatus(element);</span>
+<span class="pc bpc" id="L256" title="3 of 4 branches missed.">		} else if (!isBinaryCompatible &amp;&amp; !isSourceCompatible) {</span>
+<span class="nc" id="L257">			return md.message.statusIncompatible;</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">		} else if (!isBinaryCompatible) {</span>
+<span class="nc" id="L259">			return md.message.statusBinaryIncompatible;</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">		} else if (!isSourceCompatible) {</span>
+<span class="fc" id="L261">			return md.message.statusSourceIncompatible;</span>
 		}
-<span class="nc" id="L264">		return md.message.statusSerializationIncompatible;</span>
+<span class="nc" id="L263">		return md.message.statusSerializationIncompatible;</span>
 	}
 
 	private String renderLiteralStatus(JApiHasChangeStatus element) {
-<span class="pc bpc" id="L268" title="2 of 4 branches missed.">		switch (element.getChangeStatus()) {</span>
+<span class="pc bpc" id="L267" title="2 of 4 branches missed.">		switch (element.getChangeStatus()) {</span>
 			case NEW:
-<span class="nc" id="L270">				return md.message.statusNew;</span>
+<span class="nc" id="L269">				return md.message.statusNew;</span>
 			case REMOVED:
-<span class="fc" id="L272">				return md.message.statusRemoved;</span>
+<span class="fc" id="L271">				return md.message.statusRemoved;</span>
 			case UNCHANGED:
-<span class="nc" id="L274">				return md.message.statusUnchanged;</span>
+<span class="nc" id="L273">				return md.message.statusUnchanged;</span>
 			default:
 			case MODIFIED:
-<span class="fc" id="L277">				return md.message.statusModified;</span>
+<span class="fc" id="L276">				return md.message.statusModified;</span>
 		}
 	}
 
 	private String renderClassLink(JApiClass clazz) {
-<span class="fc" id="L282">		final String name = clazz.getFullyQualifiedName();</span>
-<span class="fc bfc" id="L283" title="All 2 branches covered.">		return md.options.isReportOnlySummary() ? name : references.link(HASH + renderSlug(name), name, null).toString();</span>
+<span class="fc" id="L281">		final String name = clazz.getFullyQualifiedName();</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">		return md.options.isReportOnlySummary() ? name : references.link(HASH + renderSlug(name), name, null).toString();</span>
 	}
 
 	private String renderClassSimpleName(JApiClass clazz) {
-<span class="fc" id="L287">		final String simpleName = formatTypeName(clazz.getFullyQualifiedName(), emptyList(), true);</span>
-<span class="fc" id="L288">		return renderChange(clazz, renderCode(simpleName));</span>
+<span class="fc" id="L286">		final String simpleName = formatTypeName(clazz.getFullyQualifiedName(), emptyList(), true);</span>
+<span class="fc" id="L287">		return renderChange(clazz, renderCode(simpleName));</span>
 	}
 
 	private String renderClassType(JApiClass clazz) {
-<span class="fc" id="L292">		final JApiClassType classType = clazz.getClassType();</span>
-<span class="fc" id="L293">		return renderChange(classType, md.message.getClassType(classType.getOldTypeOptional()), md.message.getClassType(classType.getNewTypeOptional()));</span>
+<span class="fc" id="L291">		final JApiClassType classType = clazz.getClassType();</span>
+<span class="fc" id="L292">		return renderChange(classType, md.message.getClassType(classType.getOldTypeOptional()), md.message.getClassType(classType.getNewTypeOptional()));</span>
 	}
 
 	private String renderClassSuperclass(JApiClass clazz) {
-<span class="fc" id="L297">		final JApiSuperclass superclass = clazz.getSuperclass();</span>
-<span class="fc" id="L298">		final JApiClass correspondingClass = superclass.getCorrespondingJApiClass().or((JApiClass) null);</span>
-<span class="fc" id="L299">		return renderChange(superclass,</span>
-<span class="fc" id="L300">			renderTypeWithGenericTemplates(superclass.getOldSuperclassName().or((String) null), superclass, correspondingClass),</span>
-<span class="fc" id="L301">			renderTypeWithGenericTemplates(superclass.getNewSuperclassName().or((String) null), superclass, correspondingClass));</span>
+<span class="fc" id="L296">		final JApiSuperclass superclass = clazz.getSuperclass();</span>
+<span class="fc" id="L297">		final JApiClass correspondingClass = superclass.getCorrespondingJApiClass().orElse(null);</span>
+<span class="fc" id="L298">		return renderChange(superclass,</span>
+<span class="fc" id="L299">			renderTypeWithGenericTemplates(superclass.getOldSuperclassName().orElse(null), superclass, correspondingClass),</span>
+<span class="fc" id="L300">			renderTypeWithGenericTemplates(superclass.getNewSuperclassName().orElse(null), superclass, correspondingClass));</span>
 	}
 
 	private String renderClassJdk(JApiClass clazz) {
-<span class="fc" id="L305">		final JApiClassFileFormatVersion version = clazz.getClassFileFormatVersion();</span>
-<span class="fc" id="L306">		return renderChange(version, getOldJdkVersion(version), getNewJdkVersion(version));</span>
+<span class="fc" id="L304">		final JApiClassFileFormatVersion version = clazz.getClassFileFormatVersion();</span>
+<span class="fc" id="L305">		return renderChange(version, getOldJdkVersion(version), getNewJdkVersion(version));</span>
 	}
 
 	private String renderGenericTemplateName(JApiGenericTemplate genericTemplate) {
-<span class="nc" id="L310">		return renderChange(genericTemplate, renderCode(genericTemplate.getName()));</span>
+<span class="nc" id="L309">		return renderChange(genericTemplate, renderCode(genericTemplate.getName()));</span>
 	}
 
 	private String renderGenericTemplateType(JApiGenericTemplate genericTemplate) {
-<span class="nc" id="L314">		return renderChange(genericTemplate,</span>
-<span class="nc" id="L315">			renderTypeWithGenericTypes(genericTemplate.getOldType(), genericTemplate.getOldGenericTypes()),</span>
-<span class="nc" id="L316">			renderTypeWithGenericTypes(genericTemplate.getNewType(), genericTemplate.getNewGenericTypes()));</span>
+<span class="nc" id="L313">		return renderChange(genericTemplate,</span>
+<span class="nc" id="L314">			renderTypeWithGenericTypes(genericTemplate.getOldType(), genericTemplate.getOldGenericTypes()),</span>
+<span class="nc" id="L315">			renderTypeWithGenericTypes(genericTemplate.getNewType(), genericTemplate.getNewGenericTypes()));</span>
 	}
 
 	private String renderImplementedInterfaceName(JApiImplementedInterface implInterface) {
-<span class="nc" id="L320">		return renderChange(implInterface, renderTypeWithGenericTemplates(</span>
-<span class="nc" id="L321">			implInterface.getFullyQualifiedName(), implInterface, implInterface.getCorrespondingJApiClass().or((JApiClass) null)));</span>
+<span class="nc" id="L319">		return renderChange(implInterface, renderTypeWithGenericTemplates(</span>
+<span class="nc" id="L320">			implInterface.getFullyQualifiedName(), implInterface, implInterface.getCorrespondingJApiClass().orElse(null)));</span>
 	}
 
 	private String renderNameAndParameters(JApiBehavior behavior) {
-<span class="fc" id="L325">		final String name = behavior.getName();</span>
-<span class="pc bpc" id="L326" title="1 of 2 branches missed.">		final int pos = name != null ? name.lastIndexOf('$') : -1;</span>
-<span class="pc bpc" id="L327" title="1 of 2 branches missed.">		final String simpleName = pos &gt; 0 ? name.substring(pos + 1) : name;</span>
-<span class="fc" id="L328">		return renderChange(behavior, renderCode(simpleName)) + renderParameters(behavior);</span>
+<span class="fc" id="L324">		final String name = behavior.getName();</span>
+<span class="pc bpc" id="L325" title="1 of 2 branches missed.">		final int pos = name != null ? name.lastIndexOf('$') : -1;</span>
+<span class="pc bpc" id="L326" title="1 of 2 branches missed.">		final String simpleName = pos &gt; 0 ? name.substring(pos + 1) : name;</span>
+<span class="fc" id="L327">		return renderChange(behavior, renderCode(simpleName)) + renderParameters(behavior);</span>
 	}
 
 	private String renderParameters(JApiBehavior behavior) {
-<span class="fc" id="L332">		return parenthesis(behavior.getParameters().stream().map(x -&gt; renderParameter(behavior, x)).collect(CSV));</span>
+<span class="fc" id="L331">		return parenthesis(behavior.getParameters().stream().map(x -&gt; renderParameter(behavior, x)).collect(CSV));</span>
 	}
 
 	private String renderParameter(JApiBehavior method, JApiParameter parameter) {
-<span class="pc bpc" id="L336" title="1 of 2 branches missed.">		if (parameter.getTemplateNameOptional().isPresent()) {</span>
-<span class="nc" id="L337">			return renderChange(parameter, renderCode(parameter.getTemplateName()));</span>
+<span class="pc bpc" id="L335" title="1 of 2 branches missed.">		if (parameter.getTemplateNameOptional().isPresent()) {</span>
+<span class="nc" id="L336">			return renderChange(parameter, renderCode(parameter.getTemplateName()));</span>
 		}
-<span class="fc" id="L339">		final JApiChangeStatus status = method.getChangeStatus();</span>
-<span class="fc" id="L340">		final JApiModifier&lt;VarargsModifier&gt; varargs = method.getVarargsModifier();</span>
-<span class="pc bpc" id="L341" title="1 of 2 branches missed.">		final String oldType = (status == NEW) ? null : renderParameterType(method, parameter, varargs.getOldModifier(), parameter.getOldGenericTypes());</span>
-<span class="fc bfc" id="L342" title="All 2 branches covered.">		final String newType = (status == REMOVED) ? null : renderParameterType(method, parameter, varargs.getNewModifier(), parameter.getNewGenericTypes());</span>
-<span class="fc" id="L343">		return renderChange(parameter, oldType, newType);</span>
+<span class="fc" id="L338">		final JApiChangeStatus status = method.getChangeStatus();</span>
+<span class="fc" id="L339">		final JApiModifier&lt;VarargsModifier&gt; varargs = method.getVarargsModifier();</span>
+<span class="pc bpc" id="L340" title="1 of 2 branches missed.">		final String oldType = (status == NEW) ? null : renderParameterType(method, parameter, varargs.getOldModifier(), parameter.getOldGenericTypes());</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">		final String newType = (status == REMOVED) ? null : renderParameterType(method, parameter, varargs.getNewModifier(), parameter.getNewGenericTypes());</span>
+<span class="fc" id="L342">		return renderChange(parameter, oldType, newType);</span>
 	}
 
 	private String renderGenericTemplates(JApiBehavior behavior) {
-<span class="fc" id="L347">		final List&lt;JApiGenericTemplate&gt; genericTemplates = behavior.getGenericTemplates();</span>
-<span class="pc bpc" id="L348" title="1 of 2 branches missed.">		if (genericTemplates.isEmpty()) {</span>
-<span class="fc" id="L349">			return EMPTY;</span>
+<span class="fc" id="L346">		final List&lt;JApiGenericTemplate&gt; genericTemplates = behavior.getGenericTemplates();</span>
+<span class="pc bpc" id="L347" title="1 of 2 branches missed.">		if (genericTemplates.isEmpty()) {</span>
+<span class="fc" id="L348">			return EMPTY;</span>
 		}
-<span class="nc" id="L351">		return BACKSLASH + ANGLE_OPEN +</span>
-<span class="nc" id="L352">			genericTemplates.stream().map(this::renderGenericTemplate).collect(CSV) +</span>
+<span class="nc" id="L350">		return BACKSLASH + ANGLE_OPEN +</span>
+<span class="nc" id="L351">			genericTemplates.stream().map(this::renderGenericTemplate).collect(CSV) +</span>
 			BACKSLASH + ANGLE_CLOSE;
 	}
 
 	private String renderGenericTemplate(JApiGenericTemplate genericTemplate) {
-<span class="nc" id="L357">		final String name = genericTemplate.getName();</span>
-<span class="nc" id="L358">		final String oldTemplate = renderGenericTemplate(name, genericTemplate.getOldTypeOptional().or((String) null), genericTemplate.getOldGenericTypes());</span>
-<span class="nc" id="L359">		final String newTemplate = renderGenericTemplate(name, genericTemplate.getNewTypeOptional().or((String) null), genericTemplate.getNewGenericTypes());</span>
-<span class="nc" id="L360">		return renderChange(genericTemplate, oldTemplate, newTemplate);</span>
+<span class="nc" id="L356">		final String name = genericTemplate.getName();</span>
+<span class="nc" id="L357">		final String oldTemplate = renderGenericTemplate(name, genericTemplate.getOldTypeOptional().orElse(null), genericTemplate.getOldGenericTypes());</span>
+<span class="nc" id="L358">		final String newTemplate = renderGenericTemplate(name, genericTemplate.getNewTypeOptional().orElse(null), genericTemplate.getNewGenericTypes());</span>
+<span class="nc" id="L359">		return renderChange(genericTemplate, oldTemplate, newTemplate);</span>
 	}
 
 	private String renderGenericTemplate(String name, String type, List&lt;JApiGenericType&gt; genericTypes) {
-<span class="nc" id="L364">		final String fullType = formatGenericTemplate(name, type, genericTypes, false);</span>
-<span class="nc" id="L365">		final String simpleType = formatGenericTemplate(name, type, genericTypes, true);</span>
-<span class="nc" id="L366">		return renderCodeWithTooltip(fullType, simpleType);</span>
+<span class="nc" id="L363">		final String fullType = formatGenericTemplate(name, type, genericTypes, false);</span>
+<span class="nc" id="L364">		final String simpleType = formatGenericTemplate(name, type, genericTypes, true);</span>
+<span class="nc" id="L365">		return renderCodeWithTooltip(fullType, simpleType);</span>
 	}
 
 	private String renderCompatibilityChanges(List&lt;JApiCompatibilityChange&gt; changes) {
-<span class="fc bfc" id="L370" title="All 2 branches covered.">		if (changes.isEmpty()) {</span>
-<span class="fc" id="L371">			return renderNoChangesBadge();</span>
+<span class="fc bfc" id="L369" title="All 2 branches covered.">		if (changes.isEmpty()) {</span>
+<span class="fc" id="L370">			return renderNoChangesBadge();</span>
 		}
-<span class="fc" id="L373">		return changes.stream().map(this::renderChangeBadge).collect(SPACES);</span>
+<span class="fc" id="L372">		return changes.stream().map(this::renderChangeBadge).collect(SPACES);</span>
 	}
 
 	private String renderCompatibilityChanges(JApiCompatibility hasCompatibilityChanges) {
-<span class="fc" id="L377">		return renderCompatibilityChanges(hasCompatibilityChanges.getCompatibilityChanges());</span>
+<span class="fc" id="L376">		return renderCompatibilityChanges(hasCompatibilityChanges.getCompatibilityChanges());</span>
 	}
 
 	@SafeVarargs
 	private final String renderCompatibilityChanges(List&lt;? extends JApiCompatibility&gt;... haveCompatibilityChanges) {
-<span class="fc" id="L382">		return renderCompatibilityChanges(Stream.of(haveCompatibilityChanges).flatMap(List::stream)</span>
-<span class="fc" id="L383">			.map(JApiCompatibility::getCompatibilityChanges).flatMap(List::stream).distinct().collect(toList()));</span>
+<span class="fc" id="L381">		return renderCompatibilityChanges(Stream.of(haveCompatibilityChanges).flatMap(List::stream)</span>
+<span class="fc" id="L382">			.map(JApiCompatibility::getCompatibilityChanges).flatMap(List::stream).distinct().collect(toList()));</span>
 	}
 
 	private String renderAllCompatibilityChanges(JApiClass clazz) {
-<span class="fc" id="L387">		final Stream&lt;List&lt;? extends JApiCompatibility&gt;&gt; allCompatibilityChanges = Stream.of(</span>
-<span class="fc" id="L388">				singletonList(clazz),</span>
-<span class="fc" id="L389">				singletonList(clazz.getClassFileFormatVersion()),</span>
-<span class="fc" id="L390">				singletonList(clazz.getSuperclass()),</span>
-<span class="fc" id="L391">				clazz.getGenericTemplates(),</span>
-<span class="fc" id="L392">				clazz.getInterfaces(),</span>
-<span class="fc" id="L393">				clazz.getAnnotations(),</span>
-<span class="fc" id="L394">				clazz.getAnnotations().stream().map(JApiAnnotation::getElements).flatMap(List::stream).collect(toList()),</span>
-<span class="fc" id="L395">				clazz.getConstructors(),</span>
-<span class="fc" id="L396">				clazz.getConstructors().stream().map(JApiConstructor::getParameters).flatMap(List::stream).collect(toList()),</span>
-<span class="fc" id="L397">				clazz.getMethods(),</span>
-<span class="fc" id="L398">				clazz.getMethods().stream().map(JApiMethod::getReturnType).collect(toList()),</span>
-<span class="fc" id="L399">				clazz.getMethods().stream().map(JApiMethod::getParameters).flatMap(List::stream).collect(toList()),</span>
-<span class="fc" id="L400">				clazz.getFields());</span>
-<span class="fc" id="L401">		return renderCompatibilityChanges(allCompatibilityChanges</span>
-<span class="fc" id="L402">			.flatMap(List::stream)</span>
-<span class="fc" id="L403">			.map(JApiCompatibility::getCompatibilityChanges)</span>
-<span class="fc" id="L404">			.flatMap(List::stream)</span>
-<span class="fc" id="L405">			.distinct().sorted(Comparator.comparing(JApiCompatibilityChange::getType))</span>
-<span class="fc" id="L406">			.collect(toList()));</span>
+<span class="fc" id="L386">		final Stream&lt;List&lt;? extends JApiCompatibility&gt;&gt; allCompatibilityChanges = Stream.of(</span>
+<span class="fc" id="L387">				singletonList(clazz),</span>
+<span class="fc" id="L388">				singletonList(clazz.getClassFileFormatVersion()),</span>
+<span class="fc" id="L389">				singletonList(clazz.getSuperclass()),</span>
+<span class="fc" id="L390">				clazz.getGenericTemplates(),</span>
+<span class="fc" id="L391">				clazz.getInterfaces(),</span>
+<span class="fc" id="L392">				clazz.getAnnotations(),</span>
+<span class="fc" id="L393">				clazz.getAnnotations().stream().map(JApiAnnotation::getElements).flatMap(List::stream).collect(toList()),</span>
+<span class="fc" id="L394">				clazz.getConstructors(),</span>
+<span class="fc" id="L395">				clazz.getConstructors().stream().map(JApiConstructor::getParameters).flatMap(List::stream).collect(toList()),</span>
+<span class="fc" id="L396">				clazz.getMethods(),</span>
+<span class="fc" id="L397">				clazz.getMethods().stream().map(JApiMethod::getReturnType).collect(toList()),</span>
+<span class="fc" id="L398">				clazz.getMethods().stream().map(JApiMethod::getParameters).flatMap(List::stream).collect(toList()),</span>
+<span class="fc" id="L399">				clazz.getFields());</span>
+<span class="fc" id="L400">		return renderCompatibilityChanges(allCompatibilityChanges</span>
+<span class="fc" id="L401">			.flatMap(List::stream)</span>
+<span class="fc" id="L402">			.map(JApiCompatibility::getCompatibilityChanges)</span>
+<span class="fc" id="L403">			.flatMap(List::stream)</span>
+<span class="fc" id="L404">			.distinct().sorted(Comparator.comparing(JApiCompatibilityChange::getType))</span>
+<span class="fc" id="L405">			.collect(toList()));</span>
 	}
 
 	private String renderClassLevelCompatibilityChanges(JApiClass clazz) {
-<span class="fc" id="L410">		return renderCompatibilityChanges(Arrays.asList(clazz, clazz.getClassFileFormatVersion(), clazz.getSuperclass()));</span>
+<span class="fc" id="L409">		return renderCompatibilityChanges(Arrays.asList(clazz, clazz.getClassFileFormatVersion(), clazz.getSuperclass()));</span>
 	}
 
 	private String renderAllCompatibilityChanges(JApiAnnotation annotation) {
-<span class="nc" id="L414">		return renderCompatibilityChanges(singletonList(annotation), annotation.getElements());</span>
+<span class="nc" id="L413">		return renderCompatibilityChanges(singletonList(annotation), annotation.getElements());</span>
 	}
 
 	private String renderAllCompatibilityChanges(JApiConstructor constructor) {
-<span class="nc" id="L418">		return renderCompatibilityChanges(singletonList(constructor), constructor.getParameters());</span>
+<span class="nc" id="L417">		return renderCompatibilityChanges(singletonList(constructor), constructor.getParameters());</span>
 	}
 
 	private String renderAllCompatibilityChanges(JApiMethod method) {
-<span class="fc" id="L422">		return renderCompatibilityChanges(singletonList(method), singletonList(method.getReturnType()), method.getParameters());</span>
+<span class="fc" id="L421">		return renderCompatibilityChanges(singletonList(method), singletonList(method.getReturnType()), method.getParameters());</span>
 	}
 
 	private String renderNoChangesBadge() {
-<span class="fc" id="L426">		return new MarkdownBadge(null, md.message.noCompatibilityChanges, md.message.colorNoChanges)</span>
-<span class="fc" id="L427">			.toRefImage(references).toString();</span>
+<span class="fc" id="L425">		return new MarkdownBadge(null, md.message.noCompatibilityChanges, md.message.colorNoChanges)</span>
+<span class="fc" id="L426">			.toRefImage(references).toString();</span>
 	}
 
 	private String renderChangeBadge(JApiCompatibilityChange change) {
-<span class="fc" id="L431">		final JApiCompatibilityChangeType type = change.getType();</span>
-<span class="fc" id="L432">		return new MarkdownBadge(null, md.message.compatibilityChangeType.getOrDefault(type, type.name()), md.message.getSemanticColor(change.getSemanticVersionLevel()))</span>
-<span class="fc" id="L433">			.toRefImage(references).toString();</span>
+<span class="fc" id="L430">		final JApiCompatibilityChangeType type = change.getType();</span>
+<span class="fc" id="L431">		return new MarkdownBadge(null, md.message.compatibilityChangeType.getOrDefault(type, type.name()), md.message.getSemanticColor(change.getSemanticVersionLevel()))</span>
+<span class="fc" id="L432">			.toRefImage(references).toString();</span>
 	}
 
 	private String renderSerializationChange(JApiClass clazz) {
-<span class="fc" id="L437">		final JApiJavaObjectSerializationChangeStatus change = clazz.getJavaObjectSerializationCompatible();</span>
-<span class="fc" id="L438">		final String text = md.message.serializationCompatibility.getOrDefault(change, change.getDescription());</span>
-<span class="pc bpc" id="L439" title="1 of 2 branches missed.">		final String color = change.isIncompatible() ? md.message.colorMajorChanges : md.message.colorNoChanges;</span>
-<span class="pc bpc" id="L440" title="1 of 2 branches missed.">		final String msg = change.isIncompatible() ? md.message.statusIncompatible : text;</span>
-<span class="fc" id="L441">		return new MarkdownBadge(null, msg, color).toRefImage(references, text).toString();</span>
+<span class="fc" id="L436">		final JApiJavaObjectSerializationChangeStatus change = clazz.getJavaObjectSerializationCompatible();</span>
+<span class="fc" id="L437">		final String text = md.message.serializationCompatibility.getOrDefault(change, change.getDescription());</span>
+<span class="pc bpc" id="L438" title="1 of 2 branches missed.">		final String color = change.isIncompatible() ? md.message.colorMajorChanges : md.message.colorNoChanges;</span>
+<span class="pc bpc" id="L439" title="1 of 2 branches missed.">		final String msg = change.isIncompatible() ? md.message.statusIncompatible : text;</span>
+<span class="fc" id="L440">		return new MarkdownBadge(null, msg, color).toRefImage(references, text).toString();</span>
 	}
 
 	private String renderChange(JApiHasChangeStatus hasStatus, String oldValue, String newValue) {
-<span class="pc bpc" id="L445" title="1 of 4 branches missed.">		if (oldValue == null &amp;&amp; newValue == null) {</span>
-<span class="fc" id="L446">			return null;</span>
+<span class="pc bpc" id="L444" title="1 of 4 branches missed.">		if (oldValue == null &amp;&amp; newValue == null) {</span>
+<span class="fc" id="L445">			return null;</span>
 		}
-<span class="pc bpc" id="L448" title="1 of 4 branches missed.">		switch (hasStatus.getChangeStatus()) {</span>
+<span class="pc bpc" id="L447" title="1 of 4 branches missed.">		switch (hasStatus.getChangeStatus()) {</span>
 			case NEW:
-<span class="nc bnc" id="L450" title="All 2 branches missed.">				return newValue == null ? null : format(md.message.added, newValue);</span>
+<span class="nc bnc" id="L449" title="All 2 branches missed.">				return newValue == null ? null : format(md.message.added, newValue);</span>
 			case REMOVED:
-<span class="pc bpc" id="L452" title="1 of 2 branches missed.">				return oldValue == null ? null : format(md.message.removed, oldValue);</span>
+<span class="pc bpc" id="L451" title="1 of 2 branches missed.">				return oldValue == null ? null : format(md.message.removed, oldValue);</span>
 			case UNCHANGED:
-<span class="fc bfc" id="L454" title="All 2 branches covered.">				if (newValue == null) {</span>
-<span class="fc" id="L455">					return format(md.message.unchanged, oldValue);</span>
-<span class="pc bpc" id="L456" title="1 of 4 branches missed.">				} else if (oldValue == null || newValue.equals(oldValue)) {</span>
-<span class="fc" id="L457">					return format(md.message.unchanged, newValue);</span>
+<span class="fc bfc" id="L453" title="All 2 branches covered.">				if (newValue == null) {</span>
+<span class="fc" id="L454">					return format(md.message.unchanged, oldValue);</span>
+<span class="pc bpc" id="L455" title="1 of 4 branches missed.">				} else if (oldValue == null || newValue.equals(oldValue)) {</span>
+<span class="fc" id="L456">					return format(md.message.unchanged, newValue);</span>
 				}
-<span class="fc" id="L459">				return format(md.message.modified, oldValue, newValue);</span>
+<span class="fc" id="L458">				return format(md.message.modified, oldValue, newValue);</span>
 			default:
 			case MODIFIED:
-<span class="pc bpc" id="L462" title="1 of 2 branches missed.">				if (oldValue == null) {</span>
-<span class="nc" id="L463">					return format(md.message.added, newValue);</span>
-<span class="pc bpc" id="L464" title="1 of 2 branches missed.">				} else if (newValue == null) {</span>
-<span class="nc" id="L465">					return format(md.message.removed, oldValue);</span>
-<span class="pc bpc" id="L466" title="1 of 2 branches missed.">				} else if (newValue.equals(oldValue)) {</span>
-<span class="fc" id="L467">					return format(md.message.unchanged, newValue);</span>
+<span class="pc bpc" id="L461" title="1 of 2 branches missed.">				if (oldValue == null) {</span>
+<span class="nc" id="L462">					return format(md.message.added, newValue);</span>
+<span class="pc bpc" id="L463" title="1 of 2 branches missed.">				} else if (newValue == null) {</span>
+<span class="nc" id="L464">					return format(md.message.removed, oldValue);</span>
+<span class="pc bpc" id="L465" title="1 of 2 branches missed.">				} else if (newValue.equals(oldValue)) {</span>
+<span class="fc" id="L466">					return format(md.message.unchanged, newValue);</span>
 				}
-<span class="nc" id="L469">				return format(md.message.modified, oldValue, newValue);</span>
+<span class="nc" id="L468">				return format(md.message.modified, oldValue, newValue);</span>
 		}
 	}
 
 	private String renderChange(JApiHasChangeStatus status, String value) {
-<span class="fc" id="L474">		return renderChange(status, value, value);</span>
+<span class="fc" id="L473">		return renderChange(status, value, value);</span>
 	}
 
 	private String renderModifiers(JApiHasModifiers clazz) {
-<span class="fc" id="L478">		return clazz.getModifiers().stream().map(this::renderModifier)</span>
-<span class="fc" id="L479">			.filter(Objects::nonNull).collect(SPACES);</span>
+<span class="fc" id="L477">		return clazz.getModifiers().stream().map(this::renderModifier)</span>
+<span class="fc" id="L478">			.filter(Objects::nonNull).collect(SPACES);</span>
 	}
 
 	private String renderModifier(JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt; modifier) {
-<span class="fc" id="L483">		final String oldName = getOldModifierName(modifier).or((String) null);</span>
-<span class="fc" id="L484">		final String newName = getNewModifierName(modifier).or((String) null);</span>
-<span class="fc" id="L485">		return renderChange(modifier, renderCode(oldName), renderCode(newName));</span>
+<span class="fc" id="L482">		final String oldName = getOldModifierName(modifier).orElse(null);</span>
+<span class="fc" id="L483">		final String newName = getNewModifierName(modifier).orElse(null);</span>
+<span class="fc" id="L484">		return renderChange(modifier, renderCode(oldName), renderCode(newName));</span>
 	}
 
 	private String renderTypeWithGenericTypes(String type, List&lt;JApiGenericType&gt; genericTypes) {
-<span class="pc bpc" id="L489" title="1 of 2 branches missed.">		if (type == null) {</span>
-<span class="nc" id="L490">			return null;</span>
+<span class="pc bpc" id="L488" title="1 of 2 branches missed.">		if (type == null) {</span>
+<span class="nc" id="L489">			return null;</span>
 		}
-<span class="fc" id="L492">		final String fullType = formatTypeName(type, genericTypes, false);</span>
-<span class="fc" id="L493">		final String simpleType = formatTypeName(type, genericTypes, true);</span>
-<span class="fc" id="L494">		return renderCodeWithTooltip(fullType, simpleType);</span>
+<span class="fc" id="L491">		final String fullType = formatTypeName(type, genericTypes, false);</span>
+<span class="fc" id="L492">		final String simpleType = formatTypeName(type, genericTypes, true);</span>
+<span class="fc" id="L493">		return renderCodeWithTooltip(fullType, simpleType);</span>
 	}
 
 	private String renderTypeWithGenericTemplates(String type, JApiHasChangeStatus hasChangeStatus, JApiHasGenericTemplates hasGenericTemplates) {
-<span class="fc bfc" id="L498" title="All 2 branches covered.">		if (type == null) {</span>
-<span class="fc" id="L499">			return null;</span>
+<span class="fc bfc" id="L497" title="All 2 branches covered.">		if (type == null) {</span>
+<span class="fc" id="L498">			return null;</span>
 		}
-<span class="fc" id="L501">		final String fullType = formatTypeName(type, hasChangeStatus, hasGenericTemplates, false);</span>
-<span class="fc" id="L502">		final String simpleType = formatTypeName(type, hasChangeStatus, hasGenericTemplates, true);</span>
-<span class="fc" id="L503">		return renderCodeWithTooltip(fullType, simpleType);</span>
+<span class="fc" id="L500">		final String fullType = formatTypeName(type, hasChangeStatus, hasGenericTemplates, false);</span>
+<span class="fc" id="L501">		final String simpleType = formatTypeName(type, hasChangeStatus, hasGenericTemplates, true);</span>
+<span class="fc" id="L502">		return renderCodeWithTooltip(fullType, simpleType);</span>
 	}
 
 	private String renderParameterType(JApiBehavior method, JApiParameter parameter, Optional&lt;VarargsModifier&gt; varargs, List&lt;JApiGenericType&gt; genericTypes) {
-<span class="pc bpc" id="L507" title="1 of 2 branches missed.">		if (parameter.getType() == null) {</span>
-<span class="nc" id="L508">			return null;</span>
+<span class="pc bpc" id="L506" title="1 of 2 branches missed.">		if (parameter.getType() == null) {</span>
+<span class="nc" id="L507">			return null;</span>
 		}
-<span class="fc" id="L510">		final String fullType = formatParameterTypeName(method, parameter, varargs, genericTypes, false);</span>
-<span class="fc" id="L511">		final String simpleType = formatParameterTypeName(method, parameter, varargs, genericTypes, true);</span>
-<span class="fc" id="L512">		return renderCodeWithTooltip(fullType, simpleType);</span>
+<span class="fc" id="L509">		final String fullType = formatParameterTypeName(method, parameter, varargs, genericTypes, false);</span>
+<span class="fc" id="L510">		final String simpleType = formatParameterTypeName(method, parameter, varargs, genericTypes, true);</span>
+<span class="fc" id="L511">		return renderCodeWithTooltip(fullType, simpleType);</span>
 	}
 
 	private String renderMemberValue(Optional&lt;MemberValue&gt; optionalValue) {
-<span class="nc bnc" id="L516" title="All 2 branches missed.">		if (!optionalValue.isPresent()) {</span>
-<span class="nc" id="L517">			return EMPTY;</span>
+<span class="nc bnc" id="L515" title="All 2 branches missed.">		if (!optionalValue.isPresent()) {</span>
+<span class="nc" id="L516">			return EMPTY;</span>
 		}
-<span class="nc" id="L519">		final String fullValue = formatMemberValue(optionalValue.get(), false);</span>
-<span class="nc" id="L520">		final String simpleValue = formatMemberValue(optionalValue.get(), true);</span>
-<span class="nc" id="L521">		return renderCodeWithTooltip(fullValue, simpleValue);</span>
+<span class="nc" id="L518">		final String fullValue = formatMemberValue(optionalValue.get(), false);</span>
+<span class="nc" id="L519">		final String simpleValue = formatMemberValue(optionalValue.get(), true);</span>
+<span class="nc" id="L520">		return renderCodeWithTooltip(fullValue, simpleValue);</span>
 	}
 
 	private String renderReturnType(JApiMethod method) {
-<span class="fc" id="L525">		final JApiReturnType returnType = method.getReturnType();</span>
-<span class="fc" id="L526">		return renderChange(returnType,</span>
-<span class="fc" id="L527">			renderTypeWithGenericTypes(returnType.getOldReturnType(), returnType.getOldGenericTypes()),</span>
-<span class="fc" id="L528">			renderTypeWithGenericTypes(returnType.getNewReturnType(), returnType.getNewGenericTypes()));</span>
+<span class="fc" id="L524">		final JApiReturnType returnType = method.getReturnType();</span>
+<span class="fc" id="L525">		return renderChange(returnType,</span>
+<span class="fc" id="L526">			renderTypeWithGenericTypes(returnType.getOldReturnType(), returnType.getOldGenericTypes()),</span>
+<span class="fc" id="L527">			renderTypeWithGenericTypes(returnType.getNewReturnType(), returnType.getNewGenericTypes()));</span>
 	}
 
 	private String renderFieldType(JApiField field) {
-<span class="fc" id="L532">		final JApiType fieldType = field.getType();</span>
-<span class="fc" id="L533">		return renderChange(fieldType,</span>
-<span class="fc" id="L534">			renderTypeWithGenericTypes(fieldType.getOldValue(), field.getOldGenericTypes()),</span>
-<span class="fc" id="L535">			renderTypeWithGenericTypes(fieldType.getNewValue(), field.getNewGenericTypes()));</span>
+<span class="fc" id="L531">		final JApiType fieldType = field.getType();</span>
+<span class="fc" id="L532">		return renderChange(fieldType,</span>
+<span class="fc" id="L533">			renderTypeWithGenericTypes(fieldType.getOldValue(), field.getOldGenericTypes()),</span>
+<span class="fc" id="L534">			renderTypeWithGenericTypes(fieldType.getNewValue(), field.getNewGenericTypes()));</span>
 	}
 
 	private String renderFieldName(JApiField field) {
-<span class="fc" id="L539">		return renderCode(field.getName());</span>
+<span class="fc" id="L538">		return renderCode(field.getName());</span>
 	}
 
 	private String renderExceptions(JApiBehavior behavior) {
-<span class="fc" id="L543">		return behavior.getExceptions().stream().map(this::renderException).collect(CSV);</span>
+<span class="fc" id="L542">		return behavior.getExceptions().stream().map(this::renderException).collect(CSV);</span>
 	}
 
 	private String renderException(JApiException exception) {
-<span class="nc" id="L547">		return renderChange(exception, renderTypeWithGenericTypes(exception.getName(), emptyList()));</span>
+<span class="nc" id="L546">		return renderChange(exception, renderTypeWithGenericTypes(exception.getName(), emptyList()));</span>
 	}
 
 	private String renderInlineAnnotations(JApiHasAnnotations hasAnnotations) {
-<span class="fc" id="L551">		return hasAnnotations.getAnnotations().stream().map(this::renderAnnotation).collect(BR);</span>
+<span class="fc" id="L550">		return hasAnnotations.getAnnotations().stream().map(this::renderAnnotation).collect(BR);</span>
 	}
 
 	private String renderAnnotation(JApiAnnotation annotation) {
-<span class="nc" id="L555">		final String typeName = renderTypeWithGenericTemplates(annotation.getFullyQualifiedName(), annotation, annotation.getCorrespondingJApiClass().or((JApiClass) null));</span>
-<span class="nc" id="L556">		return renderChange(annotation, typeName) +</span>
-<span class="nc bnc" id="L557" title="All 2 branches missed.">			(annotation.getElements().isEmpty() ? EMPTY : COLON + SPACE) +</span>
-<span class="nc" id="L558">			annotation.getElements().stream().map(this::renderAnnotationElement).collect(CSV);</span>
+<span class="nc" id="L554">		final String typeName = renderTypeWithGenericTemplates(annotation.getFullyQualifiedName(), annotation, annotation.getCorrespondingJApiClass().orElse(null));</span>
+<span class="nc" id="L555">		return renderChange(annotation, typeName) +</span>
+<span class="nc bnc" id="L556" title="All 2 branches missed.">			(annotation.getElements().isEmpty() ? EMPTY : COLON + SPACE) +</span>
+<span class="nc" id="L557">			annotation.getElements().stream().map(this::renderAnnotationElement).collect(CSV);</span>
 	}
 
 	private String renderAnnotationElement(JApiAnnotationElement element) {
-<span class="nc" id="L562">		return renderChange(element, renderCode(element.getName())) + EQUAL +</span>
-<span class="nc" id="L563">			renderChange(element, renderMemberValue(element.getOldValue()), renderMemberValue(element.getNewValue()));</span>
+<span class="nc" id="L561">		return renderChange(element, renderCode(element.getName())) + EQUAL +</span>
+<span class="nc" id="L562">			renderChange(element, renderMemberValue(element.getOldValue()), renderMemberValue(element.getNewValue()));</span>
 	}
 
 	private String renderCode(String text) {
-<span class="pc bpc" id="L567" title="1 of 4 branches missed.">		return text == null || text.isEmpty() ? text : backticks(text);</span>
+<span class="pc bpc" id="L566" title="1 of 4 branches missed.">		return text == null || text.isEmpty() ? text : backticks(text);</span>
 	}
 
 	private String renderCodeWithTooltip(String fullType, String simpleType) {
-<span class="fc bfc" id="L571" title="All 2 branches covered.">		if (fullType.equals(simpleType)) {</span>
-<span class="fc" id="L572">			return renderCode(simpleType);</span>
+<span class="fc bfc" id="L570" title="All 2 branches covered.">		if (fullType.equals(simpleType)) {</span>
+<span class="fc" id="L571">			return renderCode(simpleType);</span>
 		}
-<span class="fc" id="L574">		return references.link(null, renderCode(simpleType), fullType).toString();</span>
+<span class="fc" id="L573">		return references.link(null, renderCode(simpleType), fullType).toString();</span>
 	}
 
 	String renderArchive(JApiCmpArchive archive) {
-<span class="fc" id="L578">		final String label = renderSimpleArchiveName(archive);</span>
-<span class="fc" id="L579">		final String version = archive.getVersion().getStringVersion();</span>
-<span class="pc bpc" id="L580" title="2 of 4 branches missed.">		final String message = version != null &amp;&amp; !version.equals(N_A) ? version : md.message.unknownVersion;</span>
-<span class="fc" id="L581">		return new MarkdownBadge(label, message, md.message.colorVersionNumber).toString();</span>
+<span class="fc" id="L577">		final String label = renderSimpleArchiveName(archive);</span>
+<span class="fc" id="L578">		final String version = archive.getVersion().getStringVersion();</span>
+<span class="pc bpc" id="L579" title="2 of 4 branches missed.">		final String message = version != null &amp;&amp; !version.equals(N_A) ? version : md.message.unknownVersion;</span>
+<span class="fc" id="L580">		return new MarkdownBadge(label, message, md.message.colorVersionNumber).toString();</span>
 	}
 
 	String renderSimpleArchiveName(JApiCmpArchive archive) {
-<span class="fc" id="L585">		final String version = archive.getVersion().getStringVersion();</span>
-<span class="fc" id="L586">		String name = archive.getFile().getName();</span>
+<span class="fc" id="L584">		final String version = archive.getVersion().getStringVersion();</span>
+<span class="fc" id="L585">		String name = archive.getFile().getName();</span>
 		// Drop version from archive name
-<span class="pc bpc" id="L588" title="2 of 4 branches missed.">		if (version != null &amp;&amp; name.contains(version)) {</span>
-<span class="nc" id="L589">			name = name.replace(version, EMPTY);</span>
+<span class="pc bpc" id="L587" title="2 of 4 branches missed.">		if (version != null &amp;&amp; name.contains(version)) {</span>
+<span class="nc" id="L588">			name = name.replace(version, EMPTY);</span>
 		}
 		// Drop extension from archive name
-<span class="fc" id="L592">		final int dot = name.lastIndexOf(DOT);</span>
-<span class="pc bpc" id="L593" title="1 of 2 branches missed.">		if (dot &gt; 0) {</span>
-<span class="fc" id="L594">			name = name.substring(0, dot);</span>
+<span class="fc" id="L591">		final int dot = name.lastIndexOf(DOT);</span>
+<span class="pc bpc" id="L592" title="1 of 2 branches missed.">		if (dot &gt; 0) {</span>
+<span class="fc" id="L593">			name = name.substring(0, dot);</span>
 		}
 		// Drop trailing dashes or underscores
-<span class="pc bpc" id="L597" title="2 of 4 branches missed.">		if (name.endsWith(DASH) || name.endsWith(UNDERSCORE)) {</span>
-<span class="nc" id="L598">			name = name.substring(0, name.length() - 1);</span>
+<span class="pc bpc" id="L596" title="2 of 4 branches missed.">		if (name.endsWith(DASH) || name.endsWith(UNDERSCORE)) {</span>
+<span class="nc" id="L597">			name = name.substring(0, name.length() - 1);</span>
 		}
-<span class="fc" id="L600">		return name;</span>
+<span class="fc" id="L599">		return name;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

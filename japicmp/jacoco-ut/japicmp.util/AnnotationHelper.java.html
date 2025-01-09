@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AnnotationHelper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.util</a> &gt; <span class="el_source">AnnotationHelper.java</span></div><h1>AnnotationHelper.java</h1><pre class="source lang-java linenums">package japicmp.util;
 
-import japicmp.util.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiChangeStatus;
@@ -11,6 +10,7 @@ import javassist.bytecode.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 <span class="nc" id="L15">public class AnnotationHelper {</span>
 
@@ -44,14 +44,14 @@ import java.util.Map;
 <span class="fc" id="L44">						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.of(foundAnnotation), JApiChangeStatus.UNCHANGED);</span>
 <span class="fc" id="L45">						annotations.add(jApiAnnotation);</span>
 <span class="fc" id="L46">					} else {</span>
-<span class="fc" id="L47">						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.&lt;Annotation&gt;absent(), JApiChangeStatus.REMOVED);</span>
+<span class="fc" id="L47">						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.&lt;Annotation&gt;empty(), JApiChangeStatus.REMOVED);</span>
 <span class="fc" id="L48">						annotations.add(jApiAnnotation);</span>
 					}
 <span class="fc" id="L50">				}</span>
 <span class="fc bfc" id="L51" title="All 2 branches covered.">				for (Annotation annotation : newAnnotationMap.values()) {</span>
 <span class="fc" id="L52">					Annotation foundAnnotation = oldAnnotationMap.get(annotation.getTypeName());</span>
 <span class="fc bfc" id="L53" title="All 2 branches covered.">					if (foundAnnotation == null) {</span>
-<span class="fc" id="L54">						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.&lt;Annotation&gt;absent(), Optional.of(annotation), JApiChangeStatus.NEW);</span>
+<span class="fc" id="L54">						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.&lt;Annotation&gt;empty(), Optional.of(annotation), JApiChangeStatus.NEW);</span>
 <span class="fc" id="L55">						annotations.add(jApiAnnotation);</span>
 					}
 <span class="fc" id="L57">				}</span>
@@ -62,7 +62,7 @@ import java.util.Map;
 <span class="pc bpc" id="L62" title="1 of 2 branches missed.">					if (oldAnnotationsAttribute != null) {</span>
 <span class="nc" id="L63">						Map&lt;String, Annotation&gt; oldAnnotationMap = buildAnnotationMap(oldAnnotationsAttribute.getAnnotations());</span>
 <span class="nc bnc" id="L64" title="All 2 branches missed.">						for (Annotation annotation : oldAnnotationMap.values()) {</span>
-<span class="nc" id="L65">							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.&lt;Annotation&gt;absent(),</span>
+<span class="nc" id="L65">							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.&lt;Annotation&gt;empty(),</span>
 								JApiChangeStatus.REMOVED);
 <span class="nc" id="L67">							annotations.add(jApiAnnotation);</span>
 <span class="nc" id="L68">						}</span>
@@ -74,7 +74,7 @@ import java.util.Map;
 <span class="fc bfc" id="L74" title="All 2 branches covered.">					if (newAnnotationsAttribute != null) {</span>
 <span class="fc" id="L75">						Map&lt;String, Annotation&gt; newAnnotationMap = buildAnnotationMap(newAnnotationsAttribute.getAnnotations());</span>
 <span class="fc bfc" id="L76" title="All 2 branches covered.">						for (Annotation annotation : newAnnotationMap.values()) {</span>
-<span class="fc" id="L77">							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.&lt;Annotation&gt;absent(), Optional.of(annotation), JApiChangeStatus.NEW);</span>
+<span class="fc" id="L77">							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.&lt;Annotation&gt;empty(), Optional.of(annotation), JApiChangeStatus.NEW);</span>
 <span class="fc" id="L78">							annotations.add(jApiAnnotation);</span>
 <span class="fc" id="L79">						}</span>
 					}

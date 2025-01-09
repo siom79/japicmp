@@ -7,7 +7,6 @@ import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.OutputGenerator;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
-import japicmp.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -21,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;

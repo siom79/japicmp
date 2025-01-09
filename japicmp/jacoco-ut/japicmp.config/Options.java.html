@@ -9,12 +9,12 @@ import japicmp.cmp.JApiCmpArchive;
 import japicmp.exception.JApiCmpException;
 import japicmp.filter.*;
 import japicmp.model.AccessModifier;
-import japicmp.util.Optional;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,16 +27,16 @@ public class Options {
 <span class="fc" id="L27">	private List&lt;JApiCmpArchive&gt; newArchives = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L28">	private boolean outputOnlyModifications = false;</span>
 <span class="fc" id="L29">	private boolean outputOnlyBinaryIncompatibleModifications = false;</span>
-<span class="fc" id="L30">	private Optional&lt;String&gt; xmlOutputFile = Optional.absent();</span>
-<span class="fc" id="L31">	private Optional&lt;String&gt; htmlOutputFile = Optional.absent();</span>
+<span class="fc" id="L30">	private Optional&lt;String&gt; xmlOutputFile = Optional.empty();</span>
+<span class="fc" id="L31">	private Optional&lt;String&gt; htmlOutputFile = Optional.empty();</span>
 <span class="fc" id="L32">	private Optional&lt;AccessModifier&gt; accessModifier = Optional.of(AccessModifier.PROTECTED);</span>
 <span class="fc" id="L33">	private List&lt;Filter&gt; includes = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L34">	private List&lt;Filter&gt; excludes = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L35">	private boolean includeSynthetic = false;</span>
 <span class="fc" id="L36">	private final IgnoreMissingClasses ignoreMissingClasses = new IgnoreMissingClasses();</span>
-<span class="fc" id="L37">	private Optional&lt;String&gt; htmlStylesheet = Optional.absent();</span>
-<span class="fc" id="L38">	private Optional&lt;String&gt; oldClassPath = Optional.absent();</span>
-<span class="fc" id="L39">	private Optional&lt;String&gt; newClassPath = Optional.absent();</span>
+<span class="fc" id="L37">	private Optional&lt;String&gt; htmlStylesheet = Optional.empty();</span>
+<span class="fc" id="L38">	private Optional&lt;String&gt; oldClassPath = Optional.empty();</span>
+<span class="fc" id="L39">	private Optional&lt;String&gt; newClassPath = Optional.empty();</span>
 <span class="fc" id="L40">	private JApiCli.ClassPathMode classPathMode = JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH;</span>
 <span class="fc" id="L41">	private boolean noAnnotations = false;</span>
 	private boolean reportOnlyFilename;
@@ -194,7 +194,7 @@ public class Options {
 <span class="nc" id="L194">	}</span>
 
 	public List&lt;Filter&gt; createFilterList(Optional&lt;String&gt; argumentString, List&lt;Filter&gt; filters, String errorMessage, boolean exclusive) {
-<span class="fc bfc" id="L197" title="All 2 branches covered.">		for (String filterString : Splitter.on(&quot;;&quot;).trimResults().omitEmptyStrings().split(argumentString.or(&quot;&quot;))) {</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">		for (String filterString : Splitter.on(&quot;;&quot;).trimResults().omitEmptyStrings().split(argumentString.orElse(&quot;&quot;))) {</span>
 			try {
 				// filter based on annotations
 <span class="pc bpc" id="L200" title="1 of 2 branches missed.">				if (filterString.startsWith(&quot;@&quot;)) {</span>

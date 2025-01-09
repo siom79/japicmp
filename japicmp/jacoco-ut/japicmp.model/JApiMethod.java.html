@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiMethod.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp</a> &gt; <a href="index.source.html" class="el_package">japicmp.model</a> &gt; <span class="el_source">JApiMethod.java</span></div><h1>JApiMethod.java</h1><pre class="source lang-java linenums">package japicmp.model;
 
 import japicmp.cmp.JarArchiveComparator;
-import japicmp.util.Optional;
 import japicmp.util.OptionalHelper;
 import japicmp.util.SignatureParser;
 import javassist.CtMethod;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Optional;
 
 public class JApiMethod extends JApiBehavior {
 	private final Optional&lt;CtMethod&gt; oldMethod;
@@ -37,7 +37,7 @@ public class JApiMethod extends JApiBehavior {
 <span class="fc" id="L37">	}</span>
 
 	private JApiReturnType computeReturnTypeChanges(Optional&lt;CtMethod&gt; oldMethodOptional, Optional&lt;CtMethod&gt; newMethodOptional) {
-<span class="fc" id="L40">		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.absent(), Optional.absent());</span>
+<span class="fc" id="L40">		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.empty(), Optional.empty());</span>
 <span class="fc bfc" id="L41" title="All 4 branches covered.">		if (oldMethodOptional.isPresent() &amp;&amp; newMethodOptional.isPresent()) {</span>
 <span class="fc" id="L42">			SignatureParser.ParsedParameter oldReturnType = computeReturnType(oldMethodOptional.get());</span>
 <span class="fc" id="L43">			SignatureParser.ParsedParameter newReturnType = computeReturnType(newMethodOptional.get());</span>
@@ -51,12 +51,12 @@ public class JApiMethod extends JApiBehavior {
 <span class="fc" id="L51">		} else {</span>
 <span class="fc bfc" id="L52" title="All 2 branches covered.">			if (oldMethodOptional.isPresent()) {</span>
 <span class="fc" id="L53">				SignatureParser.ParsedParameter oldReturnType = computeReturnType(oldMethodOptional.get());</span>
-<span class="fc" id="L54">				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType.getType()), Optional.absent());</span>
+<span class="fc" id="L54">				jApiReturnType = new JApiReturnType(JApiChangeStatus.REMOVED, Optional.of(oldReturnType.getType()), Optional.empty());</span>
 <span class="fc" id="L55">				SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(oldMethodOptional.get(), oldReturnType), jApiReturnType.getOldGenericTypes());</span>
 			}
 <span class="fc bfc" id="L57" title="All 2 branches covered.">			if (newMethodOptional.isPresent()) {</span>
 <span class="fc" id="L58">				SignatureParser.ParsedParameter newReturnType = computeReturnType(newMethodOptional.get());</span>
-<span class="fc" id="L59">				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.absent(), Optional.of(newReturnType.getType()));</span>
+<span class="fc" id="L59">				jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.empty(), Optional.of(newReturnType.getType()));</span>
 <span class="fc" id="L60">				SignatureParser.copyGenericParameters(computeReturnTypeGenericSignature(newMethodOptional.get(), newReturnType), jApiReturnType.getNewGenericTypes());</span>
 			}
 		}
