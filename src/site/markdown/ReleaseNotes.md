@@ -3,6 +3,12 @@ Versions
 
 The following versions of japicmp are available:
 
+0.23.1 (2025-01-09)
+-------------------
+* No NPE on `MarkdownTable.calculateMaxWidth`. [#412](https://github.com/siom79/japicmp/issues/412)
+
+Available at [Maven Central](https://search.maven.org/search?q=g:com.github.siom79.japicmp%20v:0.23.1).
+
 0.23.0 (2024-08-20)
 -------------------
 * New option --markdown to generate a Markdown report. [#404](https://github.com/siom79/japicmp/issues/404)
