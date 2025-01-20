@@ -36,35 +36,15 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-		boolean binaryCompatible = true;
-		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
-			if (!compatibilityChange.isBinaryCompatible()) {
-				binaryCompatible = false;
-			}
-		}
-		if (binaryCompatible && correspondingJApiClass.isPresent()) {
-			if (!correspondingJApiClass.get().isBinaryCompatible()) {
-				binaryCompatible = false;
-			}
-		}
-		return binaryCompatible;
+		return compatibilityChanges.stream().allMatch(JApiCompatibilityChange::isBinaryCompatible)
+			&& correspondingJApiClass.map(JApiClass::isBinaryCompatible).orElse(true);
 	}
 
 	@Override
 	@XmlAttribute
 	public boolean isSourceCompatible() {
-		boolean sourceCompatible = true;
-		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {
-			if (!compatibilityChange.isSourceCompatible()) {
-				sourceCompatible = false;
-			}
-		}
-		if (sourceCompatible && correspondingJApiClass.isPresent()) {
-			if (!correspondingJApiClass.get().isSourceCompatible()) {
-				sourceCompatible = false;
-			}
-		}
-		return sourceCompatible;
+		return compatibilityChanges.stream().allMatch(JApiCompatibilityChange::isSourceCompatible)
+			&& correspondingJApiClass.map(JApiClass::isSourceCompatible).orElse(true);
 	}
 
 	@XmlElementWrapper(name = "compatibilityChanges")

@@ -267,14 +267,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 
 	@XmlAttribute(name = "name")
 	public String getName() {
-		String name = "n.a.";
-		if (oldFieldOptional.isPresent()) {
-			name = oldFieldOptional.get().getName();
-		}
-		if (newFieldOptional.isPresent()) {
-			name = newFieldOptional.get().getName();
-		}
-		return name;
+		return oldFieldOptional.map(CtField::getName)
+			.orElseGet(() -> newFieldOptional.map(CtField::getName).orElse("n.a."));
 	}
 
 	@XmlTransient

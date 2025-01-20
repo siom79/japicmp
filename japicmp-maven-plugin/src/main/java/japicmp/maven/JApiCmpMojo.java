@@ -894,7 +894,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	private String guessVersion(File file) {
 		String name = file.getName();
 		Optional<SemanticVersion> semanticVersion = japicmp.versioning.Version.getSemanticVersion(name);
-		String version = semanticVersion.isPresent() ? semanticVersion.get().toString() : "n.a.";
+		String version = semanticVersion.map(Object::toString).orElse("n.a.");
 		if (name.contains("SNAPSHOT")) {
 			version += "-SNAPSHOT";
 		}

@@ -34,10 +34,9 @@ public enum AccessModifier implements JApiModifierBase {
 	}
 
 	public static Optional<AccessModifier> toModifier(String accessModifierArg) {
-		Optional<String> stringOptional = Optional.ofNullable(accessModifierArg);
-		if (stringOptional.isPresent()) {
+		if (accessModifierArg != null) {
 			try {
-				return Optional.of(valueOf(stringOptional.get().toUpperCase()));
+				return Optional.of(valueOf(accessModifierArg.toUpperCase()));
 			} catch (IllegalArgumentException e) {
 				throw new JApiCmpException(JApiCmpException.Reason.CliError, String.format("Invalid value for option accessModifier: %s. Possible values are: %s.",
 					accessModifierArg, listOfAccessModifier()), e);
