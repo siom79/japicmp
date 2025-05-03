@@ -127,7 +127,6 @@
 						<configuration>
 							<argLine>
 								--add-opens java.base/java.lang=ALL-UNNAMED
-								-Djava.security.manager=allow
 							</argLine>
 						</configuration>
 					</plugin>
@@ -137,7 +136,6 @@
 						<configuration>
 							<argLine>
 								--add-opens java.base/java.lang=ALL-UNNAMED
-								-Djava.security.manager=allow
 							</argLine>
 						</configuration>
 					</plugin>
