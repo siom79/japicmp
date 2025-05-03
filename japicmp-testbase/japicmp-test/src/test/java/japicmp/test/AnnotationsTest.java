@@ -5,8 +5,8 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.*;
 import japicmp.test.annotation.AnnotationChanged;
 import japicmp.test.annotation.TestAnnotation;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class AnnotationsTest {
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));

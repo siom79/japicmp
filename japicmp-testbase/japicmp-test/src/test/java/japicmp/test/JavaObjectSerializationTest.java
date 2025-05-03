@@ -6,20 +6,10 @@ import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiJavaObjectSerializationCompatibility;
-import japicmp.test.serialversion.CompatibleChanges;
-import japicmp.test.serialversion.ExtendsSerializableClassModified;
-import japicmp.test.serialversion.ExtendsSerializableClassUnchanged;
-import japicmp.test.serialversion.IncompatibleChanges;
-import japicmp.test.serialversion.ModifiedAndSerialVersionUidModified;
-import japicmp.test.serialversion.ModifiedButSerialVersionUidUnchanged;
-import japicmp.test.serialversion.ModifiedFieldAddedButSerialVersionUidUnchanged;
-import japicmp.test.serialversion.NotSerializable;
-import japicmp.test.serialversion.SerialVersionUnchanged;
-import japicmp.test.serialversion.UnchangedWithSerialVersionUid;
-import japicmp.test.serialversion.UnchangedWithSerialVersionUidChange;
+import japicmp.test.serialversion.*;
 import javassist.CtClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,13 +26,13 @@ import static japicmp.test.util.Helper.getArchive;
 import static japicmp.test.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class JavaObjectSerializationTest {
 	private static final Logger LOGGER = Logger.getLogger(JavaObjectSerializationTest.class.getName());
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setAccessModifier(AccessModifier.PRIVATE);

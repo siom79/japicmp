@@ -6,21 +6,19 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiMethod;
 import japicmp.model.JApiReturnType;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static japicmp.test.util.Helper.getArchive;
-import static japicmp.test.util.Helper.getJApiClass;
-import static japicmp.test.util.Helper.getJApiMethod;
+import static japicmp.test.util.Helper.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class MethodReturnTypeTest {
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));

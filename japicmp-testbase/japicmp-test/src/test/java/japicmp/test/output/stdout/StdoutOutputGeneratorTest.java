@@ -11,34 +11,34 @@ import japicmp.config.Options;
 import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiClass;
 import japicmp.output.stdout.StdoutOutputGenerator;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static japicmp.test.util.Helper.getArchive;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
-public class StdoutOutputGeneratorTest {
+class StdoutOutputGeneratorTest {
 
 	@Test
-	public void test() {
+	void test() {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
 		Options options = Options.newDefault();
 		options.setOutputOnlyModifications(true);
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String string = generator.generate();
-		assertThat(string, containsString("+++  NEW CLASS: PUBLIC(+) japicmp.test.Added"));
-		assertThat(string, containsString("---! REMOVED CLASS: PUBLIC(-) japicmp.test.Removed"));
-		assertThat(string, containsString("***! MODIFIED CLASS: PUBLIC STATIC japicmp.test.Superclasses$SuperClassChanges"));
-		assertThat(string, containsString("***! MODIFIED SUPERCLASS: japicmp.test.Superclasses$SuperclassB (<- japicmp.test.Superclasses$SuperclassA)"));
-		assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.Annotations$AuthorAnnotationGetsNewValue"));
-		assertThat(string, containsString("\t***  MODIFIED ANNOTATION: japicmp.test.Annotations$Author"));
-		assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.Annotations"));
-		assertThat(string, containsString("\t===  UNCHANGED FIELD: PUBLIC int fieldAnnotationValueModified"));
-		assertThat(string, containsString("\t\t***  MODIFIED ANNOTATION: japicmp.test.Annotations$FieldAnnotation"));
+		MatcherAssert.assertThat(string, containsString("+++  NEW CLASS: PUBLIC(+) japicmp.test.Added"));
+		MatcherAssert.assertThat(string, containsString("---! REMOVED CLASS: PUBLIC(-) japicmp.test.Removed"));
+		MatcherAssert.assertThat(string, containsString("***! MODIFIED CLASS: PUBLIC STATIC japicmp.test.Superclasses$SuperClassChanges"));
+		MatcherAssert.assertThat(string, containsString("***! MODIFIED SUPERCLASS: japicmp.test.Superclasses$SuperclassB (<- japicmp.test.Superclasses$SuperclassA)"));
+		MatcherAssert.assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.Annotations$AuthorAnnotationGetsNewValue"));
+		MatcherAssert.assertThat(string, containsString("\t***  MODIFIED ANNOTATION: japicmp.test.Annotations$Author"));
+		MatcherAssert.assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.Annotations"));
+		MatcherAssert.assertThat(string, containsString("\t===  UNCHANGED FIELD: PUBLIC int fieldAnnotationValueModified"));
+		MatcherAssert.assertThat(string, containsString("\t\t***  MODIFIED ANNOTATION: japicmp.test.Annotations$FieldAnnotation"));
 		assertNoToStringModel(string);
 	}
 
@@ -49,11 +49,11 @@ public class StdoutOutputGeneratorTest {
 				return input.contains("japicmp.model.");
 			}
 		}).toList();
-		assertEquals("", Joiner.on("\n").join(toString));
+		Assertions.assertEquals("", Joiner.on("\n").join(toString));
 	}
 
 	@Test
-	public void testOnlyModificationsAnnotationAddedToConstructor() {
+	void testOnlyModificationsAnnotationAddedToConstructor() {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp.test.annotation", false));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(jarArchiveComparatorOptions);
@@ -62,6 +62,6 @@ public class StdoutOutputGeneratorTest {
 		options.setOutputOnlyModifications(true);
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String string = generator.generate();
-		assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.annotation.AnnotationAddedToConstructor"));
+		MatcherAssert.assertThat(string, containsString("===  UNCHANGED CLASS: PUBLIC japicmp.test.annotation.AnnotationAddedToConstructor"));
 	}
 }

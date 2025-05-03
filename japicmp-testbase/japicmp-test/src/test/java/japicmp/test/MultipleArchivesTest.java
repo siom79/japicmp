@@ -12,8 +12,8 @@ import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import japicmp.output.xml.model.JApiCmpXmlRoot;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
@@ -24,13 +24,13 @@ import java.util.Optional;
 
 import static japicmp.test.util.Helper.getArchive;
 import static japicmp.test.util.Helper.getJApiClass;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class MultipleArchivesTest {
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setAccessModifier(AccessModifier.PRIVATE);

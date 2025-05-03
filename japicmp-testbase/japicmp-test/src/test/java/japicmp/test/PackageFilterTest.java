@@ -6,7 +6,7 @@ import japicmp.filter.JavadocLikePackageFilter;
 import japicmp.model.JApiClass;
 import japicmp.test.packageOne.PackageOne;
 import japicmp.test.packageTwo.PackageTwo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import static japicmp.test.util.Helper.getArchive;
 import static japicmp.test.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class PackageFilterTest {
 

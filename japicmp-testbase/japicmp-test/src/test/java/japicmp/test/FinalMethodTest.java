@@ -8,8 +8,8 @@ import japicmp.model.JApiCompatibilityChange;
 import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.test.semver.finalpublicmethod.ClassWithFinalPublicMethod;
 import japicmp.test.semver.finalpublicmethod.ClassWithFinalPublicMethodInSuperClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +24,7 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 public class FinalMethodTest {
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));

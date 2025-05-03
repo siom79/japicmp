@@ -4,22 +4,20 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
-import static japicmp.test.util.Helper.getArchive;
-import static japicmp.test.util.Helper.getJApiClass;
-import static japicmp.test.util.Helper.getJApiMethod;
+import static japicmp.test.util.Helper.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AbstractTest {
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);

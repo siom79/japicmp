@@ -12,7 +12,8 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -22,65 +23,9 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class JApiCmpMojoTest {
-
-	@Test
-	public void testSimple() throws MojoFailureException, MojoExecutionException {
-//		JApiCmpMojo mojo = new JApiCmpMojo();
-//		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
-//		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
-//		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, new Parameter(), null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.<String>absent(), true, null, null, null, null);
-//		ArtifactResolver artifactResolver = mock(ArtifactResolver.class);
-//		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
-//		Set<Artifact> artifactSet = new HashSet<>();
-//		Artifact resolvedArtifact = mock(Artifact.class);
-//		artifactSet.add(resolvedArtifact);
-//		when(resolvedArtifact.getFile()).thenReturn(Paths.get(System.getProperty("user.dir"), "target", "guava-18.0.jar").toFile());
-//		when(artifactResolutionResult.getArtifacts()).thenReturn(artifactSet);
-//		when(artifactResolver.resolve(Matchers.<ArtifactResolutionRequest>anyObject())).thenReturn(artifactResolutionResult);
-//		ArtifactFactory artifactFactory = mock(ArtifactFactory.class);
-//		when(artifactFactory.createArtifactWithClassifier(eq("groupId"), eq("artifactId"), eq("0.1.1"), anyString(), anyString())).thenReturn(mock(Artifact.class));
-//		MavenProject mavenProject = mock(MavenProject.class);
-//		when(mavenProject.getArtifact()).thenReturn(mock(Artifact.class));
-//		MavenParameters mavenParameters = new MavenParameters(new ArrayList<ArtifactRepository>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mock(MojoExecution.class), "0.0.1", mock(ArtifactMetadataSource.class));
-//
-//		mojo.executeWithParameters(pluginParameters, mavenParameters);
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", "japicmp.diff")), is(true));
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", "japicmp.xml")), is(true));
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", "japicmp.html")), is(true));
-	}
-
-	@Test
-	public void testNoXmlAndNoHtmlNoDiffReport() throws MojoFailureException, MojoExecutionException {
-//		JApiCmpMojo mojo = new JApiCmpMojo();
-//		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
-//		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
-//		Parameter parameter = new Parameter();
-//		parameter.setSkipHtmlReport(true);
-//		parameter.setSkipXmlReport(true);
-//		parameter.setSkipDiffReport(true);
-//		String reportDir = "noXmlAndNoHtmlNoDiffReport";
-//		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, parameter, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", reportDir).toFile()), Optional.<String>absent(), true, null, null, null, null);
-//		ArtifactResolver artifactResolver = mock(ArtifactResolver.class);
-//		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
-//		Set<Artifact> artifactSet = new HashSet<>();
-//		Artifact resolvedArtifact = mock(Artifact.class);
-//		artifactSet.add(resolvedArtifact);
-//		when(resolvedArtifact.getFile()).thenReturn(Paths.get(System.getProperty("user.dir"), "target", "guava-18.0.jar").toFile());
-//		when(artifactResolutionResult.getArtifacts()).thenReturn(artifactSet);
-//		when(artifactResolver.resolve(Matchers.<ArtifactResolutionRequest>anyObject())).thenReturn(artifactResolutionResult);
-//		ArtifactFactory artifactFactory = mock(ArtifactFactory.class);
-//		when(artifactFactory.createArtifactWithClassifier(eq("groupId"), eq("artifactId"), eq("0.1.1"), anyString(), anyString())).thenReturn(mock(Artifact.class));
-//		MavenProject mavenProject = mock(MavenProject.class);
-//		when(mavenProject.getArtifact()).thenReturn(mock(Artifact.class));
-//		MavenParameters mavenParameters = new MavenParameters(new ArrayList<ArtifactRepository>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mock(MojoExecution.class), "0.0.1", mock(ArtifactMetadataSource.class));
-//		mojo.executeWithParameters(pluginParameters, mavenParameters);
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.diff")), is(false));
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.xml")), is(false));
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", reportDir, "japicmp", "japicmp.html")), is(false));
-	}
 
 	public static Version createVersion(String groupId, String artifactId, String version) {
 		Version versionInstance = new Version();
@@ -97,9 +42,9 @@ public class JApiCmpMojoTest {
 		testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(false);
 	}
 
-	@Test(expected = MojoFailureException.class)
+	@Test
 	public void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusionTrue() throws Exception {
-		testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(true);
+		Assertions.assertThrows(MojoFailureException.class, () -> testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(true));
 	}
 
 	private void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
@@ -134,9 +79,9 @@ public class JApiCmpMojoTest {
 		testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(false);
 	}
 
-	@Test(expected = MojoFailureException.class)
+	@Test
 	public void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusionTrue() throws Exception {
-		testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(true);
+		Assertions.assertThrows(MojoFailureException.class, () -> testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(true));
 	}
 
 	private void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
@@ -173,9 +118,9 @@ public class JApiCmpMojoTest {
 		testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(false);
 	}
 
-	@Test(expected = MojoFailureException.class)
+	@Test
 	public void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusionTrue() throws Exception {
-		testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(true);
+		Assertions.assertThrows(MojoFailureException.class, () -> testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(true));
 	}
 
 	private void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
@@ -212,9 +157,9 @@ public class JApiCmpMojoTest {
 		testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(false);
 	}
 
-	@Test(expected = MojoFailureException.class)
-	public void testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusionTrue() throws Exception {
-		testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(true);
+	@Test
+	public void testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusionTrue() {
+		Assertions.assertThrows(MojoFailureException.class, () -> testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(true));
 	}
 
 	private void testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
@@ -222,7 +167,7 @@ public class JApiCmpMojoTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classPool);
 				return Arrays.asList(typeCtClass, ctClass);

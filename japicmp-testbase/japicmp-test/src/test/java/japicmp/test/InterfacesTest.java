@@ -6,25 +6,20 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
 import japicmp.model.JApiMethod;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.List;
 
-import static japicmp.test.util.Helper.getArchive;
-import static japicmp.test.util.Helper.getJApiClass;
-import static japicmp.test.util.Helper.getJApiField;
-import static japicmp.test.util.Helper.getJApiImplementedInterface;
-import static japicmp.test.util.Helper.getJApiMethod;
-import static japicmp.test.util.Helper.replaceLastDotWith$;
+import static japicmp.test.util.Helper.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class InterfacesTest {
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(new JarArchiveComparatorOptions());
 		jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));

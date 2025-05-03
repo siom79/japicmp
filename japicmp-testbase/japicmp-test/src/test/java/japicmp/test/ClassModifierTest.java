@@ -4,28 +4,21 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
-import japicmp.test.ClassModifier.FinalStaysFinalInnerClass;
-import japicmp.test.ClassModifier.FinalToNonFinalInnerClass;
-import japicmp.test.ClassModifier.NonFinalStaysNonFinalInnerClass;
-import japicmp.test.ClassModifier.NonFinalToFinalInnerClass;
-import japicmp.test.ClassModifier.NonStaticStaysNonStaticInnerClass;
-import japicmp.test.ClassModifier.NonStaticToStaticInnerClass;
-import japicmp.test.ClassModifier.StaticStaysStaticInnerClass;
-import japicmp.test.ClassModifier.StaticToNonStaticInnerClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import japicmp.test.ClassModifier.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static japicmp.test.util.Helper.getArchive;
 import static japicmp.test.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ClassModifierTest {
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);

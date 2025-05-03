@@ -4,8 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +15,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ITClassFileFormatVersion {
 
@@ -33,7 +33,7 @@ public class ITClassFileFormatVersion {
 		for (Element element : tdCells) {
 			String text = element.text();
 			if (!"MODIFIED (!)".equals(text) && !"50.0".equals(text) && !"52.0".equals(text)) {
-				Assert.fail("text of HTML element does not equal 'MODIFIED' or 50.0 or 52.0: " + text);
+				fail("text of HTML element does not equal 'MODIFIED' or 50.0 or 52.0: " + text);
 			}
 		}
 	}

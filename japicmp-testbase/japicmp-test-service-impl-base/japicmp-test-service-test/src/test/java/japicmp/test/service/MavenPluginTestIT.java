@@ -1,6 +1,6 @@
 package japicmp.test.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -10,8 +10,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class MavenPluginTestIT {
 

@@ -2,20 +2,21 @@ package japicmp.ant;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildFileRule;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class JApiCmpTaskTest {
-	@Rule
-	public final BuildFileRule rule = new BuildFileRule();
 
-	@Before
+	public BuildFileRule rule;
+
+	@BeforeEach
 	public void setUp() {
+		rule =  new BuildFileRule();
 		rule.configureProject(System.getProperty("user.dir") + "/src/test/resources/japicmp/japicmptask.xml");
 	}
 
@@ -39,14 +40,14 @@ public class JApiCmpTaskTest {
 			not(containsString("---! REMOVED METHOD: PUBLIC(-) java.util.List<japicmp.model.JApiClass> compare(java.io.File, java.io.File)")));
 	}
 
-	@Test(expected = BuildException.class)
+	@Test
 	public void testBreakOnBinaryIncompatibility() {
-		rule.executeTarget("binary");
+		Assertions.assertThrows(BuildException.class, () -> rule.executeTarget("binary"));
 	}
 
-	@Test(expected = BuildException.class)
+	@Test
 	public void testBreakOnSourceIncompatibility() {
-		rule.executeTarget("source");
+		Assertions.assertThrows(BuildException.class, () -> rule.executeTarget("source"));
 	}
 
 	@Test
@@ -59,8 +60,8 @@ public class JApiCmpTaskTest {
 		rule.executeTarget("semantic");
 	}
 
-	@Test(expected = BuildException.class)
+	@Test
 	public void testBreakOnModifications() {
-		rule.executeTarget("modifications");
+		Assertions.assertThrows(BuildException.class, () -> rule.executeTarget("modifications"));
 	}
 }

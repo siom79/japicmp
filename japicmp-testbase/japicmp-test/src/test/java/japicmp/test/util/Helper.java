@@ -12,7 +12,6 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class Helper {
 
@@ -183,8 +184,8 @@ public class Helper {
 			verifier.execute();
 		} catch (Exception e) {
 			exceptionThrown = true;
-			Assert.assertThat(e.getClass().isAssignableFrom(exceptionClass), CoreMatchers.is(true));
+			assertThat(e.getClass().isAssignableFrom(exceptionClass), CoreMatchers.is(true));
 		}
-		Assert.assertThat(exceptionThrown, CoreMatchers.is(true));
+		assertThat(exceptionThrown, CoreMatchers.is(true));
 	}
 }
