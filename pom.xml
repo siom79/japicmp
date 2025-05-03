@@ -149,9 +149,9 @@
 		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven api version -->
 		<reporting.version>3.1.0</reporting.version>
 		<plugin-annotation.version>3.6.4</plugin-annotation.version>
-		<surefireVersion>3.0.0-M7</surefireVersion>
+		<surefireVersion>3.5.3</surefireVersion>
 		<javassist.version>3.30.2-GA</javassist.version>
-		<guava.version>33.0.0-jre</guava.version>
+		<guava.version>33.4.8-jre</guava.version>
 		<jaxb.version>2.3.2</jaxb.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots</sonatypeOssDistMgmtSnapshotsUrl>
 	</properties>
