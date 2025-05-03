@@ -1,97 +1,97 @@
 package japicmp.util;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-public class MethodDescriptorParserTest {
+class MethodDescriptorParserTest {
 	private MethodDescriptorParser subject;
 
-	@Before
-	public void before() throws Exception {
+	@BeforeEach
+	public void before() {
 		subject = new MethodDescriptorParser();
 	}
 
 	@Test
-	public void testNoParamsReturnsVoid() {
+	void testNoParamsReturnsVoid() {
 		subject.parse("()V");
-		assertThat(subject.getReturnType(), is("void"));
-		assertThat(subject.getParameters().size(), is(0));
+		MatcherAssert.assertThat(subject.getReturnType(), is("void"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(0));
 	}
 
 	@Test
-	public void testTwoReferenceParamsReturnsReference() {
+	void testTwoReferenceParamsReturnsReference() {
 		subject.parse("(Lorg/apache/http/conn/routing/HttpRoute;Ljava/lang/Object;)Lorg/apache/http/conn/ManagedClientConnection;");
-		assertThat(subject.getReturnType(), is("org.apache.http.conn.ManagedClientConnection"));
-		assertThat(subject.getParameters().size(), is(2));
-		assertThat(subject.getParameters(), hasItem("org.apache.http.conn.routing.HttpRoute"));
-		assertThat(subject.getParameters(), hasItem("java.lang.Object"));
+		MatcherAssert.assertThat(subject.getReturnType(), is("org.apache.http.conn.ManagedClientConnection"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(2));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("org.apache.http.conn.routing.HttpRoute"));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("java.lang.Object"));
 	}
 
 	@Test
-	public void testOneReferenceOnePrimParamsReturnsVoid() {
+	void testOneReferenceOnePrimParamsReturnsVoid() {
 		subject.parse("(JLjava/util/concurrent/TimeUnit;)V");
-		assertThat(subject.getReturnType(), is("void"));
-		assertThat(subject.getParameters().size(), is(2));
-		assertThat(subject.getParameters(), hasItem("long"));
-		assertThat(subject.getParameters(), hasItem("java.util.concurrent.TimeUnit"));
+		MatcherAssert.assertThat(subject.getReturnType(), is("void"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(2));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("long"));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("java.util.concurrent.TimeUnit"));
 	}
 
 	@Test
-	public void testArrayTwoPrimParamsReturnsVoid() {
+	void testArrayTwoPrimParamsReturnsVoid() {
 		subject.parse("([BII)V");
-		assertThat(subject.getReturnType(), is("void"));
-		assertThat(subject.getParameters().size(), is(3));
-		assertThat(subject.getParameters(), hasItem("byte[]"));
-		assertThat(subject.getParameters(), hasItem("int"));
+		MatcherAssert.assertThat(subject.getReturnType(), is("void"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(3));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("byte[]"));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("int"));
 	}
 
 	@Test
-	public void testArrayPrimParamReturnsVoid() {
+	void testArrayPrimParamReturnsVoid() {
 		subject.parse("([B)V");
-		assertThat(subject.getReturnType(), is("void"));
-		assertThat(subject.getParameters().size(), is(1));
-		assertThat(subject.getParameters(), hasItem("byte[]"));
+		MatcherAssert.assertThat(subject.getReturnType(), is("void"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(1));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("byte[]"));
 	}
 
 	@Test
-	public void testArrayRefParamReturnsVoid() {
+	void testArrayRefParamReturnsVoid() {
 		subject.parse("([Lorg/apache/http/cookie/Cookie;)V");
-		assertThat(subject.getReturnType(), is("void"));
-		assertThat(subject.getParameters().size(), is(1));
-		assertThat(subject.getParameters(), hasItem("org.apache.http.cookie.Cookie[]"));
+		MatcherAssert.assertThat(subject.getReturnType(), is("void"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(1));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("org.apache.http.cookie.Cookie[]"));
 	}
 
 	@Test
-	public void testOneReferenceParamsReturnsVoid() {
+	void testOneReferenceParamsReturnsVoid() {
 		subject.parse("(Lorg/apache/http/impl/conn/tsccm/BasicPoolEntry;)V");
-		assertThat(subject.getReturnType(), is("void"));
-		assertThat(subject.getParameters().size(), is(1));
-		assertThat(subject.getParameters(), hasItem("org.apache.http.impl.conn.tsccm.BasicPoolEntry"));
+		MatcherAssert.assertThat(subject.getReturnType(), is("void"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(1));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("org.apache.http.impl.conn.tsccm.BasicPoolEntry"));
 	}
 
 	@Test
-	public void testOneReferenceParamsReturnsOneReference() {
+	void testOneReferenceParamsReturnsOneReference() {
 		subject.parse("(Ljava/util/List;)Ljava/util/List;");
-		assertThat(subject.getReturnType(), is("java.util.List"));
-		assertThat(subject.getParameters().size(), is(1));
-		assertThat(subject.getParameters(), hasItem("java.util.List"));
+		MatcherAssert.assertThat(subject.getReturnType(), is("java.util.List"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(1));
+		MatcherAssert.assertThat(subject.getParameters(), hasItem("java.util.List"));
 	}
 
 	@Test
-	public void testNoParamsReturnsReference() {
+	void testNoParamsReturnsReference() {
 		subject.parse("()Lorg/apache/http/conn/scheme/SchemeRegistry;");
-		assertThat(subject.getReturnType(), is("org.apache.http.conn.scheme.SchemeRegistry"));
-		assertThat(subject.getParameters().size(), is(0));
+		MatcherAssert.assertThat(subject.getReturnType(), is("org.apache.http.conn.scheme.SchemeRegistry"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(0));
 	}
 
 	@Test
-	public void testNoParamsReturnsI() {
+	void testNoParamsReturnsI() {
 		subject.parse("()I");
-		assertThat(subject.getReturnType(), is("int"));
-		assertThat(subject.getParameters().size(), is(0));
+		MatcherAssert.assertThat(subject.getReturnType(), is("int"));
+		MatcherAssert.assertThat(subject.getParameters().size(), is(0));
 	}
 }

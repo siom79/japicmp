@@ -1,21 +1,21 @@
 package japicmp;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Paths;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
 
-public class JApiCmpTest {
+class JApiCmpTest {
 	private ByteArrayOutputStream out;
 	private ByteArrayOutputStream err;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		out = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(out));
@@ -25,69 +25,69 @@ public class JApiCmpTest {
 	}
 
 	@Test
-	public void testWithoutArguments() {
+	void testWithoutArguments() {
 		JApiCmp.main(new String[]{});
-		Assert.assertTrue(err.toString().contains("E: Required option"));
+		Assertions.assertTrue(err.toString().contains("E: Required option"));
 	}
 
 	private void assertThatUseHelpOptionIsPrinted() {
-		assertThat(out.toString(), containsString(JApiCmp.USE_HELP_OR_H_FOR_MORE_INFORMATION));
+		MatcherAssert.assertThat(out.toString(), containsString(JApiCmp.USE_HELP_OR_H_FOR_MORE_INFORMATION));
 	}
 
 	private void assertThatHelpIsPrinted() {
-		assertThat(out.toString(), containsString("SYNOPSIS"));
-		assertThat(out.toString(), containsString("OPTIONS"));
+		MatcherAssert.assertThat(out.toString(), containsString("SYNOPSIS"));
+		MatcherAssert.assertThat(out.toString(), containsString("OPTIONS"));
 	}
 
 	@Test
-	public void testHelp() {
+	void testHelp() {
 		JApiCmp.main(new String[]{"-h"});
-		Assert.assertFalse(err.toString().contains("E: "));
+		Assertions.assertFalse(err.toString().contains("E: "));
 		assertThatHelpIsPrinted();
 	}
 
 	@Test
-	public void testHelpLongOption() {
+	void testHelpLongOption() {
 		JApiCmp.main(new String[]{"--help"});
-		Assert.assertFalse(err.toString().contains("E: "));
+		Assertions.assertFalse(err.toString().contains("E: "));
 		assertThatHelpIsPrinted();
 	}
 
 	@Test
-	public void testWithNewArchiveOptionButWithoutArgument() {
+	void testWithNewArchiveOptionButWithoutArgument() {
 		JApiCmp.main(new String[]{"-n"});
-		Assert.assertTrue(err.toString().contains("E: Missing argument for option '-n, --new'.".trim()));
+		Assertions.assertTrue(err.toString().contains("E: Missing argument for option '-n, --new'.".trim()));
 		assertThatUseHelpOptionIsPrinted();
 	}
 
 	@Test
-	public void testWithOldArchiveOptionButWithoutArgument() {
+	void testWithOldArchiveOptionButWithoutArgument() {
 		JApiCmp.main(new String[]{"-o"});
-		Assert.assertTrue(err.toString().contains("E: Missing argument for option '-o, --old'.".trim()));
+		Assertions.assertTrue(err.toString().contains("E: Missing argument for option '-o, --old'.".trim()));
 		assertThatUseHelpOptionIsPrinted();
 	}
 
 
 	@Test
-	public void testWithNewArchiveOptionButWithInvalidArgument() {
+	void testWithNewArchiveOptionButWithInvalidArgument() {
 		JApiCmp.main(new String[]{"-n", "xyz.jar", "-o", "zyx.jar"});
-		Assert.assertTrue(err.toString().contains("E: File".trim()));
-		Assert.assertTrue(err.toString().contains("does not exist.".trim()));
+		Assertions.assertTrue(err.toString().contains("E: File".trim()));
+		Assertions.assertTrue(err.toString().contains("does not exist.".trim()));
 		assertThatUseHelpOptionIsPrinted();
 	}
 
 	@Test
-	public void testWithOldArchiveOptionButWithInvalidArgument() {
+	void testWithOldArchiveOptionButWithInvalidArgument() {
 		JApiCmp.main(new String[]{"-n", pathTo("new.jar"), "-o", "xyz.jar"});
-		Assert.assertTrue(err.toString().contains("E: File".trim()));
-		Assert.assertTrue(err.toString().contains("does not exist.".trim()));
+		Assertions.assertTrue(err.toString().contains("E: File".trim()));
+		Assertions.assertTrue(err.toString().contains("does not exist.".trim()));
 		assertThatUseHelpOptionIsPrinted();
 	}
 
 	@Test
-	public void testWithOldArchiveOptionAndNewArchiveOption() {
+	void testWithOldArchiveOptionAndNewArchiveOption() {
 		JApiCmp.main(new String[]{"-n", pathTo("new.jar"), "-o", pathTo("old.jar")});
-		Assert.assertFalse(err.toString().contains("E: ".trim()));
+		Assertions.assertFalse(err.toString().contains("E: ".trim()));
 	}
 
 	private String pathTo(String jarFileName) {

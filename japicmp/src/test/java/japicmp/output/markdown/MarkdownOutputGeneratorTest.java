@@ -1,18 +1,5 @@
 package japicmp.output.markdown;
 
-import static japicmp.model.AccessModifier.PRIVATE;
-import static japicmp.model.JApiCompatibilityChangeType.FIELD_GENERICS_CHANGED;
-import static japicmp.model.JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED;
-import static japicmp.model.JApiCompatibilityChangeType.METHOD_REMOVED;
-import static japicmp.model.JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED;
-import static japicmp.model.JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -24,17 +11,28 @@ import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class MarkdownOutputGeneratorTest {
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
+import static japicmp.model.AccessModifier.PRIVATE;
+import static japicmp.model.JApiCompatibilityChangeType.*;
+import static japicmp.model.JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+class MarkdownOutputGeneratorTest {
 
 	static final String TEST_CLASS_FQN = "japicmp.Test";
 	static final String TEST_INTERFACE_NAME = "MyInterface";
@@ -49,7 +47,7 @@ public class MarkdownOutputGeneratorTest {
 	static final MarkdownMessageOptions MSG = MarkdownOptions.newDefault().message;
 
 	@Test
-	public void testNoChanges() {
+	void testNoChanges() {
 		Options options = Options.newDefault();
 		options.setOldArchives(singletonList(OLD_ARCHIVE));
 		options.setNewArchives(singletonList(NEW_ARCHIVE));
@@ -61,7 +59,7 @@ public class MarkdownOutputGeneratorTest {
 	}
 
 	@Test
-	public void testWarningWhenIgnoreMissingClasses() {
+	void testWarningWhenIgnoreMissingClasses() {
 		Options options = Options.newDefault();
 		options.setOldArchives(Arrays.asList(OLD_ARCHIVE, OLD_ARCHIVE));
 		options.setNewArchives(Arrays.asList(NEW_ARCHIVE, NEW_ARCHIVE));
@@ -74,7 +72,7 @@ public class MarkdownOutputGeneratorTest {
 	}
 
 	@Test
-	public void testNoClassFileFormatVersionIfInterfaceRemoved() throws Exception {
+	void testNoClassFileFormatVersionIfInterfaceRemoved() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -100,11 +98,11 @@ public class MarkdownOutputGeneratorTest {
 		String generated = generator.generate();
 		assertThat(generated, containsString(
 			format(MSG.summaryMajorChanges, format(MSG.oneNewVersion, NEW_VERSION), format(MSG.oneOldVersion, OLD_VERSION))));
-		Assert.assertFalse(generated.contains("-1.-1"));
+		Assertions.assertFalse(generated.contains("-1.-1"));
 	}
 
 	@Test
-	public void testMethodWithGenericTypes() throws Exception {
+	void testMethodWithGenericTypes() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -156,7 +154,7 @@ public class MarkdownOutputGeneratorTest {
 	}
 
 	@Test
-	public void testMethodWithGenericTypesReportOnlySummary() throws Exception {
+	void testMethodWithGenericTypesReportOnlySummary() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -209,7 +207,7 @@ public class MarkdownOutputGeneratorTest {
 	}
 
 	@Test
-	public void testMethodWithGenericTypesRemoved() throws Exception {
+	void testMethodWithGenericTypesRemoved() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -251,7 +249,7 @@ public class MarkdownOutputGeneratorTest {
 	}
 
 	@Test
-	public void testFieldWithGenericTypes() throws Exception {
+	void testFieldWithGenericTypes() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {

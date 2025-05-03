@@ -2,40 +2,40 @@ package japicmp.util;
 
 import japicmp.model.AccessModifier;
 import javassist.Modifier;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-public class ModifierHelperTest {
+class ModifierHelperTest {
 
 	@Test
-	public void publicToPublic() {
-		assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPublic(0), AccessModifier.PUBLIC), is(true));
+	void publicToPublic() {
+		MatcherAssert.assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPublic(0), AccessModifier.PUBLIC), is(true));
 	}
 
 	@Test
-	public void publicToProtected() {
-		assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPublic(0), AccessModifier.PROTECTED), is(true));
+	void publicToProtected() {
+		MatcherAssert.assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPublic(0), AccessModifier.PROTECTED), is(true));
 	}
 
 	@Test
-	public void publicToPrivate() {
-		assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPublic(0), AccessModifier.PRIVATE), is(true));
+	void publicToPrivate() {
+		MatcherAssert.assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPublic(0), AccessModifier.PRIVATE), is(true));
 	}
 
 	@Test
-	public void privateToPublic() {
-		assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPrivate(0), AccessModifier.PUBLIC), is(false));
+	void privateToPublic() {
+		MatcherAssert.assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPrivate(0), AccessModifier.PUBLIC), is(false));
 	}
 
 	@Test
-	public void privateToProtected() {
-		assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPrivate(0), AccessModifier.PROTECTED), is(false));
+	void privateToProtected() {
+		MatcherAssert.assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPrivate(0), AccessModifier.PROTECTED), is(false));
 	}
 
 	@Test
-	public void privateToPrivate() {
-		assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPrivate(0), AccessModifier.PRIVATE), is(true));
+	void privateToPrivate() {
+		MatcherAssert.assertThat(ModifierHelper.matchesModifierLevel(Modifier.setPrivate(0), AccessModifier.PRIVATE), is(true));
 	}
 }

@@ -22,15 +22,12 @@ import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
-import japicmp.util.CtClassBuilder;
-import japicmp.util.CtFieldBuilder;
-import japicmp.util.CtInterfaceBuilder;
-import japicmp.util.CtMethodBuilder;
-import japicmp.util.Helper;
+import japicmp.util.*;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,9 +41,9 @@ public class IncompatibleErrorOutputTest {
 		testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(false);
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusionTrue() throws Exception {
-		testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(true);
+	@Test
+	public void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusionTrue() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(true));
 	}
 
 	private void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
@@ -81,9 +78,9 @@ public class IncompatibleErrorOutputTest {
 		testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(false);
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusionTrue() throws Exception {
-		testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(true);
+	@Test
+	public void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusionTrue() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(true));
 	}
 
 	private void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
@@ -116,9 +113,9 @@ public class IncompatibleErrorOutputTest {
 		testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(false);
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusionTrue() throws Exception {
-		testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(true);
+	@Test
+	public void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusionTrue() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(true));
 	}
 
 	private void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
@@ -153,9 +150,9 @@ public class IncompatibleErrorOutputTest {
 		testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(false);
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusionTrue() throws Exception {
-		testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(true);
+	@Test
+	public void testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusionTrue() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(true));
 	}
 
 	private void testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
@@ -163,7 +160,7 @@ public class IncompatibleErrorOutputTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		ClassesHelper.CompareClassesResult result = ClassesHelper.compareClassesWithResult(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classPool);
 				return Arrays.asList(typeCtClass, ctClass);
@@ -183,42 +180,42 @@ public class IncompatibleErrorOutputTest {
 		new IncompatibleErrorOutput(options, result.getjApiClasses(), result.getJarArchiveComparator()).generate();
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testSemVerMinorChangeMissingOldVersion() throws Exception {
-		testMissingVersions("1.0.0", true, "1.1.0", false);
+	@Test
+	public void testSemVerMinorChangeMissingOldVersion() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testMissingVersions(true, "1.1.0"));
 	}
 
 	@Test
 	public void testSemVerMajjorChangeMissingOldVersion() throws Exception {
-		testMissingVersions("1.0.0", true, "2.0.0", false);
+		testMissingVersions(true, "2.0.0");
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testSemVerMinorChangeMissingNewVersion() throws Exception {
-		testMissingVersions("1.0.0", true, "1.1.0",false);
+	@Test
+	public void testSemVerMinorChangeMissingNewVersion() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testMissingVersions(true, "1.1.0"));
 	}
 
 	@Test
 	public void testSemVerMajorChangeMissingNewVersion() throws Exception {
-		testMissingVersions("1.0.0", true, "2.0.0",false);
+		testMissingVersions(true, "2.0.0");
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testSemVerMinorChange() throws Exception {
-		testMissingVersions("1.0.0", false, "1.1.0", false);
+	@Test
+	public void testSemVerMinorChange() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testMissingVersions(false, "1.1.0"));
 	}
 
 	@Test
 	public void testSemVerMajorChange() throws Exception {
-		testMissingVersions("1.0.0", false, "2.0.0", false);
+		testMissingVersions(false, "2.0.0");
 	}
 
-	private void testMissingVersions(String oldVersion, boolean missingOld, String newVersion, boolean missingNew) throws Exception {
+	private void testMissingVersions(boolean missingOld, String newVersion) throws Exception {
 		Options options = Options.newDefault();
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		ClassesHelper.CompareClassesResult result = ClassesHelper.compareClassesWithResult(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classPool);
 				return Arrays.asList(typeCtClass, ctClass);
@@ -234,19 +231,19 @@ public class IncompatibleErrorOutputTest {
 		options.addExcludeFromArgument(Optional.of("japicmp.SuperType"), false); // exclude japicmp.SuperType
 
 		options.setErrorOnSemanticIncompatibility(true);
-		options.setIgnoreMissingNewVersion(missingNew);
+		options.setIgnoreMissingNewVersion(false);
 		options.setIgnoreMissingOldVersion(missingOld);
 
-		JApiCmpArchive oldFile = Helper.getArchive("japicmp-test-v"+oldVersion+".jar", oldVersion);
+		JApiCmpArchive oldFile = Helper.getArchive("japicmp-test-v"+ "1.0.0" +".jar", "1.0.0");
 		options.setOldArchives(Collections.singletonList(oldFile));
 		JApiCmpArchive newFile = Helper.getArchive("japicmp-test-v"+newVersion+".jar", newVersion);
 		options.setNewArchives(Collections.singletonList(newFile));
 		new IncompatibleErrorOutput(options, result.getjApiClasses(), result.getJarArchiveComparator()).generate();
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testBreakBuildIfGenericReturnTypeModifiedTrue() throws Exception {
-		testBreakBuildIfGenericReturnTypeModified(true);
+	@Test
+	public void testBreakBuildIfGenericReturnTypeModifiedTrue() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testBreakBuildIfGenericReturnTypeModified(true));
 	}
 
 	@Test
