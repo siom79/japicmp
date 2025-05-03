@@ -6,7 +6,7 @@ import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,10 +15,10 @@ import static japicmp.util.Helper.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class InterfacesTest {
+class InterfacesTest {
 
 	@Test
-	public void testMethodAddedToInterfaceDefinedInSuperInterface() throws Exception {
+	void testMethodAddedToInterfaceDefinedInSuperInterface() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -47,7 +47,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testMethodAddedToInterfaceAndInSuperInterface() throws Exception {
+	void testMethodAddedToInterfaceAndInSuperInterface() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -75,7 +75,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testInterfaceMarkerAdded() throws Exception {
+	void testInterfaceMarkerAdded() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -99,7 +99,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testInterfaceAdded() throws Exception {
+	void testInterfaceAdded() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -128,7 +128,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testMethodPulledUp() throws Exception {
+	void testMethodPulledUp() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -157,7 +157,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testClassImplementsInterface() throws Exception {
+	void testClassImplementsInterface() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -184,7 +184,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testClassNoLongerImplementsInterface() throws Exception {
+	void testClassNoLongerImplementsInterface() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -213,7 +213,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testInterfaceHierarchyHasOneMoreLevel() throws Exception {
+	void testInterfaceHierarchyHasOneMoreLevel() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -241,7 +241,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testInterfaceHierarchyHasOneLessLevel() throws Exception {
+	void testInterfaceHierarchyHasOneLessLevel() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -270,7 +270,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testInterfaceMovedToSuperclass() throws Exception {
+	void testInterfaceMovedToSuperclass() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -300,7 +300,7 @@ public class InterfacesTest {
 	}
 
 	@Test
-	public void testInterfaceMovedToSubclass() throws Exception {
+	void testInterfaceMovedToSubclass() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {

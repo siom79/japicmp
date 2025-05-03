@@ -7,7 +7,8 @@ import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,12 +16,11 @@ import java.util.List;
 import static japicmp.util.Helper.getJApiClass;
 import static japicmp.util.Helper.getJApiMethod;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
-public class ExceptionsTest {
+class ExceptionsTest {
 
 	@Test
-	public void testMethodThrowsUnchangedExceptions() throws Exception {
+	void testMethodThrowsUnchangedExceptions() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -39,12 +39,12 @@ public class ExceptionsTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		JApiMethod method = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(method.getExceptions().size(), is(1));
-		assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(method.getExceptions().size(), is(1));
+		MatcherAssert.assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 	}
 
 	@Test
-	public void testMethodThrowsNewExceptions() throws Exception {
+	void testMethodThrowsNewExceptions() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -63,12 +63,12 @@ public class ExceptionsTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		JApiMethod method = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(method.getExceptions().size(), is(1));
-		assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.NEW));
+		MatcherAssert.assertThat(method.getExceptions().size(), is(1));
+		MatcherAssert.assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.NEW));
 	}
 
 	@Test
-	public void testMethodThrowsRemovedExceptions() throws Exception {
+	void testMethodThrowsRemovedExceptions() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -87,12 +87,12 @@ public class ExceptionsTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		JApiMethod method = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(method.getExceptions().size(), is(1));
-		assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		MatcherAssert.assertThat(method.getExceptions().size(), is(1));
+		MatcherAssert.assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.REMOVED));
 	}
 
 	@Test
-	public void testMethodRemovedThrowsExceptions() throws Exception {
+	void testMethodRemovedThrowsExceptions() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -110,12 +110,12 @@ public class ExceptionsTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		JApiMethod method = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(method.getExceptions().size(), is(1));
-		assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		MatcherAssert.assertThat(method.getExceptions().size(), is(1));
+		MatcherAssert.assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.REMOVED));
 	}
 
 	@Test
-	public void testMethodAddedThrowsExceptions() throws Exception {
+	void testMethodAddedThrowsExceptions() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -133,7 +133,7 @@ public class ExceptionsTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		JApiMethod method = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(method.getExceptions().size(), is(1));
-		assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.NEW));
+		MatcherAssert.assertThat(method.getExceptions().size(), is(1));
+		MatcherAssert.assertThat(method.getExceptions().get(0).getChangeStatus(), is(JApiChangeStatus.NEW));
 	}
 }

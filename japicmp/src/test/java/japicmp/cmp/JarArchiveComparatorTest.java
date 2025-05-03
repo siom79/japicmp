@@ -8,7 +8,7 @@ import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,10 +18,10 @@ import static japicmp.util.Helper.getJApiMethod;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class JarArchiveComparatorTest {
+class JarArchiveComparatorTest {
 
 	@Test
-	public void testOverrideCompatibilityChangeClassRemoved() throws Exception {
+	void testOverrideCompatibilityChangeClassRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChangeType.CLASS_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
 		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChangeType.SUPERCLASS_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
@@ -43,7 +43,7 @@ public class JarArchiveComparatorTest {
 	}
 
 	@Test
-	public void testOverrideCompatibilityChangeMethodRemoved() throws Exception {
+	void testOverrideCompatibilityChangeMethodRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED, true, true, JApiSemanticVersionLevel.MAJOR));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {

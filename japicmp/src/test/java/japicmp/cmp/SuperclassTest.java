@@ -5,7 +5,7 @@ import japicmp.util.CtClassBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,10 +15,10 @@ import static japicmp.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class SuperclassTest {
+class SuperclassTest {
 
 	@Test
-	public void testClassHasNoSuperclass() throws Exception {
+	void testClassHasNoSuperclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -39,7 +39,7 @@ public class SuperclassTest {
 	}
 
 	@Test
-	public void testNewClass() throws Exception {
+	void testNewClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -65,7 +65,7 @@ public class SuperclassTest {
 	}
 
 	@Test
-	public void testRemovedClass() throws Exception {
+	void testRemovedClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -91,7 +91,7 @@ public class SuperclassTest {
 	}
 
 	@Test
-	public void testClassHierarchyHasOneMoreLevel() throws Exception {
+	void testClassHierarchyHasOneMoreLevel() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -120,7 +120,7 @@ public class SuperclassTest {
 	}
 
 	@Test
-	public void testClassHierarchyHasOneMoreLevelWithExistingClasses() throws Exception {
+	void testClassHierarchyHasOneMoreLevelWithExistingClasses() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -149,7 +149,7 @@ public class SuperclassTest {
 	}
 
 	@Test
-	public void testClassHierarchyHasOneLessLevel() throws Exception {
+	void testClassHierarchyHasOneLessLevel() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {

@@ -12,7 +12,7 @@ import javassist.NotFoundException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Evaluator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,10 +26,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 
-public class HtmlOutputGeneratorTest {
+class HtmlOutputGeneratorTest {
 
 	@Test
-    public void testHtmlReport() throws Exception {
+	void testHtmlReport() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -64,7 +64,7 @@ public class HtmlOutputGeneratorTest {
 	}
 
 	@Test
-	public void testSummaryOnly() throws Exception {
+	void testSummaryOnly() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override

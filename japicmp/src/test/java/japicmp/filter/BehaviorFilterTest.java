@@ -4,14 +4,9 @@ import japicmp.exception.JApiCmpException;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
 import japicmp.util.CtMethodBuilder;
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtBehavior;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtMethod;
-import javassist.NotFoundException;
-import org.junit.Test;
+import javassist.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -44,12 +39,9 @@ public class BehaviorFilterTest {
 		assertThat(filter.matches(ctBehavior), is(true));
 	}
 
-	@Test(expected = JApiCmpException.class)
+	@Test
 	public void testMethodMissingParenthesis() throws CannotCompileException {
-		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method(");
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
-		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new CtClass[]{}).addToClass(ctClass);
-		assertThat(filter.matches(ctBehavior), is(true));
+		Assertions.assertThrows(JApiCmpException.class, () -> new JavadocLikeBehaviorFilter("japicmp.Test#method("));
 	}
 
 	@Test

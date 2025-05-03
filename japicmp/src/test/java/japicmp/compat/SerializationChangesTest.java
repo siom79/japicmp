@@ -11,7 +11,8 @@ import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -19,12 +20,11 @@ import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-public class SerializationChangesTest {
+class SerializationChangesTest {
 
 	@Test
-	public void testEnumUnchanged() throws Exception {
+	void testEnumUnchanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -43,16 +43,16 @@ public class SerializationChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.ENUM));
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(false));
+		MatcherAssert.assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.ENUM));
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(false));
 	}
 
 	@Test
-	public void testEnumElementAdded() throws Exception {
+	void testEnumElementAdded() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -72,16 +72,16 @@ public class SerializationChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.ENUM));
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(false));
+		MatcherAssert.assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.ENUM));
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(false));
 	}
 
 	@Test
-	public void testEnumElementRemoved() throws Exception {
+	void testEnumElementRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -101,17 +101,17 @@ public class SerializationChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.ENUM));
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.ENUM));
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED));
 	}
 
 	@Test
-	 public void testClassCompatible() throws Exception {
+	void testClassCompatible() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -132,17 +132,17 @@ public class SerializationChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.CLASS));
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(false));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE));
+		MatcherAssert.assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.CLASS));
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(false));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE));
 	}
 
 	@Test
-	public void testClassCompatibleWithSerialVersionUid() throws Exception {
+	void testClassCompatibleWithSerialVersionUid() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -165,17 +165,17 @@ public class SerializationChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.CLASS));
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(false));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE));
+		MatcherAssert.assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.CLASS));
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(false));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE));
 	}
 
 	@Test
-	public void testClassSerialVersionUidChanged() throws Exception {
+	void testClassSerialVersionUidChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -198,17 +198,17 @@ public class SerializationChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.CLASS));
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_MODIFIED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.CLASS));
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_MODIFIED));
 	}
 
 	@Test
-	public void testClassSerialVersionUidRemovedAndNotMatchesNewDefault() throws Exception {
+	void testClassSerialVersionUidRemovedAndNotMatchesNewDefault() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -230,12 +230,12 @@ public class SerializationChangesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.CLASS));
-		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
-		assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(true));
-		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MATCHES_NEW_DEFAULT));
+		MatcherAssert.assertThat(jApiClass.getClassType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.getClassType().getNewTypeOptional().get(), is(JApiClassType.ClassType.CLASS));
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableOld(), is(true));
+		MatcherAssert.assertThat(jApiClass.getSerialVersionUid().isSerializableNew(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible().isIncompatible(), is(true));
+		MatcherAssert.assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_SERIALVERSIONUID_REMOVED_AND_NOT_MATCHES_NEW_DEFAULT));
 	}
 }

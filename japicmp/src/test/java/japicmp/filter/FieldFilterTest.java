@@ -7,41 +7,32 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
-public class FieldFilterTest {
+class FieldFilterTest {
 
 	@Test
-	public void testOneFieldMatches() throws CannotCompileException {
+	void testOneFieldMatches() throws CannotCompileException {
 		JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter("japicmp.Test#field");
 		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
 		CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
-		assertThat(fieldFilter.matches(ctField), is(true));
+		MatcherAssert.assertThat(fieldFilter.matches(ctField), is(true));
 	}
 
 	@Test
-	public void testOneFieldMatchesNot() throws CannotCompileException {
+	void testOneFieldMatchesNot() throws CannotCompileException {
 		JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter("japicmp.Test#field42");
 		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
 		CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
-		assertThat(fieldFilter.matches(ctField), is(false));
+		MatcherAssert.assertThat(fieldFilter.matches(ctField), is(false));
 	}
 
-	@Test(expected = JApiCmpException.class)
-	public void testTwoHashSigns() throws CannotCompileException {
-		JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter("japicmp.Test##field42");
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
-		CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
-		assertThat(fieldFilter.matches(ctField), is(false));
-	}
-
-	public void testFieldOfInnerClass() throws CannotCompileException {
-		JavadocLikeFieldFilter fieldFilter = new JavadocLikeFieldFilter("japicmp.Test$InnerClass#field");
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test$InnerClass").addToClassPool(new ClassPool());
-		CtField ctField = CtFieldBuilder.create().name("field").addToClass(ctClass);
-		assertThat(fieldFilter.matches(ctField), is(false));
+	@Test
+	void testTwoHashSigns() throws CannotCompileException {
+		Assertions.assertThrows(JApiCmpException.class, () -> new JavadocLikeFieldFilter("japicmp.Test##field42"));
 	}
 }
