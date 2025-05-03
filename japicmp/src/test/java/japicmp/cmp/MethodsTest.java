@@ -5,7 +5,8 @@ import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,12 +14,11 @@ import java.util.Objects;
 
 import static japicmp.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-public class MethodsTest {
+class MethodsTest {
 
 	@Test
-	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeUnchanged() throws Exception {
+	void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeUnchanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -39,11 +39,11 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(2));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(2));
 	}
 
 	@Test
-	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeTwoNewMethods() throws Exception {
+	void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeTwoNewMethods() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -62,14 +62,14 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(2));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(2));
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
-			assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+			MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
 		}
 	}
 
 	@Test
-	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneNewMethod() throws Exception {
+	void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneNewMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -89,26 +89,26 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(2));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(2));
 		boolean intReturnFound = false;
 		boolean booleanReturnFound = false;
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
 			JApiReturnType returnType = jApiMethod.getReturnType();
 			if (Objects.equals(returnType.getNewReturnType(), "int") && Objects.equals(returnType.getOldReturnType(), "int")) {
 				intReturnFound = true;
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+				MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 			}
 			if (Objects.equals(returnType.getNewReturnType(), "boolean")) {
 				booleanReturnFound = true;
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+				MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
 			}
 		}
-		assertThat(intReturnFound, is(true));
-		assertThat(booleanReturnFound, is(true));
+		MatcherAssert.assertThat(intReturnFound, is(true));
+		MatcherAssert.assertThat(booleanReturnFound, is(true));
 	}
 
 	@Test
-	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneRemovedMethod() throws Exception {
+	void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneRemovedMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -128,26 +128,26 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(2));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(2));
 		boolean intReturnFound = false;
 		boolean booleanReturnFound = false;
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
 			JApiReturnType returnType = jApiMethod.getReturnType();
 			if (Objects.equals(returnType.getNewReturnType(), "int") && Objects.equals(returnType.getOldReturnType(), "int")) {
 				intReturnFound = true;
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+				MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 			}
 			if (Objects.equals(returnType.getOldReturnType(), "boolean")) {
 				booleanReturnFound = true;
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+				MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
 			}
 		}
-		assertThat(intReturnFound, is(true));
-		assertThat(booleanReturnFound, is(true));
+		MatcherAssert.assertThat(intReturnFound, is(true));
+		MatcherAssert.assertThat(booleanReturnFound, is(true));
 	}
 
 	@Test
-	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeTwoRemovedMethods() throws Exception {
+	void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeTwoRemovedMethods() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -166,14 +166,14 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(2));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(2));
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
-			assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+			MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
 		}
 	}
 
 	@Test
-	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneModifiedMethod() throws Exception {
+	void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneModifiedMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -194,26 +194,26 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(2));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(2));
 		boolean intReturnFound = false;
 		boolean changedReturnFound = false;
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
 			JApiReturnType returnType = jApiMethod.getReturnType();
 			if (Objects.equals(returnType.getNewReturnType(), "int") && Objects.equals(returnType.getOldReturnType(), "int")) {
 				intReturnFound = true;
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+				MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 			}
 			if (Objects.equals(returnType.getNewReturnType(), "double") && Objects.equals(returnType.getOldReturnType(), "boolean")) {
 				changedReturnFound = true;
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+				MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 			}
 		}
-		assertThat(intReturnFound, is(true));
-		assertThat(changedReturnFound, is(true));
+		MatcherAssert.assertThat(intReturnFound, is(true));
+		MatcherAssert.assertThat(changedReturnFound, is(true));
 	}
 
 	@Test
-	public void testClassOneMethodAdded() throws Exception {
+	void testClassOneMethodAdded() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -231,16 +231,16 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(1));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(1));
 		JApiMethod jApiMethod = jApiClass.getMethods().get(0);
-		assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(jApiMethod.getReturnType().getNewReturnType(), is("int"));
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(jApiMethod.getAccessModifier().getNewModifier().get(), is(AccessModifier.PUBLIC));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.NEW));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getNewReturnType(), is("int"));
+		MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+		MatcherAssert.assertThat(jApiMethod.getAccessModifier().getNewModifier().get(), is(AccessModifier.PUBLIC));
 	}
 
 	@Test
-	public void testClassOneMethodRemoved() throws Exception {
+	void testClassOneMethodRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -258,16 +258,16 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(1));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(1));
 		JApiMethod jApiMethod = jApiClass.getMethods().get(0);
-		assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.REMOVED));
-		assertThat(jApiMethod.getReturnType().getOldReturnType(), is("int"));
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
-		assertThat(jApiMethod.getAccessModifier().getOldModifier().get(), is(AccessModifier.PUBLIC));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getOldReturnType(), is("int"));
+		MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		MatcherAssert.assertThat(jApiMethod.getAccessModifier().getOldModifier().get(), is(AccessModifier.PUBLIC));
 	}
 
 	@Test
-	public void testClassOneMethodReturnTypeChanged() throws Exception {
+	void testClassOneMethodReturnTypeChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -286,17 +286,17 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(1));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(1));
 		JApiMethod jApiMethod = jApiClass.getMethods().get(0);
-		assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiMethod.getReturnType().getOldReturnType(), is("int"));
-		assertThat(jApiMethod.getReturnType().getNewReturnType(), is("boolean"));
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiMethod.getAccessModifier().getOldModifier().get(), is(AccessModifier.PUBLIC));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getOldReturnType(), is("int"));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getNewReturnType(), is("boolean"));
+		MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiMethod.getAccessModifier().getOldModifier().get(), is(AccessModifier.PUBLIC));
 	}
 
 	@Test
-	public void testClassOneMethodAccessModifierChanged() throws Exception {
+	void testClassOneMethodAccessModifierChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -316,19 +316,19 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(1));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(1));
 		JApiMethod jApiMethod = jApiClass.getMethods().get(0);
-		assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiMethod.getReturnType().getOldReturnType(), is("int"));
-		assertThat(jApiMethod.getReturnType().getNewReturnType(), is("int"));
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiMethod.getAccessModifier().getOldModifier().get(), is(AccessModifier.PUBLIC));
-		assertThat(jApiMethod.getAccessModifier().getNewModifier().get(), is(AccessModifier.PRIVATE));
-		assertThat(jApiMethod.getAccessModifier().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getOldReturnType(), is("int"));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getNewReturnType(), is("int"));
+		MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiMethod.getAccessModifier().getOldModifier().get(), is(AccessModifier.PUBLIC));
+		MatcherAssert.assertThat(jApiMethod.getAccessModifier().getNewModifier().get(), is(AccessModifier.PRIVATE));
+		MatcherAssert.assertThat(jApiMethod.getAccessModifier().getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 	}
 
 	@Test
-	public void testClassOneMethodUnchanged() throws Exception {
+	void testClassOneMethodUnchanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -347,17 +347,17 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(1));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(1));
 		JApiMethod jApiMethod = jApiClass.getMethods().get(0);
-		assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiMethod.getReturnType().getOldReturnType(), is("int"));
-		assertThat(jApiMethod.getReturnType().getNewReturnType(), is("int"));
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
-		assertThat(jApiMethod.getAccessModifier().getOldModifier().get(), is(AccessModifier.PUBLIC));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getOldReturnType(), is("int"));
+		MatcherAssert.assertThat(jApiMethod.getReturnType().getNewReturnType(), is("int"));
+		MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiMethod.getAccessModifier().getOldModifier().get(), is(AccessModifier.PUBLIC));
 	}
 
 	@Test
-	public void testClassWithTwoMethodsOneAddedWithAdditionalParameter() throws Exception {
+	void testClassWithTwoMethodsOneAddedWithAdditionalParameter() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -377,20 +377,20 @@ public class MethodsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		assertThat(jApiClass.getMethods().size(), is(2));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(2));
 		boolean noParamFound = false;
 		boolean oneParamFound = false;
 		for (JApiMethod jApiMethod : jApiClass.getMethods()) {
 			if (jApiMethod.getParameters().size() == 0) {
 				noParamFound = true;
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+				MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
 			}
 			if (jApiMethod.getParameters().size() == 1) {
 				oneParamFound = true;
-				assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+				MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
 			}
 		}
-		assertThat(noParamFound, is(true));
-		assertThat(oneParamFound, is(true));
+		MatcherAssert.assertThat(noParamFound, is(true));
+		MatcherAssert.assertThat(oneParamFound, is(true));
 	}
 }

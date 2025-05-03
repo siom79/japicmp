@@ -1,36 +1,37 @@
 package japicmp.util;
 
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-public class StringArrayEnumerationTest {
+class StringArrayEnumerationTest {
 
-	@Test(expected = NoSuchElementException.class)
-	public void testEmptyArray() {
+	@Test
+	void testEmptyArray() {
 		StringArrayEnumeration sae = new StringArrayEnumeration(new String[]{});
-		assertThat(sae.hasMoreElements(), is(false));
-		sae.nextElement();
+		MatcherAssert.assertThat(sae.hasMoreElements(), is(false));
+		Assertions.assertThrows(NoSuchElementException.class, sae::nextElement);
 	}
 
 	@Test
-	public void testOneElementArray() {
+	void testOneElementArray() {
 		StringArrayEnumeration sae = new StringArrayEnumeration(new String[]{"1"});
-		assertThat(sae.hasMoreElements(), is(true));
-		assertThat(sae.nextElement(), is("1"));
-		assertThat(sae.hasMoreElements(), is(false));
+		MatcherAssert.assertThat(sae.hasMoreElements(), is(true));
+		MatcherAssert.assertThat(sae.nextElement(), is("1"));
+		MatcherAssert.assertThat(sae.hasMoreElements(), is(false));
 	}
 
 	@Test
-	public void testTwoElementsArray() {
+	void testTwoElementsArray() {
 		StringArrayEnumeration sae = new StringArrayEnumeration(new String[]{"1", "2"});
-		assertThat(sae.hasMoreElements(), is(true));
-		assertThat(sae.nextElement(), is("1"));
-		assertThat(sae.hasMoreElements(), is(true));
-		assertThat(sae.nextElement(), is("2"));
-		assertThat(sae.hasMoreElements(), is(false));
+		MatcherAssert.assertThat(sae.hasMoreElements(), is(true));
+		MatcherAssert.assertThat(sae.nextElement(), is("1"));
+		MatcherAssert.assertThat(sae.hasMoreElements(), is(true));
+		MatcherAssert.assertThat(sae.nextElement(), is("2"));
+		MatcherAssert.assertThat(sae.hasMoreElements(), is(false));
 	}
 }

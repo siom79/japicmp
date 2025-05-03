@@ -9,7 +9,8 @@ import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,17 +20,16 @@ import static japicmp.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
 
-public class ShowSyntheticTest {
+class ShowSyntheticTest {
 
 	@Test
-	public void testShowSynthetic() throws Exception {
+	void testShowSynthetic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -43,26 +43,26 @@ public class ShowSyntheticTest {
 				return Arrays.asList(ctClass, syntheticClass);
 			}
 		});
-		assertThat(jApiClasses.size(), is(2));
+		MatcherAssert.assertThat(jApiClasses.size(), is(2));
 		JApiClass jApiClass = getJApiClass(jApiClasses, CtClassBuilder.DEFAULT_CLASS_NAME);
-		assertThat(jApiClass.getMethods().size(), is(1));
-		assertThat(jApiClass.getFields().size(), is(1));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(1));
+		MatcherAssert.assertThat(jApiClass.getFields().size(), is(1));
 		Options configOptions = Options.newDefault();
 		configOptions.setIncludeSynthetic(true);
 		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses);
 		String output = stdoutOutputGenerator.generate();
-		assertThat(output, containsString("+++  NEW CLASS: PUBLIC(+) SYNTHETIC(+) japicmp.SyntheticClass"));
-		assertThat(output, containsString("+++  NEW FIELD: PUBLIC(+) SYNTHETIC(+) int field"));
-		assertThat(output, containsString("+++  NEW METHOD: PUBLIC(+) SYNTHETIC(+) void method()"));
+		MatcherAssert.assertThat(output, containsString("+++  NEW CLASS: PUBLIC(+) SYNTHETIC(+) japicmp.SyntheticClass"));
+		MatcherAssert.assertThat(output, containsString("+++  NEW FIELD: PUBLIC(+) SYNTHETIC(+) int field"));
+		MatcherAssert.assertThat(output, containsString("+++  NEW METHOD: PUBLIC(+) SYNTHETIC(+) void method()"));
 	}
 
 	@Test
-	public void testNotShowSynthetic() throws Exception {
+	void testNotShowSynthetic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(false);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -79,15 +79,15 @@ public class ShowSyntheticTest {
 		Options configOptions = Options.newDefault();
 		configOptions.setIncludeSynthetic(false);
 		(new OutputFilter(configOptions)).filter(jApiClasses);
-		assertThat(jApiClasses.size(), is(1));
+		MatcherAssert.assertThat(jApiClasses.size(), is(1));
 		JApiClass jApiClass = getJApiClass(jApiClasses, CtClassBuilder.DEFAULT_CLASS_NAME);
-		assertThat(jApiClass.getMethods().size(), is(0));
-		assertThat(jApiClass.getFields().size(), is(0));
+		MatcherAssert.assertThat(jApiClass.getMethods().size(), is(0));
+		MatcherAssert.assertThat(jApiClass.getFields().size(), is(0));
 		configOptions.setIncludeSynthetic(true);
 		StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(configOptions, jApiClasses);
 		String output = stdoutOutputGenerator.generate();
-		assertThat(output, not(containsString("+++  NEW CLASS: PUBLIC(+) SYNTHETIC(+) japicmp.SyntheticClass")));
-		assertThat(output, not(containsString("+++  NEW FIELD: PUBLIC(+) SYNTHETIC(+) int field")));
-		assertThat(output, not(containsString("+++  NEW METHOD: PUBLIC(+) SYNTHETIC(+) japicmp.Test method()")));
+		MatcherAssert.assertThat(output, not(containsString("+++  NEW CLASS: PUBLIC(+) SYNTHETIC(+) japicmp.SyntheticClass")));
+		MatcherAssert.assertThat(output, not(containsString("+++  NEW FIELD: PUBLIC(+) SYNTHETIC(+) int field")));
+		MatcherAssert.assertThat(output, not(containsString("+++  NEW METHOD: PUBLIC(+) SYNTHETIC(+) japicmp.Test method()")));
 	}
 }

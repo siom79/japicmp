@@ -8,8 +8,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,13 +20,13 @@ import java.util.List;
 
 import static japicmp.test.output.xml.XmlHelper.getDivForClass;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class XmlOutputGeneratorClassTypeTest {
 	private static Document documentPublic;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() throws IOException {
 		Path diffPublicXmlPath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.xml");
 		Path diffPublicHtmlPath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html");

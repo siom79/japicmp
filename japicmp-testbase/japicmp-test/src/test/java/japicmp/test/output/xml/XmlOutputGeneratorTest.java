@@ -11,8 +11,8 @@ import japicmp.output.html.HtmlOutputGeneratorOptions;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class XmlOutputGeneratorTest {
 	private static Document documentOnlyModifications;
 	private static File htmlFile;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() throws IOException {
 		Path diffHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff.html");
 		Path diffOnlyModificationsHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_onlyModifications.html");

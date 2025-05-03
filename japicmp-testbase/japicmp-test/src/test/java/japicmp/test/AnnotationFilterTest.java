@@ -13,14 +13,15 @@ import japicmp.test.annotation.filter.ClassWithMembersToExclude;
 import japicmp.test.annotation.filter.ExcludedClass;
 import japicmp.test.annotation.filter.exclpckg.Excluded;
 import japicmp.test.annotation.filter.inclpckg.Included;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static japicmp.test.util.Helper.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test to ensure that annotation-based includes and excludes are working.
@@ -43,10 +44,10 @@ public class AnnotationFilterTest {
 		options.getFilters().getIncludes().add(new AnnotationClassFilter("@japicmp.test.annotation.filter.PublicAPI"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-		Assert.assertEquals(3, jApiClasses.size());
-        Assert.assertTrue(jApiClasses.stream().anyMatch(jApiClass -> jApiClass.getFullyQualifiedName().contains(AnnotatedClass.class.getSimpleName())));
-        Assert.assertTrue(jApiClasses.stream().anyMatch(jApiClass -> jApiClass.getFullyQualifiedName().contains(ClassWithInnerClass.class.getSimpleName())));
-		Assert.assertEquals(JApiChangeStatus.MODIFIED, jApiClasses.get(0).getChangeStatus());
+		assertEquals(3, jApiClasses.size());
+        assertTrue(jApiClasses.stream().anyMatch(jApiClass -> jApiClass.getFullyQualifiedName().contains(AnnotatedClass.class.getSimpleName())));
+        assertTrue(jApiClasses.stream().anyMatch(jApiClass -> jApiClass.getFullyQualifiedName().contains(ClassWithInnerClass.class.getSimpleName())));
+		assertEquals(JApiChangeStatus.MODIFIED, jApiClasses.get(0).getChangeStatus());
 	}
 
 	@Test
@@ -66,7 +67,7 @@ public class AnnotationFilterTest {
 		options.getFilters().getIncludes().add(new AnnotationClassFilter("@japicmp.test.annotation.filter.PublicAPI"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-		Assert.assertEquals(3, jApiClasses.size());
+		assertEquals(3, jApiClasses.size());
 		JApiClass jApiClass = getJApiClass(jApiClasses, ClassWithInnerClass.class.getName() + "$NewInnerClass");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.NEW));
 	}
@@ -77,7 +78,7 @@ public class AnnotationFilterTest {
 		options.getFilters().getIncludes().add(new AnnotationClassFilter("@japicmp.test.annotation.filter.PublicAPI"));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		final List<JApiClass> jApiClasses = jarArchiveComparator.compare(getArchive("japicmp-test-v1.jar"), getArchive("japicmp-test-v2.jar"));
-		Assert.assertEquals(3, jApiClasses.size());
+		assertEquals(3, jApiClasses.size());
 		JApiClass jApiClass = getJApiClass(jApiClasses, ClassWithInnerClass.class.getName());
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "newMethod");

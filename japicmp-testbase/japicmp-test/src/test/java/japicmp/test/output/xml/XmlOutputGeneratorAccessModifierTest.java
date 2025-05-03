@@ -7,8 +7,8 @@ import japicmp.test.util.Helper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class XmlOutputGeneratorAccessModifierTest {
 	private static Document documentPublic;
 	private static Document documentPrivate;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() throws IOException {
 		Path diffPublicHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_public.html");
 		Path diffPrivateHtmlFilePath = Paths.get(System.getProperty("user.dir"), "target", "diff_private.html");

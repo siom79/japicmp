@@ -24,7 +24,7 @@
 	</licenses>
 
 	<properties>
-		<ant.version>1.10.12</ant.version>
+		<ant.version>1.10.15</ant.version>
 	</properties>
 
 	<dependencies>
@@ -43,6 +43,18 @@
 			<groupId>org.apache.ant</groupId>
 			<artifactId>ant-testutil</artifactId>
 			<version>${ant.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

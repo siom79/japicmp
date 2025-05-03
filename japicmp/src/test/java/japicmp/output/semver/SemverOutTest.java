@@ -6,33 +6,33 @@ import japicmp.config.Options;
 import japicmp.model.JApiClass;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
-public class SemverOutTest {
+class SemverOutTest {
 
 	@Test
-	public void testNoChangesAtAll() throws Exception {
+	void testNoChangesAtAll() throws Exception {
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(new JarArchiveComparatorOptions(), new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				return Collections.emptyList();
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				return Collections.emptyList();
 			}
 		});
-		assertThat(jApiClasses.size(), is(0));
+		MatcherAssert.assertThat(jApiClasses.size(), is(0));
 		Options options = Options.newDefault();
 		SemverOut semverOut = new SemverOut(options, jApiClasses);
 		String output = semverOut.generate();
-		assertThat(output, is(SemverOut.SEMVER_COMPATIBLE));
+		MatcherAssert.assertThat(output, is(SemverOut.SEMVER_COMPATIBLE));
 	}
 }

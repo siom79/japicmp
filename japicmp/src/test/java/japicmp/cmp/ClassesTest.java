@@ -8,7 +8,8 @@ import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,17 +17,16 @@ import java.util.List;
 import static japicmp.util.Helper.getJApiClass;
 import static japicmp.util.Helper.getJApiMethod;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
-public class ClassesTest {
+class ClassesTest {
 
 	@Test
-	public void testAbstractMethodAdded() throws Exception {
+	void testAbstractMethodAdded() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
 				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
 				return Arrays.asList(superClass, subClass);
@@ -42,13 +42,13 @@ public class ClassesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Subclass");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(jApiMethod.isBinaryCompatible(), is(true));
-		assertThat(jApiMethod.isSourceCompatible(), is(false));
+		MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+		MatcherAssert.assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		MatcherAssert.assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
 
 	@Test
-	public void testAbstractMethodAddedThatOverridesExistingAbstractMethod() throws Exception {
+	void testAbstractMethodAddedThatOverridesExistingAbstractMethod() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -71,18 +71,18 @@ public class ClassesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Subclass");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(jApiMethod.isBinaryCompatible(), is(true));
-		assertThat(jApiMethod.isSourceCompatible(), is(true));
+		MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+		MatcherAssert.assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		MatcherAssert.assertThat(jApiMethod.isSourceCompatible(), is(true));
 	}
 
 	@Test
-	public void testAbstractMethodAddedThatOverridesNewAbstractMethod() throws Exception {
+	void testAbstractMethodAddedThatOverridesNewAbstractMethod() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
 				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
 				return Arrays.asList(superClass, subClass);
@@ -99,13 +99,13 @@ public class ClassesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Subclass");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(jApiMethod.isBinaryCompatible(), is(true));
-		assertThat(jApiMethod.isSourceCompatible(), is(false));
+		MatcherAssert.assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.NEW));
+		MatcherAssert.assertThat(jApiMethod.isBinaryCompatible(), is(true));
+		MatcherAssert.assertThat(jApiMethod.isSourceCompatible(), is(false));
 	}
 
 	@Test
-	public void testAbstractMethodAddedViaNewSuperclass() throws Exception {
+	void testAbstractMethodAddedViaNewSuperclass() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -126,7 +126,7 @@ public class ClassesTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Subclass");
-		assertThat(jApiClass.isBinaryCompatible(), is(true));
-		assertThat(jApiClass.isSourceCompatible(), is(false));
+		MatcherAssert.assertThat(jApiClass.isBinaryCompatible(), is(true));
+		MatcherAssert.assertThat(jApiClass.isSourceCompatible(), is(false));
 	}
 }

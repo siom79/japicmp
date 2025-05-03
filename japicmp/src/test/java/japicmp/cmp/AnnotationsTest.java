@@ -8,7 +8,8 @@ import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,13 +18,10 @@ import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.List;
 
-import static japicmp.util.Helper.getJApiClass;
-import static japicmp.util.Helper.getJApiField;
-import static japicmp.util.Helper.getJApiMethod;
+import static japicmp.util.Helper.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
-public class AnnotationsTest {
+class AnnotationsTest {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD})
@@ -32,7 +30,7 @@ public class AnnotationsTest {
 	}
 
 	@Test
-	public void testNoAnnotationsClass() throws Exception {
+	void testNoAnnotationsClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setNoAnnotations(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -50,13 +48,13 @@ public class AnnotationsTest {
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
-		assertThat(jApiClasses.size(), is(2));
+		MatcherAssert.assertThat(jApiClasses.size(), is(2));
 		JApiClass jApiClass = getJApiClass(jApiClasses, "big.bang.theory.Sheldon");
-		assertThat(jApiClass.getAnnotations().size(), is(0));
+		MatcherAssert.assertThat(jApiClass.getAnnotations().size(), is(0));
 	}
 
 	@Test
-	public void testNoAnnotationsMethod() throws Exception {
+	void testNoAnnotationsMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setNoAnnotations(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -76,14 +74,14 @@ public class AnnotationsTest {
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
-		assertThat(jApiClasses.size(), is(2));
+		MatcherAssert.assertThat(jApiClasses.size(), is(2));
 		JApiClass jApiClass = getJApiClass(jApiClasses, "big.bang.theory.Sheldon");
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "excel");
-		assertThat(jApiMethod.getAnnotations().size(), is(0));
+		MatcherAssert.assertThat(jApiMethod.getAnnotations().size(), is(0));
 	}
 
 	@Test
-	public void testNoAnnotationsField() throws Exception {
+	void testNoAnnotationsField() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setNoAnnotations(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -103,9 +101,9 @@ public class AnnotationsTest {
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
-		assertThat(jApiClasses.size(), is(2));
+		MatcherAssert.assertThat(jApiClasses.size(), is(2));
 		JApiClass jApiClass = getJApiClass(jApiClasses, "big.bang.theory.Sheldon");
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "age");
-		assertThat(jApiField.getAnnotations().size(), is(0));
+		MatcherAssert.assertThat(jApiField.getAnnotations().size(), is(0));
 	}
 }

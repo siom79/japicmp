@@ -6,7 +6,8 @@ import japicmp.model.*;
 import japicmp.util.*;
 import javassist.*;
 import org.hamcrest.core.Is;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,12 +17,11 @@ import static japicmp.util.Helper.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertEquals;
 
-public class CompatibilityChangesTest {
+class CompatibilityChangesTest {
 
 	@Test
-	public void testClassRemoved() throws Exception {
+	void testClassRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -43,7 +43,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testClassNowAbstract() throws Exception {
+	void testClassNowAbstract() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -66,7 +66,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testClassNowFinal() throws Exception {
+	void testClassNowFinal() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -89,7 +89,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testClassNoLongerPublic() throws Exception {
+	void testClassNoLongerPublic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -112,7 +112,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testClassTypeChanged() throws Exception {
+	void testClassTypeChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -135,7 +135,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testSuperclassRemoved() throws Exception {
+	void testSuperclassRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -159,7 +159,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testSuperclassChanged() throws Exception {
+	void testSuperclassChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -184,7 +184,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testSuperclassAdded() throws Exception {
+	void testSuperclassAdded() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -206,14 +206,14 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getSuperclass().getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.SUPERCLASS_ADDED)));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		JApiSuperclass superclass = jApiClass.getSuperclass();
-		assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
-		assertEquals("japicmp.Superclass", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
+		Assertions.assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
+		Assertions.assertEquals("japicmp.Superclass", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
 		assertThat(superclass.isBinaryCompatible(), is(true));
 		assertThat(superclass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.SUPERCLASS_ADDED)));
 	}
 
 	@Test
-	public void testSuperclassUnchangedObject() throws Exception {
+	void testSuperclassUnchangedObject() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -234,14 +234,14 @@ public class CompatibilityChangesTest {
 		assertThat(jApiClass.getCompatibilityChanges().size(), is(0));
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		JApiSuperclass superclass = jApiClass.getSuperclass();
-		assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
-		assertEquals("java.lang.Object", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
+		Assertions.assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
+		Assertions.assertEquals("java.lang.Object", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
 		assertThat(superclass.isBinaryCompatible(), is(true));
 		assertThat(superclass.getCompatibilityChanges().size(), is(0));
 	}
 
 	@Test
-	public void testMethodRemovedInSuperclass() throws Exception {
+	void testMethodRemovedInSuperclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -267,7 +267,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodRemovedInSuperclassButOverriddenInSubclass() throws Exception {
+	void testMethodRemovedInSuperclassButOverriddenInSubclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -295,7 +295,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldRemovedInSuperclass() throws Exception {
+	void testFieldRemovedInSuperclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -321,7 +321,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldRemovedInSuperclassButOverriddenInSubclass() throws Exception {
+	void testFieldRemovedInSuperclassButOverriddenInSubclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -349,7 +349,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodRemoved() throws Exception {
+	void testMethodRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -373,14 +373,14 @@ public class CompatibilityChangesTest {
 		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_REMOVED)));
 		assertThat(jApiMethod.isBinaryCompatible(), is(false));
 		JApiSuperclass superclass = jApiClass.getSuperclass();
-		assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
-		assertEquals("java.lang.Object", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
+		Assertions.assertEquals("japicmp.Test", superclass.getJApiClassOwning().getFullyQualifiedName());
+		Assertions.assertEquals("java.lang.Object", superclass.getCorrespondingJApiClass().get().getFullyQualifiedName());
 		assertThat(superclass.isBinaryCompatible(), is(true));
 		assertThat(superclass.getCompatibilityChanges().size(), is(0));
 	}
 
 	@Test
-	public void testMethodLessAccessiblePublicToPrivate() throws Exception {
+	void testMethodLessAccessiblePublicToPrivate() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -407,7 +407,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testClassLessAccessiblePublicToPrivate() throws Exception {
+	void testClassLessAccessiblePublicToPrivate() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -430,7 +430,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodLessAccessibleThanInSuperclass() throws Exception {
+	void testMethodLessAccessibleThanInSuperclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -460,7 +460,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodStaticOverridesNonStatic() throws Exception {
+	void testMethodStaticOverridesNonStatic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -490,7 +490,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodReturnTypeChanges() throws Exception {
+	void testMethodReturnTypeChanges() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -517,7 +517,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodReturnTypeChangesAndVisibilityIncreasesProtectedToPublic() throws Exception {
+	void testMethodReturnTypeChangesAndVisibilityIncreasesProtectedToPublic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -546,7 +546,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodReturnTypeChangesAndVisibilityIncreasesPrivateToProtected() throws Exception {
+	void testMethodReturnTypeChangesAndVisibilityIncreasesPrivateToProtected() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -575,7 +575,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNowAbstract() throws Exception {
+	void testMethodNowAbstract() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -602,7 +602,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNowFinal() throws Exception {
+	void testMethodNowFinal() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -629,7 +629,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodRemainsEffectivelyFinal() throws Exception {
+	void testMethodRemainsEffectivelyFinal() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -656,7 +656,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNowStatic() throws Exception {
+	void testMethodNowStatic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -683,7 +683,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNoLongerStatic() throws Exception {
+	void testMethodNoLongerStatic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -710,7 +710,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNowVarargs() throws Exception {
+	void testMethodNowVarargs() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -740,7 +740,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNoLongerVarargs() throws Exception {
+	void testMethodNoLongerVarargs() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -770,7 +770,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldStaticOverridesStatic() throws Exception {
+	void testFieldStaticOverridesStatic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -800,7 +800,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldLessAccessibleThanInSuperclass() throws Exception {
+	void testFieldLessAccessibleThanInSuperclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -831,7 +831,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldNowFinal() throws Exception {
+	void testFieldNowFinal() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -859,7 +859,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldNowTransient() throws Exception {
+	void testFieldNowTransient() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -889,7 +889,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldNowVolatile() throws Exception {
+	void testFieldNowVolatile() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -919,7 +919,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldNowStatic() throws Exception {
+	void testFieldNowStatic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -947,7 +947,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldNoLongerTransient() throws Exception {
+	void testFieldNoLongerTransient() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -977,7 +977,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldNoLongerVolatile() throws Exception {
+	void testFieldNoLongerVolatile() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1007,7 +1007,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldNoLongerStatic() throws Exception {
+	void testFieldNoLongerStatic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1035,7 +1035,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldTypeChanged() throws Exception {
+	void testFieldTypeChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1063,7 +1063,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldRemoved() throws Exception {
+	void testFieldRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1090,7 +1090,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldLessAccessible() throws Exception {
+	void testFieldLessAccessible() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1118,7 +1118,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testConstructorRemoved() throws Exception {
+	void testConstructorRemoved() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1145,7 +1145,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testConstructorLessAccessible() throws Exception {
+	void testConstructorLessAccessible() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1173,7 +1173,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testPublicConstructorLessAccessibleWithFinalClass() throws Exception {
+	void testPublicConstructorLessAccessibleWithFinalClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1201,7 +1201,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testProtectedConstructorLessAccessibleWithFinalClass() throws Exception {
+	void testProtectedConstructorLessAccessibleWithFinalClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1227,7 +1227,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testConstructorThrowsNewCheckedException() throws Exception {
+	void testConstructorThrowsNewCheckedException() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1252,7 +1252,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testConstructorNoLongerThrowsNewCheckedException() throws Exception {
+	void testConstructorNoLongerThrowsNewCheckedException() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1277,7 +1277,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodAddedToInterface() throws Exception {
+	void testMethodAddedToInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1306,7 +1306,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodStaticAddedToInterface() throws Exception {
+	void testMethodStaticAddedToInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1336,7 +1336,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNotStaticChangesToStaticInInterface() throws Exception {
+	void testMethodNotStaticChangesToStaticInInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1367,7 +1367,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodStaticChangesToNotStaticInInterface() throws Exception {
+	void testMethodStaticChangesToNotStaticInInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1398,7 +1398,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodAddedToPublicClass() throws Exception {
+	void testMethodAddedToPublicClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1427,7 +1427,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAbstractClassNowExtendsAnotherAbstractClass() throws Exception {
+	void testAbstractClassNowExtendsAnotherAbstractClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1459,7 +1459,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodAddedToNewInterface() throws Exception {
+	void testMethodAddedToNewInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1487,7 +1487,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testInterfaceMovedToAbstractClass() throws Exception {
+	void testInterfaceMovedToAbstractClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1523,7 +1523,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAbstractMethodMovedToInterface() throws Exception {
+	void testAbstractMethodMovedToInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1556,7 +1556,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodMovedFromOneInterfaceToAnother() throws Exception {
+	void testMethodMovedFromOneInterfaceToAnother() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1588,7 +1588,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodMovedFromOneAbstractClassToAnother() throws Exception {
+	void testMethodMovedFromOneAbstractClassToAnother() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		options.setAccessModifier(AccessModifier.PRIVATE);
@@ -1620,7 +1620,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testClassNowCheckedException() throws Exception {
+	void testClassNowCheckedException() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -1644,7 +1644,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodThrowsNewCheckedException() throws Exception {
+	void testMethodThrowsNewCheckedException() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1672,7 +1672,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodNoLongerThrowsNewCheckedException() throws Exception {
+	void testMethodNoLongerThrowsNewCheckedException() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1700,7 +1700,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodThrowsNewRuntimeException() throws Exception {
+	void testMethodThrowsNewRuntimeException() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1728,7 +1728,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testNewMethodThrowsCheckedException() throws Exception {
+	void testNewMethodThrowsCheckedException() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1754,7 +1754,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMemberVariableMovedToSuperclass() throws Exception {
+	void testMemberVariableMovedToSuperclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1779,7 +1779,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testInterfaceImplementedBySuperclass() throws Exception {
+	void testInterfaceImplementedBySuperclass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1804,7 +1804,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testInterfaceAddDefaultMethod() throws Exception {
+	void testInterfaceAddDefaultMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1836,7 +1836,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testInterfaceDefaultMethodOverriddenInSubInterface() throws Exception {
+	void testInterfaceDefaultMethodOverriddenInSubInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1870,7 +1870,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testInterfaceAbstractMethodChangesToDefaultMethod() throws Exception {
+	void testInterfaceAbstractMethodChangesToDefaultMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1903,7 +1903,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotcationDeprecatedAddedToMethod() throws Exception {
+	void testAnnotcationDeprecatedAddedToMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1927,7 +1927,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotcationDeprecatedAddedToClass() throws Exception {
+	void testAnnotcationDeprecatedAddedToClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1948,7 +1948,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotcationDeprecatedRemovedFromClass() throws Exception {
+	void testAnnotcationDeprecatedRemovedFromClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -1972,7 +1972,7 @@ public class CompatibilityChangesTest {
 	 * Tests that no regression of issue #222 occurs
 	 */
 	@Test
-	public void testMethodMovedToSuperClass() throws Exception {
+	void testMethodMovedToSuperClass() throws Exception {
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
         List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
             @Override
@@ -2002,7 +2002,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodMovedToNewSuperClassInTheMiddle() throws Exception {
+	void testMethodMovedToNewSuperClassInTheMiddle() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2032,7 +2032,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodMovedToSuperClassOfSuperClass() throws Exception {
+	void testMethodMovedToSuperClassOfSuperClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2073,7 +2073,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testFieldMovedToSuperClassOfSuperClass() throws Exception {
+	void testFieldMovedToSuperClassOfSuperClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2114,7 +2114,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAddDefaultMethodToInterface() throws Exception {
+	void testAddDefaultMethodToInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2139,7 +2139,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAddAbstractMethodToInterface() throws Exception {
+	void testAddAbstractMethodToInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2164,7 +2164,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testNewInterfaceWithInterface() throws Exception {
+	void testNewInterfaceWithInterface() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2187,7 +2187,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testNewInterfaceWithClass() throws Exception {
+	void testNewInterfaceWithClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2220,7 +2220,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testNewClassExtendsExistingAbstractClass() throws Exception {
+	void testNewClassExtendsExistingAbstractClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2244,7 +2244,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testClassBecomesInterfacesAndInterfaceClass() throws Exception {
+	void testClassBecomesInterfacesAndInterfaceClass() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2273,7 +2273,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testClassExtendsUnaryOperator() throws Exception {
+	void testClassExtendsUnaryOperator() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2301,7 +2301,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testNewMethodInSuperInterface() throws Exception {
+	void testNewMethodInSuperInterface() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2325,7 +2325,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMoveMethodToSuperclassAndMakeFinal() throws Exception {
+	void testMoveMethodToSuperclassAndMakeFinal() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2356,7 +2356,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testRemoveMethodInSubClassAndSuperClass() throws Exception {
+	void testRemoveMethodInSubClassAndSuperClass() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2385,7 +2385,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testPackagePrivateClassChangesToPublicClassWithMethodReturnTypeChangeIssue365() throws Exception {
+	void testPackagePrivateClassChangesToPublicClassWithMethodReturnTypeChangeIssue365() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2415,7 +2415,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testNewMethodWithGenerics() throws Exception {
+	void testNewMethodWithGenerics() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2447,7 +2447,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testRemovedMethodWithGenerics() throws Exception {
+	void testRemovedMethodWithGenerics() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2480,7 +2480,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodWithGenericsChanged() throws Exception {
+	void testMethodWithGenericsChanged() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2519,7 +2519,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testMethodWithByteArrayAndArrayOfByteArrays() throws Exception {
+	void testMethodWithByteArrayAndArrayOfByteArrays() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -2566,7 +2566,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationAddedToClass() throws Exception {
+	void testAnnotationAddedToClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2587,7 +2587,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationRemovedFromClass() throws Exception {
+	void testAnnotationRemovedFromClass() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2608,7 +2608,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationOnClassModified() throws Exception {
+	void testAnnotationOnClassModified() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2634,7 +2634,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationAddedToMethod() throws Exception {
+	void testAnnotationAddedToMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2658,7 +2658,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationRemovedFromMethod() throws Exception {
+	void testAnnotationRemovedFromMethod() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2682,7 +2682,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationOnMethodModified() throws Exception {
+	void testAnnotationOnMethodModified() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2708,7 +2708,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationAddedToField() throws Exception {
+	void testAnnotationAddedToField() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2732,7 +2732,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationRemovedFromField() throws Exception {
+	void testAnnotationRemovedFromField() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -2756,7 +2756,7 @@ public class CompatibilityChangesTest {
 	}
 
 	@Test
-	public void testAnnotationOnFieldModified() throws Exception {
+	void testAnnotationOnFieldModified() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override

@@ -7,20 +7,20 @@ import japicmp.util.CtMethodBuilder;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
-public class ClassesComparatorTest {
+class ClassesComparatorTest {
 	@Test
-	public void testMethodAdded() throws Exception {
+	void testMethodAdded() throws Exception {
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(new JarArchiveComparatorOptions(), new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createOldClasses(ClassPool classPool) {
 				return Collections.singletonList(createClassWithoutMethod(classPool));
 			}
 
@@ -29,12 +29,12 @@ public class ClassesComparatorTest {
 				return Collections.singletonList(createClassWithMethod(classPool));
 			}
 		});
-		assertThat(jApiClasses.size(), is(1));
-		assertThat(jApiClasses.get(0).getMethods().size(), is(1));
-		assertThat(jApiClasses.get(0).getMethods().get(0).getChangeStatus(), is(JApiChangeStatus.NEW));
-		assertThat(jApiClasses.get(0).getMethods().get(0).isBinaryCompatible(), is(true));
-		assertThat(jApiClasses.get(0).isBinaryCompatible(), is(true));
-		assertThat(jApiClasses.get(0).getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiClasses.size(), is(1));
+		MatcherAssert.assertThat(jApiClasses.get(0).getMethods().size(), is(1));
+		MatcherAssert.assertThat(jApiClasses.get(0).getMethods().get(0).getChangeStatus(), is(JApiChangeStatus.NEW));
+		MatcherAssert.assertThat(jApiClasses.get(0).getMethods().get(0).isBinaryCompatible(), is(true));
+		MatcherAssert.assertThat(jApiClasses.get(0).isBinaryCompatible(), is(true));
+		MatcherAssert.assertThat(jApiClasses.get(0).getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 	}
 
 	private CtClass createClassWithoutMethod(ClassPool classPool) {

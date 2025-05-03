@@ -8,18 +8,18 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
 import static japicmp.util.Helper.*;
 
-public class GenericsTest {
+class GenericsTest {
 
 	@Test
-	public void testMethodWithGenericReturnTypeChanged() throws Exception {
+	void testMethodWithGenericReturnTypeChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -40,20 +40,20 @@ public class GenericsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		Assert.assertEquals(1, jApiClass.getMethods().size());
+		Assertions.assertEquals(1, jApiClass.getMethods().size());
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
 		JApiReturnType returnType = jApiMethod.getReturnType();
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, returnType.getChangeStatus());
-		Assert.assertTrue(returnType.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED)));
-		Assert.assertEquals(1, returnType.getOldGenericTypes().size());
-		Assert.assertTrue(returnType.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Object")));
-		Assert.assertEquals(1, returnType.getNewGenericTypes().size());
-		Assert.assertTrue(returnType.getNewGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Integer")));
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, returnType.getChangeStatus());
+		Assertions.assertTrue(returnType.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED)));
+		Assertions.assertEquals(1, returnType.getOldGenericTypes().size());
+		Assertions.assertTrue(returnType.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Object")));
+		Assertions.assertEquals(1, returnType.getNewGenericTypes().size());
+		Assertions.assertTrue(returnType.getNewGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Integer")));
 	}
 
 	@Test
-	public void testMethodWithGenericArgChanged() throws Exception {
+	void testMethodWithGenericArgChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -74,21 +74,21 @@ public class GenericsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		Assert.assertEquals(1, jApiClass.getMethods().size());
+		Assertions.assertEquals(1, jApiClass.getMethods().size());
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
-		Assert.assertEquals(1, jApiMethod.getParameters().size());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
+		Assertions.assertEquals(1, jApiMethod.getParameters().size());
 		JApiParameter firstParam = jApiMethod.getParameters().get(0);
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
-		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
-		Assert.assertEquals(1, firstParam.getOldGenericTypes().size());
-		Assert.assertTrue(firstParam.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Integer")));
-		Assert.assertEquals(1, firstParam.getNewGenericTypes().size());
-		Assert.assertTrue(firstParam.getNewGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Long")));
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
+		Assertions.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
+		Assertions.assertEquals(1, firstParam.getOldGenericTypes().size());
+		Assertions.assertTrue(firstParam.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Integer")));
+		Assertions.assertEquals(1, firstParam.getNewGenericTypes().size());
+		Assertions.assertTrue(firstParam.getNewGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Long")));
 	}
 
 	@Test
-	public void testConstructorWithGenericArgChanged() throws Exception {
+	void testConstructorWithGenericArgChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -109,21 +109,21 @@ public class GenericsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		Assert.assertEquals(1, jApiClass.getConstructors().size());
+		Assertions.assertEquals(1, jApiClass.getConstructors().size());
 		JApiConstructor jApiConstructor = getJApiConstructor(jApiClass.getConstructors(), Collections.singletonList("java.util.List"));
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, jApiConstructor.getChangeStatus());
-		Assert.assertEquals(1, jApiConstructor.getParameters().size());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, jApiConstructor.getChangeStatus());
+		Assertions.assertEquals(1, jApiConstructor.getParameters().size());
 		JApiParameter firstParam = jApiConstructor.getParameters().get(0);
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
-		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
-		Assert.assertEquals(1, firstParam.getOldGenericTypes().size());
-		Assert.assertTrue(firstParam.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Integer")));
-		Assert.assertEquals(1, firstParam.getNewGenericTypes().size());
-		Assert.assertTrue(firstParam.getNewGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Long")));
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
+		Assertions.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
+		Assertions.assertEquals(1, firstParam.getOldGenericTypes().size());
+		Assertions.assertTrue(firstParam.getOldGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Integer")));
+		Assertions.assertEquals(1, firstParam.getNewGenericTypes().size());
+		Assertions.assertTrue(firstParam.getNewGenericTypes().stream().anyMatch(gt -> gt.getType().equals("java.lang.Long")));
 	}
 
 	@Test
-	public void testMethodWithGenericTemplateUnChanged() throws Exception {
+	void testMethodWithGenericTemplateUnChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -146,16 +146,16 @@ public class GenericsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		Assert.assertEquals(1, jApiClass.getMethods().size());
+		Assertions.assertEquals(1, jApiClass.getMethods().size());
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
-		Assert.assertEquals(2, jApiMethod.getParameters().size());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
+		Assertions.assertEquals(2, jApiMethod.getParameters().size());
 		JApiParameter firstParam = jApiMethod.getParameters().get(0);
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
 	}
 
 	@Test
-	public void testMethodWithGenericTemplateClassChanged() throws Exception {
+	void testMethodWithGenericTemplateClassChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -178,20 +178,20 @@ public class GenericsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		Assert.assertEquals(1, jApiClass.getMethods().size());
+		Assertions.assertEquals(1, jApiClass.getMethods().size());
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
-		Assert.assertEquals(1, jApiMethod.getParameters().size());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
+		Assertions.assertEquals(1, jApiMethod.getParameters().size());
 		JApiParameter firstParam = jApiMethod.getParameters().get(0);
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
-		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
-		Assert.assertEquals("java.lang.Integer", firstParam.getOldGenericTypes().get(0).getType());
-		Assert.assertEquals("java.lang.Long", firstParam.getNewGenericTypes().get(0).getType());
-		Assert.assertEquals("T", firstParam.getTemplateName());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
+		Assertions.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
+		Assertions.assertEquals("java.lang.Integer", firstParam.getOldGenericTypes().get(0).getType());
+		Assertions.assertEquals("java.lang.Long", firstParam.getNewGenericTypes().get(0).getType());
+		Assertions.assertEquals("T", firstParam.getTemplateName());
 	}
 
 	@Test
-	public void testMethodWithGenericTemplateMethodChanged() throws Exception {
+	void testMethodWithGenericTemplateMethodChanged() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -212,15 +212,15 @@ public class GenericsTest {
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
-		Assert.assertEquals(1, jApiClass.getMethods().size());
+		Assertions.assertEquals(1, jApiClass.getMethods().size());
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
-		Assert.assertEquals(1, jApiMethod.getParameters().size());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, jApiMethod.getChangeStatus());
+		Assertions.assertEquals(1, jApiMethod.getParameters().size());
 		JApiParameter firstParam = jApiMethod.getParameters().get(0);
-		Assert.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
-		Assert.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
-		Assert.assertEquals("java.lang.Integer", firstParam.getOldGenericTypes().get(0).getType());
-		Assert.assertEquals("java.lang.Long", firstParam.getNewGenericTypes().get(0).getType());
-		Assert.assertEquals("TEST", firstParam.getTemplateName());
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, firstParam.getChangeStatus());
+		Assertions.assertTrue(firstParam.getCompatibilityChanges().contains(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_PARAMETER_GENERICS_CHANGED)));
+		Assertions.assertEquals("java.lang.Integer", firstParam.getOldGenericTypes().get(0).getType());
+		Assertions.assertEquals("java.lang.Long", firstParam.getNewGenericTypes().get(0).getType());
+		Assertions.assertEquals("TEST", firstParam.getTemplateName());
 	}
 }

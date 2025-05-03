@@ -9,7 +9,7 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,10 +19,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class XmlOutputGeneratorTest {
+class XmlOutputGeneratorTest {
 
 	@Test
-	public void testXmlReport() throws Exception {
+	void testXmlReport() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {

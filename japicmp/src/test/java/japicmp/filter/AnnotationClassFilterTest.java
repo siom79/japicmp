@@ -3,15 +3,15 @@ package japicmp.filter;
 import japicmp.util.CtClassBuilder;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class AnnotationClassFilterTest {
+class AnnotationClassFilterTest {
 
 	@Test
-    public void testMatchesAnnotation() {
+	void testMatchesAnnotation() {
 		AnnotationClassFilter annotationClassFilter = new AnnotationClassFilter("@japicmp.Exclude");
 		CtClass ctClass = CtClassBuilder.create()
 			.name("japicmp.ExcludeMe")
@@ -24,7 +24,7 @@ public class AnnotationClassFilterTest {
 	}
 
 	@Test
-	public void testMatchesNotAnnotation() {
+	void testMatchesNotAnnotation() {
 		AnnotationClassFilter annotationClassFilter = new AnnotationClassFilter("@japicmp.Exclude");
 		CtClass ctClass = CtClassBuilder.create()
 			.name("japicmp.ExcludeMeNot")

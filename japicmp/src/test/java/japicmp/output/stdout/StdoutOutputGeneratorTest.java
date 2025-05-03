@@ -6,47 +6,43 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
-import japicmp.util.CtClassBuilder;
-import japicmp.util.CtConstructorBuilder;
-import japicmp.util.CtFieldBuilder;
-import japicmp.util.CtInterfaceBuilder;
-import japicmp.util.CtMethodBuilder;
+import japicmp.util.*;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
 
-public class StdoutOutputGeneratorTest {
+class StdoutOutputGeneratorTest {
 
 	@Test
-	public void testNoChanges() {
+	void testNoChanges() {
 		Options options = Options.newDefault();
-		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0));
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<>(0));
 		String generated = generator.generate();
-		assertThat(generated, containsString(StdoutOutputGenerator.NO_CHANGES));
+		MatcherAssert.assertThat(generated, containsString(StdoutOutputGenerator.NO_CHANGES));
 	}
 
 	@Test
-	public void testWarningWhenIgnoreMissingClasses() {
+	void testWarningWhenIgnoreMissingClasses() {
 		Options options = Options.newDefault();
 		options.setIgnoreMissingClasses(true);
-		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<JApiClass>(0));
+		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, new ArrayList<>(0));
 		String generated = generator.generate();
-		assertThat(generated, containsString(StdoutOutputGenerator.WARNING));
-		assertThat(generated, containsString(CliParser.IGNORE_MISSING_CLASSES));
+		MatcherAssert.assertThat(generated, containsString(StdoutOutputGenerator.WARNING));
+		MatcherAssert.assertThat(generated, containsString(CliParser.IGNORE_MISSING_CLASSES));
 	}
 
 	@Test
-	public void testNoClassFileFormatVersionIfInterfaceRemoved() throws Exception {
+	void testNoClassFileFormatVersionIfInterfaceRemoved() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -57,18 +53,18 @@ public class StdoutOutputGeneratorTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				return Collections.emptyList();
 			}
 		});
 		Options options = Options.newDefault();
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String generated = generator.generate();
-		Assert.assertFalse(generated.contains("-1.-1"));
+		Assertions.assertFalse(generated.contains("-1.-1"));
 	}
 
 	@Test
-	public void testMethodWithGenericTypes() throws Exception {
+	void testMethodWithGenericTypes() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -91,11 +87,11 @@ public class StdoutOutputGeneratorTest {
 		Options options = Options.newDefault();
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String generated = generator.generate();
-		Assert.assertTrue(generated.contains("===* UNCHANGED METHOD: PUBLIC java.util.List<java.lang.Short>(<- <java.lang.Byte>) method(java.util.List<java.lang.Long>(<- <java.lang.Integer>))"));
+		Assertions.assertTrue(generated.contains("===* UNCHANGED METHOD: PUBLIC java.util.List<java.lang.Short>(<- <java.lang.Byte>) method(java.util.List<java.lang.Long>(<- <java.lang.Integer>))"));
 	}
 
 	@Test
-	public void testMethodWithGenericTypesRemoved() throws Exception {
+	void testMethodWithGenericTypesRemoved() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -108,7 +104,7 @@ public class StdoutOutputGeneratorTest {
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<CtClass> createNewClasses(ClassPool classPool) {
 				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
 				return Collections.singletonList(ctClass);
 			}
@@ -116,11 +112,11 @@ public class StdoutOutputGeneratorTest {
 		Options options = Options.newDefault();
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String generated = generator.generate();
-		Assert.assertTrue(generated.contains("---! REMOVED METHOD: PUBLIC(-) java.util.List<java.lang.Byte> method(java.util.List<java.lang.Integer>)"));
+		Assertions.assertTrue(generated.contains("---! REMOVED METHOD: PUBLIC(-) java.util.List<java.lang.Byte> method(java.util.List<java.lang.Integer>)"));
 	}
 
 	@Test
-	public void testFieldWithGenericTypes() throws Exception {
+	void testFieldWithGenericTypes() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
@@ -143,11 +139,11 @@ public class StdoutOutputGeneratorTest {
 		Options options = Options.newDefault();
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String generated = generator.generate();
-		Assert.assertTrue(generated.contains("===* UNCHANGED FIELD: PUBLIC java.util.List<java.lang.Short>(<- <java.lang.Byte>) list"));
+		Assertions.assertTrue(generated.contains("===* UNCHANGED FIELD: PUBLIC java.util.List<java.lang.Short>(<- <java.lang.Byte>) list"));
 	}
 
 	@Test
-	public void testSummaryOnly() throws Exception {
+	void testSummaryOnly() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
@@ -168,21 +164,21 @@ public class StdoutOutputGeneratorTest {
 		Options options = Options.newDefault();
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(options, jApiClasses);
 		String generated = generator.generate();
-		Assert.assertTrue(generated.contains("***! MODIFIED CLASS: PUBLIC japicmp.Test"));
-		Assert.assertTrue(generated.contains("===  CLASS FILE FORMAT VERSION"));
-		Assert.assertTrue(generated.contains("===  UNCHANGED SUPERCLASS"));
-		Assert.assertTrue(generated.contains("---! REMOVED FIELD"));
-		Assert.assertTrue(generated.contains("---! REMOVED CONSTRUCTOR"));
-		Assert.assertTrue(generated.contains("---! REMOVED METHOD"));
-		Assert.assertTrue(generated.contains("---  REMOVED ANNOTATION"));
+		Assertions.assertTrue(generated.contains("***! MODIFIED CLASS: PUBLIC japicmp.Test"));
+		Assertions.assertTrue(generated.contains("===  CLASS FILE FORMAT VERSION"));
+		Assertions.assertTrue(generated.contains("===  UNCHANGED SUPERCLASS"));
+		Assertions.assertTrue(generated.contains("---! REMOVED FIELD"));
+		Assertions.assertTrue(generated.contains("---! REMOVED CONSTRUCTOR"));
+		Assertions.assertTrue(generated.contains("---! REMOVED METHOD"));
+		Assertions.assertTrue(generated.contains("---  REMOVED ANNOTATION"));
 		options.setReportOnlySummary(true);
 		generated = generator.generate();
-		Assert.assertTrue(generated.contains("***! MODIFIED CLASS: PUBLIC japicmp.Test"));
-		Assert.assertFalse(generated.contains("===  CLASS FILE FORMAT VERSION"));
-		Assert.assertFalse(generated.contains("===  UNCHANGED SUPERCLASS"));
-		Assert.assertFalse(generated.contains("---! REMOVED FIELD"));
-		Assert.assertFalse(generated.contains("---! REMOVED CONSTRUCTOR"));
-		Assert.assertFalse(generated.contains("---! REMOVED METHOD"));
-		Assert.assertFalse(generated.contains("---  REMOVED ANNOTATION"));
+		Assertions.assertTrue(generated.contains("***! MODIFIED CLASS: PUBLIC japicmp.Test"));
+		Assertions.assertFalse(generated.contains("===  CLASS FILE FORMAT VERSION"));
+		Assertions.assertFalse(generated.contains("===  UNCHANGED SUPERCLASS"));
+		Assertions.assertFalse(generated.contains("---! REMOVED FIELD"));
+		Assertions.assertFalse(generated.contains("---! REMOVED CONSTRUCTOR"));
+		Assertions.assertFalse(generated.contains("---! REMOVED METHOD"));
+		Assertions.assertFalse(generated.contains("---  REMOVED ANNOTATION"));
 	}
 }

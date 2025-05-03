@@ -6,8 +6,8 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiField;
 import japicmp.model.JApiSuperclass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,17 +15,14 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static japicmp.test.service.util.Helper.createClassPath;
-import static japicmp.test.service.util.Helper.getArchive;
-import static japicmp.test.service.util.Helper.getJApiClass;
-import static japicmp.test.service.util.Helper.getJApiField;
+import static japicmp.test.service.util.Helper.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class SuperclassWithSubclassAddsNewStaticFieldTest {
 	private static List<JApiClass> jApiClasses;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		initLogging();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();

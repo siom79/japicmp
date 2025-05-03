@@ -4,10 +4,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.junit.Test;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class SkipModuleStrategyTest {
 
 	private MavenParameters createMavenParameters() {
 		RemoteRepository remoteRepository = new RemoteRepository.Builder("id", "type", "http://example.org").build();
-		return new MavenParameters(new ArrayList<ArtifactRepository>(), 
+		return new MavenParameters(new ArrayList<ArtifactRepository>(),
 			new MavenProject(), mock(MojoExecution.class), "", mock(RepositorySystem.class), mock(
 				RepositorySystemSession.class), Collections.singletonList(remoteRepository));
 	}

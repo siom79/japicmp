@@ -7,8 +7,9 @@ import japicmp.util.CtConstructorBuilder;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,15 +17,13 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import static japicmp.util.JarUtil.createJarFile;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
-public class OptionsTest {
+class OptionsTest {
 
 	private static Path oldPath;
 	private static Path newPath;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() throws IOException, CannotCompileException {
 		ClassPool cp = new ClassPool(true);
 		CtClass ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
@@ -37,7 +36,7 @@ public class OptionsTest {
 	}
 
 	@Test
-	public void testVerify() {
+	void testVerify() {
 		// GIVEN
 		Options options = Options.newDefault();
 		options.getOldArchives().add(new JApiCmpArchive(oldPath.toFile(), "1.0.0"));
@@ -49,7 +48,7 @@ public class OptionsTest {
 	}
 
 	@Test
-	public void testVerifyNotExistingHtmlStylesheet() {
+	void testVerifyNotExistingHtmlStylesheet() {
 		// GIVEN
 		Options options = Options.newDefault();
 		options.getOldArchives().add(new JApiCmpArchive(oldPath.toFile(), "1.0.0"));
@@ -59,15 +58,15 @@ public class OptionsTest {
 		try {
 			// WHEN
 			options.verify();
-			fail();
+			Assertions.fail();
 		} catch (JApiCmpException e) {
 			// THEN
-			assertEquals("HTML stylesheet 'none.css' does not exist.", e.getMessage());
+			Assertions.assertEquals("HTML stylesheet 'none.css' does not exist.", e.getMessage());
 		}
 	}
 
 	@Test
-	public void testVerifyCssFileWithoutHtmlOutput() {
+	void testVerifyCssFileWithoutHtmlOutput() {
 		// GIVEN
 		Options options = Options.newDefault();
 		options.getOldArchives().add(new JApiCmpArchive(oldPath.toFile(), "1.0.0"));
@@ -76,10 +75,10 @@ public class OptionsTest {
 		try {
 			// WHEN
 			options.verify();
-			fail();
+			Assertions.fail();
 		} catch (JApiCmpException e) {
 			// THEN
-			assertEquals("Define a HTML output file, if you want to apply a stylesheet.", e.getMessage());
+			Assertions.assertEquals("Define a HTML output file, if you want to apply a stylesheet.", e.getMessage());
 		}
 	}
 }
