@@ -149,10 +149,13 @@
 		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven api version -->
 		<reporting.version>3.1.0</reporting.version>
 		<plugin-annotation.version>3.6.4</plugin-annotation.version>
-		<surefireVersion>3.0.0-M7</surefireVersion>
+		<surefireVersion>3.5.3</surefireVersion>
 		<javassist.version>3.30.2-GA</javassist.version>
-		<guava.version>33.0.0-jre</guava.version>
+		<guava.version>33.4.8-jre</guava.version>
 		<jaxb.version>2.3.2</jaxb.version>
+		<jsoup.version>1.20.1</jsoup.version>
+		<mockito.version>4.3.1</mockito.version>
+		<junit.version>4.13.1</junit.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots</sonatypeOssDistMgmtSnapshotsUrl>
 	</properties>
 
@@ -167,19 +170,19 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>4.3.1</version>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.15.3</version>
+			<version>${jsoup.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
