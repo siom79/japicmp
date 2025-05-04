@@ -233,22 +233,24 @@ public class JApiCmpMojo extends AbstractMojo {
 		if ("bundle".equals(type) || "ejb".equals(type)) {
 			mappedType = "jar";
 		}
-		DefaultArtifact artifactVersion = new DefaultArtifact(groupId, artifactId, classifier, mappedType,
-			version);
-		return artifactVersion;
+		return new DefaultArtifact(groupId, artifactId, classifier, mappedType, version);
 	}
 
 	private Artifact getComparisonArtifact(final MavenParameters mavenParameters, final PluginParameters pluginParameters,
 										   final ConfigurationVersion configurationVersion) throws MojoFailureException, MojoExecutionException {
 		MavenProject mavenProject = mavenParameters.getMavenProject();
+		// create a version range of the form (,<current-version-of-the-project>), that includes all versions up to this version
 		DefaultArtifact artifactVersionRange = createDefaultArtifact(mavenProject, mavenParameters.getVersionRangeWithProjectVersion());
 		VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifactVersionRange, mavenParameters.getRemoteRepos(), null);
 		try {
+			getLog().debug("Trying version range: " + versionRangeRequest);
 			VersionRangeResult versionRangeResult = mavenParameters.getRepoSystem()
 				.resolveVersionRange(mavenParameters.getRepoSession(), versionRangeRequest);
+			getLog().debug("Version range result: " + versionRangeRequest);
 			List<org.eclipse.aether.version.Version> versions = versionRangeResult.getVersions();
 			filterSnapshots(versions, pluginParameters);
 			filterVersionPattern(versions, pluginParameters);
+			getLog().debug("Version range after filtering: " + versions);
 			if (!versions.isEmpty()) {
 				DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject, versions.get(versions.size() - 1).toString());
 				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
@@ -964,9 +966,11 @@ public class JApiCmpMojo extends AbstractMojo {
 		ArtifactRequest request = new ArtifactRequest();
 		request.setArtifact(artifact);
 		request.setRepositories(mavenParameters.getRemoteRepos());
-		ArtifactResult resolutionResult = null;
+		ArtifactResult resolutionResult;
 		try {
+			getLog().debug("Trying to resolve artifact: " + request);
 			resolutionResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), request);
+			getLog().debug("Resolved artifact: " + resolutionResult);
 			if (resolutionResult != null) {
 				if (resolutionResult.getExceptions() != null && !resolutionResult.getExceptions().isEmpty()) {
 					List<Exception> exceptions = resolutionResult.getExceptions();
