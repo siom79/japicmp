@@ -12,7 +12,6 @@ import japicmp.output.markdown.MarkdownBadge;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.Optional;
 
 public class MarkdownMessageOptions {
 
@@ -151,11 +150,8 @@ public class MarkdownMessageOptions {
 		}
 	}
 
-	public String getClassType(Optional<JApiClassType.ClassType> classType) {
-		if (!classType.isPresent()) {
-			return EMPTY;
-		}
-		switch (classType.get()) {
+	public String getClassType(JApiClassType.ClassType classType) {
+		switch (classType) {
 			case ANNOTATION:
 				return typeAnnotation;
 			case INTERFACE:

@@ -97,11 +97,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 		if (memberNames != null) {
 			for (String memberName : memberNames) {
 				MemberValue memberValue = annotation.getMemberValue(memberName);
-				if (memberValue == null) {
-					map.put(memberName, Optional.<MemberValue>empty());
-				} else {
-					map.put(memberName, Optional.of(memberValue));
-				}
+				map.put(memberName, Optional.ofNullable(memberValue));
 			}
 		}
 		return map;

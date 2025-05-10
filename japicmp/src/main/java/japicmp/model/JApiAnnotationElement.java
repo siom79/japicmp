@@ -103,6 +103,14 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibi
 		}
 	}
 
+	private static List<JApiAnnotationElementValue> getElementValues(MemberValue memberValue) {
+		JApiAnnotationElementValue elementValue = getMemberValue(memberValue);
+		if(elementValue.getType() == JApiAnnotationElementValue.Type.Array) {
+			return new ArrayList<>(elementValue.getValues());
+		}
+		return new ArrayList<>(Collections.singleton(elementValue));
+	}
+
 	@XmlAttribute(name = "name")
 	public String getName() {
 		return name;
@@ -127,31 +135,13 @@ public class JApiAnnotationElement implements JApiHasChangeStatus, JApiCompatibi
 	@XmlElementWrapper(name = "oldElementValues")
 	@XmlElement(name = "oldElementValue")
 	public List<JApiAnnotationElementValue> getOldElementValues() {
-		List<JApiAnnotationElementValue> values = new ArrayList<>();
-		if (this.oldValue.isPresent()) {
-			JApiAnnotationElementValue memberValue = getMemberValue(this.oldValue.get());
-			if (memberValue.getType() == JApiAnnotationElementValue.Type.Array) {
-				values.addAll(memberValue.getValues());
-			} else {
-				values.add(memberValue);
-			}
-		}
-		return values;
+		return this.oldValue.map(JApiAnnotationElement::getElementValues).orElseGet(ArrayList::new);
 	}
 
 	@XmlElementWrapper(name = "newElementValues")
 	@XmlElement(name = "newElementValue")
 	public List<JApiAnnotationElementValue> getNewElementValues() {
-		List<JApiAnnotationElementValue> values = new ArrayList<>();
-		if (this.newValue.isPresent()) {
-			JApiAnnotationElementValue memberValue = getMemberValue(this.newValue.get());
-			if (memberValue.getType() == JApiAnnotationElementValue.Type.Array) {
-				values.addAll(memberValue.getValues());
-			} else {
-				values.add(memberValue);
-			}
-		}
-		return values;
+		return this.newValue.map(JApiAnnotationElement::getElementValues).orElseGet(ArrayList::new);
 	}
 
 	@XmlAttribute

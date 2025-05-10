@@ -80,52 +80,26 @@ public class JApiMethod extends JApiBehavior {
 	}
 
 	public boolean hasSameReturnType(JApiMethod otherMethod) {
-		boolean haveSameReturnType = false;
 		JApiReturnType otherReturnType = otherMethod.getReturnType();
 		if (otherReturnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || otherReturnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 			if (this.returnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || this.returnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				if (otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType()) && otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {
-					haveSameReturnType = true;
-				}
+				return otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType())
+					&& otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType());
 			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.NEW) {
-				if (otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {
-					haveSameReturnType = true;
-				}
-			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				if (otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType())) {
-					haveSameReturnType = true;
-				}
+				return otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType());
 			}
-		} else if (otherReturnType.getChangeStatus() == JApiChangeStatus.NEW) {
-			if (this.returnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || this.returnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				if (otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {
-					haveSameReturnType = true;
-				}
-			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.NEW) {
-				if (otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType())) {
-					haveSameReturnType = true;
-				}
-			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				if (otherReturnType.getNewReturnType().equals(this.returnType.getOldReturnType())) {
-					haveSameReturnType = true;
-				}
-			}
-		} else {
-			if (this.returnType.getChangeStatus() == JApiChangeStatus.UNCHANGED || this.returnType.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-				if (otherReturnType.getOldReturnType().equals(this.returnType.getNewReturnType())) {
-					haveSameReturnType = true;
-				}
-			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.NEW) {
-				if (otherReturnType.getOldReturnType().equals(this.returnType.getNewReturnType())) {
-					haveSameReturnType = true;
-				}
-			} else if (this.returnType.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				if (otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType())) {
-					haveSameReturnType = true;
-				}
-			}
+			return otherReturnType.getOldReturnType().equals(returnType.getOldReturnType());
 		}
-		return haveSameReturnType;
+		if (otherReturnType.getChangeStatus() == JApiChangeStatus.NEW) {
+			if (this.returnType.getChangeStatus() == JApiChangeStatus.REMOVED) {
+				return otherReturnType.getNewReturnType().equals(this.returnType.getOldReturnType());
+			}
+			return otherReturnType.getNewReturnType().equals(this.returnType.getNewReturnType());
+		}
+		if (returnType.getChangeStatus() == JApiChangeStatus.REMOVED) {
+			return otherReturnType.getOldReturnType().equals(this.returnType.getOldReturnType());
+		}
+		return otherReturnType.getOldReturnType().equals(this.returnType.getNewReturnType());
 	}
 
 	public boolean hasSameSignature(JApiMethod jApiMethod) {
@@ -161,13 +135,7 @@ public class JApiMethod extends JApiBehavior {
 	}
 
 	public static String toString(Optional<CtMethod> method) {
-		if(method == null ) {
-			return OptionalHelper.N_A;
-		}
-		if(method.isPresent()) {
-			return method.get().getLongName();
-		}
-		return OptionalHelper.N_A;
+		return method.map(CtMethod::getLongName).orElse(OptionalHelper.N_A);
 	}
 
 	@Override

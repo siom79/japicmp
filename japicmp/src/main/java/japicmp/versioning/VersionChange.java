@@ -49,10 +49,7 @@ public class VersionChange {
 				for (int i=0; i<oldVersions.size(); i++) {
 					SemanticVersion oldVersion = oldVersions.get(i);
 					SemanticVersion newVersion = newVersions.get(i);
-					Optional<SemanticVersion.ChangeType> changeTypeOptional = oldVersion.computeChangeType(newVersion);
-					if (changeTypeOptional.isPresent()) {
-						changeTypes.add(changeTypeOptional.get());
-					}
+					oldVersion.computeChangeType(newVersion).ifPresent(changeTypes::add);
 				}
 				SemanticVersion.ChangeType maxRank = SemanticVersion.ChangeType.UNCHANGED;
 				for (SemanticVersion.ChangeType changeType : changeTypes) {

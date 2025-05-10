@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import japicmp.cmp.JarArchiveComparator;
+import java.util.function.Predicate;
 import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -18,26 +19,13 @@ public class JApiException implements JApiHasChangeStatus {
 	}
 
 	private boolean isCheckedException(Optional<CtClass> ctClassOptional, JarArchiveComparator jarArchiveComparator) throws OutOfMemoryError {
-		boolean checkedException = false;
-		if (ctClassOptional.isPresent()) {
-			boolean subClassOfException = false;
-			CtClass ctClass = ctClassOptional.get();
-			Optional<CtClass> exceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, Exception.class.getName());
-			if (exceptionOptional.isPresent()) {
-				if (ctClass.subclassOf(exceptionOptional.get())) {
-					subClassOfException = true;
-				}
-			}
-			if (subClassOfException) {
-				Optional<CtClass> runtimeExceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, RuntimeException.class.getName());
-				if (runtimeExceptionOptional.isPresent()) {
-					if (!ctClass.subclassOf(runtimeExceptionOptional.get())) {
-						checkedException = true;
-					}
-				}
-			}
-		}
-		return checkedException;
+		Predicate<CtClass> isException = x -> isSubclassOf(Exception.class, x, jarArchiveComparator);
+		Predicate<CtClass> isNotRuntimeException = x -> !isSubclassOf(RuntimeException.class, x, jarArchiveComparator);
+		return ctClassOptional.filter(isException.and(isNotRuntimeException)).isPresent();
+	}
+
+	private static boolean isSubclassOf(Class<?> clazz, CtClass ctClass, JarArchiveComparator jarArchiveComparator) {
+		return jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, clazz.getName()).map(ctClass::subclassOf).orElse(false);
 	}
 
 	@XmlAttribute(name = "name")

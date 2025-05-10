@@ -284,9 +284,7 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 			if (sb.length() > 0) {
 				sb.append(",");
 			}
-			if (value.getName().isPresent()) {
-				sb.append(value.getName().get()).append("=");
-			}
+			value.getName().ifPresent(name -> sb.append(name).append("="));
 			if (value.getType() != Type.Array && value.getType() != Type.Annotation) {
 				if (value.getType() == Type.Enum) {
 					sb.append(value.getFullyQualifiedName()).append(".").append(value.getValueString());
@@ -491,30 +489,22 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	}
 
 	private <T> String modifierAsString(JApiModifier<T> modifier, T notPrintValue) {
+		final Optional<T> oldModifier = modifier.getOldModifier().filter(x -> x != notPrintValue);
+		final Optional<T> newModifier = modifier.getNewModifier().filter(x -> x != notPrintValue);
 		if (modifier.getOldModifier().isPresent() && modifier.getNewModifier().isPresent()) {
 			if (modifier.getChangeStatus() == JApiChangeStatus.MODIFIED) {
 				return modifier.getNewModifier().get() + " (<- " + modifier.getOldModifier().get() + ") ";
 			} else if (modifier.getChangeStatus() == JApiChangeStatus.NEW) {
-				if (modifier.getNewModifier().get() != notPrintValue) {
-					return modifier.getNewModifier().get() + "(+) ";
-				}
+				return newModifier.map(x -> x + "(+) ").orElse("");
 			} else if (modifier.getChangeStatus() == JApiChangeStatus.REMOVED) {
-				if (modifier.getOldModifier().get() != notPrintValue) {
-					return modifier.getOldModifier().get() + "(-) ";
-				}
+				return oldModifier.map(x -> x + "(-) ").orElse("");
 			} else {
-				if (modifier.getNewModifier().get() != notPrintValue) {
-					return modifier.getNewModifier().get() + " ";
-				}
+				return newModifier.map(x -> x + " ").orElse("");
 			}
-		} else if (modifier.getOldModifier().isPresent()) {
-			if (modifier.getOldModifier().get() != notPrintValue) {
-				return modifier.getOldModifier().get() + "(-) ";
-			}
-		} else if (modifier.getNewModifier().isPresent()) {
-			if (modifier.getNewModifier().get() != notPrintValue) {
-				return modifier.getNewModifier().get() + "(+) ";
-			}
+		} else if (oldModifier.isPresent()) {
+			return oldModifier.get() + "(-) ";
+		} else if (newModifier.isPresent()) {
+			return newModifier.get() + "(+) ";
 		}
 		return "";
 	}
@@ -531,12 +521,9 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 			} else {
 				return type.getNewTypeOptional().get();
 			}
-		} else if (type.getOldTypeOptional().isPresent() && !type.getNewTypeOptional().isPresent()) {
-			return type.getOldTypeOptional().get();
-		} else if (!type.getOldTypeOptional().isPresent() && type.getNewTypeOptional().isPresent()) {
-			return type.getNewTypeOptional().get();
 		}
-		return "n.a.";
+		return type.getOldTypeOptional()
+			.orElseGet(() -> type.getNewTypeOptional().orElse("n.a."));
 	}
 
 	private void processSuperclassChanges(StringBuilder sb, JApiClass jApiClass) {
@@ -549,12 +536,9 @@ public class StdoutOutputGenerator extends OutputGenerator<String> {
 	private String superclassChangeAsString(JApiSuperclass jApiSuperclass) {
 		if (jApiSuperclass.getOldSuperclassName().isPresent() && jApiSuperclass.getNewSuperclassName().isPresent()) {
 			return jApiSuperclass.getNewSuperclassName().get() + " (<- " + jApiSuperclass.getOldSuperclassName().get() + ")";
-		} else if (jApiSuperclass.getOldSuperclassName().isPresent() && !jApiSuperclass.getNewSuperclassName().isPresent()) {
-			return jApiSuperclass.getOldSuperclassName().get();
-		} else if (!jApiSuperclass.getOldSuperclassName().isPresent() && jApiSuperclass.getNewSuperclassName().isPresent()) {
-			return jApiSuperclass.getNewSuperclassName().get();
 		}
-		return "n.a.";
+		return jApiSuperclass.getOldSuperclassName()
+			.orElseGet(() -> jApiSuperclass.getNewSuperclassName().orElse("n.a."));
 	}
 
 	private void processInterfaceChanges(StringBuilder sb, JApiClass jApiClass) {

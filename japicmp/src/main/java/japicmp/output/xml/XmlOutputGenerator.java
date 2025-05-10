@@ -53,17 +53,20 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 	}
 
 	public static List<File> writeToFiles(Options options, XmlOutput xmlOutput) {
+		return xmlOutput.getXmlOutputStream()
+			.flatMap(out -> options.getXmlOutputFile().map(file -> writeToFiles(out, file, xmlOutput)))
+			.orElseGet(ArrayList::new);
+	}
+
+	private static List<File> writeToFiles(ByteArrayOutputStream outputStream, String xmlOutputFile, XmlOutput xmlOutput) {
 		List<File> filesWritten = new ArrayList<>();
 		try {
-			if (xmlOutput.getXmlOutputStream().isPresent() && options.getXmlOutputFile().isPresent()) {
-				File xmlFile = new File(options.getXmlOutputFile().get());
-				try (FileOutputStream fos = new FileOutputStream(xmlFile)) {
-					ByteArrayOutputStream outputStream = xmlOutput.getXmlOutputStream().get();
-					outputStream.writeTo(fos);
-					filesWritten.add(xmlFile);
-				} catch (IOException e) {
-					throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to write XML file '" + xmlFile.getAbsolutePath() + "': " + e.getMessage(), e);
-				}
+			File xmlFile = new File(xmlOutputFile);
+			try (FileOutputStream fos = new FileOutputStream(xmlFile)) {
+				outputStream.writeTo(fos);
+				filesWritten.add(xmlFile);
+			} catch (IOException e) {
+				throw new JApiCmpException(JApiCmpException.Reason.IoException, "Failed to write XML file '" + xmlFile.getAbsolutePath() + "': " + e.getMessage(), e);
 			}
 		} finally {
 			try {
@@ -136,9 +139,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 		jApiCmpXmlRoot.setPackagesExclude(filtersAsString(options.getExcludes(), false));
 		jApiCmpXmlRoot.setIgnoreMissingClasses(options.getIgnoreMissingClasses().isIgnoreAllMissingClasses());
 		jApiCmpXmlRoot.setIgnoreMissingClassesByRegularExpressions(regExAsString(options.getIgnoreMissingClasses().getIgnoreMissingClassRegularExpression()));
-		if (xmlOutputGeneratorOptions.getTitle().isPresent()) {
-			jApiCmpXmlRoot.setTitle(xmlOutputGeneratorOptions.getTitle().get());
-		}
+		xmlOutputGeneratorOptions.getTitle().ifPresent(jApiCmpXmlRoot::setTitle);
 		jApiCmpXmlRoot.setSemanticVersioning(xmlOutputGeneratorOptions.getSemanticVersioningInformation());
 		return jApiCmpXmlRoot;
 	}
