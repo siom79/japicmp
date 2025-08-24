@@ -78,6 +78,8 @@ By using the available Ant task, you can also integrate japicmp into your Ant bu
 There is an online version of japicmp that lets you compare two artifacts from the maven central repository
 without installing the tool first. Just click [this](https://www.japicmp.de) link and give it a try.
 
+![japicmp-online](doc/japicmp_online.png)
+
 ## Motivation
 
 Every time you release a new version of a library or a product, you have to tell your clients or customers what
