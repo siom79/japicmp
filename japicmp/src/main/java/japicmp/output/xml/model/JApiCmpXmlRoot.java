@@ -120,13 +120,7 @@ public class JApiCmpXmlRoot {
 
 	@XmlAttribute
 	public String getTitle() {
-		String title;
-		if (this.titleOptional.isPresent()) {
-			title = this.titleOptional.get();
-		} else {
-			title = "JApiCmp-Report";
-		}
-		return title;
+		return this.titleOptional.orElse("JApiCmp-Report");
 	}
 
 	public void setTitle(String title) {

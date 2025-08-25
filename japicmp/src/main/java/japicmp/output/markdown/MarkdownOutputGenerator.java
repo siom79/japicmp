@@ -289,7 +289,7 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 
 	private String renderClassType(JApiClass clazz) {
 		final JApiClassType classType = clazz.getClassType();
-		return renderChange(classType, md.message.getClassType(classType.getOldTypeOptional()), md.message.getClassType(classType.getNewTypeOptional()));
+		return renderChange(classType, classType.getOldTypeOptional().map(md.message::getClassType).orElse(EMPTY), classType.getNewTypeOptional().map(md.message::getClassType).orElse(EMPTY));
 	}
 
 	private String renderClassSuperclass(JApiClass clazz) {
@@ -512,12 +512,8 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 	}
 
 	private String renderMemberValue(Optional<MemberValue> optionalValue) {
-		if (!optionalValue.isPresent()) {
-			return EMPTY;
-		}
-		final String fullValue = formatMemberValue(optionalValue.get(), false);
-		final String simpleValue = formatMemberValue(optionalValue.get(), true);
-		return renderCodeWithTooltip(fullValue, simpleValue);
+		return optionalValue.map(x -> renderCodeWithTooltip(formatMemberValue(x, false), formatMemberValue(x, true)))
+			.orElse(EMPTY);
 	}
 
 	private String renderReturnType(JApiMethod method) {

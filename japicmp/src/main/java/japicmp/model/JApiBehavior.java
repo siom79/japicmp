@@ -10,6 +10,7 @@ import javassist.Modifier;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ExceptionsAttribute;
 
+import javassist.bytecode.MethodInfo;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -127,37 +128,19 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 	}
 
 	private List<String> extractExceptions(Optional<? extends CtBehavior> methodOptional) {
-		if (methodOptional.isPresent()) {
-			ExceptionsAttribute exceptionsAttribute = null;
-			try {
-				exceptionsAttribute = methodOptional.get().getMethodInfo().getExceptionsAttribute();
-			} catch (NullPointerException ex) {
-				return Collections.emptyList();
-			}
-			String[] exceptions;
-			if (exceptionsAttribute != null && exceptionsAttribute.getExceptions() != null) {
-				exceptions = exceptionsAttribute.getExceptions();
-			} else {
-				exceptions = new String[0];
-			}
-			List<String> list = new ArrayList<>(exceptions.length);
-			Collections.addAll(list, exceptions);
-			return list;
-		} else {
-			return Collections.emptyList();
-		}
+		return methodOptional
+			.map(CtBehavior::getMethodInfo)
+			.map(MethodInfo::getExceptionsAttribute)
+			.map(ExceptionsAttribute::getExceptions)
+			.map(Arrays::asList)
+			.map(ArrayList::new)
+			.orElseGet(ArrayList::new);
 	}
 
 	private Optional<Integer> getLineNumber(Optional<? extends CtBehavior> methodOptional) {
-		Optional<Integer> lineNumberOptional = Optional.empty();
-		if (methodOptional.isPresent()) {
-			CtBehavior ctMethod = methodOptional.get();
-			int lineNumber = ctMethod.getMethodInfo().getLineNumber(0);
-			if (lineNumber >= 0) {
-				lineNumberOptional = Optional.of(lineNumber);
-			}
-		}
-		return lineNumberOptional;
+		return methodOptional.map(CtBehavior::getMethodInfo)
+			.map(info -> info.getLineNumber(0))
+			.filter(number -> number >= 0);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -227,42 +210,25 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 	}
 
 	protected JApiAttribute<SyntheticAttribute> extractSyntheticAttribute(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
-		JApiAttribute<SyntheticAttribute> jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
-		if (oldBehaviorOptional.isPresent() && newBehaviorOptional.isPresent()) {
-			CtBehavior oldBehavior = oldBehaviorOptional.get();
-			CtBehavior newBehavior = newBehaviorOptional.get();
-			byte[] attributeOldBehavior = oldBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
-			byte[] attributeNewBehavior = newBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
-			if (attributeOldBehavior != null && attributeNewBehavior != null) {
-				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
-			} else if (attributeOldBehavior != null) {
-				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
-			} else if (attributeNewBehavior != null) {
-				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.MODIFIED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
-			} else {
-				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
+		Optional<SyntheticAttribute> oldAttribute = oldBehaviorOptional.map(this::extractSyntheticAttribute);
+		Optional<SyntheticAttribute> newAttribute = newBehaviorOptional.map(this::extractSyntheticAttribute);
+		if (oldAttribute.isPresent() && newAttribute.isPresent()) {
+			if (oldAttribute.equals(newAttribute)) {
+				return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, oldAttribute, newAttribute);
 			}
-		} else {
-			if (oldBehaviorOptional.isPresent()) {
-				CtBehavior ctBehavior = oldBehaviorOptional.get();
-				byte[] attribute = ctBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
-				if (attribute != null) {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>empty());
-				} else {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.NON_SYNTHETIC), Optional.<SyntheticAttribute>empty());
-				}
-			}
-			if (newBehaviorOptional.isPresent()) {
-				CtBehavior ctBehavior = newBehaviorOptional.get();
-				byte[] attribute = ctBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
-				if (attribute != null) {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>empty(), Optional.of(SyntheticAttribute.SYNTHETIC));
-				} else {
-					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>empty(), Optional.of(SyntheticAttribute.NON_SYNTHETIC));
-				}
-			}
+			return new JApiAttribute<>(JApiChangeStatus.MODIFIED, oldAttribute, newAttribute);
 		}
-		return jApiAttribute;
+		if (oldAttribute.isPresent()) {
+			return new JApiAttribute<>(JApiChangeStatus.REMOVED, oldAttribute, Optional.empty());
+		}
+		if (newAttribute.isPresent()) {
+			return new JApiAttribute<>(JApiChangeStatus.NEW, Optional.empty(), newAttribute);
+		}
+		return new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
+	}
+
+	private SyntheticAttribute extractSyntheticAttribute(CtBehavior behavior) {
+		return behavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC) == null ? SyntheticAttribute.NON_SYNTHETIC : SyntheticAttribute.SYNTHETIC;
 	}
 
 	public boolean hasSameParameter(JApiMethod method) {

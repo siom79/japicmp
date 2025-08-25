@@ -209,22 +209,19 @@ public class CompatibilityChanges {
 		JApiSuperclass superclass = jApiClass.getSuperclass();
 		if (superclass.getNewSuperclassName().isPresent()) {
 			String newSuperclassName = superclass.getNewSuperclassName().get();
-			JApiClass foundClass = classMap.get(newSuperclassName);
-			if (foundClass == null) {
-				Optional<JApiClass> superclassJApiClassOptional = superclass.getJApiClass();
-				if (superclassJApiClassOptional.isPresent()) {
-					foundClass = superclassJApiClassOptional.get();
-				} else {
-					foundClass = loadClass(newSuperclassName, EnumSet.of(Classpath.NEW_CLASSPATH));
-					evaluate(Collections.singletonList(foundClass));
-				}
-				classMap.put(foundClass.getFullyQualifiedName(), foundClass);
-			}
+			superclass.getJApiClass().ifPresent(x -> classMap.putIfAbsent(newSuperclassName, x));
+			JApiClass foundClass = classMap.computeIfAbsent(newSuperclassName, this::loadAndEvaluate);
 			superclass.setJApiClass(foundClass);
 			T returnValue = onSuperclassCallback.callback(foundClass, classMap, superclass.getChangeStatus());
 			returnValues.add(returnValue);
 			forAllSuperclasses(foundClass, classMap, returnValues, onSuperclassCallback);
 		}
+	}
+
+	private JApiClass loadAndEvaluate(String className) {
+		JApiClass loaded = loadClass(className, EnumSet.of(Classpath.NEW_CLASSPATH));
+		evaluate(Collections.singletonList(loaded));
+		return loaded;
 	}
 
 	private enum Classpath {
@@ -284,15 +281,12 @@ public class CompatibilityChanges {
 	}
 
 	private boolean fieldTypeMatches(JApiField field1, JApiField field2) {
-		boolean matches = true;
-		JApiType type1 = field1.getType();
-		JApiType type2 = field2.getType();
-		if (type1.getNewTypeOptional().isPresent() && type2.getNewTypeOptional().isPresent()) {
-			if (!type1.getNewTypeOptional().get().equals(type2.getNewTypeOptional().get())) {
-				matches = false;
-			}
+		Optional<String> newType1 = field1.getType().getNewTypeOptional();
+		Optional<String> newType2 = field2.getType().getNewTypeOptional();
+		if (newType1.isPresent() && newType2.isPresent()) {
+			return newType1.equals(newType2);
 		}
-		return matches;
+		return true;
 	}
 
 	private void checkIfConstructorsHaveChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
@@ -318,7 +312,7 @@ public class CompatibilityChanges {
 	}
 
 	private static boolean isNotFinal(JApiClass jApiClass) {
-		return !(jApiClass.getFinalModifier().getNewModifier().isPresent() && jApiClass.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL);
+		return !jApiClass.getFinalModifier().getNewModifier().map(FinalModifier.FINAL::equals).orElse(false);
 	}
 
 	private void checkIfMethodsHaveChangedIncompatible(JApiClass jApiClass, Map<String, JApiClass> classMap) {
@@ -366,11 +360,9 @@ public class CompatibilityChanges {
 									return 1;
 								}
 							}
-							if (superMethod.getStaticModifier().getNewModifier().isPresent() && method.getStaticModifier().getNewModifier().isPresent()) {
-								if (superMethod.getStaticModifier().getNewModifier().get() == StaticModifier.NON_STATIC
-									&& method.getStaticModifier().getNewModifier().get() == StaticModifier.STATIC) {
-									return 2;
-								}
+							if (superMethod.getStaticModifier().getNewModifier().map(StaticModifier.NON_STATIC::equals).orElse(false) &&
+								method.getStaticModifier().getNewModifier().map(StaticModifier.STATIC::equals).orElse(false)) {
+								return 2;
 							}
 						}
 					}
@@ -391,8 +383,8 @@ public class CompatibilityChanges {
 			}
 			// section 13.4.17 of "Java Language Specification" SE7
 			if (isNotPrivate(method) && method.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
-				if ((jApiClass.getFinalModifier().getOldModifier().isPresent() && jApiClass.getFinalModifier().getOldModifier().get() != FinalModifier.FINAL) &&
-					!(method.getStaticModifier().getOldModifier().isPresent() && method.getStaticModifier().getOldModifier().get() == StaticModifier.STATIC)) {
+				if (jApiClass.getFinalModifier().getOldModifier().map(x -> x != FinalModifier.FINAL).orElse(false) &&
+					!method.getStaticModifier().getOldModifier().map(StaticModifier.STATIC::equals).orElse(false)) {
 					addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_NOW_FINAL);
 				}
 			}
@@ -401,10 +393,8 @@ public class CompatibilityChanges {
 				forAllSuperclasses(jApiClass, classMap, returnValues, (superclass, classMap1, changeStatusOfSuperclass) -> {
 					for (JApiMethod superMethod : superclass.getMethods()) {
 						if (areMatching(superMethod, method)) {
-							if (method.getFinalModifier().getOldModifier().isPresent()
-								&& method.getFinalModifier().getOldModifier().get() == FinalModifier.NON_FINAL
-								&& superMethod.getFinalModifier().getNewModifier().isPresent()
-								&& superMethod.getFinalModifier().getNewModifier().get() == FinalModifier.FINAL) {
+							if (method.getFinalModifier().getOldModifier().map(FinalModifier.NON_FINAL::equals).orElse(false)
+								&& superMethod.getFinalModifier().getNewModifier().map(FinalModifier.FINAL::equals).orElse(false)) {
 								addCompatibilityChange(superMethod, JApiCompatibilityChangeType.METHOD_NOW_FINAL);
 								return 1;
 							}
@@ -542,8 +532,8 @@ public class CompatibilityChanges {
 					}
 				} else if (method.getChangeStatus() == JApiChangeStatus.MODIFIED || method.getChangeStatus() == JApiChangeStatus.UNCHANGED) {
 					JApiModifier<AbstractModifier> abstractModifier = method.getAbstractModifier();
-					if (abstractModifier.getOldModifier().isPresent() && abstractModifier.getOldModifier().get() == AbstractModifier.ABSTRACT &&
-						abstractModifier.getNewModifier().isPresent() && abstractModifier.getNewModifier().get() == AbstractModifier.NON_ABSTRACT) {
+					if (abstractModifier.getOldModifier().map(AbstractModifier.ABSTRACT::equals).orElse(false) &&
+						abstractModifier.getNewModifier().map(AbstractModifier.NON_ABSTRACT::equals).orElse(false)) {
 						// method changed from abstract to default
 						addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_ABSTRACT_NOW_DEFAULT);
 					}
@@ -618,11 +608,7 @@ public class CompatibilityChanges {
 	}
 
 	private boolean isAbstract(JApiHasAbstractModifier jApiHasAbstractModifier) {
-		if (jApiHasAbstractModifier.getAbstractModifier().getNewModifier().isPresent()) {
-			AbstractModifier abstractModifier = jApiHasAbstractModifier.getAbstractModifier().getNewModifier().get();
-			return abstractModifier == AbstractModifier.ABSTRACT;
-		}
-		return false;
+		return jApiHasAbstractModifier.getAbstractModifier().getNewModifier().map(AbstractModifier.ABSTRACT::equals).orElse(false);
 	}
 
 	private void checkIfExceptionIsNowChecked(JApiBehavior behavior) {
@@ -637,19 +623,19 @@ public class CompatibilityChanges {
 	}
 
 	private boolean isClass(final JApiClass jApiClass) {
-		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.CLASS;
+		return jApiClass.getClassType().getNewTypeOptional().map(JApiClassType.ClassType.CLASS::equals).orElse(false);
 	}
 
 	private boolean isInterface(final JApiClass jApiClass) {
-		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.INTERFACE;
+		return jApiClass.getClassType().getNewTypeOptional().map(JApiClassType.ClassType.INTERFACE::equals).orElse(false);
 	}
 
 	private boolean isAnnotation(final JApiClass jApiClass) {
-		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ANNOTATION;
+		return jApiClass.getClassType().getNewTypeOptional().map(JApiClassType.ClassType.ANNOTATION::equals).orElse(false);
 	}
 
 	private boolean isEnum(final JApiClass jApiClass) {
-		return jApiClass.getClassType().getNewTypeOptional().isPresent() && jApiClass.getClassType().getNewTypeOptional().get() == JApiClassType.ClassType.ENUM;
+		return jApiClass.getClassType().getNewTypeOptional().map(JApiClassType.ClassType.ENUM::equals).orElse(false);
 	}
 
 	private void checkIfMethodHasBeenPulledUp(JApiClass jApiClass, Map<String, JApiClass> classMap, final JApiMethod method, List<Integer> returnValues) {
@@ -693,11 +679,7 @@ public class CompatibilityChanges {
 				}
 			}
 
-			if (aClass.getSuperclass() != null && aClass.getSuperclass().getJApiClass().isPresent()) {
-				aClass = aClass.getSuperclass().getJApiClass().get();
-			} else {
-				aClass = null;
-			}
+			aClass = Optional.ofNullable(aClass.getSuperclass()).flatMap(JApiSuperclass::getJApiClass).orElse(null);
 		}
 		return false;
 	}
@@ -777,15 +759,11 @@ public class CompatibilityChanges {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.FIELD_REMOVED_IN_SUPERCLASS);
 			}
 			if (superclass.getOldSuperclassName().isPresent() && superclass.getNewSuperclassName().isPresent()) {
-				if (!superclass.getOldSuperclassName().get().equals(superclass.getNewSuperclassName().get())) {
-					boolean superClassChangedToObject = false;
-					boolean superClassChangedFromObject = false;
-					if (!superclass.getOldSuperclassName().get().equals("java.lang.Object") && superclass.getNewSuperclassName().get().equals("java.lang.Object")) {
-						superClassChangedToObject = true;
-					}
-					if (superclass.getOldSuperclassName().get().equals("java.lang.Object") && !superclass.getNewSuperclassName().get().equals("java.lang.Object")) {
-						superClassChangedFromObject = true;
-					}
+				if (!superclass.getOldSuperclassName().equals(superclass.getNewSuperclassName())) {
+					String oldSuperclassName = superclass.getOldSuperclassName().get();
+					String newSuperclassName = superclass.getNewSuperclassName().get();
+					boolean superClassChangedToObject = !oldSuperclassName.equals("java.lang.Object") && newSuperclassName.equals("java.lang.Object");
+					boolean superClassChangedFromObject = oldSuperclassName.equals("java.lang.Object") && !newSuperclassName.equals("java.lang.Object");
 					if (superClassChangedToObject) {
 						addCompatibilityChange(superclass, JApiCompatibilityChangeType.SUPERCLASS_REMOVED);
 					} else if (superClassChangedFromObject) {
@@ -796,7 +774,7 @@ public class CompatibilityChanges {
 						final List<JApiSuperclass> matchingAncestors = new ArrayList<>();
 						forAllSuperclasses(jApiClass, classMap, ancestors, (clazz, classMap12, changeStatusOfSuperclass) -> {
 							JApiSuperclass ancestor = clazz.getSuperclass();
-							if (ancestor.getNewSuperclassName().isPresent() && ancestor.getNewSuperclassName().get().equals(superclass.getOldSuperclassName().get())) {
+							if (ancestor.getNewSuperclassName().filter(oldSuperclassName::equals).isPresent()) {
 								matchingAncestors.add(ancestor);
 							}
 							return ancestor;
@@ -912,14 +890,9 @@ public class CompatibilityChanges {
 						}
 						if (!isImplemented) {
 							if (jApiMethod.getChangeStatus() == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.NEW || changeStatusOfSuperclass == JApiChangeStatus.MODIFIED) {
-								if (jApiMethod.getAbstractModifier().getNewModifier().isPresent()) {
-									AbstractModifier abstractModifier = jApiMethod.getAbstractModifier().getNewModifier().get();
-									if (abstractModifier == AbstractModifier.ABSTRACT) {
-										abstractMethods.add(jApiMethod);
-									} else {
-										defaultMethods.add(jApiMethod);
-									}
-								}
+								jApiMethod.getAbstractModifier().getNewModifier()
+									.map(x -> x == AbstractModifier.ABSTRACT ? abstractMethods : defaultMethods)
+									.ifPresent(methods -> methods.add(jApiMethod));
 							}
 						}
 					}
@@ -944,14 +917,9 @@ public class CompatibilityChanges {
 					}
 					if (!isImplemented) {
 						if (interfaceMethod.getChangeStatus() == JApiChangeStatus.NEW || jApiImplementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
-							if (interfaceMethod.getAbstractModifier().getNewModifier().isPresent()) {
-								AbstractModifier abstractModifier = interfaceMethod.getAbstractModifier().getNewModifier().get();
-								if (abstractModifier == AbstractModifier.ABSTRACT) {
-									abstractMethods.add(interfaceMethod);
-								} else {
-									defaultMethods.add(interfaceMethod);
-								}
-							}
+							interfaceMethod.getAbstractModifier().getNewModifier()
+								.map(x -> x == AbstractModifier.ABSTRACT ? abstractMethods : defaultMethods)
+								.ifPresent(methods -> methods.add(interfaceMethod));
 						}
 					}
 				}
@@ -1004,12 +972,8 @@ public class CompatibilityChanges {
 	private void checkIfClassNowCheckedException(JApiClass jApiClass) {
 		JApiSuperclass jApiClassSuperclass = jApiClass.getSuperclass();
 		if (jApiClassSuperclass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
-			if (jApiClassSuperclass.getNewSuperclassName().isPresent()) {
-				String fqn = jApiClassSuperclass.getNewSuperclassName().get();
-				if ("java.lang.Exception".equals(fqn)) {
-					addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NOW_CHECKED_EXCEPTION);
-				}
-			}
+			jApiClassSuperclass.getNewSuperclassName().filter("java.lang.Exception"::equals)
+				.ifPresent(fqn -> addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NOW_CHECKED_EXCEPTION));
 		}
 	}
 

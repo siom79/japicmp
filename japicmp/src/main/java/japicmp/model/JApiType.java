@@ -44,12 +44,9 @@ public class JApiType implements JApiHasChangeStatus {
 	}
 
 	public boolean hasChanged() {
-		boolean hasChanged = false;
 		if (oldTypeOptional.isPresent() && newTypeOptional.isPresent()) {
-			if (!oldTypeOptional.get().equals(newTypeOptional.get())) {
-				hasChanged = true;
-			}
+			return !oldTypeOptional.equals(newTypeOptional);
 		}
-		return hasChanged;
+		return false;
 	}
 }
