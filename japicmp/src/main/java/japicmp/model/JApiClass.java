@@ -832,6 +832,30 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return list;
 	}
 
+	public boolean isOldClassExtendable() {
+		boolean isFinal = false;
+		if (finalModifier.getOldModifier().isPresent()) {
+			isFinal = finalModifier.getOldModifier().get().equals(FinalModifier.FINAL);
+		}
+		boolean allConstructorsPrivate = !getConstructors().isEmpty() && getConstructors()
+			.stream()
+			.allMatch(c -> c.getAccessModifier().getOldModifier().isPresent() &&
+				c.getAccessModifier().getOldModifier().get().getLevel() == AccessModifier.PRIVATE.getLevel());
+		return !isFinal && !allConstructorsPrivate;
+	}
+
+	public boolean isNewClassExtendable() {
+		boolean isFinal = false;
+		if (finalModifier.getNewModifier().isPresent()) {
+			isFinal = finalModifier.getNewModifier().get().equals(FinalModifier.FINAL);
+		}
+		boolean allConstructorsPrivate = !getConstructors().isEmpty() && getConstructors()
+			.stream()
+			.allMatch(c -> c.getAccessModifier().getNewModifier().isPresent() &&
+				c.getAccessModifier().getNewModifier().get().getLevel() == AccessModifier.PRIVATE.getLevel());
+		return !isFinal && !allConstructorsPrivate;
+	}
+
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {

@@ -13,7 +13,7 @@ public enum JApiCompatibilityChangeType {
 	ANNOTATION_REMOVED(true, true, JApiSemanticVersionLevel.PATCH),
 	CLASS_REMOVED(false, false, JApiSemanticVersionLevel.MAJOR),
 	CLASS_NOW_ABSTRACT(false, false, JApiSemanticVersionLevel.MAJOR),
-	CLASS_NOW_FINAL(false, false, JApiSemanticVersionLevel.MAJOR),
+	CLASS_NOW_NOT_EXTENDABLE(false, false, JApiSemanticVersionLevel.MAJOR),
 	CLASS_NO_LONGER_PUBLIC(false, false, JApiSemanticVersionLevel.MAJOR),
 	CLASS_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),
 	CLASS_NOW_CHECKED_EXCEPTION(true, false, JApiSemanticVersionLevel.MINOR),

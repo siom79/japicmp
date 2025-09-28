@@ -43,13 +43,10 @@ public class CompatibilityChanges {
 		if (jApiClass.getChangeStatus() == JApiChangeStatus.REMOVED) {
 			addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_REMOVED);
 		} else if (jApiClass.getChangeStatus() == JApiChangeStatus.MODIFIED) {
+			checkIfClassIsNotExtendable(jApiClass);
 			// section 13.4.1 of "Java Language Specification" SE7
 			if (jApiClass.getAbstractModifier().hasChangedFromTo(AbstractModifier.NON_ABSTRACT, AbstractModifier.ABSTRACT)) {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NOW_ABSTRACT);
-			}
-			// section 13.4.2 of "Java Language Specification" SE7
-			if (jApiClass.getFinalModifier().hasChangedFromTo(FinalModifier.NON_FINAL, FinalModifier.FINAL)) {
-				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NOW_FINAL);
 			}
 			// section 13.4.3 of "Java Language Specification" SE7
 			if (jApiClass.getAccessModifier().hasChangedFrom(AccessModifier.PUBLIC)) {
@@ -70,6 +67,12 @@ public class CompatibilityChanges {
 		}
 		if (jApiClass.getChangeStatus().isNotNewOrRemoved()) {
 			checkIfGenericTemplatesHaveChanged(jApiClass);
+		}
+	}
+
+	private void checkIfClassIsNotExtendable(JApiClass jApiClass) {
+		if (jApiClass.isOldClassExtendable() && !jApiClass.isNewClassExtendable()) {
+			addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.CLASS_NOW_NOT_EXTENDABLE);
 		}
 	}
 
