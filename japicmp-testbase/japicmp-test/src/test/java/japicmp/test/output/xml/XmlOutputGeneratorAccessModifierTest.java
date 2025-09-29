@@ -66,7 +66,7 @@ public class XmlOutputGeneratorAccessModifierTest {
 	@Test
 	public void publicFilterAccessModifierChangesBelowPublicVisible() {
 		Elements divForClass = XmlHelper.getDivForClass(documentPublic, replaceLastDotWith$(AccessModifierLevel.AccessModifierChangesBelowPublic.class.getCanonicalName()));
-		assertThat(divForClass.isEmpty(), is(true));
+		assertThat(divForClass.isEmpty(), is(false));
 	}
 
 	@Test

@@ -2,16 +2,7 @@ package japicmp.output;
 
 import com.google.common.collect.ImmutableList;
 import japicmp.config.Options;
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiAnnotation;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiConstructor;
-import japicmp.model.JApiField;
-import japicmp.model.JApiHasAnnotations;
-import japicmp.model.JApiImplementedInterface;
-import japicmp.model.JApiMethod;
-import japicmp.model.JApiSuperclass;
+import japicmp.model.*;
 import japicmp.util.ModifierHelper;
 
 import java.util.Collections;
@@ -198,19 +189,23 @@ public class OutputFilter extends Filter {
 
 					@Override
 					public void visit(Iterator<JApiMethod> iterator, JApiMethod jApiMethod) {
-						if (jApiMethod.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-							builder.add(Boolean.TRUE);
-						} else {
-							evaluateAnnotations(jApiMethod);
+						if (ModifierHelper.matchesModifierLevel(jApiMethod, OutputFilter.this.options.getAccessModifier())) {
+							if (jApiMethod.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+								builder.add(Boolean.TRUE);
+							} else {
+								evaluateAnnotations(jApiMethod);
+							}
 						}
 					}
 
 					@Override
 					public void visit(Iterator<JApiConstructor> iterator, JApiConstructor jApiConstructor) {
-						if (jApiConstructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-							builder.add(Boolean.TRUE);
-						} else {
-							evaluateAnnotations(jApiConstructor);
+						if (ModifierHelper.matchesModifierLevel(jApiConstructor, OutputFilter.this.options.getAccessModifier())) {
+							if (jApiConstructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+								builder.add(Boolean.TRUE);
+							} else {
+								evaluateAnnotations(jApiConstructor);
+							}
 						}
 					}
 
@@ -223,10 +218,12 @@ public class OutputFilter extends Filter {
 
 					@Override
 					public void visit(Iterator<JApiField> iterator, JApiField jApiField) {
-						if (jApiField.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-							builder.add(Boolean.TRUE);
-						} else {
-							evaluateAnnotations(jApiField);
+						if (ModifierHelper.matchesModifierLevel(jApiField, OutputFilter.this.options.getAccessModifier())) {
+							if (jApiField.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+								builder.add(Boolean.TRUE);
+							} else {
+								evaluateAnnotations(jApiField);
+							}
 						}
 					}
 
