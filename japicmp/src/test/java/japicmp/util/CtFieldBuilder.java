@@ -4,6 +4,7 @@ import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.Modifier;
+import javassist.bytecode.AccessFlag;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
@@ -82,18 +83,17 @@ public class CtFieldBuilder {
 	}
 
 	public CtFieldBuilder privateAccess() {
-		this.modifier = this.modifier & ~Modifier.PUBLIC;
-		this.modifier = this.modifier | Modifier.PRIVATE;
+		this.modifier = AccessFlag.setPrivate(this.modifier);
 		return this;
 	}
 
 	public CtFieldBuilder packageProtectedAccess() {
-		this.modifier = this.modifier & ~Modifier.PUBLIC;
+		this.modifier = AccessFlag.setPackage(this.modifier);
 		return this;
 	}
 
 	public CtFieldBuilder protectedAccess() {
-		this.modifier = this.modifier & ~Modifier.PROTECTED;
+		this.modifier = AccessFlag.setProtected(this.modifier);
 		return this;
 	}
 

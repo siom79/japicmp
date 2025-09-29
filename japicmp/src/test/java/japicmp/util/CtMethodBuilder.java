@@ -68,6 +68,10 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return (CtMethodBuilder) super.protectedAccess();
 	}
 
+	public CtMethodBuilder packageProtectedAccess() {
+		return (CtMethodBuilder) super.packageProtectedAccess();
+	}
+
 	public CtMethodBuilder staticAccess() {
 		return (CtMethodBuilder) super.staticAccess();
 	}
