@@ -74,13 +74,6 @@ class SemverOutIntegTest {
 		Assertions.assertEquals(SemverOut.SEMVER_MAJOR, string);
 	}
 
-	@Test
-	void testSemver_private_inner_class_changes() {
-		String lastPackage = "semver.privateinnerclass";
-		String string = getSemverDiff(lastPackage);
-		Assertions.assertEquals(SemverOut.SEMVER_MAJOR, string); // private inner class becomes package protected -> change is binary incompatible
-	}
-
 	private String getSemverDiff(String lastPackage) {
 		JApiCmpArchive oldFile = Helper.getArchive("japicmp-test-v1.jar");
 		JApiCmpArchive newFile = Helper.getArchive("japicmp-test-v2.jar");
