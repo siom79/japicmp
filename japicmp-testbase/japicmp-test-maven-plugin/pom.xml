@@ -389,7 +389,7 @@
 										<semanticVersionLevel>PATCH</semanticVersionLevel>
 									</overrideCompatibilityChangeParameter>
 									<overrideCompatibilityChangeParameter>
-										<compatibilityChange>CLASS_NOW_FINAL</compatibilityChange>
+										<compatibilityChange>CLASS_NOW_NOT_EXTENDABLE</compatibilityChange>
 										<binaryCompatible>true</binaryCompatible>
 										<sourceCompatible>true</sourceCompatible>
 										<semanticVersionLevel>PATCH</semanticVersionLevel>

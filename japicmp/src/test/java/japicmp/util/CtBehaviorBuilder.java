@@ -2,6 +2,7 @@ package japicmp.util;
 
 import javassist.CtClass;
 import javassist.Modifier;
+import javassist.bytecode.AccessFlag;
 
 public abstract class CtBehaviorBuilder {
 	protected int modifier = 0;
@@ -32,17 +33,22 @@ public abstract class CtBehaviorBuilder {
 	}
 
 	public CtBehaviorBuilder publicAccess() {
-		this.modifier = this.modifier | Modifier.PUBLIC;
+		this.modifier = AccessFlag.setPublic(this.modifier);
 		return this;
 	}
 
 	public CtBehaviorBuilder privateAccess() {
-		this.modifier = this.modifier | Modifier.PRIVATE;
+		this.modifier = AccessFlag.setPrivate(this.modifier);
 		return this;
 	}
 
 	public CtBehaviorBuilder protectedAccess() {
-		this.modifier = this.modifier | Modifier.PROTECTED;
+		this.modifier = AccessFlag.setProtected(this.modifier);
+		return this;
+	}
+
+	public CtBehaviorBuilder packageProtectedAccess() {
+		this.modifier = AccessFlag.setPackage(this.modifier);
 		return this;
 	}
 

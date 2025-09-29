@@ -16,6 +16,7 @@ import java.util.List;
 import static japicmp.util.Helper.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsNot.not;
 
 class CompatibilityChangesTest {
@@ -84,8 +85,35 @@ class CompatibilityChangesTest {
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
-		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_NOW_FINAL)));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_NOW_NOT_EXTENDABLE)));
 		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
+	}
+
+	@Test
+	void testClassNowOnlyPrivateConstructors() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws CannotCompileException {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().publicAccess().parameter(CtClass.intType).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws CannotCompileException {
+				CtClass ctClass = CtClassBuilder.create().finalModifier().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().privateAccess().parameter(CtClass.intType).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_NOW_NOT_EXTENDABLE)));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(false));
 	}
 
 	@Test
@@ -2779,5 +2807,61 @@ class CompatibilityChangesTest {
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
 		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
 		assertThat(jApiField.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.ANNOTATION_MODIFIED)));
+	}
+
+	@Test
+	void testClassNotExtendablePrivateConstructorsProtectedMethodToPackagePrivate() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().privateAccess().addToClass(aClass);
+				CtFieldBuilder.create().protectedAccess().name("field").addToClass(aClass);
+				CtMethodBuilder.create().protectedAccess().name("method").addToClass(aClass);
+				return Collections.singletonList(aClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().privateAccess().addToClass(aClass);
+				CtFieldBuilder.create().packageProtectedAccess().name("field").addToClass(aClass);
+				CtMethodBuilder.create().packageProtectedAccess().name("method").addToClass(aClass);
+				return Collections.singletonList(aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
+		assertThat(jApiField.getCompatibilityChanges(), hasSize(0));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasSize(0));
+	}
+
+	@Test
+	void testClassNotExtendableFinalProtectedMethodToPackagePrivate() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass aClass = CtClassBuilder.create().finalModifier().name("japicmp.Test").addToClassPool(classPool);
+				CtFieldBuilder.create().protectedAccess().name("field").addToClass(aClass);
+				CtMethodBuilder.create().protectedAccess().name("method").addToClass(aClass);
+				return Collections.singletonList(aClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass aClass = CtClassBuilder.create().finalModifier().name("japicmp.Test").addToClassPool(classPool);
+				CtFieldBuilder.create().packageProtectedAccess().name("field").addToClass(aClass);
+				CtMethodBuilder.create().packageProtectedAccess().name("method").addToClass(aClass);
+				return Collections.singletonList(aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
+		assertThat(jApiField.getCompatibilityChanges(), hasSize(0));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getCompatibilityChanges(), hasSize(0));
 	}
 }

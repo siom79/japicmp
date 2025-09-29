@@ -185,15 +185,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField), options);
 					enhanceGenericTypeToField(oldField, jApiField.getOldGenericTypes());
 					enhanceGenericTypeToField(newField, jApiField.getNewGenericTypes());
-					if (includeField(jApiField)) {
-						fields.add(jApiField);
-					}
+					fields.add(jApiField);
 				} else {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.REMOVED, Optional.of(oldField), Optional.<CtField>empty(), options);
 					enhanceGenericTypeToField(oldField, jApiField.getOldGenericTypes());
-					if (includeField(jApiField)) {
-						fields.add(jApiField);
-					}
+					fields.add(jApiField);
 				}
 			}
 			for (CtField newField : newFieldsMap.values()) {
@@ -201,9 +197,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				if (oldField == null) {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.NEW, Optional.<CtField>empty(), Optional.of(newField), options);
 					enhanceGenericTypeToField(newField, jApiField.getNewGenericTypes());
-					if (includeField(jApiField)) {
-						fields.add(jApiField);
-					}
+					fields.add(jApiField);
 				}
 			}
 		} else {
@@ -212,9 +206,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				for (CtField field : fieldMap.values()) {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.REMOVED, Optional.of(field), Optional.<CtField>empty(), options);
 					enhanceGenericTypeToField(field, jApiField.getOldGenericTypes());
-					if (includeField(jApiField)) {
-						fields.add(jApiField);
-					}
+					fields.add(jApiField);
 				}
 			}
 			if (newClassOptional.isPresent()) {
@@ -222,9 +214,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				for (CtField field : fieldMap.values()) {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.NEW, Optional.<CtField>empty(), Optional.of(field), options);
 					enhanceGenericTypeToField(field, jApiField.getNewGenericTypes());
-					if (includeField(jApiField)) {
-						fields.add(jApiField);
-					}
+					fields.add(jApiField);
 				}
 			}
 		}
@@ -239,10 +229,6 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				SignatureParser.copyGenericParameters(parsedParameter, genericTypes);
 			}
 		}
-	}
-
-	private boolean includeField(JApiField jApiField) {
-		return ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier());
 	}
 
 	private Map<String, CtField> buildFieldMap(CtClass ctClass) {
@@ -405,26 +391,20 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				if (newMethodsWithSameName == null) {
 					JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>empty(), jarArchiveComparator);
 					addParametersToMethod(methodDescriptorParser, jApiMethod);
-					if (includeMethod(jApiMethod)) {
-						methods.add(jApiMethod);
-					}
+					methods.add(jApiMethod);
 				} else {
 					Optional<CtMethod> matchingMethodOptional = findMatchingMethod(oldMethod, newMethodsWithSameName);
 					if (matchingMethodOptional.isPresent()) {
 						CtMethod matchingMethod = matchingMethodOptional.get();
 						JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(oldMethod), Optional.of(matchingMethod), jarArchiveComparator);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
-						if (includeMethod(jApiMethod)) {
-							methods.add(jApiMethod);
-						}
+						methods.add(jApiMethod);
 						oldMethodsWithSameNameIterator.remove();
 						newMethodsWithSameName.remove(matchingMethod);
 					} else {
 						JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>empty(), jarArchiveComparator);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
-						if (includeMethod(jApiMethod)) {
-							methods.add(jApiMethod);
-						}
+						methods.add(jApiMethod);
 					}
 				}
 			}
@@ -437,24 +417,18 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				if (methodsWithSameName == null) {
 					JApiMethod jApiMethod = new JApiMethod(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>empty(), Optional.of(ctMethod), jarArchiveComparator);
 					addParametersToMethod(methodDescriptorParser, jApiMethod);
-					if (includeMethod(jApiMethod)) {
-						methods.add(jApiMethod);
-					}
+					methods.add(jApiMethod);
 				} else {
 					Optional<CtMethod> matchingMethodOptional = findMatchingMethod(ctMethod, methodsWithSameName);
 					if (matchingMethodOptional.isPresent()) {
 						CtMethod matchingMethod = matchingMethodOptional.get();
 						JApiMethod jApiMethod = new JApiMethod(jApiClass, ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(matchingMethod), jarArchiveComparator);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
-						if (includeMethod(jApiMethod)) {
-							methods.add(jApiMethod);
-						}
+						methods.add(jApiMethod);
 					} else {
 						JApiMethod jApiMethod = new JApiMethod(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>empty(), Optional.of(ctMethod), jarArchiveComparator);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
-						if (includeMethod(jApiMethod)) {
-							methods.add(jApiMethod);
-						}
+						methods.add(jApiMethod);
 					}
 				}
 			}
@@ -516,10 +490,6 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 	}
 
-	private boolean includeMethod(JApiMethod jApiMethod) {
-		return ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier());
-	}
-
 	private void sortConstructorsIntoLists(JApiClass jApiClass, Map<String, CtConstructor> oldConstructorsMap, Map<String, CtConstructor> newConstructorsMap) {
 		SignatureParser methodDescriptorParser = new SignatureParser();
 		for (CtConstructor ctMethod : oldConstructorsMap.values()) {
@@ -529,15 +499,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (foundMethod == null) {
 				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>empty(), jarArchiveComparator);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
-				if (includeConstructor(jApiConstructor)) {
-					constructors.add(jApiConstructor);
-				}
+				constructors.add(jApiConstructor);
 			} else {
 				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod), jarArchiveComparator);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
-				if (includeConstructor(jApiConstructor)) {
-					constructors.add(jApiConstructor);
-				}
+				constructors.add(jApiConstructor);
 			}
 		}
 		for (CtConstructor ctMethod : newConstructorsMap.values()) {
@@ -547,15 +513,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			if (foundMethod == null) {
 				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>empty(), Optional.of(ctMethod), jarArchiveComparator);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
-				if (includeConstructor(jApiConstructor)) {
-					constructors.add(jApiConstructor);
-				}
+				constructors.add(jApiConstructor);
 			}
 		}
-	}
-
-	private boolean includeConstructor(JApiConstructor jApiConstructor) {
-		return ModifierHelper.matchesModifierLevel(jApiConstructor, options.getAccessModifier());
 	}
 
 	private void addParametersToMethod(SignatureParser methodDescriptorParser, JApiBehavior jApiBehavior) {
@@ -830,6 +790,30 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		List<JApiAttribute<? extends Enum<?>>> list = new ArrayList<>();
 		list.add(this.syntheticAttribute);
 		return list;
+	}
+
+	public boolean isOldClassExtendable() {
+		boolean isFinal = false;
+		if (finalModifier.getOldModifier().isPresent()) {
+			isFinal = finalModifier.getOldModifier().get().equals(FinalModifier.FINAL);
+		}
+		boolean allConstructorsPrivate = !getConstructors().isEmpty() && getConstructors()
+			.stream()
+			.allMatch(c -> c.getAccessModifier().getOldModifier().isPresent() &&
+				c.getAccessModifier().getOldModifier().get().getLevel() == AccessModifier.PRIVATE.getLevel());
+		return !isFinal && !allConstructorsPrivate;
+	}
+
+	public boolean isNewClassExtendable() {
+		boolean isFinal = false;
+		if (finalModifier.getNewModifier().isPresent()) {
+			isFinal = finalModifier.getNewModifier().get().equals(FinalModifier.FINAL);
+		}
+		boolean allConstructorsPrivate = !getConstructors().isEmpty() && getConstructors()
+			.stream()
+			.allMatch(c -> c.getAccessModifier().getNewModifier().isPresent() &&
+				c.getAccessModifier().getNewModifier().get().getLevel() == AccessModifier.PRIVATE.getLevel());
+		return !isFinal && !allConstructorsPrivate;
 	}
 
 	@Override
