@@ -748,7 +748,7 @@ public class CompatibilityChanges {
 					);
 				}
 				for (JApiMethod jApiMethod : superclass1.getMethods()) {
-					if (jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED && !isImplemented(jApiMethod, jApiMethod.getjApiClass())) {
+					if (hasToBeEvaluated(jApiMethod) && jApiMethod.getChangeStatus() == JApiChangeStatus.REMOVED && !isImplemented(jApiMethod, jApiMethod.getjApiClass())) {
 						boolean implemented = false;
 						for (JApiMethod implementedMethod : implementedMethods) {
 							if (jApiMethod.getName().equals(implementedMethod.getName()) && jApiMethod.hasSameSignature(implementedMethod)) {
@@ -762,7 +762,7 @@ public class CompatibilityChanges {
 					}
 				}
 				for (JApiField jApiField : superclass1.getFields()) {
-					if (jApiField.getChangeStatus() == JApiChangeStatus.REMOVED) {
+					if (hasToBeEvaluated(jApiField) && jApiField.getChangeStatus() == JApiChangeStatus.REMOVED) {
 						boolean overridden = false;
 						for (JApiField field : fields) {
 							if (field.getName().equals(jApiField.getName()) && hasSameType(jApiField, field)) {
