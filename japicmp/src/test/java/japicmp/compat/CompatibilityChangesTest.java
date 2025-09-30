@@ -2864,4 +2864,35 @@ class CompatibilityChangesTest {
 		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
 		assertThat(jApiMethod.getCompatibilityChanges(), hasSize(0));
 	}
+
+	@Test
+	void testPrivateFieldAndMethodRemovedInSuperclass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass aSuperClass = CtClassBuilder.create().finalModifier().name("japicmp.Superclass").addToClassPool(classPool);
+				CtFieldBuilder.create().privateAccess().name("field").addToClass(aSuperClass);
+				CtMethodBuilder.create().privateAccess().name("method").addToClass(aSuperClass);
+				CtClass aClass = CtClassBuilder.create().finalModifier().name("japicmp.Test").withSuperclass(aSuperClass).addToClassPool(classPool);
+				return Arrays.asList(aSuperClass, aClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass aSuperClass = CtClassBuilder.create().finalModifier().name("japicmp.Superclass").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().finalModifier().name("japicmp.Test").withSuperclass(aSuperClass).addToClassPool(classPool);
+				return Arrays.asList(aSuperClass, aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Superclass");
+		JApiField jApiField = getJApiField(jApiClass.getFields(), "field");
+		assertThat(jApiField.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getCompatibilityChanges(), hasSize(0));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
 }
