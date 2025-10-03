@@ -161,6 +161,15 @@ python3 release.py --release-version <release-version> --old-version <old-versio
 	* Close and release staging repository if sanity checks are successful.
 * Update maven site report with [Action](https://github.com/siom79/japicmp/actions/workflows/mvn-site.yml)
 
+If the release fails, the version must be reverted and the tag created during the release has to be deleted:
+```bash
+mvn versions:set -DnewVersion=<new-version>-SNAPSHOT
+mvn versions:commit
+git push
+git push --delete origin japicmp-base-<new-version>
+```
+Afterward, the release action can be executed again.
+
 ## Contributions
 
 Pull requests are welcome, but please follow these rules:
