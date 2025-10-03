@@ -4,7 +4,7 @@
 
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-base</artifactId>
-	<version>0.23.2-SNAPSHOT</version>
+	<version>0.24.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>japicmp-base</name>
@@ -285,6 +285,15 @@
 					</configuration>
 				</plugin>
 				<plugin>
+					<groupId>org.sonatype.central</groupId>
+					<artifactId>central-publishing-maven-plugin</artifactId>
+					<version>0.9.0</version>
+					<extensions>true</extensions>
+					<configuration>
+						<publishingServerId>ossrh</publishingServerId>
+					</configuration>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>3.4.1</version>
@@ -551,22 +560,12 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
-
-	<repositories>
-		<repository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>
