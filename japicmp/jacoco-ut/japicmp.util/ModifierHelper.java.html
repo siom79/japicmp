@@ -77,7 +77,7 @@ public class ModifierHelper {
 <span class="fc" id="L77">				return true;</span>
 			}
 <span class="pc bpc" id="L79" title="2 of 4 branches missed.">		} else if (accessModifier.getOldModifier().isPresent() &amp;&amp; !accessModifier.getNewModifier().isPresent()) {</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">			if (accessModifier.getOldModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel()) {</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">			if (accessModifier.getOldModifier().get().getLevel() &gt; AccessModifier.PRIVATE.getLevel()) {</span>
 <span class="fc" id="L81">				return true;</span>
 			}
 		}
@@ -104,7 +104,7 @@ public class ModifierHelper {
 <span class="fc" id="L104">				return true;</span>
 			}
 		}
-<span class="pc bpc" id="L107" title="1 of 2 branches missed.">		if (accessModifier.getNewModifier().isPresent()) {</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">		if (accessModifier.getNewModifier().isPresent()) {</span>
 <span class="fc" id="L108">			AccessModifier newModifier = accessModifier.getNewModifier().get();</span>
 <span class="fc bfc" id="L109" title="All 2 branches covered.">			if (matchesModifierLevel(newModifier, accessModifierParam)) {</span>
 <span class="fc" id="L110">				return true;</span>

@@ -538,7 +538,7 @@
       <xs:enumeration value="ANNOTATION_REMOVED"/>
       <xs:enumeration value="CLASS_REMOVED"/>
       <xs:enumeration value="CLASS_NOW_ABSTRACT"/>
-      <xs:enumeration value="CLASS_NOW_FINAL"/>
+      <xs:enumeration value="CLASS_NOW_NOT_EXTENDABLE"/>
       <xs:enumeration value="CLASS_NO_LONGER_PUBLIC"/>
       <xs:enumeration value="CLASS_TYPE_CHANGED"/>
       <xs:enumeration value="CLASS_NOW_CHECKED_EXCEPTION"/>
