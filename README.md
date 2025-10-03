@@ -3,7 +3,7 @@ The website is located at [https://siom79.github.io/japicmp](https://siom79.gith
 # japicmp
 japicmp is a tool to compare two versions of a jar archive:
 ``` bash
-java -jar japicmp-0.24.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+java -jar japicmp-.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
 ```
 It can also be used as a library:
 ```java
@@ -156,7 +156,7 @@ python3 release.py --release-version <release-version> --old-version <old-versio
 ```
 * Push changes to remote repository.
 * Run release [Action](https://github.com/siom79/japicmp/actions/workflows/release.yml)
-* Login to [Sonatype's Nexus repository](https://oss.sonatype.org/)
+* Login to [Central repository](https://central.sonatype.com/publishing)
 	* Download released artifact from staging repository.
 	* Close and release staging repository if sanity checks are successful.
 * Update maven site report with [Action](https://github.com/siom79/japicmp/actions/workflows/mvn-site.yml)
