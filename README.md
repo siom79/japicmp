@@ -145,7 +145,7 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
 
 This is the release procedure:
 * Update ReleaseNotes.md.
-* Set the release version in maven:
+* If necessary: Set the release version in maven:
 ```bash
 mvn versions:set -DnewVersion=<version>-SNAPSHOT
 mvn versions:commit

@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.24.1 (2025-10-05)
+-------------------
+* CompatibilityChanges.hasToBeEvaluated() includes accessModifier and synthetic filter [#426](https://github.com/siom79/japicmp/issues/426)
+
 0.24.0 (2025-10-03)
 -------------------
 * Replaced CLASS_NOW_FINAL with CLASS_NOW_NOT_EXTENDABLE [#426](https://github.com/siom79/japicmp/issues/426)
