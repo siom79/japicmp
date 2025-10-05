@@ -17,9 +17,11 @@ import static japicmp.util.ModifierHelper.*;
 
 public class CompatibilityChanges {
 	private final JarArchiveComparator jarArchiveComparator;
+	private final JarArchiveComparatorOptions options;
 
-	public CompatibilityChanges(JarArchiveComparator jarArchiveComparator) {
+	public CompatibilityChanges(JarArchiveComparator jarArchiveComparator, JarArchiveComparatorOptions options) {
 		this.jarArchiveComparator = jarArchiveComparator;
+		this.options = options;
 	}
 
 	public void evaluate(List<JApiClass> classes) {
@@ -1033,21 +1035,27 @@ public class CompatibilityChanges {
 	}
 
 	private boolean hasToBeEvaluated(JApiMethod jApiMethod) {
-		boolean notPrivate = ModifierHelper.isNotPrivate(jApiMethod);
+		boolean hasToBeEvaluated = ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier());
 		if (!jApiMethod.getjApiClass().isNewClassExtendable()) {
-			notPrivate = ModifierHelper.matchesModifierLevel(jApiMethod, AccessModifier.PUBLIC);
+			hasToBeEvaluated = ModifierHelper.matchesModifierLevel(jApiMethod, AccessModifier.PUBLIC);
 		}
-		return notPrivate;
+		if (hasToBeEvaluated) {
+			hasToBeEvaluated = ModifierHelper.includeSynthetic(jApiMethod, options);
+		}
+		return hasToBeEvaluated;
 	}
 
 	private boolean hasToBeEvaluated(JApiField jApiField) {
-		boolean hasToBeEvaluated = ModifierHelper.isNotPrivate(jApiField);
+		boolean hasToBeEvaluated = ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier());
 		if (!jApiField.getjApiClass().isNewClassExtendable()) {
 			JApiModifier<AccessModifier> accessModifier = jApiField.getAccessModifier();
 			if (accessModifier.getNewModifier().isPresent()) {
 				AccessModifier newModifier = accessModifier.getNewModifier().get();
 				hasToBeEvaluated = matchesModifierLevel(newModifier, AccessModifier.PUBLIC);
 			}
+		}
+		if (hasToBeEvaluated) {
+			hasToBeEvaluated = ModifierHelper.includeSynthetic(jApiField, options);
 		}
 		return hasToBeEvaluated;
 	}

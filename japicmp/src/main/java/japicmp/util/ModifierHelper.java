@@ -2,29 +2,15 @@ package japicmp.util;
 
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.model.AbstractModifier;
-import japicmp.model.AccessModifier;
-import japicmp.model.BridgeModifier;
-import japicmp.model.FinalModifier;
-import japicmp.model.JApiAttribute;
-import japicmp.model.JApiCanBeSynthetic;
-import japicmp.model.JApiChangeStatus;
-import japicmp.model.JApiHasAccessModifier;
-import japicmp.model.JApiModifier;
-import japicmp.model.JApiModifierBase;
-import japicmp.model.StaticModifier;
-import japicmp.model.SyntheticAttribute;
-import japicmp.model.SyntheticModifier;
-import japicmp.model.TransientModifier;
-import japicmp.model.VolatileModifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import japicmp.model.*;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
 
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class ModifierHelper {
 	public static final int ACC_BRIDGE = 0x00000040;
@@ -218,7 +204,7 @@ public class ModifierHelper {
 	}
 
 	public static boolean includeSynthetic(JApiCanBeSynthetic jApiCanBeSynthetic, JarArchiveComparatorOptions options) {
-		return options.isIncludeSynthetic() || !isSynthetic(jApiCanBeSynthetic);
+		return !isSynthetic(jApiCanBeSynthetic) || options.isIncludeSynthetic();
 	}
 
 	public static boolean includeSynthetic(JApiCanBeSynthetic jApiCanBeSynthetic, Options options) {
