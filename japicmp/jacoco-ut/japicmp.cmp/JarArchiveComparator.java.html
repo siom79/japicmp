@@ -166,8 +166,8 @@ public class JarArchiveComparator {
 <span class="nc" id="L166">		return newClassPathAsString;</span>
 	}
 
-	private void checkBinaryCompatibility(List&lt;JApiClass&gt; classList) {
-<span class="fc" id="L170">		CompatibilityChanges compatibilityChanges = new CompatibilityChanges(this);</span>
+	private void checkBinaryCompatibility(List&lt;JApiClass&gt; classList, JarArchiveComparatorOptions options) {
+<span class="fc" id="L170">		CompatibilityChanges compatibilityChanges = new CompatibilityChanges(this, options);</span>
 <span class="fc" id="L171">		compatibilityChanges.evaluate(classList);</span>
 <span class="fc" id="L172">	}</span>
 
@@ -204,7 +204,7 @@ public class JarArchiveComparator {
 <span class="nc" id="L204">				LOGGER.fine(jApiClass.toString());</span>
 <span class="nc" id="L205">			}</span>
 		}
-<span class="fc" id="L207">		checkBinaryCompatibility(classList);</span>
+<span class="fc" id="L207">		checkBinaryCompatibility(classList, options);</span>
 <span class="fc" id="L208">		checkJavaObjectSerializationCompatibility(classList);</span>
 <span class="fc" id="L209">		OutputFilter.sortClassesAndMethods(classList);</span>
 <span class="fc" id="L210">		return classList;</span>

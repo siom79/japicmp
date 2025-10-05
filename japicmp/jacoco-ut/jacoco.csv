@@ -76,7 +76,7 @@ japicmp,japicmp.model,JApiClassType.ClassType,0,27,0,0,0,2,0,1,0,1
 japicmp,japicmp.model,JApiConstructor,49,48,3,3,10,11,5,4,3,3
 japicmp,japicmp.model,JApiGenericType,44,26,8,2,9,9,5,5,1,4
 japicmp,japicmp.compat,CompatibilityChanges.Classpath,0,15,0,0,0,3,0,1,0,1
-japicmp,japicmp.compat,CompatibilityChanges,176,3135,103,585,37,633,91,311,0,58
+japicmp,japicmp.compat,CompatibilityChanges,176,3158,103,589,37,638,91,313,0,58
 japicmp,japicmp.config,Options,263,568,26,34,65,160,36,69,14,61
 japicmp,japicmp.config,IgnoreMissingClasses,0,57,0,8,0,18,0,10,0,6
 japicmp,japicmp.output.xml.model,JApiCmpXmlRoot,18,139,1,1,6,53,4,29,3,29
@@ -98,7 +98,7 @@ japicmp,japicmp.util,GenericTemplateHelper,27,260,7,21,5,53,6,11,1,2
 japicmp,japicmp.util,TypeNameHelper,194,175,30,26,24,28,25,17,3,10
 japicmp,japicmp.util,ListJoiner,91,0,12,0,27,0,12,0,6,0
 japicmp,japicmp.util,Streams,16,28,0,2,2,7,0,2,0,1
-japicmp,japicmp.util,ModifierHelper,42,627,21,103,8,128,19,63,1,19
+japicmp,japicmp.util,ModifierHelper,30,639,17,107,6,130,16,66,0,20
 japicmp,japicmp.util,StringHelper,6,13,1,3,1,5,1,2,0,1
 japicmp,japicmp.util,SignatureParser.DiffType,0,15,0,0,0,3,0,1,0,1
 japicmp,japicmp.util,SignatureParser.ParsedTemplate,0,31,0,0,0,9,0,5,0,5
@@ -130,12 +130,12 @@ japicmp,japicmp.exception,JApiCmpException,70,75,3,1,5,13,3,6,1,6
 japicmp,japicmp.exception,JApiCmpException.Reason,0,63,0,0,0,11,0,1,0,1
 japicmp,japicmp.cmp,ReducibleClassPool,0,9,0,0,0,3,0,2,0,2
 japicmp,japicmp.cmp,JarArchiveComparatorOptions.ClassPathMode,0,15,0,0,0,2,0,1,0,1
-japicmp,japicmp.cmp,JarArchiveComparator,565,378,64,28,102,93,46,30,7,23
+japicmp,japicmp.cmp,JarArchiveComparator,565,380,64,28,102,93,46,30,7,23
 japicmp,japicmp.cmp,JarArchiveComparatorOptions.OverrideCompatibilityChange,0,27,0,0,0,10,0,5,0,5
 japicmp,japicmp.cmp,ClassesComparator,0,215,3,15,0,45,3,12,0,6
 japicmp,japicmp.cmp,JarArchiveComparator.ArchiveType,0,15,0,0,0,2,0,1,0,1
 japicmp,japicmp.cmp,JApiCmpArchive,98,18,6,0,19,6,7,3,4,3
-japicmp,japicmp.cmp,JarArchiveComparatorOptions,42,165,3,2,11,50,7,19,4,19
+japicmp,japicmp.cmp,JarArchiveComparatorOptions,39,168,3,2,10,51,6,20,3,20
 japicmp,japicmp.output.stdout,StdoutOutputGenerator,575,1409,87,143,79,282,65,95,3,39
 japicmp,japicmp.output.markdown.config,MarkdownOptions,0,56,0,2,0,15,0,6,0,5
 japicmp,japicmp.output.markdown.config,MarkdownTitleOptions,0,33,0,0,0,11,0,1,0,1

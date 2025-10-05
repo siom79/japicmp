@@ -1,13 +1,9 @@
-Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.24.1-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.23.1/japicmp-0.23.1.jar
-***  MODIFIED CLASS: PUBLIC japicmp.compat.CompatibilityChanges  (not serializable)
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.24.2-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.24.0/japicmp-0.24.0.jar
+***  MODIFIED CLASS: PUBLIC japicmp.cmp.JarArchiveComparator  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-***  MODIFIED CLASS: PUBLIC japicmp.model.JApiClass  (not serializable)
+***! MODIFIED CLASS: PUBLIC japicmp.compat.CompatibilityChanges  (not serializable)
 	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	+++  NEW METHOD: PUBLIC(+) boolean isNewClassExtendable()
-	+++  NEW METHOD: PUBLIC(+) boolean isOldClassExtendable()
-***! MODIFIED ENUM: PUBLIC FINAL japicmp.model.JApiCompatibilityChangeType  (field removed)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	---! REMOVED FIELD: PUBLIC(-) STATIC(-) FINAL(-) japicmp.model.JApiCompatibilityChangeType CLASS_NOW_FINAL
-	+++  NEW FIELD: PUBLIC(+) STATIC(+) FINAL(+) japicmp.model.JApiCompatibilityChangeType CLASS_NOW_NOT_EXTENDABLE
+	---! REMOVED CONSTRUCTOR: PUBLIC(-) CompatibilityChanges(japicmp.cmp.JarArchiveComparator)
+	+++  NEW CONSTRUCTOR: PUBLIC(+) CompatibilityChanges(japicmp.cmp.JarArchiveComparator, japicmp.cmp.JarArchiveComparatorOptions)
 
 Semantic versioning suggestion: 1.0.0
