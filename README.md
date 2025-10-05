@@ -17,7 +17,7 @@ japicmp is available in the Maven Central Repository:
 <dependency>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp</artifactId>
-	<version>0.24.0</version>
+	<version>0.24.1</version>
 </dependency>
 ```
 A maven plugin allows you to integrate the checks into your build:
@@ -26,7 +26,7 @@ A maven plugin allows you to integrate the checks into your build:
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.24.0</version>
+	<version>0.24.1</version>
 	<configuration>
 		<oldVersion>
 			<dependency>
@@ -145,7 +145,7 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
 
 This is the release procedure:
 * Update ReleaseNotes.md.
-* Set the release version in maven:
+* If necessary: Set the release version in maven:
 ```bash
 mvn versions:set -DnewVersion=<version>-SNAPSHOT
 mvn versions:commit
