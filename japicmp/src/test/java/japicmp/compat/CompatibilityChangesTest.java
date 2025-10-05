@@ -2895,4 +2895,63 @@ class CompatibilityChangesTest {
 		assertThat(jApiClass.isBinaryCompatible(), is(true));
 		assertThat(jApiClass.isSourceCompatible(), is(true));
 	}
+
+	@Test
+	void testPackagePrivateMethodRemovedInSuperclass() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setAccessModifier(AccessModifier.PROTECTED);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass aSuperClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtMethodBuilder.create().packageProtectedAccess().name("method").addToClass(aSuperClass);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(aSuperClass).addToClassPool(classPool);
+				return Arrays.asList(aSuperClass, aClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass aSuperClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(aSuperClass).addToClassPool(classPool);
+				return Arrays.asList(aSuperClass, aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Superclass");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getCompatibilityChanges(), hasSize(0));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
+
+	@Test
+	void testPackagePrivateSyntheticMethodRemovedInSuperclassIgnoreSynthetic() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setAccessModifier(AccessModifier.PRIVATE);
+		options.setIncludeSynthetic(false);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass aSuperClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtMethodBuilder.create().packageProtectedAccess().syntheticModifier().name("method").addToClass(aSuperClass);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(aSuperClass).addToClassPool(classPool);
+				return Arrays.asList(aSuperClass, aClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass aSuperClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
+				CtClass aClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(aSuperClass).addToClassPool(classPool);
+				return Arrays.asList(aSuperClass, aClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Superclass");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.REMOVED));
+		jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getCompatibilityChanges(), hasSize(0));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
 }
