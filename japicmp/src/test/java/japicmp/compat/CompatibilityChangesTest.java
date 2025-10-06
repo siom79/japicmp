@@ -2547,6 +2547,38 @@ class CompatibilityChangesTest {
 	}
 
 	@Test
+	void testNewMethodWithGenericsImplemented() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) {
+				CtClass ctClassC = CtClassBuilder.create().name("C").addToClassPool(classPool);
+				return Collections.singletonList(ctClassC);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("I").addToClassPool(classPool);
+				CtMethodBuilder.create()
+					.abstractMethod()
+					.returnType(CtClass.voidType)
+					.name("newMethod")
+					.parameter(classPool.get("java.lang.Object"))
+					.signature("<T:Ljava/lang/Object;>(TT;)TT;")
+					.addToClass(ctInterface);
+				CtClass ctClassC = CtClassBuilder.create().name("C").implementsInterface(ctInterface).addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("newMethod")
+					.parameter(classPool.get("java.lang.String")).addToClass(ctClassC);
+				return Collections.singletonList(ctClassC);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "C");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.getCompatibilityChanges().size(), is(1));
+	}
+
+	@Test
 	void testMethodWithByteArrayAndArrayOfByteArrays() throws Exception {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
