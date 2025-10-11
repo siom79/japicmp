@@ -1,29 +1,7 @@
 package japicmp.maven;
 
-import com.google.common.base.Joiner;
-import japicmp.cli.JApiCli;
-import japicmp.cmp.JApiCmpArchive;
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.config.Options;
-import japicmp.exception.JApiCmpException;
-import japicmp.model.AccessModifier;
-import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChangeType;
-import japicmp.model.JApiSemanticVersionLevel;
-import japicmp.output.html.HtmlOutput;
-import japicmp.output.html.HtmlOutputGenerator;
-import japicmp.output.html.HtmlOutputGeneratorOptions;
-import japicmp.output.incompatible.IncompatibleErrorOutput;
-import japicmp.output.markdown.MarkdownOutputGenerator;
-import japicmp.output.markdown.config.MarkdownOptions;
-import japicmp.output.semver.SemverOut;
-import japicmp.output.stdout.StdoutOutputGenerator;
-import japicmp.output.xml.XmlOutput;
-import japicmp.output.xml.XmlOutputGenerator;
-import japicmp.output.xml.XmlOutputGeneratorOptions;
-import japicmp.versioning.SemanticVersion;
-import org.apache.maven.RepositoryUtils;
+import java.io.File;
+import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -32,982 +10,165 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.jar.JarFile;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-@Mojo(name = "cmp", requiresDependencyResolution = ResolutionScope.COMPILE, defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
+/** Compares versions of the project using japicmp. */
+@Mojo(name = "cmp", requiresDependencyResolution = ResolutionScope.COMPILE,
+      defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
 public class JApiCmpMojo extends AbstractMojo {
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private Version oldVersion;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<DependencyDescriptor> oldVersions;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private Version newVersion;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<DependencyDescriptor> newVersions;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private Parameter parameter;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<Dependency> dependencies;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<Dependency> oldClassPathDependencies;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<Dependency> newClassPathDependencies;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "false")
-	private boolean skip;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skip", defaultValue = "false")
-	private boolean skipExec;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipMarkdownReport", required = false)
-	private boolean skipMarkdownReport;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipXmlReport", required = false)
-	private boolean skipXmlReport;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.skipHtmlReport", required = false)
-	private boolean skipHtmlReport;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnModifications", required = false)
-	private boolean breakBuildOnModifications;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnBinaryIncompatibleModifications", required = false)
-	private boolean breakBuildOnBinaryIncompatibleModifications;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildOnSourceIncompatibleModifications", required = false)
-	private boolean breakBuildOnSourceIncompatibleModifications;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioning", required = false)
-	private boolean breakBuildBasedOnSemanticVersioning;
-	@org.apache.maven.plugins.annotations.Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero", required = false)
-	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
-	@org.apache.maven.plugins.annotations.Parameter(property = "project.build.directory", required = true)
-	private File projectBuildDir;
-	@Component
-	private RepositorySystem repoSystem;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
-	private RepositorySystemSession repoSession;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
-	private List<RemoteRepository> remoteRepos;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteArtifactRepositories}")
-	private List<ArtifactRepository> artifactRepositories;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project}")
-	private MavenProject mavenProject;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${mojoExecution}", readonly = true)
-	private MojoExecution mojoExecution;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "(,${project.version})", readonly = true)
-	private String versionRangeWithProjectVersion;
-	private Options options;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories,
-			this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
-			this.remoteRepos);
-		PluginParameters pluginParameters = new PluginParameters(this.skipExec || this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.of(
-			this.projectBuildDir), Optional.<String>empty(), true, this.oldVersions, this.newVersions, this.oldClassPathDependencies,
-			this.newClassPathDependencies);
-		executeWithParameters(pluginParameters, mavenParameters);
-	}
+  /** The old version to compare. */
+  @Parameter
+  Version oldVersion;
 
-	Optional<HtmlOutput> executeWithParameters(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException, MojoExecutionException {
-		if (pluginParameters.getSkipParam()) {
-			getLog().info("Skipping execution because parameter 'skip' was set to true.");
-			return Optional.empty();
-		}
-		if (isPomModuleNeedingSkip(pluginParameters, mavenParameters)) {
-			getLog().info("Skipping execution because parameter 'skipPomModules' was set to true and this is artifact is of type pom.");
-			return Optional.empty();
-		}
-		if (skipModule(pluginParameters, mavenParameters)) {
-			return Optional.empty();
-		}
-		Options options = getOptions(pluginParameters, mavenParameters);
-		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
-		setUpClassPath(comparatorOptions, pluginParameters, mavenParameters);
-		setUpOverrideCompatibilityChanges(comparatorOptions, pluginParameters);
-		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
-		if (options.getNewArchives().isEmpty()) {
-			getLog().warn("Skipping execution because no new version could be resolved/found.");
-			return Optional.empty();
-		}
-		List<JApiClass> jApiClasses = jarArchiveComparator.compare(options.getOldArchives(), options.getNewArchives());
-		try {
-			PostAnalysisScriptExecutor postAnalysisScriptExecutor = new PostAnalysisScriptExecutor();
-			jApiClasses = postAnalysisScriptExecutor.apply(pluginParameters.getParameterParam(), jApiClasses, getLog());
-			File jApiCmpBuildDir = createJapiCmpBaseDir(pluginParameters);
-			SemverOut semverOut = new SemverOut(options, jApiClasses);
-			String semanticVersioningInformation = semverOut.generate();
-			generateDiffOutput(mavenParameters, pluginParameters, options, jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
-			if (!skipMarkdownReport(pluginParameters)) {
-				generateMarkdownOutput(mavenParameters, pluginParameters, options, jApiClasses, jApiCmpBuildDir);
-			}
-			if (!skipXmlReport(pluginParameters)) {
-				XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters, semanticVersioningInformation);
-				if (pluginParameters.isWriteToFiles()) {
-					List<File> filesWritten = XmlOutputGenerator.writeToFiles(options, xmlOutput);
-					for (File file : filesWritten) {
-						getLog().info("Written file '" + file.getAbsolutePath() + "'.");
-					}
-				}
-			}
-			Optional<HtmlOutput> retVal = Optional.empty();
-			if (!skipHtmlReport(pluginParameters)) {
-				HtmlOutput htmlOutput = generateHtmlOutput(jApiClasses, jApiCmpBuildDir, options, mavenParameters, pluginParameters, semanticVersioningInformation);
-				retVal = Optional.of(htmlOutput);
-				if (pluginParameters.isWriteToFiles() && options.getHtmlOutputFile().isPresent()) {
-					Path path = Paths.get(options.getHtmlOutputFile().get());
-					Files.write(path, htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
-					getLog().info("Written file '" + path + "'.");
-				}
-			}
-			breakBuildIfNecessary(jApiClasses, pluginParameters.getParameterParam(), options, jarArchiveComparator);
-			return retVal;
-		} catch (IOException e) {
-			throw new MojoFailureException(String.format("Failed to construct output directory: %s", e.getMessage()), e);
-		}
-	}
+  /** A {@code List} of old versions to compare. */
+  @Parameter
+  List<DependencyDescriptor> oldVersions;
 
-	private void setUpOverrideCompatibilityChanges(JarArchiveComparatorOptions comparatorOptions, PluginParameters pluginParameters) throws MojoFailureException {
-		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getOverrideCompatibilityChangeParameters() != null) {
-			List<Parameter.OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters = pluginParameters.getParameterParam().getOverrideCompatibilityChangeParameters();
-			for (Parameter.OverrideCompatibilityChangeParameter configChange : overrideCompatibilityChangeParameters) {
+  /** The new version to compare. */
+  @Parameter
+  Version newVersion;
 
-				String compatibilityChange = configChange.getCompatibilityChange();
-				JApiCompatibilityChangeType foundChange = null;
-				for (JApiCompatibilityChangeType change : JApiCompatibilityChangeType.values()) {
-					if (change.name().equalsIgnoreCase(compatibilityChange)) {
-						foundChange = change;
-						break;
-					}
-				}
-				if (foundChange == null) {
-					throw new MojoFailureException("Unknown compatibility change '" + compatibilityChange + "'. Supported values: " + Joiner.on(',').join(JApiCompatibilityChangeType.values()));
-				}
+  /** A {@code List} of new versions to compare. */
+  @Parameter
+  List<DependencyDescriptor> newVersions;
 
-				JApiSemanticVersionLevel foundSemanticVersionLevel = foundChange.getSemanticVersionLevel();
-				String semanticVersionLevel = configChange.getSemanticVersionLevel();
-				for (JApiSemanticVersionLevel level : JApiSemanticVersionLevel.values()) {
-					if (level.name().equalsIgnoreCase(semanticVersionLevel)) {
-						foundSemanticVersionLevel = level;
-						break;
-					}
-				}
-				if (foundSemanticVersionLevel == null) {
-					throw new MojoFailureException("Unknown semantic version level '" + semanticVersionLevel + "'. Supported values: " + Joiner.on(',').join(JApiSemanticVersionLevel.values()));
-				}
+  /** The parameters defined for the plugin. */
+  @Parameter
+  ConfigParameters parameter;
 
-				comparatorOptions.addOverrideCompatibilityChange(new JarArchiveComparatorOptions.OverrideCompatibilityChange(foundChange, configChange.isBinaryCompatible(), configChange.isSourceCompatible(), foundSemanticVersionLevel));
-			}
-		}
-	}
+  /** Additional dependencies to use. */
+  @Parameter
+  List<Dependency> dependencies;
 
-	private boolean skipModule(PluginParameters pluginParameters, MavenParameters mavenParameters) {
-		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, getLog());
-		return skipModuleStrategy.skip();
-	}
+  /** The classpath for the old dependencies. */
+  @Parameter
+  List<Dependency> oldClassPathDependencies;
 
-	private enum ConfigurationVersion {
-		OLD, NEW
-	}
+  /** The classpath for the new dependencies. */
+  @Parameter
+  List<Dependency> newClassPathDependencies;
 
-	private static DefaultArtifact createDefaultArtifact(MavenProject mavenProject, String version) {
-		org.apache.maven.artifact.Artifact artifact = mavenProject.getArtifact();
-		return createDefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), artifact.getType(), version);
-	}
+  /** Specifies whether the report generation should be skipped. */
+  @Parameter(property = "japicmp.skip", defaultValue = "false")
+  boolean skip;
 
-	private static DefaultArtifact createDefaultArtifact(String groupId, String artifactId, String classifier, String type, String version) {
-		String mappedType = type;
-		if ("bundle".equals(type) || "ejb".equals(type)) {
-			mappedType = "jar";
-		}
-		return new DefaultArtifact(groupId, artifactId, classifier, mappedType, version);
-	}
+  /** Specifies whether the Diff report generation should be skipped. */
+  @Parameter(property = "japicmp.skipDiffReport")
+  boolean skipDiffReport;
 
-	private Artifact getComparisonArtifact(final MavenParameters mavenParameters, final PluginParameters pluginParameters,
-										   final ConfigurationVersion configurationVersion) throws MojoFailureException, MojoExecutionException {
-		MavenProject mavenProject = mavenParameters.getMavenProject();
-		// create a version range of the form (,<current-version-of-the-project>), that includes all versions up to this version
-		DefaultArtifact artifactVersionRange = createDefaultArtifact(mavenProject, mavenParameters.getVersionRangeWithProjectVersion());
-		VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifactVersionRange, mavenParameters.getRemoteRepos(), null);
-		try {
-			getLog().debug("Trying version range: " + versionRangeRequest);
-			VersionRangeResult versionRangeResult = mavenParameters.getRepoSystem()
-				.resolveVersionRange(mavenParameters.getRepoSession(), versionRangeRequest);
-			getLog().debug("Version range result: " + versionRangeRequest);
-			List<org.eclipse.aether.version.Version> versions = versionRangeResult.getVersions();
-			filterSnapshots(versions, pluginParameters);
-			filterVersionPattern(versions, pluginParameters);
-			getLog().debug("Version range after filtering: " + versions);
-			if (!versions.isEmpty()) {
-				DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject, versions.get(versions.size() - 1).toString());
-				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion, mavenParameters.getRemoteRepos(), null);
-				ArtifactResult artifactResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), artifactRequest);
-				processArtifactResult(artifactVersion, artifactResult, pluginParameters, configurationVersion);
-				return artifactResult.getArtifact();
-			} else {
-				if (ignoreMissingOldVersion(pluginParameters, configurationVersion)) {
-					getLog().warn("Ignoring missing old artifact version: " +
-						artifactVersionRange.getGroupId() + ":" + artifactVersionRange.getArtifactId());
-					return null;
-				} else {
-					throw new MojoFailureException("Could not find previous version for artifact: " + artifactVersionRange.getGroupId() + ":"
-						+ artifactVersionRange.getArtifactId());
-				}
-			}
-		} catch (final VersionRangeResolutionException | ArtifactResolutionException e) {
-			getLog().error("Failed to retrieve comparison artifact: " + e.getMessage(), e);
-			throw new MojoFailureException(e.getMessage(), e);
-		}
-	}
+  /** Specifies whether the Markdown report generation should be skipped. */
+  @Parameter(property = "japicmp.skipMarkdownReport")
+  boolean skipMarkdownReport;
 
-	private void processArtifactResult(DefaultArtifact artifactVersion, ArtifactResult artifactResult,
-									   PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		if (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty()) {
-			List<Exception> exceptions = artifactResult.getExceptions();
-			for (Exception exception : exceptions) {
-				getLog().debug(exception.getMessage(), exception);
-			}
-		}
-		if (artifactResult.isMissing()) {
-			if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-				getLog().warn("Ignoring missing artifact: " + artifactResult.getArtifact());
-			} else {
-				throw new MojoFailureException("Could not resolve artifact: " + artifactVersion);
-			}
-		}
-	}
+  /** Specifies whether the XML report generation should be skipped. */
+  @Parameter(property = "japicmp.skipXmlReport")
+  boolean skipXmlReport;
 
-	private void filterVersionPattern(List<org.eclipse.aether.version.Version> availableVersions, PluginParameters pluginParameters) throws MojoFailureException {
-		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getOldVersionPattern() != null) {
-			String versionPattern = pluginParameters.getParameterParam().getOldVersionPattern();
-			Pattern pattern;
-			try {
-				pattern = Pattern.compile(versionPattern);
-			} catch (PatternSyntaxException e) {
-				throw new MojoFailureException("Could not compile provided versionPattern '" + versionPattern + "' as regular expression: " + e.getMessage(), e);
-			}
-			for (Iterator<org.eclipse.aether.version.Version> versionIterator = availableVersions.iterator(); versionIterator.hasNext(); ) {
-				org.eclipse.aether.version.Version version = versionIterator.next();
-				Matcher matcher = pattern.matcher(version.toString());
-				if (!matcher.matches()) {
-					versionIterator.remove();
-					if (getLog().isDebugEnabled()) {
-						getLog().debug("Filtering version '" + version.toString() + "' because it does not match configured versionPattern '" + versionPattern + "'.");
-					}
-				}
-			}
-		} else {
-			getLog().debug("Parameter <oldVersionPattern> not configured, i.e. no version filtered.");
-		}
-	}
+  /** Specifies whether the HTML report generation should be skipped. */
+  @Parameter(property = "japicmp.skipHtmlReport")
+  boolean skipHtmlReport;
 
-	private void filterSnapshots(List<org.eclipse.aether.version.Version> versions, PluginParameters pluginParameters) {
-		if (pluginParameters.getParameterParam() != null && !pluginParameters.getParameterParam().isIncludeSnapshots()) {
-			versions.removeIf(version -> version.toString() != null && version.toString().endsWith("SNAPSHOT"));
-		}
-	}
+  @Parameter(property = "japicmp.breakBuildOnModifications")
+  boolean breakBuildOnModifications;
 
-	private void populateArchivesListsFromParameters(PluginParameters pluginParameters, MavenParameters mavenParameters, List<JApiCmpArchive> oldArchives, List<JApiCmpArchive> newArchives) throws MojoFailureException {
-		if (pluginParameters.getOldVersionParam() != null) {
-			oldArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getOldVersionParam(), "oldVersion", mavenParameters, pluginParameters, ConfigurationVersion.OLD));
-		}
-		if (pluginParameters.getOldVersionsParam() != null) {
-			for (DependencyDescriptor dependencyDescriptor : pluginParameters.getOldVersionsParam()) {
-				if (dependencyDescriptor != null) {
-					oldArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "oldVersions", mavenParameters, pluginParameters, ConfigurationVersion.OLD));
-				}
-			}
-		}
-		if (pluginParameters.getOldVersionParam() == null && pluginParameters.getOldVersionsParam() == null) {
-			try {
-				Artifact comparisonArtifact = getComparisonArtifact(mavenParameters, pluginParameters, ConfigurationVersion.OLD);
-				if (comparisonArtifact != null && comparisonArtifact.getVersion() != null) {
-					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, mavenParameters, pluginParameters, ConfigurationVersion.OLD);
-					for (Artifact artifact : artifacts) {
-						File file = artifact.getFile();
-						if (file != null) {
-							oldArchives.add(new JApiCmpArchive(file, guessVersion(file)));
-						} else {
-							handleMissingArtifactFile(pluginParameters, artifact);
-						}
-					}
-				}
-			} catch (MojoExecutionException e) {
-				throw new MojoFailureException("Computing and resolving comparison artifact failed: " + e.getMessage(), e);
-			}
-		}
-		if (pluginParameters.getNewVersionParam() != null) {
-			newArchives.addAll(retrieveFileFromConfiguration(pluginParameters.getNewVersionParam(), "newVersion", mavenParameters, pluginParameters, ConfigurationVersion.NEW));
-		}
-		if (pluginParameters.getNewVersionsParam() != null) {
-			for (DependencyDescriptor dependencyDescriptor : pluginParameters.getNewVersionsParam()) {
-				if (dependencyDescriptor != null) {
-					newArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions", mavenParameters, pluginParameters, ConfigurationVersion.NEW));
-				}
-			}
-		}
-		if (pluginParameters.getNewVersionParam() == null && pluginParameters.getNewVersionsParam() == null) {
-			MavenProject mavenProject = mavenParameters.getMavenProject();
-			if (mavenProject != null && mavenProject.getArtifact() != null) {
-				DefaultArtifact defaultArtifact = createDefaultArtifact(mavenProject, mavenProject.getVersion());
-				Set<Artifact> artifacts = resolveArtifact(defaultArtifact, mavenParameters, pluginParameters, ConfigurationVersion.NEW);
-				for (Artifact artifact : artifacts) {
-					File file = artifact.getFile();
-					if (file != null) {
-						try (JarFile jarFile = new JarFile(file)) {
-							getLog().debug("Could open file '" + file.getAbsolutePath() + "' of artifact as jar archive: " + jarFile.getName());
-							newArchives.add(new JApiCmpArchive(file, guessVersion(file)));
-						} catch (IOException e) {
-							getLog().warn("No new version specified and file '" + file.getAbsolutePath() + "' of artifact could not be opened as jar archive: " + e.getMessage(), e);
-						}
-					} else {
-						getLog().warn("Artifact " + artifact + " does not have a file. Cannot resolve artifact automatically.");
-					}
-				}
-			}
-		}
-		if (oldArchives.isEmpty()) {
-			String message = "Please provide at least one resolvable old version using one of the configuration elements <oldVersion/> or <oldVersions/>.";
-			if (ignoreMissingArtifact(pluginParameters, ConfigurationVersion.OLD)) {
-				getLog().warn(message);
-			} else {
-				throw new MojoFailureException(message);
-			}
-		}
-		if (newArchives.isEmpty()) {
-			String message = "Please provide at least one resolvable new version using one of the configuration elements <newVersion/> or <newVersions/>.";
-			if (ignoreMissingArtifact(pluginParameters, ConfigurationVersion.NEW)) {
-				getLog().warn(message);
-			} else {
-				throw new MojoFailureException(message);
-			}
-		}
-	}
+  @Parameter(property = "japicmp.breakBuildOnBinaryIncompatibleModifications")
+  boolean breakBuildOnBinaryIncompatibleModifications;
 
-	void breakBuildIfNecessary(List<JApiClass> jApiClasses, Parameter parameterParam, Options options, JarArchiveComparator jarArchiveComparator) throws MojoFailureException, MojoExecutionException {
-		if (breakBuildBasedOnSemanticVersioning(parameterParam)) {
-			options.setErrorOnSemanticIncompatibility(true);
-		}
-		if (breakBuildBasedOnSemanticVersioningForMajorVersionZero(parameterParam)) {
-			options.setErrorOnSemanticIncompatibilityForMajorVersionZero(true);
-		}
-		if (breakBuildOnBinaryIncompatibleModifications(parameterParam)) {
-			options.setErrorOnBinaryIncompatibility(true);
-		}
-		if (breakBuildOnSourceIncompatibleModifications(parameterParam)) {
-			options.setErrorOnSourceIncompatibility(true);
-		}
-		if (breakBuildOnModificationsParameter(parameterParam)) {
-			options.setErrorOnModifications(true);
-		}
-		if (!parameterParam.isBreakBuildIfCausedByExclusion()) {
-			options.setErrorOnExclusionIncompatibility(false);
-		}
-		if (this.parameter != null && this.parameter.getIgnoreMissingOldVersion()) {
-			options.setIgnoreMissingOldVersion(true);
-		}
-		if (this.parameter != null && this.parameter.getIgnoreMissingNewVersion()) {
-			options.setIgnoreMissingNewVersion(true);
-		}
+  @Parameter(property = "japicmp.breakBuildOnSourceIncompatibleModifications")
+  boolean breakBuildOnSourceIncompatibleModifications;
 
-		IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses, jarArchiveComparator) {
-			@Override
-			protected void warn(String msg, Throwable error) {
-				getLog().warn(msg, error);
-			}
-		};
-		try {
-			errorOutput.generate();
-		} catch (JApiCmpException e) {
-			if (e.getReason() == JApiCmpException.Reason.IncompatibleChange) {
-				throw new MojoFailureException(e.getMessage());
-			} else {
-				throw new MojoExecutionException("Error while checking for incompatible changes", e);
-			}
-		}
-	}
+  @Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioning")
+  boolean breakBuildBasedOnSemanticVersioning;
 
-	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero(Parameter parameterParam) {
-		boolean retVal = false;
-		if (this.parameter != null) {
-			retVal = this.parameter.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero();
-		}
-		return retVal || this.breakBuildBasedOnSemanticVersioningForMajorVersionZero;
-	}
+  @Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero")
+  boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 
-	Options getOptions(PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
-		if (this.options != null) {
-			return this.options;
-		}
-		this.options = Options.newDefault();
-		populateArchivesListsFromParameters(pluginParameters, mavenParameters, this.options.getOldArchives(), this.options.getNewArchives());
-		Parameter parameterParam = pluginParameters.getParameterParam();
-		if (parameterParam != null) {
-			String accessModifierArg = parameterParam.getAccessModifier();
-			if (accessModifierArg != null) {
-				try {
-					AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
-					this.options.setAccessModifier(accessModifier);
-				} catch (IllegalArgumentException e) {
-					throw new MojoFailureException(String.format("Invalid value for option accessModifier: %s. Possible values are: %s.", accessModifierArg, AccessModifier.listOfAccessModifier()), e);
-				}
-			}
-			this.options.setOutputOnlyBinaryIncompatibleModifications(parameterParam.getOnlyBinaryIncompatible());
-			this.options.setOutputOnlyModifications(parameterParam.getOnlyModified());
+  @Parameter(defaultValue = "${project.build.directory}/reports", required = true)
+  File outputDirectory;
 
-			List<String> excludes = parameterParam.getExcludes();
-			if (excludes != null) {
-				for (String exclude : excludes) {
-					this.options.addExcludeFromArgument(Optional.ofNullable(exclude), parameterParam.isExcludeExclusively());
-				}
-			}
-			List<String> includes = parameterParam.getIncludes();
-			if (includes != null) {
-				for (String include : includes) {
-					this.options.addIncludeFromArgument(Optional.ofNullable(include), parameterParam.isIncludeExlusively());
-				}
-			}
+  @Component
+  RepositorySystem repoSystem;
 
-			this.options.setIncludeSynthetic(parameterParam.getIncludeSynthetic());
-			this.options.setIgnoreMissingClasses(parameterParam.getIgnoreMissingClasses());
+  @Parameter(readonly = true, defaultValue = "${repositorySystemSession}")
+  RepositorySystemSession repoSession;
 
-			List<String> ignoreMissingClassesByRegularExpressions = parameterParam.getIgnoreMissingClassesByRegularExpressions();
-			if (ignoreMissingClassesByRegularExpressions != null) {
-				for (String ignoreMissingClassRegularExpression : ignoreMissingClassesByRegularExpressions) {
-					this.options.addIgnoreMissingClassRegularExpression(ignoreMissingClassRegularExpression);
-				}
-			}
-			String htmlStylesheet = parameterParam.getHtmlStylesheet();
-			if (htmlStylesheet != null) {
-				this.options.setHtmlStylesheet(Optional.of(htmlStylesheet));
-			}
-			this.options.setNoAnnotations(parameterParam.getNoAnnotations());
-			this.options.setReportOnlyFilename(parameterParam.isReportOnlyFilename());
-			this.options.setReportOnlySummary(parameterParam.isReportOnlySummary());
-		}
-		return this.options;
-	}
+  /** Specifies the {@code List} of remote repositories. */
+  @Parameter(readonly = true, defaultValue = "${project.remoteProjectRepositories}")
+  List<RemoteRepository> remoteRepos;
 
-	private boolean breakBuildOnModificationsParameter(Parameter parameterParam) {
-		boolean retVal = false;
-		if (parameterParam != null) {
-			retVal = parameterParam.getBreakBuildOnModifications();
-		}
-		return retVal || this.breakBuildOnModifications;
-	}
+  /** Specifies the {@code List} of remote artifact repositories. */
+  @Parameter(required = true, defaultValue = "${project.remoteArtifactRepositories}")
+  List<ArtifactRepository> artifactRepositories;
 
-	private boolean breakBuildOnBinaryIncompatibleModifications(Parameter parameterParam) {
-		boolean retVal = false;
-		if (parameterParam != null) {
-			retVal = parameterParam.getBreakBuildOnBinaryIncompatibleModifications();
-		}
-		return retVal || this.breakBuildOnBinaryIncompatibleModifications;
-	}
+  /** A reference to the current Maven project. */
+  @Parameter(readonly = true, defaultValue = "${project}")
+  MavenProject mavenProject;
 
-	private boolean breakBuildOnSourceIncompatibleModifications(Parameter parameter) {
-		boolean retVal = false;
-		if (parameter != null) {
-			retVal = parameter.getBreakBuildOnSourceIncompatibleModifications();
-		}
-		return retVal || this.breakBuildOnSourceIncompatibleModifications;
-	}
+  /** A reference to the current Maven execution object. */
+  @Parameter(readonly = true, defaultValue = "${mojoExecution}")
+  MojoExecution mojoExecution;
 
-	private boolean breakBuildBasedOnSemanticVersioning(Parameter parameter) {
-		boolean retVal = false;
-		if (parameter != null) {
-			retVal = parameter.getBreakBuildBasedOnSemanticVersioning();
-		}
-		return retVal || this.breakBuildBasedOnSemanticVersioning;
-	}
+  /** The version range to compare. */
+  @Parameter(readonly = true, defaultValue = "(,${project.version})")
+  String versionRangeWithProjectVersion;
 
-	private File createJapiCmpBaseDir(PluginParameters pluginParameters) throws MojoFailureException {
-		if (pluginParameters.getProjectBuildDirParam().isPresent()) {
-			try {
-				File projectBuildDirParam = pluginParameters.getProjectBuildDirParam().get();
-				if (projectBuildDirParam != null) {
-					File jApiCmpBuildDir = new File(projectBuildDirParam.getCanonicalPath() + File.separator + "japicmp");
-					boolean mkdirs = jApiCmpBuildDir.mkdirs();
-					if (mkdirs || jApiCmpBuildDir.isDirectory() && jApiCmpBuildDir.canWrite()) {
-						return jApiCmpBuildDir;
-					}
+  /** Specifies the current project build directory. */
+  @Parameter(required = true, property = "project.build.directory")
+  File projectBuildDir;
 
-					throw new MojoFailureException(String.format("Failed to create directory '%s'.", jApiCmpBuildDir.getAbsolutePath()));
-				} else {
-					throw new MojoFailureException("Maven parameter projectBuildDir is not set.");
-				}
-			} catch (IOException e) {
-				throw new MojoFailureException("Failed to create output directory: " + e.getMessage(), e);
-			}
-		} else if (pluginParameters.getOutputDirectory().isPresent()) {
-			String outputDirectory = pluginParameters.getOutputDirectory().get();
-			if (outputDirectory != null) {
-				File outputDirFile = new File(outputDirectory);
-				boolean mkdirs = outputDirFile.mkdirs();
-				if (mkdirs || outputDirFile.isDirectory() && outputDirFile.canWrite()) {
-					return outputDirFile;
-				}
+  /*
+   * Class variable to support unit tests.
+   */
+  JApiCmpProcessor processor;
 
-				throw new MojoFailureException(String.format("Failed to create directory '%s'.", outputDirFile.getAbsolutePath()));
-			} else {
-				throw new MojoFailureException("Maven parameter outputDirectory is not set.");
-			}
-		} else {
-			throw new MojoFailureException("None of the two parameters projectBuildDir and outputDirectory are present");
-		}
-	}
+  /**
+   * Default constructor.
+   */
+  public JApiCmpMojo() {
+    /* Intentionally left blank. */
+  }
 
-	private void generateDiffOutput(MavenParameters mavenParameters, PluginParameters pluginParameters, Options options,
-									List<JApiClass> jApiClasses, File jApiCmpBuildDir, String semanticVersioningInformation) throws IOException, MojoFailureException {
-		boolean skipDiffReport = false;
-		if (pluginParameters.getParameterParam() != null) {
-			skipDiffReport = pluginParameters.getParameterParam().isSkipDiffReport();
-		}
-		if (!skipDiffReport) {
-			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
-			String diffOutput = stdoutOutputGenerator.generate();
-			diffOutput += "\nSemantic versioning suggestion: " + semanticVersioningInformation;
-			File output = new File(jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename(mavenParameters) + ".diff");
-			writeToFile(diffOutput, output);
-		}
-	}
+  /**
+   * Executes the japicmp comparison via {@link JApiCmpProcessor}.
+   *
+   * @throws MojoExecutionException if an error occurs during execution
+   * @throws MojoFailureException   if an error occurs during processing
+   */
+  public void execute() throws MojoExecutionException, MojoFailureException {
 
-	private void generateMarkdownOutput(MavenParameters mavenParameters, PluginParameters pluginParameters, Options options,
-										List<JApiClass> jApiClasses, File jApiCmpBuildDir) throws IOException, MojoFailureException {
-		MarkdownOptions mdOptions = MarkdownOptions.newDefault(options);
-		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getMarkdownTitle() != null) {
-			mdOptions.title.report = pluginParameters.getParameterParam().getMarkdownTitle();
-		}
-		MarkdownOutputGenerator mdOut = new MarkdownOutputGenerator(mdOptions, jApiClasses);
-		String markdown = mdOut.generate();
-		File output = new File(jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename(mavenParameters) + ".md");
-		writeToFile(markdown, output);
-	}
+    MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories,
+            this.mavenProject, this.mojoExecution,
+            this.versionRangeWithProjectVersion,
+            this.repoSystem, this.repoSession,
+            this.remoteRepos);
+    PluginParameters pluginParameters = new PluginParameters(this.skip,
+            this.newVersion,
+            this.oldVersion, this.parameter,
+            this.dependencies,
+            this.projectBuildDir,
+            this.outputDirectory, true,
+            this.oldVersions, this.newVersions,
+            this.oldClassPathDependencies,
+            this.newClassPathDependencies,
+            new SkipReport(
+                    this.skipDiffReport,
+                    this.skipHtmlReport,
+                    this.skipMarkdownReport,
+                    this.skipXmlReport),
+            new BreakBuild(
+                    this.breakBuildBasedOnSemanticVersioning,
+                    this.breakBuildBasedOnSemanticVersioningForMajorVersionZero,
+                    this.breakBuildOnBinaryIncompatibleModifications,
+                    this.breakBuildOnSourceIncompatibleModifications,
+                    this.breakBuildOnModifications));
 
-	private XmlOutput generateXmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters,
-										PluginParameters pluginParameters, String semanticVersioningInformation) throws IOException {
-		String filename = createFilename(mavenParameters);
-		options.setXmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".xml"));
-		XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
-		xmlOutputGeneratorOptions.setCreateSchemaFile(true);
-		xmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
-		if (pluginParameters.getParameterParam() != null) {
-			String optionalTitle = pluginParameters.getParameterParam().getHtmlTitle();
-			xmlOutputGeneratorOptions.setTitle(optionalTitle != null ? optionalTitle : options.getDifferenceDescription());
-		}
-		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options, xmlOutputGeneratorOptions);
-		return xmlGenerator.generate();
-	}
-
-	private HtmlOutput generateHtmlOutput(List<JApiClass> jApiClasses, File jApiCmpBuildDir, Options options, MavenParameters mavenParameters,
-										  PluginParameters pluginParameters, String semanticVersioningInformation) throws IOException {
-		String filename = createFilename(mavenParameters);
-		options.setHtmlOutputFile(Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
-		HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
-		htmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
-		if (pluginParameters.getParameterParam() != null) {
-			String title = pluginParameters.getParameterParam().getHtmlTitle();
-			htmlOutputGeneratorOptions.setTitle(title != null ? title : options.getDifferenceDescription());
-		}
-		HtmlOutputGenerator htmlOutputGenerator = new HtmlOutputGenerator(jApiClasses, options, htmlOutputGeneratorOptions);
-		return htmlOutputGenerator.generate();
-	}
-
-	private boolean skipHtmlReport(PluginParameters pluginParameters) {
-		boolean skipReport = false;
-		if (pluginParameters.getParameterParam() != null) {
-			skipReport = pluginParameters.getParameterParam().getSkipHtmlReport();
-		}
-		return skipReport || this.skipHtmlReport;
-	}
-
-	private boolean skipXmlReport(PluginParameters pluginParameters) {
-		boolean skipReport = false;
-		if (pluginParameters.getParameterParam() != null) {
-			skipReport = pluginParameters.getParameterParam().getSkipXmlReport();
-		}
-		return skipReport || this.skipXmlReport;
-	}
-
-	private boolean skipMarkdownReport(PluginParameters pluginParameters) {
-		boolean skipReport = false;
-		if (pluginParameters.getParameterParam() != null) {
-			skipReport = pluginParameters.getParameterParam().getSkipMarkdownReport();
-		}
-		return skipReport || this.skipMarkdownReport;
-	}
-
-	private String createFilename(MavenParameters mavenParameters) {
-		String filename = "japicmp";
-		String executionId = mavenParameters.getMojoExecution().getExecutionId();
-		if (executionId != null && !"default".equals(executionId)) {
-			filename = executionId;
-		}
-		StringBuilder sb = new StringBuilder();
-		for (char c : filename.toCharArray()) {
-			if (c == '.' || Character.isJavaIdentifierPart(c) || c == '-') {
-				sb.append(c);
-			}
-		}
-		return sb.toString();
-	}
-
-	private void setUpClassPath(JarArchiveComparatorOptions comparatorOptions, PluginParameters pluginParameters, MavenParameters mavenParameters) throws MojoFailureException {
-		if (pluginParameters != null) {
-			if (pluginParameters.getDependenciesParam() != null) {
-				if (pluginParameters.getOldClassPathDependencies() != null || pluginParameters.getNewClassPathDependencies() != null) {
-					throw new MojoFailureException("Please specify either a <dependencies/> element or the two elements <oldClassPathDependencies/> and <newClassPathDependencies/>. " +
-						"With <dependencies/> you can specify one common classpath for both versions and with <oldClassPathDependencies/> and <newClassPathDependencies/> a " +
-						"separate classpath for the new and old version.");
-				} else {
-					if (getLog().isDebugEnabled()) {
-						getLog().debug("Element <dependencies/> found. Using " + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
-					}
-					for (Dependency dependency : pluginParameters.getDependenciesParam()) {
-						List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile("dependencies", dependency, mavenParameters, true, pluginParameters, ConfigurationVersion.NEW);
-						for (JApiCmpArchive jApiCmpArchive : jApiCmpArchives) {
-							comparatorOptions.getClassPathEntries().add(jApiCmpArchive.getFile().getAbsolutePath());
-						}
-						comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH);
-					}
-				}
-			} else {
-				if (pluginParameters.getOldClassPathDependencies() != null || pluginParameters.getNewClassPathDependencies() != null) {
-					if (getLog().isDebugEnabled()) {
-						getLog().debug("At least one of the elements <oldClassPathDependencies/> or <newClassPathDependencies/> found. Using " + JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
-					}
-					if (pluginParameters.getOldClassPathDependencies() != null) {
-						for (Dependency dependency : pluginParameters.getOldClassPathDependencies()) {
-							List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile("oldClassPathDependencies", dependency, mavenParameters, true, pluginParameters, ConfigurationVersion.OLD);
-							for (JApiCmpArchive archive : jApiCmpArchives) {
-								comparatorOptions.getOldClassPath().add(archive.getFile().getAbsolutePath());
-							}
-						}
-					}
-					if (pluginParameters.getNewClassPathDependencies() != null) {
-						for (Dependency dependency : pluginParameters.getNewClassPathDependencies()) {
-							List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile("newClassPathDependencies", dependency, mavenParameters, true, pluginParameters, ConfigurationVersion.NEW);
-							for (JApiCmpArchive archive : jApiCmpArchives) {
-								comparatorOptions.getNewClassPath().add(archive.getFile().getAbsolutePath());
-							}
-						}
-					}
-					comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
-				} else {
-					if (getLog().isDebugEnabled()) {
-						getLog().debug("None of the elements <oldClassPathDependencies/>, <newClassPathDependencies/> or <dependencies/> found. Using " + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
-					}
-					comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH);
-				}
-			}
-		}
-		setUpClassPathUsingMavenProject(comparatorOptions, mavenParameters, pluginParameters, ConfigurationVersion.NEW);
-	}
-
-	private void setUpClassPathUsingMavenProject(JarArchiveComparatorOptions comparatorOptions, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		MavenProject mavenProject = mavenParameters.getMavenProject();
-		notNull(mavenProject, "Maven parameter mavenProject should be provided by maven container.");
-		Set<String> classPathEntries = new HashSet<>();
-		for (Artifact artifact : getCompileArtifacts(mavenProject)) {
-			File resolvedFile = artifact.getFile();
-			if (resolvedFile != null) {
-				String absolutePath = resolvedFile.getAbsolutePath();
-				if (classPathEntries.add(absolutePath)) {
-					if (getLog().isDebugEnabled()) {
-						getLog().debug("Adding to classpath: " + absolutePath);
-					}
-				}
-			} else {
-				handleMissingArtifactFile(pluginParameters, artifact);
-			}
-		}
-		comparatorOptions.getClassPathEntries().addAll(classPathEntries);
-	}
-
-	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject) {
-		Set<org.apache.maven.artifact.Artifact> projectDependencies = mavenProject.getArtifacts(); // dependencies that this project has, including transitive ones
-		HashSet<Artifact> result = new HashSet<>(1 + projectDependencies.size());
-		result.add(RepositoryUtils.toArtifact(mavenProject.getArtifact())); // distinguished: the project artifact
-		for (org.apache.maven.artifact.Artifact dep : projectDependencies) {
-			if (dep.getArtifactHandler().isAddedToClasspath()) {
-				if (org.apache.maven.artifact.Artifact.SCOPE_COMPILE.equals(dep.getScope())
-					|| org.apache.maven.artifact.Artifact.SCOPE_PROVIDED.equals(dep.getScope())
-					|| org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(dep.getScope())) {
-					result.add(RepositoryUtils.toArtifact(dep));
-				}
-			}
-		}
-		return result;
-	}
-
-
-	private void handleMissingArtifactFile(final PluginParameters pluginParameters, final Artifact artifact) {
-		if (pluginParameters.getParameterParam().isIgnoreMissingOptionalDependency()) {
-			getLog().info("Ignoring missing optional dependency: " + toDescriptor(artifact));
-		} else {
-			getLog().warn("Could not resolve optional artifact: " + toDescriptor(artifact));
-		}
-	}
-
-	private String toDescriptor(final Artifact artifact) {
-		return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
-	}
-
-	private List<JApiCmpArchive> retrieveFileFromConfiguration(DependencyDescriptor dependencyDescriptor, String parameterName, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		List<JApiCmpArchive> jApiCmpArchives;
-		if (dependencyDescriptor instanceof Dependency) {
-			Dependency dependency = (Dependency) dependencyDescriptor;
-			jApiCmpArchives = resolveDependencyToFile(parameterName, dependency, mavenParameters, false, pluginParameters, configurationVersion);
-		} else if (dependencyDescriptor instanceof ConfigurationFile) {
-			ConfigurationFile configurationFile = (ConfigurationFile) dependencyDescriptor;
-			jApiCmpArchives = resolveConfigurationFileToFile(parameterName, configurationFile, configurationVersion, pluginParameters);
-		} else {
-			throw new MojoFailureException("DependencyDescriptor is not of type <dependency/> nor of type <configurationFile/>.");
-		}
-		return jApiCmpArchives;
-	}
-
-	private List<JApiCmpArchive> retrieveFileFromConfiguration(Version version, String parameterName, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		if (version != null) {
-			Dependency dependency = version.getDependency();
-			if (dependency != null) {
-				return resolveDependencyToFile(parameterName, dependency, mavenParameters, false, pluginParameters, configurationVersion);
-			} else if (version.getFile() != null) {
-				ConfigurationFile configurationFile = version.getFile();
-				return resolveConfigurationFileToFile(parameterName, configurationFile, configurationVersion, pluginParameters);
-			} else {
-				throw new MojoFailureException("Missing configuration parameter 'dependency'.");
-			}
-		}
-		throw new MojoFailureException(String.format("Missing configuration parameter: %s", parameterName));
-	}
-
-	private List<JApiCmpArchive> resolveConfigurationFileToFile(String parameterName, ConfigurationFile configurationFile, ConfigurationVersion configurationVersion, PluginParameters pluginParameters) throws MojoFailureException {
-		String path = configurationFile.getPath();
-		if (path == null) {
-			throw new MojoFailureException(String.format("The path element in the configuration of the plugin is missing for %s.", parameterName));
-		}
-		File file = new File(path);
-		if (!file.exists()) {
-			if (!ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-				throw new MojoFailureException(String.format("The path '%s' does not point to an existing file.", path));
-			} else {
-				getLog().warn("The file given by path '" + file.getAbsolutePath() + "' does not exist.");
-			}
-		}
-		if (!file.isFile() || !file.canRead()) {
-			if (!ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-				throw new MojoFailureException(String.format("The file given by path '%s' is either not a file or is not readable.", path));
-			} else {
-				getLog().warn("The file given by path '" + file.getAbsolutePath() + "' is either not a file or is not readable.");
-			}
-		}
-		return Collections.singletonList(new JApiCmpArchive(file, guessVersion(file)));
-	}
-
-	private List<JApiCmpArchive> resolveDependencyToFile(String parameterName, Dependency dependency, MavenParameters mavenParameters,
-														 boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>();
-		if (getLog().isDebugEnabled()) {
-			getLog().debug("Trying to resolve dependency '" + dependency + "' to file.");
-		}
-		MavenProject mavenProject = mavenParameters.getMavenProject();
-		if (dependency.getSystemPath() == null) {
-			String descriptor = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
-			getLog().debug(parameterName + ": " + descriptor);
-			String projectDescriptor = mavenProject.getGroupId() + ":" + mavenProject.getArtifactId() + ":" + mavenProject.getVersion();
-
-			Set<Artifact> artifacts;
-			if (descriptor.equals(projectDescriptor)) {
-				artifacts = getCompileArtifacts(mavenProject); // do not repeat what Maven already did for us
-			} else {
-				artifacts = resolveArtifact(dependency, mavenParameters, transitively, pluginParameters, configurationVersion);
-			}
-
-			for (Artifact artifact : artifacts) {
-				File file = artifact.getFile();
-				if (file != null) {
-					jApiCmpArchives.add(new JApiCmpArchive(file, artifact.getVersion()));
-				} else {
-					handleMissingArtifactFile(pluginParameters, artifact);
-				}
-			}
-			if (jApiCmpArchives.isEmpty()) {
-				String message = String.format("Could not resolve dependency with descriptor '%s'.", descriptor);
-				if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-					getLog().warn(message);
-				} else {
-					throw new MojoFailureException(message);
-				}
-			}
-		} else {
-			String systemPath = dependency.getSystemPath();
-			Pattern pattern = Pattern.compile("\\$\\{([^\\}])");
-			Matcher matcher = pattern.matcher(systemPath);
-			if (matcher.matches()) {
-				for (int i = 1; i <= matcher.groupCount(); i++) {
-					String property = matcher.group(i);
-					String propertyResolved = mavenParameters.getMavenProject().getProperties().getProperty(property);
-					if (propertyResolved != null) {
-						systemPath = systemPath.replaceAll("${" + property + "}", propertyResolved);
-					} else {
-						throw new MojoFailureException("Could not resolve property '" + property + "'.");
-					}
-				}
-			}
-			File file = new File(systemPath);
-			boolean addFile = true;
-			if (!file.exists()) {
-				if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-					getLog().warn("Could not find file, but ignoreMissingOldVersion is set tot true: " + file.getAbsolutePath());
-				} else {
-					throw new MojoFailureException("File '" + file.getAbsolutePath() + "' does not exist.");
-				}
-				addFile = false;
-			}
-			if (!file.canRead()) {
-				if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-					getLog().warn("File is not readable, but ignoreMissingOldVersion is set tot true: " + file.getAbsolutePath());
-				} else {
-					throw new MojoFailureException("File '" + file.getAbsolutePath() + "' is not readable.");
-				}
-				addFile = false;
-			}
-			String version = guessVersion(file);
-			if (addFile) {
-				jApiCmpArchives.add(new JApiCmpArchive(file, version));
-			}
-		}
-		return jApiCmpArchives;
-	}
-
-	private String guessVersion(File file) {
-		String name = file.getName();
-		Optional<SemanticVersion> semanticVersion = japicmp.versioning.Version.getSemanticVersion(name);
-		String version = semanticVersion.isPresent() ? semanticVersion.get().toString() : "n.a.";
-		if (name.contains("SNAPSHOT")) {
-			version += "-SNAPSHOT";
-		}
-		return version;
-	}
-
-	private boolean ignoreMissingArtifact(PluginParameters pluginParameters, ConfigurationVersion configurationVersion) {
-		return ignoreNonResolvableArtifacts(pluginParameters)
-			|| ignoreMissingOldVersion(pluginParameters, configurationVersion)
-			|| ignoreMissingNewVersion(pluginParameters, configurationVersion);
-	}
-
-	private boolean ignoreNonResolvableArtifacts(PluginParameters pluginParameters) {
-		boolean ignoreNonResolvableArtifacts = false;
-		Parameter parameterParam = pluginParameters.getParameterParam();
-		if (parameterParam != null) {
-			String ignoreNonResolvableArtifactsAsString = parameterParam.getIgnoreNonResolvableArtifacts();
-			if (Boolean.TRUE.toString().equalsIgnoreCase(ignoreNonResolvableArtifactsAsString)) {
-				ignoreNonResolvableArtifacts = true;
-			}
-		}
-		return ignoreNonResolvableArtifacts;
-	}
-
-	private boolean ignoreMissingOldVersion(PluginParameters pluginParameters, ConfigurationVersion configurationVersion) {
-		return (configurationVersion == ConfigurationVersion.OLD && ignoreMissingOldVersion(pluginParameters));
-	}
-
-	private boolean ignoreMissingNewVersion(PluginParameters pluginParameters, ConfigurationVersion configurationVersion) {
-		return (configurationVersion == ConfigurationVersion.NEW && ignoreMissingNewVersion(pluginParameters));
-	}
-
-	private boolean ignoreMissingOldVersion(PluginParameters pluginParameters) {
-		boolean ignoreMissingOldVersion = false;
-		if (pluginParameters.getParameterParam() != null) {
-			ignoreMissingOldVersion = pluginParameters.getParameterParam().getIgnoreMissingOldVersion();
-		}
-		return ignoreMissingOldVersion;
-	}
-
-	private boolean ignoreMissingNewVersion(PluginParameters pluginParameters) {
-		boolean ignoreMissingNewVersion = false;
-		if (pluginParameters.getParameterParam() != null) {
-			ignoreMissingNewVersion = pluginParameters.getParameterParam().getIgnoreMissingNewVersion();
-		}
-		return ignoreMissingNewVersion;
-	}
-
-	private void writeToFile(String output, File outputfile) throws MojoFailureException, IOException {
-		try (OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(outputfile), Charset.forName("UTF-8"))) {
-			fileWriter.write(output);
-			getLog().info("Written file '" + outputfile.getAbsolutePath() + "'.");
-		} catch (Exception e) {
-			throw new MojoFailureException(String.format("Failed to write diff file: %s", e.getMessage()), e);
-		}
-	}
-
-	private Set<Artifact> resolveArtifact(Dependency dependency, MavenParameters mavenParameters, boolean transitively, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		notNull(mavenParameters.getArtifactRepositories(), "Maven parameter artifactRepositories should be provided by maven container.");
-		Artifact artifact = createDefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), dependency.getType(), dependency.getVersion());
-		return resolveArtifact(artifact, mavenParameters, pluginParameters, configurationVersion);
-	}
-
-	private Set<Artifact> resolveArtifact(Artifact artifact, MavenParameters mavenParameters, PluginParameters pluginParameters, ConfigurationVersion configurationVersion) throws MojoFailureException {
-		notNull(mavenParameters.getRepoSystem(), "Maven parameter repoSystem should be provided by maven container.");
-		notNull(mavenParameters.getRepoSession(), "Maven parameter repoSession should be provided by maven container.");
-		ArtifactRequest request = new ArtifactRequest();
-		request.setArtifact(artifact);
-		request.setRepositories(mavenParameters.getRemoteRepos());
-		ArtifactResult resolutionResult;
-		try {
-			getLog().debug("Trying to resolve artifact: " + request);
-			resolutionResult = mavenParameters.getRepoSystem().resolveArtifact(mavenParameters.getRepoSession(), request);
-			getLog().debug("Resolved artifact: " + resolutionResult);
-			if (resolutionResult != null) {
-				if (resolutionResult.getExceptions() != null && !resolutionResult.getExceptions().isEmpty()) {
-					List<Exception> exceptions = resolutionResult.getExceptions();
-					for (Exception exception : exceptions) {
-						getLog().debug(exception.getMessage(), exception);
-					}
-				}
-				if (resolutionResult.isMissing()) {
-					if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-						getLog().warn("Ignoring missing artifact " + request.getArtifact());
-					} else {
-						throw new MojoFailureException("Could not resolve artifact " + request.getArtifact());
-					}
-					return new HashSet<>();
-				}
-				return new HashSet<>(Collections.singletonList(resolutionResult.getArtifact()));
-			}
-
-		} catch (final ArtifactResolutionException e) {
-			if (ignoreMissingArtifact(pluginParameters, configurationVersion)) {
-				getLog().warn(e.getMessage());
-			} else {
-				throw new MojoFailureException(e.getMessage(), e);
-			}
-		}
-		return new HashSet<>();
-	}
-
-	private boolean isPomModuleNeedingSkip(PluginParameters pluginParameters, MavenParameters mavenParameters) {
-		return pluginParameters.getParameterParam().getSkipPomModules()
-			&& "pom".equalsIgnoreCase(mavenParameters.getMavenProject().getArtifact().getType());
-	}
-
-	private static <T> T notNull(T value, String msg) throws MojoFailureException {
-		if (value == null) {
-			throw new MojoFailureException(msg);
-		}
-		return value;
-	}
+    processor = new JApiCmpProcessor(pluginParameters, mavenParameters, getLog());
+    processor.execute();
+  }
 }

@@ -2,82 +2,122 @@ package japicmp.maven;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 
+/** Plugin parameters defined for the JApiCmp plugin. */
 public class PluginParameters {
-	private final boolean skipParam;
-	private final Version oldVersionParam;
-	private final List<DependencyDescriptor> oldVersionsParam;
-	private final Version newVersionParam;
-	private final List<DependencyDescriptor> newVersionsParam;
-	private final Parameter parameterParam;
-	private final List<Dependency> dependenciesParam;
-	private final List<Dependency> oldClassPathDependencies;
-	private final List<Dependency> newClassPathDependencies;
-	private final Optional<File> projectBuildDirParam;
-	private final Optional<String> outputDirectory;
-	private final boolean writeToFiles;
+  private final boolean skip;
+  private final SkipReport skipReport;
+  private final Version oldVersion;
+  private final List<DependencyDescriptor> oldVersions;
+  private final Version newVersion;
+  private final List<DependencyDescriptor> newVersions;
+  private final ConfigParameters parameter;
+  private final List<Dependency> dependencies;
+  private final List<Dependency> oldClassPathDependencies;
+  private final List<Dependency> newClassPathDependencies;
+  private final File projectBuildDir;
+  private final File outputDirectory;
+  private final boolean writeToFiles;
+  private final BreakBuild breakBuild;
 
-	public PluginParameters(boolean skipParam, Version newVersionParam, Version oldVersionParam, Parameter parameterParam, List<Dependency> dependenciesParam, Optional<File> projectBuildDirParam, Optional<String> outputDirectory, boolean writeToFiles, List<DependencyDescriptor> oldVersionsParam, List<DependencyDescriptor> newVersionsParam, List<Dependency> oldClassPathDependencies, List<Dependency> newClassPathDependencies) {
-		this.skipParam = skipParam;
-		this.newVersionParam = newVersionParam;
-		this.oldVersionParam = oldVersionParam;
-		this.parameterParam = parameterParam == null ? new Parameter() : parameterParam;
-		this.dependenciesParam = dependenciesParam;
-		this.oldClassPathDependencies = oldClassPathDependencies;
-		this.newClassPathDependencies = newClassPathDependencies;
-		this.projectBuildDirParam = projectBuildDirParam;
-		this.outputDirectory = outputDirectory;
-		this.writeToFiles = writeToFiles;
-		this.oldVersionsParam = oldVersionsParam;
-		this.newVersionsParam = newVersionsParam;
-	}
+  /**
+   * Creates a new {@code PluginParameters} instance with the given values.
+   *
+   * @param skip
+   * @param newVersion
+   * @param oldVersion
+   * @param parameter
+   * @param dependencies
+   * @param projectBuildDir
+   * @param outputDirectory
+   * @param writeToFiles
+   * @param oldVersions
+   * @param newVersions
+   * @param oldClassPathDependencies
+   * @param newClassPathDependencies
+   * @param skipReport
+   * @param breakBuild
+   */
+  public PluginParameters(final boolean skip,
+                          final Version newVersion,
+                          final Version oldVersion,
+                          final ConfigParameters parameter, final List<Dependency> dependencies,
+                          final File projectBuildDir, final File outputDirectory,
+                          final boolean writeToFiles,
+                          final List<DependencyDescriptor> oldVersions,
+                          final List<DependencyDescriptor> newVersions,
+                          final List<Dependency> oldClassPathDependencies,
+                          final List<Dependency> newClassPathDependencies,
+                          final SkipReport skipReport, final BreakBuild breakBuild) {
+    this.skip = skip;
+    this.newVersion = newVersion;
+    this.oldVersion = oldVersion;
+    this.parameter = parameter == null ? new ConfigParameters() : parameter;
+    this.dependencies = dependencies;
+    this.oldClassPathDependencies = oldClassPathDependencies;
+    this.newClassPathDependencies = newClassPathDependencies;
+    this.projectBuildDir = projectBuildDir;
+    this.outputDirectory = outputDirectory;
+    this.writeToFiles = writeToFiles;
+    this.oldVersions = oldVersions;
+    this.newVersions = newVersions;
+    this.skipReport = skipReport;
+    this.breakBuild = breakBuild;
+  }
 
-	public boolean getSkipParam() {
-		return skipParam;
-	}
+  public boolean skip() {
+    return skip;
+  }
 
-	public Version getNewVersionParam() {
-		return newVersionParam;
-	}
+  public Version newVersion() {
+    return newVersion;
+  }
 
-	public Version getOldVersionParam() {
-		return oldVersionParam;
-	}
+  public Version oldVersion() {
+    return oldVersion;
+  }
 
-	public Parameter getParameterParam() {
-		return parameterParam;
-	}
+  public ConfigParameters parameter() {
+    return parameter;
+  }
 
-	public List<Dependency> getDependenciesParam() {
-		return dependenciesParam;
-	}
+  public List<Dependency> dependencies() {
+    return dependencies;
+  }
 
-	public Optional<File> getProjectBuildDirParam() {
-		return projectBuildDirParam;
-	}
+  public File projectBuildDir() {
+    return projectBuildDir;
+  }
 
-	public Optional<String> getOutputDirectory() {
-		return outputDirectory;
-	}
+  public File outputDirectory() {
+    return outputDirectory;
+  }
 
-	public boolean isWriteToFiles() {
-		return writeToFiles;
-	}
+  public boolean isWriteToFiles() {
+    return writeToFiles;
+  }
 
-	public List<DependencyDescriptor> getOldVersionsParam() {
-		return oldVersionsParam;
-	}
+  public List<DependencyDescriptor> oldVersions() {
+    return oldVersions;
+  }
 
-	public List<DependencyDescriptor> getNewVersionsParam() {
-		return newVersionsParam;
-	}
+  public List<DependencyDescriptor> newVersions() {
+    return newVersions;
+  }
 
-	public List<Dependency> getOldClassPathDependencies() {
-		return oldClassPathDependencies;
-	}
+  public List<Dependency> oldClassPathDependencies() {
+    return oldClassPathDependencies;
+  }
 
-	public List<Dependency> getNewClassPathDependencies() {
-		return newClassPathDependencies;
-	}
+  public List<Dependency> newClassPathDependencies() {
+    return newClassPathDependencies;
+  }
+
+  public BreakBuild breakBuild() {
+    return breakBuild;
+  }
+
+  public SkipReport skipReport() {
+    return skipReport;
+  }
 }
