@@ -10,7 +10,7 @@ import java.util.Collections;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
 
-final class SkipModuleStrategyTest extends BaseTest {
+final class SkipModuleStrategyTest extends AbstractTest {
 
   @Test
   void testModuleIsExcluded() {

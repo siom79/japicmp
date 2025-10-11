@@ -5,12 +5,10 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import japicmp.cmp.ClassesHelper;
-import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.maven.util.CtClassBuilder;
 import japicmp.maven.util.CtFieldBuilder;
-import japicmp.maven.util.CtInterfaceBuilder;
 import japicmp.maven.util.CtMethodBuilder;
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,72 +22,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-final class JApiCmpMojoTest {
+final class JApiCmpMojoTest extends AbstractTest {
 
-  static Version createVersion(String groupId, String artifactId, String version) {
-    final Dependency dependency = new Dependency();
-    dependency.setGroupId(groupId);
-    dependency.setArtifactId(artifactId);
-    dependency.setVersion(version);
-    final Version versionInstance = new Version(dependency, null);
-    return versionInstance;
-  }
-
-  /*
-   * TODO: Move th JApiCmpProcessorTest
-   * @Test
-   */
-  void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusionFalse() throws Exception {
-    testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(false);
-  }
-
-  /*
-   * TODO: Move th JApiCmpProcessorTest
-   * @Test
-   */
-  void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusionTrue() throws Exception {
-    Assertions.assertThrows(MojoFailureException.class,
-                            () -> testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(true));
-  }
-
-  private void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(
-          boolean breakBuildIfCausedByExclusion) throws Exception {
-    Options options = Options.newDefault();
-    JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(
-            options);
-    ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(
-            jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
-              @Override
-              public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-                CtClass interfaceCtClass = CtInterfaceBuilder.create()
-                        .name("japicmp.ITest")
-                        .addToClassPool(classPool);
-                CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").implementsInterface(
-                        interfaceCtClass).addToClassPool(classPool);
-                return Arrays.asList(interfaceCtClass, ctClass);
-              }
-
-              @Override
-              public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-                CtClass interfaceCtClass = CtInterfaceBuilder.create()
-                        .name("japicmp.ITest")
-                        .addToClassPool(classPool);
-                CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(
-                        classPool);
-                return Arrays.asList(interfaceCtClass, ctClass);
-              }
-            });
-    options.addExcludeFromArgument(Optional.of("japicmp.ITest"), false); // exclude japicmp.ITest
-    JApiCmpMojo mojo = new JApiCmpMojo();
-    ConfigParameters parameterParam = new ConfigParameters();
-    parameterParam.setBreakBuildIfCausedByExclusion(
-            breakBuildIfCausedByExclusion); // do not break the build if cause is excluded
-    parameterParam.setBreakBuildOnBinaryIncompatibleModifications(true);
-    parameterParam.setBreakBuildOnSourceIncompatibleModifications(true);
-    mojo.processor.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam,
-                                         options,
-                                         new JarArchiveComparator(jarArchiveComparatorOptions));
-  }
 
   /*
    * TODO: Move th JApiCmpProcessorTest

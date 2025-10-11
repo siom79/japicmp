@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Collection of tests of the {@link JApiCmpProcessor} skip logic.
  */
-final class JApiCmpProcessorSkipTest extends BaseTest {
+final class JApiCmpProcessorSkipTest extends AbstractTest {
 
   ConfigParameters configParams;
   MavenParameters mavenParams;

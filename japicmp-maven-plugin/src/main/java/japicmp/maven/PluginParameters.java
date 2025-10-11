@@ -23,20 +23,20 @@ public class PluginParameters {
   /**
    * Creates a new {@code PluginParameters} instance with the given values.
    *
-   * @param skip
-   * @param newVersion
-   * @param oldVersion
-   * @param parameter
-   * @param dependencies
-   * @param projectBuildDir
-   * @param outputDirectory
-   * @param writeToFiles
-   * @param oldVersions
-   * @param newVersions
-   * @param oldClassPathDependencies
-   * @param newClassPathDependencies
-   * @param skipReport
-   * @param breakBuild
+   * @param skip                     skip execution
+   * @param newVersion               the new version to compare
+   * @param oldVersion               the old version to compare
+   * @param parameter                additional comparison parameters
+   * @param dependencies             project dependencies
+   * @param projectBuildDir          the project build directory
+   * @param outputDirectory          the report output directory
+   * @param writeToFiles             the write to files flag
+   * @param oldVersions              other old versions
+   * @param newVersions              other new versions
+   * @param oldClassPathDependencies the old path to dependencies
+   * @param newClassPathDependencies the new path to dependencies
+   * @param skipReport               the skip report flags
+   * @param breakBuild               the break build flags
    */
   public PluginParameters(final boolean skip,
                           final Version newVersion,

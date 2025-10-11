@@ -10,7 +10,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-abstract class BaseTest {
+abstract class AbstractTest {
 
   /**
    * Creates MavenParameters for tests.
@@ -32,13 +32,30 @@ abstract class BaseTest {
    * @return the mocked PluginParameters
    */
   PluginParameters createPluginParameters(final ConfigParameters configParameters) {
-    final Version oldVersion = JApiCmpMojoTest.createVersion("groupId", "artifactId", "0.1.0");
-    final Version newVersion = JApiCmpMojoTest.createVersion("groupId", "artifactId", "0.1.1");
-    final ConfigParameters parameter = configParameters;
-    return new PluginParameters(false, newVersion, oldVersion, parameter, new ArrayList<>(), null,
+    final Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
+    final Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
+    return new PluginParameters(false, newVersion, oldVersion, configParameters, new ArrayList<>(),
+                                null,
                                 null, false, new ArrayList<>(), new ArrayList<>(),
                                 new ArrayList<>(), new ArrayList<>(), new SkipReport(),
                                 new BreakBuild());
+  }
+
+  /**
+   * Creates a Version instance for testing.
+   *
+   * @param groupId    the group ID of the Version
+   * @param artifactId the artifact ID of the Version
+   * @param version    the version of the Version
+   *
+   * @return a new Version instance
+   */
+  Version createVersion(String groupId, String artifactId, String version) {
+    final Dependency dependency = new Dependency();
+    dependency.setGroupId(groupId);
+    dependency.setArtifactId(artifactId);
+    dependency.setVersion(version);
+    return new Version(dependency, null);
   }
 
 }
