@@ -67,4 +67,8 @@ public class Generics<T, U extends List<Integer> & Serializable, V extends List<
 	public static class NewImplementsSupplier {
 
 	}
+
+	public static class NewImplementsConsumer {
+
+	}
 }

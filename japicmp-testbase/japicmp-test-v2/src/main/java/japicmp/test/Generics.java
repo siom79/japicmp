@@ -2,6 +2,7 @@ package japicmp.test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Generics<T, U extends List<Long>>  {
@@ -69,6 +70,14 @@ public class Generics<T, U extends List<Long>>  {
 		@Override
 		public String get() {
 			return "";
+		}
+	}
+
+	public static class NewImplementsConsumer implements Consumer<String> {
+
+		@Override
+		public void accept(String s) {
+
 		}
 	}
 }

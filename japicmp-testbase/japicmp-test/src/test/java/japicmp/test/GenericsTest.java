@@ -32,4 +32,13 @@ public class GenericsTest {
 		assertThat(jApiClass.getCompatibilityChanges().size(), is(1));
 		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_ADDED)));
 	}
+
+	@Test
+	void testNewImplementsConsumer() {
+		JApiClass jApiClass = getJApiClass(jApiClasses, Generics.NewImplementsConsumer.class.getName());
+		assertThat(jApiClass.getCompatibilityChanges().size(), is(2));
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.INTERFACE_ADDED)));
+		// Consumer.andThen()
+		assertThat(jApiClass.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE)));
+	}
 }
