@@ -2,6 +2,7 @@ package japicmp.test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class Generics<T, U extends List<Long>>  {
 
@@ -61,5 +62,13 @@ public class Generics<T, U extends List<Long>>  {
 
 	public <X extends List<Integer> & MyInterface<Integer>> X methodWithAmpersandTemplate(X x) {
 		return null;
+	}
+
+	public static class NewImplementsSupplier implements Supplier<String> {
+
+		@Override
+		public String get() {
+			return "";
+		}
 	}
 }
