@@ -267,15 +267,20 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 
 	public boolean hasSameParameter(JApiMethod method) {
 		boolean hasSameParameter = true;
-		List<JApiParameter> parameters1 = getParameters();
-		List<JApiParameter> parameters2 = method.getParameters();
-		if (parameters1.size() != parameters2.size()) {
+		List<JApiParameter> thisParams = getParameters();
+		List<JApiParameter> otherParams = method.getParameters();
+		if (thisParams.size() != otherParams.size()) {
 			hasSameParameter = false;
 		}
 		if (hasSameParameter) {
-			for (int i = 0; i < parameters1.size(); i++) {
-				if (!parameters1.get(i).getType().equals(parameters2.get(i).getType())) {
+			for (int i = 0; i < thisParams.size(); i++) {
+				JApiParameter thisParam = thisParams.get(i);
+				JApiParameter otherParam = otherParams.get(i);
+				if (!thisParam.getTemplateNameOptional().isPresent() && // template parameter means java.lang.Object (that matches anyway)
+					!otherParam.getTemplateNameOptional().isPresent() &&
+					!thisParam.getType().equals(otherParam.getType())) {
 					hasSameParameter = false;
+					break;
 				}
 			}
 		}
