@@ -92,28 +92,6 @@ public class JApiCmpMojo extends AbstractMojo {
   @Parameter(defaultValue = "${project.build.directory}/reports", required = true)
   File outputDirectory;
 
-  @Component
-  RepositorySystem repoSystem;
-
-  @Parameter(readonly = true, defaultValue = "${repositorySystemSession}")
-  RepositorySystemSession repoSession;
-
-  /** Specifies the {@code List} of remote repositories. */
-  @Parameter(readonly = true, defaultValue = "${project.remoteProjectRepositories}")
-  List<RemoteRepository> remoteRepos;
-
-  /** Specifies the {@code List} of remote artifact repositories. */
-  @Parameter(required = true, defaultValue = "${project.remoteArtifactRepositories}")
-  List<ArtifactRepository> artifactRepositories;
-
-  /** A reference to the current Maven project. */
-  @Parameter(readonly = true, defaultValue = "${project}")
-  MavenProject mavenProject;
-
-  /** A reference to the current Maven execution object. */
-  @Parameter(readonly = true, defaultValue = "${mojoExecution}")
-  MojoExecution mojoExecution;
-
   /** The version range to compare. */
   @Parameter(readonly = true, defaultValue = "(,${project.version})")
   String versionRangeWithProjectVersion;
@@ -121,6 +99,29 @@ public class JApiCmpMojo extends AbstractMojo {
   /** Specifies the current project build directory. */
   @Parameter(required = true, property = "project.build.directory")
   File projectBuildDir;
+
+  /** A reference to the current Maven project. */
+  @Parameter(defaultValue = "${project}", readonly = true)
+  MavenProject mavenProject;
+
+  /** A reference to the current Maven execution object. */
+  @Parameter(defaultValue = "${mojoExecution}", readonly = true)
+  MojoExecution mojoExecution;
+
+  /** A reference to the current Maven repository system. */
+  @Component
+  RepositorySystem repoSystem;
+
+  @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+  RepositorySystemSession repoSession;
+
+  /** Specifies the {@code List} of remote repositories. */
+  @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+  List<RemoteRepository> remoteRepos;
+
+  /** Specifies the {@code List} of remote artifact repositories. */
+  @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
+  List<ArtifactRepository> artifactRepositories;
 
   /*
    * Class variable to support unit tests.
@@ -143,30 +144,30 @@ public class JApiCmpMojo extends AbstractMojo {
   public void execute() throws MojoExecutionException, MojoFailureException {
 
     MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories,
-            this.mavenProject, this.mojoExecution,
-            this.versionRangeWithProjectVersion,
-            this.repoSystem, this.repoSession,
-            this.remoteRepos);
+                                                          this.mavenProject, this.mojoExecution,
+                                                          this.versionRangeWithProjectVersion,
+                                                          this.repoSystem, this.repoSession,
+                                                          this.remoteRepos);
     PluginParameters pluginParameters = new PluginParameters(this.skip,
-            this.newVersion,
-            this.oldVersion, this.parameter,
-            this.dependencies,
-            this.projectBuildDir,
-            this.outputDirectory, true,
-            this.oldVersions, this.newVersions,
-            this.oldClassPathDependencies,
-            this.newClassPathDependencies,
-            new SkipReport(
-                    this.skipDiffReport,
-                    this.skipHtmlReport,
-                    this.skipMarkdownReport,
-                    this.skipXmlReport),
-            new BreakBuild(
-                    this.breakBuildBasedOnSemanticVersioning,
-                    this.breakBuildBasedOnSemanticVersioningForMajorVersionZero,
-                    this.breakBuildOnBinaryIncompatibleModifications,
-                    this.breakBuildOnSourceIncompatibleModifications,
-                    this.breakBuildOnModifications));
+                                                             this.newVersion,
+                                                             this.oldVersion, this.parameter,
+                                                             this.dependencies,
+                                                             this.projectBuildDir,
+                                                             this.outputDirectory, true,
+                                                             this.oldVersions, this.newVersions,
+                                                             this.oldClassPathDependencies,
+                                                             this.newClassPathDependencies,
+                                                             new SkipReport(
+                                                                     this.skipDiffReport,
+                                                                     this.skipHtmlReport,
+                                                                     this.skipMarkdownReport,
+                                                                     this.skipXmlReport),
+                                                             new BreakBuild(
+                                                                     this.breakBuildBasedOnSemanticVersioning,
+                                                                     this.breakBuildBasedOnSemanticVersioningForMajorVersionZero,
+                                                                     this.breakBuildOnBinaryIncompatibleModifications,
+                                                                     this.breakBuildOnSourceIncompatibleModifications,
+                                                                     this.breakBuildOnModifications));
 
     processor = new JApiCmpProcessor(pluginParameters, mavenParameters, getLog());
     processor.execute();

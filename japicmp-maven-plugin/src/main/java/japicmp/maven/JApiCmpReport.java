@@ -75,22 +75,9 @@ public class JApiCmpReport extends AbstractMavenReport {
   @Parameter(property = "japicmp.skipXmlReport")
   boolean skipXmlReport;
 
-  /** Specifies the {@code List} of remote artifact repositories. */
-  @Parameter(required = true, defaultValue = "${project.remoteArtifactRepositories}")
-  List<ArtifactRepository> artifactRepositories;
-
   /** Specifies the current project build directory. */
   @Parameter(required = true, property = "project.build.directory")
   File projectBuildDir;
-
-  @Parameter(defaultValue = "${mojoExecution}", readonly = true)
-  MojoExecution mojoExecution;
-
-  @Component
-  RepositorySystem repoSystem;
-
-  @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
-  RepositorySystemSession repoSession;
 
   /** Remote project repositories used for the project. */
   @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
@@ -98,6 +85,25 @@ public class JApiCmpReport extends AbstractMavenReport {
 
   @Parameter(defaultValue = "(,${project.version})", readonly = true)
   String versionRangeWithProjectVersion;
+
+  /** A reference to the current Maven execution object. */
+  @Parameter(defaultValue = "${mojoExecution}", readonly = true)
+  MojoExecution mojoExecution;
+
+  /** A reference to the current Maven repository system. */
+  @Component
+  RepositorySystem repoSystem;
+  @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+  RepositorySystemSession repoSession;
+
+  /** Specifies the {@code List} of remote repositories. */
+  @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+  List<RemoteRepository> remoteRepos;
+
+  /** Specifies the {@code List} of remote artifact repositories. */
+  @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
+  List<ArtifactRepository> artifactRepositories;
+
 
   MavenParameters mavenParameters;
   PluginParameters pluginParameters;
@@ -115,21 +121,21 @@ public class JApiCmpReport extends AbstractMavenReport {
   protected void executeReport(Locale locale) throws MavenReportException {
 
     mavenParameters = new MavenParameters(this.artifactRepositories, this.project,
-            this.mojoExecution, this.versionRangeWithProjectVersion,
-            this.repoSystem, this.repoSession,
-            this.remoteProjectRepositories);
+                                          this.mojoExecution, this.versionRangeWithProjectVersion,
+                                          this.repoSystem, this.repoSession,
+                                          this.remoteProjectRepositories);
     pluginParameters = new PluginParameters(this.skip,
-            this.newVersion, this.oldVersion, this.parameter,
-            this.dependencies, this.projectBuildDir,
-            this.outputDirectory, true, this.oldVersions,
-            this.newVersions, this.oldClassPathDependencies,
-            this.newClassPathDependencies,
-            new SkipReport(
-                    this.skipDiffReport,
-                    this.skipHtmlReport,
-                    this.skipMarkdownReport,
-                    this.skipXmlReport),
-            new BreakBuild());
+                                            this.newVersion, this.oldVersion, this.parameter,
+                                            this.dependencies, this.projectBuildDir,
+                                            this.outputDirectory, true, this.oldVersions,
+                                            this.newVersions, this.oldClassPathDependencies,
+                                            this.newClassPathDependencies,
+                                            new SkipReport(
+                                                    this.skipDiffReport,
+                                                    this.skipHtmlReport,
+                                                    this.skipMarkdownReport,
+                                                    this.skipXmlReport),
+                                            new BreakBuild());
 
     try {
       processor = new JApiCmpProcessor(pluginParameters, mavenParameters, getLog());
