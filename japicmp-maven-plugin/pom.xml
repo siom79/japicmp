@@ -119,7 +119,6 @@
 						<goals>
 							<goal>helpmojo</goal>
 						</goals>
-						<phase>process-classes</phase>
 					</execution>
 				</executions>
 			</plugin>
