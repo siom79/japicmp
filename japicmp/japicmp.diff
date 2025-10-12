@@ -1,9 +1,3 @@
-Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.24.2-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.24.0/japicmp-0.24.0.jar
-***  MODIFIED CLASS: PUBLIC japicmp.cmp.JarArchiveComparator  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-***! MODIFIED CLASS: PUBLIC japicmp.compat.CompatibilityChanges  (not serializable)
-	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
-	---! REMOVED CONSTRUCTOR: PUBLIC(-) CompatibilityChanges(japicmp.cmp.JarArchiveComparator)
-	+++  NEW CONSTRUCTOR: PUBLIC(+) CompatibilityChanges(japicmp.cmp.JarArchiveComparator, japicmp.cmp.JarArchiveComparatorOptions)
-
-Semantic versioning suggestion: 1.0.0
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.24.3-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.24.1/japicmp-0.24.1.jar
+No changes.
+Semantic versioning suggestion: 0.0.1

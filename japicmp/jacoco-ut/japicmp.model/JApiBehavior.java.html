@@ -267,119 +267,124 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 
 	public boolean hasSameParameter(JApiMethod method) {
 <span class="fc" id="L269">		boolean hasSameParameter = true;</span>
-<span class="fc" id="L270">		List&lt;JApiParameter&gt; parameters1 = getParameters();</span>
-<span class="fc" id="L271">		List&lt;JApiParameter&gt; parameters2 = method.getParameters();</span>
-<span class="pc bpc" id="L272" title="1 of 2 branches missed.">		if (parameters1.size() != parameters2.size()) {</span>
+<span class="fc" id="L270">		List&lt;JApiParameter&gt; thisParams = getParameters();</span>
+<span class="fc" id="L271">		List&lt;JApiParameter&gt; otherParams = method.getParameters();</span>
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">		if (thisParams.size() != otherParams.size()) {</span>
 <span class="nc" id="L273">			hasSameParameter = false;</span>
 		}
 <span class="pc bpc" id="L275" title="1 of 2 branches missed.">		if (hasSameParameter) {</span>
-<span class="fc bfc" id="L276" title="All 2 branches covered.">			for (int i = 0; i &lt; parameters1.size(); i++) {</span>
-<span class="fc bfc" id="L277" title="All 2 branches covered.">				if (!parameters1.get(i).getType().equals(parameters2.get(i).getType())) {</span>
-<span class="fc" id="L278">					hasSameParameter = false;</span>
+<span class="fc bfc" id="L276" title="All 2 branches covered.">			for (int i = 0; i &lt; thisParams.size(); i++) {</span>
+<span class="fc" id="L277">				JApiParameter thisParam = thisParams.get(i);</span>
+<span class="fc" id="L278">				JApiParameter otherParam = otherParams.get(i);</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">				if (!thisParam.getTemplateNameOptional().isPresent() &amp;&amp; // template parameter means java.lang.Object (that matches anyway)</span>
+<span class="pc bpc" id="L280" title="1 of 2 branches missed.">					!otherParam.getTemplateNameOptional().isPresent() &amp;&amp;</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">					!thisParam.getType().equals(otherParam.getType())) {</span>
+<span class="fc" id="L282">					hasSameParameter = false;</span>
+<span class="fc" id="L283">					break;</span>
 				}
 			}
 		}
-<span class="fc" id="L282">		return hasSameParameter;</span>
+<span class="fc" id="L287">		return hasSameParameter;</span>
 	}
 
 	private JApiModifier&lt;StaticModifier&gt; extractStaticModifier(Optional&lt;? extends CtBehavior&gt; oldBehaviorOptional, Optional&lt;? extends CtBehavior&gt; newBehaviorOptional) {
-<span class="fc" id="L286">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;StaticModifier&gt;() {</span>
+<span class="fc" id="L291">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;StaticModifier&gt;() {</span>
 			@Override
 			public StaticModifier getModifierForOld(CtBehavior oldBehavior) {
-<span class="fc bfc" id="L289" title="All 2 branches covered.">				return Modifier.isStatic(oldBehavior.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
+<span class="fc bfc" id="L294" title="All 2 branches covered.">				return Modifier.isStatic(oldBehavior.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
 			}
 
 			@Override
 			public StaticModifier getModifierForNew(CtBehavior newBehavior) {
-<span class="fc bfc" id="L294" title="All 2 branches covered.">				return Modifier.isStatic(newBehavior.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">				return Modifier.isStatic(newBehavior.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;</span>
 			}
 		});
 	}
 
 	private JApiModifier&lt;FinalModifier&gt; extractFinalModifier(Optional&lt;? extends CtBehavior&gt; oldBehaviorOptional, Optional&lt;? extends CtBehavior&gt; newBehaviorOptional) {
-<span class="fc" id="L300">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;FinalModifier&gt;() {</span>
+<span class="fc" id="L305">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;FinalModifier&gt;() {</span>
 			@Override
 			public FinalModifier getModifierForOld(CtBehavior oldBehavior) {
-<span class="fc bfc" id="L303" title="All 2 branches covered.">				return Modifier.isFinal(oldBehavior.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;</span>
+<span class="fc bfc" id="L308" title="All 2 branches covered.">				return Modifier.isFinal(oldBehavior.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;</span>
 			}
 
 			@Override
 			public FinalModifier getModifierForNew(CtBehavior newBehavior) {
-<span class="fc bfc" id="L308" title="All 2 branches covered.">				return Modifier.isFinal(newBehavior.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;</span>
+<span class="fc bfc" id="L313" title="All 2 branches covered.">				return Modifier.isFinal(newBehavior.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;</span>
 			}
 		});
 	}
 
 	private JApiModifier&lt;AccessModifier&gt; extractAccessModifier(Optional&lt;? extends CtBehavior&gt; oldBehaviorOptional, Optional&lt;? extends CtBehavior&gt; newBehaviorOptional) {
-<span class="fc" id="L314">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;AccessModifier&gt;() {</span>
+<span class="fc" id="L319">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;AccessModifier&gt;() {</span>
 			@Override
 			public AccessModifier getModifierForOld(CtBehavior oldBehavior) {
-<span class="fc" id="L317">				return ModifierHelper.translateToModifierLevel(oldBehavior.getModifiers());</span>
+<span class="fc" id="L322">				return ModifierHelper.translateToModifierLevel(oldBehavior.getModifiers());</span>
 			}
 
 			@Override
 			public AccessModifier getModifierForNew(CtBehavior newBehavior) {
-<span class="fc" id="L322">				return ModifierHelper.translateToModifierLevel(newBehavior.getModifiers());</span>
+<span class="fc" id="L327">				return ModifierHelper.translateToModifierLevel(newBehavior.getModifiers());</span>
 			}
 		});
 	}
 
 	private JApiModifier&lt;AbstractModifier&gt; extractAbstractModifier(Optional&lt;? extends CtBehavior&gt; oldBehaviorOptional, Optional&lt;? extends CtBehavior&gt; newBehaviorOptional) {
-<span class="fc" id="L328">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;AbstractModifier&gt;() {</span>
+<span class="fc" id="L333">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;AbstractModifier&gt;() {</span>
 			@Override
 			public AbstractModifier getModifierForOld(CtBehavior oldBehavior) {
-<span class="fc bfc" id="L331" title="All 2 branches covered.">				return Modifier.isAbstract(oldBehavior.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">				return Modifier.isAbstract(oldBehavior.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;</span>
 			}
 
 			@Override
 			public AbstractModifier getModifierForNew(CtBehavior newBehavior) {
-<span class="fc bfc" id="L336" title="All 2 branches covered.">				return Modifier.isAbstract(newBehavior.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">				return Modifier.isAbstract(newBehavior.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;</span>
 			}
 		});
 	}
 
 	private JApiModifier&lt;BridgeModifier&gt; extractBridgeModifier(Optional&lt;? extends CtBehavior&gt; oldBehaviorOptional, Optional&lt;? extends CtBehavior&gt; newBehaviorOptional) {
-<span class="fc" id="L342">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;BridgeModifier&gt;() {</span>
+<span class="fc" id="L347">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;BridgeModifier&gt;() {</span>
 			@Override
 			public BridgeModifier getModifierForOld(CtBehavior oldBehavior) {
-<span class="fc bfc" id="L345" title="All 2 branches covered.">				return ModifierHelper.isBridge(oldBehavior.getModifiers()) ? BridgeModifier.BRIDGE : BridgeModifier.NON_BRIDGE;</span>
+<span class="fc bfc" id="L350" title="All 2 branches covered.">				return ModifierHelper.isBridge(oldBehavior.getModifiers()) ? BridgeModifier.BRIDGE : BridgeModifier.NON_BRIDGE;</span>
 			}
 
 			@Override
 			public BridgeModifier getModifierForNew(CtBehavior newBehavior) {
-<span class="fc bfc" id="L350" title="All 2 branches covered.">				return ModifierHelper.isBridge(newBehavior.getModifiers()) ? BridgeModifier.BRIDGE : BridgeModifier.NON_BRIDGE;</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">				return ModifierHelper.isBridge(newBehavior.getModifiers()) ? BridgeModifier.BRIDGE : BridgeModifier.NON_BRIDGE;</span>
 			}
 		});
 	}
 
 	private JApiModifier&lt;SyntheticModifier&gt; extractSyntheticModifier(Optional&lt;? extends CtBehavior&gt; oldBehaviorOptional, Optional&lt;? extends CtBehavior&gt; newBehaviorOptional) {
-<span class="fc" id="L356">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;SyntheticModifier&gt;() {</span>
+<span class="fc" id="L361">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;SyntheticModifier&gt;() {</span>
 			@Override
 			public SyntheticModifier getModifierForOld(CtBehavior oldBehavior) {
-<span class="fc bfc" id="L359" title="All 2 branches covered.">				return ModifierHelper.isSynthetic(oldBehavior.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;</span>
+<span class="fc bfc" id="L364" title="All 2 branches covered.">				return ModifierHelper.isSynthetic(oldBehavior.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;</span>
 			}
 
 			@Override
 			public SyntheticModifier getModifierForNew(CtBehavior newBehavior) {
-<span class="fc bfc" id="L364" title="All 2 branches covered.">				return ModifierHelper.isSynthetic(newBehavior.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;</span>
+<span class="fc bfc" id="L369" title="All 2 branches covered.">				return ModifierHelper.isSynthetic(newBehavior.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;</span>
 			}
 		});
 	}
 
 	private JApiModifier&lt;VarargsModifier&gt; extractVarargsModifier(Optional&lt;? extends CtBehavior&gt; oldBehaviorOptional, Optional&lt;? extends CtBehavior&gt; newBehaviorOptional) {
-<span class="fc" id="L370">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;VarargsModifier&gt;() {</span>
+<span class="fc" id="L375">		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback&lt;VarargsModifier&gt;() {</span>
 			private VarargsModifier getModifier(CtBehavior behavior) {
-<span class="fc bfc" id="L372" title="All 2 branches covered.">				return Modifier.isVarArgs(behavior.getModifiers()) ? VarargsModifier.VARARGS : VarargsModifier.NON_VARARGS;</span>
+<span class="fc bfc" id="L377" title="All 2 branches covered.">				return Modifier.isVarArgs(behavior.getModifiers()) ? VarargsModifier.VARARGS : VarargsModifier.NON_VARARGS;</span>
 			}
 
 			@Override
 			public VarargsModifier getModifierForOld(CtBehavior oldBehavior) {
-<span class="fc" id="L377">				return getModifier(oldBehavior);</span>
+<span class="fc" id="L382">				return getModifier(oldBehavior);</span>
 			}
 
 			@Override
 			public VarargsModifier getModifierForNew(CtBehavior newBehavior) {
-<span class="fc" id="L382">				return getModifier(newBehavior);</span>
+<span class="fc" id="L387">				return getModifier(newBehavior);</span>
 			}
 		});
 	}
@@ -388,198 +393,198 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 	@XmlElementWrapper(name = &quot;modifiers&quot;)
 	@XmlElement(name = &quot;modifier&quot;)
 	public List&lt;? extends JApiModifier&lt;? extends Enum&lt;? extends Enum&lt;?&gt;&gt;&gt;&gt; getModifiers() {
-<span class="fc" id="L391">		return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier, this.bridgeModifier, this.syntheticModifier);</span>
+<span class="fc" id="L396">		return Arrays.asList(this.finalModifier, this.staticModifier, this.accessModifier, this.abstractModifier, this.bridgeModifier, this.syntheticModifier);</span>
 	}
 
 	@XmlAttribute
 	public String getName() {
-<span class="fc" id="L396">		return name;</span>
+<span class="fc" id="L401">		return name;</span>
 	}
 
 	@XmlAttribute
 	@Override
 	public JApiChangeStatus getChangeStatus() {
-<span class="fc" id="L402">		return changeStatus;</span>
+<span class="fc" id="L407">		return changeStatus;</span>
 	}
 
 	@XmlElementWrapper(name = &quot;parameters&quot;)
 	@XmlElement(name = &quot;parameter&quot;)
 	public List&lt;JApiParameter&gt; getParameters() {
-<span class="fc" id="L408">		return parameters;</span>
+<span class="fc" id="L413">		return parameters;</span>
 	}
 
 	public void addParameter(JApiParameter jApiParameter) {
-<span class="fc" id="L412">		parameters.add(jApiParameter);</span>
-<span class="fc" id="L413">	}</span>
+<span class="fc" id="L417">		parameters.add(jApiParameter);</span>
+<span class="fc" id="L418">	}</span>
 
 	@XmlTransient
 	@Override
 	public JApiModifier&lt;AccessModifier&gt; getAccessModifier() {
-<span class="fc" id="L418">		return accessModifier;</span>
+<span class="fc" id="L423">		return accessModifier;</span>
 	}
 
 	@XmlTransient
 	@Override
 	public JApiModifier&lt;FinalModifier&gt; getFinalModifier() {
-<span class="fc" id="L424">		return finalModifier;</span>
+<span class="fc" id="L429">		return finalModifier;</span>
 	}
 
 	@XmlTransient
 	@Override
 	public JApiModifier&lt;StaticModifier&gt; getStaticModifier() {
-<span class="fc" id="L430">		return staticModifier;</span>
+<span class="fc" id="L435">		return staticModifier;</span>
 	}
 
 	@Override
 	public JApiModifier&lt;AbstractModifier&gt; getAbstractModifier() {
-<span class="fc" id="L435">		return this.abstractModifier;</span>
+<span class="fc" id="L440">		return this.abstractModifier;</span>
 	}
 
 	@XmlElementWrapper(name = &quot;attributes&quot;)
 	@XmlElement(name = &quot;attribute&quot;)
 	public List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; getAttributes() {
-<span class="fc" id="L441">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L442">		list.add(this.syntheticAttribute);</span>
-<span class="fc" id="L443">		return list;</span>
+<span class="fc" id="L446">		List&lt;JApiAttribute&lt;? extends Enum&lt;?&gt;&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L447">		list.add(this.syntheticAttribute);</span>
+<span class="fc" id="L448">		return list;</span>
 	}
 
 	@XmlTransient
 	@Override
 	public JApiModifier&lt;BridgeModifier&gt; getBridgeModifier() {
-<span class="fc" id="L449">		return this.bridgeModifier;</span>
+<span class="fc" id="L454">		return this.bridgeModifier;</span>
 	}
 
 	@XmlTransient
 	@Override
 	public JApiModifier&lt;SyntheticModifier&gt; getSyntheticModifier() {
-<span class="fc" id="L455">		return this.syntheticModifier;</span>
+<span class="fc" id="L460">		return this.syntheticModifier;</span>
 	}
 
 	@XmlTransient
 	@Override
 	public JApiAttribute&lt;SyntheticAttribute&gt; getSyntheticAttribute() {
-<span class="fc" id="L461">		return syntheticAttribute;</span>
+<span class="fc" id="L466">		return syntheticAttribute;</span>
 	}
 
 	@XmlTransient
 	public JApiModifier&lt;VarargsModifier&gt; getVarargsModifier() {
-<span class="fc" id="L466">		return varargsModifier;</span>
+<span class="fc" id="L471">		return varargsModifier;</span>
 	}
 
 	@Override
 	@XmlAttribute
 	public boolean isBinaryCompatible() {
-<span class="fc" id="L472">		boolean binaryCompatible = true;</span>
-<span class="fc bfc" id="L473" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
-<span class="fc bfc" id="L474" title="All 2 branches covered.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
-<span class="fc" id="L475">				binaryCompatible = false;</span>
-<span class="fc" id="L476">				break;</span>
+<span class="fc" id="L477">		boolean binaryCompatible = true;</span>
+<span class="fc bfc" id="L478" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">			if (!compatibilityChange.isBinaryCompatible()) {</span>
+<span class="fc" id="L480">				binaryCompatible = false;</span>
+<span class="fc" id="L481">				break;</span>
 			}
-<span class="fc" id="L478">		}</span>
-<span class="fc" id="L479">		return binaryCompatible;</span>
+<span class="fc" id="L483">		}</span>
+<span class="fc" id="L484">		return binaryCompatible;</span>
 	}
 
 	@Override
 	@XmlAttribute
 	public boolean isSourceCompatible() {
-<span class="fc" id="L485">		boolean sourceCompatible = true;</span>
-<span class="fc bfc" id="L486" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
-<span class="fc bfc" id="L487" title="All 2 branches covered.">			if (!compatibilityChange.isSourceCompatible()) {</span>
-<span class="fc" id="L488">				sourceCompatible = false;</span>
-<span class="fc" id="L489">				break;</span>
+<span class="fc" id="L490">		boolean sourceCompatible = true;</span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">		for (JApiCompatibilityChange compatibilityChange : compatibilityChanges) {</span>
+<span class="fc bfc" id="L492" title="All 2 branches covered.">			if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="fc" id="L493">				sourceCompatible = false;</span>
+<span class="fc" id="L494">				break;</span>
 			}
-<span class="fc" id="L491">		}</span>
-<span class="fc bfc" id="L492" title="All 2 branches covered.">		for (JApiParameter jApiParameter : getParameters()) {</span>
-<span class="fc bfc" id="L493" title="All 2 branches covered.">			for (JApiCompatibilityChange compatibilityChange : jApiParameter.getCompatibilityChanges()) {</span>
-<span class="pc bpc" id="L494" title="1 of 2 branches missed.">				if (!compatibilityChange.isSourceCompatible()) {</span>
-<span class="fc" id="L495">					sourceCompatible = false;</span>
-<span class="fc" id="L496">					break;</span>
+<span class="fc" id="L496">		}</span>
+<span class="fc bfc" id="L497" title="All 2 branches covered.">		for (JApiParameter jApiParameter : getParameters()) {</span>
+<span class="fc bfc" id="L498" title="All 2 branches covered.">			for (JApiCompatibilityChange compatibilityChange : jApiParameter.getCompatibilityChanges()) {</span>
+<span class="pc bpc" id="L499" title="1 of 2 branches missed.">				if (!compatibilityChange.isSourceCompatible()) {</span>
+<span class="fc" id="L500">					sourceCompatible = false;</span>
+<span class="fc" id="L501">					break;</span>
 				}
-<span class="nc" id="L498">			}</span>
-<span class="fc" id="L499">		}</span>
-<span class="fc" id="L500">		return sourceCompatible;</span>
+<span class="nc" id="L503">			}</span>
+<span class="fc" id="L504">		}</span>
+<span class="fc" id="L505">		return sourceCompatible;</span>
 	}
 
 	@XmlElementWrapper(name = &quot;compatibilityChanges&quot;)
 	@XmlElement(name = &quot;compatibilityChange&quot;)
 	@Override
 	public List&lt;JApiCompatibilityChange&gt; getCompatibilityChanges() {
-<span class="fc" id="L507">		return compatibilityChanges;</span>
+<span class="fc" id="L512">		return compatibilityChanges;</span>
 	}
 
 	@XmlElementWrapper(name = &quot;annotations&quot;)
 	@XmlElement(name = &quot;annotation&quot;)
 	@Override
 	public List&lt;JApiAnnotation&gt; getAnnotations() {
-<span class="fc" id="L514">		return annotations;</span>
+<span class="fc" id="L519">		return annotations;</span>
 	}
 
 	@Override
 	public Optional&lt;Integer&gt; getOldLineNumber() {
-<span class="nc" id="L519">		return this.oldLineNumber;</span>
+<span class="nc" id="L524">		return this.oldLineNumber;</span>
 	}
 
 	@Override
 	public Optional&lt;Integer&gt; geNewLineNumber() {
-<span class="nc" id="L524">		return this.newLineNumber;</span>
+<span class="nc" id="L529">		return this.newLineNumber;</span>
 	}
 
 	@XmlAttribute(name = &quot;oldLineNumber&quot;)
 	public String getOldLineNumberAsString() {
-<span class="fc" id="L529">		return OptionalHelper.optionalToString(this.oldLineNumber);</span>
+<span class="fc" id="L534">		return OptionalHelper.optionalToString(this.oldLineNumber);</span>
 	}
 
 	@XmlAttribute(name = &quot;newLineNumber&quot;)
 	public String getNewLineNumberAsString() {
-<span class="fc" id="L534">		return OptionalHelper.optionalToString(this.newLineNumber);</span>
+<span class="fc" id="L539">		return OptionalHelper.optionalToString(this.newLineNumber);</span>
 	}
 
 	@XmlElementWrapper(name = &quot;exceptions&quot;)
 	@XmlElement(name = &quot;exception&quot;)
 	public List&lt;JApiException&gt; getExceptions() {
-<span class="fc" id="L540">		return exceptions;</span>
+<span class="fc" id="L545">		return exceptions;</span>
 	}
 
 	@XmlTransient
 	public JApiClass getjApiClass() {
-<span class="fc" id="L545">		return this.jApiClass;</span>
+<span class="fc" id="L550">		return this.jApiClass;</span>
 	}
 
 	@XmlElementWrapper(name = &quot;genericTemplates&quot;)
 	@XmlElement(name = &quot;genericTemplate&quot;)
 	public List&lt;JApiGenericTemplate&gt; getGenericTemplates() {
-<span class="fc" id="L551">		return genericTemplates;</span>
+<span class="fc" id="L556">		return genericTemplates;</span>
 	}
 
 	public abstract void enhanceGenericTypeToParameters();
 
 	protected void enhanceGenericTypeToParameters(JApiClass jApiClass, Optional&lt;? extends CtBehavior&gt; oldBehavior, Optional&lt;? extends CtBehavior&gt; newBehavior) {
-<span class="fc bfc" id="L557" title="All 4 branches covered.">		if (oldBehavior.isPresent() &amp;&amp; oldBehavior.get().getGenericSignature() != null) {</span>
-<span class="fc" id="L558">			String genericSignature = oldBehavior.get().getGenericSignature();</span>
-<span class="fc" id="L559">			SignatureParser signatureParser = new SignatureParser();</span>
-<span class="fc" id="L560">			signatureParser.parse(genericSignature);</span>
-<span class="fc" id="L561">			List&lt;JApiParameter&gt; jApiParameters = signatureParser.getJApiParameters(jApiClass, SignatureParser.DiffType.OLD_PARAMS);</span>
-<span class="pc bpc" id="L562" title="1 of 2 branches missed.">			if (jApiParameters.size() == this.getParameters().size()) {</span>
-<span class="fc bfc" id="L563" title="All 2 branches covered.">				for (int i = 0; i &lt; getParameters().size(); i++) {</span>
-<span class="fc" id="L564">					getParameters().get(i).setTemplateName(jApiParameters.get(i).getTemplateNameOptional());</span>
-<span class="fc" id="L565">					getParameters().get(i).getOldGenericTypes().clear();</span>
-<span class="fc" id="L566">					getParameters().get(i).getOldGenericTypes().addAll(jApiParameters.get(i).getOldGenericTypes());</span>
+<span class="fc bfc" id="L562" title="All 4 branches covered.">		if (oldBehavior.isPresent() &amp;&amp; oldBehavior.get().getGenericSignature() != null) {</span>
+<span class="fc" id="L563">			String genericSignature = oldBehavior.get().getGenericSignature();</span>
+<span class="fc" id="L564">			SignatureParser signatureParser = new SignatureParser();</span>
+<span class="fc" id="L565">			signatureParser.parse(genericSignature);</span>
+<span class="fc" id="L566">			List&lt;JApiParameter&gt; jApiParameters = signatureParser.getJApiParameters(jApiClass, SignatureParser.DiffType.OLD_PARAMS);</span>
+<span class="pc bpc" id="L567" title="1 of 2 branches missed.">			if (jApiParameters.size() == this.getParameters().size()) {</span>
+<span class="fc bfc" id="L568" title="All 2 branches covered.">				for (int i = 0; i &lt; getParameters().size(); i++) {</span>
+<span class="fc" id="L569">					getParameters().get(i).setTemplateName(jApiParameters.get(i).getTemplateNameOptional());</span>
+<span class="fc" id="L570">					getParameters().get(i).getOldGenericTypes().clear();</span>
+<span class="fc" id="L571">					getParameters().get(i).getOldGenericTypes().addAll(jApiParameters.get(i).getOldGenericTypes());</span>
 				}
 			}
 		}
-<span class="fc bfc" id="L570" title="All 4 branches covered.">		if (newBehavior.isPresent() &amp;&amp; newBehavior.get().getGenericSignature() != null) {</span>
-<span class="fc" id="L571">			String genericSignature = newBehavior.get().getGenericSignature();</span>
-<span class="fc" id="L572">			SignatureParser signatureParser = new SignatureParser();</span>
-<span class="fc" id="L573">			signatureParser.parse(genericSignature);</span>
-<span class="fc" id="L574">			List&lt;JApiParameter&gt; jApiParameters = signatureParser.getJApiParameters(jApiClass, SignatureParser.DiffType.NEW_PARAMS);</span>
-<span class="pc bpc" id="L575" title="1 of 2 branches missed.">			if (jApiParameters.size() == this.getParameters().size()) {</span>
-<span class="fc bfc" id="L576" title="All 2 branches covered.">				for (int i = 0; i &lt; getParameters().size(); i++) {</span>
-<span class="fc" id="L577">					getParameters().get(i).setTemplateName(jApiParameters.get(i).getTemplateNameOptional());</span>
-<span class="fc" id="L578">					getParameters().get(i).getNewGenericTypes().clear();</span>
-<span class="fc" id="L579">					getParameters().get(i).getNewGenericTypes().addAll(jApiParameters.get(i).getNewGenericTypes());</span>
+<span class="fc bfc" id="L575" title="All 4 branches covered.">		if (newBehavior.isPresent() &amp;&amp; newBehavior.get().getGenericSignature() != null) {</span>
+<span class="fc" id="L576">			String genericSignature = newBehavior.get().getGenericSignature();</span>
+<span class="fc" id="L577">			SignatureParser signatureParser = new SignatureParser();</span>
+<span class="fc" id="L578">			signatureParser.parse(genericSignature);</span>
+<span class="fc" id="L579">			List&lt;JApiParameter&gt; jApiParameters = signatureParser.getJApiParameters(jApiClass, SignatureParser.DiffType.NEW_PARAMS);</span>
+<span class="pc bpc" id="L580" title="1 of 2 branches missed.">			if (jApiParameters.size() == this.getParameters().size()) {</span>
+<span class="fc bfc" id="L581" title="All 2 branches covered.">				for (int i = 0; i &lt; getParameters().size(); i++) {</span>
+<span class="fc" id="L582">					getParameters().get(i).setTemplateName(jApiParameters.get(i).getTemplateNameOptional());</span>
+<span class="fc" id="L583">					getParameters().get(i).getNewGenericTypes().clear();</span>
+<span class="fc" id="L584">					getParameters().get(i).getNewGenericTypes().addAll(jApiParameters.get(i).getNewGenericTypes());</span>
 				}
 			}
 		}
-<span class="fc" id="L583">	}</span>
+<span class="fc" id="L588">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

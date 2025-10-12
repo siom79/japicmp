@@ -45,7 +45,7 @@ japicmp,japicmp.model,JApiAnnotationElementValue.Type,0,87,0,0,0,2,0,1,0,1
 japicmp,japicmp.model,JApiAnnotationElementValue,146,126,32,18,30,29,30,7,9,3
 japicmp,japicmp.model,JApiCompatibilityChange,4,85,3,5,0,22,3,11,0,10
 japicmp,japicmp.model,JApiBehavior.new ModifierHelper.ExtractModifierFromBehaviorCallback() {...},0,22,0,2,0,4,0,5,0,4
-japicmp,japicmp.model,JApiBehavior,70,990,19,99,15,201,21,83,3,42
+japicmp,japicmp.model,JApiBehavior,70,1003,20,102,15,206,22,84,3,42
 japicmp,japicmp.model,AccessModifier,72,42,6,0,15,6,5,3,2,3
 japicmp,japicmp.model,JApiAnnotationElement,252,141,28,22,45,37,29,9,9,4
 japicmp,japicmp.model,JApiParameter,58,77,12,2,15,23,10,11,3,11
