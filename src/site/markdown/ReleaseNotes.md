@@ -3,6 +3,11 @@ Versions
 
 The following versions of japicmp are available:
 
+0.24.2 (2025-10-12)
+-------------------
+* Include template parameters in hasSameParameter-Check for implemented methods. [#438](https://github.com/siom79/japicmp/issues/438)
+* Do not bind helpmojo to phase. [#439](https://github.com/siom79/japicmp/issues/439)
+
 0.24.1 (2025-10-05)
 -------------------
 * CompatibilityChanges.hasToBeEvaluated() includes accessModifier and synthetic filter [#426](https://github.com/siom79/japicmp/issues/426)
