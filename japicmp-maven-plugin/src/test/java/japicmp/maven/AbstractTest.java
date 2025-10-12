@@ -51,11 +51,23 @@ abstract class AbstractTest {
    * @return a new Version instance
    */
   Version createVersion(String groupId, String artifactId, String version) {
+    return new Version(createDependency(groupId, artifactId, version), null);
+  }
+
+  /**
+   * Creates a Dependency instance with the give values.
+   *
+   * @param groupId    the group ID of the Dependency
+   * @param artifactId the artifact ID of the Dependency
+   * @param version    the version of the Dependency
+   *
+   * @return a new Dependency instance
+   */
+  Dependency createDependency(String groupId, String artifactId, String version) {
     final Dependency dependency = new Dependency();
     dependency.setGroupId(groupId);
     dependency.setArtifactId(artifactId);
     dependency.setVersion(version);
-    return new Version(dependency, null);
+    return dependency;
   }
-
 }

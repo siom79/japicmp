@@ -96,7 +96,7 @@ public class JApiCmpProcessor {
     }
     if (isPomModuleNeedingSkip()) {
       log.info("Skipping execution because parameter 'skipPomModules' was set to true and this is "
-                       + "artifact is of type pom.");
+                       + "an artifact of type pom.");
       return Optional.empty();
     }
     if (skipModule()) {
@@ -216,9 +216,9 @@ public class JApiCmpProcessor {
   }
 
   /**
-   *
+   * A local enum for specifying old or new versions.
    */
-  private enum ConfigurationVersion {
+  enum ConfigurationVersion {
     OLD, NEW
   }
 
@@ -365,13 +365,11 @@ public class JApiCmpProcessor {
         Matcher matcher = pattern.matcher(version.toString());
         if (! matcher.matches()) {
           versionIterator.remove();
-          if (log.isDebugEnabled()) {
-            log.debug("Filtering version '"
-                              + version
-                              + "' because it does not match configured versionPattern '"
-                              + versionPattern
-                              + "'.");
-          }
+          log.debug("Filtering version '"
+                            + version
+                            + "' because it does not match configured versionPattern '"
+                            + versionPattern
+                            + "'.");
         }
       }
     } else {
@@ -906,10 +904,8 @@ public class JApiCmpProcessor {
                           + "with <oldClassPathDependencies/> and <newClassPathDependencies/> a "
                           + "separate classpath for the new and old version.");
         } else {
-          if (log.isDebugEnabled()) {
-            log.debug("Element <dependencies/> found. Using "
-                              + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
-          }
+          log.debug("Element <dependencies/> found. Using "
+                            + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
           for (Dependency dependency : pluginParameters.dependencies()) {
             List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile("dependencies",
                                                                            dependency,
@@ -926,11 +922,9 @@ public class JApiCmpProcessor {
       } else {
         if (pluginParameters.oldClassPathDependencies() != null
                 || pluginParameters.newClassPathDependencies() != null) {
-          if (log.isDebugEnabled()) {
-            log.debug("At least one of the elements <oldClassPathDependencies/> or "
-                              + "<newClassPathDependencies/> found. Using "
-                              + JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
-          }
+          log.debug("At least one of the elements <oldClassPathDependencies/> or "
+                            + "<newClassPathDependencies/> found. Using "
+                            + JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
           if (pluginParameters.oldClassPathDependencies() != null) {
             for (Dependency dependency : pluginParameters.oldClassPathDependencies()) {
               List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile(
@@ -952,12 +946,11 @@ public class JApiCmpProcessor {
           comparatorOptions.setClassPathMode(
                   JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
         } else {
-          if (log.isDebugEnabled()) {
-            log.debug(
-                    "None of the elements <oldClassPathDependencies/>, <newClassPathDependencies/> or"
-                            + " <dependencies/> found. Using "
-                            + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
-          }
+          log.debug(
+                  "None of the elements <oldClassPathDependencies/>, <newClassPathDependencies/> or"
+                          + " <dependencies/> found. Using "
+                          + JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
+
           comparatorOptions.setClassPathMode(
                   JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH);
         }
@@ -981,9 +974,7 @@ public class JApiCmpProcessor {
       if (resolvedFile != null) {
         String absolutePath = resolvedFile.getAbsolutePath();
         if (classPathEntries.add(absolutePath)) {
-          if (log.isDebugEnabled()) {
-            log.debug("Adding to classpath: " + absolutePath);
-          }
+          log.debug("Adding to classpath: " + absolutePath);
         }
       } else {
         handleMissingArtifactFile(artifact);
@@ -1147,14 +1138,14 @@ public class JApiCmpProcessor {
    *
    * @throws MojoFailureException
    */
-  private List<JApiCmpArchive> resolveDependencyToFile(final String parameterName,
-                                                       final Dependency dependency,
-                                                       final ConfigurationVersion configurationVersion)
+  List<JApiCmpArchive> resolveDependencyToFile(final String parameterName,
+                                               final Dependency dependency,
+                                               final ConfigurationVersion configurationVersion)
           throws MojoFailureException {
     List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>();
-    if (log.isDebugEnabled()) {
-      log.debug("Trying to resolve dependency '" + dependency + "' to file.");
-    }
+
+    log.debug("Trying to resolve dependency '" + dependency + "' to file.");
+
     MavenProject mavenProject = mavenParameters.mavenProject();
     if (dependency.getSystemPath() == null) {
       String descriptor = dependency.getGroupId()
@@ -1171,8 +1162,8 @@ public class JApiCmpProcessor {
 
       Set<Artifact> artifacts;
       if (descriptor.equals(projectDescriptor)) {
-        artifacts = getCompileArtifacts(
-                mavenProject); // do not repeat what Maven already did for us
+        // do not repeat what Maven already did for us
+        artifacts = getCompileArtifacts(mavenProject);
       } else {
         artifacts = resolveArtifact(dependency, configurationVersion);
       }
@@ -1196,7 +1187,6 @@ public class JApiCmpProcessor {
       }
     } else {
       String systemPath = dependency.getSystemPath();
-      //      Pattern pattern = Pattern.compile("\\$\\{([^\\}])");
       Pattern pattern = Pattern.compile("\\$\\{([^}])");
       Matcher matcher = pattern.matcher(systemPath);
       if (matcher.matches()) {
@@ -1215,7 +1205,7 @@ public class JApiCmpProcessor {
       boolean addFile = true;
       if (! file.exists()) {
         if (ignoreMissingArtifact(configurationVersion)) {
-          log.warn("Could not find file, but ignoreMissingOldVersion is set tot true: "
+          log.warn("Could not find file, but ignoreMissingOldVersion is set to true: "
                            + file.getAbsolutePath());
         } else {
           throw new MojoFailureException("File '" + file.getAbsolutePath() + "' does not exist.");

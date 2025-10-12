@@ -33,6 +33,8 @@ import org.junit.jupiter.api.Test;
  */
 final class JApiCmpProcessorBreakTest extends AbstractTest {
 
+  final static Log logger = mock(Log.class);
+
   ConfigParameters configParams;
   MavenParameters mavenParams;
   PluginParameters pluginParams;
@@ -46,7 +48,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
 
   @Test
   void testBreakOnSemanticVersioning() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.breakBuildBasedOnSemanticVersioning(configParams));
 
     processor.pluginParameters.breakBuild().setOnSemanticVersioning(true);
@@ -59,7 +61,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
 
   @Test
   void testBreakOnSemanticVersioningForMajorVersionZero() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.breakBuildBasedOnSemanticVersioningForMajorVersionZero(configParams));
 
     processor.pluginParameters.breakBuild().setOnSemanticVersioningForMajorVersionZero(true);
@@ -72,7 +74,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
 
   @Test
   void testBreakOnModifications() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.breakBuildOnModifications(configParams));
 
     processor.pluginParameters.breakBuild().setOnModifications(true);
@@ -85,7 +87,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
 
   @Test
   void testBreakOnBinaryIncompatibleModifications() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.breakBuildOnBinaryIncompatibleModifications(configParams));
 
     processor.pluginParameters.breakBuild().setOnBinaryIncompatibleModifications(true);
@@ -98,7 +100,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
 
   @Test
   void testBreakOnSourceIncompatibleModifications() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.breakBuildOnSourceIncompatibleModifications(configParams));
 
     processor.pluginParameters.breakBuild().setOnSourceIncompatibleModifications(true);
@@ -153,16 +155,15 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
                 return Arrays.asList(interfaceCtClass, ctClass);
               }
             });
-
-    options.addExcludeFromArgument(Optional.of("japicmp.ITest"), false); // exclude japicmp.ITest
-
+    // exclude japicmp.ITest
+    options.addExcludeFromArgument(Optional.of("japicmp.ITest"), false);
     // do not break the build if cause is excluded
     configParams.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion);
     configParams.setBreakBuildOnBinaryIncompatibleModifications(true);
     configParams.setBreakBuildOnSourceIncompatibleModifications(true);
     final JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams,
                                                             mavenParams,
-                                                            mock(Log.class));
+                                                            logger);
     processor.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), pluginParams.parameter(),
                                     options,
                                     new JarArchiveComparator(comparatorOptions));
@@ -174,7 +175,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
   }
 
   @Test
-  void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusionTrue() throws Exception {
+  void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusionTrue() {
     Assertions.assertThrows(MojoFailureException.class,
                             () -> testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(true));
   }
@@ -211,7 +212,6 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
                 return Arrays.asList(fieldTypeCtClass, ctClass);
               }
             });
-
     // exclude japicmp.FieldType
     options.addExcludeFromArgument(Optional.of("japicmp.FieldType"), false);
     // do not break the build if cause is excluded
@@ -221,7 +221,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
 
     final JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams,
                                                             mavenParams,
-                                                            mock(Log.class));
+                                                            logger);
     processor.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), configParams,
                                     options, compareClassesResult.getJarArchiveComparator());
   }
@@ -234,8 +234,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
   }
 
   @Test
-  void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusionTrue()
-          throws Exception {
+  void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusionTrue() {
     Assertions.assertThrows(MojoFailureException.class,
                             () -> testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(
                                     true));
@@ -278,15 +277,14 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
             });
     // exclude japicmp.MethodReturnType
     options.addExcludeFromArgument(Optional.of("japicmp.MethodReturnType"), false);
-
-    configParams.setBreakBuildIfCausedByExclusion(
-            breakBuildIfCausedByExclusion); // do not break the build if cause is excluded
+    // do not break the build if cause is excluded
+    configParams.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion);
     configParams.setBreakBuildOnBinaryIncompatibleModifications(true);
     configParams.setBreakBuildOnSourceIncompatibleModifications(true);
 
     final JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams,
                                                             mavenParams,
-                                                            mock(Log.class));
+                                                            logger);
     processor.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), configParams,
                                     options, compareClassesResult.getJarArchiveComparator());
   }
@@ -332,7 +330,6 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
                 return Arrays.asList(typeCtClass, ctClass);
               }
             });
-
     // exclude japicmp.SuperType
     options.addExcludeFromArgument(Optional.of("japicmp.SuperType"), false);
     // do not break the build if cause is excluded
@@ -342,7 +339,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
 
     final JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams,
                                                             mavenParams,
-                                                            mock(Log.class));
+                                                            logger);
     processor.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), configParams,
                                     options, compareClassesResult.getJarArchiveComparator());
   }
@@ -371,7 +368,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
               }
 
               @Override
-              public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+              public List<CtClass> createNewClasses(ClassPool classPool) {
                 CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(
                         classPool);
                 return Collections.singletonList(ctClass);
@@ -383,7 +380,7 @@ final class JApiCmpProcessorBreakTest extends AbstractTest {
 
     final JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams,
                                                             mavenParams,
-                                                            mock(Log.class));
+                                                            logger);
     try {
       processor.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), configParams,
                                       options, compareClassesResult.getJarArchiveComparator());
