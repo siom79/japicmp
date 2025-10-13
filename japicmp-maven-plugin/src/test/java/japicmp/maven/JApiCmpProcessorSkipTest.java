@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
  */
 final class JApiCmpProcessorSkipTest extends AbstractTest {
 
+  final static Log logger = mock(Log.class);
+
   ConfigParameters configParams;
   MavenParameters mavenParams;
   PluginParameters pluginParams;
@@ -26,7 +28,7 @@ final class JApiCmpProcessorSkipTest extends AbstractTest {
 
   @Test
   void testSkipDiffReport() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.skipDiffReport());
 
     processor.pluginParameters.skipReport().setSkipDiffReport(true);
@@ -39,7 +41,7 @@ final class JApiCmpProcessorSkipTest extends AbstractTest {
 
   @Test
   void testSkipHtmlReport() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.skipHtmlReport());
 
     processor.pluginParameters.skipReport().setSkipHtmlReport(true);
@@ -52,7 +54,7 @@ final class JApiCmpProcessorSkipTest extends AbstractTest {
 
   @Test
   void testSkipMarkdownReport() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.skipMarkdownReport());
 
     processor.pluginParameters.skipReport().setSkipMarkdownReport(true);
@@ -65,7 +67,7 @@ final class JApiCmpProcessorSkipTest extends AbstractTest {
 
   @Test
   void testSkipXmlReport() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, mock(Log.class));
+    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
     assertFalse(processor.skipMarkdownReport());
 
     processor.pluginParameters.skipReport().setSkipXmlReport(true);
