@@ -154,7 +154,7 @@ public class JApiCmpProcessor {
 	private void setUpOverrideCompatibilityChanges(
 			final JarArchiveComparatorOptions comparatorOptions)
 			throws MojoFailureException {
-		if (pluginParameters.parameter().getOverrideCompatibilityChangeParameters()!=null) {
+		if (pluginParameters.parameter().getOverrideCompatibilityChangeParameters() != null) {
 			List<ConfigParameters.OverrideCompatibilityChangeParameter>
 					overrideCompatibilityChangeParameters =
 					pluginParameters.parameter().getOverrideCompatibilityChangeParameters();
@@ -169,7 +169,7 @@ public class JApiCmpProcessor {
 						break;
 					}
 				}
-				if (foundChange==null) {
+				if (foundChange == null) {
 					throw new MojoFailureException("Unknown compatibility change '"
 							+ compatibilityChange
 							+ "'. Supported values: "
@@ -185,7 +185,7 @@ public class JApiCmpProcessor {
 						break;
 					}
 				}
-				if (foundSemanticVersionLevel==null) {
+				if (foundSemanticVersionLevel == null) {
 					throw new MojoFailureException("Unknown semantic version level '"
 							+ semanticVersionLevel
 							+ "'. Supported values: "
@@ -244,12 +244,14 @@ public class JApiCmpProcessor {
 	}
 
 	/**
-	 * @param configurationVersion
+	 * Returns am artifact to compare.
 	 *
-	 * @return
+	 * @param configurationVersion the artifact version (OLD vs. NEW)
 	 *
-	 * @throws MojoFailureException
-	 * @throws MojoExecutionException
+	 * @return the found artifact
+	 *
+	 * @throws MojoFailureException   if a Mojo error occurs
+	 * @throws MojoExecutionException if an execution error occurs
 	 */
 	private Artifact getComparisonArtifact(final ConfigurationVersion configurationVersion)
 			throws MojoFailureException, MojoExecutionException {
@@ -311,7 +313,7 @@ public class JApiCmpProcessor {
 									   final ArtifactResult artifactResult,
 									   final ConfigurationVersion configurationVersion)
 			throws MojoFailureException {
-		if (artifactResult.getExceptions()!=null && !artifactResult.getExceptions().isEmpty()) {
+		if (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty()) {
 			List<Exception> exceptions = artifactResult.getExceptions();
 			for (Exception exception : exceptions) {
 				log.debug(exception.getMessage(), exception);
@@ -334,7 +336,7 @@ public class JApiCmpProcessor {
 	private void filterVersionPattern(
 			final List<org.eclipse.aether.version.Version> availableVersions)
 			throws MojoFailureException {
-		if (pluginParameters.parameter().getOldVersionPattern()!=null) {
+		if (pluginParameters.parameter().getOldVersionPattern() != null) {
 			String versionPattern = pluginParameters.parameter().getOldVersionPattern();
 			Pattern pattern;
 			try {
@@ -369,7 +371,7 @@ public class JApiCmpProcessor {
 	private void filterSnapshots(final List<org.eclipse.aether.version.Version> versions) {
 		if (!pluginParameters.parameter().isIncludeSnapshots()) {
 			versions.removeIf(
-					version -> version.toString()!=null && version.toString().endsWith("SNAPSHOT"));
+					version -> version.toString() != null && version.toString().endsWith("SNAPSHOT"));
 		}
 	}
 
@@ -382,26 +384,26 @@ public class JApiCmpProcessor {
 	private void populateArchivesListsFromParameters(final List<JApiCmpArchive> oldArchives,
 													 final List<JApiCmpArchive> newArchives)
 			throws MojoFailureException {
-		if (pluginParameters.oldVersion()!=null) {
+		if (pluginParameters.oldVersion() != null) {
 			oldArchives.addAll(retrieveFileFromConfiguration(pluginParameters.oldVersion(), "oldVersion",
 					ConfigurationVersion.OLD));
 		}
-		if (pluginParameters.oldVersions()!=null) {
+		if (pluginParameters.oldVersions() != null) {
 			for (DependencyDescriptor dependencyDescriptor : pluginParameters.oldVersions()) {
-				if (dependencyDescriptor!=null) {
+				if (dependencyDescriptor != null) {
 					oldArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "oldVersions",
 							ConfigurationVersion.OLD));
 				}
 			}
 		}
-		if (pluginParameters.oldVersion()==null && pluginParameters.oldVersions()==null) {
+		if (pluginParameters.oldVersion() == null && pluginParameters.oldVersions() == null) {
 			try {
 				Artifact comparisonArtifact = getComparisonArtifact(ConfigurationVersion.OLD);
-				if (comparisonArtifact!=null && comparisonArtifact.getVersion()!=null) {
+				if (comparisonArtifact != null && comparisonArtifact.getVersion() != null) {
 					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, ConfigurationVersion.OLD);
 					for (Artifact artifact : artifacts) {
 						File file = artifact.getFile();
-						if (file!=null) {
+						if (file != null) {
 							oldArchives.add(new JApiCmpArchive(file, guessVersion(file)));
 						} else {
 							handleMissingArtifactFile(artifact);
@@ -413,27 +415,27 @@ public class JApiCmpProcessor {
 						"Computing and resolving comparison artifact failed: " + e.getMessage(), e);
 			}
 		}
-		if (pluginParameters.newVersion()!=null) {
+		if (pluginParameters.newVersion() != null) {
 			newArchives.addAll(retrieveFileFromConfiguration(pluginParameters.newVersion(), "newVersion",
 					ConfigurationVersion.NEW));
 		}
-		if (pluginParameters.newVersions()!=null) {
+		if (pluginParameters.newVersions() != null) {
 			for (DependencyDescriptor dependencyDescriptor : pluginParameters.newVersions()) {
-				if (dependencyDescriptor!=null) {
+				if (dependencyDescriptor != null) {
 					newArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions",
 							ConfigurationVersion.NEW));
 				}
 			}
 		}
-		if (pluginParameters.newVersion()==null && pluginParameters.newVersions()==null) {
+		if (pluginParameters.newVersion() == null && pluginParameters.newVersions() == null) {
 			MavenProject mavenProject = mavenParameters.mavenProject();
-			if (mavenProject!=null && mavenProject.getArtifact()!=null) {
+			if (mavenProject != null && mavenProject.getArtifact() != null) {
 				DefaultArtifact defaultArtifact = createDefaultArtifact(mavenProject,
 						mavenProject.getVersion());
 				Set<Artifact> artifacts = resolveArtifact(defaultArtifact, ConfigurationVersion.NEW);
 				for (Artifact artifact : artifacts) {
 					File file = artifact.getFile();
-					if (file!=null) {
+					if (file != null) {
 						try (JarFile jarFile = new JarFile(file)) {
 							log.debug("Could open file '"
 									+ file.getAbsolutePath()
@@ -526,7 +528,7 @@ public class JApiCmpProcessor {
 		try {
 			errorOutput.generate();
 		} catch (JApiCmpException e) {
-			if (e.getReason()==JApiCmpException.Reason.IncompatibleChange) {
+			if (e.getReason() == JApiCmpException.Reason.IncompatibleChange) {
 				throw new MojoFailureException(e.getMessage());
 			} else {
 				throw new MojoExecutionException("Error while checking for incompatible changes", e);
@@ -540,16 +542,16 @@ public class JApiCmpProcessor {
 	 * @throws MojoFailureException
 	 */
 	Options getOptions() throws MojoFailureException {
-		if (this.options!=null) {
+		if (this.options != null) {
 			return this.options;
 		}
 		this.options = Options.newDefault();
 		populateArchivesListsFromParameters(this.options.getOldArchives(),
 				this.options.getNewArchives());
 		ConfigParameters parameterParam = pluginParameters.parameter();
-		if (parameterParam!=null) {
+		if (parameterParam != null) {
 			String accessModifierArg = parameterParam.getAccessModifier();
-			if (accessModifierArg!=null) {
+			if (accessModifierArg != null) {
 				try {
 					AccessModifier accessModifier = AccessModifier.valueOf(accessModifierArg.toUpperCase());
 					this.options.setAccessModifier(accessModifier);
@@ -565,14 +567,14 @@ public class JApiCmpProcessor {
 			this.options.setOutputOnlyModifications(parameterParam.getOnlyModified());
 
 			List<String> excludes = parameterParam.getExcludes();
-			if (excludes!=null) {
+			if (excludes != null) {
 				for (String exclude : excludes) {
 					this.options.addExcludeFromArgument(Optional.ofNullable(exclude),
 							parameterParam.isExcludeExclusively());
 				}
 			}
 			List<String> includes = parameterParam.getIncludes();
-			if (includes!=null) {
+			if (includes != null) {
 				for (String include : includes) {
 					this.options.addIncludeFromArgument(Optional.ofNullable(include),
 							parameterParam.isIncludeExlusively());
@@ -584,14 +586,14 @@ public class JApiCmpProcessor {
 
 			List<String> ignoreMissingClassesByRegularExpressions =
 					parameterParam.getIgnoreMissingClassesByRegularExpressions();
-			if (ignoreMissingClassesByRegularExpressions!=null) {
+			if (ignoreMissingClassesByRegularExpressions != null) {
 				for (String ignoreMissingClassRegularExpression :
 						ignoreMissingClassesByRegularExpressions) {
 					this.options.addIgnoreMissingClassRegularExpression(ignoreMissingClassRegularExpression);
 				}
 			}
 			String htmlStylesheet = parameterParam.getHtmlStylesheet();
-			if (htmlStylesheet!=null) {
+			if (htmlStylesheet != null) {
 				this.options.setHtmlStylesheet(Optional.of(htmlStylesheet));
 			}
 			this.options.setNoAnnotations(parameterParam.getNoAnnotations());
@@ -659,7 +661,7 @@ public class JApiCmpProcessor {
 	File createJapiCmpBaseDir() throws MojoFailureException {
 		File baseDir;
 		try {
-			if (pluginParameters.outputDirectory()!=null) {
+			if (pluginParameters.outputDirectory() != null) {
 				baseDir = pluginParameters.outputDirectory();
 			} else {
 				File projectBuildDirParam = pluginParameters.projectBuildDir();
@@ -710,7 +712,7 @@ public class JApiCmpProcessor {
 			throws IOException, MojoFailureException {
 		if (pluginParameters.isWriteToFiles()) {
 			MarkdownOptions mdOptions = MarkdownOptions.newDefault(options);
-			if (pluginParameters.parameter().getMarkdownTitle()!=null) {
+			if (pluginParameters.parameter().getMarkdownTitle() != null) {
 				mdOptions.title.report = pluginParameters.parameter().getMarkdownTitle();
 			}
 			MarkdownOutputGenerator mdOut = new MarkdownOutputGenerator(mdOptions, jApiClasses);
@@ -765,7 +767,7 @@ public class JApiCmpProcessor {
 
 		String optionalTitle = pluginParameters.parameter().getHtmlTitle();
 		xmlOutputGeneratorOptions.setTitle(
-				optionalTitle!=null ? optionalTitle:options.getDifferenceDescription());
+				optionalTitle != null ? optionalTitle:options.getDifferenceDescription());
 
 		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options,
 				xmlOutputGeneratorOptions);
@@ -815,7 +817,7 @@ public class JApiCmpProcessor {
 		HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
 		htmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
 		final String title = pluginParameters.parameter().getHtmlTitle();
-		htmlOutputGeneratorOptions.setTitle(title!=null ? title:options.getDifferenceDescription());
+		htmlOutputGeneratorOptions.setTitle(title != null ? title:options.getDifferenceDescription());
 
 		final HtmlOutputGenerator htmlOutputGenerator = new HtmlOutputGenerator(jApiClasses, options,
 				htmlOutputGeneratorOptions);
@@ -877,12 +879,12 @@ public class JApiCmpProcessor {
 	private String createFilename() {
 		String filename = "japicmp";
 		String executionId = mavenParameters.mojoExecution().getExecutionId();
-		if (executionId!=null && !"default".equals(executionId)) {
+		if (executionId != null && !"default".equals(executionId)) {
 			filename = executionId;
 		}
 		StringBuilder sb = new StringBuilder();
 		for (char c : filename.toCharArray()) {
-			if (c=='.' || Character.isJavaIdentifierPart(c) || c=='-') {
+			if (c == '.' || Character.isJavaIdentifierPart(c) || c == '-') {
 				sb.append(c);
 			}
 		}
@@ -896,10 +898,10 @@ public class JApiCmpProcessor {
 	 */
 	private void setUpClassPath(final JarArchiveComparatorOptions comparatorOptions)
 			throws MojoFailureException {
-		if (pluginParameters!=null) {
-			if (pluginParameters.dependencies()!=null) {
-				if (pluginParameters.oldClassPathDependencies()!=null
-						|| pluginParameters.newClassPathDependencies()!=null) {
+		if (pluginParameters != null) {
+			if (pluginParameters.dependencies() != null) {
+				if (pluginParameters.oldClassPathDependencies() != null
+						|| pluginParameters.newClassPathDependencies() != null) {
 					throw new MojoFailureException(
 							"Please specify either a <dependencies/> element or the two elements "
 									+ "<oldClassPathDependencies/> and <newClassPathDependencies/>. "
@@ -924,12 +926,12 @@ public class JApiCmpProcessor {
 					}
 				}
 			} else {
-				if (pluginParameters.oldClassPathDependencies()!=null
-						|| pluginParameters.newClassPathDependencies()!=null) {
+				if (pluginParameters.oldClassPathDependencies() != null
+						|| pluginParameters.newClassPathDependencies() != null) {
 					log.debug("At least one of the elements <oldClassPathDependencies/> or "
 							+ "<newClassPathDependencies/> found. Using "
 							+ JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
-					if (pluginParameters.oldClassPathDependencies()!=null) {
+					if (pluginParameters.oldClassPathDependencies() != null) {
 						for (Dependency dependency : pluginParameters.oldClassPathDependencies()) {
 							List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile(
 									"oldClassPathDependencies", dependency, ConfigurationVersion.OLD);
@@ -938,7 +940,7 @@ public class JApiCmpProcessor {
 							}
 						}
 					}
-					if (pluginParameters.newClassPathDependencies()!=null) {
+					if (pluginParameters.newClassPathDependencies() != null) {
 						for (Dependency dependency : pluginParameters.newClassPathDependencies()) {
 							List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile(
 									"newClassPathDependencies", dependency, ConfigurationVersion.NEW);
@@ -975,7 +977,7 @@ public class JApiCmpProcessor {
 		Set<String> classPathEntries = new HashSet<>();
 		for (Artifact artifact : getCompileArtifacts(mavenProject)) {
 			File resolvedFile = artifact.getFile();
-			if (resolvedFile!=null) {
+			if (resolvedFile != null) {
 				String absolutePath = resolvedFile.getAbsolutePath();
 				if (classPathEntries.add(absolutePath)) {
 					log.debug("Adding to classpath: " + absolutePath);
@@ -1073,11 +1075,11 @@ public class JApiCmpProcessor {
 															   final String parameterName,
 															   final ConfigurationVersion configurationVersion)
 			throws MojoFailureException {
-		if (version!=null) {
+		if (version != null) {
 			Dependency dependency = version.getDependency();
-			if (dependency!=null) {
+			if (dependency != null) {
 				return resolveDependencyToFile(parameterName, dependency, configurationVersion);
-			} else if (version.getFile()!=null) {
+			} else if (version.getFile() != null) {
 				ConfigurationFile configurationFile = version.getFile();
 				return resolveConfigurationFileToFile(parameterName, configurationFile,
 						configurationVersion);
@@ -1103,7 +1105,7 @@ public class JApiCmpProcessor {
 																final ConfigurationVersion configurationVersion)
 			throws MojoFailureException {
 		String path = configurationFile.getPath();
-		if (path==null) {
+		if (path == null) {
 			throw new MojoFailureException(
 					String.format(
 							"The path element in the configuration of the plugin is missing for %s.",
@@ -1151,7 +1153,7 @@ public class JApiCmpProcessor {
 		log.debug("Trying to resolve dependency '" + dependency + "' to file.");
 
 		MavenProject mavenProject = mavenParameters.mavenProject();
-		if (dependency.getSystemPath()==null) {
+		if (dependency.getSystemPath() == null) {
 			String descriptor = dependency.getGroupId()
 					+ ":"
 					+ dependency.getArtifactId()
@@ -1174,7 +1176,7 @@ public class JApiCmpProcessor {
 
 			for (Artifact artifact : artifacts) {
 				File file = artifact.getFile();
-				if (file!=null) {
+				if (file != null) {
 					jApiCmpArchives.add(new JApiCmpArchive(file, artifact.getVersion()));
 				} else {
 					handleMissingArtifactFile(artifact);
@@ -1198,7 +1200,7 @@ public class JApiCmpProcessor {
 					String property = matcher.group(i);
 					String propertyResolved = mavenParameters.mavenProject().getProperties().getProperty(
 							property);
-					if (propertyResolved!=null) {
+					if (propertyResolved != null) {
 						systemPath = systemPath.replaceAll("${" + property + "}", propertyResolved);
 					} else {
 						throw new MojoFailureException("Could not resolve property '" + property + "'.");
@@ -1265,7 +1267,7 @@ public class JApiCmpProcessor {
 	private boolean ignoreNonResolvableArtifacts() {
 		boolean ignoreNonResolvableArtifacts = false;
 		ConfigParameters parameterParam = pluginParameters.parameter();
-		if (parameterParam!=null) {
+		if (parameterParam != null) {
 			String ignoreNonResolvableArtifactsAsString =
 					parameterParam.getIgnoreNonResolvableArtifacts();
 			if (Boolean.TRUE.toString().equalsIgnoreCase(ignoreNonResolvableArtifactsAsString)) {
@@ -1281,7 +1283,7 @@ public class JApiCmpProcessor {
 	 * @return
 	 */
 	private boolean ignoreMissingOldVersion(final ConfigurationVersion configurationVersion) {
-		return (configurationVersion==ConfigurationVersion.OLD &&
+		return (configurationVersion == ConfigurationVersion.OLD &&
 				pluginParameters.parameter().getIgnoreMissingOldVersion());
 	}
 
@@ -1291,7 +1293,7 @@ public class JApiCmpProcessor {
 	 * @return
 	 */
 	private boolean ignoreMissingNewVersion(final ConfigurationVersion configurationVersion) {
-		return (configurationVersion==ConfigurationVersion.NEW &&
+		return (configurationVersion == ConfigurationVersion.NEW &&
 				pluginParameters.parameter().getIgnoreMissingNewVersion());
 	}
 
@@ -1354,8 +1356,8 @@ public class JApiCmpProcessor {
 			resolutionResult = mavenParameters.repoSystem().resolveArtifact(mavenParameters.repoSession(),
 					request);
 			log.debug("Resolved artifact: " + resolutionResult);
-			if (resolutionResult!=null) {
-				if (resolutionResult.getExceptions()!=null && !resolutionResult.getExceptions()
+			if (resolutionResult != null) {
+				if (resolutionResult.getExceptions() != null && !resolutionResult.getExceptions()
 						.isEmpty()) {
 					List<Exception> exceptions = resolutionResult.getExceptions();
 					for (Exception exception : exceptions) {
@@ -1393,7 +1395,7 @@ public class JApiCmpProcessor {
 	 * @throws MojoFailureException if the given value is {@code null}
 	 */
 	private <T> void notNull(final T value, final String msg) throws MojoFailureException {
-		if (value==null) {
+		if (value == null) {
 			throw new MojoFailureException(msg);
 		}
 	}

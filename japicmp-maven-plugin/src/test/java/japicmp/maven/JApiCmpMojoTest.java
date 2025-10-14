@@ -1,11 +1,13 @@
 package japicmp.maven;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import japicmp.maven.util.LocalMojoTest;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.junit5.InjectMojo;
 import org.junit.jupiter.api.Test;
 
@@ -130,17 +132,83 @@ final class JApiCmpMojoTest extends AbstractTest {
 	}
 
 	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/noartifacts/pom.xml")
+	void testNoArtifacts(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testSkipPomDir);
+//		testMojo.setLog(new SystemStreamLog());
+
+		assertThrows(MojoFailureException.class, testMojo::execute);
+	}
+
+	@Test
 	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
 	void testMarkdownTitle(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
-//    testMojo.setLog(new SystemStreamLog());
+//		testMojo.setLog(new SystemStreamLog());
 		testMojo.execute();
 		assertFileExists(configDiffFile);
 		assertFileExists(configHhtmlFile);
 		assertFileExists(configMdFile);
 		assertFileExists(configXmlFile);
 		assertFileContains(configMdFile, "# New Markdown Title");
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnModification(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+//		testMojo.setLog(new SystemStreamLog());
+		testMojo.parameter.setBreakBuildOnModifications(true);
+		assertThrows(MojoFailureException.class, testMojo::execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnBinaryIncompatible(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+//		testMojo.setLog(new SystemStreamLog());
+		testMojo.parameter.setBreakBuildOnBinaryIncompatibleModifications(true);
+		assertThrows(MojoFailureException.class, testMojo::execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnSourceIncompatible(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+//		testMojo.setLog(new SystemStreamLog());
+		testMojo.parameter.setBreakBuildOnSourceIncompatibleModifications(true);
+		assertThrows(MojoFailureException.class, testMojo::execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnMissingOldVersion(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+//		testMojo.setLog(new SystemStreamLog());
+		testMojo.oldVersion.getDependency().setVersion("x.y");
+		assertThrows(MojoFailureException.class, testMojo::execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testIgnoreMissingOldVersion(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+//		testMojo.setLog(new SystemStreamLog());
+		testMojo.oldVersion.getDependency().setVersion("x.y");
+		testMojo.parameter.setIgnoreMissingOldVersion(true);
+		testMojo.execute();
+		assertFileExists(configDiffFile);
+		assertFileExists(configHhtmlFile);
+		assertFileExists(configMdFile);
+		assertFileExists(configXmlFile);
+		assertFileContains(configMdFile, "with the previous version `unknown`");
 	}
 
 }
