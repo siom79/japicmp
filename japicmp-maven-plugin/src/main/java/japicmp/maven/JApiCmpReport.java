@@ -79,6 +79,10 @@ public class JApiCmpReport extends AbstractMavenReport {
   @Parameter(required = true, property = "project.build.directory")
   File projectBuildDir;
 
+  /** The report(s) output directory. */
+  @Parameter
+  File outputDirectory;
+
   /** Remote project repositories used for the project. */
   @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
   List<RemoteRepository> remoteProjectRepositories;

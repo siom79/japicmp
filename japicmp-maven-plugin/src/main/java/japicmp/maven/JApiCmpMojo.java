@@ -74,22 +74,28 @@ public class JApiCmpMojo extends AbstractMojo {
   @Parameter(property = "japicmp.skipHtmlReport")
   boolean skipHtmlReport;
 
+  /** Specifies whether to break the build on modifications. */
   @Parameter(property = "japicmp.breakBuildOnModifications")
   boolean breakBuildOnModifications;
 
+  /** Specifies whether to break the build on binary incompatible modifications. */
   @Parameter(property = "japicmp.breakBuildOnBinaryIncompatibleModifications")
   boolean breakBuildOnBinaryIncompatibleModifications;
 
+  /** Specifies whether to break the build on source incompatible modifications. */
   @Parameter(property = "japicmp.breakBuildOnSourceIncompatibleModifications")
   boolean breakBuildOnSourceIncompatibleModifications;
 
+  /** Specifies whether to break the build on semantic versioning. */
   @Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioning")
   boolean breakBuildBasedOnSemanticVersioning;
 
+  /** Specifies whether to break the build on semantic versioning for major version zero. */
   @Parameter(property = "japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero")
   boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 
-  @Parameter(defaultValue = "${project.build.directory}/reports", required = true)
+  /** The report(s) output directory. */
+  @Parameter
   File outputDirectory;
 
   /** The version range to compare. */
@@ -142,7 +148,6 @@ public class JApiCmpMojo extends AbstractMojo {
    * @throws MojoFailureException   if an error occurs during processing
    */
   public void execute() throws MojoExecutionException, MojoFailureException {
-
     MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories,
                                                           this.mavenProject, this.mojoExecution,
                                                           this.versionRangeWithProjectVersion,
