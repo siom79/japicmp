@@ -94,11 +94,7 @@ public class JApiCmpProcessor {
       log.info("Skipping execution because parameter 'skip' was set to true.");
       return Optional.empty();
     }
-    if (isPomModuleNeedingSkip()) {
-      log.info("Skipping execution because parameter 'skipPomModules' was set to true and this is "
-                       + "an artifact of type pom.");
-      return Optional.empty();
-    }
+
     if (skipModule()) {
       return Optional.empty();
     }
@@ -1385,14 +1381,6 @@ public class JApiCmpProcessor {
       }
     }
     return new HashSet<>();
-  }
-
-  /**
-   * @return
-   */
-  private boolean isPomModuleNeedingSkip() {
-    return pluginParameters.parameter().getSkipPomModules() && "pom".equalsIgnoreCase(
-            mavenParameters.mavenProject().getArtifact().getType());
   }
 
   /**

@@ -34,10 +34,10 @@ public class SkipModuleStrategy {
    * @return {@code true} if the module should be skipped
    */
   public boolean skip() {
-    MavenProject mavenProject = mavenParameters.mavenProject();
-    ConfigParameters parameters = pluginParameters.parameter();
+    final MavenProject mavenProject = mavenParameters.mavenProject();
+    final ConfigParameters parameters = pluginParameters.parameter();
     if (mavenProject != null && parameters != null) {
-      List<String> packagingSupporteds = parameters.getPackagingSupporteds();
+      final List<String> packagingSupporteds = parameters.getPackagingSupporteds();
       if ((packagingSupporteds != null) && !packagingSupporteds.isEmpty()) {
         if (!packagingSupporteds.contains(mavenProject.getPackaging())) {
           log.info("Filtered according to packagingFilter");
@@ -46,39 +46,35 @@ public class SkipModuleStrategy {
       } else {
         log.debug("No packaging support defined, no filtering");
       }
-      if ("pom".equals(mavenProject.getPackaging())) {
-        boolean skipPomModules = parameters.getSkipPomModules();
-        if (skipPomModules) {
-          log.info("Skipping execution because packaging of this module is 'pom'.");
-          return true;
-        }
+
+      if ("pom".equals(mavenProject.getPackaging()) && parameters.getSkipPomModules()) {
+        log.info("Skipping module because packaging is 'pom'.");
+        return true;
       }
 
-      String artifactId = mavenProject.getArtifactId();
+      final String artifactId = mavenProject.getArtifactId();
       if (artifactId != null) {
-        List<String> excludeModules = parameters.getExcludeModules();
+        final List<String> excludeModules = parameters.getExcludeModules();
         if (excludeModules != null) {
           for (String excludeModule : excludeModules) {
             if (excludeModule != null) {
               if (artifactId.matches(excludeModule)) {
                 log.info("Skipping module because artifactId matches exclude expression: "
-                        + excludeModule);
+                                 + excludeModule);
                 return true;
               }
             }
           }
         }
 
+        final List<String> includeModules = parameters.getIncludeModules();
         int includeCount = 0;
-        List<String> includeModules = parameters.getIncludeModules();
         if (includeModules != null) {
           for (String includeModule : includeModules) {
             if (includeModule != null) {
               includeCount++;
               if (artifactId.matches(includeModule)) {
-                if (this.log.isDebugEnabled()) {
-                  log.debug("Including module because it is explicitly included: " + includeModule);
-                }
+                log.debug("Including module because it is explicitly included: " + includeModule);
                 return false;
               }
             }
@@ -86,13 +82,15 @@ public class SkipModuleStrategy {
         }
 
         if (includeCount > 0) {
-          log.info("Skipping module because explicit includes are defined but artifactId did not match.");
+          log.info(
+                  "Skipping module because explicit includes are defined but artifactId did not match.");
           return true; // it has not been included up to now, and we have includes -> skip
         }
       } else {
         log.debug("Name of maven project is null.");
       }
     }
+
     return false;
   }
 }
