@@ -13,68 +13,68 @@ import org.junit.jupiter.api.Test;
  */
 final class JApiCmpProcessorSkipTest extends AbstractTest {
 
-  final static Log logger = mock(Log.class);
+	final static Log logger = mock(Log.class);
 
-  ConfigParameters configParams;
-  MavenParameters mavenParams;
-  PluginParameters pluginParams;
+	ConfigParameters configParams;
+	MavenParameters mavenParams;
+	PluginParameters pluginParams;
 
-  @BeforeEach
-  void setup() {
-    configParams = new ConfigParameters();
-    mavenParams = createMavenParameters();
-    pluginParams = createPluginParameters(configParams);
-  }
+	@BeforeEach
+	void setup() {
+		configParams = new ConfigParameters();
+		mavenParams = createMavenParameters();
+		pluginParams = createPluginParameters(configParams);
+	}
 
-  @Test
-  void testSkipDiffReport() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
-    assertFalse(processor.skipDiffReport());
+	@Test
+	void testSkipDiffReport() {
+		JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
+		assertFalse(processor.skipDiffReport());
 
-    processor.pluginParameters.skipReport().setSkipDiffReport(true);
-    assertTrue(processor.skipDiffReport());
+		processor.pluginParameters.skipReport().setSkipDiffReport(true);
+		assertTrue(processor.skipDiffReport());
 
-    processor.pluginParameters.skipReport().setSkipDiffReport(false);
-    configParams.setSkipDiffReport(true);
-    assertTrue(processor.skipDiffReport());
-  }
+		processor.pluginParameters.skipReport().setSkipDiffReport(false);
+		configParams.setSkipDiffReport(true);
+		assertTrue(processor.skipDiffReport());
+	}
 
-  @Test
-  void testSkipHtmlReport() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
-    assertFalse(processor.skipHtmlReport());
+	@Test
+	void testSkipHtmlReport() {
+		JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
+		assertFalse(processor.skipHtmlReport());
 
-    processor.pluginParameters.skipReport().setSkipHtmlReport(true);
-    assertTrue(processor.skipHtmlReport());
+		processor.pluginParameters.skipReport().setSkipHtmlReport(true);
+		assertTrue(processor.skipHtmlReport());
 
-    processor.pluginParameters.skipReport().setSkipHtmlReport(false);
-    configParams.setSkipHtmlReport(true);
-    assertTrue(processor.skipHtmlReport());
-  }
+		processor.pluginParameters.skipReport().setSkipHtmlReport(false);
+		configParams.setSkipHtmlReport(true);
+		assertTrue(processor.skipHtmlReport());
+	}
 
-  @Test
-  void testSkipMarkdownReport() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
-    assertFalse(processor.skipMarkdownReport());
+	@Test
+	void testSkipMarkdownReport() {
+		JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
+		assertFalse(processor.skipMarkdownReport());
 
-    processor.pluginParameters.skipReport().setSkipMarkdownReport(true);
-    assertTrue(processor.skipMarkdownReport());
+		processor.pluginParameters.skipReport().setSkipMarkdownReport(true);
+		assertTrue(processor.skipMarkdownReport());
 
-    processor.pluginParameters.skipReport().setSkipMarkdownReport(false);
-    configParams.setSkipMarkdownReport(true);
-    assertTrue(processor.skipMarkdownReport());
-  }
+		processor.pluginParameters.skipReport().setSkipMarkdownReport(false);
+		configParams.setSkipMarkdownReport(true);
+		assertTrue(processor.skipMarkdownReport());
+	}
 
-  @Test
-  void testSkipXmlReport() {
-    JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
-    assertFalse(processor.skipMarkdownReport());
+	@Test
+	void testSkipXmlReport() {
+		JApiCmpProcessor processor = new JApiCmpProcessor(pluginParams, mavenParams, logger);
+		assertFalse(processor.skipMarkdownReport());
 
-    processor.pluginParameters.skipReport().setSkipXmlReport(true);
-    assertTrue(processor.skipXmlReport());
+		processor.pluginParameters.skipReport().setSkipXmlReport(true);
+		assertTrue(processor.skipXmlReport());
 
-    processor.pluginParameters.skipReport().setSkipXmlReport(false);
-    configParams.setSkipXmlReport(true);
-    assertTrue(processor.skipXmlReport());
-  }
+		processor.pluginParameters.skipReport().setSkipXmlReport(false);
+		configParams.setSkipXmlReport(true);
+		assertTrue(processor.skipXmlReport());
+	}
 }

@@ -51,113 +51,113 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
  */
 public class LocalMojoExtension extends MojoExtension {
 
-  /** Default constructor. */
-  public LocalMojoExtension() {
-    super();
-  }
+	/** Default constructor. */
+	public LocalMojoExtension() {
+		super();
+	}
 
-  /**
-   * Resolves the mojo parameter for a Junit 5 test. This overrides the default method to provide a
-   * fully populated mojo according to the current test environment.
-   *
-   * @param parameterContext the parameter context
-   * @param extensionContext the extension context
-   *
-   * @return the resolved parameter (a fully populated {@link org.apache.maven.plugin.AbstractMojo}
-   *         object)
-   *
-   * @throws ParameterResolutionException if an error occurs
-   */
-  @Override
-  public Object resolveParameter(
-          final ParameterContext parameterContext, final ExtensionContext extensionContext) {
-    final InjectMojo injectMojo =
-            parameterContext
-                    .findAnnotation(InjectMojo.class)
-                    .orElseGet(
-                            () -> parameterContext.getDeclaringExecutable().getAnnotation(
-                                    InjectMojo.class));
-    final File testPom = new File(injectMojo.pom());
+	/**
+	 * Resolves the mojo parameter for a Junit 5 test. This overrides the default method to provide a
+	 * fully populated mojo according to the current test environment.
+	 *
+	 * @param parameterContext the parameter context
+	 * @param extensionContext the extension context
+	 *
+	 * @return the resolved parameter (a fully populated {@link org.apache.maven.plugin.AbstractMojo}
+	 * 		object)
+	 *
+	 * @throws ParameterResolutionException if an error occurs
+	 */
+	@Override
+	public Object resolveParameter(
+			final ParameterContext parameterContext, final ExtensionContext extensionContext) {
+		final InjectMojo injectMojo =
+				parameterContext
+						.findAnnotation(InjectMojo.class)
+						.orElseGet(
+								() -> parameterContext.getDeclaringExecutable().getAnnotation(
+										InjectMojo.class));
+		final File testPom = new File(injectMojo.pom());
 
-    final MavenSession newSession = newMavenSession();
-    final MavenProject newProject = newMavenProject(testPom, newSession);
-    ((DefaultPlexusContainer) getContainer())
-            .addPlexusInjector(
-                    Collections.emptyList(),
-                    binder -> {
-                      binder.bind(MavenSession.class).toInstance(newSession);
-                      binder.bind(MavenProject.class).toInstance(newProject);
-                    });
+		final MavenSession newSession = newMavenSession();
+		final MavenProject newProject = newMavenProject(testPom, newSession);
+		((DefaultPlexusContainer) getContainer())
+				.addPlexusInjector(
+						Collections.emptyList(),
+						binder -> {
+							binder.bind(MavenSession.class).toInstance(newSession);
+							binder.bind(MavenProject.class).toInstance(newProject);
+						});
 
-    return super.resolveParameter(parameterContext, extensionContext);
-  }
+		return super.resolveParameter(parameterContext, extensionContext);
+	}
 
-  /**
-   * Returns a new {@link MavenProject} based on the given pom file and session.
-   *
-   * @param testPom the test pom file
-   * @param session the current {@link MavenSession}
-   *
-   * @return a new {@code MavenProject}
-   */
-  private MavenProject newMavenProject(final File testPom, final MavenSession session) {
-    try {
-      final ProjectBuildingRequest buildingRequest = session.getProjectBuildingRequest();
-      final MavenProject project =
-              lookup(ProjectBuilder.class).build(testPom, buildingRequest).getProject();
-      session.setCurrentProject(project);
-      session.setProjects(Collections.singletonList(project));
-      return project;
-    } catch (ComponentLookupException | ProjectBuildingException e) {
-      throw new RuntimeException(e); // NOPMD - Easiest response
-    }
-  }
+	/**
+	 * Returns a new {@link MavenProject} based on the given pom file and session.
+	 *
+	 * @param testPom the test pom file
+	 * @param session the current {@link MavenSession}
+	 *
+	 * @return a new {@code MavenProject}
+	 */
+	private MavenProject newMavenProject(final File testPom, final MavenSession session) {
+		try {
+			final ProjectBuildingRequest buildingRequest = session.getProjectBuildingRequest();
+			final MavenProject project =
+					lookup(ProjectBuilder.class).build(testPom, buildingRequest).getProject();
+			session.setCurrentProject(project);
+			session.setProjects(Collections.singletonList(project));
+			return project;
+		} catch (ComponentLookupException | ProjectBuildingException e) {
+			throw new RuntimeException(e); // NOPMD - Easiest response
+		}
+	}
 
-  /**
-   * Returns a new {@link MavenSession} to use during testing.
-   *
-   * @return a new {@code MavenSession}
-   */
-  protected MavenSession newMavenSession() {
-    try {
-      final MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-      final MavenExecutionResult result = new DefaultMavenExecutionResult();
+	/**
+	 * Returns a new {@link MavenSession} to use during testing.
+	 *
+	 * @return a new {@code MavenSession}
+	 */
+	protected MavenSession newMavenSession() {
+		try {
+			final MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+			final MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-      // populate sensible defaults, including repository basedir and remote repos
-      final MavenExecutionRequestPopulator populator = getContainer().lookup(
-              MavenExecutionRequestPopulator.class);
-      populator.populateDefaults(request);
+			// populate sensible defaults, including repository basedir and remote repos
+			final MavenExecutionRequestPopulator populator = getContainer().lookup(
+					MavenExecutionRequestPopulator.class);
+			populator.populateDefaults(request);
 
-      // this is needed to allow java profiles to get resolved; i.e. avoid during project builds:
-      // [ERROR] Failed to determine Java version for profile java-1.5-detected @
-      // org.apache.commons:commons-parent:22,
-      // /Users/alex/.m2/repository/org/apache/commons/commons-parent/22/commons-parent-22.pom, line
-      // 909, column 14
-      final Properties newProps = System.getProperties();
-      final Map<String, String> envProps = System.getenv();
-      envProps.forEach((k, v) -> newProps.setProperty("env." + k, v));
-      request.setSystemProperties(newProps);
+			// this is needed to allow java profiles to get resolved; i.e. avoid during project builds:
+			// [ERROR] Failed to determine Java version for profile java-1.5-detected @
+			// org.apache.commons:commons-parent:22,
+			// /Users/alex/.m2/repository/org/apache/commons/commons-parent/22/commons-parent-22.pom, line
+			// 909, column 14
+			final Properties newProps = System.getProperties();
+			final Map<String, String> envProps = System.getenv();
+			envProps.forEach((k, v) -> newProps.setProperty("env." + k, v));
+			request.setSystemProperties(newProps);
 
-      // and this is needed so that the repo session in the maven session
-      // has a repo manager, and it points at the local repo
-      // (cf MavenRepositorySystemUtils.newSession() which is what is otherwise done)
-      final DefaultMaven maven = (DefaultMaven) getContainer().lookup(Maven.class);
-      final DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) maven.newRepositorySession(
-              request);
+			// and this is needed so that the repo session in the maven session
+			// has a repo manager, and it points at the local repo
+			// (cf MavenRepositorySystemUtils.newSession() which is what is otherwise done)
+			final DefaultMaven maven = (DefaultMaven) getContainer().lookup(Maven.class);
+			final DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) maven.newRepositorySession(
+					request);
 //      final DefaultLocalPathComposer pathComposer = new DefaultLocalPathComposer();
-      final SimpleLocalRepositoryManagerFactory repoMgrFactory =
-              new SimpleLocalRepositoryManagerFactory();
-      final LocalRepository localRepo = new LocalRepository(
-              request.getLocalRepository().getBasedir());
-      repoSession.setLocalRepositoryManager(repoMgrFactory.newInstance(repoSession, localRepo));
+			final SimpleLocalRepositoryManagerFactory repoMgrFactory =
+					new SimpleLocalRepositoryManagerFactory();
+			final LocalRepository localRepo = new LocalRepository(
+					request.getLocalRepository().getBasedir());
+			repoSession.setLocalRepositoryManager(repoMgrFactory.newInstance(repoSession, localRepo));
 
-      final MavenSession session = new MavenSession(getContainer(),
-                                                    repoSession,
-                                                    request,
-                                                    result);
-      return session;
-    } catch (Exception e) { // NOPMD - Simplify method signature
-      throw new UndeclaredThrowableException(e);
-    }
-  }
+			@SuppressWarnings("deprecation") final MavenSession session = new MavenSession(getContainer(),
+					repoSession,
+					request,
+					result);
+			return session;
+		} catch (Exception e) { // NOPMD - Simplify method signature
+			throw new UndeclaredThrowableException(e);
+		}
+	}
 }

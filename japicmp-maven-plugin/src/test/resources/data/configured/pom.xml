@@ -9,7 +9,7 @@
     <artifactId>japicmp</artifactId>
     <version>0.24.1</version>
     <packaging>jar</packaging>
-    <name>Default Configuration</name>
+    <name>Configured Example</name>
 
     <build>
         <plugins>
@@ -18,6 +18,17 @@
                 <artifactId>japicmp-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>com.github.siom79.japicmp</groupId>
+                            <artifactId>japicmp</artifactId>
+                            <version>0.20.0</version>
+                        </dependency>
+                    </oldVersion>
+                    <outputDirectory>target/reports</outputDirectory>
+                    <parameter>
+                        <markdownTitle>New Markdown Title</markdownTitle>
+                    </parameter>
                 </configuration>
                 <executions>
                     <execution>

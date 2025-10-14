@@ -1,10 +1,9 @@
 package japicmp.maven.util;
 
+import java.util.Optional;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
-
-import java.util.Optional;
 
 public class CtInterfaceBuilder {
 	private String name = "japicmp.Test";

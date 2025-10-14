@@ -216,6 +216,7 @@
             <testResource>
                 <directory>src/test/resources/data</directory>
                 <targetPath>${test.directory}</targetPath>
+                <filtering>true</filtering>
             </testResource>
         </testResources>
     </build>

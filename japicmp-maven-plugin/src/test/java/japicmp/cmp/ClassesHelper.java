@@ -1,12 +1,9 @@
 package japicmp.cmp;
 
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiClass;
+import java.util.List;
 import javassist.ClassPool;
 import javassist.CtClass;
-
-import java.util.List;
 
 public class ClassesHelper {
 

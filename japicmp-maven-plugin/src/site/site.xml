@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/DECORATION/1.8.0">
-	<body>
-		<menu name="Overview">
-			<item name="Introduction" href="index.html"/>
-			<item name="Plugin Documentation" href="plugin-info.html"/>
-			<item name="License" href="https://www.apache.org/licenses/LICENSE-2.0"/>
-		</menu>
+    <body>
+        <menu name="Overview">
+            <item name="Introduction" href="index.html"/>
+            <item name="Plugin Documentation" href="plugin-info.html"/>
+            <item name="License" href="https://www.apache.org/licenses/LICENSE-2.0"/>
+        </menu>
 
-		<menu ref="reports" inherit="bottom"/>
-	</body>
+        <menu ref="reports" inherit="bottom"/>
+    </body>
 </project>
