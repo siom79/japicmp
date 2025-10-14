@@ -124,31 +124,23 @@ public class JApiCmpProcessor {
       File jApiCmpBuildDir = createJapiCmpBaseDir();
       SemverOut semverOut = new SemverOut(options, jApiClasses);
       String semanticVersioningInformation = semverOut.generate();
-      generateDiffOutput(options, jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
-      if (! skipMarkdownReport()) {
+
+      if (!skipDiffReport()) {
+        generateDiffOutput(options, jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
+      }
+      if (!skipMarkdownReport()) {
         generateMarkdownOutput(jApiClasses, jApiCmpBuildDir);
       }
-      if (! skipXmlReport()) {
-        XmlOutput xmlOutput = generateXmlOutput(jApiClasses, jApiCmpBuildDir,
-                                                semanticVersioningInformation);
-        if (pluginParameters.isWriteToFiles()) {
-          List<File> filesWritten = XmlOutputGenerator.writeToFiles(options, xmlOutput);
-          for (File file : filesWritten) {
-            log.info("Written file '" + file.getAbsolutePath() + "'.");
-          }
-        }
+      if (!skipXmlReport()) {
+        generateXmlOutput(jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
       }
+
       Optional<HtmlOutput> retVal = Optional.empty();
-      if (! skipHtmlReport()) {
-        HtmlOutput htmlOutput = generateHtmlOutput(jApiClasses, jApiCmpBuildDir,
-                                                   semanticVersioningInformation);
-        retVal = Optional.of(htmlOutput);
-        if (pluginParameters.isWriteToFiles() && options.getHtmlOutputFile().isPresent()) {
-          Path path = Paths.get(options.getHtmlOutputFile().get());
-          Files.write(path, htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
-          log.info("Written file '" + path + "'.");
-        }
+      if (!skipHtmlReport()) {
+        retVal = Optional.of(generateHtmlOutput(jApiClasses, jApiCmpBuildDir,
+                                                semanticVersioningInformation));
       }
+
       breakBuildIfNecessary(jApiClasses, pluginParameters.parameter(), options,
                             jarArchiveComparator);
       return retVal;
@@ -166,8 +158,7 @@ public class JApiCmpProcessor {
   private void setUpOverrideCompatibilityChanges(
           final JarArchiveComparatorOptions comparatorOptions)
           throws MojoFailureException {
-    if (pluginParameters.parameter() != null
-            && pluginParameters.parameter().getOverrideCompatibilityChangeParameters() != null) {
+    if (pluginParameters.parameter().getOverrideCompatibilityChangeParameters() != null) {
       List<ConfigParameters.OverrideCompatibilityChangeParameter>
               overrideCompatibilityChangeParameters =
               pluginParameters.parameter().getOverrideCompatibilityChangeParameters();
@@ -283,7 +274,7 @@ public class JApiCmpProcessor {
       filterSnapshots(versions);
       filterVersionPattern(versions);
       log.debug("Version range after filtering: " + versions);
-      if (! versions.isEmpty()) {
+      if (!versions.isEmpty()) {
         DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject,
                                                                 versions.get(versions.size() - 1)
                                                                         .toString());
@@ -324,7 +315,7 @@ public class JApiCmpProcessor {
                                      final ArtifactResult artifactResult,
                                      final ConfigurationVersion configurationVersion)
           throws MojoFailureException {
-    if (artifactResult.getExceptions() != null && ! artifactResult.getExceptions().isEmpty()) {
+    if (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty()) {
       List<Exception> exceptions = artifactResult.getExceptions();
       for (Exception exception : exceptions) {
         log.debug(exception.getMessage(), exception);
@@ -347,8 +338,7 @@ public class JApiCmpProcessor {
   private void filterVersionPattern(
           final List<org.eclipse.aether.version.Version> availableVersions)
           throws MojoFailureException {
-    if (pluginParameters.parameter() != null
-            && pluginParameters.parameter().getOldVersionPattern() != null) {
+    if (pluginParameters.parameter().getOldVersionPattern() != null) {
       String versionPattern = pluginParameters.parameter().getOldVersionPattern();
       Pattern pattern;
       try {
@@ -363,7 +353,7 @@ public class JApiCmpProcessor {
            availableVersions.iterator(); versionIterator.hasNext(); ) {
         org.eclipse.aether.version.Version version = versionIterator.next();
         Matcher matcher = pattern.matcher(version.toString());
-        if (! matcher.matches()) {
+        if (!matcher.matches()) {
           versionIterator.remove();
           log.debug("Filtering version '"
                             + version
@@ -381,8 +371,7 @@ public class JApiCmpProcessor {
    * @param versions
    */
   private void filterSnapshots(final List<org.eclipse.aether.version.Version> versions) {
-    if (pluginParameters.parameter() != null && ! pluginParameters.parameter()
-            .isIncludeSnapshots()) {
+    if (!pluginParameters.parameter().isIncludeSnapshots()) {
       versions.removeIf(
               version -> version.toString() != null && version.toString().endsWith("SNAPSHOT"));
     }
@@ -520,15 +509,13 @@ public class JApiCmpProcessor {
     if (breakBuildOnModifications(parameterParam)) {
       options.setErrorOnModifications(true);
     }
-    if (! parameterParam.isBreakBuildIfCausedByExclusion()) {
+    if (!parameterParam.isBreakBuildIfCausedByExclusion()) {
       options.setErrorOnExclusionIncompatibility(false);
     }
-    if (pluginParameters.parameter() != null && pluginParameters.parameter()
-            .getIgnoreMissingOldVersion()) {
+    if (pluginParameters.parameter().getIgnoreMissingOldVersion()) {
       options.setIgnoreMissingOldVersion(true);
     }
-    if (pluginParameters.parameter() != null && pluginParameters.parameter()
-            .getIgnoreMissingNewVersion()) {
+    if (pluginParameters.parameter().getIgnoreMissingNewVersion()) {
       options.setIgnoreMissingNewVersion(true);
     }
 
@@ -675,40 +662,22 @@ public class JApiCmpProcessor {
    */
   File createJapiCmpBaseDir() throws MojoFailureException {
     File baseDir;
-    if (pluginParameters.projectBuildDir() == null) {
-      throw new MojoFailureException("Maven parameter projectBuildDir is not set.");
-    }
     try {
-      File projectBuildDirParam = pluginParameters.projectBuildDir();
-      File jApiCmpBuildDir = new File(
-              projectBuildDirParam.getCanonicalPath() + File.separator + "japicmp");
-      boolean mkdirs = jApiCmpBuildDir.mkdirs();
-      if ((mkdirs || jApiCmpBuildDir.isDirectory()) && jApiCmpBuildDir.canWrite()) {
-        baseDir = jApiCmpBuildDir;
+      if (pluginParameters.outputDirectory() != null) {
+        baseDir = pluginParameters.outputDirectory();
       } else {
+        File projectBuildDirParam = pluginParameters.projectBuildDir();
+        baseDir = new File(
+                projectBuildDirParam.getCanonicalPath() + File.separator + "japicmp");
+      }
+      boolean mkdirs = baseDir.mkdirs();
+      if ((!mkdirs || !baseDir.isDirectory()) || !baseDir.canWrite()) {
         throw new IOException("mkDirs failed");
       }
     } catch (IOException e) {
       throw new MojoFailureException("Failed to create output directory: " + e.getMessage(), e);
     }
-    /*
-        if (baseDir == null) {
-          if (pluginParameters.outputDirectory() == null) {
-            throw new MojoFailureException("Neither projectBuildDir nor outputDirectory are
-            present");
-          }
-          File outputDirectory = pluginParameters.outputDirectory();
 
-          boolean mkdirs = outputDirectory.mkdirs();
-          if ((mkdirs || outputDirectory.isDirectory()) && outputDirectory.canWrite()) {
-            baseDir = outputDirectory;
-          } else {
-            throw new MojoFailureException(
-                String.format("Failed to create directory '%s'.", outputDirectory.getAbsolutePath
-                ()));
-          }
-        }
-    */
     return baseDir;
   }
 
@@ -726,18 +695,12 @@ public class JApiCmpProcessor {
                                   final File jApiCmpBuildDir,
                                   final String semanticVersioningInformation)
           throws IOException, MojoFailureException {
-    boolean skipDiffReport = false;
-    if (pluginParameters.parameter() != null) {
-      skipDiffReport = pluginParameters.parameter().skipDiffReport();
-    }
-    if (! skipDiffReport) {
-      StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
-      String diffOutput = stdoutOutputGenerator.generate();
-      diffOutput += "\nSemantic versioning suggestion: " + semanticVersioningInformation;
-      File output = new File(
-              jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename() + ".diff");
-      writeToFile(diffOutput, output);
-    }
+    StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
+    String diffOutput = stdoutOutputGenerator.generate();
+    diffOutput += "\nSemantic versioning suggestion: " + semanticVersioningInformation;
+    File output = new File(
+            jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename() + ".diff");
+    writeToFile(diffOutput, output);
   }
 
   /**
@@ -749,16 +712,39 @@ public class JApiCmpProcessor {
    */
   private void generateMarkdownOutput(final List<JApiClass> jApiClasses, final File jApiCmpBuildDir)
           throws IOException, MojoFailureException {
-    MarkdownOptions mdOptions = MarkdownOptions.newDefault(options);
-    if (pluginParameters.parameter() != null
-            && pluginParameters.parameter().getMarkdownTitle() != null) {
-      mdOptions.title.report = pluginParameters.parameter().getMarkdownTitle();
+    if (pluginParameters.isWriteToFiles()) {
+      MarkdownOptions mdOptions = MarkdownOptions.newDefault(options);
+      if (pluginParameters.parameter().getMarkdownTitle() != null) {
+        mdOptions.title.report = pluginParameters.parameter().getMarkdownTitle();
+      }
+      MarkdownOutputGenerator mdOut = new MarkdownOutputGenerator(mdOptions, jApiClasses);
+      String markdown = mdOut.generate();
+      File output = new File(
+              jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename() + ".md");
+      writeToFile(markdown, output);
     }
-    MarkdownOutputGenerator mdOut = new MarkdownOutputGenerator(mdOptions, jApiClasses);
-    String markdown = mdOut.generate();
-    File output = new File(
-            jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename() + ".md");
-    writeToFile(markdown, output);
+  }
+
+  /**
+   *
+   * @param jApiClasses
+   * @param jApiCmpBuildDir
+   * @param semanticVersioningInformation
+   *
+   * @throws IOException
+   */
+  private void generateXmlOutput(final List<JApiClass> jApiClasses,
+                                 final File jApiCmpBuildDir,
+                                 final String semanticVersioningInformation)
+          throws IOException {
+    if (pluginParameters.isWriteToFiles()) {
+      XmlOutput xmlOutput = createXmlOutput(jApiClasses, jApiCmpBuildDir,
+                                            semanticVersioningInformation);
+      List<File> filesWritten = XmlOutputGenerator.writeToFiles(options, xmlOutput);
+      for (File file : filesWritten) {
+        log.info("Written file '" + file.getAbsolutePath() + "'.");
+      }
+    }
   }
 
   /**
@@ -770,9 +756,9 @@ public class JApiCmpProcessor {
    *
    * @throws IOException
    */
-  private XmlOutput generateXmlOutput(final List<JApiClass> jApiClasses,
-                                      final File jApiCmpBuildDir,
-                                      final String semanticVersioningInformation)
+  private XmlOutput createXmlOutput(final List<JApiClass> jApiClasses,
+                                    final File jApiCmpBuildDir,
+                                    final String semanticVersioningInformation)
           throws IOException {
     String filename = createFilename();
     options.setXmlOutputFile(
@@ -780,17 +766,18 @@ public class JApiCmpProcessor {
     XmlOutputGeneratorOptions xmlOutputGeneratorOptions = new XmlOutputGeneratorOptions();
     xmlOutputGeneratorOptions.setCreateSchemaFile(true);
     xmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
-    if (pluginParameters.parameter() != null) {
-      String optionalTitle = pluginParameters.parameter().getHtmlTitle();
-      xmlOutputGeneratorOptions.setTitle(
-              optionalTitle != null ? optionalTitle : options.getDifferenceDescription());
-    }
+
+    String optionalTitle = pluginParameters.parameter().getHtmlTitle();
+    xmlOutputGeneratorOptions.setTitle(
+            optionalTitle != null ? optionalTitle : options.getDifferenceDescription());
+
     XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options,
                                                              xmlOutputGeneratorOptions);
     return xmlGenerator.generate();
   }
 
   /**
+   *
    * @param jApiClasses
    * @param jApiCmpBuildDir
    * @param semanticVersioningInformation
@@ -803,18 +790,39 @@ public class JApiCmpProcessor {
                                         final File jApiCmpBuildDir,
                                         final String semanticVersioningInformation)
           throws IOException {
-    String filename = createFilename();
+    HtmlOutput htmlOutput = createHtmlOutput(jApiClasses, jApiCmpBuildDir,
+                                             semanticVersioningInformation);
+    if (pluginParameters.isWriteToFiles() && options.getHtmlOutputFile().isPresent()) {
+      Path path = Paths.get(options.getHtmlOutputFile().get());
+      Files.write(path, htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
+      log.info("Written file '" + path + "'.");
+    }
+    return htmlOutput;
+  }
+
+  /**
+   * @param jApiClasses
+   * @param jApiCmpBuildDir
+   * @param semanticVersioningInformation
+   *
+   * @return
+   *
+   * @throws IOException
+   */
+  private HtmlOutput createHtmlOutput(final List<JApiClass> jApiClasses,
+                                      final File jApiCmpBuildDir,
+                                      final String semanticVersioningInformation)
+          throws IOException {
+    final String filename = createFilename();
     options.setHtmlOutputFile(
             Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + filename + ".html"));
     HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
     htmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
-    if (pluginParameters.parameter() != null) {
-      String title = pluginParameters.parameter().getHtmlTitle();
-      htmlOutputGeneratorOptions.setTitle(
-              title != null ? title : options.getDifferenceDescription());
-    }
-    HtmlOutputGenerator htmlOutputGenerator = new HtmlOutputGenerator(jApiClasses, options,
-                                                                      htmlOutputGeneratorOptions);
+    final String title = pluginParameters.parameter().getHtmlTitle();
+    htmlOutputGeneratorOptions.setTitle(title != null ? title : options.getDifferenceDescription());
+
+    final HtmlOutputGenerator htmlOutputGenerator = new HtmlOutputGenerator(jApiClasses, options,
+                                                                            htmlOutputGeneratorOptions);
     return htmlOutputGenerator.generate();
   }
 
@@ -873,7 +881,7 @@ public class JApiCmpProcessor {
   private String createFilename() {
     String filename = "japicmp";
     String executionId = mavenParameters.mojoExecution().getExecutionId();
-    if (executionId != null && ! "default".equals(executionId)) {
+    if (executionId != null && !"default".equals(executionId)) {
       filename = executionId;
     }
     StringBuilder sb = new StringBuilder();
@@ -1106,16 +1114,16 @@ public class JApiCmpProcessor {
                       parameterName));
     }
     File file = new File(path);
-    if (! file.exists()) {
-      if (! ignoreMissingArtifact(configurationVersion)) {
+    if (!file.exists()) {
+      if (!ignoreMissingArtifact(configurationVersion)) {
         throw new MojoFailureException(
                 String.format("The path '%s' does not point to an existing file.", path));
       } else {
         log.warn("The file given by path '" + file.getAbsolutePath() + "' does not exist.");
       }
     }
-    if (! file.isFile() || ! file.canRead()) {
-      if (! ignoreMissingArtifact(configurationVersion)) {
+    if (!file.isFile() || !file.canRead()) {
+      if (!ignoreMissingArtifact(configurationVersion)) {
         throw new MojoFailureException(
                 String.format(
                         "The file given by path '%s' is either not a file or is not readable.",
@@ -1203,7 +1211,7 @@ public class JApiCmpProcessor {
       }
       File file = new File(systemPath);
       boolean addFile = true;
-      if (! file.exists()) {
+      if (!file.exists()) {
         if (ignoreMissingArtifact(configurationVersion)) {
           log.warn("Could not find file, but ignoreMissingOldVersion is set to true: "
                            + file.getAbsolutePath());
@@ -1212,7 +1220,7 @@ public class JApiCmpProcessor {
         }
         addFile = false;
       }
-      if (! file.canRead()) {
+      if (!file.canRead()) {
         if (ignoreMissingArtifact(configurationVersion)) {
           log.warn("File is not readable, but ignoreMissingOldVersion is set tot true: "
                            + file.getAbsolutePath());
@@ -1277,7 +1285,8 @@ public class JApiCmpProcessor {
    * @return
    */
   private boolean ignoreMissingOldVersion(final ConfigurationVersion configurationVersion) {
-    return (configurationVersion == ConfigurationVersion.OLD && ignoreMissingOldVersion());
+    return (configurationVersion == ConfigurationVersion.OLD &&
+            pluginParameters.parameter().getIgnoreMissingOldVersion());
   }
 
   /**
@@ -1286,29 +1295,8 @@ public class JApiCmpProcessor {
    * @return
    */
   private boolean ignoreMissingNewVersion(final ConfigurationVersion configurationVersion) {
-    return (configurationVersion == ConfigurationVersion.NEW && ignoreMissingNewVersion());
-  }
-
-  /**
-   * @return
-   */
-  private boolean ignoreMissingOldVersion() {
-    boolean ignoreMissingOldVersion = false;
-    if (pluginParameters.parameter() != null) {
-      ignoreMissingOldVersion = pluginParameters.parameter().getIgnoreMissingOldVersion();
-    }
-    return ignoreMissingOldVersion;
-  }
-
-  /**
-   * @return
-   */
-  private boolean ignoreMissingNewVersion() {
-    boolean ignoreMissingNewVersion = false;
-    if (pluginParameters.parameter() != null) {
-      ignoreMissingNewVersion = pluginParameters.parameter().getIgnoreMissingNewVersion();
-    }
-    return ignoreMissingNewVersion;
+    return (configurationVersion == ConfigurationVersion.NEW &&
+            pluginParameters.parameter().getIgnoreMissingNewVersion());
   }
 
   /**
@@ -1323,8 +1311,7 @@ public class JApiCmpProcessor {
       fileWriter.write(output);
       log.info("Written file '" + outputfile.getAbsolutePath() + "'.");
     } catch (IOException e) {
-      throw new MojoFailureException(String.format("Failed to write diff file: %s", e.getMessage()),
-                                     e);
+      throw new MojoFailureException(String.format("Failed to write file: %s", e.getMessage()), e);
     }
   }
 
@@ -1372,7 +1359,7 @@ public class JApiCmpProcessor {
                                                                       request);
       log.debug("Resolved artifact: " + resolutionResult);
       if (resolutionResult != null) {
-        if (resolutionResult.getExceptions() != null && ! resolutionResult.getExceptions()
+        if (resolutionResult.getExceptions() != null && !resolutionResult.getExceptions()
                 .isEmpty()) {
           List<Exception> exceptions = resolutionResult.getExceptions();
           for (Exception exception : exceptions) {
