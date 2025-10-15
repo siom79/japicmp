@@ -43,7 +43,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testSkip(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testDefaultDir);
-//    testMojo.setLog(new SystemStreamLog());
 		testMojo.skip = true;
 		testMojo.execute();
 		assertFileNotExists(defaultDiffFile);
@@ -57,7 +56,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testDefaultConfiguration(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testDefaultDir);
-//    testMojo.setLog(new SystemStreamLog());
 		testMojo.execute();
 		assertFileExists(defaultDiffFile);
 		assertFileExists(defaultHhtmlFile);
@@ -70,7 +68,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testDefaultNoDiff(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testDefaultDir);
-//    testMojo.setLog(new SystemStreamLog());
 		testMojo.skipDiffReport = true;
 		testMojo.execute();
 		assertFileNotExists(defaultDiffFile);
@@ -84,7 +81,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testDefaultNoHtml(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testDefaultDir);
-//    testMojo.setLog(new SystemStreamLog());
 		testMojo.skipHtmlReport = true;
 		testMojo.execute();
 		assertFileExists(defaultDiffFile);
@@ -98,7 +94,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testDefaultNoMarkdown(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testDefaultDir);
-//    testMojo.setLog(new SystemStreamLog());
 		testMojo.skipMarkdownReport = true;
 		testMojo.execute();
 		assertFileExists(defaultDiffFile);
@@ -112,7 +107,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testDefaultNoXml(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testDefaultDir);
-//    testMojo.setLog(new SystemStreamLog());
 		testMojo.skipXmlReport = true;
 		testMojo.execute();
 		assertFileExists(defaultDiffFile);
@@ -126,7 +120,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testSkipPomModule(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testSkipPomDir);
-//    testMojo.setLog(new SystemStreamLog());
 		testMojo.execute();
 		assertDirectoryEmpty(testSkipPomDir);
 	}
@@ -136,8 +129,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testNoArtifacts(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testSkipPomDir);
-//		testMojo.setLog(new SystemStreamLog());
-
 		assertThrows(MojoFailureException.class, testMojo::execute);
 	}
 
@@ -146,7 +137,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testMarkdownTitle(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
-//		testMojo.setLog(new SystemStreamLog());
 		testMojo.execute();
 		assertFileExists(configDiffFile);
 		assertFileExists(configHhtmlFile);
@@ -160,7 +150,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testBreakOnModification(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
-//		testMojo.setLog(new SystemStreamLog());
 		testMojo.parameter.setBreakBuildOnModifications(true);
 		assertThrows(MojoFailureException.class, testMojo::execute);
 	}
@@ -170,7 +159,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testBreakOnBinaryIncompatible(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
-//		testMojo.setLog(new SystemStreamLog());
 		testMojo.parameter.setBreakBuildOnBinaryIncompatibleModifications(true);
 		assertThrows(MojoFailureException.class, testMojo::execute);
 	}
@@ -180,7 +168,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testBreakOnSourceIncompatible(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
-//		testMojo.setLog(new SystemStreamLog());
 		testMojo.parameter.setBreakBuildOnSourceIncompatibleModifications(true);
 		assertThrows(MojoFailureException.class, testMojo::execute);
 	}
@@ -190,7 +177,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testBreakOnMissingOldVersion(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
-//		testMojo.setLog(new SystemStreamLog());
 		testMojo.oldVersion.getDependency().setVersion("x.y");
 		assertThrows(MojoFailureException.class, testMojo::execute);
 	}
@@ -200,7 +186,6 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testIgnoreMissingOldVersion(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
-//		testMojo.setLog(new SystemStreamLog());
 		testMojo.oldVersion.getDependency().setVersion("x.y");
 		testMojo.parameter.setIgnoreMissingOldVersion(true);
 		testMojo.execute();
@@ -209,6 +194,29 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertFileExists(configMdFile);
 		assertFileExists(configXmlFile);
 		assertFileContains(configMdFile, "with the previous version `unknown`");
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnMissingNewVersion(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.mavenProject.setVersion("x.y");
+		assertThrows(MojoFailureException.class, testMojo::execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testIgnoreMissingNewVersion(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.mavenProject.setVersion("x.y");
+		testMojo.parameter.setIgnoreMissingNewVersion(true);
+		testMojo.execute();
+		assertFileNotExists(configDiffFile);
+		assertFileNotExists(configHhtmlFile);
+		assertFileNotExists(configMdFile);
+		assertFileNotExists(configXmlFile);
 	}
 
 }

@@ -255,30 +255,30 @@ public class JApiCmpProcessor {
 	 */
 	private Artifact getComparisonArtifact(final ConfigurationVersion configurationVersion)
 			throws MojoFailureException, MojoExecutionException {
-		MavenProject mavenProject = mavenParameters.mavenProject();
+		final MavenProject mavenProject = mavenParameters.mavenProject();
 		// create a version range of the form (,<current-version-of-the-project>), that includes all
 		// versions up to this version
-		DefaultArtifact artifactVersionRange = createDefaultArtifact(mavenProject,
+		final DefaultArtifact artifactVersionRange = createDefaultArtifact(mavenProject,
 				mavenParameters.versionRangeWithProjectVersion());
-		VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifactVersionRange,
+		final VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifactVersionRange,
 				mavenParameters.remoteRepos(),
 				null);
 		try {
 			log.debug("Trying version range: " + versionRangeRequest);
-			VersionRangeResult versionRangeResult = mavenParameters.repoSystem().resolveVersionRange(
+			final VersionRangeResult versionRangeResult = mavenParameters.repoSystem().resolveVersionRange(
 					mavenParameters.repoSession(), versionRangeRequest);
 			log.debug("Version range result: " + versionRangeRequest);
-			List<org.eclipse.aether.version.Version> versions = versionRangeResult.getVersions();
+			final List<org.eclipse.aether.version.Version> versions = versionRangeResult.getVersions();
 			filterSnapshots(versions);
 			filterVersionPattern(versions);
 			log.debug("Version range after filtering: " + versions);
 			if (!versions.isEmpty()) {
-				DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject,
+				final DefaultArtifact artifactVersion = createDefaultArtifact(mavenProject,
 						versions.get(versions.size() - 1)
 								.toString());
-				ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion,
+				final ArtifactRequest artifactRequest = new ArtifactRequest(artifactVersion,
 						mavenParameters.remoteRepos(), null);
-				ArtifactResult artifactResult = mavenParameters.repoSystem().resolveArtifact(
+				final ArtifactResult artifactResult = mavenParameters.repoSystem().resolveArtifact(
 						mavenParameters.repoSession(), artifactRequest);
 				processArtifactResult(artifactVersion, artifactResult, configurationVersion);
 				return artifactResult.getArtifact();
@@ -314,7 +314,7 @@ public class JApiCmpProcessor {
 									   final ConfigurationVersion configurationVersion)
 			throws MojoFailureException {
 		if (artifactResult.getExceptions() != null && !artifactResult.getExceptions().isEmpty()) {
-			List<Exception> exceptions = artifactResult.getExceptions();
+			final List<Exception> exceptions = artifactResult.getExceptions();
 			for (Exception exception : exceptions) {
 				log.debug(exception.getMessage(), exception);
 			}
@@ -337,7 +337,7 @@ public class JApiCmpProcessor {
 			final List<org.eclipse.aether.version.Version> availableVersions)
 			throws MojoFailureException {
 		if (pluginParameters.parameter().getOldVersionPattern() != null) {
-			String versionPattern = pluginParameters.parameter().getOldVersionPattern();
+			final String versionPattern = pluginParameters.parameter().getOldVersionPattern();
 			Pattern pattern;
 			try {
 				pattern = Pattern.compile(versionPattern);
@@ -350,7 +350,7 @@ public class JApiCmpProcessor {
 			for (Iterator<org.eclipse.aether.version.Version> versionIterator =
 				 availableVersions.iterator(); versionIterator.hasNext(); ) {
 				org.eclipse.aether.version.Version version = versionIterator.next();
-				Matcher matcher = pattern.matcher(version.toString());
+				final Matcher matcher = pattern.matcher(version.toString());
 				if (!matcher.matches()) {
 					versionIterator.remove();
 					log.debug("Filtering version '"
@@ -389,7 +389,7 @@ public class JApiCmpProcessor {
 					ConfigurationVersion.OLD));
 		}
 		if (pluginParameters.oldVersions() != null) {
-			for (DependencyDescriptor dependencyDescriptor : pluginParameters.oldVersions()) {
+			for (final DependencyDescriptor dependencyDescriptor : pluginParameters.oldVersions()) {
 				if (dependencyDescriptor != null) {
 					oldArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "oldVersions",
 							ConfigurationVersion.OLD));
@@ -398,11 +398,11 @@ public class JApiCmpProcessor {
 		}
 		if (pluginParameters.oldVersion() == null && pluginParameters.oldVersions() == null) {
 			try {
-				Artifact comparisonArtifact = getComparisonArtifact(ConfigurationVersion.OLD);
+				final Artifact comparisonArtifact = getComparisonArtifact(ConfigurationVersion.OLD);
 				if (comparisonArtifact != null && comparisonArtifact.getVersion() != null) {
 					Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, ConfigurationVersion.OLD);
 					for (Artifact artifact : artifacts) {
-						File file = artifact.getFile();
+						final File file = artifact.getFile();
 						if (file != null) {
 							oldArchives.add(new JApiCmpArchive(file, guessVersion(file)));
 						} else {
@@ -420,7 +420,7 @@ public class JApiCmpProcessor {
 					ConfigurationVersion.NEW));
 		}
 		if (pluginParameters.newVersions() != null) {
-			for (DependencyDescriptor dependencyDescriptor : pluginParameters.newVersions()) {
+			for (final DependencyDescriptor dependencyDescriptor : pluginParameters.newVersions()) {
 				if (dependencyDescriptor != null) {
 					newArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions",
 							ConfigurationVersion.NEW));
@@ -428,13 +428,13 @@ public class JApiCmpProcessor {
 			}
 		}
 		if (pluginParameters.newVersion() == null && pluginParameters.newVersions() == null) {
-			MavenProject mavenProject = mavenParameters.mavenProject();
+			final MavenProject mavenProject = mavenParameters.mavenProject();
 			if (mavenProject != null && mavenProject.getArtifact() != null) {
-				DefaultArtifact defaultArtifact = createDefaultArtifact(mavenProject,
+				final DefaultArtifact defaultArtifact = createDefaultArtifact(mavenProject,
 						mavenProject.getVersion());
-				Set<Artifact> artifacts = resolveArtifact(defaultArtifact, ConfigurationVersion.NEW);
+				final Set<Artifact> artifacts = resolveArtifact(defaultArtifact, ConfigurationVersion.NEW);
 				for (Artifact artifact : artifacts) {
-					File file = artifact.getFile();
+					final File file = artifact.getFile();
 					if (file != null) {
 						try (JarFile jarFile = new JarFile(file)) {
 							log.debug("Could open file '"
