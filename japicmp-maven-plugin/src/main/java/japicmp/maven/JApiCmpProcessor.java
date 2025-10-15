@@ -667,8 +667,13 @@ public class JApiCmpProcessor {
 				baseDir = new File(
 						projectBuildDirParam.getCanonicalPath() + File.separator + "japicmp");
 			}
-			boolean success = baseDir.mkdirs();
-			if ((!success || !baseDir.isDirectory()) || !baseDir.canWrite()) {
+
+			boolean madeDir = true;
+			if (!baseDir.exists()) {
+				madeDir = baseDir.mkdirs();
+			}
+
+			if ((!madeDir || !baseDir.isDirectory()) || !baseDir.canWrite()) {
 				throw new IOException("mkDirs failed");
 			}
 		} catch (IOException e) {
