@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +27,20 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 abstract class AbstractTest {
+
+	final Path testDefaultDir = Paths.get("target/test-run/default/target");
+	final File defaultDiffFile = testDefaultDir.resolve("japicmp/japicmp.diff").toFile();
+	final File defaultHhtmlFile = testDefaultDir.resolve("japicmp/japicmp.html").toFile();
+	final File defaultMdFile = testDefaultDir.resolve("japicmp/japicmp.md").toFile();
+	final File defaultXmlFile = testDefaultDir.resolve("japicmp/japicmp.xml").toFile();
+
+	final Path testConfigDir = Paths.get("target/test-run/configured/target");
+	final File configDiffFile = testConfigDir.resolve("reports/japicmp.diff").toFile();
+	final File configHhtmlFile = testConfigDir.resolve("reports/japicmp.html").toFile();
+	final File configMdFile = testConfigDir.resolve("reports/japicmp.md").toFile();
+	final File configXmlFile = testConfigDir.resolve("reports/japicmp.xml").toFile();
+
+	final Path testSkipPomDir = Paths.get("target/test-run/skippom/target");
 
 	/**
 	 * Creates MavenParameters for tests.

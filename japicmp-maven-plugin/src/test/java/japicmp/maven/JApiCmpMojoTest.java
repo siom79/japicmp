@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import japicmp.maven.util.LocalMojoTest;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.junit5.InjectMojo;
 import org.junit.jupiter.api.Test;
@@ -16,20 +13,6 @@ import org.junit.jupiter.api.Test;
  */
 @LocalMojoTest
 final class JApiCmpMojoTest extends AbstractTest {
-
-	final Path testDefaultDir = Paths.get("target/test-run/default/target");
-	final File defaultDiffFile = testDefaultDir.resolve("japicmp/japicmp.diff").toFile();
-	final File defaultHhtmlFile = testDefaultDir.resolve("japicmp/japicmp.html").toFile();
-	final File defaultMdFile = testDefaultDir.resolve("japicmp/japicmp.md").toFile();
-	final File defaultXmlFile = testDefaultDir.resolve("japicmp/japicmp.xml").toFile();
-
-	final Path testConfigDir = Paths.get("target/test-run/configured/target");
-	final File configDiffFile = testConfigDir.resolve("reports/japicmp.diff").toFile();
-	final File configHhtmlFile = testConfigDir.resolve("reports/japicmp.html").toFile();
-	final File configMdFile = testConfigDir.resolve("reports/japicmp.md").toFile();
-	final File configXmlFile = testConfigDir.resolve("reports/japicmp.xml").toFile();
-
-	final Path testSkipPomDir = Paths.get("target/test-run/skippom/target");
 
 	/**
 	 * Default constructor.

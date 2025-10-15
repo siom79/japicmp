@@ -59,7 +59,6 @@ public class JApiCmpReport extends AbstractMavenReport {
 	@Parameter(property = "japicmp.skip", defaultValue = "false")
 	boolean skip;
 
-
 	/** Specifies whether the Diff report generation should be skipped. */
 	@Parameter(property = "japicmp.skipDiffReport")
 	boolean skipDiffReport;
@@ -78,10 +77,6 @@ public class JApiCmpReport extends AbstractMavenReport {
 	/** Specifies the current project build directory. */
 	@Parameter(required = true, property = "project.build.directory")
 	File projectBuildDir;
-
-	/** The report(s) output directory. */
-	@Parameter
-	File outputDirectory;
 
 	/** Remote project repositories used for the project. */
 	@Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
@@ -163,7 +158,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 		Sink sink = getSink();
 		try {
 			String htmlTitle = getHtmlTitle();
-			if (htmlTitle!=null) {
+			if (htmlTitle != null) {
 				sink.head();
 				sink.title();
 				sink.text(pluginParameters.parameter().getHtmlTitle());
@@ -186,8 +181,8 @@ public class JApiCmpReport extends AbstractMavenReport {
 	}
 
 	private String getHtmlTitle() {
-		if (pluginParameters.parameter()!=null
-				&& pluginParameters.parameter().getHtmlTitle()!=null) {
+		if (pluginParameters.parameter() != null
+				&& pluginParameters.parameter().getHtmlTitle() != null) {
 			return pluginParameters.parameter().getHtmlTitle();
 		}
 		return null;
@@ -195,7 +190,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	@Override
 	public String getOutputName() {
-		if (this.parameter!=null && this.parameter.getReportLinkName()!=null) {
+		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
 			return this.parameter.getReportLinkName();
 		}
 		return "japicmp";
@@ -203,7 +198,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	@Override
 	public String getName(Locale locale) {
-		if (this.parameter!=null && this.parameter.getReportLinkName()!=null) {
+		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
 			return this.parameter.getReportLinkName();
 		}
 		return "japicmp";
@@ -220,7 +215,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 		} catch (MojoFailureException e) {
 			return "failed report";
 		}
-		if (options==null) {
+		if (options == null) {
 			return "failed report";
 		}
 		return options.getDifferenceDescription();
