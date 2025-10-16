@@ -41,7 +41,7 @@ public class JApiCmpReport extends AbstractMavenReport {
 
 	/** The parameters defined for the plugin. */
 	@Parameter
-	ConfigParameters parameter;
+	ConfigParameters parameter = new ConfigParameters();
 
 	/** Additional dependencies to use. */
 	@Parameter
@@ -103,10 +103,20 @@ public class JApiCmpReport extends AbstractMavenReport {
 	@Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
 	List<ArtifactRepository> artifactRepositories;
 
-
 	MavenParameters mavenParameters;
 	PluginParameters pluginParameters;
+
+	/*
+	 * Class variable to support unit tests.
+	 */
 	JApiCmpProcessor processor;
+
+	/**
+	 * Constructs a new instance of {@code JApiCmpReport}.
+	 */
+	public JApiCmpReport() {
+		/* Intentionally left blank. */
+	}
 
 	/**
 	 * Generates the japicmp reports.
@@ -118,7 +128,6 @@ public class JApiCmpReport extends AbstractMavenReport {
 	 */
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
-
 		mavenParameters = new MavenParameters(this.artifactRepositories, this.project,
 				this.mojoExecution, this.versionRangeWithProjectVersion,
 				this.repoSystem, this.repoSession,
@@ -135,19 +144,18 @@ public class JApiCmpReport extends AbstractMavenReport {
 						this.skipMarkdownReport,
 						this.skipXmlReport),
 				new BreakBuild());
-
 		try {
 			processor = new JApiCmpProcessor(pluginParameters, mavenParameters, getLog());
-			Optional<HtmlOutput> htmlOutputOptional = processor.execute();
+			final Optional<HtmlOutput> htmlOutputOptional = processor.execute();
 			if (htmlOutputOptional.isPresent()) {
-				HtmlOutput htmlOutput = htmlOutputOptional.get();
+				final HtmlOutput htmlOutput = htmlOutputOptional.get();
 				String htmlString = htmlOutput.getHtml();
 				htmlString = replaceHtmlTags(htmlString);
 				writeToSink(htmlString);
 			}
 		} catch (Exception e) {
-			String msg = "Failed to generate report: " + e.getMessage();
-			Sink sink = getSink();
+			final String msg = "Failed to generate report: " + e.getMessage();
+			final Sink sink = getSink();
 			sink.text(msg);
 			sink.close();
 			throw new MavenReportException(msg, e);
@@ -155,9 +163,9 @@ public class JApiCmpReport extends AbstractMavenReport {
 	}
 
 	private void writeToSink(final String htmlString) {
-		Sink sink = getSink();
+		final Sink sink = getSink();
 		try {
-			String htmlTitle = getHtmlTitle();
+			final String htmlTitle = getHtmlTitle();
 			if (htmlTitle != null) {
 				sink.head();
 				sink.title();
@@ -171,43 +179,69 @@ public class JApiCmpReport extends AbstractMavenReport {
 		}
 	}
 
-	private static String replaceHtmlTags(String html) {
-		html = html.replaceAll("</?html>", "");
-		html = html.replaceAll("</?body>", "");
-		html = html.replaceAll("</?head>", "");
-		html = html.replaceAll("<title>[^<]*</title>", "");
-		html = html.replaceAll("<META[^>]*>", "");
-		return html;
+	private static String replaceHtmlTags(final String html) {
+		String newHtml = html.replaceAll("</?html>", "");
+		newHtml = newHtml.replaceAll("</?body>", "");
+		newHtml = newHtml.replaceAll("</?head>", "");
+		newHtml = newHtml.replaceAll("<title>[^<]*</title>", "");
+		newHtml = newHtml.replaceAll("<META[^>]*>", "");
+		return newHtml;
 	}
 
+	/**
+	 * Returns the HTML Title defined in the plugin parameters.
+	 *
+	 * @return the defined HTML title; {@code null} if not defined
+	 */
 	private String getHtmlTitle() {
-		if (pluginParameters.parameter() != null
-				&& pluginParameters.parameter().getHtmlTitle() != null) {
-			return pluginParameters.parameter().getHtmlTitle();
+		String ret = null;
+		if (this.parameter.getHtmlTitle() != null) {
+			ret = pluginParameters.parameter().getHtmlTitle();
 		}
-		return null;
+		return ret;
 	}
 
+	/**
+	 * Returns the base name used to create report's output file(s).
+	 *
+	 * @return the report's base name; {@code 'japicmp'} if not defined
+	 */
 	@Override
 	public String getOutputName() {
-		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
-			return this.parameter.getReportLinkName();
+		String ret = "japicmp";
+		if (this.parameter.getReportLinkName() != null) {
+			ret = this.parameter.getReportLinkName().replace(' ', '_');
 		}
-		return "japicmp";
+		return ret;
 	}
 
+	/**
+	 * Returns the localized report name.
+	 *
+	 * @param locale the wanted locale to return the report's name; could be null
+	 *
+	 * @return the name of this report
+	 */
 	@Override
 	public String getName(Locale locale) {
-		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
-			return this.parameter.getReportLinkName();
+		String ret = "japicmp";
+		if (this.parameter.getReportLinkName() != null) {
+			ret = this.parameter.getReportLinkName();
 		}
-		return "japicmp";
+		return ret;
 	}
 
+	/**
+	 * Returns  the localized report description.
+	 *
+	 * @param locale the wanted locale to return the report's name; could be null
+	 *
+	 * @return the description of this report
+	 */
 	@Override
 	public String getDescription(Locale locale) {
 		if (this.skip || isPomModuleNeedingSkip()) {
-			return "skipping report";
+			return "Skipping report";
 		}
 		Options options;
 		try {
@@ -221,8 +255,13 @@ public class JApiCmpReport extends AbstractMavenReport {
 		return options.getDifferenceDescription();
 	}
 
+	/**
+	 * Returns {@code true} if this is a POM module and the skip POM flag is set.
+	 *
+	 * @return {@code true} if this module should be skipped
+	 */
 	private boolean isPomModuleNeedingSkip() {
-		return this.pluginParameters.parameter().getSkipPomModules() && "pom".equalsIgnoreCase(
+		return this.parameter.getSkipPomModules() && "pom".equalsIgnoreCase(
 				this.project.getArtifact().getType());
 	}
 }

@@ -29,17 +29,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 abstract class AbstractTest {
 
 	final Path testDefaultDir = Paths.get("target/test-run/default/target");
-	final File defaultDiffFile = testDefaultDir.resolve("japicmp/japicmp.diff").toFile();
-	final File defaultHhtmlFile = testDefaultDir.resolve("japicmp/japicmp.html").toFile();
-	final File defaultMdFile = testDefaultDir.resolve("japicmp/japicmp.md").toFile();
-	final File defaultXmlFile = testDefaultDir.resolve("japicmp/japicmp.xml").toFile();
-
 	final Path testConfigDir = Paths.get("target/test-run/configured/target");
-	final File configDiffFile = testConfigDir.resolve("reports/japicmp.diff").toFile();
-	final File configHhtmlFile = testConfigDir.resolve("reports/japicmp.html").toFile();
-	final File configMdFile = testConfigDir.resolve("reports/japicmp.md").toFile();
-	final File configXmlFile = testConfigDir.resolve("reports/japicmp.xml").toFile();
-
 	final Path testSkipPomDir = Paths.get("target/test-run/skippom/target");
 
 	/**
@@ -109,16 +99,16 @@ abstract class AbstractTest {
 			}
 
 			// noinspection ResultOfMethodCallIgnored
-			Files.walk(dir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+			Files.walk(dir).sorted(Comparator.reverseOrder()).map(Path :: toFile).forEach(File :: delete);
 		}
 	}
 
 	void assertFileExists(final File file) {
-		assertThat(file, anExistingFile());
+		assertThat(file.getAbsolutePath() + " does not exists", file, anExistingFile());
 	}
 
 	void assertFileNotExists(final File file) {
-		assertThat(file, not(anExistingFile()));
+		assertThat(file.getAbsolutePath() + " exists", file, not(anExistingFile()));
 	}
 
 	void assertFileContains(final File file, final String contents) throws IOException {
@@ -130,7 +120,7 @@ abstract class AbstractTest {
 		// A non-existent directory is considered empty
 		if (Files.exists(dir)) {
 			final List<Path> contents = Files.list(dir).collect(Collectors.toList());
-			assertThat(contents, is(empty()));
+			assertThat(dir.getFileName() + "is not empty", contents, is(empty()));
 		}
 	}
 }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import japicmp.maven.util.LocalMojoTest;
+import java.io.File;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.junit5.InjectMojo;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,16 @@ import org.junit.jupiter.api.Test;
  */
 @LocalMojoTest
 final class JApiCmpMojoTest extends AbstractTest {
+
+	final File defaultDiffFile = testDefaultDir.resolve("japicmp/japicmp.diff").toFile();
+	final File defaultHtmlFile = testDefaultDir.resolve("japicmp/japicmp.html").toFile();
+	final File defaultMdFile = testDefaultDir.resolve("japicmp/japicmp.md").toFile();
+	final File defaultXmlFile = testDefaultDir.resolve("japicmp/japicmp.xml").toFile();
+
+	final File configDiffFile = testConfigDir.resolve("japicmp/japicmp.diff").toFile();
+	final File configHtmlFile = testConfigDir.resolve("japicmp/japicmp.html").toFile();
+	final File configMdFile = testConfigDir.resolve("japicmp/japicmp.md").toFile();
+	final File configXmlFile = testConfigDir.resolve("japicmp/japicmp.xml").toFile();
 
 	/**
 	 * Default constructor.
@@ -29,7 +40,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		testMojo.skip = true;
 		testMojo.execute();
 		assertFileNotExists(defaultDiffFile);
-		assertFileNotExists(defaultHhtmlFile);
+		assertFileNotExists(defaultHtmlFile);
 		assertFileNotExists(defaultMdFile);
 		assertFileNotExists(defaultXmlFile);
 	}
@@ -41,7 +52,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		deleteDirectory(testDefaultDir);
 		testMojo.execute();
 		assertFileExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);
+		assertFileExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
 	}
@@ -54,7 +65,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		testMojo.skipDiffReport = true;
 		testMojo.execute();
 		assertFileNotExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);
+		assertFileExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
 	}
@@ -67,7 +78,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		testMojo.skipHtmlReport = true;
 		testMojo.execute();
 		assertFileExists(defaultDiffFile);
-		assertFileNotExists(defaultHhtmlFile);
+		assertFileNotExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
 	}
@@ -80,7 +91,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		testMojo.skipMarkdownReport = true;
 		testMojo.execute();
 		assertFileExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);
+		assertFileExists(defaultHtmlFile);
 		assertFileNotExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
 	}
@@ -93,7 +104,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		testMojo.skipXmlReport = true;
 		testMojo.execute();
 		assertFileExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);
+		assertFileExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileNotExists(defaultXmlFile);
 	}
@@ -112,7 +123,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 	void testNoArtifacts(final JApiCmpMojo testMojo) throws Exception {
 		assertNotNull(testMojo);
 		deleteDirectory(testSkipPomDir);
-		assertThrows(MojoFailureException.class, testMojo::execute);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
 	}
 
 	@Test
@@ -122,7 +133,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		deleteDirectory(testConfigDir);
 		testMojo.execute();
 		assertFileExists(configDiffFile);
-		assertFileExists(configHhtmlFile);
+		assertFileExists(configHtmlFile);
 		assertFileExists(configMdFile);
 		assertFileExists(configXmlFile);
 		assertFileContains(configMdFile, "# New Markdown Title");
@@ -134,7 +145,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
 		testMojo.parameter.setBreakBuildOnModifications(true);
-		assertThrows(MojoFailureException.class, testMojo::execute);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
 	}
 
 	@Test
@@ -143,7 +154,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
 		testMojo.parameter.setBreakBuildOnBinaryIncompatibleModifications(true);
-		assertThrows(MojoFailureException.class, testMojo::execute);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
 	}
 
 	@Test
@@ -152,7 +163,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
 		testMojo.parameter.setBreakBuildOnSourceIncompatibleModifications(true);
-		assertThrows(MojoFailureException.class, testMojo::execute);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
 	}
 
 	@Test
@@ -161,7 +172,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
 		testMojo.oldVersion.getDependency().setVersion("x.y");
-		assertThrows(MojoFailureException.class, testMojo::execute);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
 	}
 
 	@Test
@@ -173,7 +184,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		testMojo.parameter.setIgnoreMissingOldVersion(true);
 		testMojo.execute();
 		assertFileExists(configDiffFile);
-		assertFileExists(configHhtmlFile);
+		assertFileExists(configHtmlFile);
 		assertFileExists(configMdFile);
 		assertFileExists(configXmlFile);
 		assertFileContains(configMdFile, "with the previous version `unknown`");
@@ -185,7 +196,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertNotNull(testMojo);
 		deleteDirectory(testConfigDir);
 		testMojo.mavenProject.setVersion("x.y");
-		assertThrows(MojoFailureException.class, testMojo::execute);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
 	}
 
 	@Test
@@ -197,7 +208,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 		testMojo.parameter.setIgnoreMissingNewVersion(true);
 		testMojo.execute();
 		assertFileNotExists(configDiffFile);
-		assertFileNotExists(configHhtmlFile);
+		assertFileNotExists(configHtmlFile);
 		assertFileNotExists(configMdFile);
 		assertFileNotExists(configXmlFile);
 	}

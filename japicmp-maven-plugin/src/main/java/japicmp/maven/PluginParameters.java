@@ -52,7 +52,7 @@ public class PluginParameters {
 		this.skip = skip;
 		this.newVersion = newVersion;
 		this.oldVersion = oldVersion;
-		this.parameter = parameter==null ? new ConfigParameters():parameter;
+		this.parameter = parameter == null ? new ConfigParameters() : parameter;
 		this.dependencies = dependencies;
 		this.oldClassPathDependencies = oldClassPathDependencies;
 		this.newClassPathDependencies = newClassPathDependencies;

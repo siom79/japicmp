@@ -40,7 +40,7 @@ public class JApiCmpMojo extends AbstractMojo {
 
 	/** The parameters defined for the plugin. */
 	@Parameter
-	ConfigParameters parameter;
+	ConfigParameters parameter = new ConfigParameters();
 
 	/** Additional dependencies to use. */
 	@Parameter
@@ -135,7 +135,7 @@ public class JApiCmpMojo extends AbstractMojo {
 	JApiCmpProcessor processor;
 
 	/**
-	 * Default constructor.
+	 * Constructs a new instance of {@code JApiCmpMojo}.
 	 */
 	public JApiCmpMojo() {
 		/* Intentionally left blank. */

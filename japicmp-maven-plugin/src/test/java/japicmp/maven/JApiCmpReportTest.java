@@ -11,12 +11,17 @@ import org.junit.jupiter.api.Test;
  * Collection of tests of JApiCmpReport.
  */
 @LocalMojoTest
-public class JApiCmpReportTest extends AbstractTest {
+final class JApiCmpReportTest extends AbstractTest {
 
 	final File defaultDiffFile = testDefaultDir.resolve("site/japicmp.diff").toFile();
-	final File defaultHhtmlFile = testDefaultDir.resolve("site/japicmp.html").toFile();
+	final File defaultHtmlFile = testDefaultDir.resolve("site/japicmp.html").toFile();
 	final File defaultMdFile = testDefaultDir.resolve("site/japicmp.md").toFile();
 	final File defaultXmlFile = testDefaultDir.resolve("site/japicmp.xml").toFile();
+
+	final File configDiffFile = testConfigDir.resolve("site/japicmp.diff").toFile();
+	final File configHtmlFile = testConfigDir.resolve("site/japicmp.html").toFile();
+	final File configMdFile = testConfigDir.resolve("site/japicmp.md").toFile();
+	final File configXmlFile = testConfigDir.resolve("site/japicmp.xml").toFile();
 
 	@Test
 	@InjectMojo(goal = "cmp-report", pom = "target/test-run/default/pom.xml")
@@ -26,7 +31,7 @@ public class JApiCmpReportTest extends AbstractTest {
 		testReport.skip = true;
 		testReport.execute();
 		assertFileNotExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);    // HTML file always created by Report
+		assertFileExists(defaultHtmlFile);    // HTML file always created by Report
 		assertFileNotExists(defaultMdFile);
 		assertFileNotExists(defaultXmlFile);
 	}
@@ -38,7 +43,7 @@ public class JApiCmpReportTest extends AbstractTest {
 		deleteDirectory(testDefaultDir);
 		testReport.execute();
 		assertFileExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);
+		assertFileExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
 	}
@@ -51,7 +56,7 @@ public class JApiCmpReportTest extends AbstractTest {
 		testReport.skipDiffReport = true;
 		testReport.execute();
 		assertFileNotExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);
+		assertFileExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
 	}
@@ -64,7 +69,7 @@ public class JApiCmpReportTest extends AbstractTest {
 		testReport.skipMarkdownReport = true;
 		testReport.execute();
 		assertFileExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);
+		assertFileExists(defaultHtmlFile);
 		assertFileNotExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
 	}
@@ -77,8 +82,24 @@ public class JApiCmpReportTest extends AbstractTest {
 		testReport.skipXmlReport = true;
 		testReport.execute();
 		assertFileExists(defaultDiffFile);
-		assertFileExists(defaultHhtmlFile);
+		assertFileExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileNotExists(defaultXmlFile);
 	}
+
+	@Test
+	@InjectMojo(goal = "cmp-report", pom = "target/test-run/configured/pom.xml")
+	void testMarkdownTitle(final JApiCmpReport testReport) throws Exception {
+		assertNotNull(testReport);
+		deleteDirectory(testConfigDir);
+		testReport.execute();
+		assertFileExists(configDiffFile);
+		assertFileExists(configHtmlFile);
+		assertFileExists(configMdFile);
+		assertFileExists(configXmlFile);
+		assertFileContains(configMdFile, "# New Markdown Title");
+		assertFileContains(configHtmlFile, "<span class=\"title\">New HTML Title</span>");
+	}
+
+
 }
