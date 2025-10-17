@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import japicmp.maven.util.LocalMojoTest;
 import java.io.File;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.junit5.InjectMojo;
 import org.junit.jupiter.api.Test;
@@ -211,6 +212,46 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertFileNotExists(configHtmlFile);
 		assertFileNotExists(configMdFile);
 		assertFileNotExists(configXmlFile);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testPostAnalysisFromFile(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setPostAnalysisScript("target/test-classes/groovy/SamplePostAnalysis.groovy");
+		testMojo.execute();
+		assertFileExists(configDiffFile);
+		assertFileExists(configHtmlFile);
+		assertFileExists(configMdFile);
+		assertFileExists(configXmlFile);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testMissingPostAnalysisScript(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setPostAnalysisScript("target/test-classes/groovy/Unknown.groovy");
+		assertThrows(MojoExecutionException.class, testMojo :: execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBadPostAnalysisScript(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setPostAnalysisScript("target/test-classes/groovy/BadScript.groovy");
+		assertThrows(MojoExecutionException.class, testMojo :: execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testNoReturnPostAnalysisScript(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setPostAnalysisScript("target/test-classes/groovy/NoReturn.groovy");
+		assertThrows(MojoExecutionException.class, testMojo :: execute);
 	}
 
 }

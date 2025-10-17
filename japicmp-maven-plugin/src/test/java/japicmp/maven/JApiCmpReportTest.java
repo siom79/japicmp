@@ -1,9 +1,11 @@
 package japicmp.maven;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import japicmp.maven.util.LocalMojoTest;
 import java.io.File;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.junit5.InjectMojo;
 import org.junit.jupiter.api.Test;
 
@@ -101,5 +103,14 @@ final class JApiCmpReportTest extends AbstractTest {
 		assertFileContains(configHtmlFile, "<span class=\"title\">New HTML Title</span>");
 	}
 
+
+	@Test
+	@InjectMojo(goal = "cmp-report", pom = "target/test-run/configured/pom.xml")
+	void testMissingPostAnalysisScript(final JApiCmpReport testReport) throws Exception {
+		assertNotNull(testReport);
+		deleteDirectory(testConfigDir);
+		testReport.parameter.setPostAnalysisScript("target/test-classes/groovy/Unknown.groovy");
+		assertThrows(MojoExecutionException.class, testReport :: execute);
+	}
 
 }

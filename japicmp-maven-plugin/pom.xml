@@ -226,6 +226,9 @@
 			<testResource>
 				<directory>src/test/resources</directory>
 				<targetPath>${project.build.directory}/test-classes</targetPath>
+				<excludes>
+					<exclude>**/data/**</exclude>
+				</excludes>
 			</testResource>
 			<testResource>
 				<directory>src/test/resources/data</directory>

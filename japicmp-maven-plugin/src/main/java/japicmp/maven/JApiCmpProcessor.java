@@ -771,7 +771,7 @@ public class JApiCmpProcessor {
 
 		String optionalTitle = pluginParameters.parameter().getHtmlTitle();
 		xmlOutputGeneratorOptions.setTitle(
-				optionalTitle != null ? optionalTitle:options.getDifferenceDescription());
+				optionalTitle != null ? optionalTitle : options.getDifferenceDescription());
 
 		XmlOutputGenerator xmlGenerator = new XmlOutputGenerator(jApiClasses, options,
 				xmlOutputGeneratorOptions);
@@ -821,7 +821,7 @@ public class JApiCmpProcessor {
 		HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
 		htmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
 		final String title = pluginParameters.parameter().getHtmlTitle();
-		htmlOutputGeneratorOptions.setTitle(title != null ? title:options.getDifferenceDescription());
+		htmlOutputGeneratorOptions.setTitle(title != null ? title : options.getDifferenceDescription());
 
 		final HtmlOutputGenerator htmlOutputGenerator = new HtmlOutputGenerator(jApiClasses, options,
 				htmlOutputGeneratorOptions);
@@ -1247,7 +1247,7 @@ public class JApiCmpProcessor {
 	private String guessVersion(final File file) {
 		String name = file.getName();
 		Optional<SemanticVersion> semanticVersion = japicmp.versioning.Version.getSemanticVersion(name);
-		String version = semanticVersion.isPresent() ? semanticVersion.get().toString():"n.a.";
+		String version = semanticVersion.isPresent() ? semanticVersion.get().toString() : "n.a.";
 		if (name.contains("SNAPSHOT")) {
 			version += "-SNAPSHOT";
 		}
