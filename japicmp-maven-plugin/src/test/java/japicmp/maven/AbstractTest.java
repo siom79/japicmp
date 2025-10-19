@@ -38,8 +38,8 @@ abstract class AbstractTest {
 	 * @return the mocked MavenParameters
 	 */
 	MavenParameters createMavenParameters() {
-		final RemoteRepository remoteRepository = new RemoteRepository.Builder("id", "type",
-				"http://example.org").build();
+		final RemoteRepository remoteRepository = new RemoteRepository.Builder("default", "releases",
+				"(https://repo.maven.apache.org/maven2").build();
 		return new MavenParameters(new ArrayList<>(), new MavenProject(),
 				mock(MojoExecution.class), "", mock(RepositorySystem.class),
 				mock(RepositorySystemSession.class),

@@ -144,6 +144,7 @@ public class LocalMojoExtension extends MojoExtension {
 			final DefaultMaven maven = (DefaultMaven) getContainer().lookup(Maven.class);
 			final DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) maven.newRepositorySession(
 					request);
+
 //      final DefaultLocalPathComposer pathComposer = new DefaultLocalPathComposer();
 			final SimpleLocalRepositoryManagerFactory repoMgrFactory =
 					new SimpleLocalRepositoryManagerFactory();
