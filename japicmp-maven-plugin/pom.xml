@@ -82,7 +82,6 @@
 			<groupId>org.apache.maven.reporting</groupId>
 			<artifactId>maven-reporting-impl</artifactId>
 			<version>${reporting.version}</version>
-			<!--
 			<exclusions>
 				<exclusion>
 					<groupId>org.codehaus.plexus</groupId>
@@ -93,7 +92,6 @@
 					<artifactId>xercesImpl</artifactId>
 				</exclusion>
 			</exclusions>
-			-->
 		</dependency>
 		<dependency>
 			<groupId>com.github.siom79.japicmp</groupId>
