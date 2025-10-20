@@ -148,7 +148,7 @@
 		<maven-api.version>3.6.3</maven-api.version>
 		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven api version -->
 		<reporting.version>3.1.0</reporting.version>
-		<plugin-annotation.version>3.6.4</plugin-annotation.version>
+		<plugin-annotation.version>3.15.1</plugin-annotation.version>
 		<surefireVersion>3.5.4</surefireVersion>
 		<javassist.version>3.30.2-GA</javassist.version>
 		<guava.version>33.4.8-jre</guava.version>
