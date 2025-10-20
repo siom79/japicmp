@@ -153,7 +153,7 @@
 		<javassist.version>3.30.2-GA</javassist.version>
 		<guava.version>33.4.8-jre</guava.version>
 		<jaxb.version>2.3.2</jaxb.version>
-		<jsoup.version>1.20.1</jsoup.version>
+		<jsoup.version>1.21.2</jsoup.version>
 		<mockito.version>4.3.1</mockito.version>
 		<junit.version>5.6.2</junit.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots</sonatypeOssDistMgmtSnapshotsUrl>
