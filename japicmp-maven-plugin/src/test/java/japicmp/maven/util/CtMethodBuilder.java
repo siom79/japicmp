@@ -1,6 +1,8 @@
 package japicmp.maven.util;
 
 import japicmp.util.ModifierHelper;
+import java.util.ArrayList;
+import java.util.List;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -9,9 +11,6 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CtMethodBuilder extends CtBehaviorBuilder {
 	private static final String DEFAULT_METHOD_NAME = "method";
@@ -87,7 +86,7 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 	}
 
 	public CtMethod addToClass(CtClass declaringClass) throws CannotCompileException {
-		if (this.returnType == null) {
+		if (this.returnType==null) {
 			this.returnType = declaringClass;
 		}
 		CtMethod ctMethod = CtNewMethod.make(this.modifier, this.returnType, this.name, this.parameters, this.exceptions, this.body, declaringClass);

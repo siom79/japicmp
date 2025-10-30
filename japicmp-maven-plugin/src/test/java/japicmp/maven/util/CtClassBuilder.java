@@ -1,6 +1,9 @@
 package japicmp.maven.util;
 
 import japicmp.util.ModifierHelper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.Modifier;
@@ -8,10 +11,6 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class CtClassBuilder {
 	private static final String DEFAULT_CLASS_NAME = "japicmp.Test";

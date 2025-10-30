@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp-base</artifactId>
@@ -12,7 +14,8 @@
 
 	<name>japicmp-maven-plugin</name>
 	<description>japicmp-maven-plugin is a maven plugin that computes the differences between two
-		versions of a jar file/artifact in order to ease the API documentation for clients/customers.
+		versions of a jar file/artifact in order to ease the API documentation for
+		clients/customers.
 	</description>
 	<url>https://github.com/siom79/japicmp</url>
 
@@ -25,9 +28,10 @@
 	</licenses>
 
 	<properties>
-		<mavenVersion>3.8.1</mavenVersion> <!-- maven.version property is reserved! -->
-		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven version -->
-		<maven-plugin.version>3.6.4</maven-plugin.version>
+		<reporting.version>3.1.0</reporting.version>
+		<maven.pluginTesting.version>4.0.0-alpha-2</maven.pluginTesting.version>
+
+		<test.directory>${project.build.directory}/test-run</test.directory>
 	</properties>
 
 	<prerequisites>
@@ -60,6 +64,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-impl</artifactId>
+			<version>${resolver.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
 			<version>${plugin-annotation.version}</version>
@@ -67,11 +77,6 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.reporting</groupId>
-			<artifactId>maven-reporting-api</artifactId>
-			<version>${reporting.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.reporting</groupId>
@@ -97,6 +102,42 @@
 			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-jsr223</artifactId>
 			<version>4.0.15</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugin-testing</groupId>
+			<artifactId>maven-plugin-testing-harness</artifactId>
+			<version>${maven.pluginTesting.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-connector-basic</artifactId>
+			<version>${resolver.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-transport-http</artifactId>
+			<version>${resolver.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-compat</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>2.0.17</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.5.19</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -158,11 +199,136 @@
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>@{argLine}</argLine>
+					<useModulePath>false</useModulePath>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.8</version>
+				<executions>
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-report</id>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+
+		<!-- Copy test data to the test directory -->
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<targetPath>${project.build.directory}/test-classes</targetPath>
+				<excludes>
+					<exclude>**/data/**</exclude>
+				</excludes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources/data</directory>
+				<targetPath>${test.directory}</targetPath>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
 	</build>
 
 	<reporting>
 		<plugins>
+			<!-- Generate the project reports -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>3.1.2</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>summary</report>
+							<report>dependency-info</report>
+							<report>modules</report>
+							<report>scm</report>
+							<report>issue-management</report>
+							<report>mailing-lists</report>
+							<report>dependency-management</report>
+							<report>dependencies</report>
+							<report>dependency-convergence</report>
+							<report>ci-management</report>
+							<report>plugin-management</report>
+							<report>plugins</report>
+							<report>distribution-management</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+
+			<!-- Generate the Javadoc -->
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>https://maven.apache.org/ref/${maven-api.version}/maven-plugin-api/apidocs</link>
+						<link>https://maven.apache.org/ref/${reporting.version}/apidocs</link>
+					</links>
+					<tags>
+						<tag>
+							<name>todo</name>
+							<placement>a</placement>
+							<head>To Do:</head>
+						</tag>
+					</tags>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>aggregate-no-fork</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<!-- Generate the code coverage report -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<configuration>
+					<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+					<excludes>
+						<exclude>**/HelpMojo*</exclude>
+					</excludes>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<!-- Generate the Surefire report -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>${surefireVersion}</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report-only</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>

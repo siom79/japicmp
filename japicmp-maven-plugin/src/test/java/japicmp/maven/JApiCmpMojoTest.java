@@ -1,254 +1,257 @@
 package japicmp.maven;
 
-import japicmp.cmp.ClassesHelper;
-import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.config.Options;
-import japicmp.maven.util.CtClassBuilder;
-import japicmp.maven.util.CtFieldBuilder;
-import japicmp.maven.util.CtInterfaceBuilder;
-import japicmp.maven.util.CtMethodBuilder;
-import javassist.ClassPool;
-import javassist.CtClass;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import japicmp.maven.util.LocalMojoTest;
+import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.junit.jupiter.api.Assertions;
+import org.apache.maven.plugin.testing.junit5.InjectMojo;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+/**
+ * Collection of tests of JApiCmpMojo.
+ */
+@LocalMojoTest
+final class JApiCmpMojoTest extends AbstractTest {
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.jupiter.api.Assertions.fail;
+	final File defaultDiffFile = testDefaultDir.resolve("japicmp/japicmp.diff").toFile();
+	final File defaultHtmlFile = testDefaultDir.resolve("japicmp/japicmp.html").toFile();
+	final File defaultMdFile = testDefaultDir.resolve("japicmp/japicmp.md").toFile();
+	final File defaultXmlFile = testDefaultDir.resolve("japicmp/japicmp.xml").toFile();
 
-public class JApiCmpMojoTest {
+	final File configDiffFile = testConfigDir.resolve("japicmp/japicmp.diff").toFile();
+	final File configHtmlFile = testConfigDir.resolve("japicmp/japicmp.html").toFile();
+	final File configMdFile = testConfigDir.resolve("japicmp/japicmp.md").toFile();
+	final File configXmlFile = testConfigDir.resolve("japicmp/japicmp.xml").toFile();
 
-	public static Version createVersion(String groupId, String artifactId, String version) {
-		Version versionInstance = new Version();
-		Dependency dependency = new Dependency();
-		dependency.setGroupId(groupId);
-		dependency.setArtifactId(artifactId);
-		dependency.setVersion(version);
-		versionInstance.setDependency(dependency);
-		return versionInstance;
+	/**
+	 * Default constructor.
+	 */
+	JApiCmpMojoTest() {
+		super();
 	}
 
 	@Test
-	public void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusionFalse() throws Exception {
-		testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(false);
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testSkip(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testDefaultDir);
+		testMojo.skip = true;
+		testMojo.execute();
+		assertFileNotExists(defaultDiffFile);
+		assertFileNotExists(defaultHtmlFile);
+		assertFileNotExists(defaultMdFile);
+		assertFileNotExists(defaultXmlFile);
 	}
 
 	@Test
-	public void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusionTrue() throws Exception {
-		Assertions.assertThrows(MojoFailureException.class, () -> testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(true));
-	}
-
-	private void testBreakBuildIfNecessaryInterfaceRemovedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
-		Options options = Options.newDefault();
-		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
-		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
-			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass interfaceCtClass = CtInterfaceBuilder.create().name("japicmp.ITest").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").implementsInterface(interfaceCtClass).addToClassPool(classPool);
-				return Arrays.asList(interfaceCtClass, ctClass);
-			}
-
-			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass interfaceCtClass = CtInterfaceBuilder.create().name("japicmp.ITest").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				return Arrays.asList(interfaceCtClass, ctClass);
-			}
-		});
-		options.addExcludeFromArgument(Optional.of("japicmp.ITest"), false); // exclude japicmp.ITest
-		JApiCmpMojo mojo = new JApiCmpMojo();
-		Parameter parameterParam = new Parameter();
-		parameterParam.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion); //do not break the build if cause is excluded
-		parameterParam.setBreakBuildOnBinaryIncompatibleModifications(true);
-		parameterParam.setBreakBuildOnSourceIncompatibleModifications(true);
-		mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, new JarArchiveComparator(jarArchiveComparatorOptions));
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testDefaultConfiguration(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testDefaultDir);
+		testMojo.execute();
+		assertFileExists(defaultDiffFile);
+		assertFileExists(defaultHtmlFile);
+		assertFileExists(defaultMdFile);
+		assertFileExists(defaultXmlFile);
 	}
 
 	@Test
-	public void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusionFalse() throws Exception {
-		testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(false);
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testDefaultNoDiff(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testDefaultDir);
+		testMojo.skipDiffReport = true;
+		testMojo.execute();
+		assertFileNotExists(defaultDiffFile);
+		assertFileExists(defaultHtmlFile);
+		assertFileExists(defaultMdFile);
+		assertFileExists(defaultXmlFile);
 	}
 
 	@Test
-	public void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusionTrue() throws Exception {
-		Assertions.assertThrows(MojoFailureException.class, () -> testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(true));
-	}
-
-	private void testBreakBuildIfNecessaryFieldTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
-		Options options = Options.newDefault();
-		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
-		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
-			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass fieldTypeCtClass = CtClassBuilder.create().name("japicmp.FieldType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtFieldBuilder.create().type(fieldTypeCtClass).name("field").addToClass(ctClass);
-				return Arrays.asList(fieldTypeCtClass, ctClass);
-			}
-
-			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass fieldTypeCtClass = CtClassBuilder.create().name("japicmp.FieldType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtFieldBuilder.create().type(classPool.get("java.lang.String")).name("field").addToClass(ctClass);
-				return Arrays.asList(fieldTypeCtClass, ctClass);
-			}
-		});
-		options.addExcludeFromArgument(Optional.of("japicmp.FieldType"), false); // exclude japicmp.FieldType
-		JApiCmpMojo mojo = new JApiCmpMojo();
-		Parameter parameterParam = new Parameter();
-		parameterParam.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion); //do not break the build if cause is excluded
-		parameterParam.setBreakBuildOnBinaryIncompatibleModifications(true);
-		parameterParam.setBreakBuildOnSourceIncompatibleModifications(true);
-		mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testDefaultNoHtml(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testDefaultDir);
+		testMojo.skipHtmlReport = true;
+		testMojo.execute();
+		assertFileExists(defaultDiffFile);
+		assertFileNotExists(defaultHtmlFile);
+		assertFileExists(defaultMdFile);
+		assertFileExists(defaultXmlFile);
 	}
 
 	@Test
-	public void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusionFalse() throws Exception {
-		testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(false);
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testDefaultNoMarkdown(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testDefaultDir);
+		testMojo.skipMarkdownReport = true;
+		testMojo.execute();
+		assertFileExists(defaultDiffFile);
+		assertFileExists(defaultHtmlFile);
+		assertFileNotExists(defaultMdFile);
+		assertFileExists(defaultXmlFile);
 	}
 
 	@Test
-	public void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusionTrue() throws Exception {
-		Assertions.assertThrows(MojoFailureException.class, () -> testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(true));
-	}
-
-	private void testBreakBuildIfNecessaryMethodReturnTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
-		Options options = Options.newDefault();
-		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
-		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
-			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.MethodReturnType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(typeCtClass).name("test").addToClass(ctClass);
-				return Arrays.asList(typeCtClass, ctClass);
-			}
-
-			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.MethodReturnType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.lang.String")).name("test").addToClass(ctClass);
-				return Arrays.asList(typeCtClass, ctClass);
-			}
-		});
-		options.addExcludeFromArgument(Optional.of("japicmp.MethodReturnType"), false); // exclude japicmp.MethodReturnType
-		JApiCmpMojo mojo = new JApiCmpMojo();
-		Parameter parameterParam = new Parameter();
-		parameterParam.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion); //do not break the build if cause is excluded
-		parameterParam.setBreakBuildOnBinaryIncompatibleModifications(true);
-		parameterParam.setBreakBuildOnSourceIncompatibleModifications(true);
-		mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testDefaultNoXml(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testDefaultDir);
+		testMojo.skipXmlReport = true;
+		testMojo.execute();
+		assertFileExists(defaultDiffFile);
+		assertFileExists(defaultHtmlFile);
+		assertFileExists(defaultMdFile);
+		assertFileNotExists(defaultXmlFile);
 	}
 
 	@Test
-	public void testBreakBuildIfNecessarySuperclassChangedCausedByExclusionFalse() throws Exception {
-		testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(false);
+	@InjectMojo(goal = "cmp", pom = "target/test-run/skippom/pom.xml")
+	void testSkipPomModule(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testSkipPomDir);
+		testMojo.execute();
+		assertDirectoryEmpty(testSkipPomDir);
 	}
 
 	@Test
-	public void testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusionTrue() {
-		Assertions.assertThrows(MojoFailureException.class, () -> testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(true));
-	}
-
-	private void testBreakBuildIfNecessarySuperclassTypeChangedCausedByExclusion(boolean breakBuildIfCausedByExclusion) throws Exception {
-		Options options = Options.newDefault();
-		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
-		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
-			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classPool);
-				return Arrays.asList(typeCtClass, ctClass);
-			}
-
-			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(classPool.get("java.text.SimpleDateFormat")).addToClassPool(classPool);
-				return Arrays.asList(typeCtClass, ctClass);
-			}
-		});
-		options.addExcludeFromArgument(Optional.of("japicmp.SuperType"), false); // exclude japicmp.SuperType
-		JApiCmpMojo mojo = new JApiCmpMojo();
-		Parameter parameterParam = new Parameter();
-		parameterParam.setBreakBuildIfCausedByExclusion(breakBuildIfCausedByExclusion); //do not break the build if cause is excluded
-		parameterParam.setBreakBuildOnBinaryIncompatibleModifications(true);
-		parameterParam.setBreakBuildOnSourceIncompatibleModifications(true);
-		mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
+	@InjectMojo(goal = "cmp", pom = "target/test-run/noartifacts/pom.xml")
+	void testNoArtifacts(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testSkipPomDir);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
 	}
 
 	@Test
-	public void testBreakBuildIfNecessaryMultipleChanges() throws Exception {
-		Options options = Options.newDefault();
-		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
-		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
-			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classPool);
-				CtFieldBuilder.create().name("field").type(CtClass.intType).addToClass(ctClass);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("method").addToClass(ctClass);
-				return Arrays.asList(typeCtClass, ctClass);
-			}
-
-			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				return Collections.singletonList(ctClass);
-			}
-		});
-		JApiCmpMojo mojo = new JApiCmpMojo();
-		Parameter parameterParam = new Parameter();
-		parameterParam.setBreakBuildOnBinaryIncompatibleModifications(true);
-		parameterParam.setBreakBuildOnSourceIncompatibleModifications(true);
-		try {
-			mojo.breakBuildIfNecessary(compareClassesResult.getjApiClasses(), parameterParam, options, compareClassesResult.getJarArchiveComparator());
-			fail("No exception thrown.");
-		} catch (MojoFailureException e) {
-			String msg = e.getMessage();
-			assertThat(msg, containsString("japicmp.SuperType:CLASS_REMOVED"));
-			assertThat(msg, containsString("japicmp.Test.method():METHOD_REMOVED"));
-			assertThat(msg, containsString("japicmp.Test.field:FIELD_REMOVED"));
-			assertThat(msg, containsString("japicmp.Test:SUPERCLASS_REMOVED"));
-		}
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testMarkdownTitle(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.execute();
+		assertFileExists(configDiffFile);
+		assertFileExists(configHtmlFile);
+		assertFileExists(configMdFile);
+		assertFileExists(configXmlFile);
+		assertFileContains(configMdFile, "# New Markdown Title");
 	}
 
 	@Test
-	public void testIgnoreMissingVersions() throws MojoFailureException, IOException, MojoExecutionException {
-//		JApiCmpMojo mojo = new JApiCmpMojo();
-//		Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
-//		Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
-//		Parameter parameterParam = new Parameter();
-//		parameterParam.setIgnoreMissingNewVersion(true);
-//		parameterParam.setIgnoreMissingOldVersion(true);
-//		PluginParameters pluginParameters = new PluginParameters(false, newVersion, oldVersion, parameterParam, null, Optional.of(Paths.get(System.getProperty("user.dir"), "target", "simple").toFile()), Optional.<String>absent(), true, null, null, null, null);
-//		ArtifactResolutionResult artifactResolutionResult = mock(ArtifactResolutionResult.class);
-//		Set<Artifact> artifactSet = new HashSet<>();
-//		when(artifactResolutionResult.getArtifacts()).thenReturn(artifactSet);
-//		when(artifactResolver.resolve(Matchers.<ArtifactResolutionRequest>anyObject())).thenReturn(artifactResolutionResult);
-//		ArtifactFactory artifactFactory = mock(ArtifactFactory.class);
-//		when(artifactFactory.createArtifactWithClassifier(eq("groupId"), eq("artifactId"), eq("0.1.1"), anyString(), anyString())).thenReturn(mock(Artifact.class));
-//		MojoExecution mojoExecution = mock(MojoExecution.class);
-//		String executionId = "ignoreMissingVersions";
-//		when(mojoExecution.getExecutionId()).thenReturn(executionId);
-//		MavenProject mavenProject = mock(MavenProject.class);
-//		when(mavenProject.getArtifact()).thenReturn(mock(Artifact.class));
-//		MavenParameters mavenParameters = new MavenParameters(new ArrayList<ArtifactRepository>(), artifactFactory, mock(ArtifactRepository.class), artifactResolver, mavenProject, mojoExecution, "0.0.1", mock(ArtifactMetadataSource.class));
-//		mojo.executeWithParameters(pluginParameters, mavenParameters);
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", executionId + ".diff")), is(false));
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", executionId + ".xml")), is(false));
-//		assertThat(Files.exists(Paths.get(System.getProperty("user.dir"), "target", "simple", "japicmp", executionId + ".html")), is(false));
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnModification(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setBreakBuildOnModifications(true);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
 	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnBinaryIncompatible(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setBreakBuildOnBinaryIncompatibleModifications(true);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnSourceIncompatible(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setBreakBuildOnSourceIncompatibleModifications(true);
+		assertThrows(MojoFailureException.class, testMojo :: execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnMissingOldVersion(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.oldVersion.getDependency().setVersion("x.y");
+		assertThrows(MojoFailureException.class, testMojo :: execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testIgnoreMissingOldVersion(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.oldVersion.getDependency().setVersion("x.y");
+		testMojo.parameter.setIgnoreMissingOldVersion(true);
+		testMojo.execute();
+		assertFileExists(configDiffFile);
+		assertFileExists(configHtmlFile);
+		assertFileExists(configMdFile);
+		assertFileExists(configXmlFile);
+		assertFileContains(configMdFile, "with the previous version `unknown`");
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBreakOnMissingNewVersion(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.mavenProject.setVersion("x.y");
+		assertThrows(MojoFailureException.class, testMojo :: execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testIgnoreMissingNewVersion(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.mavenProject.setVersion("x.y");
+		testMojo.parameter.setIgnoreMissingNewVersion(true);
+		testMojo.execute();
+		assertFileNotExists(configDiffFile);
+		assertFileNotExists(configHtmlFile);
+		assertFileNotExists(configMdFile);
+		assertFileNotExists(configXmlFile);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testPostAnalysisFromFile(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setPostAnalysisScript("target/test-classes/groovy/SamplePostAnalysis.groovy");
+		testMojo.execute();
+		assertFileExists(configDiffFile);
+		assertFileExists(configHtmlFile);
+		assertFileExists(configMdFile);
+		assertFileExists(configXmlFile);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testMissingPostAnalysisScript(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setPostAnalysisScript("target/test-classes/groovy/Unknown.groovy");
+		assertThrows(MojoExecutionException.class, testMojo :: execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testBadPostAnalysisScript(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setPostAnalysisScript("target/test-classes/groovy/BadScript.groovy");
+		assertThrows(MojoExecutionException.class, testMojo :: execute);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/configured/pom.xml")
+	void testNoReturnPostAnalysisScript(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testConfigDir);
+		testMojo.parameter.setPostAnalysisScript("target/test-classes/groovy/NoReturn.groovy");
+		assertThrows(MojoExecutionException.class, testMojo :: execute);
+	}
+
 }

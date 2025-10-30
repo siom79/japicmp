@@ -14,7 +14,7 @@ public abstract class CtBehaviorBuilder {
 	}
 
 	public CtBehaviorBuilder parameter(CtClass parameter) {
-		if (this.parameters == null) {
+		if (this.parameters==null) {
 			this.parameters = new CtClass[]{parameter};
 		} else {
 			CtClass[] newParameters = new CtClass[this.parameters.length + 1];

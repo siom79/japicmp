@@ -1,5 +1,6 @@
 package japicmp.maven;
 
+import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -7,8 +8,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import java.util.List;
-
+/** Class for storing Maven parameters. */
 public class MavenParameters {
 	private final List<ArtifactRepository> artifactRepositories;
 	private final MavenProject mavenProject;
@@ -18,9 +18,25 @@ public class MavenParameters {
 	private final RepositorySystemSession repoSession;
 	private final List<RemoteRepository> remoteRepos;
 
-	public MavenParameters(final List<ArtifactRepository> artifactRepositories,
-						   final MavenProject mavenProject, final MojoExecution mojoExecution, final String versionRangeWithProjectVersion,
-						   final RepositorySystem repoSystem, final RepositorySystemSession repoSession, final List<RemoteRepository> remoteRepos) {
+	/**
+	 * Constructs a {@code MavenParameters} instance with the given values.
+	 *
+	 * @param artifactRepositories           the artifact repositories
+	 * @param mavenProject                   the Maven project
+	 * @param mojoExecution                  the Mojo execution
+	 * @param versionRangeWithProjectVersion the version range
+	 * @param repoSystem                     the repository system
+	 * @param repoSession                    the repository system session
+	 * @param remoteRepos                    the remote repositories
+	 */
+	public MavenParameters(
+			final List<ArtifactRepository> artifactRepositories,
+			final MavenProject mavenProject,
+			final MojoExecution mojoExecution,
+			final String versionRangeWithProjectVersion,
+			final RepositorySystem repoSystem,
+			final RepositorySystemSession repoSession,
+			final List<RemoteRepository> remoteRepos) {
 		this.artifactRepositories = artifactRepositories;
 		this.mavenProject = mavenProject;
 		this.mojoExecution = mojoExecution;
@@ -30,31 +46,66 @@ public class MavenParameters {
 		this.remoteRepos = remoteRepos;
 	}
 
-	public List<ArtifactRepository> getArtifactRepositories() {
+	/**
+	 * Returns the artifact repositories.
+	 *
+	 * @return the artifact repositories
+	 */
+	public List<ArtifactRepository> artifactRepositories() {
 		return artifactRepositories;
 	}
 
-	public MavenProject getMavenProject() {
+	/**
+	 * Returns the Maven project.
+	 *
+	 * @return the Maven project
+	 */
+	public MavenProject mavenProject() {
 		return mavenProject;
 	}
 
-	public MojoExecution getMojoExecution() {
+	/**
+	 * Returns the Mojo execution object.
+	 *
+	 * @return the Mojo execution object
+	 */
+	public MojoExecution mojoExecution() {
 		return mojoExecution;
 	}
 
-	public String getVersionRangeWithProjectVersion() {
+	/**
+	 * Returns the version range with project versions.
+	 *
+	 * @return the version range with project versions
+	 */
+	public String versionRangeWithProjectVersion() {
 		return versionRangeWithProjectVersion;
 	}
 
-	public RepositorySystem getRepoSystem() {
+	/**
+	 * Returns the repository system.
+	 *
+	 * @return the repository system
+	 */
+	public RepositorySystem repoSystem() {
 		return this.repoSystem;
 	}
 
-	public RepositorySystemSession getRepoSession() {
+	/**
+	 * Returns the repository system session.
+	 *
+	 * @return the repository system session
+	 */
+	public RepositorySystemSession repoSession() {
 		return this.repoSession;
 	}
 
-	public List<RemoteRepository> getRemoteRepos() {
+	/**
+	 * Returns the remote repositories.
+	 *
+	 * @return the remote repositories
+	 */
+	public List<RemoteRepository> remoteRepos() {
 		return this.remoteRepos;
 	}
 }

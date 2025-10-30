@@ -2,6 +2,10 @@ package japicmp.maven;
 
 import japicmp.config.Options;
 import japicmp.output.html.HtmlOutput;
+import java.io.File;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.MojoExecution;
@@ -9,92 +13,163 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import java.io.File;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
+/** Generates the japicmp reports for the project. */
 @Mojo(name = "cmp-report", defaultPhase = LifecyclePhase.SITE)
 public class JApiCmpReport extends AbstractMavenReport {
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private Version oldVersion;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<DependencyDescriptor> oldVersions;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private Version newVersion;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<DependencyDescriptor> newVersions;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private Parameter parameter;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<Dependency> dependencies;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<Dependency> oldClassPathDependencies;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private List<Dependency> newClassPathDependencies;
-	@org.apache.maven.plugins.annotations.Parameter(required = false)
-	private boolean skip;
-	@org.apache.maven.plugins.annotations.Parameter(required = true, readonly = true, property = "project.reporting.outputDirectory")
-	private String outputDirectory;
-	@Component
-	private RepositorySystem repoSystem;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
-	private RepositorySystemSession repoSession;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
-	private List<RemoteRepository> remoteRepos;
-	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${localRepository}")
-	private ArtifactRepository localRepository;
-	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project.remoteArtifactRepositories}")
-	private List<ArtifactRepository> artifactRepositories;
-	@org.apache.maven.plugins.annotations.Parameter(required = true, defaultValue = "${project}")
-	private MavenProject mavenProject;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "${mojoExecution}", readonly = true)
-	private MojoExecution mojoExecution;
-	@org.apache.maven.plugins.annotations.Parameter(defaultValue = "(,${project.version})", readonly = true)
-	private String versionRangeWithProjectVersion;
-	private JApiCmpMojo mojo;
-	private MavenParameters mavenParameters;
-	private PluginParameters pluginParameters;
+	/** The old version to compare. */
+	@Parameter
+	Version oldVersion;
 
+	/** A {@code List} of old versions to compare. */
+	@Parameter
+	List<DependencyDescriptor> oldVersions;
+
+	/** The new version to compare. */
+	@Parameter
+	Version newVersion;
+
+	/** A {@code List} of new versions to compare. */
+	@Parameter
+	List<DependencyDescriptor> newVersions;
+
+	/** The parameters defined for the plugin. */
+	@Parameter
+	ConfigParameters parameter = new ConfigParameters();
+
+	/** Additional dependencies to use. */
+	@Parameter
+	List<Dependency> dependencies;
+
+	/** The classpath for the old dependencies. */
+	@Parameter
+	List<Dependency> oldClassPathDependencies;
+
+	/** The classpath for the new dependencies. */
+	@Parameter
+	List<Dependency> newClassPathDependencies;
+
+	/** Specifies whether the report generation should be skipped. */
+	@Parameter(property = "japicmp.skip", defaultValue = "false")
+	boolean skip;
+
+	/** Specifies whether the Diff report generation should be skipped. */
+	@Parameter(property = "japicmp.skipDiffReport")
+	boolean skipDiffReport;
+
+	/** Specifies whether the HTML report generation should be skipped. */
+	@Parameter(property = "japicmp.skipHtmlReport")
+	boolean skipHtmlReport;
+	/** Specifies whether the Markdown report generation should be skipped. */
+	@Parameter(property = "japicmp.skipMarkdownReport")
+	boolean skipMarkdownReport;
+
+	/** Specifies whether the XML report generation should be skipped. */
+	@Parameter(property = "japicmp.skipXmlReport")
+	boolean skipXmlReport;
+
+	/** Specifies the current project build directory. */
+	@Parameter(required = true, property = "project.build.directory")
+	File projectBuildDir;
+
+	/** Remote project repositories used for the project. */
+	@Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+	List<RemoteRepository> remoteProjectRepositories;
+
+	@Parameter(defaultValue = "(,${project.version})", readonly = true)
+	String versionRangeWithProjectVersion;
+
+	/** A reference to the current Maven execution object. */
+	@Parameter(defaultValue = "${mojoExecution}", readonly = true)
+	MojoExecution mojoExecution;
+
+	/** A reference to the current Maven repository system. */
+	@Component
+	RepositorySystem repoSystem;
+	@Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+	RepositorySystemSession repoSession;
+
+	/** Specifies the {@code List} of remote repositories. */
+	@Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+	List<RemoteRepository> remoteRepos;
+
+	/** Specifies the {@code List} of remote artifact repositories. */
+	@Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
+	List<ArtifactRepository> artifactRepositories;
+
+	MavenParameters mavenParameters;
+	PluginParameters pluginParameters;
+
+	/*
+	 * Class variable to support unit tests.
+	 */
+	JApiCmpProcessor processor;
+
+	/**
+	 * Constructs a new instance of {@code JApiCmpReport}.
+	 */
+	public JApiCmpReport() {
+		/* Intentionally left blank. */
+	}
+
+	/**
+	 * Generates the japicmp reports.
+	 *
+	 * @param locale the wanted locale to return the report's description, could be
+	 *               <code>null</code>.
+	 *
+	 * @throws MavenReportException if an error occurs
+	 */
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
+		mavenParameters = new MavenParameters(this.artifactRepositories, this.project,
+				this.mojoExecution, this.versionRangeWithProjectVersion,
+				this.repoSystem, this.repoSession,
+				this.remoteProjectRepositories);
+		pluginParameters = new PluginParameters(this.skip,
+				this.newVersion, this.oldVersion, this.parameter,
+				this.dependencies, this.projectBuildDir,
+				this.outputDirectory, true, this.oldVersions,
+				this.newVersions, this.oldClassPathDependencies,
+				this.newClassPathDependencies,
+				new SkipReport(
+						this.skipDiffReport,
+						this.skipHtmlReport,
+						this.skipMarkdownReport,
+						this.skipXmlReport),
+				new BreakBuild());
 		try {
-			JApiCmpMojo mojo = getMojo();
-			if (this.skip || isPomModuleNeedingSkip()) {
-				getLog().info("japicmp module set to skip");
-				return;
-			}
-			Optional<HtmlOutput> htmlOutputOptional = mojo.executeWithParameters(this.pluginParameters, this.mavenParameters);
+			processor = new JApiCmpProcessor(pluginParameters, mavenParameters, getLog());
+			final Optional<HtmlOutput> htmlOutputOptional = processor.execute();
 			if (htmlOutputOptional.isPresent()) {
-				HtmlOutput htmlOutput = htmlOutputOptional.get();
+				final HtmlOutput htmlOutput = htmlOutputOptional.get();
 				String htmlString = htmlOutput.getHtml();
 				htmlString = replaceHtmlTags(htmlString);
 				writeToSink(htmlString);
 			}
 		} catch (Exception e) {
-			String msg = "Failed to generate report: " + e.getMessage();
-			Sink sink = getSink();
+			final String msg = "Failed to generate report: " + e.getMessage();
+			final Sink sink = getSink();
 			sink.text(msg);
 			sink.close();
 			throw new MavenReportException(msg, e);
 		}
 	}
 
-	private void writeToSink(String htmlString) {
-		Sink sink = getSink();
+	private void writeToSink(final String htmlString) {
+		final Sink sink = getSink();
 		try {
-			String htmlTitle = getHtmlTitle();
+			final String htmlTitle = getHtmlTitle();
 			if (htmlTitle != null) {
 				sink.head();
 				sink.title();
-				sink.text(pluginParameters.getParameterParam().getHtmlTitle());
+				sink.text(pluginParameters.parameter().getHtmlTitle());
 				sink.title_();
 				sink.head_();
 			}
@@ -104,75 +179,89 @@ public class JApiCmpReport extends AbstractMavenReport {
 		}
 	}
 
-	private static String replaceHtmlTags(String html) {
-		html = html.replaceAll("</?html>", "");
-		html = html.replaceAll("</?body>", "");
-		html = html.replaceAll("</?head>", "");
-		html = html.replaceAll("<title>[^<]*</title>", "");
-		html = html.replaceAll("<META[^>]*>", "");
-		return html;
+	private static String replaceHtmlTags(final String html) {
+		String newHtml = html.replaceAll("</?html>", "");
+		newHtml = newHtml.replaceAll("</?body>", "");
+		newHtml = newHtml.replaceAll("</?head>", "");
+		newHtml = newHtml.replaceAll("<title>[^<]*</title>", "");
+		newHtml = newHtml.replaceAll("<META[^>]*>", "");
+		return newHtml;
 	}
 
-	private JApiCmpMojo getMojo() {
-		if (this.mojo != null) {
-			return this.mojo;
-		}
-		this.mojo = new JApiCmpMojo();
-		this.mavenParameters = new MavenParameters(this.artifactRepositories,
-			this.mavenProject, this.mojoExecution, this.versionRangeWithProjectVersion, this.repoSystem, this.repoSession,
-			this.remoteRepos);
-		this.pluginParameters = new PluginParameters(this.skip, this.newVersion, this.oldVersion, this.parameter, this.dependencies, Optional.<File>empty(), Optional.of(
-			this.outputDirectory), false, this.oldVersions, this.newVersions, this.oldClassPathDependencies, this.newClassPathDependencies);
-		return this.mojo;
-	}
-
-	private Options getOptions() {
-		try {
-			return getMojo().getOptions(this.pluginParameters, this.mavenParameters);
-		} catch (MojoFailureException e) {
-			getLog().debug("Failed to retrieve options: " + e.getLocalizedMessage(), e);
-			return null;
-		}
-	}
-
+	/**
+	 * Returns the HTML Title defined in the plugin parameters.
+	 *
+	 * @return the defined HTML title; {@code null} if not defined
+	 */
 	private String getHtmlTitle() {
-		if (pluginParameters.getParameterParam() != null && pluginParameters.getParameterParam().getHtmlTitle() != null) {
-			return pluginParameters.getParameterParam().getHtmlTitle();
+		String ret = null;
+		if (this.parameter.getHtmlTitle() != null) {
+			ret = pluginParameters.parameter().getHtmlTitle();
 		}
-		return null;
+		return ret;
 	}
 
+	/**
+	 * Returns the base name used to create report's output file(s).
+	 *
+	 * @return the report's base name; {@code 'japicmp'} if not defined
+	 */
 	@Override
 	public String getOutputName() {
-		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
-			return this.parameter.getReportLinkName();
+		String ret = "japicmp";
+		if (this.parameter.getReportLinkName() != null) {
+			ret = this.parameter.getReportLinkName().replace(' ', '_');
 		}
-		return "japicmp";
+		return ret;
 	}
 
+	/**
+	 * Returns the localized report name.
+	 *
+	 * @param locale the wanted locale to return the report's name; could be null
+	 *
+	 * @return the name of this report
+	 */
 	@Override
 	public String getName(Locale locale) {
-		if (this.parameter != null && this.parameter.getReportLinkName() != null) {
-			return this.parameter.getReportLinkName();
+		String ret = "japicmp";
+		if (this.parameter.getReportLinkName() != null) {
+			ret = this.parameter.getReportLinkName();
 		}
-		return "japicmp";
+		return ret;
 	}
 
+	/**
+	 * Returns  the localized report description.
+	 *
+	 * @param locale the wanted locale to return the report's name; could be null
+	 *
+	 * @return the description of this report
+	 */
 	@Override
 	public String getDescription(Locale locale) {
-		getMojo();
 		if (this.skip || isPomModuleNeedingSkip()) {
-			return "skipping report";
+			return "Skipping report";
 		}
-		Options options = getOptions();
+		Options options;
+		try {
+			options = processor.getOptions();
+		} catch (MojoFailureException e) {
+			return "failed report";
+		}
 		if (options == null) {
 			return "failed report";
 		}
 		return options.getDifferenceDescription();
 	}
 
+	/**
+	 * Returns {@code true} if this is a POM module and the skip POM flag is set.
+	 *
+	 * @return {@code true} if this module should be skipped
+	 */
 	private boolean isPomModuleNeedingSkip() {
-		return this.pluginParameters.getParameterParam().getSkipPomModules()
-			&& "pom".equalsIgnoreCase(this.mavenProject.getArtifact().getType());
+		return this.parameter.getSkipPomModules() && "pom".equalsIgnoreCase(
+				this.project.getArtifact().getType());
 	}
 }

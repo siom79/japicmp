@@ -1,6 +1,8 @@
 package japicmp.maven.util;
 
 import japicmp.util.ModifierHelper;
+import java.util.ArrayList;
+import java.util.List;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
@@ -9,9 +11,6 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CtFieldBuilder {
 	private static final String DEFAULT_FIELD_NAME = "field";
@@ -39,7 +38,7 @@ public class CtFieldBuilder {
 	public CtField addToClass(CtClass ctClass) throws CannotCompileException {
 		CtField ctField = new CtField(this.type, this.name, ctClass);
 		ctField.setModifiers(this.modifier);
-		if (constantValue != null) {
+		if (constantValue!=null) {
 			if (constantValue instanceof Boolean) {
 				ctClass.addField(ctField, CtField.Initializer.constant((Boolean) constantValue));
 			} else if (constantValue instanceof Integer) {

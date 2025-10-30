@@ -1,107 +1,98 @@
 package japicmp.maven;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Optional;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class SkipModuleStrategyTest {
+import java.util.Collections;
+import org.apache.maven.plugin.logging.Log;
+import org.junit.jupiter.api.Test;
+
+final class SkipModuleStrategyTest extends AbstractTest {
 
 	@Test
-	public void testModuleIsExcluded() {
-		PluginParameters pluginParameters = createPluginParameters();
-		MavenParameters mavenParameters = createMavenParameters();
-		mavenParameters.getMavenProject().setArtifactId("name-to-exclude");
-		pluginParameters.getParameterParam().setExcludeModules(Collections.singletonList(".*excl.*"));
-		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
+	void testModuleIsExcluded() {
+		final PluginParameters pluginParameters = createPluginParameters(new ConfigParameters());
+		final MavenParameters mavenParameters = createMavenParameters();
+		mavenParameters.mavenProject().setArtifactId("name-to-exclude");
+		pluginParameters.parameter().setExcludeModules(Collections.singletonList(".*excl.*"));
+		final SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters,
+				mavenParameters,
+				mock(Log.class));
 		assertThat(skipModuleStrategy.skip(), is(true));
 	}
 
 	@Test
-	public void testModuleIsIncluded() {
-		PluginParameters pluginParameters = createPluginParameters();
-		MavenParameters mavenParameters = createMavenParameters();
-		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		pluginParameters.getParameterParam().setIncludeModules(Collections.singletonList(".*incl.*"));
-		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
-		assertThat(skipModuleStrategy.skip(), is(false));
+	void testModuleIsIncluded() {
+		final PluginParameters pluginParameters = createPluginParameters(new ConfigParameters());
+		final MavenParameters mavenParameters = createMavenParameters();
+		mavenParameters.mavenProject().setArtifactId("name-to-include");
+		pluginParameters.parameter().setIncludeModules(Collections.singletonList(".*incl.*"));
+		final SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters,
+				mavenParameters,
+				mock(Log.class));
+		assertFalse(skipModuleStrategy.skip());
 	}
 
 	@Test
-	public void testModuleIsIncludedAndExcludeDoesNotMatch() {
-		PluginParameters pluginParameters = createPluginParameters();
-		MavenParameters mavenParameters = createMavenParameters();
-		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		pluginParameters.getParameterParam().setExcludeModules(Collections.singletonList(".*excl.*"));
-		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
-		assertThat(skipModuleStrategy.skip(), is(false));
+	void testModuleIsIncludedAndExcludeDoesNotMatch() {
+		final PluginParameters pluginParameters = createPluginParameters(new ConfigParameters());
+		final MavenParameters mavenParameters = createMavenParameters();
+		mavenParameters.mavenProject().setArtifactId("name-to-include");
+		pluginParameters.parameter().setExcludeModules(Collections.singletonList(".*excl.*"));
+		final SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters,
+				mavenParameters,
+				mock(Log.class));
+		assertFalse(skipModuleStrategy.skip());
 	}
 
 	@Test
-	public void testExcludeBeforeInclude() {
-		PluginParameters pluginParameters = createPluginParameters();
-		MavenParameters mavenParameters = createMavenParameters();
-		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		pluginParameters.getParameterParam().setExcludeModules(Collections.singletonList(".*incl.*"));
-		pluginParameters.getParameterParam().setIncludeModules(Collections.singletonList(".*incl.*"));
-		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
-		assertThat(skipModuleStrategy.skip(), is(true));
+	void testExcludeBeforeInclude() {
+		final PluginParameters pluginParameters = createPluginParameters(new ConfigParameters());
+		final MavenParameters mavenParameters = createMavenParameters();
+		mavenParameters.mavenProject().setArtifactId("name-to-include");
+		pluginParameters.parameter().setExcludeModules(Collections.singletonList(".*incl.*"));
+		pluginParameters.parameter().setIncludeModules(Collections.singletonList(".*incl.*"));
+		final SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters,
+				mavenParameters,
+				mock(Log.class));
+		assertTrue(skipModuleStrategy.skip());
 	}
 
 	@Test
-	public void testModuleIsIncludedAndNoIncludesAndExcludesDefined() {
-		PluginParameters pluginParameters = createPluginParameters();
-		MavenParameters mavenParameters = createMavenParameters();
-		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
-		assertThat(skipModuleStrategy.skip(), is(false));
+	void testModuleIsIncludedAndNoIncludesAndExcludesDefined() {
+		final PluginParameters pluginParameters = createPluginParameters(new ConfigParameters());
+		final MavenParameters mavenParameters = createMavenParameters();
+		mavenParameters.mavenProject().setArtifactId("name-to-include");
+		final SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters,
+				mavenParameters,
+				mock(Log.class));
+		assertFalse(skipModuleStrategy.skip());
 	}
 
 	@Test
-	public void testModuleIsNotIncludedAndNoIncludesDefined() {
-		PluginParameters pluginParameters = createPluginParameters();
-		MavenParameters mavenParameters = createMavenParameters();
-		mavenParameters.getMavenProject().setArtifactId("name-to-include");
-		pluginParameters.getParameterParam().setIncludeModules(Collections.singletonList(".*test.*"));
-		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
-		assertThat(skipModuleStrategy.skip(), is(true));
+	void testModuleIsNotIncludedAndNoIncludesDefined() {
+		final PluginParameters pluginParameters = createPluginParameters(new ConfigParameters());
+		final MavenParameters mavenParameters = createMavenParameters();
+		mavenParameters.mavenProject().setArtifactId("name-to-include");
+		pluginParameters.parameter().setIncludeModules(Collections.singletonList(".*test.*"));
+		final SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters,
+				mavenParameters,
+				mock(Log.class));
+		assertTrue(skipModuleStrategy.skip());
 	}
 
 	@Test
-	public void testMavenProjectNameIsNotAvailable() {
-		PluginParameters pluginParameters = createPluginParameters();
-		MavenParameters mavenParameters = createMavenParameters();
-		mavenParameters.getMavenProject().setArtifactId(null);
-		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters, mavenParameters, mock(Log.class));
-		assertThat(skipModuleStrategy.skip(), is(false));
+	void testMavenProjectNameIsNotAvailable() {
+		final PluginParameters pluginParameters = createPluginParameters(new ConfigParameters());
+		final MavenParameters mavenParameters = createMavenParameters();
+		mavenParameters.mavenProject().setArtifactId(null);
+		final SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters,
+				mavenParameters,
+				mock(Log.class));
+		assertFalse(skipModuleStrategy.skip());
 	}
 
-	private MavenParameters createMavenParameters() {
-		RemoteRepository remoteRepository = new RemoteRepository.Builder("id", "type", "http://example.org").build();
-		return new MavenParameters(new ArrayList<ArtifactRepository>(),
-			new MavenProject(), mock(MojoExecution.class), "", mock(RepositorySystem.class), mock(
-				RepositorySystemSession.class), Collections.singletonList(remoteRepository));
-	}
-
-	private PluginParameters createPluginParameters() {
-		Version oldVersion = JApiCmpMojoTest.createVersion("groupId", "artifactId", "0.1.0");
-		Version newVersion = JApiCmpMojoTest.createVersion("groupId", "artifactId", "0.1.1");
-		Parameter parameter = new Parameter();
-		return new PluginParameters(false, newVersion, oldVersion, parameter, new ArrayList<Dependency>(),
-			Optional.<File>empty(), Optional.<String>empty(), false, new ArrayList<DependencyDescriptor>(),
-			new ArrayList<DependencyDescriptor>(), new ArrayList<Dependency>(), new ArrayList<Dependency>());
-	}
 }

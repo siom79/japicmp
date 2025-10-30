@@ -145,8 +145,8 @@
 		<github.actor>siom79</github.actor>
 		<github.token>secret</github.token>
 		<maven.site.skip>false</maven.site.skip>
-		<maven-api.version>3.6.3</maven-api.version>
-		<resolver.version>1.4.1</resolver.version> <!-- keep in sync with maven api version -->
+		<maven-api.version>3.8.1</maven-api.version>
+		<resolver.version>1.6.2</resolver.version> <!-- keep in sync with maven api version -->
 		<reporting.version>3.1.0</reporting.version>
 		<plugin-annotation.version>3.6.4</plugin-annotation.version>
 		<surefireVersion>3.5.4</surefireVersion>
@@ -154,7 +154,7 @@
 		<guava.version>33.4.8-jre</guava.version>
 		<jaxb.version>2.3.2</jaxb.version>
 		<jsoup.version>1.21.2</jsoup.version>
-		<mockito.version>4.3.1</mockito.version>
+		<mockito.version>4.6.1</mockito.version>
 		<junit.version>5.6.2</junit.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots</sonatypeOssDistMgmtSnapshotsUrl>
 	</properties>
@@ -166,7 +166,7 @@
 		<module>japicmp-ant-task</module>
 	</modules>
 
-    <dependencies>
+	<dependencies>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
@@ -185,7 +185,7 @@
 			<version>2.2</version>
 			<scope>test</scope>
 		</dependency>
-    <dependency>
+		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>${mockito.version}</version>
@@ -440,7 +440,7 @@
 		<connection>scm:git:https://github.com/${github.account}/${github.project}.git</connection>
 		<developerConnection>scm:git:https://github.com/${github.account}/${github.project}.git</developerConnection>
 		<url>https://github.com/${github.account}/${github.project}.git</url>
-		<tag>japicmp-base-0.22.0</tag>
+		<tag>japicmp-base-0.24.2</tag>
 	</scm>
 
 	<distributionManagement>
