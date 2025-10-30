@@ -1,25 +1,16 @@
 package japicmp.maven;
 
-import java.util.List;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
-/**
- * Class for identifying when to skip a module.
- */
+import java.util.List;
+
 public class SkipModuleStrategy {
 
 	private final PluginParameters pluginParameters;
 	private final MavenParameters mavenParameters;
 	private final Log log;
 
-	/**
-	 * Constructs a {@code SkipModuleStrategy} object.
-	 *
-	 * @param pluginParameters the defined plugin parameters
-	 * @param mavenParameters  the defined Maven parameters
-	 * @param log              the Maven log for writing messages
-	 */
 	public SkipModuleStrategy(final PluginParameters pluginParameters,
 							  final MavenParameters mavenParameters,
 							  final Log log) {
@@ -28,11 +19,6 @@ public class SkipModuleStrategy {
 		this.log = log;
 	}
 
-	/**
-	 * Returns {@code true} if the module should be skipped.
-	 *
-	 * @return {@code true} if the module should be skipped
-	 */
 	public boolean skip() {
 		final MavenProject mavenProject = mavenParameters.mavenProject();
 		final ConfigParameters parameters = pluginParameters.parameter();

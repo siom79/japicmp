@@ -23,24 +23,6 @@ import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import japicmp.versioning.SemanticVersion;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.jar.JarFile;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -48,16 +30,21 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.resolution.ArtifactRequest;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.VersionRangeRequest;
-import org.eclipse.aether.resolution.VersionRangeResolutionException;
-import org.eclipse.aether.resolution.VersionRangeResult;
+import org.eclipse.aether.resolution.*;
 
-/**
- * Core class for running japicmp against the specified project.
- */
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 public class JApiCmpProcessor {
 
 	final MavenParameters mavenParameters;
@@ -66,13 +53,6 @@ public class JApiCmpProcessor {
 
 	private Options options;
 
-	/**
-	 * Constructs a japicmp processor.
-	 *
-	 * @param pluginParameters Plugin parameters
-	 * @param mavenParameters  maven parameters
-	 * @param log              maven log
-	 */
 	public JApiCmpProcessor(final PluginParameters pluginParameters,
 							final MavenParameters mavenParameters,
 							final Log log) {
@@ -81,14 +61,6 @@ public class JApiCmpProcessor {
 		this.log = log;
 	}
 
-	/**
-	 * Executes the japicmp processor.
-	 *
-	 * @return HTML Output (optional)
-	 *
-	 * @throws MojoExecutionException if an error occurs during execution
-	 * @throws MojoFailureException   if an error occurs during processing
-	 */
 	public Optional<HtmlOutput> execute() throws MojoExecutionException, MojoFailureException {
 		if (pluginParameters.skip()) {
 			log.info("japicmp skipped.");
@@ -115,10 +87,6 @@ public class JApiCmpProcessor {
 				options.getNewArchives());
 		try {
 			PostAnalysisScriptExecutor postAnalysisScriptExecutor = new PostAnalysisScriptExecutor();
-/*
-			jApiClasses = postAnalysisScriptExecutor.apply(pluginParameters.parameter(), jApiClasses,
-					log);
-*/
 			postAnalysisScriptExecutor.apply(pluginParameters.parameter(), jApiClasses, log);
 			final File jApiCmpBuildDir = createJApiCmpBaseDir();
 			final SemverOut semverOut = new SemverOut(options, jApiClasses);
@@ -149,11 +117,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param comparatorOptions
-	 *
-	 * @throws MojoFailureException
-	 */
 	private void setUpOverrideCompatibilityChanges(
 			final JarArchiveComparatorOptions comparatorOptions)
 			throws MojoFailureException {
@@ -205,19 +168,10 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * A local enum for specifying old or new versions.
-	 */
 	enum ConfigurationVersion {
 		OLD, NEW
 	}
 
-	/**
-	 * @param mavenProject
-	 * @param version
-	 *
-	 * @return
-	 */
 	private DefaultArtifact createDefaultArtifact(final MavenProject mavenProject,
 												  final String version) {
 		final org.apache.maven.artifact.Artifact artifact = mavenProject.getArtifact();
@@ -225,15 +179,6 @@ public class JApiCmpProcessor {
 				artifact.getClassifier(), artifact.getType(), version);
 	}
 
-	/**
-	 * @param groupId
-	 * @param artifactId
-	 * @param classifier
-	 * @param type
-	 * @param version
-	 *
-	 * @return
-	 */
 	private DefaultArtifact createDefaultArtifact(final String groupId,
 												  final String artifactId,
 												  final String classifier,
@@ -246,14 +191,6 @@ public class JApiCmpProcessor {
 		return new DefaultArtifact(groupId, artifactId, classifier, mappedType, version);
 	}
 
-	/**
-	 * Returns am artifact to compare.
-	 *
-	 * @return the found artifact
-	 *
-	 * @throws MojoFailureException   if a Mojo error occurs
-	 * @throws MojoExecutionException if an execution error occurs
-	 */
 	private Artifact getComparisonArtifact()
 			throws MojoFailureException, MojoExecutionException {
 		final MavenProject mavenProject = mavenParameters.mavenProject();
@@ -303,12 +240,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param artifactVersion
-	 * @param artifactResult
-	 *
-	 * @throws MojoFailureException
-	 */
 	private void processArtifactResult(final DefaultArtifact artifactVersion,
 									   final ArtifactResult artifactResult)
 			throws MojoFailureException {
@@ -327,11 +258,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param availableVersions
-	 *
-	 * @throws MojoFailureException
-	 */
 	private void filterVersionPattern(
 			final List<org.eclipse.aether.version.Version> availableVersions)
 			throws MojoFailureException {
@@ -364,9 +290,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param versions
-	 */
 	private void filterSnapshots(final List<org.eclipse.aether.version.Version> versions) {
 		if (!pluginParameters.parameter().isIncludeSnapshots()) {
 			versions.removeIf(
@@ -374,12 +297,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param oldArchives
-	 * @param newArchives
-	 *
-	 * @throws MojoFailureException
-	 */
 	private void populateArchivesListsFromParameters(final List<JApiCmpArchive> oldArchives,
 													 final List<JApiCmpArchive> newArchives)
 			throws MojoFailureException {
@@ -477,15 +394,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param jApiClasses
-	 * @param parameterParam
-	 * @param options
-	 * @param jarArchiveComparator
-	 *
-	 * @throws MojoFailureException
-	 * @throws MojoExecutionException
-	 */
 	void breakBuildIfNecessary(final List<JApiClass> jApiClasses,
 							   final ConfigParameters parameterParam,
 							   final Options options,
@@ -535,11 +443,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @return
-	 *
-	 * @throws MojoFailureException
-	 */
 	Options getOptions() throws MojoFailureException {
 		if (this.options != null) {
 			return this.options;
@@ -602,61 +505,31 @@ public class JApiCmpProcessor {
 		return this.options;
 	}
 
-	/**
-	 * @param params
-	 *
-	 * @return
-	 */
 	boolean breakBuildOnModifications(final ConfigParameters params) {
 		return pluginParameters.breakBuild().onModifications()
 				| params.getBreakBuildOnModifications();
 	}
 
-	/**
-	 * @param params
-	 *
-	 * @return
-	 */
 	boolean breakBuildOnBinaryIncompatibleModifications(final ConfigParameters params) {
 		return pluginParameters.breakBuild().onBinaryIncompatibleModifications()
 				| params.getBreakBuildOnBinaryIncompatibleModifications();
 	}
 
-	/**
-	 * @param params
-	 *
-	 * @return
-	 */
 	boolean breakBuildOnSourceIncompatibleModifications(final ConfigParameters params) {
 		return pluginParameters.breakBuild().onSourceIncompatibleModifications()
 				| params.getBreakBuildOnSourceIncompatibleModifications();
 	}
 
-	/**
-	 * @param params
-	 *
-	 * @return
-	 */
 	boolean breakBuildBasedOnSemanticVersioning(final ConfigParameters params) {
 		return pluginParameters.breakBuild().onSemanticVersioning()
 				| params.getBreakBuildBasedOnSemanticVersioning();
 	}
 
-	/**
-	 * @param params
-	 *
-	 * @return
-	 */
 	boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero(final ConfigParameters params) {
 		return pluginParameters.breakBuild().onSemanticVersioningForMajorVersionZero()
 				| params.isBreakBuildBasedOnSemanticVersioningForMajorVersionZero();
 	}
 
-	/**
-	 * @return
-	 *
-	 * @throws MojoFailureException
-	 */
 	File createJApiCmpBaseDir() throws MojoFailureException {
 		File baseDir;
 		try {
@@ -683,15 +556,6 @@ public class JApiCmpProcessor {
 		return baseDir;
 	}
 
-	/**
-	 * @param options
-	 * @param jApiClasses
-	 * @param jApiCmpBuildDir
-	 * @param semanticVersioningInformation
-	 *
-	 * @throws IOException
-	 * @throws MojoFailureException
-	 */
 	private void generateDiffOutput(final Options options,
 									final List<JApiClass> jApiClasses,
 									final File jApiCmpBuildDir,
@@ -705,13 +569,6 @@ public class JApiCmpProcessor {
 		writeToFile(diffOutput, output);
 	}
 
-	/**
-	 * @param jApiClasses
-	 * @param jApiCmpBuildDir
-	 *
-	 * @throws IOException
-	 * @throws MojoFailureException
-	 */
 	private void generateMarkdownOutput(final List<JApiClass> jApiClasses, final File jApiCmpBuildDir)
 			throws IOException, MojoFailureException {
 		if (pluginParameters.isWriteToFiles()) {
@@ -727,14 +584,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 *
-	 * @param jApiClasses
-	 * @param jApiCmpBuildDir
-	 * @param semanticVersioningInformation
-	 *
-	 * @throws IOException
-	 */
 	private void generateXmlOutput(final List<JApiClass> jApiClasses,
 								   final File jApiCmpBuildDir,
 								   final String semanticVersioningInformation)
@@ -749,15 +598,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param jApiClasses
-	 * @param jApiCmpBuildDir
-	 * @param semanticVersioningInformation
-	 *
-	 * @return
-	 *
-	 * @throws IOException
-	 */
 	private XmlOutput createXmlOutput(final List<JApiClass> jApiClasses,
 									  final File jApiCmpBuildDir,
 									  final String semanticVersioningInformation)
@@ -778,16 +618,6 @@ public class JApiCmpProcessor {
 		return xmlGenerator.generate();
 	}
 
-	/**
-	 *
-	 * @param jApiClasses
-	 * @param jApiCmpBuildDir
-	 * @param semanticVersioningInformation
-	 *
-	 * @return
-	 *
-	 * @throws IOException
-	 */
 	private HtmlOutput generateHtmlOutput(final List<JApiClass> jApiClasses,
 										  final File jApiCmpBuildDir,
 										  final String semanticVersioningInformation)
@@ -802,15 +632,6 @@ public class JApiCmpProcessor {
 		return htmlOutput;
 	}
 
-	/**
-	 * @param jApiClasses
-	 * @param jApiCmpBuildDir
-	 * @param semanticVersioningInformation
-	 *
-	 * @return
-	 *
-	 * @throws IOException
-	 */
 	private HtmlOutput createHtmlOutput(final List<JApiClass> jApiClasses,
 										final File jApiCmpBuildDir,
 										final String semanticVersioningInformation)
@@ -828,58 +649,32 @@ public class JApiCmpProcessor {
 		return htmlOutputGenerator.generate();
 	}
 
-	/**
-	 * @return
-	 */
 	boolean skipModule() {
 		SkipModuleStrategy skipModuleStrategy = new SkipModuleStrategy(pluginParameters,
 				mavenParameters, log);
 		return skipModuleStrategy.skip();
 	}
 
-	/**
-	 * Returns {@code true} if the generation of HTML reports should be skipped.
-	 *
-	 * @return {@code true} if the generation of HTML reports should be skipped
-	 */
 	boolean skipDiffReport() {
 		return pluginParameters.skipReport().diffReport() |
 				pluginParameters.parameter().skipDiffReport();
 	}
 
-	/**
-	 * Returns {@code true} if the generation of HTML reports should be skipped.
-	 *
-	 * @return {@code true} if the generation of HTML reports should be skipped
-	 */
 	boolean skipHtmlReport() {
 		return pluginParameters.skipReport().htmlReport() |
 				pluginParameters.parameter().skipHtmlReport();
 	}
 
-	/**
-	 * Returns {@code true} if the generation of Markdown reports should be skipped.
-	 *
-	 * @return {@code true} if the generation of Markdown reports should be skipped
-	 */
 	boolean skipMarkdownReport() {
 		return pluginParameters.skipReport().markdownReport() |
 				pluginParameters.parameter().skipMarkdownReport();
 	}
 
-	/**
-	 * Returns {@code true} if the generation of XML reports should be skipped.
-	 *
-	 * @return {@code true} if the generation of XML reports should be skipped
-	 */
 	boolean skipXmlReport() {
 		return pluginParameters.skipReport().xmlReport() |
 				pluginParameters.parameter().skipXmlReport();
 	}
 
-	/**
-	 * @return
-	 */
 	private String createFilename() {
 		String filename = "japicmp";
 		String executionId = mavenParameters.mojoExecution().getExecutionId();
@@ -895,11 +690,6 @@ public class JApiCmpProcessor {
 		return sb.toString();
 	}
 
-	/**
-	 * @param comparatorOptions
-	 *
-	 * @throws MojoFailureException
-	 */
 	private void setUpClassPath(final JarArchiveComparatorOptions comparatorOptions)
 			throws MojoFailureException {
 		if (pluginParameters != null) {
@@ -969,11 +759,6 @@ public class JApiCmpProcessor {
 		setUpClassPathUsingMavenProject(comparatorOptions);
 	}
 
-	/**
-	 * @param comparatorOptions
-	 *
-	 * @throws MojoFailureException
-	 */
 	private void setUpClassPathUsingMavenProject(final JarArchiveComparatorOptions comparatorOptions)
 			throws MojoFailureException {
 		MavenProject mavenProject = mavenParameters.mavenProject();
@@ -993,11 +778,6 @@ public class JApiCmpProcessor {
 		comparatorOptions.getClassPathEntries().addAll(classPathEntries);
 	}
 
-	/**
-	 * @param mavenProject
-	 *
-	 * @return
-	 */
 	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject) {
 		Set<org.apache.maven.artifact.Artifact> projectDependencies =
 				mavenProject.getArtifacts(); // dependencies that this project has, including transitive
@@ -1017,9 +797,6 @@ public class JApiCmpProcessor {
 		return result;
 	}
 
-	/**
-	 * @param artifact
-	 */
 	private void handleMissingArtifactFile(final Artifact artifact) {
 		if (pluginParameters.parameter().isIgnoreMissingOptionalDependency()) {
 			log.info("Ignoring missing optional dependency: " + toDescriptor(artifact));
@@ -1028,24 +805,10 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param artifact
-	 *
-	 * @return
-	 */
 	private String toDescriptor(final Artifact artifact) {
 		return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
 	}
 
-	/**
-	 * @param dependencyDescriptor
-	 * @param parameterName
-	 * @param configurationVersion
-	 *
-	 * @return
-	 *
-	 * @throws MojoFailureException
-	 */
 	private List<JApiCmpArchive> retrieveFileFromConfiguration(
 			final DependencyDescriptor dependencyDescriptor,
 			final String parameterName,
@@ -1066,15 +829,6 @@ public class JApiCmpProcessor {
 		return jApiCmpArchives;
 	}
 
-	/**
-	 * @param version
-	 * @param parameterName
-	 * @param configurationVersion
-	 *
-	 * @return
-	 *
-	 * @throws MojoFailureException if an error occurs during processing
-	 */
 	private List<JApiCmpArchive> retrieveFileFromConfiguration(final Version version,
 															   final String parameterName,
 															   final ConfigurationVersion configurationVersion)
@@ -1095,15 +849,6 @@ public class JApiCmpProcessor {
 				String.format("Missing configuration parameter: %s", parameterName));
 	}
 
-	/**
-	 * @param parameterName
-	 * @param configurationFile
-	 * @param configurationVersion
-	 *
-	 * @return
-	 *
-	 * @throws MojoFailureException
-	 */
 	private List<JApiCmpArchive> resolveConfigurationFileToFile(final String parameterName,
 																final ConfigurationFile configurationFile,
 																final ConfigurationVersion configurationVersion)
@@ -1139,15 +884,6 @@ public class JApiCmpProcessor {
 		return Collections.singletonList(new JApiCmpArchive(file, guessVersion(file)));
 	}
 
-	/**
-	 * @param parameterName
-	 * @param dependency
-	 * @param configurationVersion
-	 *
-	 * @return
-	 *
-	 * @throws MojoFailureException
-	 */
 	List<JApiCmpArchive> resolveDependencyToFile(final String parameterName,
 												 final Dependency dependency,
 												 final ConfigurationVersion configurationVersion)
@@ -1239,11 +975,6 @@ public class JApiCmpProcessor {
 		return jApiCmpArchives;
 	}
 
-	/**
-	 * @param file
-	 *
-	 * @return
-	 */
 	private String guessVersion(final File file) {
 		String name = file.getName();
 		Optional<SemanticVersion> semanticVersion = japicmp.versioning.Version.getSemanticVersion(name);
@@ -1254,20 +985,12 @@ public class JApiCmpProcessor {
 		return version;
 	}
 
-	/**
-	 * @param configurationVersion
-	 *
-	 * @return
-	 */
 	private boolean ignoreMissingArtifact(final ConfigurationVersion configurationVersion) {
 		return ignoreNonResolvableArtifacts()
 				|| ignoreMissingOldVersion(configurationVersion)
 				|| ignoreMissingNewVersion(configurationVersion);
 	}
 
-	/**
-	 * @return
-	 */
 	private boolean ignoreNonResolvableArtifacts() {
 		boolean ignoreNonResolvableArtifacts = false;
 		ConfigParameters parameterParam = pluginParameters.parameter();
@@ -1281,32 +1004,16 @@ public class JApiCmpProcessor {
 		return ignoreNonResolvableArtifacts;
 	}
 
-	/**
-	 * @param configurationVersion
-	 *
-	 * @return
-	 */
 	private boolean ignoreMissingOldVersion(final ConfigurationVersion configurationVersion) {
 		return (configurationVersion == ConfigurationVersion.OLD &&
 				pluginParameters.parameter().getIgnoreMissingOldVersion());
 	}
 
-	/**
-	 * @param configurationVersion
-	 *
-	 * @return
-	 */
 	private boolean ignoreMissingNewVersion(final ConfigurationVersion configurationVersion) {
 		return (configurationVersion == ConfigurationVersion.NEW &&
 				pluginParameters.parameter().getIgnoreMissingNewVersion());
 	}
 
-	/**
-	 * @param output
-	 * @param outputFile
-	 *
-	 * @throws MojoFailureException
-	 */
 	private void writeToFile(final String output, final File outputFile) throws MojoFailureException {
 		try (OutputStreamWriter fileWriter = new OutputStreamWriter(
 				Files.newOutputStream(outputFile.toPath()), StandardCharsets.UTF_8)) {
@@ -1317,14 +1024,6 @@ public class JApiCmpProcessor {
 		}
 	}
 
-	/**
-	 * @param dependency
-	 * @param configurationVersion
-	 *
-	 * @return
-	 *
-	 * @throws MojoFailureException
-	 */
 	private Set<Artifact> resolveArtifact(final Dependency dependency,
 										  final ConfigurationVersion configurationVersion)
 			throws MojoFailureException {
@@ -1336,14 +1035,6 @@ public class JApiCmpProcessor {
 		return resolveArtifact(artifact, configurationVersion);
 	}
 
-	/**
-	 * @param artifact
-	 * @param configurationVersion
-	 *
-	 * @return
-	 *
-	 * @throws MojoFailureException
-	 */
 	private Set<Artifact> resolveArtifact(final Artifact artifact,
 										  final ConfigurationVersion configurationVersion)
 			throws MojoFailureException {
@@ -1389,15 +1080,6 @@ public class JApiCmpProcessor {
 		return new HashSet<>();
 	}
 
-	/**
-	 * Throws an exception if given the value is {@code null}.
-	 *
-	 * @param value the value to check
-	 * @param msg   the error message to include in the exception
-	 * @param <T>   the given value type
-	 *
-	 * @throws MojoFailureException if the given value is {@code null}
-	 */
 	private <T> void notNull(final T value, final String msg) throws MojoFailureException {
 		if (value == null) {
 			throw new MojoFailureException(msg);
