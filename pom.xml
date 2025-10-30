@@ -145,7 +145,7 @@
 		<github.actor>siom79</github.actor>
 		<github.token>secret</github.token>
 		<maven.site.skip>false</maven.site.skip>
-		<maven-api.version>3.8.1</maven-api.version>
+		<maven-api.version>3.9.11</maven-api.version>
 		<resolver.version>1.6.2</resolver.version> <!-- keep in sync with maven api version -->
 		<reporting.version>3.1.0</reporting.version>
 		<plugin-annotation.version>3.6.4</plugin-annotation.version>
