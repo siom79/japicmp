@@ -1,39 +1,22 @@
 package japicmp.maven;
 
 import japicmp.model.JApiClass;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 
-/**
- * Class to execute the post-analysis script.
- */
 public class PostAnalysisScriptExecutor {
 
-	/**
-	 * Applies the post-analysis script.
-	 *
-	 * @param parameter   the current configuration parameters
-	 * @param jApiClasses the {@code List} of classes being analyzed
-	 * @param log         the Maven logger
-	 *
-	 * @return a filtered list of analyzed classes
-	 *
-	 * @throws MojoExecutionException if the script fails
-	 */
 	public List<JApiClass> apply(final ConfigParameters parameter, final List<JApiClass> jApiClasses, final Log log)
 			throws MojoExecutionException {
 
@@ -85,15 +68,6 @@ public class PostAnalysisScriptExecutor {
 		return filteredList;
 	}
 
-	/**
-	 * Returns a stream of the specified post-analysis script
-	 *
-	 * @param postAnalysisFilterScript the file name of the post-analysis script
-	 *
-	 * @return the stream of the post-analysis script
-	 *
-	 * @throws FileNotFoundException if the post-analysis script is not found
-	 */
 	private InputStream getInputStream(final String postAnalysisFilterScript) throws FileNotFoundException {
 		if (Files.exists(Paths.get(postAnalysisFilterScript))) {
 			return new FileInputStream(postAnalysisFilterScript);

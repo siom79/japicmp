@@ -3,7 +3,6 @@ package japicmp.maven;
 import java.io.File;
 import java.util.List;
 
-/** Plugin parameters defined for the JApiCmp plugin. */
 public class PluginParameters {
 	private final boolean skip;
 	private final SkipReport skipReport;
@@ -20,24 +19,6 @@ public class PluginParameters {
 	private final boolean writeToFiles;
 	private final BreakBuild breakBuild;
 
-	/**
-	 * Creates a new {@code PluginParameters} instance with the given values.
-	 *
-	 * @param skip                     skip execution
-	 * @param newVersion               the new version to compare
-	 * @param oldVersion               the old version to compare
-	 * @param parameter                additional comparison parameters
-	 * @param dependencies             project dependencies
-	 * @param projectBuildDir          the project build directory
-	 * @param outputDirectory          the report output directory
-	 * @param writeToFiles             the write to files flag
-	 * @param oldVersions              other old versions
-	 * @param newVersions              other new versions
-	 * @param oldClassPathDependencies the old path to dependencies
-	 * @param newClassPathDependencies the new path to dependencies
-	 * @param skipReport               the skip report flags
-	 * @param breakBuild               the break build flags
-	 */
 	public PluginParameters(final boolean skip,
 							final Version newVersion,
 							final Version oldVersion,

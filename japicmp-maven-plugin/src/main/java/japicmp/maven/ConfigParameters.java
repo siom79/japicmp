@@ -1,7 +1,8 @@
 package japicmp.maven;
 
-import java.util.List;
 import org.apache.maven.plugins.annotations.Parameter;
+
+import java.util.List;
 
 /** Class for storing the japicmp configuration parameters. */
 public class ConfigParameters {
@@ -126,9 +127,6 @@ public class ConfigParameters {
 	@Parameter
 	private String reportLinkName;
 
-	/**
-	 * Default Contructor.
-	 */
 	public ConfigParameters() {
 		// Intentionally left blank.
 	}
