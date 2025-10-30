@@ -66,18 +66,14 @@ public class JApiCmpProcessor {
 			log.info("japicmp skipped.");
 			return Optional.empty();
 		}
-
 		if (skipModule()) {
 			return Optional.empty();
 		}
-
-		final Options options = getOptions();
-		final JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
-
+		Options options = getOptions();
+		JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(options);
 		setUpClassPath(comparatorOptions);
 		setUpOverrideCompatibilityChanges(comparatorOptions);
-
-		final JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
+		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
 		if (options.getNewArchives().isEmpty()) {
 			log.warn("Skipping execution because no new version could be resolved/found.");
 			return Optional.empty();
@@ -88,10 +84,9 @@ public class JApiCmpProcessor {
 		try {
 			PostAnalysisScriptExecutor postAnalysisScriptExecutor = new PostAnalysisScriptExecutor();
 			postAnalysisScriptExecutor.apply(pluginParameters.parameter(), jApiClasses, log);
-			final File jApiCmpBuildDir = createJApiCmpBaseDir();
-			final SemverOut semverOut = new SemverOut(options, jApiClasses);
-			final String semanticVersioningInformation = semverOut.generate();
-
+			File jApiCmpBuildDir = createJApiCmpBaseDir();
+			SemverOut semverOut = new SemverOut(options, jApiClasses);
+			String semanticVersioningInformation = semverOut.generate();
 			if (!skipDiffReport()) {
 				generateDiffOutput(options, jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
 			}
@@ -101,13 +96,11 @@ public class JApiCmpProcessor {
 			if (!skipXmlReport()) {
 				generateXmlOutput(jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
 			}
-
 			Optional<HtmlOutput> retVal = Optional.empty();
 			if (!skipHtmlReport()) {
 				retVal = Optional.of(generateHtmlOutput(jApiClasses, jApiCmpBuildDir,
 						semanticVersioningInformation));
 			}
-
 			breakBuildIfNecessary(jApiClasses, pluginParameters.parameter(), options,
 					jarArchiveComparator);
 			return retVal;
@@ -121,12 +114,9 @@ public class JApiCmpProcessor {
 			final JarArchiveComparatorOptions comparatorOptions)
 			throws MojoFailureException {
 		if (pluginParameters.parameter().getOverrideCompatibilityChangeParameters() != null) {
-			final List<ConfigParameters.OverrideCompatibilityChangeParameter>
-					overrideCompatibilityChangeParameters =
+			final List<ConfigParameters.OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters =
 					pluginParameters.parameter().getOverrideCompatibilityChangeParameters();
-			for (final ConfigParameters.OverrideCompatibilityChangeParameter configChange :
-					overrideCompatibilityChangeParameters) {
-
+			for (final ConfigParameters.OverrideCompatibilityChangeParameter configChange : overrideCompatibilityChangeParameters) {
 				final String compatibilityChange = configChange.getCompatibilityChange();
 				JApiCompatibilityChangeType foundChange = null;
 				for (JApiCompatibilityChangeType change : JApiCompatibilityChangeType.values()) {
@@ -142,7 +132,6 @@ public class JApiCmpProcessor {
 							+ Joiner.on(',')
 							.join(JApiCompatibilityChangeType.values()));
 				}
-
 				final String semanticVersionLevel = configChange.getSemanticVersionLevel();
 				JApiSemanticVersionLevel foundSemanticVersionLevel = foundChange.getSemanticVersionLevel();
 				for (final JApiSemanticVersionLevel level : JApiSemanticVersionLevel.values()) {
@@ -158,7 +147,6 @@ public class JApiCmpProcessor {
 							+ Joiner.on(',').join(
 							JApiSemanticVersionLevel.values()));
 				}
-
 				comparatorOptions.addOverrideCompatibilityChange(
 						new JarArchiveComparatorOptions.OverrideCompatibilityChange(foundChange,
 								configChange.isBinaryCompatible(),
@@ -423,10 +411,8 @@ public class JApiCmpProcessor {
 		if (pluginParameters.parameter().getIgnoreMissingNewVersion()) {
 			options.setIgnoreMissingNewVersion(true);
 		}
-
 		IncompatibleErrorOutput errorOutput = new IncompatibleErrorOutput(options, jApiClasses,
 				jarArchiveComparator) {
-
 			@Override
 			protected void warn(String msg, Throwable error) {
 				log.warn(msg, error);
@@ -467,7 +453,6 @@ public class JApiCmpProcessor {
 			this.options.setOutputOnlyBinaryIncompatibleModifications(
 					parameterParam.getOnlyBinaryIncompatible());
 			this.options.setOutputOnlyModifications(parameterParam.getOnlyModified());
-
 			List<String> excludes = parameterParam.getExcludes();
 			if (excludes != null) {
 				for (String exclude : excludes) {
@@ -482,10 +467,8 @@ public class JApiCmpProcessor {
 							parameterParam.isIncludeExlusively());
 				}
 			}
-
 			this.options.setIncludeSynthetic(parameterParam.getIncludeSynthetic());
 			this.options.setIgnoreMissingClasses(parameterParam.getIgnoreMissingClasses());
-
 			List<String> ignoreMissingClassesByRegularExpressions =
 					parameterParam.getIgnoreMissingClassesByRegularExpressions();
 			if (ignoreMissingClassesByRegularExpressions != null) {
@@ -552,7 +535,6 @@ public class JApiCmpProcessor {
 		} catch (IOException e) {
 			throw new MojoFailureException("Failed to create output directory: " + e.getMessage(), e);
 		}
-
 		return baseDir;
 	}
 
@@ -889,9 +871,7 @@ public class JApiCmpProcessor {
 												 final ConfigurationVersion configurationVersion)
 			throws MojoFailureException {
 		List<JApiCmpArchive> jApiCmpArchives = new ArrayList<>();
-
 		log.debug("Trying to resolve dependency '" + dependency + "' to file.");
-
 		MavenProject mavenProject = mavenParameters.mavenProject();
 		if (dependency.getSystemPath() == null) {
 			String descriptor = dependency.getGroupId()
@@ -905,7 +885,6 @@ public class JApiCmpProcessor {
 					+ mavenProject.getArtifactId()
 					+ ":"
 					+ mavenProject.getVersion();
-
 			Set<Artifact> artifacts;
 			if (descriptor.equals(projectDescriptor)) {
 				// do not repeat what Maven already did for us
@@ -913,7 +892,6 @@ public class JApiCmpProcessor {
 			} else {
 				artifacts = resolveArtifact(dependency, configurationVersion);
 			}
-
 			for (Artifact artifact : artifacts) {
 				File file = artifact.getFile();
 				if (file != null) {
@@ -1069,7 +1047,6 @@ public class JApiCmpProcessor {
 				}
 				return new HashSet<>(Collections.singletonList(resolutionResult.getArtifact()));
 			}
-
 		} catch (final ArtifactResolutionException e) {
 			if (ignoreMissingArtifact(configurationVersion)) {
 				log.warn(e.getMessage());
