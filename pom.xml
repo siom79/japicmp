@@ -4,7 +4,7 @@
 
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-base</artifactId>
-	<version>0.24.2-SNAPSHOT</version>
+	<version>0.24.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>japicmp-base</name>
@@ -149,11 +149,11 @@
 		<resolver.version>1.6.2</resolver.version> <!-- keep in sync with maven api version -->
 		<reporting.version>3.1.0</reporting.version>
 		<plugin-annotation.version>3.6.4</plugin-annotation.version>
-		<surefireVersion>3.5.3</surefireVersion>
+		<surefireVersion>3.5.4</surefireVersion>
 		<javassist.version>3.30.2-GA</javassist.version>
 		<guava.version>33.4.8-jre</guava.version>
 		<jaxb.version>2.3.2</jaxb.version>
-		<jsoup.version>1.20.1</jsoup.version>
+		<jsoup.version>1.21.2</jsoup.version>
 		<mockito.version>4.6.1</mockito.version>
 		<junit.version>5.6.2</junit.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots</sonatypeOssDistMgmtSnapshotsUrl>
@@ -242,7 +242,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>3.6.2</version>
 				<executions>
 					<execution>
 						<id>enforce-versions</id>
@@ -380,7 +380,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.9.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

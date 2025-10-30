@@ -63,4 +63,12 @@ public class Generics<T, U extends List<Integer> & Serializable, V extends List<
 	public <X extends List<Integer> & Serializable & MyInterface<Integer>> X methodWithAmpersandTemplate(X x) {
 		return null;
 	}
+
+	public static class NewImplementsSupplier {
+
+	}
+
+	public static class NewImplementsConsumer {
+
+	}
 }

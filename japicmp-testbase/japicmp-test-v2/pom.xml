@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp-testbase</artifactId>
-		<version>0.24.2-SNAPSHOT</version>
+		<version>0.24.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>japicmp-test-v2</artifactId>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
-			<version>3.4</version>
+			<version>3.6.1</version>
 		</dependency>
 	</dependencies>
 
@@ -70,7 +70,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.5</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 							<skip>false</skip>
@@ -103,7 +103,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.5</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 							<skip>false</skip>

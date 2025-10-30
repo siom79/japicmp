@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.github.siom79.japicmp</groupId>
 		<artifactId>japicmp-testbase</artifactId>
-		<version>0.24.2-SNAPSHOT</version>
+		<version>0.24.3-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -24,7 +24,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
-			<version>3.4</version>
+			<version>3.6.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -114,7 +114,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.4</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 						</configuration>
@@ -161,7 +161,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.4</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 						</configuration>
@@ -197,7 +197,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.4</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 						</configuration>
@@ -231,7 +231,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.4</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 						</configuration>
@@ -262,7 +262,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.4</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 						</configuration>
@@ -654,7 +654,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.5</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 						</configuration>
@@ -685,7 +685,7 @@
 								<dependency>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>commons-math3</artifactId>
-									<version>3.4</version>
+									<version>3.6.1</version>
 								</dependency>
 							</dependencies>
 						</configuration>
