@@ -326,7 +326,7 @@
 					<!-- explicitly define maven-deploy-plugin after other to force exec order -->
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.1.4</version>
 					<executions>
 						<execution>
 							<id>deploy</id>
