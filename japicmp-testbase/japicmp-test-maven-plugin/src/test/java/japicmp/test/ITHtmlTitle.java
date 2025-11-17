@@ -36,6 +36,6 @@ public class ITHtmlTitle {
 		Document document = Jsoup.parse(htmlPath.toFile(), StandardCharsets.UTF_8.toString());
 		Elements title = document.select("title");
 		assertThat(title.isEmpty(), is(false));
-		assertThat(title.text(), is("japicmp-test-maven-plugin – Test-Title for Site-Report"));
+		assertThat(title.text(), is("Test-Title for Site-Report – japicmp-test-maven-plugin"));
 	}
 }
