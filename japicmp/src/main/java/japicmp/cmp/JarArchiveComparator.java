@@ -20,7 +20,6 @@ import java.io.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -228,39 +227,9 @@ public class JarArchiveComparator {
 			} catch (IOException e) {
 				throw new JApiCmpException(Reason.IoException, "Failed to load archive from file: " + e.getMessage(), e);
 			}
-		} else if (archive.getBytes() != null) {
-			return bytesToCtClasses(archive, classPool);
 		} else {
-			throw new JApiCmpException(Reason.IllegalArgument, JApiCmpArchive.class.getSimpleName() + " has no file and no bytes: " + archive);
+			throw new JApiCmpException(Reason.IllegalArgument, JApiCmpArchive.class.getSimpleName() + " has no file: " + archive);
 		}
-	}
-
-	private static Stream<CtClass> bytesToCtClasses(JApiCmpArchive archive, ReducibleClassPool classPool) {
-		List<CtClass> ctClasses = new ArrayList<>();
-		try (JarInputStream jarInputStream = new JarInputStream(new ByteArrayInputStream(archive.getBytes()))) {
-			JarEntry nextJarEntry = jarInputStream.getNextJarEntry();
-			while (nextJarEntry != null) {
-				if (!nextJarEntry.isDirectory() && nextJarEntry.getName().endsWith(".class")) {
-					byte[] byteArray = getJarEntryContent(jarInputStream);
-					CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(byteArray));
-					ctClasses.add(ctClass);
-				}
-				nextJarEntry = jarInputStream.getNextJarEntry();
-			}
-		} catch (IOException e) {
-			throw new JApiCmpException(Reason.IoException, "Failed to load archive from byte array: " + e.getMessage(), e);
-		}
-		return ctClasses.stream();
-	}
-
-	private static byte[] getJarEntryContent(JarInputStream jarInputStream) throws IOException {
-		int len;
-		byte[] buffer = new byte[1024];
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		while ((len = jarInputStream.read(buffer)) > 0) {
-			baos.write(buffer, 0, len);
-		}
-        return baos.toByteArray();
 	}
 
 	private CtClass ctClass(ClassPool classPool, JarFile jarFile, JarEntry jarEntry) {
