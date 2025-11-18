@@ -332,17 +332,9 @@ public class Options {
 		List<String> paths = new ArrayList<>(archives.size());
 		for (JApiCmpArchive archive : archives) {
 			if (this.reportOnlyFilename) {
-				if (archive.getFile() != null) {
-					paths.add(archive.getFile().getName());
-				} else {
-					paths.add(archive.getName());
-				}
+				paths.add(archive.getFile().getName());
 			} else {
-				if (archive.getFile() != null) {
-					paths.add(archive.getFile().getAbsolutePath());
-				} else {
-					paths.add(archive.getName());
-				}
+				paths.add(archive.getFile().getAbsolutePath());
 			}
 		}
 		return paths;
