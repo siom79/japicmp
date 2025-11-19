@@ -42,7 +42,7 @@ class FileHelperTest {
 		MatcherAssert.assertThat(archives.get(1).getVersion().getStringVersion(), is("44.55.66"));
 
 		MatcherAssert.assertThat(archives.get(2).getFile(), is(new File("projectd.jar")));
-		MatcherAssert.assertThat(archives.get(2).getVersion().getSemanticVersion().isEmpty(), is(true));
+		MatcherAssert.assertThat(archives.get(2).getVersion().getSemanticVersion().isPresent(), is(false));
 		MatcherAssert.assertThat(archives.get(2).getVersion().getStringVersion(), is("n.a."));
 	}
 }
