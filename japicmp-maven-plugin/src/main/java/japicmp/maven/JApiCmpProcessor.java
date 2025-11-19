@@ -22,6 +22,7 @@ import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.output.xml.XmlOutput;
 import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
+import japicmp.util.FileHelper;
 import japicmp.versioning.SemanticVersion;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -308,7 +309,7 @@ public class JApiCmpProcessor {
 					for (Artifact artifact : artifacts) {
 						final File file = artifact.getFile();
 						if (file != null) {
-							oldArchives.add(new JApiCmpArchive(file, guessVersion(file)));
+							oldArchives.add(new JApiCmpArchive(file, FileHelper.guessVersion(file)));
 						} else {
 							handleMissingArtifactFile(artifact);
 						}
@@ -345,7 +346,7 @@ public class JApiCmpProcessor {
 									+ file.getAbsolutePath()
 									+ "' of artifact as jar archive: "
 									+ jarFile.getName());
-							newArchives.add(new JApiCmpArchive(file, guessVersion(file)));
+							newArchives.add(new JApiCmpArchive(file, FileHelper.guessVersion(file)));
 						} catch (IOException e) {
 							log.warn("No new version specified and file '"
 									+ file.getAbsolutePath()
@@ -863,7 +864,7 @@ public class JApiCmpProcessor {
 						+ "' is either not a file or is not readable.");
 			}
 		}
-		return Collections.singletonList(new JApiCmpArchive(file, guessVersion(file)));
+		return Collections.singletonList(new JApiCmpArchive(file, FileHelper.guessVersion(file)));
 	}
 
 	List<JApiCmpArchive> resolveDependencyToFile(final String parameterName,
@@ -945,22 +946,12 @@ public class JApiCmpProcessor {
 				}
 				addFile = false;
 			}
-			String version = guessVersion(file);
+			String version = FileHelper.guessVersion(file);
 			if (addFile) {
 				jApiCmpArchives.add(new JApiCmpArchive(file, version));
 			}
 		}
 		return jApiCmpArchives;
-	}
-
-	private String guessVersion(final File file) {
-		String name = file.getName();
-		Optional<SemanticVersion> semanticVersion = japicmp.versioning.Version.getSemanticVersion(name);
-		String version = semanticVersion.isPresent() ? semanticVersion.get().toString() : "n.a.";
-		if (name.contains("SNAPSHOT")) {
-			version += "-SNAPSHOT";
-		}
-		return version;
 	}
 
 	private boolean ignoreMissingArtifact(final ConfigurationVersion configurationVersion) {
