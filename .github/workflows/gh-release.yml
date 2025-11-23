@@ -22,7 +22,7 @@ jobs:
               run: mvn -B package
 
             - name: Artefakte sammeln
-              run: mkdir japicmp/build && cp japicmp/target/*.jar japicmp/build/
+              run: mkdir japicmp/build && cp japicmp/target/japicmp*.jar japicmp/build/
 
             - name: Release erstellen
               uses: softprops/action-gh-release@v2
