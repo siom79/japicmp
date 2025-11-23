@@ -21,8 +21,8 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class Options {
+	public static final String N_A = "n.a.";
 	private static final Logger LOGGER = Logger.getLogger(Options.class.getName());
-	static final String N_A = "n.a.";
 	private List<JApiCmpArchive> oldArchives = new ArrayList<>();
 	private List<JApiCmpArchive> newArchives = new ArrayList<>();
 	private boolean outputOnlyModifications = false;

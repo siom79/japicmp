@@ -1,25 +1,48 @@
-name: mvn site
+name: Build & Deploy Maven Site
 
 on:
-  workflow_dispatch:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
 
 jobs:
-  release:
+    build:
+        name: Build Maven Site
+        runs-on: ubuntu-latest
 
-    name: Site
-    runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Maven Central
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: 17
-          cache: maven
-      - name: Generate website
-        run: |
-          git config --global user.name '${{ github.actor }}'
-          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
-          mvn install
-          mvn site:site site:stage scm-publish:publish-scm -Dgithub.actor=${{ github.actor }} -Dgithub.token=${{ secrets.GITHUB_TOKEN }}
+            - name: Set up Java
+              uses: actions/setup-java@v4
+              with:
+                  distribution: 'zulu'
+                  java-version: 17
+                  cache: maven
+
+            - name: Build Maven site
+              run: |
+                  mvn -B install
+                  mvn -B site site:stage
+
+            - name: Upload site to Pages artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: target/staging
+
+    deploy:
+        name: Deploy to GitHub Pages
+        needs: build
+        runs-on: ubuntu-latest
+
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+
+        steps:
+            - name: Deploy
+              id: deployment
+              uses: actions/deploy-pages@v4
