@@ -18,10 +18,11 @@ jobs:
           java-version: 17
           cache: maven
       - name: Generate website
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name '${{ github.actor }}'
           git config --global user.email '${{ github.actor }}@users.noreply.github.com'
           mvn install
-          mvn site:site site:stage scm-publish:publish-scm -Dgithub.actor=${{ github.actor }} -Dgithub.token=${{ secrets.GITHUB_TOKEN }}
+            mvn site:site site:stage scm-publish:publish-scm \
+                -Dscmpublish.username=x-access-token \
+                -Dscmpublish.password=${{ secrets.GITHUB_TOKEN }}
+
