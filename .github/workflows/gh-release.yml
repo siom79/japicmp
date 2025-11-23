@@ -22,11 +22,11 @@ jobs:
               run: mvn -B package
 
             - name: Artefakte sammeln
-              run: mkdir build && cp target/*.jar build/
+              run: mkdir japicmp/build && cp japicmp/target/*.jar japicmp/build/
 
             - name: Release erstellen
               uses: softprops/action-gh-release@v2
               with:
-                  files: build/*.jar
+                  files: japicmp/build/*.jar
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
