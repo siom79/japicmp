@@ -3,6 +3,11 @@ Versions
 
 The following versions of japicmp are available:
 
+0.25.0 (2025-11-23)
+-------------------
+* Add support for guessing version numbers to CLI invocations. [#467](https://github.com/siom79/japicmp/issues/467)
+* Plugin refactoring. [#450](https://github.com/siom79/japicmp/issues/450)
+
 0.24.2 (2025-10-12)
 -------------------
 * Include template parameters in hasSameParameter-Check for implemented methods. [#438](https://github.com/siom79/japicmp/issues/438)
