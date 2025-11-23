@@ -1,4 +1,4 @@
-name: Maven Release
+name: Github Release Package
 
 on:
     workflow_dispatch:
