@@ -1,0 +1,32 @@
+name: Github Release Package
+
+on:
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Repository auschecken
+              uses: actions/checkout@v4
+
+            - name: Java einrichten
+              uses: actions/setup-java@v4
+              with:
+                  distribution: 'temurin'
+                  java-version: '17'
+                  cache: maven
+
+            - name: Projekt bauen
+              run: mvn -B package
+
+            - name: Artefakte sammeln
+              run: mkdir build && cp target/*.jar build/
+
+            - name: Release erstellen
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: build/*.jar
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

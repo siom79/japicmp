@@ -1,6 +1,7 @@
 package japicmp.cmp;
 
 import japicmp.compat.CompatibilityChanges;
+import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.exception.JApiCmpException.Reason;
 import japicmp.filter.AnnotationFilterBase;
@@ -402,6 +403,9 @@ public class JarArchiveComparator {
 	 */
 	public Optional<CtClass> loadClass(ArchiveType archiveType, String name) {
 		Optional<CtClass> loadedClass = Optional.empty();
+		if (Options.N_A.equalsIgnoreCase(name)) {
+			return loadedClass;
+		}
 		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
 			try {
 				loadedClass = Optional.of(commonClassPool.get(name));
