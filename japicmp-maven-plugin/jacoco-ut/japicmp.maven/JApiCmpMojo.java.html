@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JApiCmpMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp-maven-plugin</a> &gt; <a href="index.source.html" class="el_package">japicmp.maven</a> &gt; <span class="el_source">JApiCmpMojo.java</span></div><h1>JApiCmpMojo.java</h1><pre class="source lang-java linenums">package japicmp.maven;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
+
+import java.io.File;
+import java.util.List;
+
+@Mojo(name = &quot;cmp&quot;, requiresDependencyResolution = ResolutionScope.COMPILE,
+	  defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
+public class JApiCmpMojo extends AbstractMojo {
+
+	@Parameter
+	Version oldVersion;
+	@Parameter
+	List&lt;DependencyDescriptor&gt; oldVersions;
+	@Parameter
+	Version newVersion;
+	@Parameter
+	List&lt;DependencyDescriptor&gt; newVersions;
+<span class="fc" id="L29">	@Parameter</span>
+	ConfigParameters parameter = new ConfigParameters();
+	@Parameter
+	List&lt;Dependency&gt; dependencies;
+	@Parameter
+	List&lt;Dependency&gt; oldClassPathDependencies;
+	@Parameter
+	List&lt;Dependency&gt; newClassPathDependencies;
+	@Parameter(property = &quot;japicmp.skip&quot;, defaultValue = &quot;false&quot;)
+	boolean skip;
+	@Parameter(property = &quot;japicmp.skipDiffReport&quot;)
+	boolean skipDiffReport;
+	@Parameter(property = &quot;japicmp.skipMarkdownReport&quot;)
+	boolean skipMarkdownReport;
+	@Parameter(property = &quot;japicmp.skipXmlReport&quot;)
+	boolean skipXmlReport;
+	@Parameter(property = &quot;japicmp.skipHtmlReport&quot;)
+	boolean skipHtmlReport;
+	@Parameter(property = &quot;japicmp.breakBuildOnModifications&quot;)
+	boolean breakBuildOnModifications;
+	@Parameter(property = &quot;japicmp.breakBuildOnBinaryIncompatibleModifications&quot;)
+	boolean breakBuildOnBinaryIncompatibleModifications;
+	@Parameter(property = &quot;japicmp.breakBuildOnSourceIncompatibleModifications&quot;)
+	boolean breakBuildOnSourceIncompatibleModifications;
+	@Parameter(property = &quot;japicmp.breakBuildBasedOnSemanticVersioning&quot;)
+	boolean breakBuildBasedOnSemanticVersioning;
+	@Parameter(property = &quot;japicmp.breakBuildBasedOnSemanticVersioningForMajorVersionZero&quot;)
+	boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
+	@Parameter
+	File outputDirectory;
+	@Parameter(readonly = true, defaultValue = &quot;(,${project.version})&quot;)
+	String versionRangeWithProjectVersion;
+	@Parameter(required = true, property = &quot;project.build.directory&quot;)
+	File projectBuildDir;
+	@Parameter(defaultValue = &quot;${project}&quot;, readonly = true)
+	MavenProject mavenProject;
+	@Parameter(defaultValue = &quot;${mojoExecution}&quot;, readonly = true)
+	MojoExecution mojoExecution;
+	@Component
+	RepositorySystem repoSystem;
+	@Parameter(defaultValue = &quot;${repositorySystemSession}&quot;, readonly = true)
+	RepositorySystemSession repoSession;
+	@Parameter(defaultValue = &quot;${project.remoteProjectRepositories}&quot;, readonly = true)
+	List&lt;RemoteRepository&gt; remoteRepos;
+	@Parameter(defaultValue = &quot;${project.remoteArtifactRepositories}&quot;, readonly = true)
+	List&lt;ArtifactRepository&gt; artifactRepositories;
+	JApiCmpProcessor processor;
+
+<span class="fc" id="L77">	public JApiCmpMojo() {</span>
+		/* Intentionally left blank. */
+<span class="fc" id="L79">	}</span>
+
+	public void execute() throws MojoExecutionException, MojoFailureException {
+<span class="fc" id="L82">		MavenParameters mavenParameters = new MavenParameters(this.artifactRepositories,</span>
+				this.mavenProject, this.mojoExecution,
+				this.versionRangeWithProjectVersion,
+				this.repoSystem, this.repoSession,
+				this.remoteRepos);
+<span class="fc" id="L87">		PluginParameters pluginParameters = new PluginParameters(this.skip,</span>
+				this.newVersion,
+				this.oldVersion, this.parameter,
+				this.dependencies,
+				this.projectBuildDir,
+				this.outputDirectory, true,
+				this.oldVersions, this.newVersions,
+				this.oldClassPathDependencies,
+				this.newClassPathDependencies,
+				new SkipReport(
+						this.skipDiffReport,
+						this.skipHtmlReport,
+						this.skipMarkdownReport,
+						this.skipXmlReport),
+				new BreakBuild(
+						this.breakBuildBasedOnSemanticVersioning,
+						this.breakBuildBasedOnSemanticVersioningForMajorVersionZero,
+						this.breakBuildOnBinaryIncompatibleModifications,
+						this.breakBuildOnSourceIncompatibleModifications,
+						this.breakBuildOnModifications));
+
+<span class="fc" id="L108">		processor = new JApiCmpProcessor(pluginParameters, mavenParameters, getLog());</span>
+<span class="fc" id="L109">		processor.execute();</span>
+<span class="fc" id="L110">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

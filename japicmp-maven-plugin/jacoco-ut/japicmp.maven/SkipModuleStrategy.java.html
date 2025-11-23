@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SkipModuleStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp-maven-plugin</a> &gt; <a href="index.source.html" class="el_package">japicmp.maven</a> &gt; <span class="el_source">SkipModuleStrategy.java</span></div><h1>SkipModuleStrategy.java</h1><pre class="source lang-java linenums">package japicmp.maven;
+
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+
+import java.util.List;
+
+public class SkipModuleStrategy {
+
+	private final PluginParameters pluginParameters;
+	private final MavenParameters mavenParameters;
+	private final Log log;
+
+	public SkipModuleStrategy(final PluginParameters pluginParameters,
+							  final MavenParameters mavenParameters,
+<span class="fc" id="L16">							  final Log log) {</span>
+<span class="fc" id="L17">		this.pluginParameters = pluginParameters;</span>
+<span class="fc" id="L18">		this.mavenParameters = mavenParameters;</span>
+<span class="fc" id="L19">		this.log = log;</span>
+<span class="fc" id="L20">	}</span>
+
+	public boolean skip() {
+<span class="fc" id="L23">		final MavenProject mavenProject = mavenParameters.mavenProject();</span>
+<span class="fc" id="L24">		final ConfigParameters parameters = pluginParameters.parameter();</span>
+<span class="pc bpc" id="L25" title="2 of 4 branches missed.">		if (mavenProject!=null &amp;&amp; parameters!=null) {</span>
+<span class="fc" id="L26">			final List&lt;String&gt; packagingSupporteds = parameters.getPackagingSupporteds();</span>
+<span class="pc bpc" id="L27" title="3 of 4 branches missed.">			if ((packagingSupporteds!=null) &amp;&amp; !packagingSupporteds.isEmpty()) {</span>
+<span class="nc bnc" id="L28" title="All 2 branches missed.">				if (!packagingSupporteds.contains(mavenProject.getPackaging())) {</span>
+<span class="nc" id="L29">					log.info(&quot;Filtered according to packagingFilter&quot;);</span>
+<span class="nc" id="L30">					return true;</span>
+				}
+			} else {
+<span class="fc" id="L33">				log.debug(&quot;No packaging support defined, no filtering&quot;);</span>
+			}
+
+<span class="pc bpc" id="L36" title="1 of 4 branches missed.">			if (&quot;pom&quot;.equals(mavenProject.getPackaging()) &amp;&amp; parameters.getSkipPomModules()) {</span>
+<span class="fc" id="L37">				log.info(&quot;Skipping module because packaging is 'pom'.&quot;);</span>
+<span class="fc" id="L38">				return true;</span>
+			}
+
+<span class="fc" id="L41">			final String artifactId = mavenProject.getArtifactId();</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">			if (artifactId!=null) {</span>
+<span class="fc" id="L43">				final List&lt;String&gt; excludeModules = parameters.getExcludeModules();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">				if (excludeModules!=null) {</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">					for (String excludeModule : excludeModules) {</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">						if (excludeModule!=null) {</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">							if (artifactId.matches(excludeModule)) {</span>
+<span class="fc" id="L48">								log.info(&quot;Skipping module because artifactId matches exclude expression: &quot;</span>
+										+ excludeModule);
+<span class="fc" id="L50">								return true;</span>
+							}
+						}
+<span class="fc" id="L53">					}</span>
+				}
+
+<span class="fc" id="L56">				final List&lt;String&gt; includeModules = parameters.getIncludeModules();</span>
+<span class="fc" id="L57">				int includeCount = 0;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">				if (includeModules!=null) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">					for (String includeModule : includeModules) {</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">						if (includeModule!=null) {</span>
+<span class="fc" id="L61">							includeCount++;</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">							if (artifactId.matches(includeModule)) {</span>
+<span class="fc" id="L63">								log.debug(&quot;Including module because it is explicitly included: &quot; + includeModule);</span>
+<span class="fc" id="L64">								return false;</span>
+							}
+						}
+<span class="fc" id="L67">					}</span>
+				}
+
+<span class="fc bfc" id="L70" title="All 2 branches covered.">				if (includeCount &gt; 0) {</span>
+<span class="fc" id="L71">					log.info(</span>
+							&quot;Skipping module because explicit includes are defined but artifactId did not match.&quot;);
+<span class="fc" id="L73">					return true; // it has not been included up to now, and we have includes -&gt; skip</span>
+				}
+<span class="fc" id="L75">			} else {</span>
+<span class="fc" id="L76">				log.debug(&quot;Name of maven project is null.&quot;);</span>
+			}
+		}
+
+<span class="fc" id="L80">		return false;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

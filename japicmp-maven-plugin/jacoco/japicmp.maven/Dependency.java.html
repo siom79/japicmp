@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Dependency.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp-maven-plugin</a> &gt; <a href="index.source.html" class="el_package">japicmp.maven</a> &gt; <span class="el_source">Dependency.java</span></div><h1>Dependency.java</h1><pre class="source lang-java linenums">package japicmp.maven;
+
+public class Dependency implements DependencyDescriptor {
+
+	private String groupId;
+	private String artifactId;
+	private String version;
+	private String scope;
+	private String systemPath;
+	private String classifier;
+<span class="fc" id="L11">	private String type = &quot;jar&quot;;</span>
+
+<span class="fc" id="L13">	public Dependency() {</span>
+		/* Intentionally left blank. */
+<span class="fc" id="L15">	}</span>
+
+	public String getGroupId() {
+<span class="fc" id="L18">		return groupId;</span>
+	}
+
+	public void setGroupId(String groupId) {
+<span class="fc" id="L22">		this.groupId = groupId;</span>
+<span class="fc" id="L23">	}</span>
+
+	public String getArtifactId() {
+<span class="fc" id="L26">		return artifactId;</span>
+	}
+
+	public void setArtifactId(String artifactId) {
+<span class="fc" id="L30">		this.artifactId = artifactId;</span>
+<span class="fc" id="L31">	}</span>
+
+	public String getVersion() {
+<span class="fc" id="L34">		return version;</span>
+	}
+
+	public void setVersion(String version) {
+<span class="fc" id="L38">		this.version = version;</span>
+<span class="fc" id="L39">	}</span>
+
+	public String getScope() {
+<span class="nc" id="L42">		return scope;</span>
+	}
+
+	public void setScope(String scope) {
+<span class="nc" id="L46">		this.scope = scope;</span>
+<span class="nc" id="L47">	}</span>
+
+	public String getSystemPath() {
+<span class="fc" id="L50">		return systemPath;</span>
+	}
+
+	public void setSystemPath(String systemPath) {
+<span class="nc" id="L54">		this.systemPath = systemPath;</span>
+<span class="nc" id="L55">	}</span>
+
+	public String getClassifier() {
+<span class="fc" id="L58">		return classifier;</span>
+	}
+
+	public void setClassifier(String classifier) {
+<span class="nc" id="L62">		this.classifier = classifier;</span>
+<span class="nc" id="L63">	}</span>
+
+	public String getType() {
+<span class="fc" id="L66">		return type;</span>
+	}
+
+	public void setType(String type) {
+<span class="nc" id="L70">		this.type = type;</span>
+<span class="nc" id="L71">	}</span>
+
+	@Override
+	public String toString() {
+<span class="fc" id="L75">		return &quot;Dependency{&quot; +</span>
+				&quot;groupId='&quot; + groupId + '\'' +
+				&quot;, artifactId='&quot; + artifactId + '\'' +
+				&quot;, version='&quot; + version + '\'' +
+				&quot;, scope='&quot; + scope + '\'' +
+				&quot;, systemPath='&quot; + systemPath + '\'' +
+				&quot;, classifier='&quot; + classifier + '\'' +
+				&quot;, type='&quot; + type + '\'' +
+				'}';
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

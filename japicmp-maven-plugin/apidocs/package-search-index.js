@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.github.siom79.japicmp.japicmp_maven_plugin"},{"l":"japicmp.maven"}];updateSearchResults();

@@ -22,7 +22,7 @@ public class Version {
 	public static Optional&lt;SemanticVersion&gt; getSemanticVersion(String version)  {
 <span class="fc" id="L23">		Optional&lt;SemanticVersion&gt; semanticVersion = Optional.empty();</span>
 <span class="fc" id="L24">		Matcher matcher = VERSION_PATTERN_THREE_DIGITS.matcher(version);</span>
-<span class="pc bpc" id="L25" title="1 of 2 branches missed.">		if (matcher.matches()) {</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">		if (matcher.matches()) {</span>
 <span class="pc bpc" id="L26" title="1 of 2 branches missed.">			if (matcher.groupCount() &gt;= 3) {</span>
 				try {
 <span class="fc" id="L28">					int major = Integer.parseInt(matcher.group(1));</span>
@@ -36,7 +36,7 @@ public class Version {
 <span class="nc" id="L36">				LOGGER.log(Level.FINE, String.format(&quot;Could not find three digits separated by a point in file name: %s&quot;, version));</span>
 			}
 		} else {
-<span class="nc" id="L39">			LOGGER.log(Level.FINE, String.format(&quot;Could not find three digits separated by a point in file name: %s&quot;, version));</span>
+<span class="fc" id="L39">			LOGGER.log(Level.FINE, String.format(&quot;Could not find three digits separated by a point in file name: %s&quot;, version));</span>
 		}
 <span class="fc" id="L41">		return semanticVersion;</span>
 	}
@@ -45,4 +45,4 @@ public class Version {
 <span class="fc" id="L45">		return version;</span>
 	}
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

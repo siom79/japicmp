@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<japicmp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" accessModifier="PROTECTED" creationTimestamp="2025-11-23T12:24:52.241+0000" ignoreMissingClasses="false" ignoreMissingClassesByRegularExpressions="" newJar="/home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.25.0-SNAPSHOT.jar" newVersion="0.25.0-SNAPSHOT" oldJar="/home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.24.2/japicmp-0.24.2.jar" oldVersion="0.24.2" onlyBinaryIncompatibleModifications="false" onlyModifications="true" packagesExclude="japicmp.*#__cobertura*();japicmp.*#__cobertura*(net.sourceforge.cobertura.coveragedata.LightClassmapListener);japicmp.*#__cobertura*" packagesInclude="all" semanticVersioning="0.0.1" title="Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.25.0-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.24.2/japicmp-0.24.2.jar" xsi:noNamespaceSchemaLocation="japicmp.xsd">
+    <classes>
+        <class binaryCompatible="true" changeStatus="MODIFIED" fullyQualifiedName="japicmp.util.FileHelper" javaObjectSerializationCompatible="NOT_SERIALIZABLE" javaObjectSerializationCompatibleAsString="not serializable" sourceCompatible="true">
+            <annotations/>
+            <attributes>
+                <attribute changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
+            </attributes>
+            <classFileFormatVersion changeStatus="UNCHANGED" majorVersionNew="52" majorVersionOld="52" minorVersionNew="0" minorVersionOld="0"/>
+            <classType changeStatus="UNCHANGED" newType="CLASS" oldType="CLASS"/>
+            <compatibilityChanges/>
+            <constructors/>
+            <fields/>
+            <genericTemplates/>
+            <interfaces/>
+            <methods>
+                <method binaryCompatible="true" changeStatus="NEW" name="guessVersion" newLineNumber="45" oldLineNumber="n.a." sourceCompatible="true">
+                    <annotations/>
+                    <attributes>
+                        <attribute changeStatus="NEW" newValue="NON_SYNTHETIC" oldValue="n.a."/>
+                    </attributes>
+                    <compatibilityChanges>
+                        <compatibilityChange binaryCompatible="true" sourceCompatible="true" type="METHOD_ADDED_TO_PUBLIC_CLASS"/>
+                    </compatibilityChanges>
+                    <exceptions/>
+                    <genericTemplates/>
+                    <modifiers>
+                        <modifier changeStatus="NEW" newValue="NON_FINAL" oldValue="n.a."/>
+                        <modifier changeStatus="NEW" newValue="STATIC" oldValue="n.a."/>
+                        <modifier changeStatus="NEW" newValue="PUBLIC" oldValue="n.a."/>
+                        <modifier changeStatus="NEW" newValue="NON_ABSTRACT" oldValue="n.a."/>
+                        <modifier changeStatus="NEW" newValue="NON_BRIDGE" oldValue="n.a."/>
+                        <modifier changeStatus="NEW" newValue="NON_SYNTHETIC" oldValue="n.a."/>
+                    </modifiers>
+                    <parameters>
+                        <parameter binaryCompatible="true" changeStatus="UNCHANGED" sourceCompatible="true" templateName="N/A" type="java.io.File">
+                            <compatibilityChanges/>
+                            <newGenericTypes/>
+                            <oldGenericTypes/>
+                        </parameter>
+                    </parameters>
+                    <returnType binaryCompatible="true" changeStatus="NEW" newValue="java.lang.String" oldValue="n.a." sourceCompatible="true">
+                        <compatibilityChanges/>
+                        <newGenericTypes/>
+                        <oldGenericTypes/>
+                    </returnType>
+                </method>
+            </methods>
+            <modifiers>
+                <modifier changeStatus="UNCHANGED" newValue="NON_FINAL" oldValue="NON_FINAL"/>
+                <modifier changeStatus="UNCHANGED" newValue="NON_STATIC" oldValue="NON_STATIC"/>
+                <modifier changeStatus="UNCHANGED" newValue="PUBLIC" oldValue="PUBLIC"/>
+                <modifier changeStatus="UNCHANGED" newValue="NON_ABSTRACT" oldValue="NON_ABSTRACT"/>
+                <modifier changeStatus="UNCHANGED" newValue="NON_SYNTHETIC" oldValue="NON_SYNTHETIC"/>
+            </modifiers>
+            <serialVersionUid serialVersionUidDefaultNew="n.a." serialVersionUidDefaultOld="n.a." serialVersionUidInClassNew="n.a." serialVersionUidInClassOld="n.a." serializableNew="false" serializableOld="false"/>
+            <superclass binaryCompatible="true" changeStatus="UNCHANGED" sourceCompatible="true" superclassNew="java.lang.Object" superclassOld="java.lang.Object">
+                <compatibilityChanges/>
+            </superclass>
+        </class>
+    </classes>
+</japicmp>

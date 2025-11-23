@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MavenParameters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp-maven-plugin</a> &gt; <a href="index.source.html" class="el_package">japicmp.maven</a> &gt; <span class="el_source">MavenParameters.java</span></div><h1>MavenParameters.java</h1><pre class="source lang-java linenums">package japicmp.maven;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
+
+import java.util.List;
+
+public class MavenParameters {
+	private final List&lt;ArtifactRepository&gt; artifactRepositories;
+	private final MavenProject mavenProject;
+	private final MojoExecution mojoExecution;
+	private final String versionRangeWithProjectVersion;
+	private final RepositorySystem repoSystem;
+	private final RepositorySystemSession repoSession;
+	private final List&lt;RemoteRepository&gt; remoteRepos;
+
+	public MavenParameters(
+			final List&lt;ArtifactRepository&gt; artifactRepositories,
+			final MavenProject mavenProject,
+			final MojoExecution mojoExecution,
+			final String versionRangeWithProjectVersion,
+			final RepositorySystem repoSystem,
+			final RepositorySystemSession repoSession,
+<span class="fc" id="L28">			final List&lt;RemoteRepository&gt; remoteRepos) {</span>
+<span class="fc" id="L29">		this.artifactRepositories = artifactRepositories;</span>
+<span class="fc" id="L30">		this.mavenProject = mavenProject;</span>
+<span class="fc" id="L31">		this.mojoExecution = mojoExecution;</span>
+<span class="fc" id="L32">		this.versionRangeWithProjectVersion = versionRangeWithProjectVersion;</span>
+<span class="fc" id="L33">		this.repoSystem = repoSystem;</span>
+<span class="fc" id="L34">		this.repoSession = repoSession;</span>
+<span class="fc" id="L35">		this.remoteRepos = remoteRepos;</span>
+<span class="fc" id="L36">	}</span>
+
+	public List&lt;ArtifactRepository&gt; artifactRepositories() {
+<span class="fc" id="L39">		return artifactRepositories;</span>
+	}
+
+	public MavenProject mavenProject() {
+<span class="fc" id="L43">		return mavenProject;</span>
+	}
+
+	public MojoExecution mojoExecution() {
+<span class="fc" id="L47">		return mojoExecution;</span>
+	}
+
+	public String versionRangeWithProjectVersion() {
+<span class="fc" id="L51">		return versionRangeWithProjectVersion;</span>
+	}
+
+	public RepositorySystem repoSystem() {
+<span class="fc" id="L55">		return this.repoSystem;</span>
+	}
+
+	public RepositorySystemSession repoSession() {
+<span class="fc" id="L59">		return this.repoSession;</span>
+	}
+
+	public List&lt;RemoteRepository&gt; remoteRepos() {
+<span class="fc" id="L63">		return this.remoteRepos;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

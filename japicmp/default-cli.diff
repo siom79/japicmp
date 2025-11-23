@@ -1,0 +1,6 @@
+Comparing source compatibility of /home/runner/work/japicmp/japicmp/japicmp/target/japicmp-0.25.0-SNAPSHOT.jar against /home/runner/.m2/repository/com/github/siom79/japicmp/japicmp/0.24.2/japicmp-0.24.2.jar
+***  MODIFIED CLASS: PUBLIC japicmp.util.FileHelper  (not serializable)
+	===  CLASS FILE FORMAT VERSION: 52.0 <- 52.0
+	+++  NEW METHOD: PUBLIC(+) STATIC(+) java.lang.String guessVersion(java.io.File)
+
+Semantic versioning suggestion: 0.0.1

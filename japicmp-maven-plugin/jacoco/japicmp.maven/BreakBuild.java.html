@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BreakBuild.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp-maven-plugin</a> &gt; <a href="index.source.html" class="el_package">japicmp.maven</a> &gt; <span class="el_source">BreakBuild.java</span></div><h1>BreakBuild.java</h1><pre class="source lang-java linenums">package japicmp.maven;
+
+public class BreakBuild {
+
+	private boolean onSemanticVersioning;
+	private boolean onSemanticVersioningForMajorVersionZero;
+	private boolean onModifications;
+	private boolean onBinaryIncompatibleModifications;
+	private boolean onSourceIncompatibleModifications;
+
+<span class="fc" id="L11">	BreakBuild() {</span>
+		// Intentionally left blank.
+<span class="fc" id="L13">	}</span>
+
+	public BreakBuild(
+			final boolean breakBuildOnSemanticVersioning,
+			final boolean breakBuildOnSemanticVersioningForMajorVersionZero,
+			final boolean breakBuildOnBinaryIncompatibleModifications,
+			final boolean breakBuildOnSourceIncompatibleModifications,
+<span class="fc" id="L20">			final boolean breakBuildOnModifications) {</span>
+<span class="fc" id="L21">		this.onSemanticVersioning = breakBuildOnSemanticVersioning;</span>
+<span class="fc" id="L22">		this.onSemanticVersioningForMajorVersionZero = breakBuildOnSemanticVersioningForMajorVersionZero;</span>
+<span class="fc" id="L23">		this.onModifications = breakBuildOnModifications;</span>
+<span class="fc" id="L24">		this.onBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;</span>
+<span class="fc" id="L25">		this.onSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;</span>
+<span class="fc" id="L26">	}</span>
+
+	public boolean onSemanticVersioning() {
+<span class="fc" id="L29">		return onSemanticVersioning;</span>
+	}
+
+	public boolean onSemanticVersioningForMajorVersionZero() {
+<span class="fc" id="L33">		return onSemanticVersioningForMajorVersionZero;</span>
+	}
+
+	public boolean onModifications() {
+<span class="fc" id="L37">		return onModifications;</span>
+	}
+
+	public boolean onBinaryIncompatibleModifications() {
+<span class="fc" id="L41">		return onBinaryIncompatibleModifications;</span>
+	}
+
+	public boolean onSourceIncompatibleModifications() {
+<span class="fc" id="L45">		return onSourceIncompatibleModifications;</span>
+	}
+
+	void setOnSemanticVersioning(final boolean onSemanticVersioning) {
+<span class="fc" id="L49">		this.onSemanticVersioning = onSemanticVersioning;</span>
+<span class="fc" id="L50">	}</span>
+
+	void setOnSemanticVersioningForMajorVersionZero(
+			final boolean onSemanticVersioningForMajorVersionZero) {
+<span class="fc" id="L54">		this.onSemanticVersioningForMajorVersionZero = onSemanticVersioningForMajorVersionZero;</span>
+<span class="fc" id="L55">	}</span>
+
+	void setOnModifications(final boolean onModifications) {
+<span class="fc" id="L58">		this.onModifications = onModifications;</span>
+<span class="fc" id="L59">	}</span>
+
+	void setOnBinaryIncompatibleModifications(final boolean onBinaryIncompatibleModifications) {
+<span class="fc" id="L62">		this.onBinaryIncompatibleModifications = onBinaryIncompatibleModifications;</span>
+<span class="fc" id="L63">	}</span>
+
+	void setOnSourceIncompatibleModifications(final boolean onSourceIncompatibleModifications) {
+<span class="fc" id="L66">		this.onSourceIncompatibleModifications = onSourceIncompatibleModifications;</span>
+<span class="fc" id="L67">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

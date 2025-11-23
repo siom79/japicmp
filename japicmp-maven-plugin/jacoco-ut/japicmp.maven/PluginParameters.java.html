@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PluginParameters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp-maven-plugin</a> &gt; <a href="index.source.html" class="el_package">japicmp.maven</a> &gt; <span class="el_source">PluginParameters.java</span></div><h1>PluginParameters.java</h1><pre class="source lang-java linenums">package japicmp.maven;
+
+import java.io.File;
+import java.util.List;
+
+public class PluginParameters {
+	private final boolean skip;
+	private final SkipReport skipReport;
+	private final Version oldVersion;
+	private final List&lt;DependencyDescriptor&gt; oldVersions;
+	private final Version newVersion;
+	private final List&lt;DependencyDescriptor&gt; newVersions;
+	private final ConfigParameters parameter;
+	private final List&lt;Dependency&gt; dependencies;
+	private final List&lt;Dependency&gt; oldClassPathDependencies;
+	private final List&lt;Dependency&gt; newClassPathDependencies;
+	private final File projectBuildDir;
+	private final File outputDirectory;
+	private final boolean writeToFiles;
+	private final BreakBuild breakBuild;
+
+	public PluginParameters(final boolean skip,
+							final Version newVersion,
+							final Version oldVersion,
+							final ConfigParameters parameter, final List&lt;Dependency&gt; dependencies,
+							final File projectBuildDir, final File outputDirectory,
+							final boolean writeToFiles,
+							final List&lt;DependencyDescriptor&gt; oldVersions,
+							final List&lt;DependencyDescriptor&gt; newVersions,
+							final List&lt;Dependency&gt; oldClassPathDependencies,
+							final List&lt;Dependency&gt; newClassPathDependencies,
+<span class="fc" id="L32">							final SkipReport skipReport, final BreakBuild breakBuild) {</span>
+<span class="fc" id="L33">		this.skip = skip;</span>
+<span class="fc" id="L34">		this.newVersion = newVersion;</span>
+<span class="fc" id="L35">		this.oldVersion = oldVersion;</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">		this.parameter = parameter == null ? new ConfigParameters() : parameter;</span>
+<span class="fc" id="L37">		this.dependencies = dependencies;</span>
+<span class="fc" id="L38">		this.oldClassPathDependencies = oldClassPathDependencies;</span>
+<span class="fc" id="L39">		this.newClassPathDependencies = newClassPathDependencies;</span>
+<span class="fc" id="L40">		this.projectBuildDir = projectBuildDir;</span>
+<span class="fc" id="L41">		this.outputDirectory = outputDirectory;</span>
+<span class="fc" id="L42">		this.writeToFiles = writeToFiles;</span>
+<span class="fc" id="L43">		this.oldVersions = oldVersions;</span>
+<span class="fc" id="L44">		this.newVersions = newVersions;</span>
+<span class="fc" id="L45">		this.skipReport = skipReport;</span>
+<span class="fc" id="L46">		this.breakBuild = breakBuild;</span>
+<span class="fc" id="L47">	}</span>
+
+	public boolean skip() {
+<span class="fc" id="L50">		return skip;</span>
+	}
+
+	public Version newVersion() {
+<span class="fc" id="L54">		return newVersion;</span>
+	}
+
+	public Version oldVersion() {
+<span class="fc" id="L58">		return oldVersion;</span>
+	}
+
+	public ConfigParameters parameter() {
+<span class="fc" id="L62">		return parameter;</span>
+	}
+
+	public List&lt;Dependency&gt; dependencies() {
+<span class="fc" id="L66">		return dependencies;</span>
+	}
+
+	public File projectBuildDir() {
+<span class="fc" id="L70">		return projectBuildDir;</span>
+	}
+
+	public File outputDirectory() {
+<span class="fc" id="L74">		return outputDirectory;</span>
+	}
+
+	public boolean isWriteToFiles() {
+<span class="fc" id="L78">		return writeToFiles;</span>
+	}
+
+	public List&lt;DependencyDescriptor&gt; oldVersions() {
+<span class="fc" id="L82">		return oldVersions;</span>
+	}
+
+	public List&lt;DependencyDescriptor&gt; newVersions() {
+<span class="fc" id="L86">		return newVersions;</span>
+	}
+
+	public List&lt;Dependency&gt; oldClassPathDependencies() {
+<span class="fc" id="L90">		return oldClassPathDependencies;</span>
+	}
+
+	public List&lt;Dependency&gt; newClassPathDependencies() {
+<span class="fc" id="L94">		return newClassPathDependencies;</span>
+	}
+
+	public BreakBuild breakBuild() {
+<span class="fc" id="L98">		return breakBuild;</span>
+	}
+
+	public SkipReport skipReport() {
+<span class="fc" id="L102">		return skipReport;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

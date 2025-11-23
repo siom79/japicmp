@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PostAnalysisScriptExecutor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp-maven-plugin</a> &gt; <a href="index.source.html" class="el_package">japicmp.maven</a> &gt; <span class="el_source">PostAnalysisScriptExecutor.java</span></div><h1>PostAnalysisScriptExecutor.java</h1><pre class="source lang-java linenums">package japicmp.maven;
+
+import japicmp.model.JApiClass;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="fc" id="L18">public class PostAnalysisScriptExecutor {</span>
+
+	public List&lt;JApiClass&gt; apply(final ConfigParameters parameter, final List&lt;JApiClass&gt; jApiClasses, final Log log)
+			throws MojoExecutionException {
+
+<span class="fc" id="L23">		List&lt;JApiClass&gt; filteredList = jApiClasses;</span>
+<span class="fc" id="L24">		final String postAnalysisFilterScript = parameter.getPostAnalysisScript();</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">		if (postAnalysisFilterScript != null) {</span>
+			try {
+<span class="fc" id="L27">				final InputStream inputStream = getInputStream(postAnalysisFilterScript);</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">				if (inputStream != null) {</span>
+<span class="fc" id="L29">					final ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName(&quot;groovy&quot;);</span>
+<span class="fc" id="L30">					final Bindings bindings = scriptEngine.createBindings();</span>
+<span class="fc" id="L31">					bindings.put(&quot;jApiClasses&quot;, jApiClasses);</span>
+<span class="fc" id="L32">					try (final InputStreamReader fileReader = new InputStreamReader(inputStream,</span>
+							StandardCharsets.UTF_8)) {
+<span class="fc" id="L34">						final Object returnValue = scriptEngine.eval(fileReader, bindings);</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">						if (returnValue instanceof List) {</span>
+<span class="fc" id="L36">							final List returnedList = (List) returnValue;</span>
+<span class="fc" id="L37">							filteredList = new ArrayList&lt;&gt;(returnedList.size());</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">							for (final Object obj : returnedList) {</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">								if (obj instanceof JApiClass) {</span>
+<span class="fc" id="L40">									final JApiClass jApiClass = (JApiClass) obj;</span>
+<span class="fc" id="L41">									filteredList.add(jApiClass);</span>
+								}
+<span class="fc" id="L43">							}</span>
+<span class="fc" id="L44">						} else {</span>
+<span class="fc" id="L45">							throw new MojoExecutionException(&quot;Post-analysis script does not return a list.&quot;);</span>
+						}
+<span class="fc" id="L47">					} catch (ScriptException e) {</span>
+<span class="fc" id="L48">						throw new MojoExecutionException(</span>
+<span class="fc" id="L49">								&quot;Execution of post-analysis script failed: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L50">					} catch (IOException e) {</span>
+<span class="nc" id="L51">						throw new MojoExecutionException(&quot;Failed to load post-analysis script '&quot;</span>
+								+ postAnalysisFilterScript
+								+ &quot;: &quot;
+<span class="nc" id="L54">								+ e.getMessage(), e);</span>
+<span class="fc" id="L55">					}</span>
+<span class="fc" id="L56">				} else {</span>
+<span class="fc" id="L57">					throw new MojoExecutionException(</span>
+							&quot;Post-analysis script '&quot; + postAnalysisFilterScript + &quot;' does not exist.&quot;);
+				}
+<span class="nc" id="L60">			} catch (FileNotFoundException e) {</span>
+<span class="nc" id="L61">				throw new MojoExecutionException(</span>
+						&quot;Post-analysis script '&quot; + postAnalysisFilterScript + &quot; does not exist.&quot;, e);
+<span class="fc" id="L63">			}</span>
+		} else {
+<span class="fc" id="L65">			log.debug(&quot;No post-analysis script provided.&quot;);</span>
+		}
+
+<span class="fc" id="L68">		return filteredList;</span>
+	}
+
+	private InputStream getInputStream(final String postAnalysisFilterScript) throws FileNotFoundException {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">		if (Files.exists(Paths.get(postAnalysisFilterScript))) {</span>
+<span class="fc" id="L73">			return new FileInputStream(postAnalysisFilterScript);</span>
+		}
+<span class="fc" id="L75">		return PostAnalysisScriptExecutor.class.getClassLoader().getResourceAsStream(</span>
+				postAnalysisFilterScript);
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

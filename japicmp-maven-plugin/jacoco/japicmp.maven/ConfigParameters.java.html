@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConfigParameters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">japicmp-maven-plugin</a> &gt; <a href="index.source.html" class="el_package">japicmp.maven</a> &gt; <span class="el_source">ConfigParameters.java</span></div><h1>ConfigParameters.java</h1><pre class="source lang-java linenums">package japicmp.maven;
+
+import org.apache.maven.plugins.annotations.Parameter;
+
+import java.util.List;
+
+/** Class for storing the japicmp configuration parameters. */
+public class ConfigParameters {
+
+	/** Process only modified classes. */
+	@Parameter
+	private boolean onlyModified;
+
+	/** Access modifier. */
+	@Parameter
+	private String accessModifier;
+
+	@Parameter
+	private List&lt;String&gt; includes;
+
+	@Parameter
+	private List&lt;String&gt; excludes;
+
+	@Parameter
+	private boolean onlyBinaryIncompatible;
+
+	@Parameter
+	private boolean breakBuildBasedOnSemanticVersioning;
+
+	@Parameter
+	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
+
+	@Parameter
+	private boolean breakBuildOnModifications;
+
+	@Parameter
+	private boolean breakBuildOnBinaryIncompatibleModifications;
+
+	@Parameter
+	private boolean breakBuildOnSourceIncompatibleModifications;
+
+	@Parameter
+	private boolean includeSynthetic;
+
+	@Parameter
+	private boolean ignoreMissingClasses;
+
+	@Parameter
+	private List&lt;String&gt; ignoreMissingClassesByRegularExpressions;
+
+	@Parameter(defaultValue = &quot;true&quot;)
+	private boolean skipPomModules;
+
+	@Parameter
+	private String htmlStylesheet;
+
+	@Parameter
+	private String htmlTitle;
+
+	@Parameter
+	private String markdownTitle;
+
+	@Parameter
+	private boolean noAnnotations;
+
+	@Parameter
+	private String ignoreNonResolvableArtifacts;
+
+	@Parameter
+	private List&lt;String&gt; packagingSupporteds;
+
+	@Parameter
+	private String postAnalysisScript;
+
+	@Parameter
+	private boolean skipDiffReport;
+
+	@Parameter
+	private boolean skipHtmlReport;
+
+	@Parameter
+	private boolean skipMarkdownReport;
+
+	@Parameter
+	private boolean skipXmlReport;
+
+	@Parameter(defaultValue = &quot;true&quot;)
+	private boolean ignoreMissingOldVersion;
+
+	@Parameter
+	private boolean ignoreMissingNewVersion;
+
+	@Parameter
+	private String oldVersionPattern;
+
+	@Parameter(defaultValue = &quot;false&quot;)
+	private boolean includeSnapshots;
+
+	@Parameter(defaultValue = &quot;true&quot;)
+	private boolean breakBuildIfCausedByExclusion;
+
+	@Parameter
+	private boolean reportOnlyFilename;
+
+	@Parameter
+	private boolean reportOnlySummary;
+
+	@Parameter
+	private List&lt;String&gt; includeModules;
+
+	@Parameter
+	private List&lt;String&gt; excludeModules;
+
+
+	@Parameter(defaultValue = &quot;false&quot;)
+	private boolean includeExclusively;
+
+	@Parameter(defaultValue = &quot;false&quot;)
+	private boolean excludeExclusively;
+
+	@Parameter
+	private List&lt;OverrideCompatibilityChangeParameter&gt; overrideCompatibilityChangeParameters;
+
+	@Parameter
+	private boolean ignoreMissingOptionalDependency;
+
+	@Parameter
+	private String reportLinkName;
+
+<span class="fc" id="L130">	public ConfigParameters() {</span>
+		// Intentionally left blank.
+<span class="fc" id="L132">	}</span>
+
+	public boolean getNoAnnotations() {
+<span class="fc" id="L135">		return noAnnotations;</span>
+	}
+
+	void setNoAnnotations(boolean noAnnotations) {
+<span class="nc" id="L139">		this.noAnnotations = noAnnotations;</span>
+<span class="nc" id="L140">	}</span>
+
+	public String getAccessModifier() {
+<span class="fc" id="L143">		return accessModifier;</span>
+	}
+
+	void setAccessModifier(String accessModifier) {
+<span class="nc" id="L147">		this.accessModifier = accessModifier;</span>
+<span class="nc" id="L148">	}</span>
+
+	public boolean getOnlyModified() {
+<span class="fc" id="L151">		return onlyModified;</span>
+	}
+
+	void setOnlyModified(boolean onlyModified) {
+<span class="nc" id="L155">		this.onlyModified = onlyModified;</span>
+<span class="nc" id="L156">	}</span>
+
+	public boolean getOnlyBinaryIncompatible() {
+<span class="fc" id="L159">		return onlyBinaryIncompatible;</span>
+	}
+
+	void setOnlyBinaryIncompatible(boolean onlyBinaryIncompatible) {
+<span class="nc" id="L163">		this.onlyBinaryIncompatible = onlyBinaryIncompatible;</span>
+<span class="nc" id="L164">	}</span>
+
+	public boolean getBreakBuildOnModifications() {
+<span class="fc" id="L167">		return breakBuildOnModifications;</span>
+	}
+
+	void setBreakBuildOnModifications(boolean breakBuildOnModifications) {
+<span class="fc" id="L171">		this.breakBuildOnModifications = breakBuildOnModifications;</span>
+<span class="fc" id="L172">	}</span>
+
+	public boolean getBreakBuildOnBinaryIncompatibleModifications() {
+<span class="fc" id="L175">		return breakBuildOnBinaryIncompatibleModifications;</span>
+	}
+
+	void setBreakBuildOnBinaryIncompatibleModifications(
+			boolean breakBuildOnBinaryIncompatibleModifications) {
+<span class="fc" id="L180">		this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;</span>
+<span class="fc" id="L181">	}</span>
+
+	public boolean getIncludeSynthetic() {
+<span class="fc" id="L184">		return includeSynthetic;</span>
+	}
+
+	void setIncludeSynthetic(boolean includeSynthetic) {
+<span class="nc" id="L188">		this.includeSynthetic = includeSynthetic;</span>
+<span class="nc" id="L189">	}</span>
+
+	public List&lt;String&gt; getIncludes() {
+<span class="fc" id="L192">		return includes;</span>
+	}
+
+	void setIncludes(List&lt;String&gt; includes) {
+<span class="nc" id="L196">		this.includes = includes;</span>
+<span class="nc" id="L197">	}</span>
+
+	public boolean isIncludeSnapshots() {
+<span class="fc" id="L200">		return includeSnapshots;</span>
+	}
+
+	void setIncludeSnapshots(boolean includeSnapshots) {
+<span class="nc" id="L204">		this.includeSnapshots = includeSnapshots;</span>
+<span class="nc" id="L205">	}</span>
+
+	public List&lt;String&gt; getExcludes() {
+<span class="fc" id="L208">		return excludes;</span>
+	}
+
+	void setExcludes(List&lt;String&gt; excludes) {
+<span class="nc" id="L212">		this.excludes = excludes;</span>
+<span class="nc" id="L213">	}</span>
+
+	public boolean getIgnoreMissingClasses() {
+<span class="fc" id="L216">		return ignoreMissingClasses;</span>
+	}
+
+	void setIgnoreMissingClasses(boolean ignoreMissingClasses) {
+<span class="nc" id="L220">		this.ignoreMissingClasses = ignoreMissingClasses;</span>
+<span class="nc" id="L221">	}</span>
+
+	public boolean getSkipPomModules() {
+<span class="fc" id="L224">		return skipPomModules;</span>
+	}
+
+	void setSkipPomModules(boolean skipPomModules) {
+<span class="nc" id="L228">		this.skipPomModules = skipPomModules;</span>
+<span class="nc" id="L229">	}</span>
+
+	public String getHtmlStylesheet() {
+<span class="fc" id="L232">		return htmlStylesheet;</span>
+	}
+
+	void setHtmlStylesheet(String htmlStylesheet) {
+<span class="nc" id="L236">		this.htmlStylesheet = htmlStylesheet;</span>
+<span class="nc" id="L237">	}</span>
+
+	public String getHtmlTitle() {
+<span class="fc" id="L240">		return htmlTitle;</span>
+	}
+
+	void setHtmlTitle(String htmlTitle) {
+<span class="nc" id="L244">		this.htmlTitle = htmlTitle;</span>
+<span class="nc" id="L245">	}</span>
+
+	public String getMarkdownTitle() {
+<span class="fc" id="L248">		return markdownTitle;</span>
+	}
+
+	void setMarkdownTitle(String markdownTitle) {
+<span class="nc" id="L252">		this.markdownTitle = markdownTitle;</span>
+<span class="nc" id="L253">	}</span>
+
+	public String getIgnoreNonResolvableArtifacts() {
+<span class="fc" id="L256">		return ignoreNonResolvableArtifacts;</span>
+	}
+
+	void setIgnoreNonResolvableArtifacts(String ignoreNonResolvableArtifacts) {
+<span class="nc" id="L260">		this.ignoreNonResolvableArtifacts = ignoreNonResolvableArtifacts;</span>
+<span class="nc" id="L261">	}</span>
+
+	public List&lt;String&gt; getPackagingSupporteds() {
+<span class="fc" id="L264">		return packagingSupporteds;</span>
+	}
+
+	void setPackagingSupporteds(List&lt;String&gt; packagingSupporteds) {
+<span class="nc" id="L268">		this.packagingSupporteds = packagingSupporteds;</span>
+<span class="nc" id="L269">	}</span>
+
+	public boolean getBreakBuildOnSourceIncompatibleModifications() {
+<span class="fc" id="L272">		return breakBuildOnSourceIncompatibleModifications;</span>
+	}
+
+	void setBreakBuildOnSourceIncompatibleModifications(
+			boolean breakBuildOnSourceIncompatibleModifications) {
+<span class="fc" id="L277">		this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;</span>
+<span class="fc" id="L278">	}</span>
+
+	public boolean getBreakBuildBasedOnSemanticVersioning() {
+<span class="fc" id="L281">		return breakBuildBasedOnSemanticVersioning;</span>
+	}
+
+	void setBreakBuildBasedOnSemanticVersioning(boolean breakBuildBasedOnSemanticVersioning) {
+<span class="fc" id="L285">		this.breakBuildBasedOnSemanticVersioning = breakBuildBasedOnSemanticVersioning;</span>
+<span class="fc" id="L286">	}</span>
+
+	public String getPostAnalysisScript() {
+<span class="fc" id="L289">		return postAnalysisScript;</span>
+	}
+
+	void setPostAnalysisScript(String postAnalysisScript) {
+<span class="fc" id="L293">		this.postAnalysisScript = postAnalysisScript;</span>
+<span class="fc" id="L294">	}</span>
+
+	public boolean skipDiffReport() {
+<span class="fc" id="L297">		return skipDiffReport;</span>
+	}
+
+	void setSkipDiffReport(final boolean skipDiffReport) {
+<span class="fc" id="L301">		this.skipDiffReport = skipDiffReport;</span>
+<span class="fc" id="L302">	}</span>
+
+	public boolean skipHtmlReport() {
+<span class="fc" id="L305">		return skipHtmlReport;</span>
+	}
+
+	void setSkipHtmlReport(final boolean skipHtmlReport) {
+<span class="fc" id="L309">		this.skipHtmlReport = skipHtmlReport;</span>
+<span class="fc" id="L310">	}</span>
+
+	public boolean skipMarkdownReport() {
+<span class="fc" id="L313">		return skipMarkdownReport;</span>
+	}
+
+	void setSkipMarkdownReport(final boolean skipMarkdownReport) {
+<span class="fc" id="L317">		this.skipMarkdownReport = skipMarkdownReport;</span>
+<span class="fc" id="L318">	}</span>
+
+	public boolean skipXmlReport() {
+<span class="fc" id="L321">		return skipXmlReport;</span>
+	}
+
+	void setSkipXmlReport(final boolean skipXmlReport) {
+<span class="fc" id="L325">		this.skipXmlReport = skipXmlReport;</span>
+<span class="fc" id="L326">	}</span>
+
+	public boolean getIgnoreMissingOldVersion() {
+<span class="fc" id="L329">		return ignoreMissingOldVersion;</span>
+	}
+
+	void setIgnoreMissingOldVersion(boolean ignoreMissingOldVersion) {
+<span class="fc" id="L333">		this.ignoreMissingOldVersion = ignoreMissingOldVersion;</span>
+<span class="fc" id="L334">	}</span>
+
+	public String getOldVersionPattern() {
+<span class="fc" id="L337">		return oldVersionPattern;</span>
+	}
+
+	void setOldVersionPattern(String oldVersionPattern) {
+<span class="nc" id="L341">		this.oldVersionPattern = oldVersionPattern;</span>
+<span class="nc" id="L342">	}</span>
+
+	public boolean isBreakBuildIfCausedByExclusion() {
+<span class="fc" id="L345">		return breakBuildIfCausedByExclusion;</span>
+	}
+
+	void setBreakBuildIfCausedByExclusion(boolean breakBuildIfCausedByExclusion) {
+<span class="fc" id="L349">		this.breakBuildIfCausedByExclusion = breakBuildIfCausedByExclusion;</span>
+<span class="fc" id="L350">	}</span>
+
+	public List&lt;String&gt; getIgnoreMissingClassesByRegularExpressions() {
+<span class="fc" id="L353">		return ignoreMissingClassesByRegularExpressions;</span>
+	}
+
+	void setIgnoreMissingClassesByRegularExpressions(
+			List&lt;String&gt; ignoreMissingClassesByRegularExpressions) {
+<span class="nc" id="L358">		this.ignoreMissingClassesByRegularExpressions = ignoreMissingClassesByRegularExpressions;</span>
+<span class="nc" id="L359">	}</span>
+
+	public boolean isReportOnlyFilename() {
+<span class="fc" id="L362">		return reportOnlyFilename;</span>
+	}
+
+	void setReportOnlyFilename(boolean reportOnlyFileName) {
+<span class="nc" id="L366">		this.reportOnlyFilename = reportOnlyFileName;</span>
+<span class="nc" id="L367">	}</span>
+
+	public boolean isReportOnlySummary() {
+<span class="fc" id="L370">		return reportOnlySummary;</span>
+	}
+
+	void setReportOnlySummary(boolean reportOnlySummary) {
+<span class="nc" id="L374">		this.reportOnlySummary = reportOnlySummary;</span>
+<span class="nc" id="L375">	}</span>
+
+	public boolean getIgnoreMissingNewVersion() {
+<span class="fc" id="L378">		return ignoreMissingNewVersion;</span>
+	}
+
+	void setIgnoreMissingNewVersion(boolean ignoreMissingNewVersion) {
+<span class="fc" id="L382">		this.ignoreMissingNewVersion = ignoreMissingNewVersion;</span>
+<span class="fc" id="L383">	}</span>
+
+	public List&lt;String&gt; getIncludeModules() {
+<span class="fc" id="L386">		return includeModules;</span>
+	}
+
+	void setIncludeModules(List&lt;String&gt; includeModules) {
+<span class="fc" id="L390">		this.includeModules = includeModules;</span>
+<span class="fc" id="L391">	}</span>
+
+	public List&lt;String&gt; getExcludeModules() {
+<span class="fc" id="L394">		return excludeModules;</span>
+	}
+
+	void setExcludeModules(List&lt;String&gt; excludeModules) {
+<span class="fc" id="L398">		this.excludeModules = excludeModules;</span>
+<span class="fc" id="L399">	}</span>
+
+	public boolean isBreakBuildBasedOnSemanticVersioningForMajorVersionZero() {
+<span class="fc" id="L402">		return breakBuildBasedOnSemanticVersioningForMajorVersionZero;</span>
+	}
+
+	void setBreakBuildBasedOnSemanticVersioningForMajorVersionZero(
+			boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero) {
+<span class="fc" id="L407">		this.breakBuildBasedOnSemanticVersioningForMajorVersionZero =</span>
+				breakBuildBasedOnSemanticVersioningForMajorVersionZero;
+<span class="fc" id="L409">	}</span>
+
+	public boolean isIncludeExlusively() {
+<span class="nc" id="L412">		return includeExclusively;</span>
+	}
+
+	void setIncludeExclusively(boolean includeExclusively) {
+<span class="nc" id="L416">		this.includeExclusively = includeExclusively;</span>
+<span class="nc" id="L417">	}</span>
+
+	public boolean isExcludeExclusively() {
+<span class="nc" id="L420">		return excludeExclusively;</span>
+	}
+
+	void setExcludeExclusively(boolean excludeExclusively) {
+<span class="nc" id="L424">		this.excludeExclusively = excludeExclusively;</span>
+<span class="nc" id="L425">	}</span>
+
+	public boolean isIncludeExclusively() {
+<span class="nc" id="L428">		return includeExclusively;</span>
+	}
+
+	public List&lt;OverrideCompatibilityChangeParameter&gt; getOverrideCompatibilityChangeParameters() {
+<span class="fc" id="L432">		return overrideCompatibilityChangeParameters;</span>
+	}
+
+	void setOverrideCompatibilityChangeParameters(
+			List&lt;OverrideCompatibilityChangeParameter&gt; overrideCompatibilityChangeParameters) {
+<span class="nc" id="L437">		this.overrideCompatibilityChangeParameters = overrideCompatibilityChangeParameters;</span>
+<span class="nc" id="L438">	}</span>
+
+	public boolean isIgnoreMissingOptionalDependency() {
+<span class="fc" id="L441">		return ignoreMissingOptionalDependency;</span>
+	}
+
+	void setIgnoreMissingOptionalDependency(boolean ignoreMissingOptionalDependency) {
+<span class="nc" id="L445">		this.ignoreMissingOptionalDependency = ignoreMissingOptionalDependency;</span>
+<span class="nc" id="L446">	}</span>
+
+	public String getReportLinkName() {
+<span class="fc" id="L449">		return reportLinkName;</span>
+	}
+
+	void setReportLinkName(String reportLinkName) {
+<span class="nc" id="L453">		this.reportLinkName = reportLinkName;</span>
+<span class="nc" id="L454">	}</span>
+
+	/** Local class for storing Override Compatibility Change parameters. */
+<span class="nc" id="L457">	public static class OverrideCompatibilityChangeParameter {</span>
+		@Parameter(required = true)
+		private String compatibilityChange;
+
+		@Parameter(required = true)
+		private boolean binaryCompatible;
+
+		@Parameter(required = true)
+		private boolean sourceCompatible;
+
+		@Parameter(required = true)
+		private String semanticVersionLevel;
+
+		public String getCompatibilityChange() {
+<span class="nc" id="L471">			return compatibilityChange;</span>
+		}
+
+		public boolean isBinaryCompatible() {
+<span class="nc" id="L475">			return binaryCompatible;</span>
+		}
+
+		public boolean isSourceCompatible() {
+<span class="nc" id="L479">			return sourceCompatible;</span>
+		}
+
+		public String getSemanticVersionLevel() {
+<span class="nc" id="L483">			return semanticVersionLevel;</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
