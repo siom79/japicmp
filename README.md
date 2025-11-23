@@ -144,6 +144,7 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
 ## Release
 
 This is the release procedure:
+* Create a branch named release-v0.XX.X
 * Update ReleaseNotes.md.
 * If necessary: Set the release version in maven:
 ```bash
@@ -160,6 +161,7 @@ python3 release.py --release-version <release-version> --old-version <old-versio
 	* Download released artifact from staging repository.
 	* Close and release staging repository if sanity checks are successful.
 * Update maven site report with [Action](https://github.com/siom79/japicmp/actions/workflows/mvn-site.yml)
+* Run Github Release [Action](https://github.com/siom79/japicmp/actions/workflows/gh-release.yml)
 
 If the release fails, the version must be reverted and the tag created during the release has to be deleted:
 ```bash
