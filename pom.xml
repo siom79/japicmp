@@ -151,7 +151,7 @@
 		<plugin-annotation.version>3.15.1</plugin-annotation.version>
 		<surefireVersion>3.5.4</surefireVersion>
 		<javassist.version>3.30.2-GA</javassist.version>
-		<guava.version>33.4.8-jre</guava.version>
+		<guava.version>23.0</guava.version>
 		<jaxb.version>2.3.2</jaxb.version>
 		<jsoup.version>1.21.2</jsoup.version>
 		<mockito.version>4.6.1</mockito.version>
