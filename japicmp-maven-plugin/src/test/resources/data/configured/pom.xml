@@ -39,6 +39,7 @@
 						<markdownTitle>New Markdown Title</markdownTitle>
 						<reportLinkName>API Comparison Report</reportLinkName>
 						<postAnalysisScript>groovy/SamplePostAnalysis.groovy</postAnalysisScript>
+						<ignoreMissingOldVersion>false</ignoreMissingOldVersion>
 					</parameter>
 				</configuration>
 				<executions>
