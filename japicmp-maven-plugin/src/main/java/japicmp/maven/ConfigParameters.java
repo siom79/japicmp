@@ -49,7 +49,7 @@ public class ConfigParameters {
 	private List<String> ignoreMissingClassesByRegularExpressions;
 
 	@Parameter(defaultValue = "true")
-	private boolean skipPomModules;
+	private boolean skipPomModules = true;
 
 	@Parameter
 	private String htmlStylesheet;
@@ -85,7 +85,7 @@ public class ConfigParameters {
 	private boolean skipXmlReport;
 
 	@Parameter(defaultValue = "true")
-	private boolean ignoreMissingOldVersion;
+	private boolean ignoreMissingOldVersion = true;
 
 	@Parameter
 	private boolean ignoreMissingNewVersion;
@@ -94,10 +94,10 @@ public class ConfigParameters {
 	private String oldVersionPattern;
 
 	@Parameter(defaultValue = "false")
-	private boolean includeSnapshots;
+	private boolean includeSnapshots = false;
 
 	@Parameter(defaultValue = "true")
-	private boolean breakBuildIfCausedByExclusion;
+	private boolean breakBuildIfCausedByExclusion = true;
 
 	@Parameter
 	private boolean reportOnlyFilename;
@@ -113,10 +113,10 @@ public class ConfigParameters {
 
 
 	@Parameter(defaultValue = "false")
-	private boolean includeExclusively;
+	private boolean includeExclusively = false;
 
 	@Parameter(defaultValue = "false")
-	private boolean excludeExclusively;
+	private boolean excludeExclusively = false;
 
 	@Parameter
 	private List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters;
