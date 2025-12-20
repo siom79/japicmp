@@ -9,7 +9,7 @@ The differences between the two Java APIs are also printed on the command line f
 Please note that binary incompatible changes are flagged with an exclamation mark (!) while source incompatible changes
 are marked with a trailing star (*).
 
-```
+```bash
 **** MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.collect.RangeMap  (not serializable)
 	+++* NEW METHOD: PUBLIC(+) ABSTRACT(+) java.util.Map asDescendingMapOfRanges()
 **** MODIFIED INTERFACE: PUBLIC ABSTRACT com.google.common.collect.RangeSet  (not serializable)
@@ -42,7 +42,7 @@ You can see an example [here](https://github.com/siom79/japicmp/blob/master/doc/
 
 You can also let japicmp create an XML report like the following one:
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <japicmp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" accessModifier="PRIVATE" creationTimestamp="2016-02-19T14:36:10.066+0100" ignoreMissingClasses="false" newJar="C:\MCP-IDE\repository\com\google\guava\guava\19.0\guava-19.0.jar" oldJar="C:\MCP-IDE\repository\com\google\guava\guava\18.0\guava-18.0.jar" onlyBinaryIncompatibleModifications="false" onlyModifications="true" packagesExclude="n.a." packagesInclude="all" semanticVersioning="1.0.0" title="JApiCmp-Report" xsi:noNamespaceSchemaLocation="japicmp.xsd">
     <classes>
@@ -83,14 +83,16 @@ Tracking changes of an XML document marshalled with JAXB
 
 The following output shows the changes of a model class with some JAXB bindings:
 
-	***  MODIFIED CLASS: PUBLIC japicmp.test.jaxb.SimpleDocument
-		***  MODIFIED METHOD: PUBLIC java.lang.String getTitle()
-			---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlElement
-		***  MODIFIED METHOD: PUBLIC java.lang.String getAuthor()
-			---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
-			+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlElement
-		***  MODIFIED ANNOTATION: javax.xml.bind.annotation.XmlRootElement
-			***  MODIFIED ELEMENT: name=document (<- simpleDocument)
+```bash
+***  MODIFIED CLASS: PUBLIC japicmp.test.jaxb.SimpleDocument
+	***  MODIFIED METHOD: PUBLIC java.lang.String getTitle()
+		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
+		+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlElement
+	***  MODIFIED METHOD: PUBLIC java.lang.String getAuthor()
+		---  REMOVED ANNOTATION: javax.xml.bind.annotation.XmlAttribute
+		+++  NEW ANNOTATION: javax.xml.bind.annotation.XmlElement
+	***  MODIFIED ANNOTATION: javax.xml.bind.annotation.XmlRootElement
+		***  MODIFIED ELEMENT: name=document (<- simpleDocument)
+```
 
 As can bee seen from the output above, the XML attributes title and author have changed to an XML element. The name of the XML root element has also changed from "simpleDocument" to "document".

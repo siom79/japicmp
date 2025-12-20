@@ -11,7 +11,7 @@ Basic Usage
 
 The Ant task can be included in the build file of a project like shown in the following (requires Ant >= 1.9.5):
 
-```
+```xml
 <path id="task.classpath">
 	<fileset file="${project.build.directory}/japicmp-jar-with-dependencies.jar"/>
 	<fileset file="${project.build.directory}/japicmp-ant-task.jar"/>

@@ -3,25 +3,31 @@ japicmp
 
 japicmp is a tool to compare two versions of a jar archive:
 
-	java -jar japicmp-0.25.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+```bash
+java -jar japicmp-0.25.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
+```
 
 It can also be used as a library:
 
-	JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
-	JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
-	List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchives);
+```java
+JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();
+JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
+List<JApiClass> jApiClasses = jarArchiveComparator.compare(oldArchives, newArchives);
+```
 
 japicmp is available in the Maven Central Repository:
 
-	<dependency>
-		<groupId>com.github.siom79.japicmp</groupId>
-		<artifactId>japicmp</artifactId>
-		<version>0.25.0</version>
-	</dependency>
+```xml
+<dependency>
+	<groupId>com.github.siom79.japicmp</groupId>
+	<artifactId>japicmp</artifactId>
+	<version>0.25.0</version>
+</dependency>
+```
 
 A maven plugin allows you to integrate the checks into your build:
 
-```
+```xml
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
@@ -59,7 +65,7 @@ A Sonar Qube plugin integrates the results from the japicmp analysis into your c
 
 By using the available Ant task, you can also integrate japicmp into your Ant build files:
 
-```
+```xml
 <taskdef resource="japicmp/ant/antlib.xml" classpathref="task.classpath"/>
 <japicmp oldjar="${project.build.directory}/guava-18.0.jar"
 	 newjar="${project.build.directory}/guava-19.0.jar"
