@@ -147,18 +147,18 @@ When your library implements interfaces or extends classes from other libraries 
 compatibility you must specify the classpath for the two different versions:
 
 ```bash
-java -jar japicmp-0.25.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar --new-classpath other-library-v2.jar
+java -jar japicmp-0.25.1-jar-with-dependencies.jar -n new-version.jar -o old-version.jar --new-classpath other-library-v2.jar
 	--old-classpath other-library-v1.jar
 ```
 
 In case the classpath for both versions did not change, you can add the library using the standard way:
 
 ```bash
-java -cp japicmp-0.25.0-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
+java -cp japicmp-0.25.1-jar-with-dependencies.jar;otherLibrary.jar japicmp.JApiCmp -n new-version.jar -o old-version.jar
 ```
 
 For reporting purposes you can also provide more than one jar as old or new version(s):
 
 ```bash
-java -jar japicmp-0.25.0-jar-with-dependencies.jar -o lib1-old.jar;lib2-old.jar -n lib1-new.jar;lib2-new.jar
+java -jar japicmp-0.25.1-jar-with-dependencies.jar -o lib1-old.jar;lib2-old.jar -n lib1-new.jar;lib2-new.jar
 ```
