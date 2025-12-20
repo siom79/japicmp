@@ -1,6 +1,7 @@
 The website is located at [https://siom79.github.io/japicmp](https://siom79.github.io/japicmp/).
 
-# japicmp
+![japicmp](src/site/resources/images/japicmp.png)
+
 japicmp is a tool to compare two versions of a jar archive:
 ``` bash
 java -jar japicmp-.0-jar-with-dependencies.jar -n new-version.jar -o old-version.jar
