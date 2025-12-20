@@ -6,11 +6,11 @@ Basic Usage
 
 The maven plugin can be included in the pom.xml file of your artifact in the following way (requires maven >= 3.0.3):
 
-```
+```xml
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.25.0</version>
+	<version>0.25.1</version>
 	<configuration>
 		<oldVersion>
 			<dependency>
@@ -42,11 +42,11 @@ The maven plugin can be included in the pom.xml file of your artifact in the fol
 
 You can also leave out the &lt;oldVersion&gt; and &lt;newVersion&gt; elements:
 
-```
+```xml
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.25.0</version>
+	<version>0.25.1</version>
 	<configuration>
 		<parameter>
 			<!-- see documentation -->
@@ -66,11 +66,11 @@ You can also leave out the &lt;oldVersion&gt; and &lt;newVersion&gt; elements:
 This way the plugin tries to determine the artifacts output (new version) and the latest released version (no SNAPSHOT version). If you need
 to configure the latest version more precisely (e.g. only GA versions), then you can use the parameter &lt;oldVersionPattern&gt;:
 
-```
+```xml
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.25.0</version>
+	<version>0.25.1</version>
 	<configuration>
 		<parameter>
         	<oldVersionPattern>\d+\.\d+\.\d+\.GA</oldVersionPattern>
@@ -110,19 +110,19 @@ Advanced Usage
 
 An advanced configuration can utilize the following parameters:
 
-```
+```xml
 <build>
 	<plugins>
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.25.0</version>
+			<version>0.25.1</version>
 			<configuration>
 				<oldVersion>
 					<dependency>
 						<groupId>japicmp</groupId>
 						<artifactId>japicmp-test-v1</artifactId>
-						<version>0.25.0</version>
+						<version>0.25.1</version>
 						<type>jar</type>
 					</dependency>
 				</oldVersion>
@@ -334,7 +334,7 @@ for each check. This allows you to customize the following verifications:
 If your library implements interfaces or extends classes from other libraries than the JDK, you can add these dependencies by using the
 &lt;dependencies&gt; element:
 
-```
+```xml
 <dependencies>
 	<dependency>
 		<groupId>org.apache.commons</groupId>
@@ -349,7 +349,7 @@ are appended to the classpath before the ones from the enclosing pom.xml, hence 
 
 In case the classpath between both versions differs, you can add the dependencies for the new and old version separately:
 
-```
+```xml
 <oldClassPathDependencies>
 	<dependency>
 		<groupId>org.apache.commons</groupId>
@@ -376,13 +376,13 @@ Site report
 Alternatively it can be used inside the `<reporting/>` tag in order to be invoked by the
 [maven-site-plugin](https://maven.apache.org/plugins/maven-site-plugin/) and therewith to be integrated into the site report:
 
-```
+```xml
 <reporting>
 	<plugins>
 		<plugin>
 			<groupId>com.github.siom79.japicmp</groupId>
 			<artifactId>japicmp-maven-plugin</artifactId>
-			<version>0.25.0</version>
+			<version>0.25.1</version>
 			<reportSets>
 				<reportSet>
 					<reports>
@@ -399,7 +399,7 @@ Alternatively it can be used inside the `<reporting/>` tag in order to be invoke
 ```
 To create a summary report, you can also provide multiple old and new versions:
 
-```
+```xml
 <configuration>
 	<oldVersions>
 		<dependency>
@@ -437,7 +437,7 @@ The parameter &lt;postAnalysisScript/&gt; can be used to invoke a [Groovy](http:
 This is helpful if you want to apply some custom filtering that is not possible with the standard means of japicmp. The following script for example filters out
 all classes that reside within the package `japicmp.test.annotation` and all methods that start with `get...()` and `set...()`.
 
-```
+```groovy
 def it = jApiClasses.iterator()
 while (it.hasNext()) {
 	def jApiClass = it.next()
@@ -461,7 +461,7 @@ Please note that the script has to return a list of `JApiClass` objects, otherwi
 Beyond that the script can also be used to break the build on some project specific requirement. Let's assume that for the next release no classes within the package
 `japicmp.test.annotation` should be modified in any way. The following Groovy script iterates over all classes and throws an exception if a class is not `UNCHANGED`.
 
-```
+```groovy
 import static japicmp.model.JApiChangeStatus.*
 
 def it = jApiClasses.iterator()
@@ -480,7 +480,7 @@ return jApiClasses
 The script can also be placed inside another artifact and loaded from the classpath. Therefore, add the artifact
 containing the script as dependency to the japicmp-plugin:
 
-```
+```xml
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>

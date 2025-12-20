@@ -3,6 +3,11 @@ Versions
 
 The following versions of japicmp are available:
 
+0.25.1 (2025-12-20)
+-------------------
+* Fix default values for Maven configuration parameters [#474](https://github.com/siom79/japicmp/issues/474)
+* Upgrade maven site skin to latest version. [#475](https://github.com/siom79/japicmp/issues/475)
+
 0.25.0 (2025-11-23)
 -------------------
 * Add support for guessing version numbers to CLI invocations. [#467](https://github.com/siom79/japicmp/issues/467)
