@@ -1,5 +1,7 @@
 package japicmp.maven;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -31,6 +33,21 @@ final class JApiCmpMojoTest extends AbstractTest {
 	 */
 	JApiCmpMojoTest() {
 		super();
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testDefaultParameterValues(final JApiCmpMojo testMojo) {
+		assertNotNull(testMojo);
+		assertNotNull(testMojo.parameter);
+
+		// Verify all default values are set correctly
+		assertThat(testMojo.parameter.getSkipPomModules(), is(true));
+		assertThat(testMojo.parameter.getIgnoreMissingOldVersion(), is(true));
+		assertThat(testMojo.parameter.isIncludeSnapshots(), is(false));
+		assertThat(testMojo.parameter.isBreakBuildIfCausedByExclusion(), is(true));
+		assertThat(testMojo.parameter.isIncludeExclusively(), is(false));
+		assertThat(testMojo.parameter.isExcludeExclusively(), is(false));
 	}
 
 	@Test
