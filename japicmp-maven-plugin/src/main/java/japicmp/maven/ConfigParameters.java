@@ -1,130 +1,92 @@
 package japicmp.maven;
 
-import org.apache.maven.plugins.annotations.Parameter;
-
 import java.util.List;
 
 /** Class for storing the japicmp configuration parameters. */
 public class ConfigParameters {
+	// Important: All fields in this class should be considered public user-facing parameters;
+	// changing their names or default values can be a breaking change.
+	// Note that using Maven's `@Parameter` here is not possible, see https://github.com/apache/maven-plugin-tools/issues/631
 
 	/** Process only modified classes. */
-	@Parameter
 	private boolean onlyModified;
 
 	/** Access modifier. */
-	@Parameter
 	private String accessModifier;
 
-	@Parameter
 	private List<String> includes;
 
-	@Parameter
 	private List<String> excludes;
 
-	@Parameter
 	private boolean onlyBinaryIncompatible;
 
-	@Parameter
 	private boolean breakBuildBasedOnSemanticVersioning;
 
-	@Parameter
 	private boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 
-	@Parameter
 	private boolean breakBuildOnModifications;
 
-	@Parameter
 	private boolean breakBuildOnBinaryIncompatibleModifications;
 
-	@Parameter
 	private boolean breakBuildOnSourceIncompatibleModifications;
 
-	@Parameter
 	private boolean includeSynthetic;
 
-	@Parameter
 	private boolean ignoreMissingClasses;
 
-	@Parameter
 	private List<String> ignoreMissingClassesByRegularExpressions;
 
-	@Parameter(defaultValue = "true")
 	private boolean skipPomModules = true;
 
-	@Parameter
 	private String htmlStylesheet;
 
-	@Parameter
 	private String htmlTitle;
 
-	@Parameter
 	private String markdownTitle;
 
-	@Parameter
 	private boolean noAnnotations;
 
-	@Parameter
 	private String ignoreNonResolvableArtifacts;
 
-	@Parameter
 	private List<String> packagingSupporteds;
 
-	@Parameter
 	private String postAnalysisScript;
 
-	@Parameter
 	private boolean skipDiffReport;
 
-	@Parameter
 	private boolean skipHtmlReport;
 
-	@Parameter
 	private boolean skipMarkdownReport;
 
-	@Parameter
 	private boolean skipXmlReport;
 
-	@Parameter(defaultValue = "true")
 	private boolean ignoreMissingOldVersion = true;
 
-	@Parameter
 	private boolean ignoreMissingNewVersion;
 
-	@Parameter
 	private String oldVersionPattern;
 
-	@Parameter(defaultValue = "false")
 	private boolean includeSnapshots = false;
 
-	@Parameter(defaultValue = "true")
 	private boolean breakBuildIfCausedByExclusion = true;
 
-	@Parameter
 	private boolean reportOnlyFilename;
 
-	@Parameter
 	private boolean reportOnlySummary;
 
-	@Parameter
 	private List<String> includeModules;
 
-	@Parameter
 	private List<String> excludeModules;
 
 
-	@Parameter(defaultValue = "false")
 	private boolean includeExclusively = false;
 
-	@Parameter(defaultValue = "false")
 	private boolean excludeExclusively = false;
 
-	@Parameter
 	private List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters;
 
-	@Parameter
 	private boolean ignoreMissingOptionalDependency;
 
-	@Parameter
 	private String reportLinkName;
 
 	public ConfigParameters() {
@@ -455,16 +417,16 @@ public class ConfigParameters {
 
 	/** Local class for storing Override Compatibility Change parameters. */
 	public static class OverrideCompatibilityChangeParameter {
-		@Parameter(required = true)
+		// required parameter
 		private String compatibilityChange;
 
-		@Parameter(required = true)
+		// required parameter
 		private boolean binaryCompatible;
 
-		@Parameter(required = true)
+		// required parameter
 		private boolean sourceCompatible;
 
-		@Parameter(required = true)
+		// required parameter
 		private String semanticVersionLevel;
 
 		public String getCompatibilityChange() {
