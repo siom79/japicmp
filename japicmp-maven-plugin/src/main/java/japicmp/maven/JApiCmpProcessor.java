@@ -313,8 +313,8 @@ public class JApiCmpProcessor {
         if (pluginParameters.oldVersion() == null && pluginParameters.oldVersions() == null) {
             final Artifact comparisonArtifact = getComparisonArtifact();
             if (comparisonArtifact != null && comparisonArtifact.getVersion() != null) {
-                Set<Artifact> artifacts = resolveArtifact(comparisonArtifact, ConfigurationVersion.OLD);
-                for (Artifact artifact : artifacts) {
+                final Artifact artifact = resolveArtifact(comparisonArtifact, ConfigurationVersion.OLD);
+                if (artifact != null) {
                     final File file = artifact.getFile();
                     if (file != null) {
                         oldArchives.add(new JApiCmpArchive(file, FileHelper.guessVersion(file)));
@@ -341,8 +341,8 @@ public class JApiCmpProcessor {
             if (mavenProject != null && mavenProject.getArtifact() != null) {
                 final DefaultArtifact defaultArtifact = createDefaultArtifact(mavenProject,
                         mavenProject.getVersion());
-                final Set<Artifact> artifacts = resolveArtifact(defaultArtifact, ConfigurationVersion.NEW);
-                for (Artifact artifact : artifacts) {
+                final Artifact artifact = resolveArtifact(defaultArtifact, ConfigurationVersion.NEW);
+                if (artifact != null) {
                     final File file = artifact.getFile();
                     if (file != null) {
                         try (JarFile jarFile = new JarFile(file)) {
@@ -888,9 +888,9 @@ public class JApiCmpProcessor {
             // Use the reactor to resolve all artifacts, even the project artifact. This
             // way the project artifact can be pulled from the repository in cases where
             // it's not being explicitly built; i.e., mvn clean site
-            Set<Artifact> artifacts = resolveArtifact(dependency, configurationVersion);
-            for (Artifact artifact : artifacts) {
-                File file = artifact.getFile();
+            final Artifact artifact = resolveArtifact(dependency, configurationVersion);
+            if (artifact != null) {
+                final File file = artifact.getFile();
                 if (file != null) {
                     jApiCmpArchives.add(new JApiCmpArchive(file, artifact.getVersion()));
                 } else {
@@ -989,8 +989,8 @@ public class JApiCmpProcessor {
         }
     }
 
-    private Set<Artifact> resolveArtifact(final Dependency dependency,
-                                          final ConfigurationVersion configurationVersion)
+    private Artifact resolveArtifact(final Dependency dependency,
+                                     final ConfigurationVersion configurationVersion)
             throws MojoFailureException {
         notNull(mavenParameters.artifactRepositories(),
                 "Maven parameter artifactRepositories should be provided by maven container.");
@@ -1000,8 +1000,8 @@ public class JApiCmpProcessor {
         return resolveArtifact(artifact, configurationVersion);
     }
 
-    private Set<Artifact> resolveArtifact(final Artifact artifact,
-                                          final ConfigurationVersion configurationVersion)
+    private Artifact resolveArtifact(final Artifact artifact,
+                                     final ConfigurationVersion configurationVersion)
             throws MojoFailureException {
         notNull(mavenParameters.repoSystem(),
                 "Maven parameter repoSystem should be provided by maven container.");
@@ -1030,9 +1030,9 @@ public class JApiCmpProcessor {
                     } else {
                         throw new MojoFailureException("Could not resolve artifact " + request.getArtifact());
                     }
-                    return new HashSet<>();
+                    return null;
                 }
-                return new HashSet<>(Collections.singletonList(resolutionResult.getArtifact()));
+                return resolutionResult.getArtifact();
             }
         } catch (final ArtifactResolutionException e) {
             if (ignoreMissingArtifact(configurationVersion)) {
@@ -1041,7 +1041,7 @@ public class JApiCmpProcessor {
                 throw new MojoFailureException(e.getMessage(), e);
             }
         }
-        return new HashSet<>();
+        return null;
     }
 
     private <T> void notNull(final T value, final String msg) throws MojoFailureException {
