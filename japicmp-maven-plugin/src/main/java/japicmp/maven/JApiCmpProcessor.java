@@ -485,7 +485,7 @@ public class JApiCmpProcessor {
 
 	boolean breakBuildOnModifications(final ConfigParameters params) {
 		return pluginParameters.breakBuild().onModifications()
-			| params.getBreakBuildOnModifications();
+				| params.getBreakBuildOnModifications();
 	}
 
 	boolean breakBuildOnBinaryIncompatibleModifications(final ConfigParameters params) {
