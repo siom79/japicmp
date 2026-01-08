@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.25.2 (2026-01-08)
+-------------------
+* Modified resolveDependencyToFile() to always use the reactor to resolve artifacts. [#480](https://github.com/siom79/japicmp/issues/480)
+
 0.25.1 (2025-12-20)
 -------------------
 * Fix default values for Maven configuration parameters [#474](https://github.com/siom79/japicmp/issues/474)
