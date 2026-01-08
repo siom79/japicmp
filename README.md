@@ -18,7 +18,7 @@ japicmp is available in the Maven Central Repository:
 <dependency>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp</artifactId>
-	<version>0.25.1</version>
+	<version>0.25.2</version>
 </dependency>
 ```
 A maven plugin allows you to integrate the checks into your build:
@@ -27,7 +27,7 @@ A maven plugin allows you to integrate the checks into your build:
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.25.1</version>
+	<version>0.25.2</version>
 	<configuration>
 		<oldVersion>
 			<dependency>
