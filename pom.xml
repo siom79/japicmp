@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.siom79.japicmp</groupId>
@@ -8,7 +9,8 @@
 	<packaging>pom</packaging>
 
 	<name>japicmp-base</name>
-	<description>japicmp is a tool/maven plugin that compares two versions of a jar archive for binary compatibility.</description>
+	<description>japicmp is a tool/maven plugin that compares two versions of a jar archive for binary compatibility.
+	</description>
 	<url>https://github.com/siom79/japicmp</url>
 
 	<licenses>
@@ -133,6 +135,11 @@
 			<url>https://github.com/guillermocalvo</url>
 			<email>guillermo@guillermo.dev</email>
 		</contributor>
+		<contributor>
+			<name>Bradley Larrick</name>
+			<url>https://github.com/bradleylarrick</url>
+			<email>bradleylarrick@gmail.com</email>
+		</contributor>
 	</contributors>
 
 	<properties>
@@ -156,7 +163,8 @@
 		<jsoup.version>1.21.2</jsoup.version>
 		<mockito.version>4.6.1</mockito.version>
 		<junit.version>6.0.1</junit.version>
-		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots</sonatypeOssDistMgmtSnapshotsUrl>
+		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots
+		</sonatypeOssDistMgmtSnapshotsUrl>
 	</properties>
 
 	<modules>
@@ -446,7 +454,8 @@
 	<distributionManagement>
 		<site>
 			<id>github</id>
-			<url>scm:git:https://${github.actor}:${github.token}@github.com/${github.account}/${github.project}.git</url>
+			<url>scm:git:https://${github.actor}:${github.token}@github.com/${github.account}/${github.project}.git
+			</url>
 		</site>
 		<snapshotRepository>
 			<id>ossrh</id>
