@@ -18,7 +18,7 @@ japicmp is available in the Maven Central Repository:
 <dependency>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp</artifactId>
-	<version>0.25.2</version>
+	<version>0.25.3</version>
 </dependency>
 ```
 A maven plugin allows you to integrate the checks into your build:
@@ -27,7 +27,7 @@ A maven plugin allows you to integrate the checks into your build:
 <plugin>
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-maven-plugin</artifactId>
-	<version>0.25.2</version>
+	<version>0.25.3</version>
 	<configuration>
 		<oldVersion>
 			<dependency>
@@ -152,11 +152,7 @@ This is the release procedure:
 mvn versions:set -DnewVersion=<version>-SNAPSHOT
 mvn versions:commit
 ```
-* Increment version in README.md / Site-Report
-``` bash
-python3 release.py --release-version <release-version> --old-version <old-version>
-```
-* Push changes to remote repository.
+* Increment version in README.md / Site-Report by running [this Action](https://github.com/siom79/japicmp/actions/workflows/increment-version.yml) on the release branch
 * Run release [Action](https://github.com/siom79/japicmp/actions/workflows/release.yml)
 * Login to [Central repository](https://central.sonatype.com/publishing)
 	* Download released artifact from staging repository.

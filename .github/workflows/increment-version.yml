@@ -3,14 +3,14 @@ name: Increment Version
 on:
     workflow_dispatch:
         inputs:
-            release-version:
-                description: "release-version"
-                required: true
-                default: "0.25.1"
             old-version:
                 description: "old-version"
                 required: true
                 default: "0.25.0"
+            release-version:
+                description: "release-version"
+                required: true
+                default: "0.25.1"
 
 jobs:
     run-script:
