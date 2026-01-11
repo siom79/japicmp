@@ -147,11 +147,7 @@ Use the maven site plugin (`mvn site`) to generate the following reports:
 This is the release procedure:
 * Create a branch named release-v0.XX.X
 * Update ReleaseNotes.md.
-* If necessary: Set the release version in maven:
-```bash
-mvn versions:set -DnewVersion=<version>-SNAPSHOT
-mvn versions:commit
-```
+* If necessary: Set the release version in maven using [this Action](https://github.com/siom79/japicmp/actions/workflows/mvn-set-version.yml) on the release branch
 * Increment version in README.md / Site-Report by running [this Action](https://github.com/siom79/japicmp/actions/workflows/increment-version.yml) on the release branch
 * Run release [Action](https://github.com/siom79/japicmp/actions/workflows/release.yml)
 * Login to [Central repository](https://central.sonatype.com/publishing)
@@ -159,6 +155,7 @@ mvn versions:commit
 	* Close and release staging repository if sanity checks are successful.
 * Update maven site report with [Action](https://github.com/siom79/japicmp/actions/workflows/mvn-site.yml)
 * Run Github Release [Action](https://github.com/siom79/japicmp/actions/workflows/gh-release.yml)
+* Merge release branch into master
 
 If the release fails, the version must be reverted and the tag created during the release has to be deleted:
 ```bash
