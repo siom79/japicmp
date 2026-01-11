@@ -1,0 +1,30 @@
+name: Run Python Increment Version Script
+
+on:
+    workflow_dispatch:
+        inputs:
+            release-version:
+                description: "release-version"
+                required: true
+                default: "0.25.1"
+            old-version:
+                description: "old-version"
+                required: true
+                default: "0.25.0"
+
+jobs:
+    run-script:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Run Python Script
+              run: |
+                  python release.py --release-version "${{ inputs.release-version }}" --old-version "${{ inputs.old-version }}"
