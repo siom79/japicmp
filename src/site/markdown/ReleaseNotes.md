@@ -5,7 +5,7 @@ The following versions of japicmp are available:
 
 0.25.3 (2026-01-11)
 -------------------
-* Restored adding the project artifact to compiled artifacts. [#484](https://github.com/siom79/japicmp/issues/484)
+* Restored adding the project artifact to compiled artifacts [#484](https://github.com/siom79/japicmp/issues/484)
 
 0.25.2 (2026-01-08)
 -------------------
