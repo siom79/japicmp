@@ -27,4 +27,4 @@ jobs:
 
             - name: Run Python Script
               run: |
-                  python3 release.py --release-version "${{ inputs.release-version }}" --old-version "${{ inputs.old-version }}"
+                  python release.py --release-version "${{ inputs.release-version }}" --old-version "${{ inputs.old-version }}"
