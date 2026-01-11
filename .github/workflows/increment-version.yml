@@ -30,3 +30,4 @@ jobs:
                   git config user.name '${{ github.actor }}'
                   git config user.email '${{ github.actor }}@users.noreply.github.com'
                   python release.py --release-version "${{ inputs.release-version }}" --old-version "${{ inputs.old-version }}"
+                  git push origin
