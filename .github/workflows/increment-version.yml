@@ -1,4 +1,4 @@
-name: Run Python Increment Version Script
+name: Increment Version
 
 on:
     workflow_dispatch:
@@ -27,4 +27,6 @@ jobs:
 
             - name: Run Python Script
               run: |
+                  git config user.name '${{ github.actor }}'
+                  git config user.email '${{ github.actor }}@users.noreply.github.com'
                   python release.py --release-version "${{ inputs.release-version }}" --old-version "${{ inputs.old-version }}"
