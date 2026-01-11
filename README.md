@@ -152,11 +152,7 @@ This is the release procedure:
 mvn versions:set -DnewVersion=<version>-SNAPSHOT
 mvn versions:commit
 ```
-* Increment version in README.md / Site-Report
-``` bash
-python3 release.py --release-version <release-version> --old-version <old-version>
-```
-* Push changes to remote repository.
+* Increment version in README.md / Site-Report by running [this Action](https://github.com/siom79/japicmp/actions/workflows/increment-version.yml) on the release branch
 * Run release [Action](https://github.com/siom79/japicmp/actions/workflows/release.yml)
 * Login to [Central repository](https://central.sonatype.com/publishing)
 	* Download released artifact from staging repository.
