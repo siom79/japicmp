@@ -760,8 +760,8 @@ public class JApiCmpProcessor {
 		Set<org.apache.maven.artifact.Artifact> projectDependencies =
 			mavenProject.getArtifacts();
 
-		// Removed code that added the project artifact to this set; it seems unnecessary
-		HashSet<Artifact> result = new HashSet<>(projectDependencies.size());
+		HashSet<Artifact> result = new HashSet<>(1+projectDependencies.size());
+		result.add(RepositoryUtils.toArtifact(mavenProject.getArtifact())); // include the project artifact
 		for (org.apache.maven.artifact.Artifact dep : projectDependencies) {
 			if (dep.getArtifactHandler().isAddedToClasspath()) {
 				if (org.apache.maven.artifact.Artifact.SCOPE_COMPILE.equals(dep.getScope())
