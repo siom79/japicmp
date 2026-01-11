@@ -1,4 +1,4 @@
-name: Increment Version
+name: Increment Maven Version
 
 on:
     workflow_dispatch:
