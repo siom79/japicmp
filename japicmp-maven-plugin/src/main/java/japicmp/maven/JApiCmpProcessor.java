@@ -755,13 +755,15 @@ public class JApiCmpProcessor {
 		comparatorOptions.getClassPathEntries().addAll(classPathEntries);
 	}
 
-	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject) {
+	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject) throws MojoFailureException {
 		// dependencies that this project has, including transitive ones
 		Set<org.apache.maven.artifact.Artifact> projectDependencies =
 			mavenProject.getArtifacts();
 
 		HashSet<Artifact> result = new HashSet<>(1+projectDependencies.size());
-		result.add(RepositoryUtils.toArtifact(mavenProject.getArtifact())); // include the project artifact
+		// Include the project artifact; use the reactor to resolve the project artifact in case it's not being built
+		Artifact project = RepositoryUtils.toArtifact(mavenProject.getArtifact());
+		result.add(resolveArtifact(project, ConfigurationVersion.NEW));
 		for (org.apache.maven.artifact.Artifact dep : projectDependencies) {
 			if (dep.getArtifactHandler().isAddedToClasspath()) {
 				if (org.apache.maven.artifact.Artifact.SCOPE_COMPILE.equals(dep.getScope())
