@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.25.4 (2026-01-12)
+-------------------
+* Modified getCompileArtifacts() to use reactor to resolve project artifact. [#491](https://github.com/siom79/japicmp/issues/491)
+
 0.25.3 (2026-01-11)
 -------------------
 * Restored adding the project artifact to compiled artifacts [#484](https://github.com/siom79/japicmp/issues/484)

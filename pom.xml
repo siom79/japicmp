@@ -4,7 +4,7 @@
 
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp-base</artifactId>
-	<version>0.25.4-SNAPSHOT</version>
+	<version>0.25.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>japicmp-base</name>
