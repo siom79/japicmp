@@ -140,13 +140,16 @@ public class JApiCmpProcessor {
 						break;
 					}
 				}
-				if (foundSemanticVersionLevel == null) {
-					throw new MojoFailureException("Unknown semantic version level '"
-						+ semanticVersionLevel
-						+ "'. Supported values: "
-						+ Joiner.on(',').join(
-						JApiSemanticVersionLevel.values()));
-				}
+				// This is dead code. foundSemanticVersionLevel is initialized above, and the for-loop
+				// never sets it to null; therefore, it is always non-null.
+				//
+				//				if (foundSemanticVersionLevel == null) {
+				//					throw new MojoFailureException("Unknown semantic version level '"
+				//						+ semanticVersionLevel
+				//						+ "'. Supported values: "
+				//						+ Joiner.on(',').join(
+				//						JApiSemanticVersionLevel.values()));
+				//				}
 				comparatorOptions.addOverrideCompatibilityChange(
 					new JarArchiveComparatorOptions.OverrideCompatibilityChange(foundChange,
 						configChange.isBinaryCompatible(),
@@ -760,7 +763,7 @@ public class JApiCmpProcessor {
 		Set<org.apache.maven.artifact.Artifact> projectDependencies =
 			mavenProject.getArtifacts();
 
-		HashSet<Artifact> result = new HashSet<>(1+projectDependencies.size());
+		HashSet<Artifact> result = new HashSet<>(1 + projectDependencies.size());
 		// Include the project artifact; use the reactor to resolve the project artifact in case it's not being built
 		Artifact project = RepositoryUtils.toArtifact(mavenProject.getArtifact());
 		result.add(resolveArtifact(project, ConfigurationVersion.NEW));
@@ -899,22 +902,23 @@ public class JApiCmpProcessor {
 				}
 			}
 		} else {
-			String systemPath = dependency.getSystemPath();
-			Pattern pattern = Pattern.compile("\\$\\{([^}])");
-			Matcher matcher = pattern.matcher(systemPath);
-			if (matcher.matches()) {
-				for (int i = 1; i <= matcher.groupCount(); i++) {
-					String property = matcher.group(i);
-					String propertyResolved = mavenParameters.mavenProject().getProperties().getProperty(
-						property);
-					if (propertyResolved != null) {
-						systemPath = systemPath.replaceAll("${" + property + "}", propertyResolved);
-					} else {
-						throw new MojoFailureException("Could not resolve property '" + property + "'.");
-					}
+			// Substitute any properties in the path with their values
+			final String systemPath = dependency.getSystemPath();
+			final StringBuffer newSystemPath = new StringBuffer();
+			final Pattern pattern = Pattern.compile("\\$\\{([^}]*)\\}");
+			final Matcher matcher = pattern.matcher(systemPath);
+			while (matcher.find()) {
+				final String property = matcher.group(1);
+				final String propertyResolved = mavenParameters.mavenProject().getProperties().getProperty(property);
+				if (propertyResolved != null) {
+					matcher.appendReplacement(newSystemPath, Matcher.quoteReplacement(propertyResolved));
+				} else {
+					throw new MojoFailureException("Could not resolve property '" + property + "'.");
 				}
 			}
-			File file = new File(systemPath);
+			matcher.appendTail(newSystemPath);
+
+			final File file = new File(newSystemPath.toString());
 			boolean addFile = true;
 			if (!file.exists()) {
 				if (ignoreMissingArtifact(configurationVersion)) {
