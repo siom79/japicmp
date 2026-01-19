@@ -905,7 +905,7 @@ public class JApiCmpProcessor {
 			// Substitute any properties in the path with their values
 			final String systemPath = dependency.getSystemPath();
 			final StringBuffer newSystemPath = new StringBuffer();
-			final Pattern pattern = Pattern.compile("\\$\\{([^}]*)\\}");
+			final Pattern pattern = Pattern.compile("\\$\\{([^}]*)}");
 			final Matcher matcher = pattern.matcher(systemPath);
 			while (matcher.find()) {
 				final String property = matcher.group(1);
