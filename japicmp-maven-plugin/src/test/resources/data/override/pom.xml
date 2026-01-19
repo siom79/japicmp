@@ -11,6 +11,11 @@
 	<packaging>jar</packaging>
 	<name>Configured Example</name>
 
+	<properties>
+		<projDir>${project.basedir}</projDir>
+		<testDir>test-run/override</testDir>
+	</properties>
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -27,19 +32,46 @@
 				<groupId>com.github.siom79.japicmp</groupId>
 				<artifactId>japicmp-maven-plugin</artifactId>
 				<configuration>
-					<oldVersion>
+					<newVersion>
 						<dependency>
 							<groupId>com.github.siom79.japicmp</groupId>
 							<artifactId>japicmp</artifactId>
-							<version>0.20.0</version>
+							<version>0.24.0</version>
+							<scope>system</scope>
+							<systemPath>${project.basedir}/target/test-run/override/japicmp-0.24.0.jar</systemPath>
 						</dependency>
+					</newVersion>
+					<newClassPathDependencies>
+						<dependency>
+							<groupId>org.apache.commons</groupId>
+							<artifactId>commons-math3</artifactId>
+							<version>3.5</version>
+						</dependency>
+					</newClassPathDependencies>
+					<oldVersion>
+						<file>
+							<path>target/test-run/override/japicmp-0.20.0.jar</path>
+						</file>
 					</oldVersion>
+					<oldClassPathDependencies>
+						<dependency>
+							<groupId>org.apache.commons</groupId>
+							<artifactId>commons-math3</artifactId>
+							<version>3.4</version>
+						</dependency>
+					</oldClassPathDependencies>
 					<parameter>
-						<htmlTitle>New HTML Title</htmlTitle>
-						<markdownTitle>New Markdown Title</markdownTitle>
-						<reportLinkName>API Comparison Report</reportLinkName>
-						<postAnalysisScript>groovy/SamplePostAnalysis.groovy</postAnalysisScript>
-						<ignoreMissingOldVersion>false</ignoreMissingOldVersion>
+						<overrideCompatibilityChangeParameters>
+							<overrideCompatibilityChangeParameter>
+								<compatibilityChange>CLASS_REMOVED</compatibilityChange>
+								<binaryCompatible>true</binaryCompatible>
+								<sourceCompatible>true</sourceCompatible>
+								<semanticVersionLevel>PATCH</semanticVersionLevel>
+							</overrideCompatibilityChangeParameter>
+						</overrideCompatibilityChangeParameters>
+						<skipDiffReport>true</skipDiffReport>
+						<skipHtmlReport>true</skipHtmlReport>
+						<skipMarkdownReport>true</skipMarkdownReport>
 					</parameter>
 				</configuration>
 				<executions>
@@ -52,6 +84,7 @@
 				</executions>
 			</plugin>
 		</plugins>
+
 	</build>
 
 	<reporting>

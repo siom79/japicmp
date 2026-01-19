@@ -240,6 +240,11 @@
 				<targetPath>${test.directory}</targetPath>
 				<filtering>true</filtering>
 			</testResource>
+			<testResource>
+				<directory>src/test/resources/binary</directory>
+				<targetPath>${test.directory}</targetPath>
+				<filtering>false</filtering>
+			</testResource>
 		</testResources>
 	</build>
 

@@ -27,20 +27,46 @@
 				<groupId>com.github.siom79.japicmp</groupId>
 				<artifactId>japicmp-maven-plugin</artifactId>
 				<configuration>
-					<oldVersion>
+					<oldVersions>
 						<dependency>
 							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp</artifactId>
+							<artifactId>japicmp-ant-task</artifactId>
 							<version>0.20.0</version>
 						</dependency>
-					</oldVersion>
+						<dependency>
+							<groupId>com.github.siom79.japicmp</groupId>
+							<artifactId>japicmp-maven-plugin</artifactId>
+							<version>0.20.0</version>
+						</dependency>
+					</oldVersions>
+					<newVersions>
+						<dependency>
+							<groupId>com.github.siom79.japicmp</groupId>
+							<artifactId>japicmp-ant-task</artifactId>
+							<version>0.24.0</version>
+						</dependency>
+						<dependency>
+							<groupId>com.github.siom79.japicmp</groupId>
+							<artifactId>japicmp-maven-plugin</artifactId>
+							<version>0.24.0</version>
+						</dependency>
+					</newVersions>
 					<parameter>
-						<htmlTitle>New HTML Title</htmlTitle>
-						<markdownTitle>New Markdown Title</markdownTitle>
-						<reportLinkName>API Comparison Report</reportLinkName>
-						<postAnalysisScript>groovy/SamplePostAnalysis.groovy</postAnalysisScript>
-						<ignoreMissingOldVersion>false</ignoreMissingOldVersion>
+						<htmlStylesheet>target/test-run/multiple/japicmp.css</htmlStylesheet>
+						<skipMarkdownReport>true</skipMarkdownReport>
+						<skipDiffReport>true</skipDiffReport>
+						<ignoreMissingClassesByRegularExpressions>
+							<ignoreMissingClassesByRegularExpression>org.apache.maven.*</ignoreMissingClassesByRegularExpression>
+						</ignoreMissingClassesByRegularExpressions>
 					</parameter>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.ant</groupId>
+							<artifactId>ant</artifactId>
+							<version>1.10.15</version>
+							<scope>compile</scope>
+						</dependency>
+					</dependencies>
 				</configuration>
 				<executions>
 					<execution>
