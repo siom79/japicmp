@@ -240,6 +240,11 @@
 				<targetPath>${test.directory}</targetPath>
 				<filtering>true</filtering>
 			</testResource>
+			<testResource>
+				<directory>src/test/resources/binary</directory>
+				<targetPath>${test.directory}</targetPath>
+				<filtering>false</filtering>
+			</testResource>
 		</testResources>
 	</build>
 
@@ -276,6 +281,9 @@
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
+					<sourceFileExcludes>
+						<sourceFileExclude>**/HelpMojo.java</sourceFileExclude>
+					</sourceFileExcludes>
 					<links>
 						<link>https://maven.apache.org/ref/${maven-api.version}/maven-plugin-api/apidocs</link>
 						<link>https://maven.apache.org/ref/${reporting.version}/apidocs</link>
@@ -333,6 +341,12 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<!-- Explicitly specify sourceDirectory so it doesn't check generated code -->
+					<sourceDirectories>
+						<sourceDirectory>${project.basedir}/src/main</sourceDirectory>
+					</sourceDirectories>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

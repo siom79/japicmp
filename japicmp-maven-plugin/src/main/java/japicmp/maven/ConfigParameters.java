@@ -1,6 +1,6 @@
 package japicmp.maven;
 
-import java.util.List;
+import java.util.*;
 
 /** Class for storing the japicmp configuration parameters. */
 public class ConfigParameters {
@@ -78,7 +78,6 @@ public class ConfigParameters {
 
 	private List<String> excludeModules;
 
-
 	private boolean includeExclusively = false;
 
 	private boolean excludeExclusively = false;
@@ -138,7 +137,7 @@ public class ConfigParameters {
 	}
 
 	void setBreakBuildOnBinaryIncompatibleModifications(
-			boolean breakBuildOnBinaryIncompatibleModifications) {
+		boolean breakBuildOnBinaryIncompatibleModifications) {
 		this.breakBuildOnBinaryIncompatibleModifications = breakBuildOnBinaryIncompatibleModifications;
 	}
 
@@ -235,7 +234,7 @@ public class ConfigParameters {
 	}
 
 	void setBreakBuildOnSourceIncompatibleModifications(
-			boolean breakBuildOnSourceIncompatibleModifications) {
+		boolean breakBuildOnSourceIncompatibleModifications) {
 		this.breakBuildOnSourceIncompatibleModifications = breakBuildOnSourceIncompatibleModifications;
 	}
 
@@ -316,7 +315,7 @@ public class ConfigParameters {
 	}
 
 	void setIgnoreMissingClassesByRegularExpressions(
-			List<String> ignoreMissingClassesByRegularExpressions) {
+		List<String> ignoreMissingClassesByRegularExpressions) {
 		this.ignoreMissingClassesByRegularExpressions = ignoreMissingClassesByRegularExpressions;
 	}
 
@@ -365,9 +364,9 @@ public class ConfigParameters {
 	}
 
 	void setBreakBuildBasedOnSemanticVersioningForMajorVersionZero(
-			boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero) {
+		boolean breakBuildBasedOnSemanticVersioningForMajorVersionZero) {
 		this.breakBuildBasedOnSemanticVersioningForMajorVersionZero =
-				breakBuildBasedOnSemanticVersioningForMajorVersionZero;
+			breakBuildBasedOnSemanticVersioningForMajorVersionZero;
 	}
 
 	public boolean isIncludeExlusively() {
@@ -395,7 +394,7 @@ public class ConfigParameters {
 	}
 
 	void setOverrideCompatibilityChangeParameters(
-			List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters) {
+		List<OverrideCompatibilityChangeParameter> overrideCompatibilityChangeParameters) {
 		this.overrideCompatibilityChangeParameters = overrideCompatibilityChangeParameters;
 	}
 
@@ -433,6 +432,10 @@ public class ConfigParameters {
 			return compatibilityChange;
 		}
 
+		public void setCompatibilityChange(final String compatibilityChange) {
+			this.compatibilityChange = compatibilityChange;
+		}
+
 		public boolean isBinaryCompatible() {
 			return binaryCompatible;
 		}
@@ -443,6 +446,10 @@ public class ConfigParameters {
 
 		public String getSemanticVersionLevel() {
 			return semanticVersionLevel;
+		}
+
+		public void setSemanticVersionLevel(final String semanticVersionLevel) {
+			this.semanticVersionLevel = semanticVersionLevel;
 		}
 	}
 }

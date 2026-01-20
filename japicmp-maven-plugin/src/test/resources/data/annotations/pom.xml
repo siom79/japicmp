@@ -5,9 +5,9 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.siom79.japicmp</groupId>
-	<artifactId>japicmp</artifactId>
-	<version>0.25.0</version>
+	<groupId>org.apache.httpcomponents.core5</groupId>
+	<artifactId>httpcore5</artifactId>
+	<version>5.4</version>
 	<packaging>jar</packaging>
 	<name>Configured Example</name>
 
@@ -29,17 +29,29 @@
 				<configuration>
 					<oldVersion>
 						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp</artifactId>
-							<version>0.20.0</version>
+							<groupId>org.apache.httpcomponents.core5</groupId>
+							<artifactId>httpcore5</artifactId>
+							<version>5.3.4</version>
+							<scope>compile</scope>
 						</dependency>
 					</oldVersion>
 					<parameter>
-						<htmlTitle>New HTML Title</htmlTitle>
-						<markdownTitle>New Markdown Title</markdownTitle>
-						<reportLinkName>API Comparison Report</reportLinkName>
-						<postAnalysisScript>groovy/SamplePostAnalysis.groovy</postAnalysisScript>
-						<ignoreMissingOldVersion>false</ignoreMissingOldVersion>
+						<breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
+						<breakBuildOnSourceIncompatibleModifications>true</breakBuildOnSourceIncompatibleModifications>
+						<overrideCompatibilityChangeParameters>
+							<overrideCompatibilityChangeParameter>
+								<compatibilityChange>METHOD_NEW_DEFAULT</compatibilityChange>
+								<binaryCompatible>true</binaryCompatible>
+								<sourceCompatible>true</sourceCompatible>
+							</overrideCompatibilityChangeParameter>
+						</overrideCompatibilityChangeParameters>
+						<excludes>
+							<exclude>@org.apache.hc.core5.annotation.Internal</exclude>
+							<exclude>org.apache.hc.core5.testing.reactive.ReactiveTestUtils</exclude>
+						</excludes>
+						<skipXmlReport>true</skipXmlReport>
+						<skipHtmlReport>false</skipHtmlReport>
+						<skipDiffReport>false</skipDiffReport>
 					</parameter>
 				</configuration>
 				<executions>

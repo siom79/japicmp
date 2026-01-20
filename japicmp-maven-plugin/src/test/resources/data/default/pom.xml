@@ -7,7 +7,7 @@
 
 	<groupId>com.github.siom79.japicmp</groupId>
 	<artifactId>japicmp</artifactId>
-	<version>0.24.1</version>
+	<version>0.25.0</version>
 	<packaging>jar</packaging>
 	<name>Default Configuration</name>
 
