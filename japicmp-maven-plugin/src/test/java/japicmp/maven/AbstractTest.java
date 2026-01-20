@@ -28,8 +28,9 @@ import java.util.stream.Collectors;
 
 abstract class AbstractTest {
 
-	final Path testDefaultDir = Paths.get("target/test-run/default/target");
+	final Path testAnnotationsDir = Paths.get("target/test-run/annotations/target");
 	final Path testConfigDir = Paths.get("target/test-run/configured/target");
+	final Path testDefaultDir = Paths.get("target/test-run/default/target");
 	final Path testMultipleDir = Paths.get("target/test-run/multiple/target");
 	final Path testOverrideDir = Paths.get("target/test-run/override/target");
 	final Path testSkipPomDir = Paths.get("target/test-run/skippom/target");
@@ -56,11 +57,7 @@ abstract class AbstractTest {
 	PluginParameters createPluginParameters(final ConfigParameters configParameters) {
 		final Version oldVersion = createVersion("groupId", "artifactId", "0.1.0");
 		final Version newVersion = createVersion("groupId", "artifactId", "0.1.1");
-		return new PluginParameters(false, newVersion, oldVersion, configParameters, new ArrayList<>(),
-			null,
-			null, false, new ArrayList<>(), new ArrayList<>(),
-			new ArrayList<>(), new ArrayList<>(), new SkipReport(),
-			new BreakBuild());
+		return createPluginParameters(configParameters, oldVersion, newVersion);
 	}
 
 	/**

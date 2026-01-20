@@ -25,6 +25,9 @@ import java.util.*;
 @LocalMojoTest
 final class JApiCmpMojoTest extends AbstractTest {
 
+	final File annotationsHtmlFile = testAnnotationsDir.resolve("japicmp/japicmp.html").toFile();
+	final File annotationsXmlFile = testAnnotationsDir.resolve("japicmp/japicmp.xml").toFile();
+
 	final File defaultDiffFile = testDefaultDir.resolve("japicmp/japicmp.diff").toFile();
 	final File defaultHtmlFile = testDefaultDir.resolve("japicmp/japicmp.html").toFile();
 	final File defaultMdFile = testDefaultDir.resolve("japicmp/japicmp.md").toFile();
@@ -35,9 +38,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 	final File configMdFile = testConfigDir.resolve("japicmp/japicmp.md").toFile();
 	final File configXmlFile = testConfigDir.resolve("japicmp/japicmp.xml").toFile();
 
-	final File multipleDiffFile = testMultipleDir.resolve("japicmp/japicmp.diff").toFile();
 	final File multipleHtmlFile = testMultipleDir.resolve("japicmp/japicmp.html").toFile();
-	final File multipleMdFile = testMultipleDir.resolve("japicmp/japicmp.md").toFile();
 	final File multipleXmlFile = testMultipleDir.resolve("japicmp/japicmp.xml").toFile();
 
 	final File overrideDiffFile = testOverrideDir.resolve("japicmp/japicmp.diff").toFile();
@@ -481,7 +482,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 	@Test
 	@InjectMojo(goal = "cmp", pom = "target/test-run/override/pom.xml")
 	void testConfiguredFileMissing(final JApiCmpMojo testMojo)
-		throws IOException, MojoExecutionException, MojoFailureException {
+		throws IOException {
 		assertNotNull(testMojo);
 		final ConfigurationFile newConfig = new ConfigurationFile();
 		newConfig.setPath("target/test-run/override/japicmp-0.0.0.jar");
@@ -499,8 +500,8 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertNotNull(testMojo);
 		deleteDirectory(testMultipleDir);
 		testMojo.execute();
-		assertFileExists(multipleXmlFile);
 		assertFileExists(multipleHtmlFile);
+		assertFileExists(multipleXmlFile);
 
 		assertFileContainsPattern(multipleXmlFile,
 			"^.*newJar=\".*japicmp[\\/\\\\]japicmp-ant-task[\\/\\\\]0[.]24[.]0[\\/\\\\]japicmp-ant-task-0[.]24[.]0[.]jar;"
@@ -508,5 +509,17 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertFileContainsPattern(multipleXmlFile,
 			"^.*oldJar=\".*japicmp[\\/\\\\]japicmp-ant-task[\\/\\\\]0[.]20[.]0[\\/\\\\]japicmp-ant-task-0[.]20[.]0[.]jar;"
 				+ ".*japicmp[\\/\\\\]japicmp-maven-plugin[\\/\\\\]0[.]20[.]0[\\/\\\\]japicmp-maven-plugin-0[.]20[.]0[.]jar\".*$");
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/annotations/pom.xml")
+	void testExcludedAnnotations(final JApiCmpMojo testMojo)
+		throws IOException, MojoExecutionException, MojoFailureException {
+		assertNotNull(testMojo);
+		deleteDirectory(testAnnotationsDir);
+		testMojo.execute();
+		assertFileExists(annotationsHtmlFile);
+		assertFileNotExists(annotationsXmlFile);
+
 	}
 }

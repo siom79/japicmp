@@ -56,7 +56,7 @@
 						<skipMarkdownReport>true</skipMarkdownReport>
 						<skipDiffReport>true</skipDiffReport>
 						<ignoreMissingClassesByRegularExpressions>
-							<ignoreMissingClassesByRegularExpression>org.apache.maven.*</ignoreMissingClassesByRegularExpression>
+							<ignoreMissingClassesByRegularExpression>javax.xml.bind.*</ignoreMissingClassesByRegularExpression>
 						</ignoreMissingClassesByRegularExpressions>
 					</parameter>
 					<dependencies>
