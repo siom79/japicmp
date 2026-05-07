@@ -440,7 +440,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		SignatureParser methodSignatureParser = new SignatureParser();
 		methodSignatureParser.parse(method);
 		List<CtMethod> methodsWithSameParameters = new ArrayList<>();
-		findMatchingMethodsWithSameParameterTypes(candidates, methodSignatureParser, methodsWithSameParameters);
+		boolean methodIsBridge = ModifierHelper.isBridge(method.getModifiers());
+		List<CtMethod> eligibleCandidates = new ArrayList<>();
+		for (CtMethod c : candidates) {
+			if (ModifierHelper.isBridge(c.getModifiers()) == methodIsBridge) {
+				eligibleCandidates.add(c);
+			}
+		}
+		findMatchingMethodsWithSameParameterTypes(eligibleCandidates, methodSignatureParser, methodsWithSameParameters);
 		if (methodsWithSameParameters.size() == 1) {
 			found = Optional.of(methodsWithSameParameters.get(0));
 		} else if (methodsWithSameParameters.size() > 1) {
