@@ -29,6 +29,7 @@ import javassist.CtMethod;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -238,6 +239,50 @@ public class IncompatibleErrorOutputTest {
 		options.setOldArchives(Collections.singletonList(oldFile));
 		JApiCmpArchive newFile = Helper.getArchive("japicmp-test-v"+newVersion+".jar", newVersion);
 		options.setNewArchives(Collections.singletonList(newFile));
+		new IncompatibleErrorOutput(options, result.getjApiClasses(), result.getJarArchiveComparator()).generate();
+	}
+
+	@Test
+	public void testMethodAddedToInterfaceBreaksBuildOnMinorVersionUpdate() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testMethodAddedToInterfaceWithVersionChange("1.0.0", "1.1.0"));
+	}
+
+	@Test
+	public void testMethodAddedToInterfaceBreaksBuildOnPatchVersionUpdate() {
+		Assertions.assertThrows(JApiCmpException.class, () -> testMethodAddedToInterfaceWithVersionChange("1.0.0", "1.0.1"));
+	}
+
+	@Test
+	public void testMethodAddedToInterfaceAllowedOnMajorVersionUpdate() throws Exception {
+		testMethodAddedToInterfaceWithVersionChange("1.0.0", "2.0.0");
+	}
+
+	private void testMethodAddedToInterfaceWithVersionChange(String oldVersion, String newVersion) throws Exception {
+		Options options = Options.newDefault();
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
+		ClassesHelper.CompareClassesResult result = ClassesHelper.compareClassesWithResult(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("japicmp.I").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("foo").addToClass(ctInterface);
+				return Collections.singletonList(ctInterface);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctInterface = CtInterfaceBuilder.create().name("japicmp.I").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("foo").addToClass(ctInterface);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("bar").addToClass(ctInterface);
+				return Collections.singletonList(ctInterface);
+			}
+		});
+		options.setErrorOnSemanticIncompatibility(true);
+		options.setIgnoreMissingOldVersion(false);
+		options.setIgnoreMissingNewVersion(false);
+		JApiCmpArchive oldArchive = new JApiCmpArchive(new File("old.jar"), oldVersion);
+		JApiCmpArchive newArchive = new JApiCmpArchive(new File("new.jar"), newVersion);
+		options.setOldArchives(Collections.singletonList(oldArchive));
+		options.setNewArchives(Collections.singletonList(newArchive));
 		new IncompatibleErrorOutput(options, result.getjApiClasses(), result.getJarArchiveComparator()).generate();
 	}
 
