@@ -133,8 +133,6 @@ the years, please consider buying me a coffee [here](https://www.buymeacoffee.co
 
 # Development
 
-* ![Build Status](https://travis-ci.org/siom79/japicmp.svg?branch=development)
-
 ## Reports
 
 Use the maven site plugin (`mvn site`) to generate the following reports:
