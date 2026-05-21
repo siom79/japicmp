@@ -5,7 +5,7 @@ The following versions of japicmp are available:
 
 0.26.0 (2026-05-21)
 -------------------
-* No NPE when using Markdown-Processsor with byte-based archive [516](https://github.com/siom79/japicmp/issues/516)
+* No NPE when using Markdown-Processsor with byte-based archive [#516](https://github.com/siom79/japicmp/issues/516)
 
 0.25.7 (2026-05-07)
 -------------------
