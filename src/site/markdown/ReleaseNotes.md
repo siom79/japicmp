@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.25.7 (2026-05-07)
+-------------------
+* Report incompatiblity in case a class changes from implementing a generic interface with raw types to concrete type parameters [#507](https://github.com/siom79/japicmp/issues/507)
+
 0.25.6 (2026-04-16)
 -------------------
 * No NPE in case of Maven artifacts without file [#504](https://github.com/siom79/japicmp/issues/504)
