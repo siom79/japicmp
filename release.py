@@ -39,21 +39,27 @@ def parseCli(argv):
 
 
 def replaceOldVersion(oldVersion, releaseVersion):
+	changed = False
 	for dirpath, dnames, fnames in os.walk("./"):
 		for f in fnames:
 			if f.endswith(".md") and not f.startswith("ReleaseNotes"):
-				filedata = None
 				with open(os.path.join(dirpath, f), 'r') as file:
 					filedata = file.read()
-				filedata = filedata.replace(oldVersion, releaseVersion)
-				with open(os.path.join(dirpath, f), 'w') as file:
-					file.write(filedata)
-				print("Replaced " + oldVersion + " with " + releaseVersion + " in file " + os.path.join(dirpath, f) + ".")
+				newdata = filedata.replace(oldVersion, releaseVersion)
+				if newdata != filedata:
+					with open(os.path.join(dirpath, f), 'w') as file:
+						file.write(newdata)
+					print("Replaced " + oldVersion + " with " + releaseVersion + " in file " + os.path.join(dirpath, f) + ".")
+					changed = True
+	if not changed:
+		print("No files were modified. Old version '" + oldVersion + "' not found in any .md file.")
+		sys.exit(1)
 	args = ["git", "commit", "-a", "-m", "upgraded version in *.md files to " + releaseVersion]
 	print("Commiting changes: " + ' '.join(args))
 	returncode = subprocess.call(args)
 	if returncode != 0:
 		print("Commit failed with error code " + str(returncode) + ".")
+		sys.exit(returncode)
 
 
 def printHelp():
