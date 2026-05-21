@@ -22,13 +22,13 @@ public class JavassistTest {
 	@Test
 	public void test() throws NotFoundException {
 		ClassPool classPoolOld = new ClassPool();
-		classPoolOld.appendClassPath(getArchive("japicmp-test-service-v1.jar").getFile().getAbsolutePath());
-		classPoolOld.appendClassPath(getArchive("japicmp-test-service-impl-v1.jar").getFile().getAbsolutePath());
+		classPoolOld.appendClassPath(getArchive("japicmp-test-service-v1.jar").getFile().get().getAbsolutePath());
+		classPoolOld.appendClassPath(getArchive("japicmp-test-service-impl-v1.jar").getFile().get().getAbsolutePath());
 		CtClass oldClass = classPoolOld.get(SubclassAddsNewStaticField.class.getName());
 		assertThat(oldClass.getSuperclass().getFields().length, is(1));
 		ClassPool classPoolNew = new ClassPool();
-		classPoolNew.appendClassPath(getArchive("japicmp-test-service-v2.jar").getFile().getAbsolutePath());
-		classPoolNew.appendClassPath(getArchive("japicmp-test-service-impl-v2.jar").getFile().getAbsolutePath());
+		classPoolNew.appendClassPath(getArchive("japicmp-test-service-v2.jar").getFile().get().getAbsolutePath());
+		classPoolNew.appendClassPath(getArchive("japicmp-test-service-impl-v2.jar").getFile().get().getAbsolutePath());
 		CtClass newClass = classPoolNew.get(SubclassAddsNewStaticField.class.getName());
 		assertThat(newClass.getSuperclass().getFields().length, is(1));
 	}
@@ -36,16 +36,16 @@ public class JavassistTest {
 	@Test
 	public void testMakeClass() throws NotFoundException, IOException {
 		ClassPool classPoolOld = new ClassPool();
-		classPoolOld.appendClassPath(getArchive("japicmp-test-service-v1.jar").getFile().getAbsolutePath());
-		classPoolOld.appendClassPath(getArchive("japicmp-test-service-impl-v1.jar").getFile().getAbsolutePath());
+		classPoolOld.appendClassPath(getArchive("japicmp-test-service-v1.jar").getFile().get().getAbsolutePath());
+		classPoolOld.appendClassPath(getArchive("japicmp-test-service-impl-v1.jar").getFile().get().getAbsolutePath());
 		classPoolOld.appendSystemPath();
-		List<CtClass> ctClasses = loadClasses(getArchive("japicmp-test-service-impl-v1.jar").getFile(), classPoolOld);
+		List<CtClass> ctClasses = loadClasses(getArchive("japicmp-test-service-impl-v1.jar").getFile().get(), classPoolOld);
 		assertThat(ctClasses.get(0).getSuperclass().getFields().length, is(1));
 		ClassPool classPoolNew = new ClassPool();
-		classPoolNew.appendClassPath(getArchive("japicmp-test-service-v2.jar").getFile().getAbsolutePath());
-		classPoolNew.appendClassPath(getArchive("japicmp-test-service-impl-v2.jar").getFile().getAbsolutePath());
+		classPoolNew.appendClassPath(getArchive("japicmp-test-service-v2.jar").getFile().get().getAbsolutePath());
+		classPoolNew.appendClassPath(getArchive("japicmp-test-service-impl-v2.jar").getFile().get().getAbsolutePath());
 		classPoolNew.appendSystemPath();
-		ctClasses = loadClasses(getArchive("japicmp-test-service-impl-v2.jar").getFile(), classPoolNew);
+		ctClasses = loadClasses(getArchive("japicmp-test-service-impl-v2.jar").getFile().get(), classPoolNew);
 		assertThat(ctClasses.get(0).getSuperclass().getFields().length, is(1));
 	}
 

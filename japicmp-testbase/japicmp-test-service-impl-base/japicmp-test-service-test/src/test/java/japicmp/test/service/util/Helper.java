@@ -190,8 +190,8 @@ public class Helper {
 
 	public static List<String> createClassPath(String version) {
 		List<String> classPath = new ArrayList<>();
-		classPath.add(getArchive("japicmp-test-service-" + version + ".jar").getFile().getAbsolutePath());
-		classPath.add(getArchive("japicmp-test-service-impl-" + version + ".jar").getFile().getAbsolutePath());
+		classPath.add(getArchive("japicmp-test-service-" + version + ".jar").getFile().get().getAbsolutePath());
+		classPath.add(getArchive("japicmp-test-service-impl-" + version + ".jar").getFile().get().getAbsolutePath());
 		return classPath;
 	}
 }

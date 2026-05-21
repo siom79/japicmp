@@ -3,6 +3,7 @@ package japicmp.cmp;
 import japicmp.versioning.Version;
 
 import java.io.File;
+import java.util.Optional;
 
 public class JApiCmpArchive {
 	private File file;
@@ -21,20 +22,20 @@ public class JApiCmpArchive {
         this.name = name;
     }
 
-	public File getFile() {
-		return file;
+	public Optional<File> getFile() {
+		return Optional.ofNullable(file);
 	}
 
 	public Version getVersion() {
 		return version;
 	}
 
-	public byte[] getBytes() {
-		return bytes;
+	public Optional<byte[]> getBytes() {
+		return Optional.ofNullable(bytes);
 	}
 
-	public String getName() {
-		return name;
+	public Optional<String> getName() {
+		return Optional.ofNullable(name);
 	}
 
 	@Override

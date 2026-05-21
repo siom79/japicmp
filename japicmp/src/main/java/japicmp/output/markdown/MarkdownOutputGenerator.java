@@ -19,6 +19,7 @@ import japicmp.model.JApiJavaObjectSerializationCompatibility.JApiJavaObjectSeri
 import japicmp.output.*;
 import japicmp.output.markdown.config.MarkdownOptions;
 import japicmp.output.semver.SemverOut;
+import java.io.File;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -582,7 +583,9 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 
 	String renderSimpleArchiveName(JApiCmpArchive archive) {
 		final String version = archive.getVersion().getStringVersion();
-		String name = archive.getFile().getName();
+		String name = archive.getFile()
+			.map(File::getName)
+			.orElseGet(() -> archive.getName().orElse(""));
 		// Drop version from archive name
 		if (version != null && name.contains(version)) {
 			name = name.replace(version, EMPTY);

@@ -291,4 +291,13 @@ class MarkdownOutputGeneratorTest {
 		assertThat(generated, containsString(format(MSG.compatibilitySource, MSG.unchecked)));
 		assertThat(generated, containsString(format(MSG.compatibilitySerialization, MSG.checked)));
 	}
+
+	@Test
+	void testRenderSimpleArchiveNameForByteBasedArchive() {
+		// Regression test for issue #516: byte-based archive (no File) must not throw NPE
+		JApiCmpArchive archive = new JApiCmpArchive(new byte[0], "1.0.0", "my-library-1.0.0.jar");
+		MarkdownOutputGenerator generator = new MarkdownOutputGenerator(Options.newDefault(), emptyList());
+		String name = generator.renderSimpleArchiveName(archive);
+		Assertions.assertEquals("my-library", name);
+	}
 }
