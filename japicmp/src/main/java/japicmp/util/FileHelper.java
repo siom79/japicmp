@@ -17,7 +17,7 @@ public class FileHelper {
 	public static List<File> toFileList(List<JApiCmpArchive> archives) {
 		List<File> files = new ArrayList<>(archives.size());
 		for (JApiCmpArchive archive : archives) {
-			files.add(archive.getFile());
+			archive.getFile().ifPresent(files::add);
 		}
 		return files;
 	}

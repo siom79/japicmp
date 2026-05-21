@@ -54,7 +54,7 @@ public class SyntheticAttributeTest {
 	private JApiCmpArchive instrumentClass(JApiCmpArchive archive) throws IOException, CannotCompileException, NotFoundException {
 		ClassPool classPool = ClassPool.getDefault();
 		String path = Paths.get(System.getProperty("user.dir"), "target", "japicmp-test-v2-instrumented.jar").toString();
-		try (ZipFile zipFile = new ZipFile(archive.getFile()); ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path))) {
+		try (ZipFile zipFile = new ZipFile(archive.getFile().get()); ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path))) {
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry zipEntry = entries.nextElement();

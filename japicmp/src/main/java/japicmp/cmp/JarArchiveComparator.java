@@ -220,8 +220,8 @@ public class JarArchiveComparator {
 	}
 
 	private Stream<CtClass> toCtClassStream(JApiCmpArchive archive, ReducibleClassPool classPool) {
-		if (archive.getFile() != null) {
-			try (JarFile jarFile = new JarFile(archive.getFile())) {
+		if (archive.getFile().isPresent()) {
+			try (JarFile jarFile = new JarFile(archive.getFile().get())) {
 				return jarFile.stream()
 					.map(jarEntry -> ctClass(classPool, jarFile, jarEntry))
 					.filter(Objects::nonNull)
@@ -229,7 +229,7 @@ public class JarArchiveComparator {
 			} catch (IOException e) {
 				throw new JApiCmpException(Reason.IoException, "Failed to load archive from file: " + e.getMessage(), e);
 			}
-		} else if (archive.getBytes() != null) {
+		} else if (archive.getBytes().isPresent()) {
 			return bytesToCtClasses(archive, classPool);
 		} else {
 			throw new JApiCmpException(Reason.IllegalArgument, JApiCmpArchive.class.getSimpleName() + " has no file and no bytes: " + archive);
@@ -238,7 +238,7 @@ public class JarArchiveComparator {
 
 	private static Stream<CtClass> bytesToCtClasses(JApiCmpArchive archive, ReducibleClassPool classPool) {
 		List<CtClass> ctClasses = new ArrayList<>();
-		try (JarInputStream jarInputStream = new JarInputStream(new ByteArrayInputStream(archive.getBytes()))) {
+		try (JarInputStream jarInputStream = new JarInputStream(new ByteArrayInputStream(archive.getBytes().get()))) {
 			JarEntry nextJarEntry = jarInputStream.getNextJarEntry();
 			while (nextJarEntry != null) {
 				if (!nextJarEntry.isDirectory() && nextJarEntry.getName().endsWith(".class")) {

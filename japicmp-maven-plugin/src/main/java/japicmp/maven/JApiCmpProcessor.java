@@ -683,7 +683,7 @@ public class JApiCmpProcessor {
 
 						for (JApiCmpArchive jApiCmpArchive : jApiCmpArchives) {
 							comparatorOptions.getClassPathEntries().add(
-								jApiCmpArchive.getFile().getAbsolutePath());
+								jApiCmpArchive.getFile().map(File::getAbsolutePath).orElse(""));
 						}
 						comparatorOptions.setClassPathMode(
 							JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH);
@@ -700,7 +700,7 @@ public class JApiCmpProcessor {
 							List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile(
 								"oldClassPathDependencies", dependency, ConfigurationVersion.OLD);
 							for (JApiCmpArchive archive : jApiCmpArchives) {
-								comparatorOptions.getOldClassPath().add(archive.getFile().getAbsolutePath());
+								comparatorOptions.getOldClassPath().add(archive.getFile().map(File::getAbsolutePath).orElse(""));
 							}
 						}
 					}
@@ -709,7 +709,7 @@ public class JApiCmpProcessor {
 							List<JApiCmpArchive> jApiCmpArchives = resolveDependencyToFile(
 								"newClassPathDependencies", dependency, ConfigurationVersion.NEW);
 							for (JApiCmpArchive archive : jApiCmpArchives) {
-								comparatorOptions.getNewClassPath().add(archive.getFile().getAbsolutePath());
+								comparatorOptions.getNewClassPath().add(archive.getFile().map(File::getAbsolutePath).orElse(""));
 							}
 						}
 					}

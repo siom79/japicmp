@@ -105,23 +105,29 @@ public class Options {
 	}
 
 	private static void verifyExisting(JApiCmpArchive jApiCmpArchive) {
-		if (!jApiCmpArchive.getFile().exists()) {
-			throw JApiCmpException.cliError("File '%s' does not exist.", jApiCmpArchive.getFile().getAbsolutePath());
+		if (!jApiCmpArchive.getFile().isPresent()) return;
+		File f = jApiCmpArchive.getFile().get();
+		if (!f.exists()) {
+			throw JApiCmpException.cliError("File '%s' does not exist.", f.getAbsolutePath());
 		}
 	}
 
 	private static void verifyCanRead(JApiCmpArchive jApiCmpArchive) {
-		if (!jApiCmpArchive.getFile().canRead()) {
-			throw JApiCmpException.cliError("Cannot read file '%s'.", jApiCmpArchive.getFile().getAbsolutePath());
+		if (!jApiCmpArchive.getFile().isPresent()) return;
+		File f = jApiCmpArchive.getFile().get();
+		if (!f.canRead()) {
+			throw JApiCmpException.cliError("Cannot read file '%s'.", f.getAbsolutePath());
 		}
 	}
 
 	private static void verifyJarArchive(JApiCmpArchive jApiCmpArchive) {
+		if (!jApiCmpArchive.getFile().isPresent()) return;
+		File f = jApiCmpArchive.getFile().get();
 		JarFile jarFile = null;
 		try {
-			jarFile = new JarFile(jApiCmpArchive.getFile());
+			jarFile = new JarFile(f);
 		} catch (IOException e) {
-			throw JApiCmpException.cliError("File '%s' could not be opened as a jar file: %s", jApiCmpArchive.getFile().getAbsolutePath(), e.getMessage(), e);
+			throw JApiCmpException.cliError("File '%s' could not be opened as a jar file: %s", f.getAbsolutePath(), e.getMessage(), e);
 		} finally {
 			if (jarFile != null) {
 				try {
@@ -332,16 +338,16 @@ public class Options {
 		List<String> paths = new ArrayList<>(archives.size());
 		for (JApiCmpArchive archive : archives) {
 			if (this.reportOnlyFilename) {
-				if (archive.getFile() != null) {
-					paths.add(archive.getFile().getName());
+				if (archive.getFile().isPresent()) {
+					paths.add(archive.getFile().get().getName());
 				} else {
-					paths.add(archive.getName());
+					paths.add(archive.getName().orElse(null));
 				}
 			} else {
-				if (archive.getFile() != null) {
-					paths.add(archive.getFile().getAbsolutePath());
+				if (archive.getFile().isPresent()) {
+					paths.add(archive.getFile().get().getAbsolutePath());
 				} else {
-					paths.add(archive.getName());
+					paths.add(archive.getName().orElse(null));
 				}
 			}
 		}
