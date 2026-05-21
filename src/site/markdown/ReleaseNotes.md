@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.26.0 (2026-05-21)
+-------------------
+* No NPE when using Markdown-Processsor with byte-based archive [516](https://github.com/siom79/japicmp/issues/516)
+
 0.25.7 (2026-05-07)
 -------------------
 * Report incompatiblity in case a class changes from implementing a generic interface with raw types to concrete type parameters [#507](https://github.com/siom79/japicmp/issues/507)
