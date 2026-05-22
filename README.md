@@ -83,8 +83,6 @@ without installing the tool first. Just click [this](https://www.japicmp.de) lin
 
 ## MCP-Server
 
-MCP Server
-
 The [japicmp MCP server](https://github.com/siom79/japicmp-mcp-server) exposes japicmp's API comparison capabilities as
 a tool for AI assistants that support the [Model Context Protocol (MCP)](https://modelcontextprotocol.io).
 It allows AI agents such as Claude to compare two versions of a Maven artifact directly from a conversation — resolving
