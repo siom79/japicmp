@@ -81,6 +81,15 @@ without installing the tool first. Just click [this](https://www.japicmp.de) lin
 
 ![japicmp-online](doc/japicmp_online.png)
 
+## MCP-Server
+
+The [japicmp MCP server](https://github.com/siom79/japicmp-mcp-server) exposes japicmp's API comparison capabilities as
+a tool for AI assistants that support the [Model Context Protocol (MCP)](https://modelcontextprotocol.io).
+It allows AI agents such as Claude to compare two versions of a Maven artifact directly from a conversation — resolving
+both JARs from Maven Central and returning a structured Markdown compatibility report, including binary and source
+compatibility status, a semantic versioning verdict, and a detailed diff of every changed class, method, constructor,
+and field.
+
 ## Motivation
 
 Every time you release a new version of a library or a product, you have to tell your clients or customers what
