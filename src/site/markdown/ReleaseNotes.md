@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.26.1 (2026-05-27)
+-------------------
+* New change METHOD_RETURN_TYPE_COVARIANT_CHANGED [#522](https://github.com/siom79/japicmp/issues/522)
+
 0.26.0 (2026-05-21)
 -------------------
 * No NPE when using Markdown-Processsor with byte-based archive [#516](https://github.com/siom79/japicmp/issues/516)
