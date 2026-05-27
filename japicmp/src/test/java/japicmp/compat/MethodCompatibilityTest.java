@@ -222,6 +222,45 @@ class MethodCompatibilityTest {
 	}
 
 	@Test
+	void testMethodReturnTypeCovariantChange() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.lang.Object")).name("getValue").body("return null;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				// Covariant override — Integer is a subtype of Object
+				CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.lang.Integer")).name("getValue").body("return Integer.valueOf(0);").addToClass(ctClass);
+				// Compiler-generated bridge method with original return type
+				CtMethodBuilder.create().publicAccess().bridgeModifier().syntheticModifier().returnType(classPool.get("java.lang.Object")).name("getValue").body("return null;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		JApiMethod nonBridgeMethod = null;
+		for (JApiMethod m : jApiClass.getMethods()) {
+			if (m.getName().equals("getValue") &&
+				m.getBridgeModifier().getNewModifier().map(bm -> bm == BridgeModifier.NON_BRIDGE).orElse(false)) {
+				nonBridgeMethod = m;
+				break;
+			}
+		}
+		assertThat(nonBridgeMethod, is(notNullValue()));
+		assertThat(nonBridgeMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_RETURN_TYPE_COVARIANT_CHANGED)));
+		assertThat(nonBridgeMethod.getCompatibilityChanges(), not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_RETURN_TYPE_CHANGED))));
+		assertThat(nonBridgeMethod.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+	}
+
+	@Test
 	void testMethodNowAbstract() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);

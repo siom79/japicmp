@@ -325,6 +325,7 @@ for each check. This allows you to customize the following verifications:
 | METHOD_REMOVED                                 | false                     | false                     | MAJOR                          |
 | METHOD_REMOVED_IN_SUPERCLASS                   | false                     | false                     | MAJOR                          |
 | METHOD_RETURN_TYPE_CHANGED                     | false                     | false                     | MAJOR                          |
+| METHOD_RETURN_TYPE_COVARIANT_CHANGED           | true                      | true                      | MINOR                          |
 | METHOD_RETURN_TYPE_GENERICS_CHANGED            | true                      | false                     | MINOR                          |
 | METHOD_STATIC_IN_INTERFACE_NO_LONGER_STATIC    | false                     | false                     | MAJOR                          |
 | SUPERCLASS_ADDED                               | true                      | true                      | MINOR                          |

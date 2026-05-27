@@ -31,6 +31,7 @@ public enum JApiCompatibilityChangeType {
 	METHOD_LESS_ACCESSIBLE_THAN_IN_SUPERCLASS(false, false, JApiSemanticVersionLevel.MAJOR),
 	METHOD_IS_STATIC_AND_OVERRIDES_NOT_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),
 	METHOD_RETURN_TYPE_CHANGED(false, false, JApiSemanticVersionLevel.MAJOR),
+	METHOD_RETURN_TYPE_COVARIANT_CHANGED(true, true, JApiSemanticVersionLevel.MINOR),
 	METHOD_RETURN_TYPE_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_PARAMETER_GENERICS_CHANGED(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_NOW_ABSTRACT(false, false, JApiSemanticVersionLevel.MAJOR),
