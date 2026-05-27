@@ -9,6 +9,7 @@ import japicmp.util.ModifierHelper;
 import japicmp.util.SignatureParser;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtMethod;
 import javassist.NotFoundException;
 
 import java.util.*;
@@ -448,10 +449,14 @@ public class CompatibilityChanges {
 	private void checkIfReturnTypeChanged(JApiMethod method) {
 		// section 13.4.15 of "Java Language Specification" SE7 (Method Result Type)
 		if (method.getReturnType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
-			JApiCompatibilityChange change = addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_RETURN_TYPE_CHANGED);
-			if (method.getAccessModifier().hasChangedToMoreVisible()) {
-				change.setSourceCompatible(true);
-				change.setBinaryCompatible(true);
+			if (isCovariantReturnTypeChange(method)) {
+				addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_RETURN_TYPE_COVARIANT_CHANGED);
+			} else {
+				JApiCompatibilityChange change = addCompatibilityChange(method, JApiCompatibilityChangeType.METHOD_RETURN_TYPE_CHANGED);
+				if (method.getAccessModifier().hasChangedToMoreVisible()) {
+					change.setSourceCompatible(true);
+					change.setBinaryCompatible(true);
+				}
 			}
 		}
 		if (method.getChangeStatus() == JApiChangeStatus.MODIFIED ||
@@ -459,6 +464,47 @@ public class CompatibilityChanges {
 			if (!SignatureParser.equalGenericTypes(method.getReturnType().getOldGenericTypes(), method.getReturnType().getNewGenericTypes())) {
 				addCompatibilityChange(method.getReturnType(), JApiCompatibilityChangeType.METHOD_RETURN_TYPE_GENERICS_CHANGED);
 			}
+		}
+	}
+
+	private boolean isCovariantReturnTypeChange(JApiMethod method) {
+		if (!method.getOldMethod().isPresent() || !method.getNewMethod().isPresent()) {
+			return false;
+		}
+		// Check for a compiler-generated bridge method with the original return type in the new class
+		String methodName = method.getName();
+		String oldReturnType = method.getReturnType().getOldReturnType();
+		JApiClass jApiClass = method.getjApiClass();
+		boolean bridgeMethodFound = false;
+		for (JApiMethod candidate : jApiClass.getMethods()) {
+			if (candidate == method) {
+				continue;
+			}
+			if (!candidate.getName().equals(methodName)) {
+				continue;
+			}
+			Optional<BridgeModifier> newBridgeModifier = candidate.getBridgeModifier().getNewModifier();
+			if (!newBridgeModifier.isPresent() || newBridgeModifier.get() != BridgeModifier.BRIDGE) {
+				continue;
+			}
+			if (!candidate.getReturnType().getNewReturnType().equals(oldReturnType)) {
+				continue;
+			}
+			if (candidate.hasSameParameter(method)) {
+				bridgeMethodFound = true;
+				break;
+			}
+		}
+		if (!bridgeMethodFound) {
+			return false;
+		}
+		// Verify the new return type is a subtype of the old return type
+		try {
+			CtClass oldReturnCtClass = method.getOldMethod().get().getReturnType();
+			CtClass newReturnCtClass = method.getNewMethod().get().getReturnType();
+			return newReturnCtClass.subtypeOf(oldReturnCtClass);
+		} catch (NotFoundException e) {
+			return true; // trust the bridge method as the primary indicator
 		}
 	}
 
