@@ -114,6 +114,35 @@ class ClassCompatibilityTest {
 	}
 
 	@Test
+	void testAddingPrivateConstructorKeepsClassNonExtendable() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		options.setIncludeSynthetic(true);
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws CannotCompileException {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().privateAccess().parameter(CtClass.intType).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws CannotCompileException {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtConstructorBuilder.create().privateAccess().parameter(CtClass.intType).addToClass(ctClass);
+				CtConstructorBuilder.create().privateAccess().parameter(CtClass.longType).addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.isOldClassExtendable(), is(false));
+		assertThat(jApiClass.isNewClassExtendable(), is(false));
+		assertThat(jApiClass.getCompatibilityChanges(),
+			not(hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.CLASS_NOW_NOT_EXTENDABLE))));
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+	}
+
+	@Test
 	void testClassNoLongerPublic() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
