@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.*;
+import java.util.function.Function;
 
 import static japicmp.util.ModifierHelper.isSynthetic;
 
@@ -800,27 +801,31 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	public boolean isOldClassExtendable() {
-		boolean isFinal = false;
-		if (finalModifier.getOldModifier().isPresent()) {
-			isFinal = finalModifier.getOldModifier().get().equals(FinalModifier.FINAL);
-		}
-		boolean allConstructorsPrivate = !getConstructors().isEmpty() && getConstructors()
-			.stream()
-			.allMatch(c -> c.getAccessModifier().getOldModifier().isPresent() &&
-				c.getAccessModifier().getOldModifier().get().getLevel() == AccessModifier.PRIVATE.getLevel());
-		return !isFinal && !allConstructorsPrivate;
+		return isClassExtendable(finalModifier.getOldModifier(),
+			constructor -> constructor.getAccessModifier().getOldModifier());
 	}
 
 	public boolean isNewClassExtendable() {
-		boolean isFinal = false;
-		if (finalModifier.getNewModifier().isPresent()) {
-			isFinal = finalModifier.getNewModifier().get().equals(FinalModifier.FINAL);
+		return isClassExtendable(finalModifier.getNewModifier(),
+			constructor -> constructor.getAccessModifier().getNewModifier());
+	}
+
+	private boolean isClassExtendable(Optional<FinalModifier> finalModifier,
+								  Function<JApiConstructor, Optional<AccessModifier>> constructorAccessModifier) {
+		boolean isFinal = finalModifier.isPresent() && finalModifier.get().equals(FinalModifier.FINAL);
+		boolean hasConstructors = false;
+		boolean allConstructorsPrivate = true;
+		for (JApiConstructor constructor : getConstructors()) {
+			Optional<AccessModifier> accessModifier = constructorAccessModifier.apply(constructor);
+			if (accessModifier.isPresent()) {
+				hasConstructors = true;
+				if (accessModifier.get().getLevel() != AccessModifier.PRIVATE.getLevel()) {
+					allConstructorsPrivate = false;
+					break;
+				}
+			}
 		}
-		boolean allConstructorsPrivate = !getConstructors().isEmpty() && getConstructors()
-			.stream()
-			.allMatch(c -> c.getAccessModifier().getNewModifier().isPresent() &&
-				c.getAccessModifier().getNewModifier().get().getLevel() == AccessModifier.PRIVATE.getLevel());
-		return !isFinal && !allConstructorsPrivate;
+		return !isFinal && !(hasConstructors && allConstructorsPrivate);
 	}
 
 	@Override
