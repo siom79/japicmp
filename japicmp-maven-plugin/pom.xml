@@ -175,7 +175,7 @@
 								<artifactItem>
 									<groupId>com.google.guava</groupId>
 									<artifactId>guava</artifactId>
-									<version>19.0</version>
+									<version>23.0</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<destFileName>guava-19.0.jar</destFileName>
@@ -183,7 +183,7 @@
 								<artifactItem>
 									<groupId>com.google.guava</groupId>
 									<artifactId>guava</artifactId>
-									<version>18.0</version>
+									<version>23.0</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<destFileName>guava-18.0.jar</destFileName>
