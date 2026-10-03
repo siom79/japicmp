@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.26.3 (2026-10-03)
+-------------------
+* Filter classes modified by hidden members [#529](https://github.com/siom79/japicmp/pull/529)
+
 0.26.2 (2026-09-03)
 -------------------
 * Fix false CLASS_NOW_NOT_EXTENDABLE for added private constructors [#527](https://github.com/siom79/japicmp/issues/527)
