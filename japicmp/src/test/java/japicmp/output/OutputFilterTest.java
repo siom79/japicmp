@@ -63,6 +63,8 @@ class OutputFilterTest {
 
 	private List<JApiClass> compareClassWithNewMethod(final boolean privateMethod) throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		//compare with access modifier private, otherwise the class is not MODIFIED by a private method
+		options.setAccessModifier(AccessModifier.PRIVATE);
 		return ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<CtClass> createOldClasses(ClassPool classPool) {

@@ -129,4 +129,40 @@ class ClassesTest {
 		MatcherAssert.assertThat(jApiClass.isBinaryCompatible(), is(true));
 		MatcherAssert.assertThat(jApiClass.isSourceCompatible(), is(false));
 	}
+
+	@Test
+	void testPrivateMethodAddedDoesNotModifyClassWithAccessModifierProtected() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PROTECTED);
+		JApiClass jApiClass = getJApiClass(compareClassWithNewPrivateMethod(jarArchiveComparatorOptions), CtClassBuilder.DEFAULT_CLASS_NAME);
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.UNCHANGED));
+		MatcherAssert.assertThat(jApiClass.isChangeCausedByClassElement(), is(false));
+		MatcherAssert.assertThat(getJApiMethod(jApiClass.getMethods(), "method").getChangeStatus(), is(JApiChangeStatus.NEW));
+	}
+
+	@Test
+	void testPrivateMethodAddedModifiesClassWithAccessModifierPrivate() throws Exception {
+		JarArchiveComparatorOptions jarArchiveComparatorOptions = new JarArchiveComparatorOptions();
+		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
+		JApiClass jApiClass = getJApiClass(compareClassWithNewPrivateMethod(jarArchiveComparatorOptions), CtClassBuilder.DEFAULT_CLASS_NAME);
+		MatcherAssert.assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		MatcherAssert.assertThat(jApiClass.isChangeCausedByClassElement(), is(true));
+	}
+
+	private List<JApiClass> compareClassWithNewPrivateMethod(JarArchiveComparatorOptions jarArchiveComparatorOptions) throws Exception {
+		return ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) {
+				CtClass ctClass = CtClassBuilder.create().addToClassPool(classPool);
+				return Arrays.asList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().addToClassPool(classPool);
+				CtMethodBuilder.create().privateAccess().returnType(CtClass.voidType).name("method").addToClass(ctClass);
+				return Arrays.asList(ctClass);
+			}
+		});
+	}
 }
