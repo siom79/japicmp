@@ -590,25 +590,29 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			for (JApiField field : fields) {
-				if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(field)) {
+				if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(field) && matchesAccessModifier(field)) {
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiMethod method : methods) {
-				if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(method)) {
+				if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(method) && matchesAccessModifier(method)) {
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiConstructor constructor : constructors) {
-				if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(constructor)) {
+				if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED && !isSynthetic(constructor) && matchesAccessModifier(constructor)) {
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
 			}
 		}
 		return changeStatus;
+	}
+
+	private boolean matchesAccessModifier(JApiHasAccessModifier hasAccessModifier) {
+		return ModifierHelper.matchesModifierLevel(hasAccessModifier, options.getAccessModifier());
 	}
 
 	private JApiModifier<StaticModifier> extractStaticModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
