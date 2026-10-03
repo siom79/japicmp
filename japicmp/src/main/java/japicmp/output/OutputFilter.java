@@ -159,6 +159,9 @@ public class OutputFilter extends Filter {
 							remove = true;
 						}
 					}
+					if (isModifiedOnlyByFilteredElements(jApiClass)) {
+						remove = true;
+					}
 				}
 				if (options.isOutputOnlyBinaryIncompatibleModifications()) {
 					if (jApiClass.isBinaryCompatible()) {
@@ -177,6 +180,24 @@ public class OutputFilter extends Filter {
 				if (remove) {
 					iterator.remove();
 				}
+			}
+
+			private boolean isModifiedOnlyByFilteredElements(JApiClass jApiClass) {
+				if (jApiClass.getChangeStatus() != JApiChangeStatus.MODIFIED || !jApiClass.isChangeCausedByClassElement()) {
+					return false;
+				}
+				if (jApiClass.getAccessModifier().getChangeStatus() != JApiChangeStatus.UNCHANGED
+					|| jApiClass.getStaticModifier().getChangeStatus() != JApiChangeStatus.UNCHANGED
+					|| jApiClass.getFinalModifier().getChangeStatus() != JApiChangeStatus.UNCHANGED
+					|| jApiClass.getAbstractModifier().getChangeStatus() != JApiChangeStatus.UNCHANGED
+					|| jApiClass.getSyntheticAttribute().getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+					return false;
+				}
+				if (!jApiClass.getCompatibilityChanges().isEmpty() || !jApiClass.isSourceCompatible()) {
+					return false;
+				}
+				//the class is only modified because of elements (e.g. private methods) that are not part of the output
+				return findOneChangedElement(jApiClass).isEmpty();
 			}
 
 			private ImmutableList<Boolean> findOneChangedElement(JApiClass jApiClass) {
