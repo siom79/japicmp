@@ -17,6 +17,7 @@ SYNOPSIS
                 [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]
                 [--old-classpath <oldClassPath>]
                 [--report-only-filename] [--report-only-summary]
+                [--reproducible-report]
                 [(-s | --semantic-versioning)]
                 [--markdown]
                 [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]
@@ -102,6 +103,10 @@ OPTIONS
         --report-only-summary
             Reports only a breakdown of classes and their status
             when generating plain text or html reports.
+
+        --reproducible-report
+            Omits all information that is not reproducible (e.g. the creation
+            timestamp and absolute file paths) from the reports.
 
         -s, --semantic-versioning
             Tells you which part of the version to increment.

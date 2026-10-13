@@ -50,8 +50,15 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 			renderReportResults(options) + EOL +
 			renderMissingClassesWarning(options.getIgnoreMissingClasses()) +
 			MARKDOWN_HORIZONTAL_RULE + PARAGRAPH +
-			format(md.message.generatedOn, md.message.getCurrentTimestamp()) + PARAGRAPH +
+			renderGeneratedOn() +
 			references + EOL;
+	}
+
+	private String renderGeneratedOn() {
+		if (options.isReproducibleReport()) {
+			return EMPTY;
+		}
+		return format(md.message.generatedOn, md.message.getCurrentTimestamp()) + PARAGRAPH;
 	}
 
 	private String renderHeading(int level, String text) {
@@ -96,8 +103,8 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 				format(md.message.semanticallyIncompatibleChangesIncludingDevelopmentVersions, md.message.yesNo(options.isErrorOnSemanticIncompatibilityForMajorVersionZero())))
 			),
 			format(md.message.classpathMode, options.getClassPathMode()),
-			format(md.message.oldClasspath, options.getOldClassPath().orElse(EMPTY)),
-			format(md.message.newClasspath, options.getNewClassPath().orElse(EMPTY))
+			format(md.message.oldClasspath, renderClassPath(options.getOldClassPath())),
+			format(md.message.newClasspath, renderClassPath(options.getNewClassPath()))
 		) + EOL;
 	}
 
@@ -572,6 +579,18 @@ public class MarkdownOutputGenerator extends OutputGenerator<String> {
 			return renderCode(simpleType);
 		}
 		return references.link(null, renderCode(simpleType), fullType).toString();
+	}
+
+	private String renderClassPath(Optional<String> classPath) {
+		if (!classPath.isPresent()) {
+			return EMPTY;
+		}
+		if (!options.isReproducibleReport()) {
+			return classPath.get();
+		}
+		return Arrays.stream(classPath.get().split(File.pathSeparator))
+			.map(entry -> new File(entry).getName())
+			.collect(joining(File.pathSeparator));
 	}
 
 	String renderArchive(JApiCmpArchive archive) {

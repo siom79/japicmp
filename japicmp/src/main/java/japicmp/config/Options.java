@@ -41,6 +41,7 @@ public class Options {
 	private boolean noAnnotations = false;
 	private boolean reportOnlyFilename;
 	private boolean reportOnlySummary;
+	private boolean reproducibleReport;
 	private boolean semanticVersioning;
 	private boolean markdown;
 	private boolean errorOnBinaryIncompatibility;
@@ -322,6 +323,14 @@ public class Options {
 		this.reportOnlySummary = reportOnlySummary;
 	}
 
+	public boolean isReproducibleReport() {
+		return reproducibleReport;
+	}
+
+	public void setReproducibleReport(boolean reproducibleReport) {
+		this.reproducibleReport = reproducibleReport;
+	}
+
 	public String getDifferenceDescription() {
 		Joiner joiner = Joiner.on(";");
 		StringBuilder sb = new StringBuilder()
@@ -337,7 +346,7 @@ public class Options {
 	private List<String> toPathList(List<JApiCmpArchive> archives) {
 		List<String> paths = new ArrayList<>(archives.size());
 		for (JApiCmpArchive archive : archives) {
-			if (this.reportOnlyFilename) {
+			if (this.reportOnlyFilename || this.reproducibleReport) {
 				if (archive.getFile().isPresent()) {
 					paths.add(archive.getFile().get().getName());
 				} else {

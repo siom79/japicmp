@@ -1,6 +1,7 @@
 package japicmp.output.html;
 
 import japicmp.cmp.ClassesHelper;
+import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
@@ -14,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Evaluator;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -119,5 +121,41 @@ class HtmlOutputGeneratorTest {
 		assertThat(details, not(containsString("CONSTRUCTOR_REMOVED")));
 		assertThat(details, not(containsString("METHOD_REMOVED")));
 		assertThat(details, not(containsString("ANNOTATION_REMOVED")));
+	}
+
+	@Test
+	void testHtmlReportContainsCreationTimestampAndAbsolutePathsByDefault() {
+		Options reportOptions = createOptionsWithArchives();
+
+		String html = generateHtml(reportOptions);
+
+		assertThat(html, containsString("Created:"));
+		assertThat(html, containsString(new File("dir", "old-1.0.jar").getAbsolutePath()));
+	}
+
+	@Test
+	void testHtmlReportIsReproducible() {
+		Options reportOptions = createOptionsWithArchives();
+		reportOptions.setReproducibleReport(true);
+
+		String html = generateHtml(reportOptions);
+
+		assertThat(html, not(containsString("Created:")));
+		assertThat(html, not(containsString(new File("dir", "old-1.0.jar").getAbsolutePath())));
+		assertThat(html, containsString("old-1.0.jar"));
+		assertThat(html, containsString("new-2.0.jar"));
+		assertThat(generateHtml(reportOptions), is(html));
+	}
+
+	private static Options createOptionsWithArchives() {
+		Options reportOptions = Options.newDefault();
+		reportOptions.setOldArchives(Collections.singletonList(new JApiCmpArchive(new File("dir", "old-1.0.jar"), "1.0")));
+		reportOptions.setNewArchives(Collections.singletonList(new JApiCmpArchive(new File("dir", "new-2.0.jar"), "2.0")));
+		return reportOptions;
+	}
+
+	private static String generateHtml(Options reportOptions) {
+		HtmlOutputGenerator generator = new HtmlOutputGenerator(Collections.emptyList(), reportOptions, new HtmlOutputGeneratorOptions());
+		return generator.generate().getHtml();
 	}
 }

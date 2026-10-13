@@ -140,6 +140,7 @@ public class XmlOutputGenerator extends OutputGenerator<XmlOutput> {
 			jApiCmpXmlRoot.setTitle(xmlOutputGeneratorOptions.getTitle().get());
 		}
 		jApiCmpXmlRoot.setSemanticVersioning(xmlOutputGeneratorOptions.getSemanticVersioningInformation());
+		jApiCmpXmlRoot.setReproducible(options.isReproducibleReport());
 		return jApiCmpXmlRoot;
 	}
 

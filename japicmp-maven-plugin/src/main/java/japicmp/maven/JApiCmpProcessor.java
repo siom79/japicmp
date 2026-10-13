@@ -472,6 +472,7 @@ public class JApiCmpProcessor {
 			this.options.setNoAnnotations(parameterParam.getNoAnnotations());
 			this.options.setReportOnlyFilename(parameterParam.isReportOnlyFilename());
 			this.options.setReportOnlySummary(parameterParam.isReportOnlySummary());
+			this.options.setReproducibleReport(parameterParam.isReproducibleReport());
 		}
 		return this.options;
 	}

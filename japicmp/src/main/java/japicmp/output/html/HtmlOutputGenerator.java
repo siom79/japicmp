@@ -621,8 +621,7 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 		sb.append(templateEngine.loadAndFillTemplate("/html/meta-information.html", mapOf(
 			"oldJar", options.joinOldArchives(),
 			"newJar", options.joinNewArchives(),
-			"newJar", options.joinNewArchives(),
-			"creationTimestamp", DATE_FORMAT.format(new Date()),
+			"creationTimestampRow", creationTimestampRow(),
 			"accessModifier", options.getAccessModifier().name(),
 			"onlyModifications", String.valueOf(options.isOutputOnlyModifications()),
 			"onlyBinaryIncompatibleModifications", String.valueOf(options.isOutputOnlyBinaryIncompatibleModifications()),
@@ -631,6 +630,18 @@ public class HtmlOutputGenerator extends OutputGenerator<HtmlOutput> {
 			"packagesExclude", filtersAsString(options.getExcludes(), false),
 			"semanticVersioning", htmlOutputGeneratorOptions.getSemanticVersioningInformation()
 		))).append("\n");
+	}
+
+	private String creationTimestampRow() {
+		if (options.isReproducibleReport()) {
+			return "";
+		}
+		return "<tr>\n" +
+			"\t\t\t<td>Created:</td>\n" +
+			"\t\t\t<td>\n" +
+			"\t\t\t\t" + DATE_FORMAT.format(new Date()) + "\n" +
+			"\t\t\t</td>\n" +
+			"\t\t</tr>";
 	}
 
 	private Map<String, String> mapOf(String... args) {

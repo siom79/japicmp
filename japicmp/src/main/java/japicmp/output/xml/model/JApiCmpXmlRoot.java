@@ -29,6 +29,7 @@ public class JApiCmpXmlRoot {
 	private String ignoreMissingClassesByRegularExpressions;
 	private Optional<String> titleOptional = Optional.empty();
 	private String semanticVersioning = "n.a.";
+	private boolean reproducible;
 
 	@XmlElementWrapper(name = "classes")
 	@XmlElement(name = "class")
@@ -60,6 +61,9 @@ public class JApiCmpXmlRoot {
 
 	@XmlAttribute
 	public String getCreationTimestamp() {
+		if (reproducible) {
+			return null;
+		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		return sdf.format(new Date());
 	}
@@ -131,6 +135,15 @@ public class JApiCmpXmlRoot {
 
 	public void setTitle(String title) {
 		this.titleOptional = Optional.ofNullable(title);
+	}
+
+	@XmlTransient
+	public boolean isReproducible() {
+		return reproducible;
+	}
+
+	public void setReproducible(boolean reproducible) {
+		this.reproducible = reproducible;
 	}
 
 	@XmlAttribute

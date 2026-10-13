@@ -94,6 +94,8 @@ public class CliParser {
 				options.setReportOnlyFilename(true);
 			} else if ("--report-only-summary".equals(arg)) {
 				options.setReportOnlySummary(true);
+			} else if ("--reproducible-report".equals(arg)) {
+				options.setReproducibleReport(true);
 			} else if ("--error-on-binary-incompatibility".equals(arg)) {
 				options.setErrorOnBinaryIncompatibility(true);
 			} else if ("--error-on-source-incompatibility".equals(arg)) {
@@ -130,6 +132,7 @@ public class CliParser {
 			"                [(-o <pathToOldVersionJar> | --old <pathToOldVersionJar>)]\n" +
 			"                [--old-classpath <oldClassPath>]\n" +
 			"                [--report-only-filename] [--report-only-summary]\n" +
+			"                [--reproducible-report]\n" +
 			"                [(-s | --semantic-versioning)]\n" +
 			"                [--markdown]\n" +
 			"                [(-x <pathToXmlOutputFile> | --xml-file <pathToXmlOutputFile>)]\n" +
@@ -215,6 +218,10 @@ public class CliParser {
 			"        --report-only-summary\n" +
 			"            Reports only a breakdown of classes and their status\n" +
 			"            when generating plain text or html reports.\n" +
+			"\n" +
+			"        --reproducible-report\n" +
+			"            Omits all information that is not reproducible (e.g. the creation\n" +
+			"            timestamp and absolute file paths) from the reports.\n" +
 			"\n" +
 			"        -s, --semantic-versioning\n" +
 			"            Tells you which part of the version to increment.\n" +
