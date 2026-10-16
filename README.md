@@ -168,6 +168,7 @@ If the release fails, the version must be reverted and the tag created during th
 ```bash
 mvn versions:set -DnewVersion=<new-version>-SNAPSHOT
 mvn versions:commit
+git add .
 git push
 git push --delete origin japicmp-base-<new-version>
 ```
