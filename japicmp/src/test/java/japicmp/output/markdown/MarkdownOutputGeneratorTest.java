@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static japicmp.model.AccessModifier.PRIVATE;
 import static japicmp.model.JApiCompatibilityChangeType.*;
@@ -29,6 +30,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -56,6 +58,33 @@ class MarkdownOutputGeneratorTest {
 		assertThat(generated, containsString(MSG.badgeNoChanges));
 		assertThat(generated, containsString(
 			format(MSG.summaryNoChanges, format(MSG.oneNewVersion, NEW_VERSION), format(MSG.oneOldVersion, OLD_VERSION))));
+	}
+
+	@Test
+	void testGeneratedOnAndClassPathByDefault() {
+		Options options = createOptionsWithClassPath();
+		String generated = new MarkdownOutputGenerator(options, emptyList()).generate();
+		assertThat(generated, containsString("Generated on:"));
+		assertThat(generated, containsString(new File("lib", "dependency-1.0.jar").getAbsolutePath()));
+	}
+
+	@Test
+	void testReproducibleReport() {
+		Options options = createOptionsWithClassPath();
+		options.setReproducibleReport(true);
+		String generated = new MarkdownOutputGenerator(options, emptyList()).generate();
+		assertThat(generated, not(containsString("Generated on:")));
+		assertThat(generated, not(containsString(new File("lib", "dependency-1.0.jar").getAbsolutePath())));
+		assertThat(generated, containsString("dependency-1.0.jar" + File.pathSeparator + "other-2.0.jar"));
+		assertThat(new MarkdownOutputGenerator(options, emptyList()).generate(), is(generated));
+	}
+
+	private static Options createOptionsWithClassPath() {
+		Options options = Options.newDefault();
+		options.setOldArchives(singletonList(OLD_ARCHIVE));
+		options.setNewArchives(singletonList(NEW_ARCHIVE));
+		options.setOldClassPath(Optional.of(new File("lib", "dependency-1.0.jar").getAbsolutePath() + File.pathSeparator + new File("lib", "other-2.0.jar").getAbsolutePath()));
+		return options;
 	}
 
 	@Test

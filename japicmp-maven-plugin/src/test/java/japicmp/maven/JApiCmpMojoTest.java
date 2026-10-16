@@ -2,6 +2,8 @@ package japicmp.maven;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -17,6 +19,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -100,6 +104,22 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertFileExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testReproducibleReport(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		testMojo.parameter.setReproducibleReport(true);
+		deleteDirectory(testDefaultDir);
+		testMojo.execute();
+		final String xml = new String(Files.readAllBytes(defaultXmlFile.toPath()), StandardCharsets.UTF_8);
+		final String html = new String(Files.readAllBytes(defaultHtmlFile.toPath()), StandardCharsets.UTF_8);
+		final String md = new String(Files.readAllBytes(defaultMdFile.toPath()), StandardCharsets.UTF_8);
+		assertThat(xml, not(containsString("creationTimestamp")));
+		assertThat(html, not(containsString("Created:")));
+		assertThat(md, not(containsString("Generated on:")));
+		assertThat(xml, not(containsString(File.separator + "repository" + File.separator)));
 	}
 
 	@Test

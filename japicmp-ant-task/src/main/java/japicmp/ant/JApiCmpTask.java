@@ -42,6 +42,7 @@ public class JApiCmpTask extends Task {
 	private boolean markdown = false;
 	private boolean reportOnlyFilename = false;
 	private boolean reportOnlySummary = false;
+	private boolean reproducibleReport = false;
 	private boolean ignoreMissingClasses = false;
 	private boolean includeExclusively = false;
 	private boolean excludeExclusively = false;
@@ -106,6 +107,10 @@ public class JApiCmpTask extends Task {
 
 	public void setReportOnlySummary(String reportOnlySummary) {
 		this.reportOnlySummary = Project.toBoolean(reportOnlySummary);
+	}
+
+	public void setReproducibleReport(String reproducibleReport) {
+		this.reproducibleReport = Project.toBoolean(reproducibleReport);
 	}
 
 	public void setIgnoreMissingClasses(String ignoreMissingClasses) {
@@ -260,6 +265,7 @@ public class JApiCmpTask extends Task {
 		}
 		options.setReportOnlyFilename(reportOnlyFilename);
 		options.setReportOnlySummary(reportOnlySummary);
+		options.setReproducibleReport(reproducibleReport);
 		options.setErrorOnSemanticIncompatibility(errorOnSemanticIncompatibility);
 		options.setErrorOnExclusionIncompatibility(errorOnExclusionIncompatibility);
 		options.setErrorOnSourceIncompatibility(errorOnSourceIncompatibility);

@@ -74,6 +74,8 @@ public class ConfigParameters {
 
 	private boolean reportOnlySummary;
 
+	private boolean reproducibleReport;
+
 	private List<String> includeModules;
 
 	private List<String> excludeModules;
@@ -333,6 +335,14 @@ public class ConfigParameters {
 
 	void setReportOnlySummary(boolean reportOnlySummary) {
 		this.reportOnlySummary = reportOnlySummary;
+	}
+
+	public boolean isReproducibleReport() {
+		return reproducibleReport;
+	}
+
+	void setReproducibleReport(boolean reproducibleReport) {
+		this.reproducibleReport = reproducibleReport;
 	}
 
 	public boolean getIgnoreMissingNewVersion() {
