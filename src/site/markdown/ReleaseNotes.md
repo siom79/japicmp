@@ -3,6 +3,10 @@ Versions
 
 The following versions of japicmp are available:
 
+0.26.4 (2026-10-16)
+-------------------
+* Reproducible reports [#531](https://github.com/siom79/japicmp/pull/531)
+
 0.26.3 (2026-10-03)
 -------------------
 * Filter classes modified by hidden members [#529](https://github.com/siom79/japicmp/pull/529)
