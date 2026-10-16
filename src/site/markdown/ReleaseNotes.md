@@ -3,7 +3,7 @@ Versions
 
 The following versions of japicmp are available:
 
-0.26.4 (2026-10-16)
+0.26.5 (2026-10-16)
 -------------------
 * Reproducible reports [#531](https://github.com/siom79/japicmp/pull/531)
 
