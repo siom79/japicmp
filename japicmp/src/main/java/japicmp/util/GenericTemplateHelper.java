@@ -4,11 +4,7 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiGenericTemplate;
 import japicmp.model.JApiGenericType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class GenericTemplateHelper {
 
@@ -35,7 +31,7 @@ public class GenericTemplateHelper {
 				SignatureParser.ParsedTemplate oldParsedTemplate = oldGenericTemplatesMap.get(newParsedTemplate.getName());
 				if (oldParsedTemplate != null) {
 					JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;
-					if (!newParsedTemplate.getType().equals(oldParsedTemplate.getType())) {
+					if (!newParsedTemplate.getType().equals(oldParsedTemplate.getType()) || haveAdditionalBoundsChanged(oldParsedTemplate, newParsedTemplate)) {
 						changeStatus = JApiChangeStatus.MODIFIED;
 					}
 					JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(changeStatus, newParsedTemplate.getName(), Optional.of(oldParsedTemplate.getType()), Optional.of(newParsedTemplate.getType()));
@@ -76,6 +72,14 @@ public class GenericTemplateHelper {
 			}
 		}
 		return genericTemplates;
+	}
+
+	private static boolean haveAdditionalBoundsChanged(SignatureParser.ParsedTemplate oldParsedTemplate, SignatureParser.ParsedTemplate newParsedTemplate) {
+		List<JApiGenericType> oldInterfaces = new ArrayList<>();
+		List<JApiGenericType> newInterfaces = new ArrayList<>();
+		SignatureParser.copyGenericTypeInterfaces(oldParsedTemplate, oldInterfaces);
+		SignatureParser.copyGenericTypeInterfaces(newParsedTemplate, newInterfaces);
+		return haveGenericTemplateInterfacesChanges(oldInterfaces, newInterfaces);
 	}
 
 	public static boolean haveGenericTemplateInterfacesChanges(List<JApiGenericType> oldInterfaces, List<JApiGenericType> newInterfaces) {

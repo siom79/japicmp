@@ -153,3 +153,11 @@ The following projects have related goals:
 * [Clirr](http://clirr.sourceforge.net/): A tool written in Java that compares two libraries for binary compatibility. Tracking of API changes is implemented only partially, tracking of annotations is not supported. Development has stopped around 2005.
 * [JDiff](http://javadiff.sourceforge.net/): A Javadoc doclet that generates an HTML report of all API changes. The source code for both versions has to be available, the differences are not distinguished between binary incompatible or not. Comparison of annotations is not supported.
 * [revapi](http://revapi.org/): An API analysis and change tracking tool that was started about the same time as japicmp. It ships with a maven plugin and an Ant task, but the maven plugin currently (version 0.4.1) only reports changes on the command line.
+
+Scientific work
+---------------
+
+The following publications evaluate or reference japicmp:
+
+* [Corentin Latappy, Thomas Degueule, Jean-Rémy Falleri, Romain Robbes, Lina Ochoa: Roseau: Fast, Accurate, Source-based API Breaking Change Analysis in Java. CoRR abs/2507.17369 (2025)](https://arxiv.org/abs/2507.17369)
+* [Kamil Jezek, Jens Dietrich: API Evolution and Compatibility: A Data Corpus and Tool Evaluation. J. Object Technol. 16(4): 2:1-23 (2017)](https://www.jot.fm/contents/issue_2017_04/article2.html)

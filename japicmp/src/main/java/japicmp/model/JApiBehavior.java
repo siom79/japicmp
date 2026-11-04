@@ -32,6 +32,7 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 	private final JApiModifier<SyntheticModifier> syntheticModifier;
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private final JApiModifier<VarargsModifier> varargsModifier;
+	private final JApiModifier<NativeModifier> nativeModifier;
 	private final List<JApiException> exceptions;
 	protected JApiChangeStatus changeStatus;
 	private final Optional<Integer> oldLineNumber;
@@ -57,6 +58,7 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 		this.syntheticModifier = extractSyntheticModifier(oldBehavior, newBehavior);
 		this.syntheticAttribute = extractSyntheticAttribute(oldBehavior, newBehavior);
 		this.varargsModifier = extractVarargsModifier(oldBehavior, newBehavior);
+		this.nativeModifier = extractNativeModifier(oldBehavior, newBehavior);
 		this.exceptions = computeExceptionChanges(oldBehavior, newBehavior);
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 		this.oldLineNumber = getLineNumber(oldBehavior);
@@ -219,6 +221,9 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			if (this.varargsModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+				changeStatus = JApiChangeStatus.MODIFIED;
+			}
+			if (this.nativeModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			for (JApiException jApiException : exceptions) {
@@ -393,6 +398,24 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 		});
 	}
 
+	private JApiModifier<NativeModifier> extractNativeModifier(Optional<? extends CtBehavior> oldBehaviorOptional, Optional<? extends CtBehavior> newBehaviorOptional) {
+		return ModifierHelper.extractModifierFromBehavior(oldBehaviorOptional, newBehaviorOptional, new ModifierHelper.ExtractModifierFromBehaviorCallback<NativeModifier>() {
+			private NativeModifier getModifier(CtBehavior behavior) {
+				return Modifier.isNative(behavior.getModifiers()) ? NativeModifier.NATIVE : NativeModifier.NON_NATIVE;
+			}
+
+			@Override
+			public NativeModifier getModifierForOld(CtBehavior oldBehavior) {
+				return getModifier(oldBehavior);
+			}
+
+			@Override
+			public NativeModifier getModifierForNew(CtBehavior newBehavior) {
+				return getModifier(newBehavior);
+			}
+		});
+	}
+
 	@Override
 	@XmlElementWrapper(name = "modifiers")
 	@XmlElement(name = "modifier")
@@ -473,6 +496,11 @@ public abstract class JApiBehavior implements JApiHasModifiers, JApiHasChangeSta
 	@XmlTransient
 	public JApiModifier<VarargsModifier> getVarargsModifier() {
 		return varargsModifier;
+	}
+
+	@XmlTransient
+	public JApiModifier<NativeModifier> getNativeModifier() {
+		return nativeModifier;
 	}
 
 	@Override

@@ -9,7 +9,6 @@ import japicmp.util.ModifierHelper;
 import japicmp.util.SignatureParser;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtMethod;
 import javassist.NotFoundException;
 
 import java.util.*;
@@ -438,6 +437,7 @@ public class CompatibilityChanges {
 				checkIfExceptionIsNowChecked(method);
 				checkIfAnnotationsChanged(method, classMap);
 				checkIfVarargsChanged(method);
+				checkIfNativeChanged(method);
 				checkIfParametersGenericsChanged(method);
 				if (method.getChangeStatus().isNotNewOrRemoved()) {
 					checkIfGenericTemplatesHaveChanged(method);
@@ -554,6 +554,12 @@ public class CompatibilityChanges {
 					}
 				}
 			}
+		}
+	}
+
+	private void checkIfNativeChanged(JApiBehavior behavior) {
+		if (behavior.getNativeModifier().hasChangedFromTo(NativeModifier.NON_NATIVE, NativeModifier.NATIVE)) {
+			addCompatibilityChange(behavior, JApiCompatibilityChangeType.METHOD_NOW_NATIVE);
 		}
 	}
 
@@ -886,6 +892,10 @@ public class CompatibilityChanges {
 					checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
 				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
 					addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.INTERFACE_ADDED);
+					if (isInterface(jApiClass) && jApiClass.getChangeStatus() != JApiChangeStatus.NEW
+						&& addsAbstractMethodsToInterface(jApiClass, interfaceClass, classMap)) {
+						addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
+					}
 					// no marker interface, no abstract class, no interface and annotation
 					if (!interfaceClass.getMethods().isEmpty() && !isAbstract(jApiClass) && !isInterface(jApiClass) && !isAnnotation(jApiClass) && !isEnum(jApiClass)) {
 						boolean allInterfaceMethodsImplemented = true;
@@ -1039,6 +1049,38 @@ public class CompatibilityChanges {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
 		}
+	}
+
+	private boolean addsAbstractMethodsToInterface(JApiClass jApiInterface, JApiClass newSuperInterface, Map<String, JApiClass> classMap) {
+		for (JApiMethod superInterfaceMethod : newSuperInterface.getMethods()) {
+			if (superInterfaceMethod.getChangeStatus() == JApiChangeStatus.REMOVED || !isAbstract(superInterfaceMethod) || isSynthetic(superInterfaceMethod)) {
+				continue;
+			}
+			if (!isMethodPresentInOldVersion(superInterfaceMethod, jApiInterface, classMap)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isMethodPresentInOldVersion(JApiMethod method, JApiClass jApiInterface, Map<String, JApiClass> classMap) {
+		for (JApiMethod ownMethod : jApiInterface.getMethods()) {
+			if (ownMethod.getChangeStatus() != JApiChangeStatus.NEW && areMatching(method, ownMethod)) {
+				return true;
+			}
+		}
+		for (JApiImplementedInterface otherInterface : jApiInterface.getInterfaces()) {
+			if (otherInterface.getChangeStatus() == JApiChangeStatus.NEW) {
+				continue;
+			}
+			JApiClass otherInterfaceClass = getJApiClass(otherInterface, classMap);
+			for (JApiMethod otherMethod : otherInterfaceClass.getMethods()) {
+				if (otherMethod.getChangeStatus() != JApiChangeStatus.NEW && areMatching(method, otherMethod)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private static boolean areMatching(JApiMethod left, JApiMethod right) {
