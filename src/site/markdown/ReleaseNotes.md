@@ -3,9 +3,13 @@ Versions
 
 The following versions of japicmp are available:
 
+0.27.0 (2027-11-04)
+-------------------
+* japicmp now detects added type bounds on generics, new super interfaces of interfaces, and changes to the native modifier on methods [#534](https://github.com/siom79/japicmp/pull/534)
+
 0.26.5 (2026-10-16)
 -------------------
-* Reproducible reports [#531](https://github.com/siom79/japicmp/pull/531)
+* Reproducible reports [#531](https://github.com/siom79/japicmp/issues/531)
 
 0.26.3 (2026-10-03)
 -------------------
