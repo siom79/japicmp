@@ -438,6 +438,7 @@ public class CompatibilityChanges {
 				checkIfExceptionIsNowChecked(method);
 				checkIfAnnotationsChanged(method, classMap);
 				checkIfVarargsChanged(method);
+				checkIfNativeChanged(method);
 				checkIfParametersGenericsChanged(method);
 				if (method.getChangeStatus().isNotNewOrRemoved()) {
 					checkIfGenericTemplatesHaveChanged(method);
@@ -554,6 +555,15 @@ public class CompatibilityChanges {
 					}
 				}
 			}
+		}
+	}
+
+	private void checkIfNativeChanged(JApiBehavior behavior) {
+		// The Java implementation is replaced by a native one. Existing clients still link against
+		// the method, but invoking it fails with an UnsatisfiedLinkError unless a native library
+		// providing the implementation is loaded.
+		if (behavior.getNativeModifier().hasChangedFromTo(NativeModifier.NON_NATIVE, NativeModifier.NATIVE)) {
+			addCompatibilityChange(behavior, JApiCompatibilityChangeType.METHOD_NOW_NATIVE);
 		}
 	}
 
@@ -886,6 +896,11 @@ public class CompatibilityChanges {
 					checkIfFieldsHaveChangedIncompatible(interfaceClass, classMap);
 				} else if (implementedInterface.getChangeStatus() == JApiChangeStatus.NEW) {
 					addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.INTERFACE_ADDED);
+					if (isInterface(jApiClass) && jApiClass.getChangeStatus() != JApiChangeStatus.NEW
+						&& addsAbstractMethodsToInterface(jApiClass, interfaceClass, classMap)) {
+						// classes implementing this interface now have to implement the abstract methods of the new super interface
+						addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
+					}
 					// no marker interface, no abstract class, no interface and annotation
 					if (!interfaceClass.getMethods().isEmpty() && !isAbstract(jApiClass) && !isInterface(jApiClass) && !isAnnotation(jApiClass) && !isEnum(jApiClass)) {
 						boolean allInterfaceMethodsImplemented = true;
@@ -1039,6 +1054,43 @@ public class CompatibilityChanges {
 				addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE);
 			}
 		}
+	}
+
+	/**
+	 * Checks if the newly added super interface of the given interface declares abstract methods
+	 * that were not already part of the interface (either declared by itself or inherited from one
+	 * of its previous super interfaces).
+	 */
+	private boolean addsAbstractMethodsToInterface(JApiClass jApiInterface, JApiClass newSuperInterface, Map<String, JApiClass> classMap) {
+		for (JApiMethod superInterfaceMethod : newSuperInterface.getMethods()) {
+			if (superInterfaceMethod.getChangeStatus() == JApiChangeStatus.REMOVED || !isAbstract(superInterfaceMethod) || isSynthetic(superInterfaceMethod)) {
+				continue;
+			}
+			if (!isMethodPresentInOldVersion(superInterfaceMethod, jApiInterface, classMap)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isMethodPresentInOldVersion(JApiMethod method, JApiClass jApiInterface, Map<String, JApiClass> classMap) {
+		for (JApiMethod ownMethod : jApiInterface.getMethods()) {
+			if (ownMethod.getChangeStatus() != JApiChangeStatus.NEW && areMatching(method, ownMethod)) {
+				return true;
+			}
+		}
+		for (JApiImplementedInterface otherInterface : jApiInterface.getInterfaces()) {
+			if (otherInterface.getChangeStatus() == JApiChangeStatus.NEW) {
+				continue;
+			}
+			JApiClass otherInterfaceClass = getJApiClass(otherInterface, classMap);
+			for (JApiMethod otherMethod : otherInterfaceClass.getMethods()) {
+				if (otherMethod.getChangeStatus() != JApiChangeStatus.NEW && areMatching(method, otherMethod)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private static boolean areMatching(JApiMethod left, JApiMethod right) {

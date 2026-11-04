@@ -214,7 +214,7 @@ class GenericTemplateTest {
 
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(Options.newDefault(), jApiClasses);
 		String generated = generator.generate();
-		Assertions.assertTrue(generated.contains("GENERIC TEMPLATES: ===* X:java.util.List<java.lang.Long>(<- <java.lang.Integer>) & japicmp.test.Generics$MyInterface<java.lang.Integer> (<- & java.io.Serializable & japicmp.test.Generics$MyInterface<java.lang.Integer>)"));
+		Assertions.assertTrue(generated.contains("GENERIC TEMPLATES: **** X:java.util.List<java.lang.Long> (<-java.util.List<java.lang.Integer>) & japicmp.test.Generics$MyInterface<java.lang.Integer> (<- & java.io.Serializable & japicmp.test.Generics$MyInterface<java.lang.Integer>)"));
 	}
 
 	@Test
@@ -250,6 +250,83 @@ class GenericTemplateTest {
 
 		StdoutOutputGenerator generator = new StdoutOutputGenerator(Options.newDefault(), jApiClasses);
 		String generated = generator.generate();
-		Assertions.assertTrue(generated.contains("GENERIC TEMPLATES: ===* X:java.util.List<java.lang.Long>(<- <java.lang.Integer>) & japicmp.test.Generics$MyInterface<java.lang.Integer> (<- & java.io.Serializable & japicmp.test.Generics$MyInterface<java.lang.Integer>)"));
+		Assertions.assertTrue(generated.contains("GENERIC TEMPLATES: **** X:java.util.List<java.lang.Long> (<-java.util.List<java.lang.Integer>) & japicmp.test.Generics$MyInterface<java.lang.Integer> (<- & java.io.Serializable & japicmp.test.Generics$MyInterface<java.lang.Integer>)"));
+	}
+
+	@Test
+	void testSecondBoundAddedToClassTemplate() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				ctClass.setGenericSignature("<T:Ljava/lang/Number;>Ljava/lang/Object;");
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				ctClass.setGenericSignature("<T:Ljava/lang/Number;:Ljava/lang/Comparable<TT;>;>Ljava/lang/Object;");
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		Assertions.assertEquals(1, jApiClass.getGenericTemplates().size());
+		Assertions.assertEquals(JApiChangeStatus.MODIFIED, jApiClass.getGenericTemplates().get(0).getChangeStatus());
+		Assertions.assertTrue(jApiClass.getCompatibilityChanges().stream().anyMatch(c -> c.getType() == JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED));
+		Assertions.assertTrue(jApiClass.isBinaryCompatible());
+		Assertions.assertFalse(jApiClass.isSourceCompatible());
+	}
+
+	@Test
+	void testSecondBoundRemovedFromMethodTemplate() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").body("return;")
+					.signature("<T:Ljava/lang/Number;:Ljava/lang/Comparable<TT;>;>()V").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").body("return;")
+					.signature("<T:Ljava/lang/Number;>()V").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		Assertions.assertEquals(JApiChangeStatus.MODIFIED, jApiMethod.getGenericTemplates().get(0).getChangeStatus());
+		Assertions.assertTrue(jApiMethod.getCompatibilityChanges().stream().anyMatch(c -> c.getType() == JApiCompatibilityChangeType.CLASS_GENERIC_TEMPLATE_CHANGED));
+		Assertions.assertTrue(jApiClass.isBinaryCompatible());
+		Assertions.assertFalse(jApiClass.isSourceCompatible());
+	}
+
+	@Test
+	void testUnchangedSecondBoundIsNotReported() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				ctClass.setGenericSignature("<T:Ljava/lang/Number;:Ljava/lang/Comparable<TT;>;>Ljava/lang/Object;");
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				ctClass.setGenericSignature("<T:Ljava/lang/Number;:Ljava/lang/Comparable<TT;>;>Ljava/lang/Object;");
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		Assertions.assertEquals(JApiChangeStatus.UNCHANGED, jApiClass.getGenericTemplates().get(0).getChangeStatus());
+		Assertions.assertTrue(jApiClass.getCompatibilityChanges().isEmpty());
 	}
 }

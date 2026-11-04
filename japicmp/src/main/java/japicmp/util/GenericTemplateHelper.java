@@ -35,7 +35,7 @@ public class GenericTemplateHelper {
 				SignatureParser.ParsedTemplate oldParsedTemplate = oldGenericTemplatesMap.get(newParsedTemplate.getName());
 				if (oldParsedTemplate != null) {
 					JApiChangeStatus changeStatus = JApiChangeStatus.UNCHANGED;
-					if (!newParsedTemplate.getType().equals(oldParsedTemplate.getType())) {
+					if (!newParsedTemplate.getType().equals(oldParsedTemplate.getType()) || haveAdditionalBoundsChanged(oldParsedTemplate, newParsedTemplate)) {
 						changeStatus = JApiChangeStatus.MODIFIED;
 					}
 					JApiGenericTemplate jApiGenericTemplate = new JApiGenericTemplate(changeStatus, newParsedTemplate.getName(), Optional.of(oldParsedTemplate.getType()), Optional.of(newParsedTemplate.getType()));
@@ -76,6 +76,19 @@ public class GenericTemplateHelper {
 			}
 		}
 		return genericTemplates;
+	}
+
+	/**
+	 * Compares the additional (interface) bounds of a type parameter, e.g. {@code Comparable<T>} in
+	 * {@code <T extends Number & Comparable<T>>}. Adding or removing such a bound changes the set of
+	 * type arguments that are accepted for the type parameter.
+	 */
+	private static boolean haveAdditionalBoundsChanged(SignatureParser.ParsedTemplate oldParsedTemplate, SignatureParser.ParsedTemplate newParsedTemplate) {
+		List<JApiGenericType> oldInterfaces = new ArrayList<>();
+		List<JApiGenericType> newInterfaces = new ArrayList<>();
+		SignatureParser.copyGenericTypeInterfaces(oldParsedTemplate, oldInterfaces);
+		SignatureParser.copyGenericTypeInterfaces(newParsedTemplate, newInterfaces);
+		return haveGenericTemplateInterfacesChanges(oldInterfaces, newInterfaces);
 	}
 
 	public static boolean haveGenericTemplateInterfacesChanges(List<JApiGenericType> oldInterfaces, List<JApiGenericType> newInterfaces) {

@@ -41,7 +41,7 @@ mvn -pl japicmp -am install -DskipTests
 doc/api-evolution-corpus/run.sh
 ```
 
-Geprüft wurde japicmp `0.26.6-SNAPSHOT`.
+Geprüft wurde japicmp `0.26.6-SNAPSHOT` mit den Erweiterungen aus Abschnitt 4. Ohne diese Erweiterungen erkannte japicmp 144 von 154 inkompatiblen Szenarien (93,51 %), es gab 9 Lücken.
 
 ### Bewertungsschlüssel
 
@@ -49,7 +49,7 @@ Geprüft wurde japicmp `0.26.6-SNAPSHOT`.
 |---|---|
 | ✅ korrekt | Die binäre und die source-Einstufung von japicmp stimmen mit dem Oracle überein. |
 | ⚠️ konservativ | japicmp meldet eine Inkompatibilität, die der Client im Korpus nicht auslöst, ein anderer Client aber auslösen kann (siehe K1–K6). |
-| ❌ Lücke | Das Oracle meldet eine Inkompatibilität, die japicmp **nicht** erkennt. Diese Prüfung fehlt in japicmp (siehe G1–G3). |
+| ❌ Lücke | Das Oracle meldet eine Inkompatibilität, die japicmp **nicht** erkennt. Nach den Erweiterungen G1–G3 gibt es keinen solchen Fall mehr. |
 | ℹ️ nicht statisch prüfbar / Oracle | Die Abweichung kommt aus einem Fehler im Oracle oder aus reinem Laufzeitverhalten (siehe O1, O2). |
 
 ✔ = kompatibel, ✘ = inkompatibel.
@@ -62,12 +62,12 @@ Geprüft wurde japicmp `0.26.6-SNAPSHOT`.
 | Data Types | 49 | 29 | 20 | 0 | 0 | 47 | 47 | 100,00 % | 100,00 % |
 | Exceptions | 16 | 14 | 1 | 0 | 1 | 7 | 7 | 100,00 % | 100,00 % |
 | Generics (Wildcards) | 28 | 17 | 11 | 0 | 0 | 17 | 17 | 100,00 % | 0,00 % ¹ |
-| Generics | 60 | 37 | 17 | 6 | 0 | 34 | 28 | 82,35 % | 0,00 % ¹ |
-| Inheritance | 16 | 12 | 2 | 2 | 0 | 7 | 5 | 71,43 % | 100,00 % |
+| Generics | 60 | 39 | 21 | 0 | 0 | 34 | 34 | 100,00 % | 0,00 % ¹ |
+| Inheritance | 16 | 14 | 2 | 0 | 0 | 7 | 7 | 100,00 % | 100,00 % |
 | Members | 28 | 22 | 6 | 0 | 0 | 19 | 19 | 100,00 % | 100,00 % |
-| Other Modifiers | 30 | 26 | 2 | 1 | 1 | 13 | 11 | 84,62 % | 84,62 % |
+| Other Modifiers | 30 | 27 | 2 | 0 | 1 | 13 | 12 | 92,31 % | 84,62 % |
 | Miscellaneous | 6 | 6 | 0 | 0 | 0 | 4 | 4 | 100,00 % | 100,00 % |
-| **Summe** | **251** | **181** | **59** | **9** | **2** | **154** | **144** | **93,51 %** | **65,58 %** |
+| **Summe** | **251** | **186** | **63** | **0** | **2** | **154** | **153** | **99,35 %** | **65,58 %** |
 
 ¹ Das Paper führt Generics als eine Kategorie (88 Szenarien). Hier ist sie in Typ-Parameter (60) und Wildcards (28) geteilt.
 
@@ -75,20 +75,26 @@ Geprüft wurde japicmp `0.26.6-SNAPSHOT`.
 
 | Typ | Szenarien | erkannt heute | Rate heute | japicmp 0.7.2 im Paper |
 |---|---:|---:|---:|---:|
-| nur source-inkompatibel | 68 | 60 | 88,24 % | 25,00 % |
-| binär-inkompatibel | 86 | 84 | 97,67 % | 97,67 % |
+| nur source-inkompatibel | 68 | 68 | 100,00 % | 25,00 % |
+| binär-inkompatibel | 86 | 85 | 98,84 % | 97,67 % |
 
-Strenger gezählt, also für jede Art getrennt: Von 132 source-inkompatiblen Szenarien stuft japicmp 124 als source-inkompatibel ein. Von 86 binär-inkompatiblen Szenarien stuft es 83 als binär-inkompatibel ein.
+Strenger gezählt, also für jede Art getrennt: Von 132 source-inkompatiblen Szenarien stuft japicmp alle 132 als source-inkompatibel ein (vor den Erweiterungen 124). Von 86 binär-inkompatiblen Szenarien stuft es 84 als binär-inkompatibel ein (vorher 83). Die zwei verbleibenden binären Abweichungen sind O1 und O2.
 
-Seit Version 0.7.2 aus dem Paper hat sich japicmp vor allem bei **Generics** (0 % → 82–100 %) und bei **source-Inkompatibilitäten** (25 % → 88 %) verbessert. Bei *Inheritance* liegt der heutige Wert unter dem des Papers. Das Paper wertete die Textausgabe per String-Matching aus und zählte deshalb auch jede gemeldete Änderung wie `INTERFACE_ADDED` als Treffer. Diese Auswertung zählt nur, was japicmp tatsächlich als inkompatibel einstuft.
+Seit Version 0.7.2 aus dem Paper hat sich japicmp vor allem bei **Generics** (0 % → 100 %) und bei **source-Inkompatibilitäten** (25 % → 100 %) verbessert. Zum Vergleich der Zahlen: Das Paper wertete die Textausgabe per String-Matching aus und zählte deshalb jede gemeldete Änderung als Treffer, auch eine kompatible wie `INTERFACE_ADDED`. Diese Auswertung zählt nur, was japicmp tatsächlich als inkompatibel einstuft. Übrig bleibt nur `modifierMethodStrictfpToNonStrictfp`, und dort ist das Oracle fehlerhaft (O1).
 
-## 4. Lücken in japicmp (❌)
+## 4. Geschlossene Lücken (G1–G3)
 
-| ID | Szenarien | Was fehlt |
-|---|---|---|
-| **G1** | `genericsClazzTypeBoundsAddSecond`, `genericsClazzConstructorTypeBoundsAddSecond`, `genericsClazzMethodTypeBoundsAddSecond`, `genericsIfazeTypeBoundsAddSecond`, `genericsIfazeMethodTypeBoundsAddSecond`, `genericsIfazeMethodTypeBoundsDeleteSecond` | Es wird ein **zusätzlicher Bound** (Intersection Type) eines Typ-Parameters hinzugefügt oder entfernt, z. B. `<T extends Number>` → `<T extends Number & Comparable<T>>`. Eine Änderung des *ersten* Bounds erkennt japicmp (`CLASS_GENERIC_TEMPLATE_CHANGED`). Die weiteren Interface-Bounds vergleicht es nicht. In allen 10 `*TypeBounds(Add|Delete)Second`-Szenarien meldet japicmp deshalb gar keine Änderung. Als Lücke gezählt sind nur die 6, in denen das Oracle eine Inkompatibilität zeigt. |
-| **G2** | `inheritanceIfazeStartInherite`, `inheritanceIfazeExpandSuperinterfaceSet` | Ein **Interface** bekommt ein neues Super-Interface mit abstrakten Methoden. Klassen, die das Interface implementieren, lassen sich dann nicht mehr kompilieren. japicmp meldet nur das kompatible `INTERFACE_ADDED`. Für Klassen gibt es `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE`, für Interfaces fehlt eine entsprechende Prüfung (vergleichbar mit `METHOD_ADDED_TO_INTERFACE`). |
-| **G3** | `modifierMethodNonNativeToNative` | Wird eine Methode `native`, endet der Aufruf ohne native Implementierung mit `UnsatisfiedLinkError`. japicmp wertet den Modifier `native` nicht aus. Streng genommen ist das Laufzeitverhalten. Eine eigene Meldung (z. B. `METHOD_NOW_NATIVE`) wäre trotzdem möglich. |
+Die erste Auswertung zeigte drei Prüfungen, die in japicmp fehlten. Sie sind jetzt umgesetzt. In der Matrix sind die betroffenen Szenarien mit G1, G2 bzw. G3 markiert.
+
+| ID | Szenarien | Vorher | Erweiterung |
+|---|---|---|---|
+| **G1** | `generics*TypeBounds(Add\|Delete)Second` (10 Szenarien, davon 6 laut Oracle inkompatibel) | Ein zusätzlicher Bound eines Typ-Parameters (Intersection Type), z. B. `<T extends Number>` → `<T extends Number & Comparable<T>>`, wurde nicht verglichen. japicmp meldete keine Änderung. | `GenericTemplateHelper` vergleicht jetzt auch die weiteren (Interface-)Bounds. Ändern sie sich, gilt das Template als `MODIFIED`, und japicmp meldet `CLASS_GENERIC_TEMPLATE_CHANGED` (source-inkompatibel). Das gilt für Klassen, Interfaces, Methoden und Konstruktoren. |
+| **G2** | `inheritanceIfazeStartInherite`, `inheritanceIfazeExpandSuperinterfaceSet` | Bekam ein **Interface** ein neues Super-Interface mit abstrakten Methoden, meldete japicmp nur das kompatible `INTERFACE_ADDED`. Klassen, die das Interface implementieren, lassen sich dann aber nicht mehr kompilieren. | `CompatibilityChanges` prüft jetzt bei Interfaces, ob ein neues Super-Interface abstrakte Methoden mitbringt, die das Interface vorher weder selbst deklariert noch geerbt hat. Dann meldet japicmp `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` (binär kompatibel, source-inkompatibel), wie bisher schon bei Klassen. Marker-Interfaces und bereits vorhandene Methoden lösen keine Meldung aus. |
+| **G3** | `modifierMethodNonNativeToNative` | Der Modifier `native` wurde nicht ausgewertet. | Neuer Modifier `NativeModifier` am `JApiBehavior` (`getNativeModifier()`) und neue Änderungsart **`METHOD_NOW_NATIVE`**: binär inkompatibel, source-kompatibel, `MAJOR`. Bestehende Clients linken zwar weiter, ein Aufruf endet ohne geladene native Bibliothek aber mit `UnsatisfiedLinkError`. Laut JLS §13.4.25 ist das Hinzufügen von `native` binär kompatibel. Die Einstufung als inkompatibel folgt dem Oracle und lässt sich mit `overrideCompatibilityChangeParameters` überschreiben. Der umgekehrte Fall (`native` → Java) bleibt kompatibel und wird nicht gemeldet. |
+
+Abgesichert sind die Erweiterungen durch Unit-Tests in `GenericTemplateTest`, `InterfaceCompatibilityTest` und `MethodCompatibilityTest`.
+
+Durch G1 kommen 4 neue konservative Meldungen hinzu: `*TypeBoundsDeleteSecond` auf Klassen, Konstruktoren und Interfaces. Das Entfernen eines Bounds lockert die Typ-Parameter. Für Aufrufer ist das kompatibel, japicmp behandelt es aber wie jede andere Template-Änderung (siehe K3).
 
 ## 5. Abweichungen, die nicht auf japicmp zurückgehen (ℹ️)
 
@@ -228,9 +234,9 @@ In diesen Fällen meldet japicmp eine Inkompatibilität, die der konkrete Client
 | 112 | Generics | `genericsClazzConstructorTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 113 | Generics | `genericsClazzConstructorTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 114 | Generics | `genericsClazzConstructorTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 115 | Generics | `genericsClazzConstructorTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✔ | – | ❌ Lücke (G1) |
+| 115 | Generics | `genericsClazzConstructorTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
 | 116 | Generics | `genericsClazzConstructorTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 117 | Generics | `genericsClazzConstructorTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
+| 117 | Generics | `genericsClazzConstructorTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3, G1) |
 | 118 | Generics | `genericsClazzConstructorTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 119 | Generics | `genericsClazzConstructorTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 120 | Generics | `genericsClazzConstructorTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
@@ -240,9 +246,9 @@ In diesen Fällen meldet japicmp eine Inkompatibilität, die der konkrete Client
 | 124 | Generics | `genericsClazzMethodTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 125 | Generics | `genericsClazzMethodTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 126 | Generics | `genericsClazzMethodTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 127 | Generics | `genericsClazzMethodTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✔ | – | ❌ Lücke (G1) |
+| 127 | Generics | `genericsClazzMethodTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
 | 128 | Generics | `genericsClazzMethodTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 129 | Generics | `genericsClazzMethodTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
+| 129 | Generics | `genericsClazzMethodTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3, G1) |
 | 130 | Generics | `genericsClazzMethodTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 131 | Generics | `genericsClazzMethodTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 132 | Generics | `genericsClazzMethodTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
@@ -252,9 +258,9 @@ In diesen Fällen meldet japicmp eine Inkompatibilität, die der konkrete Client
 | 136 | Generics | `genericsClazzTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 137 | Generics | `genericsClazzTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 138 | Generics | `genericsClazzTypeBoundsAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 139 | Generics | `genericsClazzTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✔ | – | ❌ Lücke (G1) |
+| 139 | Generics | `genericsClazzTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
 | 140 | Generics | `genericsClazzTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 141 | Generics | `genericsClazzTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
+| 141 | Generics | `genericsClazzTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3, G1) |
 | 142 | Generics | `genericsClazzTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 143 | Generics | `genericsClazzTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 144 | Generics | `genericsClazzTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
@@ -264,9 +270,9 @@ In diesen Fällen meldet japicmp eine Inkompatibilität, die der konkrete Client
 | 148 | Generics | `genericsIfazeMethodTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 149 | Generics | `genericsIfazeMethodTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 150 | Generics | `genericsIfazeMethodTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 151 | Generics | `genericsIfazeMethodTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✔ | – | ❌ Lücke (G1) |
+| 151 | Generics | `genericsIfazeMethodTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
 | 152 | Generics | `genericsIfazeMethodTypeBoundsDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 153 | Generics | `genericsIfazeMethodTypeBoundsDeleteSecond` | ✔ | ✘ | ✔ | ✔ | – | ❌ Lücke (G1) |
+| 153 | Generics | `genericsIfazeMethodTypeBoundsDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
 | 154 | Generics | `genericsIfazeMethodTypeBoundsGeneralization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 155 | Generics | `genericsIfazeMethodTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 156 | Generics | `genericsIfazeMethodTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
@@ -276,9 +282,9 @@ In diesen Fällen meldet japicmp eine Inkompatibilität, die der konkrete Client
 | 160 | Generics | `genericsIfazeTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 161 | Generics | `genericsIfazeTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 162 | Generics | `genericsIfazeTypeBoundsAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 163 | Generics | `genericsIfazeTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✔ | – | ❌ Lücke (G1) |
+| 163 | Generics | `genericsIfazeTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
 | 164 | Generics | `genericsIfazeTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 165 | Generics | `genericsIfazeTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
+| 165 | Generics | `genericsIfazeTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3, G1) |
 | 166 | Generics | `genericsIfazeTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
 | 167 | Generics | `genericsIfazeTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
 | 168 | Generics | `genericsIfazeTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
@@ -296,10 +302,10 @@ In diesen Fällen meldet japicmp eine Inkompatibilität, die der konkrete Client
 | 180 | Inheritance | `inheritanceIfazeContractSuperinterfaceSet` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `INTERFACE_REMOVED`, `METHOD_REMOVED`, `SUPERCLASS_REMOVED` | ✅ korrekt |
 | 181 | Inheritance | `inheritanceIfazeDefaultMethodOverrideAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
 | 182 | Inheritance | `inheritanceIfazeDefaultMethodOverrideDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 183 | Inheritance | `inheritanceIfazeExpandSuperinterfaceSet` | ✔ | ✘ | ✔ | ✔ | `INTERFACE_ADDED` | ❌ Lücke (G2) |
+| 183 | Inheritance | `inheritanceIfazeExpandSuperinterfaceSet` | ✔ | ✘ | ✔ | ✘ | `INTERFACE_ADDED`, `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` | ✅ korrekt (G2) |
 | 184 | Inheritance | `inheritanceIfazeMethodMovedFromSuperInterface` | ✔ | ✔ | ✘ | ✘ | `METHOD_REMOVED` | ⚠️ konservativ (K4) |
 | 185 | Inheritance | `inheritanceIfazeMethodMovedToSuperInterface` | ✔ | ✔ | ✔ | ✘ | `METHOD_ADDED_TO_INTERFACE` | ⚠️ konservativ (K4) |
-| 186 | Inheritance | `inheritanceIfazeStartInherite` | ✔ | ✘ | ✔ | ✔ | `INTERFACE_ADDED` | ❌ Lücke (G2) |
+| 186 | Inheritance | `inheritanceIfazeStartInherite` | ✔ | ✘ | ✔ | ✘ | `INTERFACE_ADDED`, `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` | ✅ korrekt (G2) |
 | 187 | Inheritance | `inheritanceIfazeStopInherite` | ✘ | ✘ | ✘ | ✘ | `INTERFACE_REMOVED` | ✅ korrekt |
 | 188 | Members | `membersClazzConstructorAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
 | 189 | Members | `membersClazzConstructorDelete` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
@@ -350,7 +356,7 @@ In diesen Fällen meldet japicmp eine Inkompatibilität, die der konkrete Client
 | 234 | Other Modifiers | `modifierMethodNativeToNonNative` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
 | 235 | Other Modifiers | `modifierMethodNonAbstractToAbstract` | ✘ | ✘ | ✘ | ✘ | `METHOD_NOW_ABSTRACT` | ✅ korrekt |
 | 236 | Other Modifiers | `modifierMethodNonFinalToFinal` | ✘ | ✘ | ✘ | ✘ | `METHOD_NOW_FINAL` | ✅ korrekt |
-| 237 | Other Modifiers | `modifierMethodNonNativeToNative` | ✘ | ✔ | ✔ | ✔ | – | ❌ Lücke (G3) |
+| 237 | Other Modifiers | `modifierMethodNonNativeToNative` | ✘ | ✔ | ✘ | ✔ | `METHOD_NOW_NATIVE` | ✅ korrekt (G3) |
 | 238 | Other Modifiers | `modifierMethodNonStaticToStatic` | ✘ | ✔ | ✘ | ✘ | `METHOD_NOW_STATIC` | ⚠️ konservativ (K6) |
 | 239 | Other Modifiers | `modifierMethodNonStrictfpToStrictfp` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
 | 240 | Other Modifiers | `modifierMethodNonSynchronizedToSynchronized` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |

@@ -573,4 +573,57 @@ class MethodCompatibilityTest {
 		assertThat(jApiMethod.isSourceCompatible(), is(true));
 		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
 	}
+
+	@Test
+	void testMethodNowNative() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").body("return;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().modifier(Modifier.PUBLIC | Modifier.NATIVE).name("method").body("return;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiClass.isBinaryCompatible(), is(false));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getNativeModifier().hasChangedFromTo(NativeModifier.NON_NATIVE, NativeModifier.NATIVE), is(true));
+		assertThat(jApiMethod.getCompatibilityChanges(), hasItem(new JApiCompatibilityChange(JApiCompatibilityChangeType.METHOD_NOW_NATIVE)));
+	}
+
+	@Test
+	void testMethodNoLongerNative() throws Exception {
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
+			@Override
+			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().modifier(Modifier.PUBLIC | Modifier.NATIVE).name("method").body("return;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+
+			@Override
+			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
+				CtMethodBuilder.create().publicAccess().name("method").body("return;").addToClass(ctClass);
+				return Collections.singletonList(ctClass);
+			}
+		});
+		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
+		assertThat(jApiClass.isBinaryCompatible(), is(true));
+		assertThat(jApiClass.isSourceCompatible(), is(true));
+		JApiMethod jApiMethod = getJApiMethod(jApiClass.getMethods(), "method");
+		assertThat(jApiMethod.getChangeStatus(), is(JApiChangeStatus.MODIFIED));
+		assertThat(jApiMethod.getCompatibilityChanges().size(), is(0));
+	}
 }

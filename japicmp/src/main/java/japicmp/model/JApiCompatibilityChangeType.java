@@ -40,6 +40,7 @@ public enum JApiCompatibilityChangeType {
 	METHOD_NO_LONGER_STATIC(false, false, JApiSemanticVersionLevel.MAJOR),
 	METHOD_NOW_VARARGS(true, true, JApiSemanticVersionLevel.MINOR),
 	METHOD_NO_LONGER_VARARGS(true, false, JApiSemanticVersionLevel.MINOR),
+	METHOD_NOW_NATIVE(false, true, JApiSemanticVersionLevel.MAJOR),
 	METHOD_ADDED_TO_INTERFACE(true, false, JApiSemanticVersionLevel.MINOR),
 	METHOD_ADDED_TO_PUBLIC_CLASS(true, true, JApiSemanticVersionLevel.PATCH),
 	METHOD_NOW_THROWS_CHECKED_EXCEPTION(true, false, JApiSemanticVersionLevel.MINOR),
