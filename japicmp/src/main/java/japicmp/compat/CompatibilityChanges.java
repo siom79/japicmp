@@ -9,7 +9,6 @@ import japicmp.util.ModifierHelper;
 import japicmp.util.SignatureParser;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtMethod;
 import javassist.NotFoundException;
 
 import java.util.*;
@@ -559,9 +558,6 @@ public class CompatibilityChanges {
 	}
 
 	private void checkIfNativeChanged(JApiBehavior behavior) {
-		// The Java implementation is replaced by a native one. Existing clients still link against
-		// the method, but invoking it fails with an UnsatisfiedLinkError unless a native library
-		// providing the implementation is loaded.
 		if (behavior.getNativeModifier().hasChangedFromTo(NativeModifier.NON_NATIVE, NativeModifier.NATIVE)) {
 			addCompatibilityChange(behavior, JApiCompatibilityChangeType.METHOD_NOW_NATIVE);
 		}
@@ -898,7 +894,6 @@ public class CompatibilityChanges {
 					addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.INTERFACE_ADDED);
 					if (isInterface(jApiClass) && jApiClass.getChangeStatus() != JApiChangeStatus.NEW
 						&& addsAbstractMethodsToInterface(jApiClass, interfaceClass, classMap)) {
-						// classes implementing this interface now have to implement the abstract methods of the new super interface
 						addCompatibilityChange(jApiClass, JApiCompatibilityChangeType.METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE);
 					}
 					// no marker interface, no abstract class, no interface and annotation
@@ -1056,11 +1051,6 @@ public class CompatibilityChanges {
 		}
 	}
 
-	/**
-	 * Checks if the newly added super interface of the given interface declares abstract methods
-	 * that were not already part of the interface (either declared by itself or inherited from one
-	 * of its previous super interfaces).
-	 */
 	private boolean addsAbstractMethodsToInterface(JApiClass jApiInterface, JApiClass newSuperInterface, Map<String, JApiClass> classMap) {
 		for (JApiMethod superInterfaceMethod : newSuperInterface.getMethods()) {
 			if (superInterfaceMethod.getChangeStatus() == JApiChangeStatus.REMOVED || !isAbstract(superInterfaceMethod) || isSynthetic(superInterfaceMethod)) {

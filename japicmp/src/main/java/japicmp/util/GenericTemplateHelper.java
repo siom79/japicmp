@@ -4,11 +4,7 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiGenericTemplate;
 import japicmp.model.JApiGenericType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class GenericTemplateHelper {
 
@@ -78,11 +74,6 @@ public class GenericTemplateHelper {
 		return genericTemplates;
 	}
 
-	/**
-	 * Compares the additional (interface) bounds of a type parameter, e.g. {@code Comparable<T>} in
-	 * {@code <T extends Number & Comparable<T>>}. Adding or removing such a bound changes the set of
-	 * type arguments that are accepted for the type parameter.
-	 */
 	private static boolean haveAdditionalBoundsChanged(SignatureParser.ParsedTemplate oldParsedTemplate, SignatureParser.ParsedTemplate newParsedTemplate) {
 		List<JApiGenericType> oldInterfaces = new ArrayList<>();
 		List<JApiGenericType> newInterfaces = new ArrayList<>();
