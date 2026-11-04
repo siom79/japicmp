@@ -1,382 +1,382 @@
-# japicmp und der API-Evolution-Datenkorpus von Jezek & Dietrich
+# japicmp and the API evolution data corpus by Jezek & Dietrich
 
-Dieses Dokument prüft japicmp gegen den Korpus aus
+This document evaluates japicmp against the corpus from
 
 > K. Jezek and J. Dietrich, "API evolution and compatibility: A data corpus and tool evaluation,"
 > *Journal of Object Technology*, vol. 16, no. 4, pp. 2:1–23, 2017.
-> Korpus: <https://github.com/kjezek/api-evolution-data-corpus> (Commit `407398e`)
+> Corpus: <https://github.com/kjezek/api-evolution-data-corpus> (commit `407398e`)
 
-## 1. Wie das Paper die Testfälle systematisch aufbaut
+## 1. How the paper systematically builds the test cases
 
-Das Paper legt die Testfälle entlang von drei Dimensionen an:
+The paper organizes the test cases along three dimensions:
 
-| Dimension | Ausprägungen |
+| Dimension | Values |
 |---|---|
-| **Was** ändert sich (Kategorie) | Access Modifiers, Data Types, Exceptions, Generics (Typ-Parameter und Wildcards), Inheritance, Members, Other (non-access) Modifiers, Miscellaneous |
-| **Wo** wird geändert (Element) | Klasse, innere (nested) Klasse, Interface, Methode, Konstruktor, Feld, generischer Typ |
-| **Wie** wird geändert (Änderung) | hinzufügen, entfernen, verstärken, abschwächen (bei Datentypen auch Boxing/Unboxing, Widening/Narrowing, Generalization/Specialization; bei Methoden getrennt für Parameter und Rückgabetyp) |
+| **What** changes (category) | Access Modifiers, Data Types, Exceptions, Generics (type parameters and wildcards), Inheritance, Members, Other (non-access) Modifiers, Miscellaneous |
+| **Where** the change happens (element) | class, inner (nested) class, interface, method, constructor, field, generic type |
+| **How** it changes (change) | add, delete, strengthen, weaken (for data types also boxing/unboxing, widening/narrowing, generalization/specialization; for methods separately for parameters and return type) |
 
-Das ergibt rechnerisch 7 × 8 × 4 = 224 Kombinationen. Kombinationen, die nicht kompilieren (z. B. ein Access-Modifier an einer Interface-Methode in Java 7), fallen weg. Bei Methoden, Datentypen und Generics kommen zusätzliche Fälle hinzu. So entstehen **251 Szenarien**. Jedes Szenario ist ein Java-Package mit dem Namen `<category><element><change>`. Es enthält eine Klasse in `lib-v1`, die geänderte Klasse in `lib-v2` und einen Client in `client`.
+This yields 7 × 8 × 4 = 224 combinations in theory. Combinations that do not compile (e.g. an access modifier on an interface method in Java 7) are dropped. Methods, data types and generics add further cases. The result is **251 scenarios**. Each scenario is a Java package named `<category><element><change>`. It contains a class in `lib-v1`, the changed class in `lib-v2` and a client in `client`.
 
-Das **Oracle** (`compatibility.csv`) wird dynamisch erzeugt:
+The **oracle** (`compatibility.csv`) is generated dynamically:
 
-* **source-inkompatibel:** Der Client, der gegen `lib-v1` kompiliert, lässt sich gegen `lib-v2` nicht mehr kompilieren.
-* **binär-inkompatibel:** Der gegen `lib-v1` kompilierte Client bricht mit `lib-v2` zur Laufzeit ab (Linkage-Fehler).
+* **source incompatible:** The client that compiles against `lib-v1` no longer compiles against `lib-v2`.
+* **binary incompatible:** The client compiled against `lib-v1` fails at runtime with `lib-v2` (linkage error).
 
-Wichtig für die Auswertung: Das Oracle beschreibt, was mit dem *konkreten Client* des Szenarios passiert. Ein statisches Werkzeug wie japicmp kennt den Client nicht. Es muss daher annehmen, dass jeder mögliche Client betroffen sein kann. Meldet japicmp eine Inkompatibilität, die der Beispiel-Client nicht auslöst, ist das deshalb meist **konservativ** und kein Fehler.
+Important for the evaluation: the oracle describes what happens to the *specific client* of the scenario. A static tool like japicmp does not know the client. It therefore has to assume that any possible client may be affected. If japicmp reports an incompatibility that the example client does not trigger, this is usually **conservative** and not an error.
 
-## 2. Vorgehen
+## 2. Approach
 
-1. `lib-v1` und `lib-v2` des Korpus werden mit `javac --release 8` zu `lib-v1.jar` und `lib-v2.jar` gebaut.
-2. Diese Jars werden mit der japicmp-API (`JarArchiveComparator`, Standardoptionen, also `protected` und höher) verglichen ([`CorpusEvaluation.java`](CorpusEvaluation.java)).
-3. Pro Szenario (Package unter `testing_lib`) wird gesammelt:
-   * `isBinaryCompatible()` und `isSourceCompatible()` aller Klassen des Packages,
-   * alle gemeldeten `JApiCompatibilityChangeType`s (Klasse, Superklasse, Interfaces, Methoden, Konstruktoren, Parameter, Rückgabetypen, Felder, generische Templates).
-4. Das Ergebnis wird mit dem Oracle des Korpus verglichen ([`compare.py`](compare.py)).
+1. `lib-v1` and `lib-v2` of the corpus are built with `javac --release 8` into `lib-v1.jar` and `lib-v2.jar`.
+2. These jars are compared using the japicmp API (`JarArchiveComparator`, default options, i.e. `protected` and above) ([`CorpusEvaluation.java`](CorpusEvaluation.java)).
+3. For each scenario (package below `testing_lib`) the following is collected:
+   * `isBinaryCompatible()` and `isSourceCompatible()` of all classes in the package,
+   * all reported `JApiCompatibilityChangeType`s (class, superclass, interfaces, methods, constructors, parameters, return types, fields, generic templates).
+4. The result is compared with the oracle of the corpus ([`compare.py`](compare.py)).
 
-Reproduzieren lässt sich das so (japicmp vorher bauen):
+To reproduce (build japicmp first):
 
 ```bash
 mvn -pl japicmp -am install -DskipTests
 doc/api-evolution-corpus/run.sh
 ```
 
-Geprüft wurde japicmp `0.26.6-SNAPSHOT` mit den Erweiterungen aus Abschnitt 4. Ohne diese Erweiterungen erkannte japicmp 144 von 154 inkompatiblen Szenarien (93,51 %), es gab 9 Lücken.
+The evaluated version is japicmp `0.26.6-SNAPSHOT` including the extensions from section 4. Without these extensions, japicmp detected 144 of 154 incompatible scenarios (93.51%), with 9 gaps.
 
-### Bewertungsschlüssel
+### Legend
 
-| Symbol | Bedeutung |
+| Symbol | Meaning |
 |---|---|
-| ✅ korrekt | Die binäre und die source-Einstufung von japicmp stimmen mit dem Oracle überein. |
-| ⚠️ konservativ | japicmp meldet eine Inkompatibilität, die der Client im Korpus nicht auslöst, ein anderer Client aber auslösen kann (siehe K1–K6). |
-| ❌ Lücke | Das Oracle meldet eine Inkompatibilität, die japicmp **nicht** erkennt. Nach den Erweiterungen G1–G3 gibt es keinen solchen Fall mehr. |
-| ℹ️ nicht statisch prüfbar / Oracle | Die Abweichung kommt aus einem Fehler im Oracle oder aus reinem Laufzeitverhalten (siehe O1, O2). |
+| ✅ correct | japicmp's binary and source classification match the oracle. |
+| ⚠️ conservative | japicmp reports an incompatibility that the client in the corpus does not trigger, but another client can (see C1–C6). |
+| ❌ gap | The oracle reports an incompatibility that japicmp does **not** detect. After extensions G1–G3 there are no such cases left. |
+| ℹ️ not statically checkable / oracle | The deviation stems from an error in the oracle or from pure runtime behavior (see O1, O2). |
 
-✔ = kompatibel, ✘ = inkompatibel.
+✔ = compatible, ✘ = incompatible.
 
-## 3. Ergebnis im Überblick
+## 3. Summary of results
 
-| Kategorie | Szenarien | ✅ korrekt | ⚠️ konservativ | ❌ Lücke | ℹ️ Oracle | inkompatible Szenarien | davon von japicmp erkannt | Erkennungsrate heute | japicmp 0.7.2 im Paper |
+| Category | Scenarios | ✅ correct | ⚠️ conservative | ❌ gap | ℹ️ oracle | Incompatible scenarios | Detected by japicmp | Detection rate today | japicmp 0.7.2 in the paper |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Access Modifiers | 18 | 18 | 0 | 0 | 0 | 6 | 6 | 100,00 % | 100,00 % |
-| Data Types | 49 | 29 | 20 | 0 | 0 | 47 | 47 | 100,00 % | 100,00 % |
-| Exceptions | 16 | 14 | 1 | 0 | 1 | 7 | 7 | 100,00 % | 100,00 % |
-| Generics (Wildcards) | 28 | 17 | 11 | 0 | 0 | 17 | 17 | 100,00 % | 0,00 % ¹ |
-| Generics | 60 | 39 | 21 | 0 | 0 | 34 | 34 | 100,00 % | 0,00 % ¹ |
-| Inheritance | 16 | 14 | 2 | 0 | 0 | 7 | 7 | 100,00 % | 100,00 % |
-| Members | 28 | 22 | 6 | 0 | 0 | 19 | 19 | 100,00 % | 100,00 % |
-| Other Modifiers | 30 | 27 | 2 | 0 | 1 | 13 | 12 | 92,31 % | 84,62 % |
-| Miscellaneous | 6 | 6 | 0 | 0 | 0 | 4 | 4 | 100,00 % | 100,00 % |
-| **Summe** | **251** | **186** | **63** | **0** | **2** | **154** | **153** | **99,35 %** | **65,58 %** |
+| Access Modifiers | 18 | 18 | 0 | 0 | 0 | 6 | 6 | 100.00% | 100.00% |
+| Data Types | 49 | 29 | 20 | 0 | 0 | 47 | 47 | 100.00% | 100.00% |
+| Exceptions | 16 | 14 | 1 | 0 | 1 | 7 | 7 | 100.00% | 100.00% |
+| Generics (Wildcards) | 28 | 17 | 11 | 0 | 0 | 17 | 17 | 100.00% | 0.00% ¹ |
+| Generics | 60 | 39 | 21 | 0 | 0 | 34 | 34 | 100.00% | 0.00% ¹ |
+| Inheritance | 16 | 14 | 2 | 0 | 0 | 7 | 7 | 100.00% | 100.00% |
+| Members | 28 | 22 | 6 | 0 | 0 | 19 | 19 | 100.00% | 100.00% |
+| Other Modifiers | 30 | 27 | 2 | 0 | 1 | 13 | 12 | 92.31% | 84.62% |
+| Miscellaneous | 6 | 6 | 0 | 0 | 0 | 4 | 4 | 100.00% | 100.00% |
+| **Total** | **251** | **186** | **63** | **0** | **2** | **154** | **153** | **99.35%** | **65.58%** |
 
-¹ Das Paper führt Generics als eine Kategorie (88 Szenarien). Hier ist sie in Typ-Parameter (60) und Wildcards (28) geteilt.
+¹ The paper treats generics as a single category (88 scenarios). Here it is split into type parameters (60) and wildcards (28).
 
-„Erkennungsrate“ ist wie im Paper (Tabelle „Correctly Detected Incompatibilities in Each Scenario“) der Anteil der inkompatiblen Szenarien, die japicmp als inkompatibel meldet. Aufgeteilt wie in der Tabelle „Correctly Detected Scenarios Divided into Source and Binary Incompatibilities“:
+As in the paper (table "Correctly Detected Incompatibilities in Each Scenario"), the "detection rate" is the share of incompatible scenarios that japicmp reports as incompatible. Split as in the table "Correctly Detected Scenarios Divided into Source and Binary Incompatibilities":
 
-| Typ | Szenarien | erkannt heute | Rate heute | japicmp 0.7.2 im Paper |
+| Type | Scenarios | Detected today | Rate today | japicmp 0.7.2 in the paper |
 |---|---:|---:|---:|---:|
-| nur source-inkompatibel | 68 | 68 | 100,00 % | 25,00 % |
-| binär-inkompatibel | 86 | 85 | 98,84 % | 97,67 % |
+| source incompatible only | 68 | 68 | 100.00% | 25.00% |
+| binary incompatible | 86 | 85 | 98.84% | 97.67% |
 
-Strenger gezählt, also für jede Art getrennt: Von 132 source-inkompatiblen Szenarien stuft japicmp alle 132 als source-inkompatibel ein (vor den Erweiterungen 124). Von 86 binär-inkompatiblen Szenarien stuft es 84 als binär-inkompatibel ein (vorher 83). Die zwei verbleibenden binären Abweichungen sind O1 und O2.
+Counted more strictly, i.e. separately for each kind: of 132 source-incompatible scenarios, japicmp classifies all 132 as source incompatible (124 before the extensions). Of 86 binary-incompatible scenarios, it classifies 84 as binary incompatible (83 before). The two remaining binary deviations are O1 and O2.
 
-Seit Version 0.7.2 aus dem Paper hat sich japicmp vor allem bei **Generics** (0 % → 100 %) und bei **source-Inkompatibilitäten** (25 % → 100 %) verbessert. Zum Vergleich der Zahlen: Das Paper wertete die Textausgabe per String-Matching aus und zählte deshalb jede gemeldete Änderung als Treffer, auch eine kompatible wie `INTERFACE_ADDED`. Diese Auswertung zählt nur, was japicmp tatsächlich als inkompatibel einstuft. Übrig bleibt nur `modifierMethodStrictfpToNonStrictfp`, und dort ist das Oracle fehlerhaft (O1).
+Since version 0.7.2 evaluated in the paper, japicmp has improved mainly for **generics** (0% → 100%) and for **source incompatibilities** (25% → 100%). A note on comparing the numbers: the paper evaluated the text output by string matching and therefore counted every reported change as a hit, even a compatible one such as `INTERFACE_ADDED`. This evaluation only counts what japicmp actually classifies as incompatible. The only scenario left is `modifierMethodStrictfpToNonStrictfp`, and there the oracle is wrong (O1).
 
-## 4. Geschlossene Lücken (G1–G3)
+## 4. Closed gaps (G1–G3)
 
-Die erste Auswertung zeigte drei Prüfungen, die in japicmp fehlten. Sie sind jetzt umgesetzt. In der Matrix sind die betroffenen Szenarien mit G1, G2 bzw. G3 markiert.
+The first evaluation revealed three checks that were missing in japicmp. They are now implemented. In the matrix, the affected scenarios are marked G1, G2 or G3.
 
-| ID | Szenarien | Vorher | Erweiterung |
+| ID | Scenarios | Before | Extension |
 |---|---|---|---|
-| **G1** | `generics*TypeBounds(Add\|Delete)Second` (10 Szenarien, davon 6 laut Oracle inkompatibel) | Ein zusätzlicher Bound eines Typ-Parameters (Intersection Type), z. B. `<T extends Number>` → `<T extends Number & Comparable<T>>`, wurde nicht verglichen. japicmp meldete keine Änderung. | `GenericTemplateHelper` vergleicht jetzt auch die weiteren (Interface-)Bounds. Ändern sie sich, gilt das Template als `MODIFIED`, und japicmp meldet `CLASS_GENERIC_TEMPLATE_CHANGED` (source-inkompatibel). Das gilt für Klassen, Interfaces, Methoden und Konstruktoren. |
-| **G2** | `inheritanceIfazeStartInherite`, `inheritanceIfazeExpandSuperinterfaceSet` | Bekam ein **Interface** ein neues Super-Interface mit abstrakten Methoden, meldete japicmp nur das kompatible `INTERFACE_ADDED`. Klassen, die das Interface implementieren, lassen sich dann aber nicht mehr kompilieren. | `CompatibilityChanges` prüft jetzt bei Interfaces, ob ein neues Super-Interface abstrakte Methoden mitbringt, die das Interface vorher weder selbst deklariert noch geerbt hat. Dann meldet japicmp `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` (binär kompatibel, source-inkompatibel), wie bisher schon bei Klassen. Marker-Interfaces und bereits vorhandene Methoden lösen keine Meldung aus. |
-| **G3** | `modifierMethodNonNativeToNative` | Der Modifier `native` wurde nicht ausgewertet. | Neuer Modifier `NativeModifier` am `JApiBehavior` (`getNativeModifier()`) und neue Änderungsart **`METHOD_NOW_NATIVE`**: binär inkompatibel, source-kompatibel, `MAJOR`. Bestehende Clients linken zwar weiter, ein Aufruf endet ohne geladene native Bibliothek aber mit `UnsatisfiedLinkError`. Laut JLS §13.4.25 ist das Hinzufügen von `native` binär kompatibel. Die Einstufung als inkompatibel folgt dem Oracle und lässt sich mit `overrideCompatibilityChangeParameters` überschreiben. Der umgekehrte Fall (`native` → Java) bleibt kompatibel und wird nicht gemeldet. |
+| **G1** | `generics*TypeBounds(Add\|Delete)Second` (10 scenarios, 6 of them incompatible according to the oracle) | An additional bound of a type parameter (intersection type), e.g. `<T extends Number>` → `<T extends Number & Comparable<T>>`, was not compared. japicmp reported no change. | `GenericTemplateHelper` now also compares the additional (interface) bounds. If they change, the template is `MODIFIED` and japicmp reports `CLASS_GENERIC_TEMPLATE_CHANGED` (source incompatible). This applies to classes, interfaces, methods and constructors. |
+| **G2** | `inheritanceIfazeStartInherite`, `inheritanceIfazeExpandSuperinterfaceSet` | When an **interface** got a new super interface with abstract methods, japicmp only reported the compatible `INTERFACE_ADDED`. Classes implementing the interface no longer compile, however. | For interfaces, `CompatibilityChanges` now checks whether a new super interface brings abstract methods that the interface neither declared nor inherited before. In that case japicmp reports `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` (binary compatible, source incompatible), as it already did for classes. Marker interfaces and methods that already exist do not trigger a report. |
+| **G3** | `modifierMethodNonNativeToNative` | The `native` modifier was not evaluated. | New modifier `NativeModifier` on `JApiBehavior` (`getNativeModifier()`) and new change type **`METHOD_NOW_NATIVE`**: binary incompatible, source compatible, `MAJOR`. Existing clients still link, but a call fails with `UnsatisfiedLinkError` if no native library is loaded. According to JLS §13.4.25, adding `native` is binary compatible. The classification as incompatible follows the oracle and can be overridden with `overrideCompatibilityChangeParameters`. The reverse case (`native` → Java) remains compatible and is not reported. |
 
-Abgesichert sind die Erweiterungen durch Unit-Tests in `GenericTemplateTest`, `InterfaceCompatibilityTest` und `MethodCompatibilityTest`.
+The extensions are covered by unit tests in `GenericTemplateTest`, `InterfaceCompatibilityTest` and `MethodCompatibilityTest`.
 
-Durch G1 kommen 4 neue konservative Meldungen hinzu: `*TypeBoundsDeleteSecond` auf Klassen, Konstruktoren und Interfaces. Das Entfernen eines Bounds lockert die Typ-Parameter. Für Aufrufer ist das kompatibel, japicmp behandelt es aber wie jede andere Template-Änderung (siehe K3).
+G1 adds 4 new conservative reports: `*TypeBoundsDeleteSecond` on classes, constructors and interfaces. Removing a bound relaxes the type parameters. This is compatible for callers, but japicmp treats it like any other template change (see C3).
 
-## 5. Abweichungen, die nicht auf japicmp zurückgehen (ℹ️)
+## 5. Deviations not caused by japicmp (ℹ️)
 
-| ID | Szenario | Erklärung |
+| ID | Scenario | Explanation |
 |---|---|---|
-| **O1** | `modifierMethodStrictfpToNonStrictfp` | Fehler im Oracle: Der Client dieses Szenarios benutzt die Klasse `ModifierMethodNonNativeToNative` statt `ModifierMethodStrictfpToNonStrictfp` (Copy & Paste). Den Laufzeitfehler löst also die `native`-Methode aus. `strictfp` hat keinen Einfluss auf die Kompatibilität, japicmp liegt hier richtig. |
-| **O2** | `exceptionClazzMethodTryCatchToThrowChecked` | japicmp meldet korrekt `METHOD_NOW_THROWS_CHECKED_EXCEPTION` (source-inkompatibel). Die „binäre“ Inkompatibilität im Oracle ist eine `FileNotFoundException`, die der alte Client zur Laufzeit nicht mehr abfängt. Das ist Verhalten und kein Linkage-Fehler, eine statische Analyse kann es nicht erkennen. |
+| **O1** | `modifierMethodStrictfpToNonStrictfp` | Error in the oracle: the client of this scenario uses the class `ModifierMethodNonNativeToNative` instead of `ModifierMethodStrictfpToNonStrictfp` (copy & paste). The runtime error is therefore caused by the `native` method. `strictfp` has no effect on compatibility, so japicmp is right here. |
+| **O2** | `exceptionClazzMethodTryCatchToThrowChecked` | japicmp correctly reports `METHOD_NOW_THROWS_CHECKED_EXCEPTION` (source incompatible). The "binary" incompatibility in the oracle is a `FileNotFoundException` that the old client no longer catches at runtime. This is behavior, not a linkage error, and static analysis cannot detect it. |
 
-## 6. Konservative Meldungen (⚠️)
+## 6. Conservative reports (⚠️)
 
-In diesen Fällen meldet japicmp eine Inkompatibilität, die der konkrete Client im Korpus nicht auslöst:
+In these cases japicmp reports an incompatibility that the specific client in the corpus does not trigger:
 
-| ID | Szenarien | Begründung |
+| ID | Scenarios | Rationale |
 |---|---|---|
-| **K1** | `dataTypeIfazeConstant*`, `members*ConstantDelete` | **Compile-Time-Konstanten** werden in den Client einkompiliert. Deshalb gibt es beim Entfernen oder beim Ändern des Typs keinen Linkage-Fehler, der Client arbeitet aber still mit dem alten Wert weiter (JLS §13.4.9). japicmp meldet `FIELD_REMOVED` bzw. `FIELD_TYPE_CHANGED` als binär-inkompatibel. Das ist gewollt und sinnvoll. |
-| **K2** | `dataType*Boxing/Unboxing/Widening/Narrowing/Generalization/Specialization` | Durch Boxing und Widening kompiliert der Aufruf im Client weiter. Ein Client, der die Methode überschreibt oder den Wert zuweist, bricht dagegen schon. japicmp stuft jede Typänderung als source-inkompatibel ein. Eine feinere Analyse für Aufrufer wäre möglich, wäre für Unterklassen aber falsch. |
-| **K3** | `generics*`, `genericsWildcards*` | japicmp stuft **jede** Änderung an Typ-Parametern und Generics von Parametern als source-inkompatibel ein (`CLASS_GENERIC_TEMPLATE_CHANGED`, `METHOD_PARAMETER_GENERICS_CHANGED`). Es gibt keine Varianzanalyse, die ein Lockern (Bound entfernen oder verallgemeinern, Wildcard aufweiten) von einem Verschärfen unterscheidet. Hinweis: Auch Änderungen an Typ-Parametern von *Methoden* und *Konstruktoren* werden als `CLASS_GENERIC_TEMPLATE_CHANGED` gemeldet. |
-| **K4** | `inheritanceIfazeMethodMoved*`, `members*Delete`, `membersIfazeMethodParam*`, `membersClazzMethodAbstractDelete` | Der Client implementiert das Interface nur oder ruft die Methode nur über einen anderen Typ auf. Für andere Clients (Aufruf über das Interface bzw. über das Super-Interface) gelten die gemeldeten Änderungen `METHOD_REMOVED` und `METHOD_ADDED_TO_INTERFACE`. |
-| **K5** | `exceptionClazzMethodThrowCheckedSpecialization` | Für Aufrufer ist eine speziellere Checked Exception unkritisch. Eine Unterklasse, die die Methode überschreibt und noch die allgemeinere Exception wirft, kompiliert aber nicht mehr. |
-| **K6** | `modifierFieldNonStaticToStatic`, `modifierMethodNonStaticToStatic` | Ein statisches Member lässt sich weiterhin über eine Instanz ansprechen, der Client kompiliert also. Für überschreibende Unterklassen und für Zugriffe über `super` ist die Änderung trotzdem inkompatibel. |
+| **C1** | `dataTypeIfazeConstant*`, `members*ConstantDelete` | **Compile-time constants** are inlined into the client. Removing them or changing their type therefore causes no linkage error, but the client silently keeps working with the old value (JLS §13.4.9). japicmp reports `FIELD_REMOVED` or `FIELD_TYPE_CHANGED` as binary incompatible. This is intended and sensible. |
+| **C2** | `dataType*Boxing/Unboxing/Widening/Narrowing/Generalization/Specialization` | Thanks to boxing and widening, the call in the client still compiles. A client that overrides the method or assigns the value, however, does break. japicmp classifies every type change as source incompatible. A finer analysis would be possible for callers, but would be wrong for subclasses. |
+| **C3** | `generics*`, `genericsWildcards*` | japicmp classifies **every** change to type parameters and to generics of parameters as source incompatible (`CLASS_GENERIC_TEMPLATE_CHANGED`, `METHOD_PARAMETER_GENERICS_CHANGED`). There is no variance analysis that distinguishes relaxing (removing or generalizing a bound, widening a wildcard) from tightening. Note: changes to type parameters of *methods* and *constructors* are also reported as `CLASS_GENERIC_TEMPLATE_CHANGED`. |
+| **C4** | `inheritanceIfazeMethodMoved*`, `members*Delete`, `membersIfazeMethodParam*`, `membersClazzMethodAbstractDelete` | The client only implements the interface or only calls the method through a different type. For other clients (calling through the interface or the super interface), the reported changes `METHOD_REMOVED` and `METHOD_ADDED_TO_INTERFACE` do apply. |
+| **C5** | `exceptionClazzMethodThrowCheckedSpecialization` | For callers, a more specific checked exception is harmless. A subclass that overrides the method and still throws the more general exception no longer compiles, however. |
+| **C6** | `modifierFieldNonStaticToStatic`, `modifierMethodNonStaticToStatic` | A static member can still be accessed through an instance, so the client compiles. For overriding subclasses and for access via `super`, the change is still incompatible. |
 
-## 7. Vollständige Matrix aller 251 Szenarien
+## 7. Complete matrix of all 251 scenarios
 
-| # | Kategorie | Szenario (`<category><element><change>`) | Oracle binär | Oracle source | japicmp binär | japicmp source | gemeldete japicmp-Änderungen | Bewertung |
+| # | Category | Scenario (`<category><element><change>`) | Oracle binary | Oracle source | japicmp binary | japicmp source | Reported japicmp changes | Rating |
 |---:|---|---|:-:|:-:|:-:|:-:|---|---|
-| 1 | Access Modifiers | `accessModifierClazzAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `CLASS_LESS_ACCESSIBLE`, `CLASS_NO_LONGER_PUBLIC`, `CONSTRUCTOR_LESS_ACCESSIBLE` | ✅ korrekt |
-| 2 | Access Modifiers | `accessModifierClazzAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 3 | Access Modifiers | `accessModifierClazzConstructorAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_LESS_ACCESSIBLE` | ✅ korrekt |
-| 4 | Access Modifiers | `accessModifierClazzConstructorAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 5 | Access Modifiers | `accessModifierClazzFieldAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `FIELD_LESS_ACCESSIBLE` | ✅ korrekt |
-| 6 | Access Modifiers | `accessModifierClazzFieldAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 7 | Access Modifiers | `accessModifierClazzMethodAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `METHOD_LESS_ACCESSIBLE` | ✅ korrekt |
-| 8 | Access Modifiers | `accessModifierClazzMethodAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 9 | Access Modifiers | `accessModifierClazzNestedClazzAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `CLASS_LESS_ACCESSIBLE`, `CLASS_NOW_NOT_EXTENDABLE`, `CLASS_NO_LONGER_PUBLIC`, `CONSTRUCTOR_LESS_ACCESSIBLE` | ✅ korrekt |
-| 10 | Access Modifiers | `accessModifierClazzNestedClazzAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 11 | Access Modifiers | `accessModifierClazzNestedIfazeAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `CLASS_LESS_ACCESSIBLE`, `CLASS_NO_LONGER_PUBLIC` | ✅ korrekt |
-| 12 | Access Modifiers | `accessModifierClazzNestedIfazeAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 13 | Access Modifiers | `accessModifierIfazeFieldAccessDecrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 14 | Access Modifiers | `accessModifierIfazeFieldAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 15 | Access Modifiers | `accessModifierIfazeMethodAccessDecrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 16 | Access Modifiers | `accessModifierIfazeMethodAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 17 | Access Modifiers | `accessModifierIfazeNestedIfazeAccessDecrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 18 | Access Modifiers | `accessModifierIfazeNestedIfazeAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 19 | Data Types | `dataTypeClazzConstructorParamBoxing` | ✘ | ✔ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ⚠️ konservativ (K2) |
-| 20 | Data Types | `dataTypeClazzConstructorParamGeneralization` | ✘ | ✔ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ⚠️ konservativ (K2) |
-| 21 | Data Types | `dataTypeClazzConstructorParamMutation` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 22 | Data Types | `dataTypeClazzConstructorParamNarrowing` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 23 | Data Types | `dataTypeClazzConstructorParamSpecialization` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 24 | Data Types | `dataTypeClazzConstructorParamUnboxing` | ✘ | ✔ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ⚠️ konservativ (K2) |
-| 25 | Data Types | `dataTypeClazzConstructorParamWidening` | ✘ | ✔ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ⚠️ konservativ (K2) |
-| 26 | Data Types | `dataTypeClazzFieldBoxing` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ konservativ (K2) |
-| 27 | Data Types | `dataTypeClazzFieldGeneralization` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ korrekt |
-| 28 | Data Types | `dataTypeClazzFieldMutation` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ korrekt |
-| 29 | Data Types | `dataTypeClazzFieldNarrowing` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ konservativ (K2) |
-| 30 | Data Types | `dataTypeClazzFieldSpecialization` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ konservativ (K2) |
-| 31 | Data Types | `dataTypeClazzFieldUnboxing` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ konservativ (K2) |
-| 32 | Data Types | `dataTypeClazzFieldWidening` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ korrekt |
-| 33 | Data Types | `dataTypeClazzMethodParamBoxing` | ✘ | ✔ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ⚠️ konservativ (K2) |
-| 34 | Data Types | `dataTypeClazzMethodParamGeneralization` | ✘ | ✔ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ⚠️ konservativ (K2) |
-| 35 | Data Types | `dataTypeClazzMethodParamMutation` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ korrekt |
-| 36 | Data Types | `dataTypeClazzMethodParamNarrowing` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ korrekt |
-| 37 | Data Types | `dataTypeClazzMethodParamSpecialization` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ korrekt |
-| 38 | Data Types | `dataTypeClazzMethodParamUnboxing` | ✘ | ✔ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ⚠️ konservativ (K2) |
-| 39 | Data Types | `dataTypeClazzMethodParamWidening` | ✘ | ✔ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ⚠️ konservativ (K2) |
-| 40 | Data Types | `dataTypeClazzMethodReturnTypeBoxing` | ✘ | ✔ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ⚠️ konservativ (K2) |
-| 41 | Data Types | `dataTypeClazzMethodReturnTypeGeneralization` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 42 | Data Types | `dataTypeClazzMethodReturnTypeMutation` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 43 | Data Types | `dataTypeClazzMethodReturnTypeNarrowing` | ✘ | ✔ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ⚠️ konservativ (K2) |
-| 44 | Data Types | `dataTypeClazzMethodReturnTypeSpecialization` | ✘ | ✔ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ⚠️ konservativ (K2) |
-| 45 | Data Types | `dataTypeClazzMethodReturnTypeUnboxing` | ✘ | ✔ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ⚠️ konservativ (K2) |
-| 46 | Data Types | `dataTypeClazzMethodReturnTypeWidening` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 47 | Data Types | `dataTypeIfazeConstantBoxing` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 48 | Data Types | `dataTypeIfazeConstantGeneralization` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ korrekt |
-| 49 | Data Types | `dataTypeIfazeConstantMutation` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ korrekt |
-| 50 | Data Types | `dataTypeIfazeConstantNarrowing` | ✔ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ konservativ (K1) |
-| 51 | Data Types | `dataTypeIfazeConstantSpecialization` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ konservativ (K1) |
-| 52 | Data Types | `dataTypeIfazeConstantUnboxing` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ konservativ (K1) |
-| 53 | Data Types | `dataTypeIfazeConstantWidening` | ✔ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ konservativ (K1) |
-| 54 | Data Types | `dataTypeIfazeMethodParamBoxing` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ korrekt |
-| 55 | Data Types | `dataTypeIfazeMethodParamGeneralization` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ korrekt |
-| 56 | Data Types | `dataTypeIfazeMethodParamMutation` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ korrekt |
-| 57 | Data Types | `dataTypeIfazeMethodParamNarrowing` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ korrekt |
-| 58 | Data Types | `dataTypeIfazeMethodParamSpecialization` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ korrekt |
-| 59 | Data Types | `dataTypeIfazeMethodParamUnboxing` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ korrekt |
-| 60 | Data Types | `dataTypeIfazeMethodParamWidening` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ korrekt |
-| 61 | Data Types | `dataTypeIfazeMethodReturnTypeBoxing` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 62 | Data Types | `dataTypeIfazeMethodReturnTypeGeneralization` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 63 | Data Types | `dataTypeIfazeMethodReturnTypeMutation` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 64 | Data Types | `dataTypeIfazeMethodReturnTypeNarrowing` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 65 | Data Types | `dataTypeIfazeMethodReturnTypeSpecialization` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 66 | Data Types | `dataTypeIfazeMethodReturnTypeUnboxing` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 67 | Data Types | `dataTypeIfazeMethodReturnTypeWidening` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ korrekt |
-| 68 | Exceptions | `exceptionClazzMethodCatchBlockAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 69 | Exceptions | `exceptionClazzMethodCatchBlockDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 70 | Exceptions | `exceptionClazzMethodFinallyBlockAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 71 | Exceptions | `exceptionClazzMethodFinallyBlockDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 72 | Exceptions | `exceptionClazzMethodThrowCheckedAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION` | ✅ korrekt |
-| 73 | Exceptions | `exceptionClazzMethodThrowCheckedDelete` | ✔ | ✘ | ✔ | ✘ | `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ✅ korrekt |
-| 74 | Exceptions | `exceptionClazzMethodThrowCheckedGeneralization` | ✔ | ✘ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION`, `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ✅ korrekt |
-| 75 | Exceptions | `exceptionClazzMethodThrowCheckedMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ✅ korrekt |
-| 76 | Exceptions | `exceptionClazzMethodThrowCheckedSpecialization` | ✔ | ✔ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION`, `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ⚠️ konservativ (K5) |
-| 77 | Exceptions | `exceptionClazzMethodThrowCheckedToTryCatch` | ✔ | ✘ | ✔ | ✘ | `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ✅ korrekt |
-| 78 | Exceptions | `exceptionClazzMethodThrowUncheckedAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 79 | Exceptions | `exceptionClazzMethodThrowUncheckedDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 80 | Exceptions | `exceptionClazzMethodThrowUncheckedGeneralization` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 81 | Exceptions | `exceptionClazzMethodThrowUncheckedMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION` | ✅ korrekt |
-| 82 | Exceptions | `exceptionClazzMethodThrowUncheckedSpecialization` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 83 | Exceptions | `exceptionClazzMethodTryCatchToThrowChecked` | ✘ | ✘ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION` | ℹ️ nicht statisch prüfbar / Oracle (O2) |
-| 84 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamAdd` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 85 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamDelete` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 86 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 87 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 88 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsGeneralization` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 89 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 90 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsSpecialization` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 91 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsToUpperBounds` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 92 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 93 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 94 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 95 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 96 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 97 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsToLowerBounds` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 98 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamAdd` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 99 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamDelete` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 100 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 101 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 102 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsGeneralization` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 103 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 104 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsSpecialization` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 105 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsToUpperBounds` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 106 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsAdd` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 107 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 108 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ konservativ (K3) |
-| 109 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 110 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 111 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsToLowerBounds` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ korrekt |
-| 112 | Generics | `genericsClazzConstructorTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 113 | Generics | `genericsClazzConstructorTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 114 | Generics | `genericsClazzConstructorTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 115 | Generics | `genericsClazzConstructorTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
-| 116 | Generics | `genericsClazzConstructorTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 117 | Generics | `genericsClazzConstructorTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3, G1) |
-| 118 | Generics | `genericsClazzConstructorTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 119 | Generics | `genericsClazzConstructorTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 120 | Generics | `genericsClazzConstructorTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 121 | Generics | `genericsClazzConstructorTypeDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 122 | Generics | `genericsClazzConstructorTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 123 | Generics | `genericsClazzConstructorTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 124 | Generics | `genericsClazzMethodTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 125 | Generics | `genericsClazzMethodTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 126 | Generics | `genericsClazzMethodTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 127 | Generics | `genericsClazzMethodTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
-| 128 | Generics | `genericsClazzMethodTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 129 | Generics | `genericsClazzMethodTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3, G1) |
-| 130 | Generics | `genericsClazzMethodTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 131 | Generics | `genericsClazzMethodTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 132 | Generics | `genericsClazzMethodTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 133 | Generics | `genericsClazzMethodTypeDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 134 | Generics | `genericsClazzMethodTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 135 | Generics | `genericsClazzMethodTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 136 | Generics | `genericsClazzTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 137 | Generics | `genericsClazzTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 138 | Generics | `genericsClazzTypeBoundsAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 139 | Generics | `genericsClazzTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
-| 140 | Generics | `genericsClazzTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 141 | Generics | `genericsClazzTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3, G1) |
-| 142 | Generics | `genericsClazzTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 143 | Generics | `genericsClazzTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 144 | Generics | `genericsClazzTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 145 | Generics | `genericsClazzTypeDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 146 | Generics | `genericsClazzTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 147 | Generics | `genericsClazzTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 148 | Generics | `genericsIfazeMethodTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 149 | Generics | `genericsIfazeMethodTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 150 | Generics | `genericsIfazeMethodTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 151 | Generics | `genericsIfazeMethodTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
-| 152 | Generics | `genericsIfazeMethodTypeBoundsDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 153 | Generics | `genericsIfazeMethodTypeBoundsDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
-| 154 | Generics | `genericsIfazeMethodTypeBoundsGeneralization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 155 | Generics | `genericsIfazeMethodTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 156 | Generics | `genericsIfazeMethodTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 157 | Generics | `genericsIfazeMethodTypeDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 158 | Generics | `genericsIfazeMethodTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 159 | Generics | `genericsIfazeMethodTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 160 | Generics | `genericsIfazeTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 161 | Generics | `genericsIfazeTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 162 | Generics | `genericsIfazeTypeBoundsAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 163 | Generics | `genericsIfazeTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt (G1) |
-| 164 | Generics | `genericsIfazeTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 165 | Generics | `genericsIfazeTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3, G1) |
-| 166 | Generics | `genericsIfazeTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ konservativ (K3) |
-| 167 | Generics | `genericsIfazeTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 168 | Generics | `genericsIfazeTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 169 | Generics | `genericsIfazeTypeDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 170 | Generics | `genericsIfazeTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ korrekt |
-| 171 | Generics | `genericsIfazeTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 172 | Inheritance | `inheritanceClazzContractSuperClassSet` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `CONSTRUCTOR_REMOVED`, `METHOD_REMOVED`, `SUPERCLASS_REMOVED` | ✅ korrekt |
-| 173 | Inheritance | `inheritanceClazzExpandSuperClassSet` | ✔ | ✔ | ✔ | ✔ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `SUPERCLASS_ADDED` | ✅ korrekt |
-| 174 | Inheritance | `inheritanceClazzMethodMovedFromSuperClass` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ korrekt |
-| 175 | Inheritance | `inheritanceClazzMethodMovedToSuperClass` | ✔ | ✔ | ✔ | ✔ | `METHOD_ADDED_TO_PUBLIC_CLASS` | ✅ korrekt |
-| 176 | Inheritance | `inheritanceClazzMethodOverrideAdd` | ✔ | ✔ | ✔ | ✔ | `METHOD_ADDED_TO_PUBLIC_CLASS` | ✅ korrekt |
-| 177 | Inheritance | `inheritanceClazzMethodOverrideDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 178 | Inheritance | `inheritanceClazzStartInherite` | ✔ | ✔ | ✔ | ✔ | `SUPERCLASS_ADDED` | ✅ korrekt |
-| 179 | Inheritance | `inheritanceClazzStopInherite` | ✘ | ✘ | ✘ | ✘ | `SUPERCLASS_REMOVED` | ✅ korrekt |
-| 180 | Inheritance | `inheritanceIfazeContractSuperinterfaceSet` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `INTERFACE_REMOVED`, `METHOD_REMOVED`, `SUPERCLASS_REMOVED` | ✅ korrekt |
-| 181 | Inheritance | `inheritanceIfazeDefaultMethodOverrideAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 182 | Inheritance | `inheritanceIfazeDefaultMethodOverrideDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 183 | Inheritance | `inheritanceIfazeExpandSuperinterfaceSet` | ✔ | ✘ | ✔ | ✘ | `INTERFACE_ADDED`, `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` | ✅ korrekt (G2) |
-| 184 | Inheritance | `inheritanceIfazeMethodMovedFromSuperInterface` | ✔ | ✔ | ✘ | ✘ | `METHOD_REMOVED` | ⚠️ konservativ (K4) |
-| 185 | Inheritance | `inheritanceIfazeMethodMovedToSuperInterface` | ✔ | ✔ | ✔ | ✘ | `METHOD_ADDED_TO_INTERFACE` | ⚠️ konservativ (K4) |
-| 186 | Inheritance | `inheritanceIfazeStartInherite` | ✔ | ✘ | ✔ | ✘ | `INTERFACE_ADDED`, `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` | ✅ korrekt (G2) |
-| 187 | Inheritance | `inheritanceIfazeStopInherite` | ✘ | ✘ | ✘ | ✘ | `INTERFACE_REMOVED` | ✅ korrekt |
-| 188 | Members | `membersClazzConstructorAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 189 | Members | `membersClazzConstructorDelete` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 190 | Members | `membersClazzConstructorParamAdd` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 191 | Members | `membersClazzConstructorParamDelete` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 192 | Members | `membersClazzFieldAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 193 | Members | `membersClazzFieldConstantAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 194 | Members | `membersClazzFieldConstantDelete` | ✔ | ✘ | ✘ | ✘ | `FIELD_REMOVED` | ⚠️ konservativ (K1) |
-| 195 | Members | `membersClazzFieldDelete` | ✘ | ✘ | ✘ | ✘ | `FIELD_REMOVED` | ✅ korrekt |
-| 196 | Members | `membersClazzMethodAbstractAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_ABSTRACT_ADDED_TO_CLASS`, `METHOD_ADDED_TO_PUBLIC_CLASS` | ✅ korrekt |
-| 197 | Members | `membersClazzMethodAbstractDelete` | ✔ | ✘ | ✘ | ✘ | `METHOD_REMOVED` | ⚠️ konservativ (K4) |
-| 198 | Members | `membersClazzMethodAdd` | ✔ | ✔ | ✔ | ✔ | `METHOD_ADDED_TO_PUBLIC_CLASS` | ✅ korrekt |
-| 199 | Members | `membersClazzMethodDelete` | ✘ | ✘ | ✘ | ✘ | `METHOD_REMOVED` | ✅ korrekt |
-| 200 | Members | `membersClazzMethodParamAdd` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ korrekt |
-| 201 | Members | `membersClazzMethodParamDelete` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ korrekt |
-| 202 | Members | `membersClazzNestedClazzAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 203 | Members | `membersClazzNestedClazzDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `CONSTRUCTOR_REMOVED`, `SUPERCLASS_REMOVED` | ✅ korrekt |
-| 204 | Members | `membersClazzNestedIfazeAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 205 | Members | `membersClazzNestedIfazeDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `SUPERCLASS_REMOVED` | ✅ korrekt |
-| 206 | Members | `membersIfazeConstantAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 207 | Members | `membersIfazeConstantDelete` | ✔ | ✘ | ✘ | ✘ | `FIELD_REMOVED` | ⚠️ konservativ (K1) |
-| 208 | Members | `membersIfazeMethodAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_ADDED_TO_INTERFACE` | ✅ korrekt |
-| 209 | Members | `membersIfazeMethodDefaultAdd` | ✔ | ✔ | ✔ | ✔ | `METHOD_NEW_DEFAULT` | ✅ korrekt |
-| 210 | Members | `membersIfazeMethodDefaultDelete` | ✘ | ✘ | ✘ | ✘ | `METHOD_REMOVED` | ✅ korrekt |
-| 211 | Members | `membersIfazeMethodDelete` | ✔ | ✘ | ✘ | ✘ | `METHOD_REMOVED` | ⚠️ konservativ (K4) |
-| 212 | Members | `membersIfazeMethodParamAdd` | ✔ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ⚠️ konservativ (K4) |
-| 213 | Members | `membersIfazeMethodParamDelete` | ✔ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ⚠️ konservativ (K4) |
-| 214 | Members | `membersIfazeNestedIfazeAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 215 | Members | `membersIfazeNestedIfazeDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `SUPERCLASS_REMOVED` | ✅ korrekt |
-| 216 | Other Modifiers | `modifierClazzAbstractToNonAbstract` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 217 | Other Modifiers | `modifierClazzEffectivelyFinalToFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 218 | Other Modifiers | `modifierClazzFinalToEffectivelyFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 219 | Other Modifiers | `modifierClazzFinalToNonFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 220 | Other Modifiers | `modifierClazzNonAbstractToAbstract` | ✘ | ✘ | ✘ | ✘ | `CLASS_NOW_ABSTRACT` | ✅ korrekt |
-| 221 | Other Modifiers | `modifierClazzNonFinalToFinal` | ✘ | ✘ | ✘ | ✘ | `CLASS_NOW_NOT_EXTENDABLE` | ✅ korrekt |
-| 222 | Other Modifiers | `modifierClazzNonStrictfpToStrictfp` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 223 | Other Modifiers | `modifierClazzStrictfpToNonStrictfp` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 224 | Other Modifiers | `modifierFieldFinalToNonFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 225 | Other Modifiers | `modifierFieldNonFinalToFinal` | ✘ | ✘ | ✘ | ✘ | `FIELD_NOW_FINAL` | ✅ korrekt |
-| 226 | Other Modifiers | `modifierFieldNonStaticToStatic` | ✘ | ✔ | ✘ | ✘ | `FIELD_NOW_STATIC` | ⚠️ konservativ (K6) |
-| 227 | Other Modifiers | `modifierFieldNonTransientToTransient` | ✔ | ✔ | ✔ | ✔ | `FIELD_NOW_TRANSIENT` | ✅ korrekt |
-| 228 | Other Modifiers | `modifierFieldNonVolatileToVolatile` | ✔ | ✔ | ✔ | ✔ | `FIELD_NOW_VOLATILE` | ✅ korrekt |
-| 229 | Other Modifiers | `modifierFieldStaticToNonStatic` | ✘ | ✘ | ✘ | ✘ | `FIELD_NO_LONGER_STATIC` | ✅ korrekt |
-| 230 | Other Modifiers | `modifierFieldTransientToNonTransient` | ✔ | ✔ | ✔ | ✔ | `FIELD_NO_LONGER_TRANSIENT` | ✅ korrekt |
-| 231 | Other Modifiers | `modifierFieldVolatileToNonVolatile` | ✔ | ✔ | ✔ | ✔ | `FIELD_NO_LONGER_VOLATILE` | ✅ korrekt |
-| 232 | Other Modifiers | `modifierMethodAbstractToNonAbstract` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 233 | Other Modifiers | `modifierMethodFinalToNonFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 234 | Other Modifiers | `modifierMethodNativeToNonNative` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 235 | Other Modifiers | `modifierMethodNonAbstractToAbstract` | ✘ | ✘ | ✘ | ✘ | `METHOD_NOW_ABSTRACT` | ✅ korrekt |
-| 236 | Other Modifiers | `modifierMethodNonFinalToFinal` | ✘ | ✘ | ✘ | ✘ | `METHOD_NOW_FINAL` | ✅ korrekt |
-| 237 | Other Modifiers | `modifierMethodNonNativeToNative` | ✘ | ✔ | ✘ | ✔ | `METHOD_NOW_NATIVE` | ✅ korrekt (G3) |
-| 238 | Other Modifiers | `modifierMethodNonStaticToStatic` | ✘ | ✔ | ✘ | ✘ | `METHOD_NOW_STATIC` | ⚠️ konservativ (K6) |
-| 239 | Other Modifiers | `modifierMethodNonStrictfpToStrictfp` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 240 | Other Modifiers | `modifierMethodNonSynchronizedToSynchronized` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 241 | Other Modifiers | `modifierMethodStaticToNonStatic` | ✘ | ✘ | ✘ | ✘ | `METHOD_NO_LONGER_STATIC` | ✅ korrekt |
-| 242 | Other Modifiers | `modifierMethodStrictfpToNonStrictfp` | ✘ | ✔ | ✔ | ✔ | – | ℹ️ nicht statisch prüfbar / Oracle (O1) |
-| 243 | Other Modifiers | `modifierMethodSynchronizedToNonSynchronized` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 244 | Other Modifiers | `modifierNestedClazzNonStaticToStatic` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 245 | Other Modifiers | `modifierNestedClazzStaticToNonStatic` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 246 | Miscellaneous | `otherClazzAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 247 | Miscellaneous | `otherClazzDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `CONSTRUCTOR_REMOVED`, `SUPERCLASS_REMOVED` | ✅ korrekt |
-| 248 | Miscellaneous | `otherClazzToIfaze` | ✘ | ✘ | ✘ | ✘ | `CLASS_NOW_ABSTRACT`, `CLASS_TYPE_CHANGED`, `CONSTRUCTOR_REMOVED` | ✅ korrekt |
-| 249 | Miscellaneous | `otherIfazeAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ korrekt |
-| 250 | Miscellaneous | `otherIfazeDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `SUPERCLASS_REMOVED` | ✅ korrekt |
-| 251 | Miscellaneous | `otherIfazeToClass` | ✘ | ✘ | ✘ | ✘ | `CLASS_TYPE_CHANGED` | ✅ korrekt |
+| 1 | Access Modifiers | `accessModifierClazzAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `CLASS_LESS_ACCESSIBLE`, `CLASS_NO_LONGER_PUBLIC`, `CONSTRUCTOR_LESS_ACCESSIBLE` | ✅ correct |
+| 2 | Access Modifiers | `accessModifierClazzAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 3 | Access Modifiers | `accessModifierClazzConstructorAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_LESS_ACCESSIBLE` | ✅ correct |
+| 4 | Access Modifiers | `accessModifierClazzConstructorAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 5 | Access Modifiers | `accessModifierClazzFieldAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `FIELD_LESS_ACCESSIBLE` | ✅ correct |
+| 6 | Access Modifiers | `accessModifierClazzFieldAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 7 | Access Modifiers | `accessModifierClazzMethodAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `METHOD_LESS_ACCESSIBLE` | ✅ correct |
+| 8 | Access Modifiers | `accessModifierClazzMethodAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 9 | Access Modifiers | `accessModifierClazzNestedClazzAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `CLASS_LESS_ACCESSIBLE`, `CLASS_NOW_NOT_EXTENDABLE`, `CLASS_NO_LONGER_PUBLIC`, `CONSTRUCTOR_LESS_ACCESSIBLE` | ✅ correct |
+| 10 | Access Modifiers | `accessModifierClazzNestedClazzAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 11 | Access Modifiers | `accessModifierClazzNestedIfazeAccessDecrease` | ✘ | ✘ | ✘ | ✘ | `CLASS_LESS_ACCESSIBLE`, `CLASS_NO_LONGER_PUBLIC` | ✅ correct |
+| 12 | Access Modifiers | `accessModifierClazzNestedIfazeAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 13 | Access Modifiers | `accessModifierIfazeFieldAccessDecrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 14 | Access Modifiers | `accessModifierIfazeFieldAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 15 | Access Modifiers | `accessModifierIfazeMethodAccessDecrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 16 | Access Modifiers | `accessModifierIfazeMethodAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 17 | Access Modifiers | `accessModifierIfazeNestedIfazeAccessDecrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 18 | Access Modifiers | `accessModifierIfazeNestedIfazeAccessIncrease` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 19 | Data Types | `dataTypeClazzConstructorParamBoxing` | ✘ | ✔ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ⚠️ conservative (C2) |
+| 20 | Data Types | `dataTypeClazzConstructorParamGeneralization` | ✘ | ✔ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ⚠️ conservative (C2) |
+| 21 | Data Types | `dataTypeClazzConstructorParamMutation` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 22 | Data Types | `dataTypeClazzConstructorParamNarrowing` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 23 | Data Types | `dataTypeClazzConstructorParamSpecialization` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 24 | Data Types | `dataTypeClazzConstructorParamUnboxing` | ✘ | ✔ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ⚠️ conservative (C2) |
+| 25 | Data Types | `dataTypeClazzConstructorParamWidening` | ✘ | ✔ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ⚠️ conservative (C2) |
+| 26 | Data Types | `dataTypeClazzFieldBoxing` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ conservative (C2) |
+| 27 | Data Types | `dataTypeClazzFieldGeneralization` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ correct |
+| 28 | Data Types | `dataTypeClazzFieldMutation` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ correct |
+| 29 | Data Types | `dataTypeClazzFieldNarrowing` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ conservative (C2) |
+| 30 | Data Types | `dataTypeClazzFieldSpecialization` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ conservative (C2) |
+| 31 | Data Types | `dataTypeClazzFieldUnboxing` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ conservative (C2) |
+| 32 | Data Types | `dataTypeClazzFieldWidening` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ correct |
+| 33 | Data Types | `dataTypeClazzMethodParamBoxing` | ✘ | ✔ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ⚠️ conservative (C2) |
+| 34 | Data Types | `dataTypeClazzMethodParamGeneralization` | ✘ | ✔ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ⚠️ conservative (C2) |
+| 35 | Data Types | `dataTypeClazzMethodParamMutation` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ correct |
+| 36 | Data Types | `dataTypeClazzMethodParamNarrowing` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ correct |
+| 37 | Data Types | `dataTypeClazzMethodParamSpecialization` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ correct |
+| 38 | Data Types | `dataTypeClazzMethodParamUnboxing` | ✘ | ✔ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ⚠️ conservative (C2) |
+| 39 | Data Types | `dataTypeClazzMethodParamWidening` | ✘ | ✔ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ⚠️ conservative (C2) |
+| 40 | Data Types | `dataTypeClazzMethodReturnTypeBoxing` | ✘ | ✔ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ⚠️ conservative (C2) |
+| 41 | Data Types | `dataTypeClazzMethodReturnTypeGeneralization` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 42 | Data Types | `dataTypeClazzMethodReturnTypeMutation` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 43 | Data Types | `dataTypeClazzMethodReturnTypeNarrowing` | ✘ | ✔ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ⚠️ conservative (C2) |
+| 44 | Data Types | `dataTypeClazzMethodReturnTypeSpecialization` | ✘ | ✔ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ⚠️ conservative (C2) |
+| 45 | Data Types | `dataTypeClazzMethodReturnTypeUnboxing` | ✘ | ✔ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ⚠️ conservative (C2) |
+| 46 | Data Types | `dataTypeClazzMethodReturnTypeWidening` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 47 | Data Types | `dataTypeIfazeConstantBoxing` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 48 | Data Types | `dataTypeIfazeConstantGeneralization` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ correct |
+| 49 | Data Types | `dataTypeIfazeConstantMutation` | ✘ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ✅ correct |
+| 50 | Data Types | `dataTypeIfazeConstantNarrowing` | ✔ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ conservative (C1) |
+| 51 | Data Types | `dataTypeIfazeConstantSpecialization` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ conservative (C1) |
+| 52 | Data Types | `dataTypeIfazeConstantUnboxing` | ✘ | ✔ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ conservative (C1) |
+| 53 | Data Types | `dataTypeIfazeConstantWidening` | ✔ | ✘ | ✘ | ✘ | `FIELD_TYPE_CHANGED` | ⚠️ conservative (C1) |
+| 54 | Data Types | `dataTypeIfazeMethodParamBoxing` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ correct |
+| 55 | Data Types | `dataTypeIfazeMethodParamGeneralization` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ correct |
+| 56 | Data Types | `dataTypeIfazeMethodParamMutation` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ correct |
+| 57 | Data Types | `dataTypeIfazeMethodParamNarrowing` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ correct |
+| 58 | Data Types | `dataTypeIfazeMethodParamSpecialization` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ correct |
+| 59 | Data Types | `dataTypeIfazeMethodParamUnboxing` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ correct |
+| 60 | Data Types | `dataTypeIfazeMethodParamWidening` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ✅ correct |
+| 61 | Data Types | `dataTypeIfazeMethodReturnTypeBoxing` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 62 | Data Types | `dataTypeIfazeMethodReturnTypeGeneralization` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 63 | Data Types | `dataTypeIfazeMethodReturnTypeMutation` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 64 | Data Types | `dataTypeIfazeMethodReturnTypeNarrowing` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 65 | Data Types | `dataTypeIfazeMethodReturnTypeSpecialization` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 66 | Data Types | `dataTypeIfazeMethodReturnTypeUnboxing` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 67 | Data Types | `dataTypeIfazeMethodReturnTypeWidening` | ✘ | ✘ | ✘ | ✘ | `METHOD_RETURN_TYPE_CHANGED` | ✅ correct |
+| 68 | Exceptions | `exceptionClazzMethodCatchBlockAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 69 | Exceptions | `exceptionClazzMethodCatchBlockDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 70 | Exceptions | `exceptionClazzMethodFinallyBlockAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 71 | Exceptions | `exceptionClazzMethodFinallyBlockDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 72 | Exceptions | `exceptionClazzMethodThrowCheckedAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION` | ✅ correct |
+| 73 | Exceptions | `exceptionClazzMethodThrowCheckedDelete` | ✔ | ✘ | ✔ | ✘ | `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ✅ correct |
+| 74 | Exceptions | `exceptionClazzMethodThrowCheckedGeneralization` | ✔ | ✘ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION`, `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ✅ correct |
+| 75 | Exceptions | `exceptionClazzMethodThrowCheckedMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ✅ correct |
+| 76 | Exceptions | `exceptionClazzMethodThrowCheckedSpecialization` | ✔ | ✔ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION`, `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ⚠️ conservative (C5) |
+| 77 | Exceptions | `exceptionClazzMethodThrowCheckedToTryCatch` | ✔ | ✘ | ✔ | ✘ | `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` | ✅ correct |
+| 78 | Exceptions | `exceptionClazzMethodThrowUncheckedAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 79 | Exceptions | `exceptionClazzMethodThrowUncheckedDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 80 | Exceptions | `exceptionClazzMethodThrowUncheckedGeneralization` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 81 | Exceptions | `exceptionClazzMethodThrowUncheckedMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION` | ✅ correct |
+| 82 | Exceptions | `exceptionClazzMethodThrowUncheckedSpecialization` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 83 | Exceptions | `exceptionClazzMethodTryCatchToThrowChecked` | ✘ | ✘ | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION` | ℹ️ not statically checkable / oracle (O2) |
+| 84 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamAdd` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 85 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamDelete` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 86 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 87 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 88 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsGeneralization` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 89 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 90 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsSpecialization` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 91 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamLowerBoundsToUpperBounds` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 92 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 93 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 94 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 95 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 96 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 97 | Generics (Wildcards) | `genericsWildcardsClazzConstructorParamUpperBoundsToLowerBounds` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 98 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamAdd` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 99 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamDelete` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 100 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 101 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 102 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsGeneralization` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 103 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 104 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsSpecialization` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 105 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamLowerBoundsToUpperBounds` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 106 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsAdd` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 107 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 108 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ⚠️ conservative (C3) |
+| 109 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 110 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 111 | Generics (Wildcards) | `genericsWildcardsClazzMethodParamUpperBoundsToLowerBounds` | ✔ | ✘ | ✔ | ✘ | `METHOD_PARAMETER_GENERICS_CHANGED` | ✅ correct |
+| 112 | Generics | `genericsClazzConstructorTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 113 | Generics | `genericsClazzConstructorTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 114 | Generics | `genericsClazzConstructorTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 115 | Generics | `genericsClazzConstructorTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct (G1) |
+| 116 | Generics | `genericsClazzConstructorTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 117 | Generics | `genericsClazzConstructorTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3, G1) |
+| 118 | Generics | `genericsClazzConstructorTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 119 | Generics | `genericsClazzConstructorTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 120 | Generics | `genericsClazzConstructorTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 121 | Generics | `genericsClazzConstructorTypeDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 122 | Generics | `genericsClazzConstructorTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 123 | Generics | `genericsClazzConstructorTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 124 | Generics | `genericsClazzMethodTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 125 | Generics | `genericsClazzMethodTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 126 | Generics | `genericsClazzMethodTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 127 | Generics | `genericsClazzMethodTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct (G1) |
+| 128 | Generics | `genericsClazzMethodTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 129 | Generics | `genericsClazzMethodTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3, G1) |
+| 130 | Generics | `genericsClazzMethodTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 131 | Generics | `genericsClazzMethodTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 132 | Generics | `genericsClazzMethodTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 133 | Generics | `genericsClazzMethodTypeDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 134 | Generics | `genericsClazzMethodTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 135 | Generics | `genericsClazzMethodTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 136 | Generics | `genericsClazzTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 137 | Generics | `genericsClazzTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 138 | Generics | `genericsClazzTypeBoundsAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 139 | Generics | `genericsClazzTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct (G1) |
+| 140 | Generics | `genericsClazzTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 141 | Generics | `genericsClazzTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3, G1) |
+| 142 | Generics | `genericsClazzTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 143 | Generics | `genericsClazzTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 144 | Generics | `genericsClazzTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 145 | Generics | `genericsClazzTypeDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 146 | Generics | `genericsClazzTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 147 | Generics | `genericsClazzTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 148 | Generics | `genericsIfazeMethodTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 149 | Generics | `genericsIfazeMethodTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 150 | Generics | `genericsIfazeMethodTypeBoundsAdd` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 151 | Generics | `genericsIfazeMethodTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct (G1) |
+| 152 | Generics | `genericsIfazeMethodTypeBoundsDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 153 | Generics | `genericsIfazeMethodTypeBoundsDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct (G1) |
+| 154 | Generics | `genericsIfazeMethodTypeBoundsGeneralization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 155 | Generics | `genericsIfazeMethodTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 156 | Generics | `genericsIfazeMethodTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 157 | Generics | `genericsIfazeMethodTypeDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 158 | Generics | `genericsIfazeMethodTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 159 | Generics | `genericsIfazeMethodTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 160 | Generics | `genericsIfazeTypeAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 161 | Generics | `genericsIfazeTypeAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 162 | Generics | `genericsIfazeTypeBoundsAdd` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 163 | Generics | `genericsIfazeTypeBoundsAddSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct (G1) |
+| 164 | Generics | `genericsIfazeTypeBoundsDelete` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 165 | Generics | `genericsIfazeTypeBoundsDeleteSecond` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3, G1) |
+| 166 | Generics | `genericsIfazeTypeBoundsGeneralization` | ✔ | ✔ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ⚠️ conservative (C3) |
+| 167 | Generics | `genericsIfazeTypeBoundsMutation` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 168 | Generics | `genericsIfazeTypeBoundsSpecialization` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 169 | Generics | `genericsIfazeTypeDelete` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 170 | Generics | `genericsIfazeTypeDeleteSecond` | ✔ | ✘ | ✔ | ✘ | `CLASS_GENERIC_TEMPLATE_CHANGED` | ✅ correct |
+| 171 | Generics | `genericsIfazeTypeSwap` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 172 | Inheritance | `inheritanceClazzContractSuperClassSet` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `CONSTRUCTOR_REMOVED`, `METHOD_REMOVED`, `SUPERCLASS_REMOVED` | ✅ correct |
+| 173 | Inheritance | `inheritanceClazzExpandSuperClassSet` | ✔ | ✔ | ✔ | ✔ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `SUPERCLASS_ADDED` | ✅ correct |
+| 174 | Inheritance | `inheritanceClazzMethodMovedFromSuperClass` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ correct |
+| 175 | Inheritance | `inheritanceClazzMethodMovedToSuperClass` | ✔ | ✔ | ✔ | ✔ | `METHOD_ADDED_TO_PUBLIC_CLASS` | ✅ correct |
+| 176 | Inheritance | `inheritanceClazzMethodOverrideAdd` | ✔ | ✔ | ✔ | ✔ | `METHOD_ADDED_TO_PUBLIC_CLASS` | ✅ correct |
+| 177 | Inheritance | `inheritanceClazzMethodOverrideDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 178 | Inheritance | `inheritanceClazzStartInherite` | ✔ | ✔ | ✔ | ✔ | `SUPERCLASS_ADDED` | ✅ correct |
+| 179 | Inheritance | `inheritanceClazzStopInherite` | ✘ | ✘ | ✘ | ✘ | `SUPERCLASS_REMOVED` | ✅ correct |
+| 180 | Inheritance | `inheritanceIfazeContractSuperinterfaceSet` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `INTERFACE_REMOVED`, `METHOD_REMOVED`, `SUPERCLASS_REMOVED` | ✅ correct |
+| 181 | Inheritance | `inheritanceIfazeDefaultMethodOverrideAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 182 | Inheritance | `inheritanceIfazeDefaultMethodOverrideDelete` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 183 | Inheritance | `inheritanceIfazeExpandSuperinterfaceSet` | ✔ | ✘ | ✔ | ✘ | `INTERFACE_ADDED`, `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` | ✅ correct (G2) |
+| 184 | Inheritance | `inheritanceIfazeMethodMovedFromSuperInterface` | ✔ | ✔ | ✘ | ✘ | `METHOD_REMOVED` | ⚠️ conservative (C4) |
+| 185 | Inheritance | `inheritanceIfazeMethodMovedToSuperInterface` | ✔ | ✔ | ✔ | ✘ | `METHOD_ADDED_TO_INTERFACE` | ⚠️ conservative (C4) |
+| 186 | Inheritance | `inheritanceIfazeStartInherite` | ✔ | ✘ | ✔ | ✘ | `INTERFACE_ADDED`, `METHOD_ABSTRACT_ADDED_IN_IMPLEMENTED_INTERFACE` | ✅ correct (G2) |
+| 187 | Inheritance | `inheritanceIfazeStopInherite` | ✘ | ✘ | ✘ | ✘ | `INTERFACE_REMOVED` | ✅ correct |
+| 188 | Members | `membersClazzConstructorAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 189 | Members | `membersClazzConstructorDelete` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 190 | Members | `membersClazzConstructorParamAdd` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 191 | Members | `membersClazzConstructorParamDelete` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 192 | Members | `membersClazzFieldAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 193 | Members | `membersClazzFieldConstantAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 194 | Members | `membersClazzFieldConstantDelete` | ✔ | ✘ | ✘ | ✘ | `FIELD_REMOVED` | ⚠️ conservative (C1) |
+| 195 | Members | `membersClazzFieldDelete` | ✘ | ✘ | ✘ | ✘ | `FIELD_REMOVED` | ✅ correct |
+| 196 | Members | `membersClazzMethodAbstractAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_ABSTRACT_ADDED_TO_CLASS`, `METHOD_ADDED_TO_PUBLIC_CLASS` | ✅ correct |
+| 197 | Members | `membersClazzMethodAbstractDelete` | ✔ | ✘ | ✘ | ✘ | `METHOD_REMOVED` | ⚠️ conservative (C4) |
+| 198 | Members | `membersClazzMethodAdd` | ✔ | ✔ | ✔ | ✔ | `METHOD_ADDED_TO_PUBLIC_CLASS` | ✅ correct |
+| 199 | Members | `membersClazzMethodDelete` | ✘ | ✘ | ✘ | ✘ | `METHOD_REMOVED` | ✅ correct |
+| 200 | Members | `membersClazzMethodParamAdd` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ correct |
+| 201 | Members | `membersClazzMethodParamDelete` | ✘ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_PUBLIC_CLASS`, `METHOD_REMOVED` | ✅ correct |
+| 202 | Members | `membersClazzNestedClazzAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 203 | Members | `membersClazzNestedClazzDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `CONSTRUCTOR_REMOVED`, `SUPERCLASS_REMOVED` | ✅ correct |
+| 204 | Members | `membersClazzNestedIfazeAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 205 | Members | `membersClazzNestedIfazeDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `SUPERCLASS_REMOVED` | ✅ correct |
+| 206 | Members | `membersIfazeConstantAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 207 | Members | `membersIfazeConstantDelete` | ✔ | ✘ | ✘ | ✘ | `FIELD_REMOVED` | ⚠️ conservative (C1) |
+| 208 | Members | `membersIfazeMethodAdd` | ✔ | ✘ | ✔ | ✘ | `METHOD_ADDED_TO_INTERFACE` | ✅ correct |
+| 209 | Members | `membersIfazeMethodDefaultAdd` | ✔ | ✔ | ✔ | ✔ | `METHOD_NEW_DEFAULT` | ✅ correct |
+| 210 | Members | `membersIfazeMethodDefaultDelete` | ✘ | ✘ | ✘ | ✘ | `METHOD_REMOVED` | ✅ correct |
+| 211 | Members | `membersIfazeMethodDelete` | ✔ | ✘ | ✘ | ✘ | `METHOD_REMOVED` | ⚠️ conservative (C4) |
+| 212 | Members | `membersIfazeMethodParamAdd` | ✔ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ⚠️ conservative (C4) |
+| 213 | Members | `membersIfazeMethodParamDelete` | ✔ | ✘ | ✘ | ✘ | `METHOD_ADDED_TO_INTERFACE`, `METHOD_REMOVED` | ⚠️ conservative (C4) |
+| 214 | Members | `membersIfazeNestedIfazeAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 215 | Members | `membersIfazeNestedIfazeDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `SUPERCLASS_REMOVED` | ✅ correct |
+| 216 | Other Modifiers | `modifierClazzAbstractToNonAbstract` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 217 | Other Modifiers | `modifierClazzEffectivelyFinalToFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 218 | Other Modifiers | `modifierClazzFinalToEffectivelyFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 219 | Other Modifiers | `modifierClazzFinalToNonFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 220 | Other Modifiers | `modifierClazzNonAbstractToAbstract` | ✘ | ✘ | ✘ | ✘ | `CLASS_NOW_ABSTRACT` | ✅ correct |
+| 221 | Other Modifiers | `modifierClazzNonFinalToFinal` | ✘ | ✘ | ✘ | ✘ | `CLASS_NOW_NOT_EXTENDABLE` | ✅ correct |
+| 222 | Other Modifiers | `modifierClazzNonStrictfpToStrictfp` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 223 | Other Modifiers | `modifierClazzStrictfpToNonStrictfp` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 224 | Other Modifiers | `modifierFieldFinalToNonFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 225 | Other Modifiers | `modifierFieldNonFinalToFinal` | ✘ | ✘ | ✘ | ✘ | `FIELD_NOW_FINAL` | ✅ correct |
+| 226 | Other Modifiers | `modifierFieldNonStaticToStatic` | ✘ | ✔ | ✘ | ✘ | `FIELD_NOW_STATIC` | ⚠️ conservative (C6) |
+| 227 | Other Modifiers | `modifierFieldNonTransientToTransient` | ✔ | ✔ | ✔ | ✔ | `FIELD_NOW_TRANSIENT` | ✅ correct |
+| 228 | Other Modifiers | `modifierFieldNonVolatileToVolatile` | ✔ | ✔ | ✔ | ✔ | `FIELD_NOW_VOLATILE` | ✅ correct |
+| 229 | Other Modifiers | `modifierFieldStaticToNonStatic` | ✘ | ✘ | ✘ | ✘ | `FIELD_NO_LONGER_STATIC` | ✅ correct |
+| 230 | Other Modifiers | `modifierFieldTransientToNonTransient` | ✔ | ✔ | ✔ | ✔ | `FIELD_NO_LONGER_TRANSIENT` | ✅ correct |
+| 231 | Other Modifiers | `modifierFieldVolatileToNonVolatile` | ✔ | ✔ | ✔ | ✔ | `FIELD_NO_LONGER_VOLATILE` | ✅ correct |
+| 232 | Other Modifiers | `modifierMethodAbstractToNonAbstract` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 233 | Other Modifiers | `modifierMethodFinalToNonFinal` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 234 | Other Modifiers | `modifierMethodNativeToNonNative` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 235 | Other Modifiers | `modifierMethodNonAbstractToAbstract` | ✘ | ✘ | ✘ | ✘ | `METHOD_NOW_ABSTRACT` | ✅ correct |
+| 236 | Other Modifiers | `modifierMethodNonFinalToFinal` | ✘ | ✘ | ✘ | ✘ | `METHOD_NOW_FINAL` | ✅ correct |
+| 237 | Other Modifiers | `modifierMethodNonNativeToNative` | ✘ | ✔ | ✘ | ✔ | `METHOD_NOW_NATIVE` | ✅ correct (G3) |
+| 238 | Other Modifiers | `modifierMethodNonStaticToStatic` | ✘ | ✔ | ✘ | ✘ | `METHOD_NOW_STATIC` | ⚠️ conservative (C6) |
+| 239 | Other Modifiers | `modifierMethodNonStrictfpToStrictfp` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 240 | Other Modifiers | `modifierMethodNonSynchronizedToSynchronized` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 241 | Other Modifiers | `modifierMethodStaticToNonStatic` | ✘ | ✘ | ✘ | ✘ | `METHOD_NO_LONGER_STATIC` | ✅ correct |
+| 242 | Other Modifiers | `modifierMethodStrictfpToNonStrictfp` | ✘ | ✔ | ✔ | ✔ | – | ℹ️ not statically checkable / oracle (O1) |
+| 243 | Other Modifiers | `modifierMethodSynchronizedToNonSynchronized` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 244 | Other Modifiers | `modifierNestedClazzNonStaticToStatic` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 245 | Other Modifiers | `modifierNestedClazzStaticToNonStatic` | ✘ | ✘ | ✘ | ✘ | `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 246 | Miscellaneous | `otherClazzAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 247 | Miscellaneous | `otherClazzDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `CONSTRUCTOR_REMOVED`, `SUPERCLASS_REMOVED` | ✅ correct |
+| 248 | Miscellaneous | `otherClazzToIfaze` | ✘ | ✘ | ✘ | ✘ | `CLASS_NOW_ABSTRACT`, `CLASS_TYPE_CHANGED`, `CONSTRUCTOR_REMOVED` | ✅ correct |
+| 249 | Miscellaneous | `otherIfazeAdd` | ✔ | ✔ | ✔ | ✔ | – | ✅ correct |
+| 250 | Miscellaneous | `otherIfazeDelete` | ✘ | ✘ | ✘ | ✘ | `CLASS_REMOVED`, `SUPERCLASS_REMOVED` | ✅ correct |
+| 251 | Miscellaneous | `otherIfazeToClass` | ✘ | ✘ | ✘ | ✘ | `CLASS_TYPE_CHANGED` | ✅ correct |
 
-## 8. Zusätzliche Szenarien ohne Oracle-Eintrag
+## 8. Additional scenarios without an oracle entry
 
-`lib-v1` und `lib-v2` des Korpus enthalten 10 weitere Exception-Szenarien für Interface-Methoden. Für sie gibt es keinen Client und keinen Eintrag in `compatibility.csv`. Mit ihnen kommt die Kategorie auf die 26 Exception-Szenarien aus Tabelle 1 des Papers. Die japicmp-Ergebnisse dafür sind plausibel: Checked Exceptions werden als source-inkompatibel gemeldet, Unchecked Exceptions werden ignoriert.
+`lib-v1` and `lib-v2` of the corpus contain 10 further exception scenarios for interface methods. They have no client and no entry in `compatibility.csv`. With them, the category reaches the 26 exception scenarios from Table 1 of the paper. japicmp's results for them are plausible: checked exceptions are reported as source incompatible, unchecked exceptions are ignored.
 
-| Szenario | japicmp binär | japicmp source | gemeldete japicmp-Änderungen |
+| Scenario | japicmp binary | japicmp source | Reported japicmp changes |
 |---|:-:|:-:|---|
 | `exceptionIfazeMethodThrowCheckedAdd` | ✔ | ✘ | `METHOD_NOW_THROWS_CHECKED_EXCEPTION` |
 | `exceptionIfazeMethodThrowCheckedDelete` | ✔ | ✘ | `METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION` |
