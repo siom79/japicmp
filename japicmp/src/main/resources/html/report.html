@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="japicmp">
+<title>${title}</title>
+<style>
+${style}
+</style>
+</head>
+<body class="japicmp-page">
+<div class="japicmp"><div class="wrap">
+${header}
+${summary}
+<div class="toolbar" id="japicmp-toolbar" hidden>
+	<input id="japicmp-q" class="search" type="search" placeholder="Search class, method, field or change&#8230;" aria-label="Search">
+	<div class="seg" role="group" aria-label="Filter changes">
+		<button type="button" data-f="all" aria-pressed="true">All</button>
+		<button type="button" data-f="breaking" aria-pressed="false">Breaking</button>
+		<button type="button" data-f="NEW" aria-pressed="false">New</button>
+		<button type="button" data-f="REMOVED" aria-pressed="false">Removed</button>
+		<button type="button" data-f="MODIFIED" aria-pressed="false">Modified</button>
+	</div>
+	<button class="btn" id="japicmp-expandAll" type="button">Expand all</button>
+	<button class="btn" id="japicmp-collapseAll" type="button">Collapse all</button>
+	<span class="result" id="japicmp-result"></span>
+</div>
+<div class="legend">
+	<span class="badge bin"><span class="ico">&#10006;</span>Binary</span> breaks already compiled code
+	<span class="badge src"><span class="ico">&#9888;</span>Source</span> breaks recompilation
+	<span class="badge ok"><span class="ico">&#10003;</span>Compatible</span>
+</div>
+${index}
+<main class="classes" id="japicmp-classes">
+${classes}
+</main>
+<div class="empty" id="japicmp-empty" hidden>No changes match this filter.</div>
+${footer}
+</div></div>
+<script>
+${script}
+</script>
+</body>
+</html>

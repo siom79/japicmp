@@ -169,7 +169,8 @@ public class CliParser {
 			"            Provides the path to the html output file.\n" +
 			"\n" +
 			"        --html-stylesheet <pathToHtmlStylesheet>\n" +
-			"            Provides the path to your own stylesheet.\n" +
+			"            Provides the path to your own stylesheet. It is appended to the\n" +
+			"            built-in styles of the html report.\n" +
 			"\n" +
 			"        -i <includes>, --include <includes>\n" +
 			"            Semicolon separated list of elements to include in the form\n" +

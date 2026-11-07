@@ -26,14 +26,11 @@ public class ITClassFileFormatVersion {
 			return; //in JDK 1.7 case
 		}
 		Document document = Jsoup.parse(htmlPath.toFile(), StandardCharsets.UTF_8.toString());
-		Elements classFileFormatElements = document.select(".class_fileFormatVersion");
+		Elements classFileFormatElements = document.select(".classfile");
 		assertThat(classFileFormatElements.isEmpty(), is(false));
-		Elements tdCells = classFileFormatElements.select("table > tbody > tr > td");
-		assertThat(tdCells.isEmpty(), is(false));
-		for (Element element : tdCells) {
-			String text = element.text();
-			if (!"MODIFIED (!)".equals(text) && !"50.0".equals(text) && !"52.0".equals(text)) {
-				fail("text of HTML element does not equal 'MODIFIED' or 50.0 or 52.0: " + text);
+		for (Element element : classFileFormatElements) {
+			if (!"50.0".equals(element.attr("data-old")) || !"52.0".equals(element.attr("data-new"))) {
+				fail("class file format version is not 50.0 -> 52.0: " + element.attr("data-old") + " -> " + element.attr("data-new"));
 			}
 		}
 	}

@@ -10,6 +10,6 @@ public class XmlHelper {
 	}
 
 	static Elements getDivForClass(Document document, String className) {
-		return document.select("div[id= " + className + "]");
+		return document.select("details.cls[id=" + className + "]");
 	}
 }

@@ -54,7 +54,8 @@ OPTIONS
             Provides the path to the html output file.
 
         --html-stylesheet <pathToHtmlStylesheet>
-            Provides the path to your own stylesheet.
+            Provides the path to your own stylesheet. It is appended to the
+            built-in styles of the html report.
 
         -i <includes>, --include <includes>
             Semicolon separated list of elements to include in the form

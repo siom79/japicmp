@@ -64,8 +64,10 @@ public class XmlOutputGeneratorTest {
 
 	@Test
 	public void testMetaInformationTable() {
-		assertThat(document.select("div.meta-information > table").isEmpty(), is(false));
-		assertThat(document.select("div.meta-information > table > tbody > tr").size(), is(10));
+		assertThat(document.select(".japicmp .settings").isEmpty(), is(false));
+		assertThat(document.select(".japicmp .settings > span").size(), is(7));
+		assertThat(document.select("#meta-accessmodifier-value").text(), is("PROTECTED"));
+		assertThat(document.select("#semver-version").isEmpty(), is(false));
 	}
 
 	@Test
@@ -84,68 +86,67 @@ public class XmlOutputGeneratorTest {
 	@Test
 	public void superclassAllChangesAddedWithSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassOnlyModificationsAddedWithSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$AddedWithSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	private Elements getSuperClassDiv(Document document, String className) {
 		Elements divForClass = getDivForClass(document, className);
-		Elements divSuperclass = divForClass.select("div[class=class_superclass]");
-		assertThat(divSuperclass.isEmpty(), is(false));
-		return divSuperclass;
+		assertThat(divForClass.isEmpty(), is(false));
+		return divForClass.select("[data-kind=superclass]");
 	}
 
 	@Test
 	public void superclassAllChangesAdded() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassOnlyModificationsAdded() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Added");
-		assertThat(divSuperClass.select("table").isEmpty(), is(true));
+		assertThat(divSuperClass.isEmpty(), is(true));
 	}
 
 	@Test
 	public void superclassAddedWithSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$AddedWithSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassAddedWithSuperclassOnlyModifications() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$AddedWithSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassRemovedWithSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$RemovedWithSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassRemovedWithSuperclassOnlyModifications() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$RemovedWithSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassNoSuperclassToSuperclass() {
 		Elements divSuperClass = getSuperClassDiv(document, "japicmp.test.Superclasses$NoSuperclassToSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	@Test
 	public void superclassNoSuperclassToSuperclassOnlyModifications() {
 		Elements divSuperClass = getSuperClassDiv(documentOnlyModifications, "japicmp.test.Superclasses$NoSuperclassToSuperclass");
-		assertThat(divSuperClass.select("table").isEmpty(), is(false));
+		assertThat(divSuperClass.isEmpty(), is(false));
 	}
 
 	@Test

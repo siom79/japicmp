@@ -101,7 +101,7 @@ final class JApiCmpReportTest extends AbstractTest {
 		assertFileExists(configMdFile);
 		assertFileExists(configXmlFile);
 		assertFileContains(configMdFile, "# New Markdown Title");
-		assertFileContains(configHtmlFile, "<span class=\"title\">New HTML Title</span>");
+		assertFileContains(configHtmlFile, "<h1 class=\"title\">New HTML Title</h1>");
 	}
 
 	@Test

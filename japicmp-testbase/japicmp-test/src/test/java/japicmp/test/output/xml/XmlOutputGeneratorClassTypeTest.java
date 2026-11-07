@@ -117,11 +117,11 @@ public class XmlOutputGeneratorClassTypeTest {
 	}
 
 	private void assertThatClassHeaderContains(Class<?> aClass, String htmlText) {
-		Elements elements = getDivForClass(documentPublic, aClass.getName()).select("div.class_header > span.label > span");
+		Elements elements = getDivForClass(documentPublic, aClass.getName()).select("summary .ctype");
 		assertThat(elements.size(), is(not(0)));
 		boolean found = false;
 		for (Element element : elements) {
-			if (element.html().contains(htmlText)) {
+			if (element.text().equals(htmlText)) {
 				found = true;
 			}
 		}
@@ -132,6 +132,6 @@ public class XmlOutputGeneratorClassTypeTest {
 		if (from.equals(to)) {
 			return from;
 		}
-		return to + "&nbsp;(&lt;-&nbsp;" + from + ")";
+		return to + " (was " + from + ")";
 	}
 }

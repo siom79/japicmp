@@ -24,7 +24,7 @@ public class ITHtmlTitle {
 		Elements title = document.select("title");
 		assertThat(title.isEmpty(), is(false));
 		assertThat(title.text(), is("Test-Title"));
-		Elements span = document.select("span.title");
+		Elements span = document.select(".title");
 		assertThat(span.isEmpty(), is(false));
 		assertThat(span.text(), is("Test-Title"));
 	}

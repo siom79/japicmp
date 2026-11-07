@@ -134,11 +134,12 @@ public class JApiCmpReport extends AbstractMavenReport {
 	}
 
 	private static String replaceHtmlTags(final String html) {
-		String newHtml = html.replaceAll("</?html>", "");
-		newHtml = newHtml.replaceAll("</?body>", "");
-		newHtml = newHtml.replaceAll("</?head>", "");
-		newHtml = newHtml.replaceAll("<title>[^<]*</title>", "");
-		newHtml = newHtml.replaceAll("<META[^>]*>", "");
+		String newHtml = html.replaceAll("(?i)<!DOCTYPE[^>]*>", "");
+		newHtml = newHtml.replaceAll("(?i)</?html(\\s[^>]*)?>", "");
+		newHtml = newHtml.replaceAll("(?i)</?body(\\s[^>]*)?>", "");
+		newHtml = newHtml.replaceAll("(?i)</?head(\\s[^>]*)?>", "");
+		newHtml = newHtml.replaceAll("(?i)<title>[^<]*</title>", "");
+		newHtml = newHtml.replaceAll("(?i)<meta[^>]*>", "");
 		return newHtml;
 	}
 

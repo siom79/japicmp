@@ -96,10 +96,10 @@ class HtmlOutputGeneratorTest {
 		assertThat(document.select("#warning-missingclasses").text(), containsString("WARNING"));
 
 		String summary = document.select("#toc").text();
-		assertThat(summary, containsString("MODIFIED"));
 		assertThat(summary, containsString("japicmp.Test"));
 
 		String details = document.select(new Evaluator.Id("japicmp.Test")).text();
+		assertThat(document.select(new Evaluator.Id("japicmp.Test")).select("summary .badge.kind").text(), containsString("modified class"));
 		assertThat(details, containsString("FIELD_REMOVED"));
 		assertThat(details, containsString("CONSTRUCTOR_REMOVED"));
 		assertThat(details, containsString("METHOD_REMOVED"));
@@ -113,7 +113,6 @@ class HtmlOutputGeneratorTest {
 		assertThat(document.select("#warning-missingclasses").text(), containsString("WARNING"));
 
 		summary = document.select("#toc").text();
-		assertThat(summary, containsString("MODIFIED"));
 		assertThat(summary, containsString("japicmp.Test"));
 
 		details = document.select(new Evaluator.Id("japicmp.Test")).text();
