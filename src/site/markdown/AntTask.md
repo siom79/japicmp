@@ -70,6 +70,7 @@ The following table gives an overview of all available parameters of the Ant tas
 | excludeExclusively						| true  | false	| Exclude only packages specified in the "excludes" parameter, include their sub-packages.|
 | xmlOutputFile 							| true  | n.a.  | Path to the xml output file. |
 | htmlOutputFile 							| true  | n.a.  | Path to the html output file. |
+| htmlOutputOldFile 						| true  | n.a.  | Path to an html output file that is written in the old report layout (japicmp <= 0.27.0). |
 | htmlStylesheet 							| true  | n.a.  | Path to your own stylesheet. It is appended to the built-in styles of the html report. |
 | errorOnBinaryIncompatibility				| true	| false | Exit with an error if a binary incompatibility is detected. |
 | errorOnSourceIncompatibility				| true	| false | Exit with an error if a source incompatibility is detected. |

@@ -8,6 +8,7 @@ SYNOPSIS
         java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]
                 [(-e <excludes> | --exclude <excludes>)] [--exclude-exclusively]
                 [(-h | --help)] [--html-file <pathToHtmlOutputFile>]
+                [--html-output-old <pathToOldHtmlOutputFile>]
                 [--html-stylesheet <pathToHtmlStylesheet>]
                 [(-i <includes> | --include <includes>)] [--ignore-missing-classes]
                 [--ignore-missing-classes-by-regex <ignoreMissingClassesByRegEx>...]
@@ -53,9 +54,14 @@ OPTIONS
         --html-file <pathToHtmlOutputFile>
             Provides the path to the html output file.
 
+        --html-output-old <pathToOldHtmlOutputFile>
+            Provides the path to an html output file that is written in the
+            old report layout (japicmp <= 0.27.0).
+
         --html-stylesheet <pathToHtmlStylesheet>
             Provides the path to your own stylesheet. It is appended to the
-            built-in styles of the html report.
+            built-in styles of the html report. For the old html report it
+            replaces the built-in styles.
 
         -i <includes>, --include <includes>
             Semicolon separated list of elements to include in the form

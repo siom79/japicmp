@@ -7,6 +7,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
 import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
+import japicmp.output.html.HtmlOutputGeneratorOld;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.markdown.MarkdownOutputGenerator;
@@ -58,6 +59,7 @@ public class JApiCmpTask extends Task {
 	private String excludes;
 	private String xmlOutputFile;
 	private String htmlOutputFile;
+	private String htmlOutputOldFile;
 	private String htmlStylesheet;
 	private boolean errorOnSemanticIncompatibility = false;
 	private boolean errorOnExclusionIncompatibility = false;
@@ -197,6 +199,10 @@ public class JApiCmpTask extends Task {
 		this.htmlOutputFile = htmlOutputFile;
 	}
 
+	public void setHtmlOutputOldFile(String htmlOutputOldFile) {
+		this.htmlOutputOldFile = htmlOutputOldFile;
+	}
+
 	public void setHtmlStylesheet(String htmlStylesheet) {
 		this.htmlStylesheet = htmlStylesheet;
 	}
@@ -249,6 +255,7 @@ public class JApiCmpTask extends Task {
 		options.getNewArchives().addAll(createFileList(this.newJar));
 		options.setXmlOutputFile(Optional.ofNullable(xmlOutputFile));
 		options.setHtmlOutputFile(Optional.ofNullable(htmlOutputFile));
+		options.setHtmlOutputFileOld(Optional.ofNullable(htmlOutputOldFile));
 		options.setHtmlStylesheet(Optional.ofNullable(htmlStylesheet));
 		options.setOutputOnlyModifications(onlyModified);
 		options.setAccessModifier(toModifier(accessModifier));
@@ -312,7 +319,7 @@ public class JApiCmpTask extends Task {
 			return;
 		}
 
-		if (!options.getXmlOutputFile().isPresent() && !options.getHtmlOutputFile().isPresent()) {
+		if (!options.getXmlOutputFile().isPresent() && !options.getHtmlOutputFile().isPresent() && !options.getHtmlOutputFileOld().isPresent()) {
 			StdoutOutputGenerator stdoutOutputGenerator = new StdoutOutputGenerator(options, jApiClasses);
 			log(stdoutOutputGenerator.generate());
 			return;
@@ -342,5 +349,16 @@ public class JApiCmpTask extends Task {
 				throw new BuildException("Writing HTML report failed: " + e.getMessage(), e);
             }
         }
+		if (options.getHtmlOutputFileOld().isPresent()) {
+			HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
+			htmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
+			HtmlOutputGeneratorOld htmlOutputGenerator = new HtmlOutputGeneratorOld(jApiClasses, options, htmlOutputGeneratorOptions);
+			HtmlOutput htmlOutput = htmlOutputGenerator.generate();
+			try {
+				Files.write(Paths.get(options.getHtmlOutputFileOld().get()), htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
+			} catch (IOException e) {
+				throw new BuildException("Writing old HTML report failed: " + e.getMessage(), e);
+			}
+		}
 	}
 }

@@ -29,6 +29,7 @@ public class Options {
 	private boolean outputOnlyBinaryIncompatibleModifications = false;
 	private Optional<String> xmlOutputFile = Optional.empty();
 	private Optional<String> htmlOutputFile = Optional.empty();
+	private Optional<String> htmlOutputFileOld = Optional.empty();
 	private Optional<AccessModifier> accessModifier = Optional.of(AccessModifier.PROTECTED);
 	private List<Filter> includes = new ArrayList<>();
 	private List<Filter> excludes = new ArrayList<>();
@@ -75,7 +76,7 @@ public class Options {
 		for (JApiCmpArchive archive : getNewArchives()) {
 			verifyExistsCanReadAndJar(archive);
 		}
-		if (getHtmlOutputFile().isPresent()) {
+		if (getHtmlOutputFile().isPresent() || getHtmlOutputFileOld().isPresent()) {
 			if (getHtmlStylesheet().isPresent()) {
 				String pathname = getHtmlStylesheet().get();
 				File stylesheetFile = new File(pathname);
@@ -244,6 +245,14 @@ public class Options {
 
 	public void setHtmlOutputFile(Optional<String> htmlOutputFile) {
 		this.htmlOutputFile = htmlOutputFile;
+	}
+
+	public Optional<String> getHtmlOutputFileOld() {
+		return htmlOutputFileOld;
+	}
+
+	public void setHtmlOutputFileOld(Optional<String> htmlOutputFileOld) {
+		this.htmlOutputFileOld = htmlOutputFileOld;
 	}
 
 	public boolean isIncludeSynthetic() {

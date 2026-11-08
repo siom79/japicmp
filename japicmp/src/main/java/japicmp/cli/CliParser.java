@@ -63,6 +63,9 @@ public class CliParser {
 			} else if ("--html-file".equals(arg)) {
 				String pathToHtmlOutputFile = getOptionWithArgument("--html-file", sae);
 				options.setHtmlOutputFile(Optional.ofNullable(pathToHtmlOutputFile));
+			} else if ("--html-output-old".equals(arg)) {
+				String pathToHtmlOutputFileOld = getOptionWithArgument("--html-output-old", sae);
+				options.setHtmlOutputFileOld(Optional.ofNullable(pathToHtmlOutputFileOld));
 			} else if ("-s".equals(arg) || "--semantic-versioning".equals(arg)) {
 				options.setSemanticVersioning(true);
 			} else if ("--markdown".equals(arg)) {
@@ -123,6 +126,7 @@ public class CliParser {
 			"        java -jar japicmp.jar [-a <accessModifier>] [(-b | --only-incompatible)]\n" +
 			"                [(-e <excludes> | --exclude <excludes>)] [--exclude-exclusively]\n" +
 			"                [(-h | --help)] [--html-file <pathToHtmlOutputFile>]\n" +
+			"                [--html-output-old <pathToOldHtmlOutputFile>]\n" +
 			"                [--html-stylesheet <pathToHtmlStylesheet>]\n" +
 			"                [(-i <includes> | --include <includes>)] [--ignore-missing-classes]\n" +
 			"                [--ignore-missing-classes-by-regex <ignoreMissingClassesByRegEx>...]\n" +
@@ -168,9 +172,14 @@ public class CliParser {
 			"        --html-file <pathToHtmlOutputFile>\n" +
 			"            Provides the path to the html output file.\n" +
 			"\n" +
+			"        --html-output-old <pathToOldHtmlOutputFile>\n" +
+			"            Provides the path to an html output file that is written in the\n" +
+			"            old report layout (japicmp <= 0.27.0).\n" +
+			"\n" +
 			"        --html-stylesheet <pathToHtmlStylesheet>\n" +
 			"            Provides the path to your own stylesheet. It is appended to the\n" +
-			"            built-in styles of the html report.\n" +
+			"            built-in styles of the html report. For the old html report it\n" +
+			"            replaces the built-in styles.\n" +
 			"\n" +
 			"        -i <includes>, --include <includes>\n" +
 			"            Semicolon separated list of elements to include in the form\n" +

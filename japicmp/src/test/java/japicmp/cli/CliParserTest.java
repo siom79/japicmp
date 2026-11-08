@@ -44,4 +44,12 @@ class CliParserTest {
 		assertThat(options.joinOldArchives(), is(CliParserTest.class.getSimpleName() + "_old.jar"));
 		assertThat(options.joinNewArchives(), is(CliParserTest.class.getSimpleName() + "_new.jar"));
 	}
+
+	@Test
+	void testHtmlOutputOld() {
+		Options options = new CliParser().parse(new String[]{"-o", oldPath.toString(), "-n", newPath.toString(), "--html-output-old", "old-report.html"});
+		assertThat(options.getHtmlOutputFileOld().isPresent(), is(true));
+		assertThat(options.getHtmlOutputFileOld().get(), is("old-report.html"));
+		assertThat(options.getHtmlOutputFile().isPresent(), is(false));
+	}
 }

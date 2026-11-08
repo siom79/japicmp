@@ -7,6 +7,7 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
 import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
+import japicmp.output.html.HtmlOutputGeneratorOld;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.markdown.MarkdownOutputGenerator;
@@ -70,6 +71,17 @@ public class JApiCli {
 				throw new JApiCmpException(JApiCmpException.Reason.IoException, "Could not write HTML file: " + e.getMessage(), e);
             }
         }
+		if (options.getHtmlOutputFileOld().isPresent()) {
+			HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
+			htmlOutputGeneratorOptions.setSemanticVersioningInformation(semverOut.generate());
+			HtmlOutputGeneratorOld outputGenerator = new HtmlOutputGeneratorOld(jApiClasses, options, htmlOutputGeneratorOptions);
+			HtmlOutput htmlOutput = outputGenerator.generate();
+			try {
+				Files.write(Paths.get(options.getHtmlOutputFileOld().get()), htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
+			} catch (IOException e) {
+				throw new JApiCmpException(JApiCmpException.Reason.IoException, "Could not write HTML file: " + e.getMessage(), e);
+			}
+		}
 		if (options.isMarkdown()) {
 			MarkdownOutputGenerator markdownOutputGenerator = new MarkdownOutputGenerator(options, jApiClasses);
 			String output = markdownOutputGenerator.generate();
