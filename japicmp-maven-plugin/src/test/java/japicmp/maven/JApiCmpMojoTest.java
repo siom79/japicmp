@@ -34,6 +34,7 @@ final class JApiCmpMojoTest extends AbstractTest {
 
 	final File defaultDiffFile = testDefaultDir.resolve("japicmp/japicmp.diff").toFile();
 	final File defaultHtmlFile = testDefaultDir.resolve("japicmp/japicmp.html").toFile();
+	final File defaultHtmlOldFile = testDefaultDir.resolve("japicmp/japicmp-old.html").toFile();
 	final File defaultMdFile = testDefaultDir.resolve("japicmp/japicmp.md").toFile();
 	final File defaultXmlFile = testDefaultDir.resolve("japicmp/japicmp.xml").toFile();
 
@@ -104,6 +105,24 @@ final class JApiCmpMojoTest extends AbstractTest {
 		assertFileExists(defaultHtmlFile);
 		assertFileExists(defaultMdFile);
 		assertFileExists(defaultXmlFile);
+	}
+
+	@Test
+	@InjectMojo(goal = "cmp", pom = "target/test-run/default/pom.xml")
+	void testHtmlOutputOld(final JApiCmpMojo testMojo) throws Exception {
+		assertNotNull(testMojo);
+		deleteDirectory(testDefaultDir);
+		testMojo.execute();
+		assertFileExists(defaultHtmlFile);
+		assertFileNotExists(defaultHtmlOldFile);
+
+		deleteDirectory(testDefaultDir);
+		testMojo.parameter.setHtmlOutputOld(true);
+		testMojo.execute();
+		assertFileExists(defaultHtmlFile);
+		assertFileExists(defaultHtmlOldFile);
+		final String html = new String(Files.readAllBytes(defaultHtmlOldFile.toPath()), StandardCharsets.UTF_8);
+		assertThat(html, containsString("class=\"meta-information\""));
 	}
 
 	@Test

@@ -13,6 +13,7 @@ import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JApiSemanticVersionLevel;
 import japicmp.output.html.HtmlOutput;
 import japicmp.output.html.HtmlOutputGenerator;
+import japicmp.output.html.HtmlOutputGeneratorOld;
 import japicmp.output.html.HtmlOutputGeneratorOptions;
 import japicmp.output.incompatible.IncompatibleErrorOutput;
 import japicmp.output.markdown.MarkdownOutputGenerator;
@@ -100,6 +101,9 @@ public class JApiCmpProcessor {
 			if (!skipHtmlReport()) {
 				retVal = Optional.of(generateHtmlOutput(jApiClasses, jApiCmpBuildDir,
 					semanticVersioningInformation));
+			}
+			if (!skipHtmlReport() && pluginParameters.parameter().isHtmlOutputOld()) {
+				generateHtmlOutputOld(jApiClasses, jApiCmpBuildDir, semanticVersioningInformation);
 			}
 			breakBuildIfNecessary(jApiClasses, pluginParameters.parameter(), options,
 				jarArchiveComparator);
@@ -618,6 +622,25 @@ public class JApiCmpProcessor {
 		final HtmlOutputGenerator htmlOutputGenerator = new HtmlOutputGenerator(jApiClasses, options,
 			htmlOutputGeneratorOptions);
 		return htmlOutputGenerator.generate();
+	}
+
+	private void generateHtmlOutputOld(final List<JApiClass> jApiClasses,
+									   final File jApiCmpBuildDir,
+									   final String semanticVersioningInformation)
+		throws IOException {
+		if (!pluginParameters.isWriteToFiles()) {
+			return;
+		}
+		options.setHtmlOutputFileOld(
+			Optional.of(jApiCmpBuildDir.getCanonicalPath() + File.separator + createFilename() + "-old.html"));
+		HtmlOutputGeneratorOptions htmlOutputGeneratorOptions = new HtmlOutputGeneratorOptions();
+		htmlOutputGeneratorOptions.setSemanticVersioningInformation(semanticVersioningInformation);
+		final String title = pluginParameters.parameter().getHtmlTitle();
+		htmlOutputGeneratorOptions.setTitle(title != null ? title : options.getDifferenceDescription());
+		HtmlOutput htmlOutput = new HtmlOutputGeneratorOld(jApiClasses, options, htmlOutputGeneratorOptions).generate();
+		Path path = Paths.get(options.getHtmlOutputFileOld().get());
+		Files.write(path, htmlOutput.getHtml().getBytes(StandardCharsets.UTF_8));
+		log.info("Written file '" + path + "'.");
 	}
 
 	boolean skipModule() {

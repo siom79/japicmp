@@ -173,6 +173,7 @@ An advanced configuration can utilize the following parameters:
 					<skipPomModules>true</skipPomModules>
 					<htmlStylesheet>path/to/stylesheet.css</htmlStylesheet>
 					<htmlTitle>Title of report</htmlTitle>
+					<htmlOutputOld>false</htmlOutputOld>
 					<markdownTitle>Title of report</markdownTitle>
 					<noAnnotations>false</noAnnotations>
 					<ignoreNonResolvableArtifacts>false</ignoreNonResolvableArtifacts>
@@ -246,6 +247,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | excludeExclusively								                             | true     | false		    | Exclude only packages specified in the "excludes" parameter, include their sub-packages.                                                                                                                                                                                                              |
 | htmlStylesheet								                                 | true     | n.a.		     | Path to a CSS stylesheet that is appended to the built-in styles of the HTML report.                                                                                                                                                                                                                                             |
 | htmlTitle										                                    | true     | n.a.		     | A title for the HTML report (optional).                                                                                                                                                                                                                                                               |
+| htmlOutputOld								                                 | true     | false		    | If set to true, an additional HTML report in the old layout (japicmp <= 0.27.0) is written to `<executionId>-old.html` (default: `japicmp-old.html`) next to the HTML report. Not used by the site report.
 | markdownTitle									                                 | true     | n.a.		     | A title for the Markdown report (optional).                                                                                                                                                                                                                                                           |
 | skipPomModules								                                 | true     | true		     | Setting this parameter to false (default: true) will not skip execution in modules with packaging type pom.                                                                                                                                                                                           |
 | skip											                                        | true     | false		    | Setting this parameter to true will skip execution of the plugin.                                                                                                                                                                                                                                     |

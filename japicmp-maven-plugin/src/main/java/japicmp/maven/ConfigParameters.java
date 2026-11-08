@@ -42,6 +42,8 @@ public class ConfigParameters {
 
 	private String htmlTitle;
 
+	private boolean htmlOutputOld;
+
 	private String markdownTitle;
 
 	private boolean noAnnotations;
@@ -205,6 +207,14 @@ public class ConfigParameters {
 
 	void setHtmlTitle(String htmlTitle) {
 		this.htmlTitle = htmlTitle;
+	}
+
+	public boolean isHtmlOutputOld() {
+		return htmlOutputOld;
+	}
+
+	void setHtmlOutputOld(boolean htmlOutputOld) {
+		this.htmlOutputOld = htmlOutputOld;
 	}
 
 	public String getMarkdownTitle() {
