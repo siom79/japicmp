@@ -88,6 +88,12 @@ public class ConfigParameters {
 
 	private boolean ignoreMissingOptionalDependency;
 
+	/**
+	 * Opt-in: resolve the classpath of the old and of the new version separately, each from its
+	 * own Maven dependencies (including transitive ones).
+	 */
+	private boolean resolveSeparateClassPaths;
+
 	private String reportLinkName;
 
 	public ConfigParameters() {
@@ -414,6 +420,14 @@ public class ConfigParameters {
 
 	void setIgnoreMissingOptionalDependency(boolean ignoreMissingOptionalDependency) {
 		this.ignoreMissingOptionalDependency = ignoreMissingOptionalDependency;
+	}
+
+	public boolean isResolveSeparateClassPaths() {
+		return resolveSeparateClassPaths;
+	}
+
+	void setResolveSeparateClassPaths(boolean resolveSeparateClassPaths) {
+		this.resolveSeparateClassPaths = resolveSeparateClassPaths;
 	}
 
 	public String getReportLinkName() {

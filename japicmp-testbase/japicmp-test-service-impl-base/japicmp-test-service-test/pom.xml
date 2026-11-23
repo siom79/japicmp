@@ -92,20 +92,6 @@
 							<version>${project.version}</version>
 						</dependency>
 					</newVersion>
-					<oldClassPathDependencies>
-						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-service-v1</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</oldClassPathDependencies>
-					<newClassPathDependencies>
-						<dependency>
-							<groupId>com.github.siom79.japicmp</groupId>
-							<artifactId>japicmp-test-service-v2</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</newClassPathDependencies>
 					<parameter>
 						<accessModifier>public</accessModifier>
 						<onlyModified>true</onlyModified>
@@ -114,10 +100,40 @@
 				</configuration>
 				<executions>
 					<execution>
+						<!-- explicitly configured separate classpaths -->
 						<phase>pre-integration-test</phase>
 						<goals>
 							<goal>cmp</goal>
 						</goals>
+						<configuration>
+							<oldClassPathDependencies>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-service-v1</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</oldClassPathDependencies>
+							<newClassPathDependencies>
+								<dependency>
+									<groupId>com.github.siom79.japicmp</groupId>
+									<artifactId>japicmp-test-service-v2</artifactId>
+									<version>${project.version}</version>
+								</dependency>
+							</newClassPathDependencies>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- classpaths resolved automatically from the dependencies of the old and new version -->
+						<id>separate-classpaths</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>cmp</goal>
+						</goals>
+						<configuration>
+							<parameter>
+								<resolveSeparateClassPaths>true</resolveSeparateClassPaths>
+							</parameter>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
