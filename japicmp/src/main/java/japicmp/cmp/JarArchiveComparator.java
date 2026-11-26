@@ -296,7 +296,6 @@ public class JarArchiveComparator {
 						LOGGER.fine(String.format("Adding class '%s' with jar name '%s' to list.", ctClass.getName(), ctClass.getName()));
 					}
 				} else {
-					classPool.remove(ctClass);
 					if (LOGGER.isLoggable(Level.FINE)) {
 						LOGGER.fine(String.format("Ignoring class '%s' with jar name '%s'.", ctClass.getName(), ctClass.getName()));
 					}
