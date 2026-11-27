@@ -3,7 +3,12 @@ Versions
 
 The following versions of japicmp are available:
 
-0.27.0 (2027-11-04)
+0.28.0 (2026-11-27)
+-------------------
+* maven plugin now supports automatic resolution of separate old/new classpaths [#536](https://github.com/siom79/japicmp/pull/536)
+* one single release action [#537](https://github.com/siom79/japicmp/pull/537)
+
+0.27.0 (2026-11-04)
 -------------------
 * japicmp now detects added type bounds on generics, new super interfaces of interfaces, and changes to the native modifier on methods [#534](https://github.com/siom79/japicmp/pull/534)
 
