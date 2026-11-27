@@ -177,6 +177,7 @@ An advanced configuration can utilize the following parameters:
 					<noAnnotations>false</noAnnotations>
 					<ignoreNonResolvableArtifacts>false</ignoreNonResolvableArtifacts>
 					<ignoreMissingOptionalDependency>false</ignoreMissingOptionalDependency>
+					<resolveSeparateClassPaths>false</resolveSeparateClassPaths>
 					<packagingSupporteds>
 						<packagingSupported>jar</packagingSupported>
 					</packagingSupporteds>
@@ -251,6 +252,7 @@ the &lt;dependency&gt; element. Through the &lt;parameter&gt; element you can pr
 | skip											                                        | true     | false		    | Setting this parameter to true will skip execution of the plugin.                                                                                                                                                                                                                                     |
 | ignoreNonResolvableArtifacts					                      | true     | false		    | Set this to true in order to ignore artifacts that cannot be resolved, i.e. the build does not break in case a dependency cannot be resolved to a file.                                                                                                                                               |
 | ignoreMissingOptionalDependency                        | true     | false      | Ignore missing optional dependencies.                                                                                                                                                                                                                                                                 |
+| resolveSeparateClassPaths                              | true     | false      | If set to true, the old and the new version are each analyzed against their own classpath, resolved from their own Maven dependencies (including transitive ones). See section "Classpath" below. Cannot be combined with &lt;dependencies/&gt;. |
 | ignoreMissingOldVersion						                          | true     | false		    | If set to true, not resolvable artifacts for the old version do not break the build.                                                                                                                                                                                                                  |
 | ignoreMissingNewVersion						                          | true     | false		    | If set to true, not resolvable artifacts for the new version do not break the build.                                                                                                                                                                                                                  |
 | packagingSupported							                              | true     | n.a.			    | List all packaging type for which the plugin should be executed. Helpful if you define the plugin in a root pom.                                                                                                                                                                                      |
@@ -368,6 +370,25 @@ In case the classpath between both versions differs, you can add the dependencie
 		<version>3.5</version>
 	</dependency>
 </newClassPathDependencies>
+```
+
+Specifying all (transitive) dependencies of the old version manually may not be feasible for larger projects. If you set the
+parameter `resolveSeparateClassPaths` to `true`, the plugin resolves the two classpaths automatically:
+
+* The old version is analyzed against its own dependencies (scopes compile, provided and system, including transitive ones),
+  as declared in its pom.xml.
+* The new version is analyzed against its own dependencies in the same way, if it is given as &lt;dependency/&gt;. If no
+  new version is specified (i.e. the current project is compared) or it is given as &lt;file/&gt;, the dependencies of the
+  current project are used.
+
+Dependencies configured with &lt;oldClassPathDependencies/&gt; and &lt;newClassPathDependencies/&gt; are put in front of the
+automatically resolved ones, hence you can use them to add or override entries. As the dependencies of an old version given as
+&lt;file/&gt; cannot be resolved, you have to add them using &lt;oldClassPathDependencies/&gt;.
+
+```xml
+<parameter>
+	<resolveSeparateClassPaths>true</resolveSeparateClassPaths>
+</parameter>
 ```
 
 The maven plugin produces the two files `japicmp.diff` and `japicmp.xml` within the directory `${project.build.directory}/japicmp`

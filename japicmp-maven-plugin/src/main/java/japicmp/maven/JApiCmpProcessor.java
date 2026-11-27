@@ -30,6 +30,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.resolution.*;
 
 import java.io.File;
@@ -47,11 +48,23 @@ import java.util.regex.PatternSyntaxException;
 
 public class JApiCmpProcessor {
 
+	private static final Set<String> COMPILE_CLASSPATH_SCOPES = new HashSet<>(
+		Arrays.asList("compile", "provided", "system"));
+
 	final MavenParameters mavenParameters;
 	final PluginParameters pluginParameters;
 	final Log log;
 
 	private Options options;
+
+	/** Maven artifacts of the old version(s), used to resolve their classpath when requested. */
+	private final List<Artifact> oldClassPathRoots = new ArrayList<>();
+	/** Maven artifacts of the new version(s), used to resolve their classpath when requested. */
+	private final List<Artifact> newClassPathRoots = new ArrayList<>();
+	/** Whether the new version is (also) given without Maven coordinates, e.g. the current project or a file. */
+	private boolean newVersionWithoutCoordinates;
+	/** Whether the old version is (also) given without Maven coordinates, e.g. a file. */
+	private boolean oldVersionWithoutCoordinates;
 
 	public JApiCmpProcessor(final PluginParameters pluginParameters,
 							final MavenParameters mavenParameters,
@@ -284,12 +297,14 @@ public class JApiCmpProcessor {
 		if (pluginParameters.oldVersion() != null) {
 			oldArchives.addAll(retrieveFileFromConfiguration(pluginParameters.oldVersion(), "oldVersion",
 				ConfigurationVersion.OLD));
+			recordClassPathRoot(pluginParameters.oldVersion().getDependency(), ConfigurationVersion.OLD);
 		}
 		if (pluginParameters.oldVersions() != null) {
 			for (final DependencyDescriptor dependencyDescriptor : pluginParameters.oldVersions()) {
 				if (dependencyDescriptor != null) {
 					oldArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "oldVersions",
 						ConfigurationVersion.OLD));
+					recordClassPathRoot(dependencyDescriptor, ConfigurationVersion.OLD);
 				}
 			}
 		}
@@ -301,6 +316,7 @@ public class JApiCmpProcessor {
 					final File file = artifact.getFile();
 					if (file != null) {
 						oldArchives.add(new JApiCmpArchive(file, FileHelper.guessVersion(file)));
+						oldClassPathRoots.add(artifact);
 					} else {
 						handleMissingArtifactFile(artifact);
 					}
@@ -310,16 +326,19 @@ public class JApiCmpProcessor {
 		if (pluginParameters.newVersion() != null) {
 			newArchives.addAll(retrieveFileFromConfiguration(pluginParameters.newVersion(), "newVersion",
 				ConfigurationVersion.NEW));
+			recordClassPathRoot(pluginParameters.newVersion().getDependency(), ConfigurationVersion.NEW);
 		}
 		if (pluginParameters.newVersions() != null) {
 			for (final DependencyDescriptor dependencyDescriptor : pluginParameters.newVersions()) {
 				if (dependencyDescriptor != null) {
 					newArchives.addAll(retrieveFileFromConfiguration(dependencyDescriptor, "newVersions",
 						ConfigurationVersion.NEW));
+					recordClassPathRoot(dependencyDescriptor, ConfigurationVersion.NEW);
 				}
 			}
 		}
 		if (pluginParameters.newVersion() == null && pluginParameters.newVersions() == null) {
+			newVersionWithoutCoordinates = true;
 			final MavenProject mavenProject = mavenParameters.mavenProject();
 			if (mavenProject != null && mavenProject.getArtifact() != null) {
 				final DefaultArtifact defaultArtifact = createDefaultArtifact(mavenProject,
@@ -663,6 +682,10 @@ public class JApiCmpProcessor {
 
 	private void setUpClassPath(final JarArchiveComparatorOptions comparatorOptions)
 		throws MojoFailureException {
+		if (pluginParameters != null && pluginParameters.parameter().isResolveSeparateClassPaths()) {
+			setUpSeparateClassPaths(comparatorOptions);
+			return;
+		}
 		if (pluginParameters != null) {
 			if (pluginParameters.dependencies() != null) {
 				if (pluginParameters.oldClassPathDependencies() != null
@@ -730,8 +753,194 @@ public class JApiCmpProcessor {
 		setUpClassPathUsingMavenProject(comparatorOptions);
 	}
 
+	/**
+	 * Remembers the Maven coordinates of a compared version, so that its own dependencies can be
+	 * resolved later on if {@code <resolveSeparateClassPaths/>} is enabled.
+	 */
+	private void recordClassPathRoot(final DependencyDescriptor descriptor,
+									 final ConfigurationVersion configurationVersion) {
+		if (descriptor instanceof Dependency && ((Dependency) descriptor).getSystemPath() == null) {
+			final Dependency dependency = (Dependency) descriptor;
+			final Artifact artifact = createDefaultArtifact(dependency.getGroupId(),
+				dependency.getArtifactId(), dependency.getClassifier(), dependency.getType(),
+				dependency.getVersion());
+			if (configurationVersion == ConfigurationVersion.OLD) {
+				oldClassPathRoots.add(artifact);
+			} else {
+				newClassPathRoots.add(artifact);
+			}
+		} else if (configurationVersion == ConfigurationVersion.OLD) {
+			oldVersionWithoutCoordinates = true;
+		} else {
+			newVersionWithoutCoordinates = true;
+		}
+	}
+
+	/**
+	 * Sets up two separate classpaths: the old version is analyzed against its own (transitive)
+	 * dependencies and the new version against its own (transitive) dependencies. Explicitly
+	 * configured {@code <oldClassPathDependencies/>} and {@code <newClassPathDependencies/>} are
+	 * put in front of the automatically resolved entries, hence they take precedence.
+	 */
+	private void setUpSeparateClassPaths(final JarArchiveComparatorOptions comparatorOptions)
+		throws MojoFailureException {
+		if (pluginParameters.dependencies() != null && !pluginParameters.dependencies().isEmpty()) {
+			throw new MojoFailureException(
+				"The parameter <resolveSeparateClassPaths/> cannot be combined with the element "
+					+ "<dependencies/>, which defines one common classpath for both versions. "
+					+ "Please use <oldClassPathDependencies/> and <newClassPathDependencies/> instead.");
+		}
+		log.debug("Parameter <resolveSeparateClassPaths/> is set. Using "
+			+ JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+		comparatorOptions.setClassPathMode(JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+
+		final Set<String> oldClassPath = new LinkedHashSet<>();
+		addExplicitClassPathDependencies("oldClassPathDependencies",
+			pluginParameters.oldClassPathDependencies(), ConfigurationVersion.OLD, oldClassPath);
+		addArchives(getOptions().getOldArchives(), oldClassPath);
+		for (Artifact root : oldClassPathRoots) {
+			oldClassPath.addAll(resolveClassPathOf(root, ConfigurationVersion.OLD));
+		}
+		if (oldVersionWithoutCoordinates) {
+			log.warn("The old version was not specified by Maven coordinates, hence its dependencies "
+				+ "cannot be resolved automatically. Please add them using <oldClassPathDependencies/>.");
+		}
+
+		final Set<String> newClassPath = new LinkedHashSet<>();
+		addExplicitClassPathDependencies("newClassPathDependencies",
+			pluginParameters.newClassPathDependencies(), ConfigurationVersion.NEW, newClassPath);
+		addArchives(getOptions().getNewArchives(), newClassPath);
+		for (Artifact root : newClassPathRoots) {
+			newClassPath.addAll(resolveClassPathOf(root, ConfigurationVersion.NEW));
+		}
+		if (newVersionWithoutCoordinates) {
+			log.debug("The new version was not specified by Maven coordinates. Using the "
+				+ "dependencies of the current project for the new classpath.");
+			newClassPath.addAll(getProjectClassPathEntries());
+		}
+
+		comparatorOptions.getOldClassPath().addAll(oldClassPath);
+		comparatorOptions.getNewClassPath().addAll(newClassPath);
+		log.debug("Old classpath: " + oldClassPath);
+		log.debug("New classpath: " + newClassPath);
+	}
+
+	private static void addArchives(final List<JApiCmpArchive> archives, final Set<String> classPath) {
+		for (JApiCmpArchive archive : archives) {
+			archive.getFile().ifPresent(file -> classPath.add(file.getAbsolutePath()));
+		}
+	}
+
+	private void addExplicitClassPathDependencies(final String parameterName,
+												  final List<Dependency> dependencies,
+												  final ConfigurationVersion configurationVersion,
+												  final Set<String> classPath)
+		throws MojoFailureException {
+		if (dependencies != null) {
+			for (Dependency dependency : dependencies) {
+				for (JApiCmpArchive archive : resolveDependencyToFile(parameterName, dependency,
+					configurationVersion)) {
+					archive.getFile().ifPresent(file -> classPath.add(file.getAbsolutePath()));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Resolves the compile classpath of the given artifact, i.e. the artifact itself and its
+	 * dependencies with scope compile, provided or system (including transitive ones), as Maven
+	 * would do when building that artifact.
+	 */
+	private List<String> resolveClassPathOf(final Artifact root,
+											final ConfigurationVersion configurationVersion)
+		throws MojoFailureException {
+		notNull(mavenParameters.repoSystem(),
+			"Maven parameter repoSystem should be provided by maven container.");
+		notNull(mavenParameters.repoSession(),
+			"Maven parameter repoSession should be provided by maven container.");
+		log.debug("Resolving classpath of " + root);
+		final List<String> classPath = new ArrayList<>();
+		final DependencyResult dependencyResult;
+		try {
+			final ArtifactDescriptorResult descriptor = mavenParameters.repoSystem().readArtifactDescriptor(
+				mavenParameters.repoSession(),
+				new ArtifactDescriptorRequest(root, mavenParameters.remoteRepos(), null));
+			// Use the dependencies of the descriptor as direct dependencies (instead of the artifact
+			// as root dependency), so that direct provided and optional dependencies are included.
+			final CollectRequest collectRequest = new CollectRequest();
+			collectRequest.setRootArtifact(descriptor.getArtifact());
+			collectRequest.setDependencies(descriptor.getDependencies());
+			collectRequest.setManagedDependencies(descriptor.getManagedDependencies());
+			collectRequest.setRepositories(mavenParameters.remoteRepos());
+			final DependencyRequest dependencyRequest = new DependencyRequest(collectRequest,
+				(node, parents) -> node.getDependency() == null
+					|| COMPILE_CLASSPATH_SCOPES.contains(node.getDependency().getScope()));
+			dependencyResult = resolveDependencies(root, dependencyRequest, configurationVersion);
+		} catch (ArtifactDescriptorException e) {
+			handleClassPathResolutionFailure(root, e, configurationVersion);
+			return classPath;
+		}
+		if (root.getFile() != null) {
+			classPath.add(root.getFile().getAbsolutePath());
+		}
+		if (dependencyResult != null) {
+			for (ArtifactResult artifactResult : dependencyResult.getArtifactResults()) {
+				final Artifact artifact = artifactResult.getArtifact();
+				if (artifact != null && artifact.getFile() != null) {
+					classPath.add(artifact.getFile().getAbsolutePath());
+				} else {
+					final Artifact requested = artifactResult.getRequest().getArtifact();
+					if (artifactResult.getRequest().getDependencyNode() != null
+						&& artifactResult.getRequest().getDependencyNode().getDependency() != null
+						&& artifactResult.getRequest().getDependencyNode().getDependency().isOptional()) {
+						handleMissingArtifactFile(requested);
+					} else {
+						handleClassPathResolutionFailure(root,
+							new MojoFailureException("Could not resolve " + toDescriptor(requested)),
+							configurationVersion);
+					}
+				}
+			}
+		}
+		log.debug("Classpath of " + root + ": " + classPath);
+		return classPath;
+	}
+
+	private DependencyResult resolveDependencies(final Artifact root,
+												 final DependencyRequest dependencyRequest,
+												 final ConfigurationVersion configurationVersion)
+		throws MojoFailureException {
+		try {
+			return mavenParameters.repoSystem().resolveDependencies(mavenParameters.repoSession(),
+				dependencyRequest);
+		} catch (DependencyResolutionException e) {
+			// The partial result still contains all artifacts that could be resolved; the missing
+			// ones are reported by resolveClassPathOf().
+			if (e.getResult() == null) {
+				handleClassPathResolutionFailure(root, e, configurationVersion);
+			}
+			return e.getResult();
+		}
+	}
+
+	private void handleClassPathResolutionFailure(final Artifact root, final Exception e,
+												  final ConfigurationVersion configurationVersion)
+		throws MojoFailureException {
+		final String message = "Could not resolve the classpath of " + toDescriptor(root) + ": "
+			+ e.getMessage();
+		if (ignoreMissingArtifact(configurationVersion)) {
+			log.warn(message);
+		} else {
+			throw new MojoFailureException(message, e);
+		}
+	}
+
 	private void setUpClassPathUsingMavenProject(final JarArchiveComparatorOptions comparatorOptions)
 		throws MojoFailureException {
+		comparatorOptions.getClassPathEntries().addAll(getProjectClassPathEntries());
+	}
+
+	private Set<String> getProjectClassPathEntries() throws MojoFailureException {
 		MavenProject mavenProject = mavenParameters.mavenProject();
 		notNull(mavenProject, "Maven parameter mavenProject should be provided by maven container.");
 		Set<String> classPathEntries = new HashSet<>();
@@ -746,7 +955,7 @@ public class JApiCmpProcessor {
 				handleMissingArtifactFile(artifact);
 			}
 		}
-		comparatorOptions.getClassPathEntries().addAll(classPathEntries);
+		return classPathEntries;
 	}
 
 	private Set<Artifact> getCompileArtifacts(final MavenProject mavenProject) throws MojoFailureException {

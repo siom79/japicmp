@@ -3,6 +3,7 @@ package japicmp.maven;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,12 +30,24 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -505,4 +518,102 @@ final class JApiCmpProcessorTest extends AbstractTest {
 
 		assertDoesNotThrow(() -> method.invoke(processor, options));
 	}
+
+	@Test
+	void testResolveSeparateClassPathsCannotBeCombinedWithDependencies() throws Exception {
+		configParams.setResolveSeparateClassPaths(true);
+		PluginParameters params = new PluginParameters(false,
+			createVersion("groupId", "artifactId", "0.1.1"),
+			createVersion("groupId", "artifactId", "0.1.0"), configParams,
+			Collections.singletonList(createDependency("groupId", "other", "1.0")), null, null, false,
+			new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+			new SkipReport(), new BreakBuild());
+		JApiCmpProcessor processor = new JApiCmpProcessor(params, mavenParams, logger);
+
+		InvocationTargetException e = assertThrows(InvocationTargetException.class,
+			() -> setUpClassPathMethod().invoke(processor, new JarArchiveComparatorOptions()));
+		assertTrue(e.getCause() instanceof MojoFailureException);
+		assertThat(e.getCause().getMessage(), containsString("<resolveSeparateClassPaths/>"));
+	}
+
+	@Test
+	void testResolveSeparateClassPaths() throws Exception {
+		configParams.setResolveSeparateClassPaths(true);
+		Path dir = Files.createTempDirectory("japicmp");
+		File oldJar = Files.createFile(dir.resolve("artifactId-0.1.0.jar")).toFile();
+		File newJar = Files.createFile(dir.resolve("artifactId-0.1.1.jar")).toFile();
+		File oldDepJar = Files.createFile(dir.resolve("dep-1.0.jar")).toFile();
+		File newDepJar = Files.createFile(dir.resolve("dep-2.0.jar")).toFile();
+		File explicitJar = Files.createFile(dir.resolve("explicit-3.0.jar")).toFile();
+		Map<String, File> files = new HashMap<>();
+		files.put("artifactId:0.1.0", oldJar);
+		files.put("artifactId:0.1.1", newJar);
+		files.put("dep:1.0", oldDepJar);
+		files.put("dep:2.0", newDepJar);
+		files.put("explicit:3.0", explicitJar);
+
+		RepositorySystem repoSystem = mock(RepositorySystem.class);
+		when(repoSystem.resolveArtifact(any(), any())).thenAnswer(invocation -> {
+			ArtifactRequest request = invocation.getArgument(1);
+			Artifact artifact = request.getArtifact();
+			return new ArtifactResult(request).setArtifact(
+				artifact.setFile(files.get(artifact.getArtifactId() + ":" + artifact.getVersion())));
+		});
+		when(repoSystem.readArtifactDescriptor(any(), any())).thenAnswer(invocation -> {
+			ArtifactDescriptorRequest request = invocation.getArgument(1);
+			ArtifactDescriptorResult result = new ArtifactDescriptorResult(request);
+			result.setArtifact(request.getArtifact());
+			// version 0.1.0 depends on dep:1.0, version 0.1.1 on dep:2.0
+			String depVersion = "0.1.0".equals(request.getArtifact().getVersion()) ? "1.0" : "2.0";
+			result.addDependency(new org.eclipse.aether.graph.Dependency(
+				new DefaultArtifact("groupId", "dep", "jar", depVersion), "compile"));
+			return result;
+		});
+		when(repoSystem.resolveDependencies(any(), any())).thenAnswer(invocation -> {
+			DependencyRequest request = invocation.getArgument(1);
+			DependencyResult result = new DependencyResult(request);
+			List<ArtifactResult> artifactResults = new ArrayList<>();
+			for (org.eclipse.aether.graph.Dependency dependency : request.getCollectRequest().getDependencies()) {
+				Artifact artifact = dependency.getArtifact();
+				artifactResults.add(new ArtifactResult(new ArtifactRequest(artifact, null, null)).setArtifact(
+					artifact.setFile(files.get(artifact.getArtifactId() + ":" + artifact.getVersion()))));
+			}
+			result.setArtifactResults(artifactResults);
+			return result;
+		});
+		MavenParameters params = new MavenParameters(new ArrayList<>(), new MavenProject(),
+			mock(MojoExecution.class), "", repoSystem, mock(RepositorySystemSession.class),
+			mavenParams.remoteRepos());
+		PluginParameters pluginParameters = new PluginParameters(false,
+			createVersion("groupId", "artifactId", "0.1.1"),
+			createVersion("groupId", "artifactId", "0.1.0"), configParams, null, null, null, false,
+			null, null, Collections.singletonList(createDependency("groupId", "explicit", "3.0")), null,
+			new SkipReport(), new BreakBuild());
+		JApiCmpProcessor processor = new JApiCmpProcessor(pluginParameters, params, logger);
+
+		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+		invokeSetUpClassPath(processor, options);
+
+		assertEquals(JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS,
+			options.getClassPathMode());
+		assertEquals(Arrays.asList(explicitJar.getAbsolutePath(), oldJar.getAbsolutePath(),
+			oldDepJar.getAbsolutePath()), options.getOldClassPath());
+		assertEquals(Arrays.asList(newJar.getAbsolutePath(), newDepJar.getAbsolutePath()),
+			options.getNewClassPath());
+		assertTrue(options.getClassPathEntries().isEmpty());
+	}
+
+	private static void invokeSetUpClassPath(JApiCmpProcessor processor,
+											 JarArchiveComparatorOptions options) throws Exception {
+		processor.getOptions();
+		setUpClassPathMethod().invoke(processor, options);
+	}
+
+	private static Method setUpClassPathMethod() throws NoSuchMethodException {
+		Method method = JApiCmpProcessor.class.getDeclaredMethod("setUpClassPath",
+			JarArchiveComparatorOptions.class);
+		method.setAccessible(true);
+		return method;
+	}
 }
+
