@@ -2,15 +2,31 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      release-version:
+        description: "Release version (default: pom version without -SNAPSHOT)"
+        required: false
+        default: ""
+      development-version:
+        description: "Next development version (default: next patch version -SNAPSHOT)"
+        required: false
+        default: ""
 
 jobs:
   release:
-
     name: Release to Maven Central
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.versions.outputs.release }}
+      tag: ${{ steps.versions.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up Maven Central
         uses: actions/setup-java@v4
         with:
@@ -21,12 +37,154 @@ jobs:
           server-password: OSSRH_TOKEN
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
 
-      - name: Publish to Maven Central
+      - name: Configure git
         run: |
           git config user.name '${{ github.actor }}'
           git config user.email '${{ github.actor }}@users.noreply.github.com'
-          mvn -B release:prepare release:perform -Dpassword=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine versions
+        id: versions
         env:
+          INPUT_RELEASE_VERSION: ${{ inputs.release-version }}
+        run: |
+          POM_VERSION=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)
+          RELEASE_VERSION="${INPUT_RELEASE_VERSION:-${POM_VERSION%-SNAPSHOT}}"
+          OLD_TAG=$(git describe --tags --abbrev=0 --match 'japicmp-base-*')
+          OLD_VERSION="${OLD_TAG#japicmp-base-}"
+          echo "pom=$POM_VERSION" >> "$GITHUB_OUTPUT"
+          echo "release=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "old=$OLD_VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=japicmp-base-$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "pom version: $POM_VERSION, release version: $RELEASE_VERSION, previous release: $OLD_VERSION"
+
+      - name: Check release notes
+        env:
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+        run: |
+          if ! grep -qF "$RELEASE_VERSION (" src/site/markdown/ReleaseNotes.md; then
+            echo "::error::src/site/markdown/ReleaseNotes.md has no entry for $RELEASE_VERSION"
+            exit 1
+          fi
+
+      - name: Set maven version
+        if: steps.versions.outputs.pom != format('{0}-SNAPSHOT', steps.versions.outputs.release)
+        env:
+          NEW_VERSION: ${{ steps.versions.outputs.release }}-SNAPSHOT
+        run: |
+          mvn -B versions:set -DnewVersion="$NEW_VERSION"
+          mvn -B versions:commit
+          git commit -a -m "mvn set version to $NEW_VERSION"
+
+      - name: Update version in documentation
+        env:
+          OLD_VERSION: ${{ steps.versions.outputs.old }}
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+        run: |
+          if grep -qF "$OLD_VERSION" README.md; then
+            python release.py --release-version "$RELEASE_VERSION" --old-version "$OLD_VERSION"
+          else
+            echo "README.md does not contain $OLD_VERSION, assuming documentation is already up to date."
+          fi
+          git push origin
+
+      - name: Publish to Maven Central
+        env:
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+          DEVELOPMENT_VERSION: ${{ inputs.development-version }}
+          TAG: ${{ steps.versions.outputs.tag }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          ARGS=(-DreleaseVersion="$RELEASE_VERSION" -Dtag="$TAG")
+          if [ -n "$DEVELOPMENT_VERSION" ]; then
+            ARGS+=(-DdevelopmentVersion="$DEVELOPMENT_VERSION")
+          fi
+          mvn -B release:prepare release:perform "${ARGS[@]}" -Dpassword=${{ secrets.GITHUB_TOKEN }}
+
+  site:
+    name: Maven Site
+    needs: release
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/mvn-site.yml
+    with:
+      ref: ${{ needs.release.outputs.tag }}
+
+  github-release:
+    name: GitHub Release
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+
+      - name: Build
+        run: mvn -B package
+
+      - name: Extract release notes
+        env:
+          PROJECT_VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          python3 - <<'EOF'
+          import re, os
+          version = os.environ['PROJECT_VERSION']
+          with open('src/site/markdown/ReleaseNotes.md') as f:
+              content = f.read()
+          pattern = rf'{re.escape(version)} \(\d{{4}}-\d{{2}}-\d{{2}}\)\n-+\n(.*?)(?=\n\d+\.\d+\.\d+ \(|\Z)'
+          match = re.search(pattern, content, re.DOTALL)
+          notes = match.group(1).strip() if match else f'Release {version}'
+          with open('release_notes.md', 'w') as out:
+              out.write(notes)
+          EOF
+
+      - name: Collect artifacts
+        run: mkdir japicmp/build && cp japicmp/target/japicmp*.jar japicmp/build/
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.tag }}
+          name: ${{ needs.release.outputs.version }}
+          files: japicmp/build/*.jar
+          body_path: release_notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  pull-request:
+    name: Pull Request to master
+    needs: [release, site, github-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.release.outputs.version }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          if [ -n "$(gh pr list --base master --head "$BRANCH" --state open --json number --jq '.[]')" ]; then
+            echo "Pull request for $BRANCH already exists."
+          else
+            gh pr create --base master --head "$BRANCH" \
+              --title "Release $VERSION" \
+              --body "Merges release branch \`$BRANCH\` (release $VERSION) back into master."
+          fi

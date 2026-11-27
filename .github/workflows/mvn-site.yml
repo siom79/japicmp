@@ -2,6 +2,13 @@ name: Build & Deploy Maven Site
 
 on:
     workflow_dispatch:
+    workflow_call:
+        inputs:
+            ref:
+                description: "Git ref (e.g. release tag) to build the site from"
+                type: string
+                required: false
+                default: ""
 
 permissions:
     contents: read
@@ -15,6 +22,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.ref }}
 
             - name: Set up Java
               uses: actions/setup-java@v4
